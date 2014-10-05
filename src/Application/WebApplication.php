@@ -14,6 +14,8 @@ use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
 use Windwalker\Core\Error\SimpleErrorHandler;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
@@ -112,6 +114,8 @@ class WebApplication extends AbstractWebApplication
 			->registerServiceProvider(new WebProvider($this));
 
 		static::registerProviders($this->container);
+
+		PackageHelper::registerPackages(static::getPackages(), $this, $this->container);
 	}
 
 	/**
@@ -212,6 +216,8 @@ class WebApplication extends AbstractWebApplication
 		{
 			$routes = $this->loadRoutingConfiguration();
 
+			$routes = array_merge($routes, $this->loadPackagesRouting());
+
 			foreach ($routes as $name => $route)
 			{
 				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
@@ -225,6 +231,33 @@ class WebApplication extends AbstractWebApplication
 		}
 
 		return $router;
+	}
+
+	/**
+	 * loadRoutingFromPackages
+	 *
+	 * @return  array
+	 */
+	protected function loadPackagesRouting()
+	{
+		$packages = $this->config->get('packages');
+
+		$routing = array();
+
+		foreach ((array) $packages as $name => $package)
+		{
+			$class = $package['class'];
+
+			/** @var AbstractPackage $class */
+			$routes = $class::loadRouting();
+
+			foreach ((array) $routes as $key => $route)
+			{
+				$routing[$name . ':' . $key] = $route;
+			}
+		}
+
+		return $routing;
 	}
 
 	/**

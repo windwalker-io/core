@@ -10,6 +10,7 @@ namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 
 /**
@@ -30,6 +31,8 @@ abstract class PackageHelper
 	 */
 	public static function registerPackages($packages, $application, $container)
 	{
+		$config = Ioc::getConfig();
+
 		foreach ($packages as $package)
 		{
 			if (is_string($package))
@@ -44,6 +47,16 @@ abstract class PackageHelper
 			{
 				$package->registerCommands($application);
 			}
+
+			$pkgConfig = array(
+				'name' => $package->getName(),
+				'class' => get_class($package),
+				'config' => $package::loadConfig()
+			);
+
+			$config->set('packages.' . $package->getName(), $pkgConfig);
+
+			$container->set('package.' . $package->getName(), $package);
 		}
 	}
 }

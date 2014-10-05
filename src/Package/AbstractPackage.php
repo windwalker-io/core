@@ -8,10 +8,13 @@
 
 namespace Windwalker\Core\Package;
 
+use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 use Windwalker\Filesystem\Path\PathLocator;
+use Windwalker\Registry\Registry;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractPackage class.
@@ -98,6 +101,61 @@ class AbstractPackage
 	 */
 	public static function registerProviders(Container $container)
 	{
+	}
+
+	/**
+	 * loadConfiguration
+	 *
+	 * @throws  \RuntimeException
+	 * @return  array
+	 */
+	public static function loadConfig()
+	{
+		$file = static::getDir() . '/config.yml';
+
+		if (!is_file($file))
+		{
+			return null;
+		}
+
+		return Yaml::parse(file_get_contents($file));
+	}
+
+	/**
+	 * loadRouting
+	 *
+	 * @return  mixed
+	 */
+	public static function loadRouting()
+	{
+		$file = static::getDir() . '/routing.yml';
+
+		if (!is_file($file))
+		{
+			return null;
+		}
+
+		return Yaml::parse(file_get_contents($file));
+	}
+
+	/**
+	 * getRoot
+	 *
+	 * @return  string
+	 */
+	public static function getFile()
+	{
+		return ReflectionHelper::getPath(get_called_class());
+	}
+
+	/**
+	 * getDir
+	 *
+	 * @return  string
+	 */
+	public static function getDir()
+	{
+		return dirname(static::getFile());
 	}
 
 	/**
