@@ -9,8 +9,7 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
-use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Ioc;
+use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 
 /**
@@ -23,9 +22,9 @@ abstract class PackageHelper
 	/**
 	 * registerPackages
 	 *
-	 * @param array|AbstractPackage  $packages
-	 * @param WebApplication|Console $application
-	 * @param Container              $container
+	 * @param array|AbstractPackage            $packages
+	 * @param WindwalkerWebApplication|Console $application
+	 * @param Container                        $container
 	 *
 	 * @return  void
 	 */

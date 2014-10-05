@@ -101,6 +101,16 @@ abstract class Ioc
 	}
 
 	/**
+	 * getDispatcher
+	 *
+	 * @return  \Windwalker\Event\Dispatcher
+	 */
+	public static function getDispatcher()
+	{
+		return static::get('dispatcher');
+	}
+
+	/**
 	 * getSession
 	 *
 	 * @return  \Windwalker\Session\Session
@@ -184,7 +194,7 @@ abstract class Ioc
 
 		$config = $container->get('system.config');
 
-		$alias = $config->get('registry.' . $key, $key);
+		$alias = $config->get('ioc.registry.' . $key, $key);
 
 		if (!$container->exists($alias))
 		{
@@ -196,7 +206,7 @@ abstract class Ioc
 			return null;
 		}
 
-		return $container->get($key, $forceNew);
+		return $container->get($alias, $forceNew);
 	}
 }
  

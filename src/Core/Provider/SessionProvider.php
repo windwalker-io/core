@@ -35,8 +35,8 @@ class SessionProvider implements ServiceProviderInterface
 			/** @var \Windwalker\Registry\Registry $config */
 			$config = $container->get('system.config');
 
-			$handler = $config->get('session.handler', 'native');
-			$options = $config->get('session.options', array());
+			$handler  = $config->get('session.handler', 'native');
+			$options  = (array) $config->get('session', array());
 
 			return new Session($self->getHandler($handler), null, null, null, $options);
 		};

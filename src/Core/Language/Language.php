@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Language;
 
-use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Facade\Facade;
 use Windwalker\Language\Language as WindwalkerLanguage;
 use Windwalker\Language\LanguageNormalize;

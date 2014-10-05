@@ -10,10 +10,9 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Core\Application\Console;
-use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
 
 /**
  * The SystemProvider class.
@@ -25,7 +24,7 @@ class SystemProvider implements ServiceProviderInterface
 	/**
 	 * Property app.
 	 *
-	 * @var AbstractWebApplication|WebApplication|Console
+	 * @var AbstractWebApplication|WindwalkerWebApplication|Console
 	 */
 	protected $app;
 
@@ -49,6 +48,7 @@ class SystemProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		$container->share('system.application', $this->app)
+			// ->alias('application', 'system.application')
 			->alias('app', 'system.application');
 
 		$container->share('system.config', $this->app->config)

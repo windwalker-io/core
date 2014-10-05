@@ -26,16 +26,13 @@ class ViewHelper extends AbstractHelper
 	 */
 	public static function getGlobalVariables()
 	{
-		$container = Ioc::getContainer();
-
 		return array(
-			'uri' => $container->get('uri'),
-			'app' => $container->get('system.application'),
+			'uri' => Ioc::get('uri'),
+			'app' => Ioc::getApplication(),
 			'container' => Ioc::getContainer(),
 			'helper' => new HelperSet,
-			'flash' => $container->get('session')->getFlashBag()->takeAll(),
-			'datetime' => new Date('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
+			'flash' => Ioc::getSession()->getFlashBag()->takeAll(),
+			'datetime' => new Date('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
 		);
 	}
 }
- 
