@@ -178,15 +178,20 @@ abstract class Ioc
 	 *
 	 * @return  mixed
 	 */
-	protected static function get($key, $forceNew = false)
+	public static function get($key, $forceNew = false)
 	{
 		$container = static::getContainer();
 
 		$config = $container->get('system.config');
 
-		$key = $config->get('registry.' . $key, 'system.' . $key);
+		$alias = $config->get('registry.' . $key, $key);
 
-		if (!$container->exists($key))
+		if (!$container->exists($alias))
+		{
+			$alias = $key;
+		}
+
+		if (!$container->exists($alias))
 		{
 			return null;
 		}
