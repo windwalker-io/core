@@ -1,0 +1,23 @@
+{
+	"name": "windwalker/core",
+	"description": "A modern PHP framework.",
+	"homepage": "https://github.com/ventoviro/windwalker-core",
+	"license": "GNU Lesser General Public License",
+	"minimum-stability": "dev",
+	"require" : {
+		"windwalker/framework" : "~2.0",
+		"symfony/yaml" : "2.*@stable"
+	},
+	"require-dev" : {
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Windwalker\\Core" : "src/"
+		}
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-master" : "2.0-dev"
+		}
+	}
+}
