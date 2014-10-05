@@ -8,10 +8,13 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Ioc;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Core\View\Helper\ViewHelper;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * Class HtmlView
@@ -39,15 +42,12 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 *
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
-	 *
-	 * @internal param \Windwalker\Model\ModelInterface $model The model object.
 	 */
 	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
 		parent::__construct($data, $renderer);
 
-		$this->renderer->addPath(WINDWALKER_TEMPLATE . '/_global', Priority::LOW);
-		$this->renderer->addPath(WINDWALKER_TEMPLATE . '/' . $this->getPackage() . '/' . $this->getName(), Priority::NORMAL);
+		$this->registerPaths();
 
 		$this->initialise();
 	}
@@ -119,6 +119,30 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$this->prepareGlobals($data);
 
 		return $this->renderer->render($this->getLayout(), (array) $data);
+	}
+
+	/**
+	 * registerPaths
+	 *
+	 * @return  void
+	 */
+	protected function registerPaths()
+	{
+		$paths = $this->renderer->getPaths();
+
+		$viewTmpl = dirname(ReflectionHelper::getPath($this)) . '/../../Templates/' . $this->getName();
+
+		if (is_dir($viewTmpl))
+		{
+			$paths->insert(realpath($viewTmpl), Priority::NORMAL);
+		}
+
+		$paths = Priority::createQueue(
+			array_merge(iterator_to_array($paths), iterator_to_array(RendererHelper::getGlobalPaths())),
+			Priority::LOW
+		);
+
+		$this->renderer->setPaths($paths);
 	}
 
 	/**

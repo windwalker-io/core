@@ -9,11 +9,12 @@
 namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Ioc;
 
 /**
  * Class Migration
  */
-class MigrationCommand extends Command
+class PhinxCommand extends Command
 {
 	/**
 	 * An enabled flag.
@@ -27,7 +28,7 @@ class MigrationCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $name = 'migration';
+	protected $name = 'phinx';
 
 	/**
 	 * The command description.
@@ -67,10 +68,12 @@ class MigrationCommand extends Command
 		array_shift($argv);
 		array_shift($argv);
 
+		$server = Ioc::getEnvironment()->server;
+
 		if ($argv >= 2)
 		{
 			$argv[] = '-c';
-			$argv[] = realpath(__DIR__ . '/../etc/phinx.config.php');
+			$argv[] = realpath(dirname($server->getEntry()) . '/../etc/phinx.config.php');
 		}
 
 		$out = system('php ' . WINDWALKER_VENDOR . '/robmorgan/phinx/bin/phinx ' . implode(' ', $argv));

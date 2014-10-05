@@ -63,7 +63,7 @@ abstract class Ioc
 	/**
 	 * getApplication
 	 *
-	 * @return  \Windwalker\Application\Application
+	 * @return  \Windwalker\Application\Application|\Windwalker\Core\Console\Console
 	 */
 	public static function getApplication()
 	{

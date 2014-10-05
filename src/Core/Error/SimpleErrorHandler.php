@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Error;
 
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Ioc;
 use Windwalker\Renderer\PhpRenderer;
 
 /**
@@ -71,13 +73,15 @@ class SimpleErrorHandler
 	 */
 	protected static function respond($exception)
 	{
-		$body = (new PhpRenderer(__DIR__ . '/../Resources/Template'))->render('error.error', array('exception' => $exception));
+		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
+
+		$body = $renderer->render('error.error', array('exception' => $exception));
 
 		$app = new WebApplication;
 
 		$app->setBody($body)->respond();
 
-		die;
+		exit();
 	}
 
 	/**

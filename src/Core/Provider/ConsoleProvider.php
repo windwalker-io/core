@@ -8,9 +8,10 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Application\Console;
+use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Environment\Environment;
 
 /**
  * The ConsoleProvider class.
@@ -22,16 +23,16 @@ class ConsoleProvider implements ServiceProviderInterface
 	/**
 	 * Property app.
 	 *
-	 * @var Console
+	 * @var WindwalkerConsole
 	 */
 	protected $app;
 
 	/**
 	 * Class init.
 	 *
-	 * @param Console $app
+	 * @param WindwalkerConsole $app
 	 */
-	public function __construct(Console $app)
+	public function __construct(WindwalkerConsole $app)
 	{
 		$this->app = $app;
 	}
@@ -49,12 +50,21 @@ class ConsoleProvider implements ServiceProviderInterface
 		$container->share('system.io', $this->app->io)
 			->alias('io', 'system.io');
 
+		$closure = function(Container $container)
+		{
+			return new Environment;
+		};
+
 		// Environment
-//		$container->share('system.environment', $this->app->getEnvironment())
-//			->alias('environment', 'system.environment');
-//
-//		$container->share('system.client', $this->app->getEnvironment()->getClient());
-//		$container->share('system.server', $this->app->getEnvironment()->getServer());
+		$container->share('system.environment', $closure)
+			->alias('environment', 'system.environment');
+
+		$closure = function(Container $container)
+		{
+			return $container->get('system.environment')->server;
+		};
+
+		$container->share('system.server', $closure);
 	}
 }
  
