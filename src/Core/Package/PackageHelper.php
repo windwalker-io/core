@@ -31,7 +31,7 @@ abstract class PackageHelper
 	 */
 	public static function registerPackages($packages, $application, $container)
 	{
-		$config = Ioc::getConfig();
+		$config = $container->get('system.config');
 
 		foreach ($packages as $package)
 		{

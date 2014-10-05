@@ -209,7 +209,6 @@ class WebApplication extends AbstractWebApplication
 	{
 		static $registered = false;
 
-		/** @var \Windwalker\Router\Router $router */
 		$router = $this->container->get('system.router');
 
 		if (!$registered)
