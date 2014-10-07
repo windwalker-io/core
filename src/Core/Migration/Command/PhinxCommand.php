@@ -81,7 +81,7 @@ class PhinxCommand extends Command
 
 		if ($argv >= 2)
 		{
-			$argv[] = '-c="' . realpath(dirname($server->getEntry()) . '/../etc/phinx.config.php') . '"';
+			$argv[] = '--configuration="' . realpath(dirname($server->getEntry()) . '/../etc/phinx.config.php') . '"';
 		}
 
 		$out = system('php ' . WINDWALKER_VENDOR . '/robmorgan/phinx/bin/phinx ' . implode(' ', $argv));
