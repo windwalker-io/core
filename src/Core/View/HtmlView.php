@@ -177,6 +177,20 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		return $this->name;
 	}
+	
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+
+		return $this;
+	}
 
 	/**
 	 * Method to get property Package
