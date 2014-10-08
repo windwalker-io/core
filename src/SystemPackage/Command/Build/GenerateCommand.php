@@ -7,15 +7,15 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Windwalker\SystemPackage\Command\Build\Generate;
+namespace Windwalker\SystemPackage\Command\Build;
 
-use Windwalker\Core\Command\AbstractCommand;
+use Windwalker\Console\Command\Command;
 use Windwalker\Filesystem\File;
 
 /**
  * Class GenerateCommand
  */
-class GenerateCommand extends AbstractCommand
+class GenerateCommand extends Command
 {
 	/**
 	 * An enabled flag.

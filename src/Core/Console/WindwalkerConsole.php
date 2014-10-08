@@ -21,6 +21,7 @@ use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
+use Windwalker\Windwalker;
 
 /**
  * The Console class.
@@ -75,7 +76,7 @@ class WindwalkerConsole extends \Windwalker\Console\Console implements Dispatche
 
 		static::registerProviders($this->container);
 
-		PackageHelper::registerPackages(Application::getPackages(), $this, $this->container);
+		PackageHelper::registerPackages(Windwalker::getPackages(), $this, $this->container);
 	}
 
 	/**

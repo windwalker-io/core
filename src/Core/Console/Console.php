@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Console;
 
 use Windwalker\Core\Migration\Command\PhinxCommand;
+use Windwalker\Core\Seeder\Command\SeedCommand;
+use Windwalker\Windwalker;
 
 /**
  * The WindwalkerConsole class.
@@ -24,9 +26,12 @@ class Console extends WindwalkerConsole
 	 */
 	protected function initialise()
 	{
+		Windwalker::prepareSystemPath($this->config);
+
 		parent::initialise();
 
 		$this->addCommand(new PhinxCommand);
+		$this->addCommand(new SeedCommand);
 	}
 }
  

@@ -183,12 +183,12 @@ class AbstractPackage
 		foreach ($path as $file)
 		{
 			/** @var \SplFileInfo $file */
-			if (!$file->isDir())
+			if (!$file->isFile())
 			{
 				continue;
 			}
 
-			$class = $namespace . '\\Command\\' . $file->getBasename() . '\\' . $file->getBasename() . 'Command';
+			$class = $namespace . '\\Command\\' . $file->getBasename('.php');
 
 			$enabled = property_exists($class, 'isEnabled') ? $class::$isEnabled : true;
 

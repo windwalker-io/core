@@ -60,6 +60,8 @@ class WindwalkerWebApplication extends WebApplication implements DispatcherAware
 	 */
 	protected function initialise()
 	{
+		$this->prepareSystemPath($this->config);
+
 		$this->container = Ioc::getContainer();
 
 		$this->loadConfiguration($this->config);
@@ -384,6 +386,17 @@ class WindwalkerWebApplication extends WebApplication implements DispatcherAware
 		$dispatcher->triggerEvent($event);
 
 		return $this;
+	}
+
+	/**
+	 * prepareSystemPath
+	 *
+	 * @param Registry $config
+	 *
+	 * @return  void
+	 */
+	public static function prepareSystemPath(Registry $config)
+	{
 	}
 }
  

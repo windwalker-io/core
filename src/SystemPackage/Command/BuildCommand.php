@@ -1,15 +1,16 @@
 <?php
 
-namespace Windwalker\SystemPackage\Command\Build;
+namespace Windwalker\SystemPackage\Command;
 
-use Windwalker\Core\Command\AbstractCommand;
+use Windwalker\Console\Command\Command;
+use Windwalker\SystemPackage\Command\Build\GenerateCommand;
 
 /**
  * Class BuildCommand
  *
  * @since 1.0
  */
-class BuildCommand extends AbstractCommand
+class BuildCommand extends Command
 {
 	/**
 	 * An enabled flag.
@@ -32,13 +33,10 @@ class BuildCommand extends AbstractCommand
 	 */
 	protected $description = 'Some useful tools for building system.';
 
-	/**
-	 * configure
-	 *
-	 * @return  void
-	 */
-	public function configure()
+	protected function initialise()
 	{
-		parent::configure();
+		$this->addCommand(new GenerateCommand);
+
+  		parent::initialise();
 	}
 }

@@ -22,6 +22,7 @@ class AbstractCommand extends Command
 	{
 		parent::__construct($name, $io, $parent);
 
+		/*
 		$ref = new \ReflectionClass($this);
 
 		// Register sub commands
@@ -43,6 +44,7 @@ class AbstractCommand extends Command
 				$this->addCommand(new $class);
 			}
 		}
+		*/
 	}
 }
  
