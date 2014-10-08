@@ -37,7 +37,7 @@ class SeedCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $description = 'seed';
+	protected $description = 'The data seeder help you create fake data.';
 
 	/**
 	 * The usage to tell user how to use this command.

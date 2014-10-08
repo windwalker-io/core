@@ -53,7 +53,7 @@ abstract class PackageHelper
 				'config' => $package::loadConfig()
 			);
 
-			$config->set('packages.' . $package->getName(), $pkgConfig);
+			$config->set('package.' . $package->getName(), $pkgConfig);
 
 			$container->set('package.' . $package->getName(), $package);
 		}

@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Language;
 
 use Windwalker\Core\Facade\Facade;
+use Windwalker\Core\Ioc;
 use Windwalker\Language\Language as WindwalkerLanguage;
 use Windwalker\Language\LanguageNormalize;
 
@@ -29,16 +30,17 @@ abstract class Language extends Facade
 	/**
 	 * load
 	 *
-	 * @param string $file
+	 * @param string  $file
+	 * @param string  $package
 	 *
 	 * @return  void
 	 */
-	public static function load($file)
+	public static function load($file, $package = null)
 	{
 		/** @var WindwalkerLanguage $language */
 		$language = static::getInstance();
 
-		$config = static::getContainer()->get('system.config');
+		$config = Ioc::getConfig();
 
 		$format  = $config['language.format']  ? : 'ini';
 		$default = $config['language.default'] ? : 'en-GB';
@@ -47,14 +49,56 @@ abstract class Language extends Facade
 		$default = LanguageNormalize::toLanguageTag($default);
 		$locale = LanguageNormalize::toLanguageTag($locale);
 
-		$path = '%s/%s.%s';
+		// If package name exists, we load package language first, that global can override it.
+		if ($package)
+		{
+			$package = Ioc::get('package.' . $package);
 
-		$language->load(sprintf($path, $default, $file, $format), $format);
+			$path = $package->getDir() . '/Languages/%s/%s.%s';
+
+			// Get Package language
+			static::loadFile(sprintf($path, $default, $file, $format), $format);
+
+			// If locale not equals default locale, load it to override default
+			if ($locale != $default)
+			{
+				static::loadFile(sprintf($path, $locale, $file, $format), $format);
+			}
+		}
+
+		// Get Global language
+		$path = $config->get('path.languages') . '/%s/%s.%s';
+
+		static::loadFile(sprintf($path, $default, $file, $format), $format);
 
 		// If locale not equals default locale, load it to override default
 		if ($locale != $default)
 		{
-			$language->load(sprintf($path, $locale, $file, $format), $format);
+			static::loadFile(sprintf($path, $locale, $file, $format), $format);
+		}
+	}
+
+	/**
+	 * loadFile
+	 *
+	 * @param string $file
+	 * @param string $format
+	 *
+	 * @return  void
+	 */
+	protected static function loadFile($file, $format)
+	{
+		if (is_file($file))
+		{
+			static::getInstance()->load($file, $format);
+
+			$config = Ioc::getConfig();
+
+			$loaded = $config['language.loaded'];
+
+			$loaded[] = $file;
+
+			$config->set('language.loaded', $loaded);
 		}
 	}
 

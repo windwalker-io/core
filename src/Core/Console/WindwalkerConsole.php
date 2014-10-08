@@ -8,7 +8,10 @@
 
 namespace Windwalker\Core\Console;
 
-use Windwalker\Application\Application;
+use Windwalker\Console\Console;
+use Windwalker\Core\Console\Descriptor\CommandDescriptor;
+use Windwalker\Core\Migration\Command\PhinxCommand;
+use Windwalker\Core\Seeder\Command\SeedCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Provider\CacheProvider;
@@ -21,14 +24,13 @@ use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
-use Windwalker\Windwalker;
 
 /**
  * The Console class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class WindwalkerConsole extends \Windwalker\Console\Console implements DispatcherAwareInterface
+class WindwalkerConsole extends Console implements DispatcherAwareInterface
 {
 	/**
 	 * The Console title.
@@ -65,18 +67,32 @@ class WindwalkerConsole extends \Windwalker\Console\Console implements Dispatche
 	 */
 	protected function initialise()
 	{
+		// Load config
 		$this->loadConfiguration($this->config);
 
+		// Register the root command to let packages can add child commands
 		$this->registerRootCommand();
 
-		$this->container = $this->container = Ioc::getContainer();
+		// Init container and register system providers
+		$this->container = Ioc::getContainer();
 
 		$this->container->registerServiceProvider(new SystemProvider($this))
 			->registerServiceProvider(new ConsoleProvider($this));
 
-		static::registerProviders($this->container);
+		// Register custom providers
+		$this->registerProviders($this->container);
 
-		PackageHelper::registerPackages(Windwalker::getPackages(), $this, $this->container);
+		// Register commands
+		$this->registerCommands();
+
+		// Load packages
+		PackageHelper::registerPackages($this->getPackages(), $this, $this->container);
+	}
+
+	public function registerCommands()
+	{
+		$this->addCommand(new PhinxCommand);
+		$this->addCommand(new SeedCommand);
 	}
 
 	/**
@@ -86,13 +102,23 @@ class WindwalkerConsole extends \Windwalker\Console\Console implements Dispatche
 	 *
 	 * @return  void
 	 */
-	public static function registerProviders(Container $container)
+	public function registerProviders(Container $container)
 	{
 		$container
 			->registerServiceProvider(new EventProvider)
 			->registerServiceProvider(new DatabaseProvider)
 			->registerServiceProvider(new LanguageProvider)
 			->registerServiceProvider(new CacheProvider);
+	}
+
+	/**
+	 * getPackages
+	 *
+	 * @return  array
+	 */
+	public function getPackages()
+	{
+		return array();
 	}
 
 	/**
@@ -124,14 +150,6 @@ class WindwalkerConsole extends \Windwalker\Console\Console implements Dispatche
 	 */
 	protected function loadConfiguration($config)
 	{
-		$file = WINDWALKER_ETC . '/config.yml';
-
-		if (!is_file($file))
-		{
-			exit('Please copy config.dist.yml to config.yml');
-		}
-
-		$config->loadFile($file, 'yaml');
 	}
 
 	/**

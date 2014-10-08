@@ -36,21 +36,10 @@ class LanguageProvider implements ServiceProviderInterface
 
 			$debug     = $config['system.debug'] ? : false;
 			$langDebug = $config['language.debug'] ? : false;
-			$path      = $config['language.path'] ? : 'resources/languages';
-
-			$path = $container->get('environment')->server->getRoot() . '/../' . $path;
-
-			if (is_dir($path))
-			{
-				$path = realpath($path);
-			}
-
-			$loader = new FileLoader(array($path));
 
 			$language = new Language(
 				$config->get('language.locale', 'en-GB'),
-				$config->get('language.default', 'en-GB'),
-				$loader
+				$config->get('language.default', 'en-GB')
 			);
 
 			return $language->setDebug(($debug && $langDebug));

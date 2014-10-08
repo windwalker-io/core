@@ -72,7 +72,6 @@ abstract class RendererHelper
 	 */
 	protected static function registerPaths()
 	{
-		$server = Ioc::getEnvironment()->server;
 		$config = Ioc::getConfig();
 
 		static::$paths->insert(
@@ -81,7 +80,7 @@ abstract class RendererHelper
 		);
 
 		static::$paths->insert(
-			realpath($server->getRoot() . '/../' . $config->get('view.template.global') . '/_global'),
+			realpath($config->get('path.templates') . '/_global'),
 			Priority::LOW
 		);
 	}

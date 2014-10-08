@@ -40,6 +40,13 @@ abstract class Facade
 	protected static $container;
 
 	/**
+	 * Property instance.
+	 *
+	 * @var mixed
+	 */
+	protected static $instance;
+
+	/**
 	 * getInstance
 	 *
 	 * @return  mixed|object
@@ -51,7 +58,12 @@ abstract class Facade
 			throw new \LogicException('Key not set');
 		}
 
-		return static::getContainer()->get(static::$key);
+		if (!static::$instance)
+		{
+			static::$instance = static::getContainer()->get(static::$key);
+		}
+
+		return static::$instance;
 	}
 
 	/**
@@ -79,6 +91,60 @@ abstract class Facade
 	public static function setContainer($container)
 	{
 		self::$container = $container;
+	}
+
+	/**
+	 * reset
+	 *
+	 * @return  void
+	 */
+	public static function reset()
+	{
+		static::$instance = null;
+	}
+
+	/**
+	 * Method to get property Key
+	 *
+	 * @return  string
+	 */
+	public static function getKey()
+	{
+		return static::$key;
+	}
+
+	/**
+	 * Method to set property key
+	 *
+	 * @param   string $key
+	 *
+	 * @return  void
+	 */
+	public static function setKey($key)
+	{
+		self::$key = $key;
+	}
+
+	/**
+	 * Method to get property Name
+	 *
+	 * @return  string
+	 */
+	public static function getName()
+	{
+		return static::$name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  void
+	 */
+	public static function setName($name)
+	{
+		self::$name = $name;
 	}
 }
  

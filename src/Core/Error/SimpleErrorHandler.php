@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Error;
 
+use Windwalker\Application\Web\Response;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Ioc;
@@ -77,7 +78,7 @@ class SimpleErrorHandler
 
 		$body = $renderer->render('error.error', array('exception' => $exception));
 
-		$app = new WebApplication;
+		$app = new Response;
 
 		$app->setBody($body)->respond();
 

@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Application\AbstractWebApplication;
+use Windwalker\Web\AbstractWebApplication;
 use Windwalker\Core\Application\Console;
 use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
