@@ -79,6 +79,6 @@ class PhinxCommand extends Command
 
 		$_SERVER['argv'] = $argv;
 
-		include WINDWALKER_VENDOR . '/robmorgan/phinx/bin/phinx';
+		include Ioc::getConfig()->get('path.vendor') . '/robmorgan/phinx/bin/phinx';
 	}
 }

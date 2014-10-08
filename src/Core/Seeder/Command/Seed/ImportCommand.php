@@ -10,6 +10,7 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
+use Windwalker\String\StringNormalise;
 
 /**
  * Class Seed
@@ -63,9 +64,11 @@ class ImportCommand extends Command
 	{
 		$class = $this->getOption('class');
 
+		$class = StringNormalise::toClassNamespace($class);
+
 		if (!class_exists($class))
 		{
-			include_once Ioc::getConfig()->get('path.seeders') . '/' . $class . '.php';
+			include_once Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
 		}
 
 		if (!class_exists($class))

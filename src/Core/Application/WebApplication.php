@@ -157,12 +157,16 @@ class WebApplication extends AbstractWebApplication
 	 */
 	public function execute()
 	{
+		$this->prepareExecute();
+
 		$this->triggerEvent('onBeforeExecute');
 
 		// Perform application routines.
 		$this->doExecute();
 
 		$this->triggerEvent('onAfterExecute');
+
+		$this->postExecute();
 
 		$this->triggerEvent('onBeforeRespond');
 
@@ -300,7 +304,7 @@ class WebApplication extends AbstractWebApplication
 	 */
 	protected function loadPackagesRouting()
 	{
-		$packages = $this->config->get('packages');
+		$packages = $this->config->get('package');
 
 		$routing = array();
 

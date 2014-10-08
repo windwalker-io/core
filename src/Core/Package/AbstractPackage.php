@@ -44,6 +44,11 @@ class AbstractPackage
 	 */
 	public function initialise()
 	{
+		if (!$this->name)
+		{
+			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
+		}
+
 		$this->registerProviders($this->getContainer());
 	}
 
