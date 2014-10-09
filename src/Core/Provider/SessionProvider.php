@@ -38,7 +38,11 @@ class SessionProvider implements ServiceProviderInterface
 			$handler  = $config->get('session.handler', 'native');
 			$options  = (array) $config->get('session', array());
 
-			return new Session($self->getHandler($handler), null, null, null, $options);
+			$sesion = new Session($self->getHandler($handler), null, null, null, $options);
+
+			$sesion->start();
+
+			return $sesion;
 		};
 
 		$container->share('system.session', $closure)
