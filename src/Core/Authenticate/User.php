@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Auth;
+namespace Windwalker\Core\Authenticate;
 
 use Windwalker\Authenticate\Authenticate;
 use Windwalker\Authenticate\Credential;
@@ -16,18 +16,17 @@ use Windwalker\Core\Facade\Facade;
 use Windwalker\Core\Ioc;
 use Windwalker\Data\Data;
 use Windwalker\Event\Dispatcher;
-use Windwalker\Event\Event;
 use Windwalker\Registry\Registry;
 
 /**
  * The User class.
  *
- * @method boolean          authenticate()   authenticate(Credential $credential)
- * @method integer[]        getResults()     getResults()
- * @method Credential       getCredential()  getCredential()
- * @method MethodInterface  getMethod()      getMethod($name)
- * @method Authenticate     removeMethod()   removeMethod($name)
- * @method Authenticate     addMethod()      addMethod($name, MethodInterface $method)
+ * @method static boolean          authenticate()   authenticate(Credential $credential)
+ * @method static integer[]        getResults()     getResults()
+ * @method static Credential       getCredential()  getCredential()
+ * @method static MethodInterface  getMethod()      getMethod($name)
+ * @method static Authenticate     removeMethod()   removeMethod($name)
+ * @method static Authenticate     addMethod()      addMethod($name, MethodInterface $method)
  *
  * @since  {DEPLOY_VERSION}
  */
@@ -58,13 +57,14 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 * login
 	 *
 	 * @param array|object $credential
+	 * @param bool         $remember
 	 * @param array        $options
 	 *
 	 * @return  boolean
 	 */
-	public static function login($credential, $options = array())
+	public static function login($credential, $remember = false, $options = array())
 	{
-		if (!is_array($credential) || !is_object($credential))
+		if (!is_array($credential) && !is_object($credential))
 		{
 			throw new \InvalidArgumentException('Credential should be array or object.');
 		}
@@ -76,10 +76,14 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$options = $options instanceof Registry ? $options : new Registry($options);
 
+		$options['remember'] = $remember;
+
 		static::triggerEvent('onUserBeforeLogin', array('credential' => $credential, 'options' => $options));
 
 		if (!static::authenticate($credential))
 		{
+			static::triggerEvent('onUserLoginFailure', array('credential' => $credential, 'results' => static::getResults(), 'options' => $options));
+
 			return false;
 		}
 
@@ -97,13 +101,14 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	/**
 	 * logout
 	 *
-	 * @param array $options
+	 * @param array|object $credential
+	 * @param array        $options
 	 *
 	 * @return  boolean
 	 */
 	public static function logout($credential, $options = array())
 	{
-		if (!is_array($credential) || !is_object($credential))
+		if (!is_array($credential) && !is_object($credential))
 		{
 			throw new \InvalidArgumentException('Credential should be array or object.');
 		}
@@ -115,9 +120,13 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$options = $options instanceof Registry ? $options : new Registry($options);
 
+		static::triggerEvent('onUserBeforeLogout', array('credential' => $credential, 'options' => $options));
+
 		$session = Ioc::getSession();
 
 		$session->clear('user');
+
+		static::triggerEvent('onUserAfterLogout', array('credential' => $credential, 'options' => $options));
 
 		return true;
 	}
@@ -136,12 +145,21 @@ class User extends Facade implements DispatcherAwareStaticInterface
 			$conditions = get_object_vars($conditions);
 		}
 
-		if (!is_array($conditions))
+		if (!$conditions)
 		{
-			$conditions = array('id' => $conditions);
-		}
+			$session = Ioc::getSession();
 
-		$user = static::$handler->load($conditions);
+			$user = $session->get('user');
+		}
+		else
+		{
+			if (!is_array($conditions))
+			{
+				$conditions = array('id' => $conditions);
+			}
+
+			$user = static::$handler->load($conditions);
+		}
 
 		if (!$user)
 		{
@@ -162,7 +180,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 */
 	public static function save($user = array(), $options = array())
 	{
-		if (!is_array($user) || !is_object($user))
+		if (!is_array($user) && !is_object($user))
 		{
 			throw new \InvalidArgumentException('User data should be array or object.');
 		}
@@ -176,31 +194,60 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		static::triggerEvent('onUserBeforeSave', array('user' => $user, 'options' => $options));
 
-		$event = new Event('onUserAfterSave');
-
-		$event['user'] = $user;
-		$event['options'] = $options;
-		$event['success'] = true;
-		$event['message'] = null;
-
 		try
 		{
 			static::$handler->save($user);
 		}
 		catch (\Exception $e)
 		{
-			$event['success'] = false;
-			$event['message'] = $e->getMessage();
+			static::triggerEvent('onUserSaveFailure', array('user' => $user, 'exception' => $e, 'options' => $options));
+
+			throw $e;
 		}
 
-		static::triggerEvent($event);
-
-		if (!$event['success'])
-		{
-			throw new \Exception($event['message']);
-		}
+		static::triggerEvent('onUserAfterSave', array('user' => $user, 'options' => $options));
 
 		return $user;
+	}
+
+	/**
+	 * delete
+	 *
+	 * @param mixed $conditions
+	 * @param array $options
+	 *
+	 * @return  boolean
+	 */
+	public function delete($conditions = array(), $options = array())
+	{
+		if (is_object($conditions))
+		{
+			$conditions = get_object_vars($conditions);
+		}
+
+		if (!is_array($conditions))
+		{
+			$conditions = array('id' => $conditions);
+		}
+
+		$options = ($options instanceof Registry) ? $options : new Registry($options);
+
+		static::triggerEvent('onUserBeforeDelete', array('conditions' => $conditions, 'options' => $options));
+
+		try
+		{
+			static::$handler->delete($conditions);
+		}
+		catch (\Exception $e)
+		{
+			static::triggerEvent('onUserDeleteFailure', array('conditions' => $conditions, 'exception' => $e, 'options' => $options));
+
+			return false;
+		}
+
+		static::triggerEvent('onUseAfterDelete', array('conditions' => $conditions, 'options' => $options));
+
+		return true;
 	}
 
 	/**

@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Auth\Method;
+namespace Windwalker\Core\Authenticate\Method;
 
 use Windwalker\Authenticate\Authenticate;
 use Windwalker\Authenticate\Credential;
@@ -56,6 +56,10 @@ class DatabaseMethod extends AbstractMethod
 
 			return false;
 		}
+
+		unset($user->password);
+
+		$credential->bind($user);
 
 		$this->status = Authenticate::SUCCESS;
 

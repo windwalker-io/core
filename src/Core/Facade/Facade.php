@@ -67,6 +67,19 @@ abstract class Facade
 	}
 
 	/**
+	 * __callStatic
+	 *
+	 * @param string $name
+	 * @param array  $args
+	 *
+	 * @return  mixed
+	 */
+	public static function __callStatic($name, $args = array())
+	{
+		return call_user_func_array(array(static::getInstance(), $name), $args);
+	}
+
+	/**
 	 * Method to get property Container
 	 *
 	 * @return  Container

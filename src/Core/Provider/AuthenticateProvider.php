@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Authenticate\Authenticate;
-use Windwalker\Core\Auth\Method\DatabaseMethod;
+use Windwalker\Core\Authenticate\Method\DatabaseMethod;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 

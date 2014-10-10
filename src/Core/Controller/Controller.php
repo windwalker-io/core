@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Controller;
 
 use Windwalker\Controller\AbstractController;
-use Windwalker\Core\Application\WindwalkerWebApplication;
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\IO\Input;
 
 /**
@@ -29,7 +29,7 @@ abstract class Controller extends AbstractController
 	/**
 	 * Property app.
 	 *
-	 * @var  WindwalkerWebApplication
+	 * @var  WebApplication
 	 */
 	protected $app = null;
 
@@ -43,6 +43,13 @@ abstract class Controller extends AbstractController
 		'msg' => null,
 		'type' => null,
 	);
+
+	/**
+	 * Property mute.
+	 *
+	 * @var  boolean
+	 */
+	protected $mute = false;
 
 	/**
 	 * setRedirect
@@ -105,12 +112,36 @@ abstract class Controller extends AbstractController
 	 */
 	public function addFlash($msg, $type = 'info')
 	{
-		if ($this->input->get('quiet'))
+		if (!$this->mute)
 		{
 			$this->app->addFlash($msg, $type);
 		}
 
 		return $this;
+	}
+
+	/**
+	 * mute
+	 *
+	 * @param bool $bool
+	 *
+	 * @return  static
+	 */
+	public function mute($bool = true)
+	{
+		$this->mute = $bool;
+
+		return $this;
+	}
+
+	/**
+	 * isMute
+	 *
+	 * @return  bool
+	 */
+	public function isMute()
+	{
+		return $this->mute;
 	}
 }
  

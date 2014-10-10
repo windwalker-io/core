@@ -357,7 +357,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	public function addFlash($msg, $type = 'info')
 	{
 		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('system.session');
+		$session = Ioc::getSession();
 
 		$session->getFlashBag()->add($msg, $type);
 

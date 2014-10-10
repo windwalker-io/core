@@ -31,7 +31,7 @@ class ViewHelper extends AbstractHelper
 			'app' => Ioc::getApplication(),
 			'container' => Ioc::getContainer(),
 			'helper' => new HelperSet,
-			'flash' => Ioc::getSession()->getFlashBag()->takeAll(),
+			'flashes' => Ioc::getSession()->getFlashBag()->takeAll(),
 			'datetime' => new Date('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
 		);
 	}
