@@ -24,6 +24,7 @@ use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
 use Windwalker\Environment\Web\WebEnvironment;
+use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
@@ -34,7 +35,7 @@ use Windwalker\Router\Route;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class WebApplication extends AbstractWebApplication
+class WebApplication extends AbstractWebApplication implements DispatcherAwareInterface
 {
 	/**
 	 * Property env.
@@ -412,17 +413,18 @@ class WebApplication extends AbstractWebApplication
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments.
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
 	 * @since   {DEPLOY_VERSION}
 	 */
-	public function triggerEvent($event)
+	public function triggerEvent($event, $args = array())
 	{
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('system.dispatcher');
 
-		$dispatcher->triggerEvent($event);
+		$dispatcher->triggerEvent($event, $args);
 
 		return $this;
 	}

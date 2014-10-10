@@ -156,12 +156,13 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments.
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
 	 * @since   {DEPLOY_VERSION}
 	 */
-	public function triggerEvent($event)
+	public function triggerEvent($event, $args = array())
 	{
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('system.dispatcher');
