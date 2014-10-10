@@ -86,9 +86,14 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 		$this->registerCommands();
 
 		// Load packages
-		PackageHelper::registerPackages($this->getPackages(), $this, $this->container);
+		PackageHelper::registerPackages($this, $this->getPackages(), $this->container);
 	}
 
+	/**
+	 * registerCommands
+	 *
+	 * @return  void
+	 */
 	public function registerCommands()
 	{
 		$this->addCommand(new PhinxCommand);

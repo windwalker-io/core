@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Router\Router;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -15,7 +16,7 @@ use Windwalker\Utilities\ArrayHelper;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class RestfulRouter extends \Windwalker\Router\Router
+class RestfulRouter extends Router
 {
 	/**
 	 * An array of HTTP Method => controller suffix pairs for routing the request.
@@ -23,12 +24,12 @@ class RestfulRouter extends \Windwalker\Router\Router
 	 * @var  array
 	 */
 	protected $suffixMap = array(
-		'GET' => 'GetController',
-		'POST' => 'SaveController',
-		'PUT' => 'SaveController',
-		'PATCH' => 'SaveController',
-		'DELETE' => 'DeleteController',
-		'HEAD' => 'HeadController',
+		'GET'     => 'GetController',
+		'POST'    => 'SaveController',
+		'PUT'     => 'SaveController',
+		'PATCH'   => 'SaveController',
+		'DELETE'  => 'DeleteController',
+		'HEAD'    => 'HeadController',
 		'OPTIONS' => 'OptionsController'
 	);
 
@@ -60,6 +61,7 @@ class RestfulRouter extends \Windwalker\Router\Router
 	 * @param string $method
 	 * @param array  $options
 	 *
+	 * @throws  \UnexpectedValueException
 	 * @return  array|bool
 	 */
 	public function match($route, $method = 'GET', $options = array())
@@ -73,7 +75,10 @@ class RestfulRouter extends \Windwalker\Router\Router
 			throw new \UnexpectedValueException('Route profile should have "_controller" element');
 		}
 
-		$controller = trim($controller, '\\') . '\\' . $this->fetchControllerSuffix($method);
+		$variables['_suffix'] = ArrayHelper::getValue($variables, '_suffix', array());
+
+		// Suffix
+		$controller = trim($controller, '\\') . '\\' . $this->fetchControllerSuffix($method, $variables['_suffix']);
 
 		$variables['_controller'] = $this->controller = $controller;
 
@@ -108,12 +113,14 @@ class RestfulRouter extends \Windwalker\Router\Router
 	 * Get the controller class suffix string.
 	 *
 	 * @param string $method
+	 * @param array  $customSuffix
 	 *
+	 * @throws \RuntimeException
 	 * @return  string
 	 *
 	 * @since   {DEPLOY_VERSION}
 	 */
-	protected function fetchControllerSuffix($method = 'GET')
+	protected function fetchControllerSuffix($method = 'GET', $customSuffix = array())
 	{
 		$method = strtoupper($method);
 
@@ -124,19 +131,22 @@ class RestfulRouter extends \Windwalker\Router\Router
 		}
 
 		// Check if request method is POST
-		if ( $this->allowCustomMethod == true && strcmp(strtoupper($method), 'POST') === 0)
+		if ($this->allowCustomMethod == true)
 		{
 			// Get the method from input
-			$postMethod = $this->getCustomMethod();
-
-			// Validate that we have a map to handle the given HTTP method from input
-			if ($postMethod && isset($this->suffixMap[strtoupper($postMethod)]))
-			{
-				return ucfirst($this->suffixMap[strtoupper($postMethod)]);
-			}
+			$method = $this->getCustomMethod() ? : $method;
 		}
 
-		return ucfirst($this->suffixMap[$method]);
+		if (isset($customSuffix['*']))
+		{
+			return $customSuffix['*'];
+		}
+
+		$customSuffix = array_change_key_case($customSuffix, CASE_UPPER);
+
+		$suffix = array_merge($this->suffixMap, $customSuffix);
+
+		return trim($suffix[$method], '\\');
 	}
 
 	/**
@@ -198,4 +208,3 @@ class RestfulRouter extends \Windwalker\Router\Router
 		return $this->controller;
 	}
 }
- 

@@ -67,7 +67,7 @@ abstract class Ioc
 	 */
 	public static function getApplication()
 	{
-		return static::get('application');
+		return static::get('system.application');
 	}
 
 	/**
@@ -77,7 +77,7 @@ abstract class Ioc
 	 */
 	public static function getAuthenticate()
 	{
-		return static::get('authenticate');
+		return static::get('system.authenticate');
 	}
 
 	/**
@@ -87,7 +87,7 @@ abstract class Ioc
 	 */
 	public static function getConfig()
 	{
-		return static::get('config');
+		return static::get('system.config');
 	}
 
 	/**
@@ -97,7 +97,7 @@ abstract class Ioc
 	 */
 	public static function getEnvironment()
 	{
-		return static::get('environment');
+		return static::get('system.environment');
 	}
 
 	/**
@@ -107,7 +107,7 @@ abstract class Ioc
 	 */
 	public static function getInput()
 	{
-		return static::get('input');
+		return static::get('system.input');
 	}
 
 	/**
@@ -117,7 +117,7 @@ abstract class Ioc
 	 */
 	public static function getDispatcher()
 	{
-		return static::get('dispatcher');
+		return static::get('system.dispatcher');
 	}
 
 	/**
@@ -127,7 +127,7 @@ abstract class Ioc
 	 */
 	public static function getSession()
 	{
-		return static::get('session');
+		return static::get('system.session');
 	}
 
 	/**
@@ -137,7 +137,7 @@ abstract class Ioc
 	 */
 	public static function getCache()
 	{
-		return static::get('cache');
+		return static::get('system.cache');
 	}
 
 	/**
@@ -157,7 +157,7 @@ abstract class Ioc
 	 */
 	public static function getRouter()
 	{
-		return static::get('router');
+		return static::get('system.router');
 	}
 
 	/**
@@ -167,7 +167,7 @@ abstract class Ioc
 	 */
 	public static function getLanguage()
 	{
-		return static::get('language');
+		return static::get('system.language');
 	}
 
 	/**
@@ -177,7 +177,7 @@ abstract class Ioc
 	 */
 	public static function getDebugger()
 	{
-		return static::get('debugger');
+		return static::get('system.debugger');
 	}
 
 	/**
@@ -191,32 +191,61 @@ abstract class Ioc
 	}
 
 	/**
+	 * getPackage
+	 *
+	 * @param string $name
+	 *
+	 * @return  \Windwalker\Core\Package\AbstractPackage
+	 */
+	public static function getPackage($name)
+	{
+		return static::get('package.' . $name);
+	}
+
+	/**
 	 * get
 	 *
-	 * @param string $key
-	 * @param bool   $forceNew
+	 * @param string  $key
+	 * @param string  $child
+	 * @param bool    $forceNew
 	 *
 	 * @return  mixed
 	 */
-	public static function get($key, $forceNew = false)
+	public static function get($key, $child = null, $forceNew = false)
 	{
-		$container = static::getContainer();
+		$container = static::getContainer($child);
 
-		$config = $container->get('system.config');
-
-		$alias = $config->get('ioc.registry.' . $key, $key);
-
-		if (!$container->exists($alias))
-		{
-			$alias = $key;
-		}
-
-		if (!$container->exists($alias))
+		if (!$container->exists($key))
 		{
 			return null;
 		}
 
-		return $container->get($alias, $forceNew);
+		return $container->get($key, $forceNew);
+	}
+
+	/**
+	 * getNewInstance
+	 *
+	 * @param string $key
+	 * @param string $child
+	 *
+	 * @return  mixed
+	 */
+	public static function getNewInstance($key, $child = null)
+	{
+		return static::get($key, $child, true);
+	}
+
+	/**
+	 * exists
+	 *
+	 * @param string $key
+	 * @param string $child
+	 *
+	 * @return  boolean
+	 */
+	public static function exists($key, $child = null)
+	{
+		return static::getContainer($child)->exists($key);
 	}
 }
- 

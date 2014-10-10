@@ -12,8 +12,9 @@ use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
+use Windwalker\Event\Dispatcher;
+use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
-use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -40,6 +41,7 @@ class AbstractPackage
 	/**
 	 * initialise
 	 *
+	 * @throws  \LogicException
 	 * @return  void
 	 */
 	public function initialise()
@@ -49,7 +51,13 @@ class AbstractPackage
 			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
 		}
 
-		$this->registerProviders($this->getContainer());
+		$container = $this->getContainer();
+
+		$container->registerServiceProvider(new PackageProvider($this->getName(), $this));
+
+		$this->registerProviders($container);
+
+		$this->registerListeners($container->get('system.dispatcher'));
 	}
 
 	/**
@@ -98,14 +106,91 @@ class AbstractPackage
 	}
 
 	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+
+		return $this;
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $name
+	 * @param mixed  $default
+	 *
+	 * @return  mixed
+	 */
+	public function get($name, $default = null)
+	{
+		return $this->container->get('system.config')->get('package.' . $this->getName() . '.config.' . $name, $default);
+	}
+
+	/**
+	 * set
+	 *
+	 * @param string $name
+	 * @param mixed  $value
+	 *
+	 * @return  static
+	 */
+	public function set($name, $value)
+	{
+		$this->container->get('system.config')->set('package.' . $this->getName() . '.config.' . $name, $value);
+
+		return $this;
+	}
+
+	/**
 	 * Register providers.
 	 *
 	 * @param Container $container
 	 *
 	 * @return  void
 	 */
-	public static function registerProviders(Container $container)
+	public function registerProviders(Container $container)
 	{
+	}
+
+	/**
+	 * registerListeners
+	 *
+	 * @param Dispatcher $dispatcher
+	 *
+	 * @return  void
+	 */
+	public function registerListeners(Dispatcher $dispatcher)
+	{
+		$listeners = $this->get('listener', array());
+
+		$defaultOptions = array(
+			'class'    => '',
+			'priority' => ListenerPriority::NORMAL,
+			'enabled'  => true
+		);
+
+		foreach ($listeners as $name => $listener)
+		{
+			if (is_string($listener))
+			{
+				$listener = array('class' => $listener);
+			}
+
+			$listener = array_merge($defaultOptions, (array) $listener);
+
+			if (!$listener['enabled'])
+			{
+				continue;
+			}
+
+			$dispatcher->addListener(new $listener['class'], $listener['priority']);
+		}
 	}
 
 	/**

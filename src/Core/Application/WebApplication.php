@@ -11,6 +11,7 @@ namespace Windwalker\Core\Application;
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
+use Windwalker\Controller\AbstractMultiActionController;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Error\SimpleErrorHandler;
 use Windwalker\Core\Ioc;
@@ -118,7 +119,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		static::registerProviders($this->container);
 
-		PackageHelper::registerPackages($this->getPackages(), $this, $this->container);
+		PackageHelper::registerPackages($this, $this->getPackages(), $this->container);
 
 		$this->triggerEvent('onAfterInitialise');
 	}
@@ -195,15 +196,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		$this->triggerEvent('onBeforeRender');
 
-		/** @var Controller $controller */
-		$controller = new $controller($this->input, $this);
 
-		if (!($controller instanceof Controller))
-		{
-			throw new \UnexpectedValueException(
-				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
-			);
-		}
 
 		$this->setBody($controller->execute());
 
@@ -217,12 +210,54 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @param string $route
 	 *
+	 * @throws  \LogicException
+	 * @throws  \UnexpectedValueException
 	 * @return  mixed
 	 */
 	public function getController($route = null)
 	{
 		$route = $route ? : $this->container->get('uri')->get('route');
 
+		$variables = $this->matchRoute($route);
+
+		// Save for input
+		foreach ($variables as $name => $value)
+		{
+			$this->input->def($name, $value);
+
+			// Don't forget to do an explicit set on the GET superglobal.
+			$this->input->get->def($name, $value);
+		}
+
+		$controller = $variables['_controller'];
+
+		if (!class_exists($controller))
+		{
+			throw new \LogicException('Controller: ' . $controller . ' not found.');
+		}
+
+		/** @var Controller $controller */
+		$controller = new $controller($this->input, $this);
+
+		if (!($controller instanceof Controller))
+		{
+			throw new \UnexpectedValueException(
+				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
+			);
+		}
+
+		return $controller;
+	}
+
+	/**
+	 * matchRoute
+	 *
+	 * @param string $route
+	 *
+	 * @return  array|bool
+	 */
+	public function matchRoute($route = null)
+	{
 		// Hack for Router bug, remove when Windwalker beta1
 		$route = trim($route, '/') ? $route : 'home';
 
@@ -245,25 +280,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			'port' => $_SERVER['SERVER_PORT']
 		);
 
-		$variables = $router->match($route, $method, $options);
-
-		// Save for input
-		foreach ($variables as $name => $value)
-		{
-			$this->input->def($name, $value);
-
-			// Don't forget to do an explicit set on the GET superglobal.
-			$this->input->get->def($name, $value);
-		}
-
-		$class = $router->getController();
-
-		if (!class_exists($class))
-		{
-			throw new \LogicException('Controller: ' . $class . ' not found.');
-		}
-
-		return $class;
+		return $router->match($route, $method, $options);
 	}
 
 	/**
@@ -289,6 +306,16 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 				$variables = isset($route['variables']) ? $route['variables'] : array();
 				$allowMethods = isset($route['method']) ? $route['method'] : array();
 
+				if (isset($route['controller']))
+				{
+					$variables['_controller'] = $route['controller'];
+				}
+
+				if (isset($route['suffix']))
+				{
+					$variables['_suffix'] = $route['suffix'];
+				}
+
 				$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
 			}
 
@@ -311,7 +338,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		foreach ((array) $packages as $name => $package)
 		{
-			$class = $package['class'];
+			$class = $package->class;
 
 			/** @var AbstractPackage $class */
 			$routes = $class::loadRouting();
