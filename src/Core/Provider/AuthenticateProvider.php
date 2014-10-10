@@ -39,6 +39,7 @@ class AuthenticateProvider implements ServiceProviderInterface
 		};
 
 		$container->share('system.authenticate', $closure)
+			->alias('authenticate', 'system.authenticate')
 			->alias('auth', 'system.authenticate');
 	}
 }

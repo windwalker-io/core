@@ -63,11 +63,21 @@ abstract class Ioc
 	/**
 	 * getApplication
 	 *
-	 * @return  \Windwalker\Web\Application|\Windwalker\Core\Console\Console
+	 * @return  \Windwalker\Core\Application\WebApplication|\Windwalker\Console\Console
 	 */
 	public static function getApplication()
 	{
 		return static::get('application');
+	}
+
+	/**
+	 * getAuthenticate
+	 *
+	 * @return  \Windwalker\Authenticate\Authenticate
+	 */
+	public static function getAuthenticate()
+	{
+		return static::get('authenticate');
 	}
 
 	/**
