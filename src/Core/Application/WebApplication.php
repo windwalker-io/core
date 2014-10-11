@@ -13,6 +13,7 @@ use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
 use Windwalker\Controller\AbstractMultiActionController;
 use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Error\SimpleErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
@@ -192,11 +193,11 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		$controller = $this->getController();
 
+		$this->container->share('main.controller', $controller);
+
 		$this->triggerEvent('onAfterRouting');
 
 		$this->triggerEvent('onBeforeRender');
-
-
 
 		$this->setBody($controller->execute());
 
@@ -231,13 +232,28 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		$controller = $variables['_controller'];
 
+		unset($variables['_controller']);
+		unset($variables['_action']);
+		unset($variables['_rawRoute']);
+
+		$controller = explode('::', $controller);
+
+		$action = isset($controller[1]) ? $controller[1] : null;
+		$controller = $controller[0];
+
 		if (!class_exists($controller))
 		{
 			throw new \LogicException('Controller: ' . $controller . ' not found.');
 		}
 
-		/** @var Controller $controller */
+		/** @var Controller|MultiActionController $controller */
 		$controller = new $controller($this->input, $this);
+
+		if ($controller instanceof MultiActionController)
+		{
+			$controller->setActionName($action);
+			$controller->setArguments($variables);
+		}
 
 		if (!($controller instanceof Controller))
 		{
@@ -258,9 +274,6 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 */
 	public function matchRoute($route = null)
 	{
-		// Hack for Router bug, remove when Windwalker beta1
-		$route = trim($route, '/') ? $route : 'home';
-
 		/** @var \Windwalker\Core\Router\RestfulRouter $router */
 		$router = $this->getRouter();
 
@@ -298,8 +311,22 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 		{
 			$routes = $this->loadRoutingConfiguration();
 
-			$routes = array_merge($routes, $this->loadPackagesRouting());
+			// Replace package routing
+			foreach ($routes as $name => $route)
+			{
+				if (!isset($route['package']))
+				{
+					continue;
+				}
 
+				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
+
+				$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
+
+				unset($routes[$name]);
+			}
+
+			// Register routes
 			foreach ($routes as $name => $route)
 			{
 				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
@@ -311,9 +338,9 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 					$variables['_controller'] = $route['controller'];
 				}
 
-				if (isset($route['suffix']))
+				if (isset($route['action']))
 				{
-					$variables['_suffix'] = $route['suffix'];
+					$variables['_action'] = $route['action'];
 				}
 
 				$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
@@ -330,23 +357,22 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @return  array
 	 */
-	protected function loadPackagesRouting()
+	protected function loadPackageRouting(&$routing, $package, $prefix, $pattern)
 	{
-		$packages = $this->config->get('package');
+		$package = $this->config->get('package.' . $package);
 
-		$routing = array();
+		$class = $package->class;
 
-		foreach ((array) $packages as $name => $package)
+		/** @var AbstractPackage $class */
+		$routes = $class::loadRouting();
+
+		foreach ((array) $routes as $key => $route)
 		{
-			$class = $package->class;
+			$route['pattern'] = rtrim($pattern, '/ ') . '/' . ltrim($route['pattern'], '/ ');
 
-			/** @var AbstractPackage $class */
-			$routes = $class::loadRouting();
+			$route['pattern'] = ltrim($route['pattern'], '/ ');
 
-			foreach ((array) $routes as $key => $route)
-			{
-				$routing[$name . ':' . $key] = $route;
-			}
+			$routing[$prefix . ':' . $key] = $route;
 		}
 
 		return $routing;

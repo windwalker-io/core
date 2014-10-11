@@ -34,25 +34,11 @@ class RestfulRouter extends Router
 	);
 
 	/**
-	 * Property customMethod.
-	 *
-	 * @var  string
-	 */
-	protected $customMethod = null;
-
-	/**
 	 * Property controller.
 	 *
 	 * @var  string
 	 */
 	protected $controller = null;
-
-	/**
-	 * A boolean allowing to pass _method as parameter in POST requests
-	 *
-	 * @var  boolean
-	 */
-	protected $allowCustomMethod = false;
 
 	/**
 	 * match
@@ -75,38 +61,21 @@ class RestfulRouter extends Router
 			throw new \UnexpectedValueException('Route profile should have "_controller" element');
 		}
 
-		$variables['_suffix'] = ArrayHelper::getValue($variables, '_suffix', array());
+		$variables['_action'] = ArrayHelper::getValue($variables, '_action', array());
 
 		// Suffix
-		$controller = trim($controller, '\\') . '\\' . $this->fetchControllerSuffix($method, $variables['_suffix']);
+		$suffix = $this->fetchControllerSuffix($method, $variables['_action']);
+
+		if ($suffix[0] != ':')
+		{
+			$suffix = '\\' . $suffix;
+		}
+
+		$controller = trim($controller, '\\') . $suffix;
 
 		$variables['_controller'] = $this->controller = $controller;
 
 		return $variables;
-	}
-
-	/**
-	 * Get the property to allow or not method in POST request
-	 *
-	 * @return  boolean
-	 */
-	public function isAllowCustomMethod()
-	{
-		return $this->allowCustomMethod;
-	}
-
-	/**
-	 * Set to allow or not method in POST request
-	 *
-	 * @param   boolean  $value  A boolean to allow or not method in POST request
-	 *
-	 * @return  static
-	 */
-	public function allowCustomMethod($value)
-	{
-		$this->allowCustomMethod = $value;
-
-		return $this;
 	}
 
 	/**
@@ -128,13 +97,6 @@ class RestfulRouter extends Router
 		if (!isset($this->suffixMap[$method]))
 		{
 			throw new \RuntimeException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
-		}
-
-		// Check if request method is POST
-		if ($this->allowCustomMethod == true)
-		{
-			// Get the method from input
-			$method = $this->getCustomMethod() ? : $method;
 		}
 
 		if (isset($customSuffix['*']))
@@ -186,16 +148,6 @@ class RestfulRouter extends Router
 		$this->suffixMap = $suffixMap;
 
 		return $this;
-	}
-
-	/**
-	 * getCustomMethod
-	 *
-	 * @return  string
-	 */
-	public function getCustomMethod()
-	{
-		return $this->customMethod;
 	}
 
 	/**
