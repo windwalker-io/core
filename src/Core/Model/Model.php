@@ -46,15 +46,12 @@ class Model extends AbstractModel implements DatabaseModelInterface
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry       $state The model state.
-	 * @param   DatabaseDriver $db    The database adapter.
+	 * @param   Registry  $state The model state.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct(Registry $state = null, DatabaseDriver $db = null)
+	public function __construct(Registry $state = null)
 	{
-		$this->db = $db ? : Ioc::getDatabase();
-
 		$this->cache = new Cache(new RuntimeStorage);
 
 		parent::__construct($state);

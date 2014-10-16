@@ -57,6 +57,16 @@ class PhinxCommand extends Command
 	}
 
 	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		$this->app->set('show_help', false);
+	}
+
+	/**
 	 * Execute this command.
 	 *
 	 * @return int|void

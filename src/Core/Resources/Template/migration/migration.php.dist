@@ -1,0 +1,31 @@
+<?php
+/**
+ * Part of starter project. 
+ *
+ * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later;
+ */
+
+use Windwalker\Core\Migration\AbstractMigration;
+
+/**
+ * Migration class, version: {{version}}
+ */
+class {{className}} extends AbstractMigration
+{
+	/**
+	 * Migrate Up.
+	 */
+	public function up()
+	{
+
+	}
+
+	/**
+	 * Migrate Down.
+	 */
+	public function down()
+	{
+
+	}
+}

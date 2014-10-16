@@ -10,6 +10,7 @@ namespace Windwalker\Core\Console;
 
 use Windwalker\Console\Console;
 use Windwalker\Core\Console\Descriptor\CommandDescriptor;
+use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Seeder\Command\SeedCommand;
 use Windwalker\Core\Ioc;
@@ -97,6 +98,7 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	public function registerCommands()
 	{
 		$this->addCommand(new PhinxCommand);
+		$this->addCommand(new MigrationCommand);
 		$this->addCommand(new SeedCommand);
 	}
 
