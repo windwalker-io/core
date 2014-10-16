@@ -31,6 +31,7 @@ use Windwalker\Event\EventInterface;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The WebApplication class.
@@ -219,7 +220,10 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	{
 		$route = $route ? : $this->container->get('uri')->get('route');
 
-		$variables = $this->matchRoute($route);
+		$route = $this->matchRoute($route);
+
+		$variables = $route->getVariables();
+		$extra = $route->getExtra();
 
 		// Save for input
 		foreach ($variables as $name => $value)
@@ -230,12 +234,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			$this->input->get->def($name, $value);
 		}
 
-		$controller = $variables['_controller'];
-
-		unset($variables['_controller']);
-		unset($variables['_action']);
-		unset($variables['_rawRoute']);
-
+		$controller = $extra['controller'];
 		$controller = explode('::', $controller);
 
 		$action = isset($controller[1]) ? $controller[1] : null;
@@ -262,6 +261,16 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			);
 		}
 
+		$package = ArrayHelper::getValue($extra, 'package');
+
+		// Get package
+		if ($package)
+		{
+			$package = $this->container->get('package.' . $package);
+
+			$controller->setPackage($package);
+		}
+
 		return $controller;
 	}
 
@@ -270,7 +279,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @param string $route
 	 *
-	 * @return  array|bool
+	 * @return  Route
 	 */
 	public function matchRoute($route = null)
 	{
@@ -319,7 +328,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 					continue;
 				}
 
-				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
+				$pattern = ArrayHelper::getValue($route, 'pattern');
 
 				$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
 
@@ -329,18 +338,18 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			// Register routes
 			foreach ($routes as $name => $route)
 			{
-				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
-				$variables = isset($route['variables']) ? $route['variables'] : array();
-				$allowMethods = isset($route['method']) ? $route['method'] : array();
+				$pattern = ArrayHelper::getValue($route, 'pattern');
+				$variables = ArrayHelper::getValue($route, 'variables', array());
+				$allowMethods = ArrayHelper::getValue($route, 'method', array());
 
 				if (isset($route['controller']))
 				{
-					$variables['_controller'] = $route['controller'];
+					$route['extra']['controller'] = $route['controller'];
 				}
 
 				if (isset($route['action']))
 				{
-					$variables['_action'] = $route['action'];
+					$route['extra']['action'] = $route['action'];
 				}
 
 				$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
@@ -371,6 +380,8 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			$route['pattern'] = rtrim($pattern, '/ ') . '/' . ltrim($route['pattern'], '/ ');
 
 			$route['pattern'] = ltrim($route['pattern'], '/ ');
+
+			$route['extra']['package'] = $package->name;
 
 			$routing[$prefix . ':' . $key] = $route;
 		}

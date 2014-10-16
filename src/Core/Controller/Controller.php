@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller;
 
 use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\IO\Input;
 
 /**
@@ -32,6 +33,13 @@ abstract class Controller extends AbstractController
 	 * @var  WebApplication
 	 */
 	protected $app = null;
+
+	/**
+	 * Property package.
+	 *
+	 * @var  AbstractPackage
+	 */
+	protected $package = null;
 
 	/**
 	 * Property redirectUrl.
@@ -142,5 +150,29 @@ abstract class Controller extends AbstractController
 	public function isMute()
 	{
 		return $this->mute;
+	}
+
+	/**
+	 * Method to get property Package
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getPackage()
+	{
+		return $this->package;
+	}
+
+	/**
+	 * Method to set property package
+	 *
+	 * @param   AbstractPackage $package
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPackage(AbstractPackage $package)
+	{
+		$this->package = $package;
+
+		return $this;
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -48,23 +49,24 @@ class RestfulRouter extends Router
 	 * @param array  $options
 	 *
 	 * @throws  \UnexpectedValueException
-	 * @return  array|bool
+	 * @return  Route
 	 */
 	public function match($route, $method = 'GET', $options = array())
 	{
-		$variables = parent::match($route, $method, $options);
+		$route = parent::match($route, $method, $options);
 
-		$controller = ArrayHelper::getValue($variables, '_controller');
+		$variables = $route->getVariables();
+		$extra = $route->getExtra();
+
+		$controller = ArrayHelper::getValue($extra, 'controller');
 
 		if (!$controller)
 		{
-			throw new \UnexpectedValueException('Route profile should have "_controller" element');
+			throw new \UnexpectedValueException('Route profile should have "controller" element');
 		}
 
-		$variables['_action'] = ArrayHelper::getValue($variables, '_action', array());
-
 		// Suffix
-		$suffix = $this->fetchControllerSuffix($method, $variables['_action']);
+		$suffix = $this->fetchControllerSuffix($method, ArrayHelper::getValue($extra, 'action', array()));
 
 		if ($suffix[0] != ':')
 		{
@@ -73,9 +75,11 @@ class RestfulRouter extends Router
 
 		$controller = trim($controller, '\\') . $suffix;
 
-		$variables['_controller'] = $this->controller = $controller;
+		$extra['controller'] = $this->controller = $controller;
 
-		return $variables;
+		$route->setExtra($extra);
+
+		return $route;
 	}
 
 	/**
