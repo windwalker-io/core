@@ -22,10 +22,8 @@ use Windwalker\Registry\Registry;
  *
  * @since 1.0
  */
-class Model extends AbstractModel implements DatabaseModelInterface
+class Model extends AbstractModel
 {
-	use DatabaseAwareTrait;
-
 	/**
 	 * Property cache.
 	 *
@@ -84,7 +82,7 @@ class Model extends AbstractModel implements DatabaseModelInterface
 
 		foreach ($this->magicMethodPrefix as $prefix)
 		{
-			if (substr($name, 0, $prefix) == $prefix)
+			if (substr($name, 0, strlen($prefix)) == $prefix)
 			{
 				$allow = true;
 

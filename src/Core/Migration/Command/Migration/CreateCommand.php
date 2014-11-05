@@ -9,8 +9,8 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Migration\Model\MigrationsModel;
 use Windwalker\Filesystem\File;
-use Windwalker\Renderer\PhpRenderer;
 use Windwalker\String\String;
 
 /**
@@ -64,11 +64,26 @@ class CreateCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
+		$migration = new MigrationsModel;
+
+		$migration['path'] = $this->getOption('p');
+
+		$migrations = $migration->getMigrations();
+
 		$name = $this->getArgument(0);
 
 		if (!$name)
 		{
 			throw new \InvalidArgumentException('Missing first argument "name"');
+		}
+
+		// Check name not exists
+		foreach ($migrations as $migItem)
+		{
+			if (strtolower($name) == strtolower($migItem['name']))
+			{
+				throw new \RuntimeException('Migration: ' . $name . ' has exists.');
+			}
 		}
 
 		$date = gmdate('YmdHis');

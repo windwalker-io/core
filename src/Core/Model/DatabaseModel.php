@@ -10,6 +10,7 @@ namespace Windwalker\Core\Model;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Database\Driver\DatabaseDriver;
+use Windwalker\Model\DatabaseModelInterface;
 use Windwalker\Registry\Registry;
 
 /**
@@ -17,7 +18,7 @@ use Windwalker\Registry\Registry;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class DatabaseModel extends Model
+class DatabaseModel extends Model implements DatabaseModelInterface
 {
 	/**
 	 * Property db.

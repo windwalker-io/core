@@ -16,8 +16,11 @@ use Windwalker\Database\Driver\DatabaseDriver;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class AbstractMigration
+abstract class AbstractMigration
 {
+	const UP = 'up';
+	const DOWN = 'down';
+
 	/**
 	 * Property db.
 	 *
@@ -51,6 +54,20 @@ class AbstractMigration
 
 		$this->db = $db;
 	}
+
+	/**
+	 * up
+	 *
+	 * @return  void
+	 */
+	abstract public function up();
+
+	/**
+	 * down
+	 *
+	 * @return  void
+	 */
+	abstract public function down();
 
 	/**
 	 * Method to get property Db

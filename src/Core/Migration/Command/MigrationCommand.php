@@ -54,6 +54,8 @@ class MigrationCommand extends Command
 	public function initialise()
 	{
 		$this->addCommand(new Migration\CreateCommand);
+		$this->addCommand(new Migration\StatusCommand);
+		$this->addCommand(new Migration\MigrateCommand);
 
 		$this->addGlobalOption('p')
 			->alias('path')
