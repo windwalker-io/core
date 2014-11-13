@@ -86,11 +86,11 @@ LOG;
 			foreach ($logs as $log)
 			{
 				$this->out(sprintf(
-						$tmpl,
-						strtoupper($log['direction']),
-						$log['id'],
-						$log['name']
-					));
+					$tmpl,
+					strtoupper($log['direction']),
+					$log['id'],
+					$log['name']
+				));
 			}
 		}
 		else

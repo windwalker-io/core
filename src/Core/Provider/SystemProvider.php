@@ -8,9 +8,8 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Web\AbstractWebApplication;
-use Windwalker\Core\Application\Console;
-use Windwalker\Core\Application\WindwalkerWebApplication;
+use Windwalker\Application\AbstractWebApplication;
+use Windwalker\Console\Console;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -24,7 +23,7 @@ class SystemProvider implements ServiceProviderInterface
 	/**
 	 * Property app.
 	 *
-	 * @var AbstractWebApplication|WindwalkerWebApplication|Console
+	 * @var AbstractWebApplication|Console
 	 */
 	protected $app;
 

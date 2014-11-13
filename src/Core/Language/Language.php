@@ -37,9 +37,6 @@ abstract class Language extends Facade
 	 */
 	public static function load($file, $package = null)
 	{
-		/** @var WindwalkerLanguage $language */
-		$language = static::getInstance();
-
 		$config = Ioc::getConfig();
 
 		$format  = $config['language.format']  ? : 'ini';
@@ -100,6 +97,18 @@ abstract class Language extends Facade
 
 			$config->set('language.loaded', $loaded);
 		}
+	}
+
+	/**
+	 * Alias of translate().
+	 *
+	 * @param string $string
+	 *
+	 * @return  string
+	 */
+	public static function _($string)
+	{
+		return static::translate($string);
 	}
 
 	/**

@@ -11,7 +11,6 @@ namespace Windwalker\Core\Application;
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
-use Windwalker\Controller\AbstractMultiActionController;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Error\SimpleErrorHandler;
@@ -25,6 +24,7 @@ use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Web\WebEnvironment;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
@@ -121,7 +121,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		static::registerProviders($this->container);
 
-		PackageHelper::registerPackages($this, $this->getPackages(), $this->container);
+		PackageHelper::registerPackages($this, $this->loadPackages(), $this->container);
 
 		$this->triggerEvent('onAfterInitialise');
 	}
@@ -135,11 +135,27 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 */
 	protected static function registerProviders(Container $container)
 	{
-		$container
-			->registerServiceProvider(new EventProvider)
-			->registerServiceProvider(new RouterProvider)
-			->registerServiceProvider(new CacheProvider)
-			->registerServiceProvider(new SessionProvider);
+		$providers = static::loadProviders();
+
+		foreach ($providers as $provider)
+		{
+			$container->registerServiceProvider($provider);
+		}
+	}
+
+	/**
+	 * loadProviders
+	 *
+	 * @return  ServiceProviderInterface[]
+	 */
+	public static function loadProviders()
+	{
+		return array(
+			'event'   => new EventProvider,
+			'router'  => new RouterProvider,
+			'cache'   => new CacheProvider,
+			'session' => new SessionProvider,
+		);
 	}
 
 	/**
@@ -147,7 +163,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @return  array
 	 */
-	public function getPackages()
+	public function loadPackages()
 	{
 		return array();
 	}
@@ -364,11 +380,16 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	/**
 	 * loadRoutingFromPackages
 	 *
+	 * @param array  $routing
+	 * @param string $packageName
+	 * @param string $prefix
+	 * @param string $pattern
+	 *
 	 * @return  array
 	 */
-	protected function loadPackageRouting(&$routing, $package, $prefix, $pattern)
+	protected function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
 	{
-		$package = $this->config->get('package.' . $package);
+		$package = $this->config->get('package.' . $packageName);
 
 		$class = $package->class;
 
@@ -385,6 +406,10 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 			$routing[$prefix . ':' . $key] = $route;
 		}
+
+		$packageObject = $this->container->get('package.' . $packageName);
+
+		$packageObject->setRoutingPrefix($prefix);
 
 		return $routing;
 	}
@@ -504,4 +529,3 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	{
 	}
 }
- 

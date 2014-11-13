@@ -21,6 +21,8 @@ use Windwalker\Registry\Registry;
 /**
  * The User class.
  *
+ * @see \Windwalker\Authenticate\Authenticate
+ *
  * @method static boolean          authenticate()   authenticate(Credential $credential)
  * @method static integer[]        getResults()     getResults()
  * @method static Credential       getCredential()  getCredential()
@@ -91,6 +93,8 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$session = Ioc::getSession();
 
+		unset($user->password);
+
 		$session->set('user', (array) $user);
 
 		static::triggerEvent('onUserAfterLogin', array('credential' => $user, 'options' => $options));
@@ -124,7 +128,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$session = Ioc::getSession();
 
-		$session->clear('user');
+		$session->remove('user');
 
 		static::triggerEvent('onUserAfterLogout', array('credential' => $credential, 'options' => $options));
 

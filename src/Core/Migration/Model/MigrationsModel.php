@@ -120,6 +120,13 @@ class MigrationsModel extends DatabaseModel
 		return 0;
 	}
 
+	/**
+	 * migrate
+	 *
+	 * @param string $version
+	 *
+	 * @return  void
+	 */
 	public function migrate($version = null)
 	{
 		$migrations = $this->getMigrations();

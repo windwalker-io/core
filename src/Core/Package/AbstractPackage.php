@@ -11,6 +11,7 @@ namespace Windwalker\Core\Package;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Router\Router;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\ListenerPriority;
@@ -39,6 +40,13 @@ class AbstractPackage
 	protected $name = null;
 
 	/**
+	 * Property routingPrefix.
+	 *
+	 * @var  string
+	 */
+	protected $routingPrefix = null;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -58,6 +66,32 @@ class AbstractPackage
 		$this->registerProviders($container);
 
 		$this->registerListeners($container->get('system.dispatcher'));
+	}
+
+	/**
+	 * buildRoute
+	 *
+	 * @param string         $route
+	 * @param boolean|string $package
+	 *
+	 * @return  string
+	 */
+	public function buildRoute($route, $package = null)
+	{
+		if ($package === false)
+		{
+			// Nothing
+		}
+		elseif (!$package)
+		{
+			$route = $this->getRoutingPrefix() . ':' . $route;
+		}
+		else
+		{
+			$route = $package . ':' . $route;
+		}
+
+		return Router::build($route);
 	}
 
 	/**
@@ -143,6 +177,30 @@ class AbstractPackage
 	public function set($name, $value)
 	{
 		$this->container->get('system.config')->set('package.' . $this->getName() . '.config.' . $name, $value);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property RoutingPrefix
+	 *
+	 * @return  string
+	 */
+	public function getRoutingPrefix()
+	{
+		return $this->routingPrefix ? : $this->getName();
+	}
+
+	/**
+	 * Method to set property routingPrefix
+	 *
+	 * @param   string $routingPrefix
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRoutingPrefix($routingPrefix)
+	{
+		$this->routingPrefix = $routingPrefix;
 
 		return $this;
 	}

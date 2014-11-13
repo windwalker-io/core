@@ -48,4 +48,3 @@ class LanguageProvider implements ServiceProviderInterface
 		$container->share('system.language', $closure)->alias('language', 'system.language');
 	}
 }
- 

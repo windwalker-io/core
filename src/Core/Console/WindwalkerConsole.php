@@ -22,6 +22,7 @@ use Windwalker\Core\Provider\EventProvider;
 use Windwalker\Core\Provider\LanguageProvider;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
@@ -111,11 +112,27 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	 */
 	public function registerProviders(Container $container)
 	{
-		$container
-			->registerServiceProvider(new EventProvider)
-			->registerServiceProvider(new DatabaseProvider)
-			->registerServiceProvider(new LanguageProvider)
-			->registerServiceProvider(new CacheProvider);
+		$providers = static::loadProviders();
+
+		foreach ($providers as $provider)
+		{
+			$container->registerServiceProvider($provider);
+		}
+	}
+
+	/**
+	 * loadProviders
+	 *
+	 * @return  ServiceProviderInterface[]
+	 */
+	public static function loadProviders()
+	{
+		return array(
+			'event'    => new EventProvider,
+			'database' => new DatabaseProvider,
+			'cache'    => new CacheProvider,
+			'lang'     => new LanguageProvider,
+		);
 	}
 
 	/**

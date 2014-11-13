@@ -58,12 +58,12 @@ abstract class Facade
 			throw new \LogicException('Key not set');
 		}
 
-		if (!static::$instance)
+		if (empty(static::$instance[static::$key]))
 		{
-			static::$instance = static::getContainer()->get(static::$key);
+			static::$instance[static::$key] = static::getContainer()->get(static::$key);
 		}
 
-		return static::$instance;
+		return static::$instance[static::$key];
 	}
 
 	/**
