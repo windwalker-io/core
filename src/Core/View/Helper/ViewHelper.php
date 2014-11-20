@@ -20,18 +20,30 @@ use Windwalker\Core\View\Helper\Set\HelperSet;
 class ViewHelper extends AbstractHelper
 {
 	/**
+	 * Property flashes.
+	 *
+	 * @var  array
+	 */
+	protected static $flashes = array();
+
+	/**
 	 * getGlobalVariables
 	 *
 	 * @return  array
 	 */
 	public static function getGlobalVariables()
 	{
+		if (!static::$flashes)
+		{
+			static::$flashes = Ioc::getSession()->getFlashBag()->takeAll();
+		}
+
 		return array(
 			'uri' => Ioc::get('uri'),
 			'app' => Ioc::getApplication(),
 			'container' => Ioc::getContainer(),
 			'helper' => new HelperSet,
-			'flash' => Ioc::getSession()->getFlashBag()->takeAll(),
+			'flashes' => static::$flashes,
 			'datetime' => new Date('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
 		);
 	}
