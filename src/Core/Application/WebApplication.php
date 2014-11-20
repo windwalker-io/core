@@ -12,6 +12,7 @@ use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
 use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Error\SimpleErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
@@ -23,18 +24,21 @@ use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Web\WebEnvironment;
+use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The WebApplication class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class WebApplication extends AbstractWebApplication
+class WebApplication extends AbstractWebApplication implements DispatcherAwareInterface
 {
 	/**
 	 * Property env.
@@ -117,7 +121,7 @@ class WebApplication extends AbstractWebApplication
 
 		static::registerProviders($this->container);
 
-		PackageHelper::registerPackages($this->getPackages(), $this, $this->container);
+		PackageHelper::registerPackages($this, $this->loadPackages(), $this->container);
 
 		$this->triggerEvent('onAfterInitialise');
 	}
@@ -131,11 +135,27 @@ class WebApplication extends AbstractWebApplication
 	 */
 	protected static function registerProviders(Container $container)
 	{
-		$container
-			->registerServiceProvider(new EventProvider)
-			->registerServiceProvider(new RouterProvider)
-			->registerServiceProvider(new CacheProvider)
-			->registerServiceProvider(new SessionProvider);
+		$providers = static::loadProviders();
+
+		foreach ($providers as $provider)
+		{
+			$container->registerServiceProvider($provider);
+		}
+	}
+
+	/**
+	 * loadProviders
+	 *
+	 * @return  ServiceProviderInterface[]
+	 */
+	public static function loadProviders()
+	{
+		return array(
+			'event'   => new EventProvider,
+			'router'  => new RouterProvider,
+			'cache'   => new CacheProvider,
+			'session' => new SessionProvider,
+		);
 	}
 
 	/**
@@ -143,7 +163,7 @@ class WebApplication extends AbstractWebApplication
 	 *
 	 * @return  array
 	 */
-	public function getPackages()
+	public function loadPackages()
 	{
 		return array();
 	}
@@ -157,12 +177,16 @@ class WebApplication extends AbstractWebApplication
 	 */
 	public function execute()
 	{
+		$this->prepareExecute();
+
 		$this->triggerEvent('onBeforeExecute');
 
 		// Perform application routines.
 		$this->doExecute();
 
 		$this->triggerEvent('onAfterExecute');
+
+		$this->postExecute();
 
 		$this->triggerEvent('onBeforeRespond');
 
@@ -186,19 +210,11 @@ class WebApplication extends AbstractWebApplication
 
 		$controller = $this->getController();
 
+		$this->container->share('main.controller', $controller);
+
 		$this->triggerEvent('onAfterRouting');
 
 		$this->triggerEvent('onBeforeRender');
-
-		/** @var Controller $controller */
-		$controller = new $controller($this->input, $this);
-
-		if (!($controller instanceof Controller))
-		{
-			throw new \UnexpectedValueException(
-				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
-			);
-		}
 
 		$this->setBody($controller->execute());
 
@@ -212,15 +228,77 @@ class WebApplication extends AbstractWebApplication
 	 *
 	 * @param string $route
 	 *
+	 * @throws  \LogicException
+	 * @throws  \UnexpectedValueException
 	 * @return  mixed
 	 */
 	public function getController($route = null)
 	{
 		$route = $route ? : $this->container->get('uri')->get('route');
 
-		// Hack for Router bug, remove when Windwalker beta1
-		$route = trim($route, '/') ? $route : 'home';
+		$route = $this->matchRoute($route);
 
+		$variables = $route->getVariables();
+		$extra = $route->getExtra();
+
+		// Save for input
+		foreach ($variables as $name => $value)
+		{
+			$this->input->def($name, $value);
+
+			// Don't forget to do an explicit set on the GET superglobal.
+			$this->input->get->def($name, $value);
+		}
+
+		$controller = $extra['controller'];
+		$controller = explode('::', $controller);
+
+		$action = isset($controller[1]) ? $controller[1] : null;
+		$controller = $controller[0];
+
+		if (!class_exists($controller))
+		{
+			throw new \LogicException('Controller: ' . $controller . ' not found.');
+		}
+
+		/** @var Controller|MultiActionController $controller */
+		$controller = new $controller($this->input, $this);
+
+		if ($controller instanceof MultiActionController)
+		{
+			$controller->setActionName($action);
+			$controller->setArguments($variables);
+		}
+
+		if (!($controller instanceof Controller))
+		{
+			throw new \UnexpectedValueException(
+				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
+			);
+		}
+
+		$package = ArrayHelper::getValue($extra, 'package');
+
+		// Get package
+		if ($package)
+		{
+			$package = $this->container->get('package.' . $package);
+
+			$controller->setPackage($package);
+		}
+
+		return $controller;
+	}
+
+	/**
+	 * matchRoute
+	 *
+	 * @param string $route
+	 *
+	 * @return  Route
+	 */
+	public function matchRoute($route = null)
+	{
 		/** @var \Windwalker\Core\Router\RestfulRouter $router */
 		$router = $this->getRouter();
 
@@ -240,25 +318,7 @@ class WebApplication extends AbstractWebApplication
 			'port' => $_SERVER['SERVER_PORT']
 		);
 
-		$variables = $router->match($route, $method, $options);
-
-		// Save for input
-		foreach ($variables as $name => $value)
-		{
-			$this->input->def($name, $value);
-
-			// Don't forget to do an explicit set on the GET superglobal.
-			$this->input->get->def($name, $value);
-		}
-
-		$class = $router->getController();
-
-		if (!class_exists($class))
-		{
-			throw new \LogicException('Controller: ' . $class . ' not found.');
-		}
-
-		return $class;
+		return $router->match($route, $method, $options);
 	}
 
 	/**
@@ -276,13 +336,37 @@ class WebApplication extends AbstractWebApplication
 		{
 			$routes = $this->loadRoutingConfiguration();
 
-			$routes = array_merge($routes, $this->loadPackagesRouting());
-
+			// Replace package routing
 			foreach ($routes as $name => $route)
 			{
-				$pattern = isset($route['pattern']) ? $route['pattern'] : null;
-				$variables = isset($route['variables']) ? $route['variables'] : array();
-				$allowMethods = isset($route['method']) ? $route['method'] : array();
+				if (!isset($route['package']))
+				{
+					continue;
+				}
+
+				$pattern = ArrayHelper::getValue($route, 'pattern');
+
+				$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
+
+				unset($routes[$name]);
+			}
+
+			// Register routes
+			foreach ($routes as $name => $route)
+			{
+				$pattern = ArrayHelper::getValue($route, 'pattern');
+				$variables = ArrayHelper::getValue($route, 'variables', array());
+				$allowMethods = ArrayHelper::getValue($route, 'method', array());
+
+				if (isset($route['controller']))
+				{
+					$route['extra']['controller'] = $route['controller'];
+				}
+
+				if (isset($route['action']))
+				{
+					$route['extra']['action'] = $route['action'];
+				}
 
 				$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
 			}
@@ -296,26 +380,38 @@ class WebApplication extends AbstractWebApplication
 	/**
 	 * loadRoutingFromPackages
 	 *
+	 * @param array  $routing
+	 * @param string $packageName
+	 * @param string $prefix
+	 * @param string $pattern
+	 *
 	 * @return  array
 	 */
-	protected function loadPackagesRouting()
+	protected function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
 	{
-		$packages = $this->config->get('packages');
+		$package = $this->config->get('package.' . $packageName);
 
-		$routing = array();
+		$class = $package->class;
 
-		foreach ((array) $packages as $name => $package)
+		/** @var AbstractPackage $class */
+		$routes = $class::loadRouting();
+
+		foreach ((array) $routes as $key => $route)
 		{
-			$class = $package['class'];
+			$route['pattern'] = rtrim($pattern, '/ ') . '/' . ltrim($route['pattern'], '/ ');
 
-			/** @var AbstractPackage $class */
-			$routes = $class::loadRouting();
+			$route['pattern'] = ltrim($route['pattern'], '/ ');
 
-			foreach ((array) $routes as $key => $route)
-			{
-				$routing[$name . ':' . $key] = $route;
-			}
+			$route['pattern'] = $route['pattern'] ? : '/';
+
+			$route['extra']['package'] = $package->name;
+
+			$routing[$prefix . ':' . $key] = $route;
 		}
+
+		$packageObject = $this->container->get('package.' . $packageName);
+
+		$packageObject->setRoutingPrefix($prefix);
 
 		return $routing;
 	}
@@ -352,7 +448,7 @@ class WebApplication extends AbstractWebApplication
 	public function addFlash($msg, $type = 'info')
 	{
 		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('system.session');
+		$session = Ioc::getSession();
 
 		$session->getFlashBag()->add($msg, $type);
 
@@ -408,17 +504,18 @@ class WebApplication extends AbstractWebApplication
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments.
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
 	 * @since   {DEPLOY_VERSION}
 	 */
-	public function triggerEvent($event)
+	public function triggerEvent($event, $args = array())
 	{
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('system.dispatcher');
 
-		$dispatcher->triggerEvent($event);
+		$dispatcher->triggerEvent($event, $args);
 
 		return $this;
 	}
@@ -434,4 +531,3 @@ class WebApplication extends AbstractWebApplication
 	{
 	}
 }
- 
