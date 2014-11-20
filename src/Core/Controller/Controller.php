@@ -9,7 +9,8 @@
 namespace Windwalker\Core\Controller;
 
 use Windwalker\Controller\AbstractController;
-use Windwalker\Core\Application\WindwalkerWebApplication;
+use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\IO\Input;
 
 /**
@@ -29,9 +30,16 @@ abstract class Controller extends AbstractController
 	/**
 	 * Property app.
 	 *
-	 * @var  WindwalkerWebApplication
+	 * @var  WebApplication
 	 */
 	protected $app = null;
+
+	/**
+	 * Property package.
+	 *
+	 * @var  AbstractPackage
+	 */
+	protected $package = null;
 
 	/**
 	 * Property redirectUrl.
@@ -43,6 +51,13 @@ abstract class Controller extends AbstractController
 		'msg' => null,
 		'type' => null,
 	);
+
+	/**
+	 * Property mute.
+	 *
+	 * @var  boolean
+	 */
+	protected $mute = false;
 
 	/**
 	 * setRedirect
@@ -92,7 +107,12 @@ abstract class Controller extends AbstractController
 			return;
 		}
 
-		$this->app->addFlash($msg, $type)->redirect($url);
+		if ($msg)
+		{
+			$this->app->addFlash($msg, $type);
+		}
+
+		$this->app->redirect($url);
 	}
 
 	/**
@@ -105,12 +125,59 @@ abstract class Controller extends AbstractController
 	 */
 	public function addFlash($msg, $type = 'info')
 	{
-		if ($this->input->get('quiet'))
+		if (!$this->mute)
 		{
 			$this->app->addFlash($msg, $type);
 		}
 
 		return $this;
 	}
+
+	/**
+	 * mute
+	 *
+	 * @param bool $bool
+	 *
+	 * @return  static
+	 */
+	public function mute($bool = true)
+	{
+		$this->mute = $bool;
+
+		return $this;
+	}
+
+	/**
+	 * isMute
+	 *
+	 * @return  bool
+	 */
+	public function isMute()
+	{
+		return $this->mute;
+	}
+
+	/**
+	 * Method to get property Package
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getPackage()
+	{
+		return $this->package;
+	}
+
+	/**
+	 * Method to set property package
+	 *
+	 * @param   AbstractPackage $package
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPackage(AbstractPackage $package)
+	{
+		$this->package = $package;
+
+		return $this;
+	}
 }
- 
