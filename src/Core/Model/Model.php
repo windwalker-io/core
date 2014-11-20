@@ -22,10 +22,8 @@ use Windwalker\Registry\Registry;
  *
  * @since 1.0
  */
-class Model extends AbstractModel implements DatabaseModelInterface
+class Model extends AbstractModel
 {
-	use DatabaseAwareTrait;
-
 	/**
 	 * Property cache.
 	 *
@@ -46,16 +44,13 @@ class Model extends AbstractModel implements DatabaseModelInterface
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry       $state The model state.
-	 * @param   DatabaseDriver $db    The database adapter.
+	 * @param   Registry  $state The model state.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct(Registry $state = null, DatabaseDriver $db = null)
+	public function __construct(Registry $state = null)
 	{
-		$this->db = $db ? : Ioc::getDatabase();
-
-		$this->cache = new Cache(new RuntimeStorage);
+		$this->resetCache();
 
 		parent::__construct($state);
 
@@ -87,7 +82,7 @@ class Model extends AbstractModel implements DatabaseModelInterface
 
 		foreach ($this->magicMethodPrefix as $prefix)
 		{
-			if (substr($name, 0, $prefix) == $prefix)
+			if (substr($name, 0, strlen($prefix)) == $prefix)
 			{
 				$allow = true;
 
@@ -157,6 +152,18 @@ class Model extends AbstractModel implements DatabaseModelInterface
 	}
 
 	/**
+	 * resetCache
+	 *
+	 * @return  static
+	 */
+	public function resetCache()
+	{
+		$this->cache = new Cache(new RuntimeStorage);
+
+		return $this;
+	}
+
+	/**
 	 * fetch
 	 *
 	 * @param string   $id
@@ -169,4 +176,3 @@ class Model extends AbstractModel implements DatabaseModelInterface
 		return $this->cache->call($this->getCacheId($id), $closure);
 	}
 }
- 
