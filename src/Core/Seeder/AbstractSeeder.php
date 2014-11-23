@@ -61,7 +61,8 @@ abstract class AbstractSeeder
 			$seeder = new $seeder;
 		}
 
-		$seeder->setDb($this->db);
+		$seeder->setDb($this->db)
+			->setCommand($this->command);
 
 		$seeder->doExecute();
 

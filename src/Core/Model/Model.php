@@ -50,7 +50,7 @@ class Model extends AbstractModel
 	 */
 	public function __construct(Registry $state = null)
 	{
-		$this->cache = new Cache(new RuntimeStorage);
+		$this->resetCache();
 
 		parent::__construct($state);
 
@@ -149,6 +149,18 @@ class Model extends AbstractModel
 	protected function hasCache($id = null)
 	{
 		return $this->cache->exists($this->getCacheId($id));
+	}
+
+	/**
+	 * resetCache
+	 *
+	 * @return  static
+	 */
+	public function resetCache()
+	{
+		$this->cache = new Cache(new RuntimeStorage);
+
+		return $this;
 	}
 
 	/**

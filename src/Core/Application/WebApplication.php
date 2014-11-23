@@ -402,6 +402,8 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 			$route['pattern'] = ltrim($route['pattern'], '/ ');
 
+			$route['pattern'] = $route['pattern'] ? : '/';
+
 			$route['extra']['package'] = $package->name;
 
 			$routing[$prefix . ':' . $key] = $route;

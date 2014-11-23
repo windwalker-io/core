@@ -53,8 +53,8 @@ class SeedCommand extends Command
 	 */
 	public function initialise()
 	{
-		$this->addOption(
-			new Option(array('c', 'class'), 'DatabaseSeeder', 'The class to import.', Option::IS_GLOBAL)
+		$this->addGlobalOption(
+			new Option(array('c', 'class'), 'DatabaseSeeder', 'The class to import.')
 		);
 
 		$this->addCommand(new ImportCommand);

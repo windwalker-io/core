@@ -107,7 +107,12 @@ abstract class Controller extends AbstractController
 			return;
 		}
 
-		$this->app->addFlash($msg, $type)->redirect($url);
+		if ($msg)
+		{
+			$this->app->addFlash($msg, $type);
+		}
+
+		$this->app->redirect($url);
 	}
 
 	/**
