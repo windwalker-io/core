@@ -176,4 +176,3 @@ class Model extends AbstractModel
 		return $this->cache->call($this->getCacheId($id), $closure);
 	}
 }
- 
