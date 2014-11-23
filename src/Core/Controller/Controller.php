@@ -180,4 +180,16 @@ abstract class Controller extends AbstractController
 
 		return $this;
 	}
+
+	/**
+	 * Method to get property RedirectUrl
+	 *
+	 * @param bool $removeKey
+	 *
+	 * @return  array
+	 */
+	public function getRedirect($removeKey = false)
+	{
+		return $removeKey ? array_values($this->redirectUrl) : $this->redirectUrl;
+	}
 }
