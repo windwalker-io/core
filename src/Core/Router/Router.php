@@ -45,7 +45,7 @@ abstract class Router extends Facade
 
 		if ($type == static::TYPE_PATH)
 		{
-			$uri = Ioc::getApplication()->get('uri.base.path') . $uri;
+			$uri = Ioc::getApplication()->get('uri.base.path') . ltrim($uri, '/');
 		}
 		elseif ($type == static::TYPE_FULL)
 		{
