@@ -75,12 +75,12 @@ abstract class RendererHelper
 		$config = Ioc::getConfig();
 
 		static::$paths->insert(
-			realpath(__DIR__ . '/../Resources/Template'),
+			realpath($config->get('path.templates') . '/_global'),
 			Priority::LOW
 		);
 
 		static::$paths->insert(
-			realpath($config->get('path.templates') . '/_global'),
+			realpath(__DIR__ . '/../Resources/Template'),
 			Priority::LOW
 		);
 	}
