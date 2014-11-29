@@ -91,13 +91,41 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$user = static::getCredential();
 
+		static::makeUserLogin($user);
+
+		static::triggerEvent('onUserAfterLogin', array('credential' => $user, 'options' => $options));
+
+		return true;
+	}
+
+	/**
+	 * makeUserLogin
+	 *
+	 * @param mixed $user
+	 *
+	 * @return  bool
+	 */
+	public static function makeUserLogin($user)
+	{
+		if (!is_array($user) && !is_object($user))
+		{
+			$user = User::get($user);
+		}
+		elseif (!($user instanceof Data))
+		{
+			$user = new Data($user);
+		}
+
+		if ($user->isNull())
+		{
+			return false;
+		}
+
 		$session = Ioc::getSession();
 
 		unset($user->password);
 
 		$session->set('user', (array) $user);
-
-		static::triggerEvent('onUserAfterLogin', array('credential' => $user, 'options' => $options));
 
 		return true;
 	}
