@@ -14,7 +14,10 @@ use Windwalker\Core\Ioc;
 /**
  * The Router class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  {DEPLOY_VERSION}.
+ * 
+ * @see \Windwalker\Router\Router
+ * @see \Windwalker\Core\Router\RestfulRouter
  */
 abstract class Router extends Facade
 {
