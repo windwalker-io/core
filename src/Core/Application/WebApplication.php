@@ -261,8 +261,16 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			throw new \LogicException('Controller: ' . $controller . ' not found.');
 		}
 
+		$package = ArrayHelper::getValue($extra, 'package');
+
+		// Get package
+		if ($package)
+		{
+			$package = $this->container->get('package.' . $package);
+		}
+
 		/** @var Controller|MultiActionController $controller */
-		$controller = new $controller($this->input, $this);
+		$controller = new $controller($this->input, $this, $this->container, $package);
 
 		if ($controller instanceof MultiActionController)
 		{
@@ -277,15 +285,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			);
 		}
 
-		$package = ArrayHelper::getValue($extra, 'package');
 
-		// Get package
-		if ($package)
-		{
-			$package = $this->container->get('package.' . $package);
-
-			$controller->setPackage($package);
-		}
 
 		return $controller;
 	}

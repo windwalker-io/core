@@ -44,17 +44,28 @@ abstract class PackageHelper
 				$package = new $package;
 			}
 
+			// If we set custom name to package, use this as alias.
 			if (!is_numeric($alias))
 			{
 				$package->setName($alias);
 			}
 
+			// Get package identify name.
 			$name = $package->getName();
 
 			// Get global config to override package config
 			$pkgConfig = new Registry($package::loadConfig());
 
+			// Legacy to override package config from global config
 			$pkgConfig->loadObject($config->get('package.' . $name, array()));
+
+			// Override package config from etc
+			$file = $config->get('path.etc') . '/' . $name . '/config.yml';
+
+			if (is_file($file))
+			{
+				$pkgConfig->loadFile($file);
+			}
 
 			$pkgConfig = array(
 				'name' => $name,

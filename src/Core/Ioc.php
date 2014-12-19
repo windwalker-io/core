@@ -9,6 +9,7 @@
 namespace Windwalker\Core;
 
 use Windwalker\DI\Container;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The Factory class.
@@ -32,13 +33,13 @@ abstract class Ioc
 	public static $subContainers = array();
 
 	/**
-	 * getContainer
+	 * getInstance
 	 *
 	 * @param string $name
 	 *
 	 * @return  Container
 	 */
-	public static function getContainer($name = null)
+	public static function factory($name = null)
 	{
 		// No name, return root container.
 		if (!$name)
@@ -58,6 +59,18 @@ abstract class Ioc
 		}
 
 		return self::$subContainers[$name];
+	}
+
+	/**
+	 * getContainer
+	 *
+	 * @param string $name
+	 *
+	 * @return  Container
+	 */
+	public static function getContainer($name = null)
+	{
+		return self::factory($name);
 	}
 
 	/**
@@ -224,6 +237,22 @@ abstract class Ioc
 	}
 
 	/**
+	 * Convenience method for creating shared keys.
+	 *
+	 * @param   string   $key      Name of dataStore key to set.
+	 * @param   callable $callback Callable function to run when requesting the specified $key.
+	 * @param   string   $name     Container name.
+	 *
+	 * @return  Container This object for chaining.
+	 *
+	 * @since    2.0
+	 */
+	public function share($key, $callback, $name = null)
+	{
+		return static::factory($name, $key, $callback);
+	}
+
+	/**
 	 * getNewInstance
 	 *
 	 * @param string $key
@@ -247,5 +276,18 @@ abstract class Ioc
 	public static function exists($key, $child = null)
 	{
 		return static::getContainer($child)->exists($key);
+	}
+
+	/**
+	 * dump
+	 *
+	 * @param int  $level
+	 * @param null $name
+	 *
+	 * @return  string
+	 */
+	public static function dump($level = 10, $name = null)
+	{
+		return ArrayHelper::dump(static::factory($name), $level);
 	}
 }
