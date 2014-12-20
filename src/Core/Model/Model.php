@@ -32,6 +32,13 @@ class Model extends AbstractModel
 	protected $cache = null;
 
 	/**
+	 * Property config.
+	 *
+	 * @var  Registry
+	 */
+	protected $config = null;
+
+	/**
 	 * Property magicMethodPrefix.
 	 *
 	 * @var  array
@@ -44,12 +51,15 @@ class Model extends AbstractModel
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry  $state The model state.
+	 * @param   Registry|array  $config The model config.
+	 * @param   Registry        $state  The model state.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct(Registry $state = null)
+	public function __construct($config = null, Registry $state = null)
 	{
+		$this->setCache($config);
+
 		$this->resetCache();
 
 		parent::__construct($state);
@@ -96,6 +106,30 @@ class Model extends AbstractModel
 		}
 
 		return null;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config instanceof Registry ? $config : new Registry($config);
+
+		return $this;
 	}
 
 	/**
@@ -174,5 +208,22 @@ class Model extends AbstractModel
 	protected function fetch($id, $closure)
 	{
 		return $this->cache->call($this->getCacheId($id), $closure);
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  Registry
+	 */
+	public function __get($name)
+	{
+		if ($name == 'config')
+		{
+			return $this->config;
+		}
+
+		return null;
 	}
 }

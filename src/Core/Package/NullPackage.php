@@ -53,10 +53,11 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 * __set
 	 *
 	 * @param $name
+	 * @param $value
 	 *
-	 * @return  mixed
+	 * @return mixed
 	 */
-	public function __set($name)
+	public function __set($name, $value)
 	{
 		return;
 	}

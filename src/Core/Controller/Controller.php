@@ -10,12 +10,18 @@ namespace Windwalker\Core\Controller;
 
 use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\IO\Input;
 use Windwalker\Ioc;
+use Windwalker\Registry\Registry;
+use Windwalker\View\AbstractView;
 
 /**
  * The Controller class.
@@ -24,6 +30,13 @@ use Windwalker\Ioc;
  */
 abstract class Controller extends AbstractController
 {
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = null;
+
 	/**
 	 * Property input.
 	 *
@@ -51,6 +64,13 @@ abstract class Controller extends AbstractController
 	 * @var  AbstractPackage
 	 */
 	protected $package = null;
+
+	/**
+	 * Property config.
+	 *
+	 * @var  Registry
+	 */
+	protected $config = null;
 
 	/**
 	 * Property redirectUrl.
@@ -85,6 +105,8 @@ abstract class Controller extends AbstractController
 
 		$this->container = $container ? : $this->getContainer();
 		$this->package = $package ? : new NullPackage;
+
+		$this->config = $this->getConfig();
 
 		parent::__construct($input, $app);
 	}
@@ -138,6 +160,73 @@ abstract class Controller extends AbstractController
 		}
 
 		return $view->setLayout($layout)->render();
+	}
+
+	/**
+	 * getView
+	 *
+	 * @param string $name
+	 * @param string $type
+	 * @param bool   $forceNew
+	 *
+	 * @return  HtmlView|TwigHtmlView|BladeHtmlView
+	 */
+	public function getView($name, $type = 'html', $forceNew = false)
+	{
+		$name = $name ? : $this->getName();
+
+		$key = 'view.' . $name . '.' . $type;
+
+		if (!$this->container->exists($key) || $forceNew)
+		{
+			$ns = MvcHelper::getPackageNamespace(get_called_class());
+
+			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
+
+			if ($class instanceof AbstractView)
+			{
+				throw new \LogicException($class . ' should be child of Windwalker\View\AbstractView');
+			}
+
+			$view = new $class($this->config);
+
+			$this->container->share($class, $view)->alias($key, $class);
+		}
+
+		return $this->container->get($key);
+	}
+
+	/**
+	 * getModel
+	 *
+	 * @param string $name
+	 * @param bool   $forceNew
+	 *
+	 * @return  mixed
+	 */
+	public function getModel($name, $forceNew = false)
+	{
+		$name = $name ? : $this->getName();
+
+		$key = 'model.' . $name;
+
+		if (!$this->container->exists($key) || $forceNew)
+		{
+			$ns = MvcHelper::getPackageNamespace(get_called_class());
+
+			$class = sprintf($ns . '\Model\%sModel', ucfirst($name), ucfirst($name));
+
+			if ($class instanceof Model)
+			{
+				throw new \LogicException($class . ' should be child of Windwalker\Model\Model');
+			}
+
+			$model = new $class($this->config);
+
+			$this->container->share($class, $model)->alias($key, $class);
+		}
+
+		return $this->container->get($key);
 	}
 
 	/**
@@ -335,5 +424,65 @@ abstract class Controller extends AbstractController
 		}
 
 		return $this->input;
+	}
+
+	/**
+	 * Method to get property Name
+	 *
+	 * @param integer $backwards
+	 *
+	 * @return string
+	 */
+	public function getName($backwards = 2)
+	{
+		if (!$this->name)
+		{
+			$this->name = MvcHelper::guessName(get_called_class(), $backwards);
+		}
+
+		return $this->name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 */
+	public function getConfig()
+	{
+		if (!$this->config)
+		{
+			$this->config = new Registry;
+		}
+
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config;
+
+		return $this;
 	}
 }

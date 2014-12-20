@@ -10,6 +10,8 @@ namespace Windwalker\Core\View;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\RendererInterface;
@@ -38,13 +40,23 @@ class HtmlView extends \Windwalker\View\HtmlView
 	protected $package;
 
 	/**
+	 * Property config.
+	 *
+	 * @var Registry
+	 */
+	protected $config;
+
+	/**
 	 * Method to instantiate the view.
 	 *
+	 * @param   Registry|array    $config   View config.
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
 	 */
-	public function __construct($data = array(), RendererInterface $renderer = null)
+	public function __construct($config = null, $data = array(), RendererInterface $renderer = null)
 	{
+		$this->setConfig($config);
+
 		parent::__construct($data, $renderer);
 
 		$this->registerPaths();
@@ -148,9 +160,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * getName
 	 *
-	 * @return  string
+	 * @param int $backwards
+	 *
+	 * @return string
 	 */
-	public function getName()
+	public function getName($backwards = 2)
 	{
 		if (!$this->name)
 		{
@@ -162,17 +176,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 				return $this->name = 'default';
 			}
 
-			$class = explode('\\', $class);
-
-			array_pop($class);
-
-			$name = array_pop($class);
-
-			array_pop($class);
-
-			$this->package = strtolower(array_pop($class));
-
-			$this->name = strtolower($name);
+			$this->name = MvcHelper::guessName(get_called_class(), $backwards);
 		}
 
 		return $this->name;
@@ -195,12 +199,16 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to get property Package
 	 *
-	 * @return  string
+	 * @param int $backwards
+	 *
+	 * @return string
 	 */
-	public function getPackage()
+	public function getPackage($backwards = 4)
 	{
-		// Init name & package
-		$this->getName();
+		if (!$this->package)
+		{
+			$this->package = MvcHelper::guessPackage(get_called_class(), $backwards = 4);
+		}
 
 		return $this->package;
 	}
@@ -220,6 +228,47 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->view->layout = $this->getLayout();
 
 		$data->bind(ViewHelper::getGlobalVariables());
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config instanceof Registry ? $config : new Registry($config);
+
+		return $this;
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  Registry
+	 */
+	public function __get($name)
+	{
+		if ($name == 'config')
+		{
+			return $this->config;
+		}
+
+		return null;
 	}
 }
  
