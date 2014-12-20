@@ -56,7 +56,9 @@ abstract class AbstractSeeder
 	{
 		if (is_string($seeder))
 		{
-			include_once dirname(ReflectionHelper::getPath(get_called_class())) . '/' . $seeder . '.php';
+			$ref = new \ReflectionClass($this);
+
+			include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
 			$seeder = new $seeder;
 		}
@@ -87,7 +89,9 @@ abstract class AbstractSeeder
 	{
 		if (is_string($seeder))
 		{
-			include_once dirname(ReflectionHelper::getPath(get_called_class())) . '/' . $seeder . '.php';
+			$ref = new \ReflectionClass($this);
+
+			include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
 			$seeder = new $seeder;
 		}

@@ -289,11 +289,16 @@ class AbstractPackage
 	/**
 	 * getRoot
 	 *
+	 * @note Reflection does not need to cache.
+	 * @see https://gist.github.com/mindplay-dk/3359812
+	 *
 	 * @return  string
 	 */
 	public static function getFile()
 	{
-		return ReflectionHelper::getPath(get_called_class());
+		$ref = new \ReflectionClass(get_called_class());
+
+		return $ref->getFileName();
 	}
 
 	/**

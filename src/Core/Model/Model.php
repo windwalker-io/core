@@ -58,7 +58,7 @@ class Model extends AbstractModel
 	 */
 	public function __construct($config = null, Registry $state = null)
 	{
-		$this->setCache($config);
+		$this->setConfig($config);
 
 		$this->resetCache();
 

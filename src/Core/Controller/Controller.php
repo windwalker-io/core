@@ -13,6 +13,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
@@ -104,7 +105,7 @@ abstract class Controller extends AbstractController
 		$input = $input ? : $this->getInput();
 
 		$this->container = $container ? : $this->getContainer();
-		$this->package = $package ? : new NullPackage;
+		$this->package = $package ? : $this->getPackage();
 
 		$this->config = $this->getConfig();
 
@@ -330,10 +331,20 @@ abstract class Controller extends AbstractController
 	/**
 	 * Method to get property Package
 	 *
-	 * @return  AbstractPackage
+	 * @param int $backwards
+	 *
+	 * @return AbstractPackage
 	 */
-	public function getPackage()
+	public function getPackage($backwards = 4)
 	{
+		if (!$this->package)
+		{
+			$package = MvcHelper::guessPackage(get_called_class(), $backwards);
+			$package = PackageHelper::getPackage(strtolower($package));
+
+			$this->package = $package ? : new NullPackage;
+		}
+
 		return $this->package;
 	}
 

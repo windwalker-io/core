@@ -285,8 +285,6 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			);
 		}
 
-
-
 		return $controller;
 	}
 

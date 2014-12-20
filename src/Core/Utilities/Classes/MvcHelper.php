@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Utilities\Classes;
 
-use Windwalker\Utilities\Reflection\ReflectionHelper;
-
 /**
  * The MvcHelper class.
  * 

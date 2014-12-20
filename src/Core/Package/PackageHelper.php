@@ -93,6 +93,25 @@ abstract class PackageHelper
 	}
 
 	/**
+	 * getPackage
+	 *
+	 * @param string $name
+	 *
+	 * @return  AbstractPackage
+	 */
+	public static function getPackage($name)
+	{
+		$key = 'package.' . strtolower($name);
+
+		if (Ioc::exists($key))
+		{
+			return Ioc::get($key);
+		}
+
+		return null;
+	}
+
+	/**
 	 * getPath
 	 *
 	 * @param string $package

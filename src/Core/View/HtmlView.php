@@ -8,15 +8,16 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Core\View\Helper\ViewHelper;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * Class HtmlView
@@ -35,7 +36,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Property package.
 	 *
-	 * @var  string
+	 * @var  AbstractPackage
 	 */
 	protected $package;
 
@@ -49,13 +50,13 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   Registry|array    $config   View config.
+	 * @param   AbstractPackage   $package  The package object.
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
 	 */
-	public function __construct($config = null, $data = array(), RendererInterface $renderer = null)
+	public function __construct(AbstractPackage $package = null, $data = array(), RendererInterface $renderer = null)
 	{
-		$this->setConfig($config);
+		$this->package = $package ? : new NullPackage;
 
 		parent::__construct($data, $renderer);
 
@@ -141,12 +142,16 @@ class HtmlView extends \Windwalker\View\HtmlView
 	protected function registerPaths()
 	{
 		$paths = $this->renderer->getPaths();
+		$config = Ioc::getConfig();
 
-		$viewTmpl = dirname(ReflectionHelper::getPath($this)) . '/../../Templates/' . $this->getName();
+		$viewTmpls = array();
 
-		if (is_dir($viewTmpl))
+		$viewTmpls[] = $this->package->getDir() . '/Templates/' . $this->getName();
+		$viewTmpls[] = $config->get('path.templates') . '/' . $this->package->getName() . '/' . $this->getName();
+
+		foreach ($viewTmpls as $tmpl)
 		{
-			$paths->insert(realpath($viewTmpl), Priority::NORMAL);
+			$paths->insert($tmpl, Priority::NORMAL);
 		}
 
 		$paths = Priority::createQueue(
@@ -199,15 +204,13 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to get property Package
 	 *
-	 * @param int $backwards
-	 *
 	 * @return string
 	 */
-	public function getPackage($backwards = 4)
+	public function getPackage()
 	{
 		if (!$this->package)
 		{
-			$this->package = MvcHelper::guessPackage(get_called_class(), $backwards = 4);
+			$this->package = new NullPackage;
 		}
 
 		return $this->package;
