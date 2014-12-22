@@ -144,22 +144,71 @@ abstract class Controller extends AbstractController
 	}
 
 	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+	}
+
+	/**
+	 * doExecute
+	 *
+	 * @return  mixed
+	 */
+	abstract protected function doExecute();
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return $result;
+	}
+
+	/**
+	 * Execute the controller.
+	 *
+	 * @return  mixed Return executed result.
+	 *
+	 * @throws  \LogicException
+	 * @throws  \RuntimeException
+	 */
+	public function execute()
+	{
+		$this->prepareExecute();
+
+		$result = $this->doExecute();
+
+		return $this->postExecute($result);
+	}
+
+	/**
 	 * renderView
 	 *
 	 * @param HtmlView $view
+	 * @param string   $layout
+	 * @param array    $data
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public function renderView($view, $data = array(), $layout = 'default')
+	public function renderView($view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{
 			$view = new $view;
 		}
 
+		$this->setConfig($this->config);
+
 		foreach ($data as $key => $value)
 		{
-			$view->set($key, $value);
+			$view[$key] = $value;
 		}
 
 		return $view->setLayout($layout)->render();
@@ -228,6 +277,9 @@ abstract class Controller extends AbstractController
 			}
 
 			$model = new $class($this->config);
+
+			/** @var Model $model */
+			$model->setConfig($this->config);
 
 			$this->container->share($class, $model)->alias($key, $class);
 		}

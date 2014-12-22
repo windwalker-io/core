@@ -30,29 +30,24 @@ class ViewHelper extends AbstractHelper
 	/**
 	 * getGlobalVariables
 	 *
-	 * @return  array
+	 * @param string $package
+	 *
+	 * @return array
 	 */
-	public static function getGlobalVariables(HtmlView $view)
+	public static function getGlobalVariables($package = null)
 	{
-		$package = $view->getPackage();
-
 		if (!static::$flashes)
 		{
 			static::$flashes = Ioc::getSession()->getFlashBag()->takeAll();
 		}
 
-		$globals = array(
+		return array(
 			'uri' => Ioc::get('uri'),
 			'app' => Ioc::getApplication(),
-			'container' => Ioc::getContainer($package->getName()),
+			'container' => Ioc::getContainer($package),
 			'helper' => new HelperSet,
 			'flashes' => static::$flashes,
 			'datetime' => new Date('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
 		);
-
-		foreach ($globals as $key => $value)
-		{
-			$view->set($key, $value);
-		}
 	}
 }

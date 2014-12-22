@@ -206,6 +206,8 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to get property Package
 	 *
+	 * @param int $backwards
+	 *
 	 * @return AbstractPackage
 	 */
 	public function getPackage($backwards = 4)
@@ -261,7 +263,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
 
-		ViewHelper::getGlobalVariables($this);
+		$globals = ViewHelper::getGlobalVariables($this->config['package.name']);
+
+		$data->bind($globals);
 	}
 
 	/**

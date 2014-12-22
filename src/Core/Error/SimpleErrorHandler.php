@@ -80,7 +80,8 @@ class SimpleErrorHandler
 
 		$app = new Response;
 
-		$app->setBody($body)->respond();
+		$app->setHeader('Status', $exception->getCode() ? : 500)
+			->setBody($body)->respond();
 
 		exit();
 	}
