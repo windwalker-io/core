@@ -52,14 +52,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   Registry|array    $config   The config object.
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
 	 */
-	public function __construct($config = null, $data = array(), RendererInterface $renderer = null)
+	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
-		$this->setConfig($config);
-
 		parent::__construct($data, $renderer);
 
 		$this->initialise();
@@ -146,6 +143,8 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		$ref = new \ReflectionClass($this);
 
+		$package = $this->getPackage();
+
 		if ($this->config['package.path'])
 		{
 			$paths->insert(Path::clean($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
@@ -155,9 +154,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
 		}
 
-		$pName = $this->package->getName() ? : MvcHelper::guessPackage(get_called_class());
-
-		$paths->insert(Path::clean($config->get('path.templates') . '/' . $pName . '/' . $this->getName()), Priority::LOW - 10);
+		$paths->insert(Path::clean($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
 
 		foreach (RendererHelper::getGlobalPaths() as $i => $path)
 		{
@@ -215,13 +212,16 @@ class HtmlView extends \Windwalker\View\HtmlView
 	{
 		if (!$this->package)
 		{
+			// Get package name or guess it.
 			$name = $this->config['package.name'] ? : MvcHelper::guessPackage(get_called_class(), $backwards);
 
+			// Get package object
 			if ($name)
 			{
 				$this->package = PackageHelper::getPackage($name);
 			}
 
+			// If package not found, use NullPackage instead.
 			if (!$this->package)
 			{
 				$this->package = new NullPackage;

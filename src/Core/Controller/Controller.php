@@ -344,14 +344,17 @@ abstract class Controller extends AbstractController
 	{
 		if (!$this->package)
 		{
+			// Guess package name.
 			$name = MvcHelper::guessPackage(get_called_class(), $backwards);
-			$package = PackageHelper::getPackage(strtolower($name));
 
-			if ($this->package)
+			// Get package object.
+			if ($name)
 			{
-				$this->package = $package;
+				$this->package = PackageHelper::getPackage(strtolower($name));
 			}
-			else
+
+			// If package not found, use NullPackage instead.
+			if (!$this->package)
 			{
 				$ref = new \ReflectionClass($this);
 				$this->package = new NullPackage;
