@@ -10,8 +10,10 @@ namespace Windwalker\Core\View;
 
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Filesystem\Path;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
@@ -50,17 +52,15 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   AbstractPackage   $package  The package object.
+	 * @param   Registry|array    $config   The config object.
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
 	 */
-	public function __construct(AbstractPackage $package = null, $data = array(), RendererInterface $renderer = null)
+	public function __construct($config = null, $data = array(), RendererInterface $renderer = null)
 	{
-		$this->package = $package ? : new NullPackage;
+		$this->setConfig($config);
 
 		parent::__construct($data, $renderer);
-
-		$this->registerPaths();
 
 		$this->initialise();
 	}
@@ -123,7 +123,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function render()
 	{
-		$this->getName();
+		$this->registerPaths();
 
 		$data = $this->getData();
 
@@ -144,20 +144,25 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$paths = $this->renderer->getPaths();
 		$config = Ioc::getConfig();
 
-		$viewTmpls = array();
+		$ref = new \ReflectionClass($this);
 
-		$viewTmpls[] = $this->package->getDir() . '/Templates/' . $this->getName();
-		$viewTmpls[] = $config->get('path.templates') . '/' . $this->package->getName() . '/' . $this->getName();
-
-		foreach ($viewTmpls as $tmpl)
+		if ($this->config['package.path'])
 		{
-			$paths->insert($tmpl, Priority::NORMAL);
+			$paths->insert(Path::clean($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
+		}
+		else
+		{
+			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
 		}
 
-		$paths = Priority::createQueue(
-			array_merge(iterator_to_array($paths), iterator_to_array(RendererHelper::getGlobalPaths())),
-			Priority::LOW
-		);
+		$pName = $this->package->getName() ? : MvcHelper::guessPackage(get_called_class());
+
+		$paths->insert(Path::clean($config->get('path.templates') . '/' . $pName . '/' . $this->getName()), Priority::LOW - 10);
+
+		foreach (RendererHelper::getGlobalPaths() as $i => $path)
+		{
+			$paths->insert($path, Priority::MIN - ($i * 10));
+		}
 
 		$this->renderer->setPaths($paths);
 	}
@@ -204,16 +209,42 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to get property Package
 	 *
-	 * @return string
+	 * @return AbstractPackage
 	 */
-	public function getPackage()
+	public function getPackage($backwards = 4)
 	{
 		if (!$this->package)
 		{
-			$this->package = new NullPackage;
+			$name = $this->config['package.name'] ? : MvcHelper::guessPackage(get_called_class(), $backwards);
+
+			if ($name)
+			{
+				$this->package = PackageHelper::getPackage($name);
+			}
+
+			if (!$this->package)
+			{
+				$this->package = new NullPackage;
+
+				$this->package->setName($name);
+			}
 		}
 
 		return $this->package;
+	}
+
+	/**
+	 * Method to set property package
+	 *
+	 * @param   AbstractPackage $package
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPackage(AbstractPackage $package)
+	{
+		$this->package = $package;
+
+		return $this;
 	}
 
 	/**
@@ -230,7 +261,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
 
-		$data->bind(ViewHelper::getGlobalVariables());
+		ViewHelper::getGlobalVariables($this);
 	}
 
 	/**
@@ -253,6 +284,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 	public function setConfig($config)
 	{
 		$this->config = $config instanceof Registry ? $config : new Registry($config);
+
+		$this->name = $this->config['name'];
+		$this->package = $this->getPackage();
 
 		return $this;
 	}

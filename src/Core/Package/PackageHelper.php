@@ -54,7 +54,7 @@ abstract class PackageHelper
 			$name = $package->getName();
 
 			// Get global config to override package config
-			$pkgConfig = new Registry($package::loadConfig());
+			$pkgConfig = new Registry($package->loadConfig());
 
 			// Legacy to override package config from global config
 			$pkgConfig->loadObject($config->get('package.' . $name, array()));

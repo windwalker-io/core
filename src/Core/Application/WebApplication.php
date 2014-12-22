@@ -387,12 +387,10 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 */
 	protected function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
 	{
-		$package = $this->config->get('package.' . $packageName);
-
-		$class = $package->class;
+		$package = PackageHelper::getPackage($packageName);
 
 		/** @var AbstractPackage $class */
-		$routes = $class::loadRouting();
+		$routes = $package->loadRouting();
 
 		foreach ((array) $routes as $key => $route)
 		{
@@ -402,7 +400,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 			$route['pattern'] = $route['pattern'] ? : '/';
 
-			$route['extra']['package'] = $package->name;
+			$route['extra']['package'] = $package->getName();
 
 			$routing[$prefix . ':' . $key] = $route;
 		}

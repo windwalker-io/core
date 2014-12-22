@@ -105,9 +105,11 @@ abstract class Controller extends AbstractController
 		$input = $input ? : $this->getInput();
 
 		$this->container = $container ? : $this->getContainer();
-		$this->package = $package ? : $this->getPackage();
+
+		$package = $package ? : $this->getPackage();
 
 		$this->config = $this->getConfig();
+		$this->setPackage($package);
 
 		parent::__construct($input, $app);
 	}
@@ -189,7 +191,10 @@ abstract class Controller extends AbstractController
 				throw new \LogicException($class . ' should be child of Windwalker\View\AbstractView');
 			}
 
-			$view = new $class($this->config);
+			/** @var HtmlView $view */
+			$view = new $class($this->package);
+
+			$view->setConfig($this->config);
 
 			$this->container->share($class, $view)->alias($key, $class);
 		}
@@ -339,10 +344,21 @@ abstract class Controller extends AbstractController
 	{
 		if (!$this->package)
 		{
-			$package = MvcHelper::guessPackage(get_called_class(), $backwards);
-			$package = PackageHelper::getPackage(strtolower($package));
+			$name = MvcHelper::guessPackage(get_called_class(), $backwards);
+			$package = PackageHelper::getPackage(strtolower($name));
 
-			$this->package = $package ? : new NullPackage;
+			if ($this->package)
+			{
+				$this->package = $package;
+			}
+			else
+			{
+				$ref = new \ReflectionClass($this);
+				$this->package = new NullPackage;
+
+				$this->package->setName($name);
+				$this->package->dir = realpath(dirname($ref->getFileName()) . str_repeat('/..', $backwards - 2));
+			}
 		}
 
 		return $this->package;
@@ -357,7 +373,11 @@ abstract class Controller extends AbstractController
 	 */
 	public function setPackage(AbstractPackage $package)
 	{
-		$this->package = $package;
+		$this->package = $package ? : $this->getPackage();
+
+		$this->config['name'] = $this->getName();
+		$this->config['package.name'] = $this->package->getName();
+		$this->config['package.path'] = $this->package->getDir();
 
 		return $this;
 	}
