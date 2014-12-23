@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Test\Integrate\View\Stub;
 
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\HtmlView;
 
 /**
@@ -17,6 +18,20 @@ use Windwalker\Core\View\HtmlView;
  */
 class StubHtmlView extends HtmlView
 {
+	/**
+	 * Property model.
+	 *
+	 * @var Model
+	 */
+	public $model;
+
+	/**
+	 * Property models.
+	 *
+	 * @var Model[]
+	 */
+	public $models;
+
 	/**
 	 * getRegisteredPaths
 	 *

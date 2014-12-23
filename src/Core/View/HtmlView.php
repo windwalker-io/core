@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -50,6 +51,20 @@ class HtmlView extends \Windwalker\View\HtmlView
 	protected $config;
 
 	/**
+	 * Property model.
+	 *
+	 * @var Model
+	 */
+	protected $model;
+
+	/**
+	 * Property models.
+	 *
+	 * @var Model[]
+	 */
+	protected $models;
+
+	/**
 	 * Method to instantiate the view.
 	 *
 	 * @param   array             $data     The data array.
@@ -57,6 +72,8 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
+		$this->models = new Data;
+
 		parent::__construct($data, $renderer);
 
 		$this->initialise();
@@ -328,5 +345,55 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		return null;
 	}
+
+	/**
+	 * Method to get property Model
+	 *
+	 * @param  string $name
+	 *
+	 * @return Model
+	 */
+	public function getModel($name = null)
+	{
+		if ($name)
+		{
+			return $this->models[$name];
+		}
+
+		return $this->model;
+	}
+
+	/**
+	 * Method to set property model
+	 *
+	 * @param   Model   $model
+	 * @param   bool    $default
+	 *
+	 * @return static Return self to support chaining.
+	 */
+	public function setModel(Model $model, $default = false)
+	{
+		if ($default || !$this->model)
+		{
+			$this->model = $model;
+		}
+
+		$this->models[$model->getName()] = $model;
+
+		return $this;
+	}
+
+	/**
+	 * removeModel
+	 *
+	 * @param string $name
+	 *
+	 * @return  static
+	 */
+	public function removeModel($name)
+	{
+		unset($this->model[$name]);
+
+		return $this;
+	}
 }
- 
