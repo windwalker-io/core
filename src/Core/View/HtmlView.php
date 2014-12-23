@@ -134,10 +134,15 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * registerPaths
 	 *
-	 * @return  void
+	 * @return void
 	 */
 	protected function registerPaths()
 	{
+		if ($this->config['path.registered'])
+		{
+			return;
+		}
+
 		$paths = $this->renderer->getPaths();
 		$config = Ioc::getConfig();
 
@@ -162,6 +167,8 @@ class HtmlView extends \Windwalker\View\HtmlView
 		}
 
 		$this->renderer->setPaths($paths);
+
+		$this->config['path.registered'] = true;
 	}
 
 	/**
@@ -175,6 +182,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	{
 		if (!$this->name)
 		{
+			if ($this->config['name'])
+			{
+				return $this->name = $this->config['name'];
+			}
+
 			$class = get_called_class();
 
 			// If we are using this class as default view, return default name.
@@ -275,6 +287,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function getConfig()
 	{
+		if (!$this->config)
+		{
+			$this->config = new Registry;
+		}
+
 		return $this->config;
 	}
 

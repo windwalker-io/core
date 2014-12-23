@@ -87,10 +87,10 @@ abstract class RendererHelper
 		);
 
 		// Priority (3)
-		static::$paths->insert(
-			realpath($config->get('path.templates') . '/_global'),
-			Priority::LOW - 20
-		);
+//		static::$paths->insert(
+//			realpath($config->get('path.templates') . '/_global'),
+//			Priority::LOW - 20
+//		);
 	}
 
 	/**

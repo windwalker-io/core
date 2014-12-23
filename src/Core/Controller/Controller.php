@@ -223,7 +223,7 @@ abstract class Controller extends AbstractController
 	 *
 	 * @return  HtmlView|TwigHtmlView|BladeHtmlView
 	 */
-	public function getView($name, $type = 'html', $forceNew = false)
+	public function getView($name = null, $type = 'html', $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
@@ -259,7 +259,7 @@ abstract class Controller extends AbstractController
 	 *
 	 * @return  mixed
 	 */
-	public function getModel($name, $forceNew = false)
+	public function getModel($name = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
