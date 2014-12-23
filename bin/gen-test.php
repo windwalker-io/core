@@ -70,7 +70,7 @@ class GenTest extends AbstractCliApplication
 
 		$classPath     = ReflectionHelper::getPath($class);
 		$testPath      = WINDWALKER_ROOT . DIRECTORY_SEPARATOR . 'test';
-		$testClass     = $this->io->getArgument(1, ReflectionHelper::getShortName($class) . 'Test');
+		$testClass     = $this->io->getArgument(2, ReflectionHelper::getShortName($class) . 'Test');
 		$testClass     = StringNormalise::toClassNamespace($testClass);
 		$testFile      = $testPath . DIRECTORY_SEPARATOR . ucfirst($package) . DIRECTORY_SEPARATOR . Path::clean($testClass) . '.php';
 		$realTestClass = 'Windwalker\\Core\\Test\\' . ucfirst($package) . '\\' . $testClass;

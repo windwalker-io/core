@@ -6,14 +6,18 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Windwalker\Core\Application;
+namespace Windwalker\Core\Test\Application;
+
+use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\DI\ServiceProviderInterface;
 
 /**
  * Test class of WebApplication
  *
  * @since {DEPLOY_VERSION}
  */
-class WebApplication extends \PHPUnit_Framework_TestCase
+class WebApplicationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * Test instance.
@@ -30,6 +34,9 @@ class WebApplication extends \PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
+		$_SERVER['PHP_SELF'] = '/foo/bar';
+		$_SERVER['SCRIPT_NAME'] = '/foo/bar';
+
 		$this->instance = new WebApplication;
 	}
 
@@ -49,14 +56,12 @@ class WebApplication extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Application\WebApplication::loadProviders
-	 * @TODO   Implement testLoadProviders().
 	 */
 	public function testLoadProviders()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$providers = $this->instance->loadProviders();
+
+		$this->assertTrue(array_shift($providers) instanceof ServiceProviderInterface);
 	}
 
 	/**
@@ -65,10 +70,12 @@ class WebApplication extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Application\WebApplication::loadPackages
-	 * @TODO   Implement testLoadPackages().
 	 */
 	public function testLoadPackages()
 	{
+		// $packages = $this->instance->loadPackages();
+
+		// $this->assertTrue(array_shift($packages) instanceof AbstractPackage);
 		// Remove the following lines when you implement this test.
 		$this->markTestIncomplete(
 			'This test has not been implemented yet.'
@@ -81,7 +88,6 @@ class WebApplication extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Application\WebApplication::execute
-	 * @TODO   Implement testExecute().
 	 */
 	public function testExecute()
 	{
