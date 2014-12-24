@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Test\Mvc\Provider\TestMvcProvider;
+use Windwalker\DI\Container;
 
 /**
  * The StubPackage class.
@@ -23,4 +25,16 @@ class MvcPackage extends AbstractPackage
 	 * @var  string
 	 */
 	protected $name = 'mvc';
+
+	/**
+	 * registerProviders
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	public function registerProviders(Container $container)
+	{
+		$container->registerServiceProvider(new TestMvcProvider);
+	}
 }

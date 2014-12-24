@@ -136,7 +136,12 @@ class ErrorHandler
 	 */
 	public static function setErrorTemplate($errorTemplate)
 	{
-		self::$errorTemplate = $errorTemplate;
+		if (!is_string($errorTemplate))
+		{
+			throw new \InvalidArgumentException('Please use string as template name (Example: "folder.file").');
+		}
+
+		static::$errorTemplate = $errorTemplate;
 	}
 
 	/**
@@ -146,7 +151,7 @@ class ErrorHandler
 	 *
 	 * @return  string
 	 */
-	public function getLevelName($constant)
+	public static function getLevelName($constant)
 	{
 		if (static::$constants[$constant])
 		{
@@ -161,10 +166,12 @@ class ErrorHandler
 	 *
 	 * @param   string $name
 	 *
-	 * @return  integer
+	 * @return  integer|false
 	 */
-	public function getLevelCode($name)
+	public static function getLevelCode($name)
 	{
+		$name = strtoupper(trim($name));
+
 		return array_search($name, static::$constants);
 	}
 

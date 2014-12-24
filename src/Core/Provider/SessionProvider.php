@@ -40,8 +40,6 @@ class SessionProvider implements ServiceProviderInterface
 
 			$sesion = new Session($self->getHandler($handler), null, null, null, $options);
 
-			$sesion->start();
-
 			return $sesion;
 		};
 

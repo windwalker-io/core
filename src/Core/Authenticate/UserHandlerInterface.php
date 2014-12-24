@@ -22,25 +22,43 @@ interface UserHandlerInterface
 	 *
 	 * @param array $conditions
 	 *
-	 * @return  mixed
+	 * @return  mixed|false
 	 */
 	public function load($conditions);
 
 	/**
 	 * save
 	 *
-	 * @param Data $data
+	 * @param UserDataInterface $user
 	 *
-	 * @return  Data
+	 * @return  UserDataInterface
 	 */
-	public function save(Data $data);
+	public function save(UserDataInterface $user);
 
 	/**
 	 * delete
 	 *
-	 * @param array $conditions
+	 * @param UserDataInterface $user
 	 *
 	 * @return  boolean
 	 */
-	public function delete($conditions);
+	public function delete(UserDataInterface $user);
+
+	/**
+	 * login
+	 *
+	 * @param UserDataInterface $user
+	 *
+	 * @return  boolean
+	 */
+	public function login(UserDataInterface $user);
+
+	/**
+	 * logout
+	 *
+	 * @param UserDataInterface $user
+	 *
+	 * @return bool
+	 */
+	public function logout(UserDataInterface $user);
 }

@@ -6,15 +6,13 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Auth;
+namespace Windwalker\Core\Authenticate\Exception;
 
 /**
- * The Auth class.
+ * The UserLogoutException class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class Auth
+class AuthenticateException extends \RuntimeException
 {
-
 }
- 

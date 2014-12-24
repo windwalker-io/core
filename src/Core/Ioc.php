@@ -47,6 +47,8 @@ abstract class Ioc
 			if (!(self::$container instanceof Container))
 			{
 				self::$container = new Container;
+
+				self::$container->name = 'windwalker.main';
 			}
 
 			return self::$container;
@@ -56,6 +58,8 @@ abstract class Ioc
 		if (empty(self::$subContainers[$name]) || !(self::$subContainers[$name] instanceof Container))
 		{
 			self::$subContainers[$name] = new Container(static::getContainer());
+
+			self::$subContainers[$name]->name = $name;
 		}
 
 		return self::$subContainers[$name];

@@ -19,6 +19,7 @@ use Windwalker\Core\Provider\LanguageProvider;
 use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\WhoopsProvider;
+use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Windwalker;
 use Windwalker\Database\Test\DsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
@@ -118,6 +119,7 @@ class TestApplication extends WebApplication
 		 */
 
 		// Your packages here...
+		// $packages['mvc'] = new MvcPackage;
 
 		return $packages;
 	}

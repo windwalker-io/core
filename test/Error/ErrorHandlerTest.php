@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Test\Error;
 
+use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Test\AbstractBaseTestCase;
 
 /**
@@ -70,6 +71,9 @@ Line: {$line}
 TXT;
 
 		$this->assertStringSafeEquals($compare, $response->getBody());
+
+		$headers = $response->getHeaders();
+		$this->assertEquals($code, $headers[0]['value']);
 	}
 
 	/**
@@ -100,5 +104,50 @@ Line: {$line}
 TXT;
 
 		$this->assertStringSafeEquals($compare, $response->getBody());
+	}
+
+	/**
+	 * testSetErrorTemplate
+	 *
+	 * @param string $tmpl
+	 *
+	 * @return  void
+	 *
+	 * @covers Windwalker\Core\Error\ErrorHandler::setErrorTemplate
+	 */
+	public function testSetErrorTemplate($tmpl)
+	{
+		StubErrorHandler::setErrorTemplate('flower.error.test');
+
+		trigger_error('Test');
+
+		$response = StubErrorHandler::$response;
+
+		$this->assertStringSafeEquals('Test Error Template', $response->getBody());
+	}
+
+	/**
+	 * testGetLevelName
+	 *
+	 * @return  void
+	 *
+	 * @covers Windwalker\Core\Error\ErrorHandler::getLevelName
+	 */
+	public function testGetLevelName()
+	{
+		$this->assertEquals('E_STRICT', ErrorHandler::getLevelName(E_STRICT));
+	}
+
+	/**
+	 * testGetLevelCode
+	 *
+	 * @return  void
+	 *
+	 * @covers Windwalker\Core\Error\ErrorHandler::getLevelCode
+	 */
+	public function testGetLevelCode()
+	{
+		$this->assertEquals(E_WARNING, ErrorHandler::getLevelCode('E_WARNING'));
+		$this->assertFalse(ErrorHandler::getLevelCode(9999.999));
 	}
 }

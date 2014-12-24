@@ -86,12 +86,7 @@ abstract class Facade
 	 */
 	protected static function getContainer()
 	{
-		if (!static::$container)
-		{
-			static::$container = Ioc::getContainer(static::$name);
-		}
-
-		return static::$container;
+		return static::$container = Ioc::factory(static::$name);
 	}
 
 	/**

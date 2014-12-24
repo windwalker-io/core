@@ -11,12 +11,16 @@ namespace Windwalker\Core\Authenticate;
 use Windwalker\Authenticate\Authenticate;
 use Windwalker\Authenticate\Credential;
 use Windwalker\Authenticate\Method\MethodInterface;
+use Windwalker\Core\Authenticate\Exception\AuthenticateException;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
 use Windwalker\Core\Facade\Facade;
 use Windwalker\Core\Ioc;
 use Windwalker\Data\Data;
 use Windwalker\Event\Dispatcher;
+use Windwalker\Event\Event;
+use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The User class.
@@ -58,42 +62,56 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	/**
 	 * login
 	 *
-	 * @param array|object $credential
+	 * @param array|object $user
 	 * @param bool         $remember
 	 * @param array        $options
 	 *
 	 * @return  boolean
 	 */
-	public static function login($credential, $remember = false, $options = array())
+	public static function login($user, $remember = false, $options = array())
 	{
-		if (!is_array($credential) && !is_object($credential))
+		if (!is_array($user) && !is_object($user))
 		{
 			throw new \InvalidArgumentException('Credential should be array or object.');
 		}
 
-		if (($credential instanceof Credential))
+		if (($user instanceof Credential))
 		{
-			$credential = new Credential($credential);
+			$user = new Credential($user);
 		}
 
 		$options = $options instanceof Registry ? $options : new Registry($options);
 
 		$options['remember'] = $remember;
 
-		static::triggerEvent('onUserBeforeLogin', array('credential' => $credential, 'options' => $options));
+		$result = false;
 
-		if (!static::authenticate($credential))
+		// Before login event
+		$event = static::triggerEvent('onUserBeforeLogin', array('credential' => $user, 'options' => $options));
+
+		// Do login
+		if (static::authenticate($event['credential']))
 		{
-			static::triggerEvent('onUserLoginFailure', array('credential' => $credential, 'results' => static::getResults(), 'options' => $options));
+			$user = static::getCredential();
+
+			$result = static::makeUserLogin($user);
+		}
+
+		// After login event
+		$event['user'] = $user;
+		$event['result'] = $result;
+
+		$event = static::triggerEvent('onUserAfterLogin', $event->getArguments());
+
+		// Fail event
+		if (!$event['result'])
+		{
+			$event['results'] = static::getResults();
+
+			static::triggerEvent('onUserLoginFailure', $event->getArguments());
 
 			return false;
 		}
-
-		$user = static::getCredential();
-
-		static::makeUserLogin($user);
-
-		static::triggerEvent('onUserAfterLogin', array('credential' => $user, 'options' => $options));
 
 		return true;
 	}
@@ -111,21 +129,17 @@ class User extends Facade implements DispatcherAwareStaticInterface
 		{
 			$user = User::get($user);
 		}
-		elseif (!($user instanceof Data))
+		elseif (!($user instanceof UserDataInterface))
 		{
-			$user = new Data($user);
+			$user = new UserData($user);
 		}
 
-		if ($user->isNull())
+		if (!$user->dump())
 		{
 			return false;
 		}
 
-		$session = Ioc::getSession();
-
-		unset($user->password);
-
-		$session->set('user', (array) $user);
+		static::$handler->login($user);
 
 		return true;
 	}
@@ -133,32 +147,35 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	/**
 	 * logout
 	 *
-	 * @param array|object $credential
+	 * @param array|object $conditions
 	 * @param array        $options
 	 *
 	 * @return  boolean
 	 */
-	public static function logout($credential, $options = array())
+	public static function logout($conditions, $options = array())
 	{
-		if (!is_array($credential) && !is_object($credential))
-		{
-			throw new \InvalidArgumentException('Credential should be array or object.');
-		}
-
-		if (($credential instanceof Credential))
-		{
-			$credential = new Credential($credential);
-		}
-
 		$options = $options instanceof Registry ? $options : new Registry($options);
 
-		static::triggerEvent('onUserBeforeLogout', array('credential' => $credential, 'options' => $options));
+		$user = User::get($conditions);
 
-		$session = Ioc::getSession();
+		// Before logout event
+		$event = static::triggerEvent('onUserBeforeLogout', array('user' => $user, 'conditions' => $conditions, 'options' => $options));
 
-		$session->remove('user');
+		// Do logout
+		$result = static::$handler->logout($event['user']);
 
-		static::triggerEvent('onUserAfterLogout', array('credential' => $credential, 'options' => $options));
+		// After logout event
+		$event['result'] = $result;
+
+		$event = static::triggerEvent('onUserAfterLogout', $event->getArguments());
+
+		// Fail event
+		if (!$event['result'])
+		{
+			static::triggerEvent('onUserLogoutFailure', $event->getArguments());
+
+			return false;
+		}
 
 		return true;
 	}
@@ -168,37 +185,18 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 *
 	 * @param array $conditions
 	 *
-	 * @return  mixed|Data
+	 * @return  UserDataInterface
 	 */
 	public static function get($conditions = array())
 	{
-		if (is_object($conditions))
+		$user = static::$handler->load($conditions);
+
+		if (!($user instanceof UserDataInterface))
 		{
-			$conditions = get_object_vars($conditions);
+			throw new \UnexpectedValueException('User data should implement from UserDataInterface');
 		}
 
-		if (!$conditions)
-		{
-			$session = Ioc::getSession();
-
-			$user = $session->get('user');
-		}
-		else
-		{
-			if (!is_array($conditions))
-			{
-				$conditions = array('id' => $conditions);
-			}
-
-			$user = static::$handler->load($conditions);
-		}
-
-		if (!$user)
-		{
-			return new Data;
-		}
-
-		return new Data($user);
+		return $user;
 	}
 
 	/**
@@ -310,7 +308,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 * @param string|\Windwalker\Event\Event $event
 	 * @param array                          $args
 	 *
-	 * @return  mixed|void
+	 * @return  EventInterface|Event
 	 */
 	public static function triggerEvent($event, $args = array())
 	{
@@ -319,7 +317,6 @@ class User extends Facade implements DispatcherAwareStaticInterface
 			static::$dispatcher = Ioc::getDispatcher();
 		}
 
-		static::$dispatcher->triggerEvent($event, $args);
+		return static::$dispatcher->triggerEvent($event, $args);
 	}
 }
- 
