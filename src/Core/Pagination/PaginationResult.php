@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\PaginationPackage;
+namespace Windwalker\Core\Pagination;
 
 /**
  * The PaginationResult class.
@@ -342,6 +342,8 @@ class PaginationResult
 		{
 			$pages[$higher] = Pagination::HIGHER;
 		}
+
+		ksort($pages);
 
 		return $pages;
 	}

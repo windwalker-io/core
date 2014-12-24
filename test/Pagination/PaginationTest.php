@@ -6,10 +6,12 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\PaginationPackage\Test;
+namespace Windwalker\Core\Test\Pagination;
 
+use Windwalker\Core\Pagination\Pagination;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Test\AbstractBaseTestCase;
-use Windwalker\PaginationPackage\Pagination;
+use Windwalker\Renderer\PhpRenderer;
 
 /**
  * The PaginationTest class.
@@ -108,5 +110,34 @@ class PaginationTest extends AbstractBaseTestCase
 		$result = $pagination->getResult();
 
 		$this->assertEquals($output, $result->getAll());
+	}
+
+	public function testTemplate()
+	{
+		$pagination = new Pagination(500, 20, 10, 4);
+
+		$compare = <<<HTML
+<ul>
+	<li> Page: 1 - Type: first </li>
+	<li> Page: 15 - Type: less </li>
+	<li> Page: 16 - Type: lower </li>
+	<li> Page: 17 - Type: lower </li>
+	<li> Page: 18 - Type: lower </li>
+	<li> Page: 19 - Type: lower </li>
+	<li> Page: 20 - Type: current </li>
+	<li> Page: 21 - Type: higher </li>
+	<li> Page: 22 - Type: higher </li>
+	<li> Page: 23 - Type: higher </li>
+	<li> Page: 24 - Type: higher </li>
+	<li> Page: 25 - Type: more </li>
+	<li> Page: 50 - Type: last </li>
+</ul>
+HTML;
+
+		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
+
+		$html = $renderer->render('pagination.test', array('pagination' => $pagination->getResult()));
+
+		$this->assertStringDataEquals($compare, $html);
 	}
 }

@@ -6,7 +6,10 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\PaginationPackage;
+namespace Windwalker\Core\Pagination;
+
+use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Renderer\PhpRenderer;
 
 /**
  * The Pagination class.
@@ -319,5 +322,20 @@ class Pagination
 		$this->result = $result;
 
 		return $this;
+	}
+
+	/**
+	 * render
+	 *
+	 * @param string $route
+	 * @param string $template
+	 *
+	 * @return string
+	 */
+	public function render($route, $template = 'pagination.default')
+	{
+		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
+
+		return $renderer->render($template, array('pagination' => $this->getResult(), 'route' => $route));
 	}
 }

@@ -287,6 +287,8 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			);
 		}
 
+		$this->config->loadArray(array('extra' => $extra));
+
 		return $controller;
 	}
 
