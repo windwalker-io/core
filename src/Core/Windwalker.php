@@ -40,6 +40,7 @@ abstract class Windwalker
 	 */
 	public static function loadConfiguration(Registry $config)
 	{
+		$config->loadFile($config['path.etc'] . '/config.yml', 'yaml');
 	}
 
 	/**

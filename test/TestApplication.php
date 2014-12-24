@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Error\SimpleErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Provider\AuthenticateProvider;
 use Windwalker\Core\Provider\CacheProvider;
@@ -19,6 +20,7 @@ use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\WhoopsProvider;
 use Windwalker\Core\Windwalker;
+use Windwalker\Database\Test\DsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;
 
@@ -40,6 +42,18 @@ class TestApplication extends WebApplication
 
 		parent::initialise();
 
+		SimpleErrorHandler::restore();
+
+		// Resolve DB info
+		$dsn = DsnResolver::getDsn($this->get('database.driver'));
+
+		$this->config['database.host'] = $dsn['host'];
+		// $this->config['database.name'] = $dsn['dbname'];
+		$this->config['database.user'] = $dsn['user'];
+		$this->config['database.password'] = $dsn['pass'];
+		$this->config['database.prefix'] = $dsn['prefix'];
+		$this->config['database.dsn'] = $dsn;
+
 		// Start session
 		Ioc::getSession();
 	}
@@ -60,7 +74,7 @@ class TestApplication extends WebApplication
 		 * But you can replace with yours, Make sure all the needed container key has
 		 * registered in your own providers.
 		 */
-		$providers['debug']    = new WhoopsProvider;
+		// $providers['debug']    = new WhoopsProvider;
 		$providers['event']    = new EventProvider;
 		$providers['database'] = new DatabaseProvider;
 		$providers['router']   = new RouterProvider;

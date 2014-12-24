@@ -6,7 +6,7 @@ database:
     host: localhost
     user: root
     password: ''
-    name: windwalker_test
+    name: null
     prefix: wind_
 session:
     handler: native

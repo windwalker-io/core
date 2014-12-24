@@ -91,13 +91,26 @@ class SimpleErrorHandler
 	 *
 	 * @return  void
 	 */
-	public static function registerErrorHandler()
+	public static function registerErrorHandler($restore = true)
 	{
-		restore_error_handler();
-		restore_exception_handler();
+		if ($restore)
+		{
+			static::restore();
+		}
 
 		set_error_handler(array(get_called_class(), 'error'));
 		set_exception_handler(array(get_called_class(), 'exception'));
+	}
+
+	/**
+	 * restore
+	 *
+	 * @return  void
+	 */
+	public static function restore()
+	{
+		restore_error_handler();
+		restore_exception_handler();
 	}
 }
  
