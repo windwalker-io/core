@@ -6,9 +6,9 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Formosa\View\Twig;
+namespace Windwalker\View\Twig;
 
-use Formosa\View\Helper\ViewHelper;
+use Windwalker\Core\View\Helper\ViewHelper;
 
 /**
  * Class FormosaExtension

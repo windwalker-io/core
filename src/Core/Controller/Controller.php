@@ -105,9 +105,11 @@ abstract class Controller extends AbstractController
 		$input = $input ? : $this->getInput();
 
 		$this->container = $container ? : $this->getContainer();
-		$this->package = $package ? : $this->getPackage();
+
+		$package = $package ? : $this->getPackage();
 
 		$this->config = $this->getConfig();
+		$this->setPackage($package);
 
 		parent::__construct($input, $app);
 	}
@@ -142,22 +144,71 @@ abstract class Controller extends AbstractController
 	}
 
 	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+	}
+
+	/**
+	 * doExecute
+	 *
+	 * @return  mixed
+	 */
+	abstract protected function doExecute();
+
+	/**
+	 * postExecute
+	 *
+	 * @param mixed $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
+		return $result;
+	}
+
+	/**
+	 * Execute the controller.
+	 *
+	 * @return  mixed Return executed result.
+	 *
+	 * @throws  \LogicException
+	 * @throws  \RuntimeException
+	 */
+	public function execute()
+	{
+		$this->prepareExecute();
+
+		$result = $this->doExecute();
+
+		return $this->postExecute($result);
+	}
+
+	/**
 	 * renderView
 	 *
 	 * @param HtmlView $view
+	 * @param string   $layout
+	 * @param array    $data
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public function renderView($view, $data = array(), $layout = 'default')
+	public function renderView($view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{
 			$view = new $view;
 		}
 
+		$this->setConfig($this->config);
+
 		foreach ($data as $key => $value)
 		{
-			$view->set($key, $value);
+			$view[$key] = $value;
 		}
 
 		return $view->setLayout($layout)->render();
@@ -172,7 +223,7 @@ abstract class Controller extends AbstractController
 	 *
 	 * @return  HtmlView|TwigHtmlView|BladeHtmlView
 	 */
-	public function getView($name, $type = 'html', $forceNew = false)
+	public function getView($name = null, $type = 'html', $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
@@ -189,7 +240,10 @@ abstract class Controller extends AbstractController
 				throw new \LogicException($class . ' should be child of Windwalker\View\AbstractView');
 			}
 
-			$view = new $class($this->config);
+			/** @var HtmlView $view */
+			$view = new $class($this->package);
+
+			$view->setConfig($this->config);
 
 			$this->container->share($class, $view)->alias($key, $class);
 		}
@@ -205,7 +259,7 @@ abstract class Controller extends AbstractController
 	 *
 	 * @return  mixed
 	 */
-	public function getModel($name, $forceNew = false)
+	public function getModel($name = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
@@ -223,6 +277,9 @@ abstract class Controller extends AbstractController
 			}
 
 			$model = new $class($this->config);
+
+			/** @var Model $model */
+			$model->setConfig($this->config);
 
 			$this->container->share($class, $model)->alias($key, $class);
 		}
@@ -339,10 +396,24 @@ abstract class Controller extends AbstractController
 	{
 		if (!$this->package)
 		{
-			$package = MvcHelper::guessPackage(get_called_class(), $backwards);
-			$package = PackageHelper::getPackage(strtolower($package));
+			// Guess package name.
+			$name = MvcHelper::guessPackage(get_called_class(), $backwards);
 
-			$this->package = $package ? : new NullPackage;
+			// Get package object.
+			if ($name)
+			{
+				$this->package = PackageHelper::getPackage(strtolower($name));
+			}
+
+			// If package not found, use NullPackage instead.
+			if (!$this->package)
+			{
+				$ref = new \ReflectionClass($this);
+				$this->package = new NullPackage;
+
+				$this->package->setName($name);
+				$this->package->dir = realpath(dirname($ref->getFileName()) . str_repeat('/..', $backwards - 2));
+			}
 		}
 
 		return $this->package;
@@ -357,7 +428,11 @@ abstract class Controller extends AbstractController
 	 */
 	public function setPackage(AbstractPackage $package)
 	{
-		$this->package = $package;
+		$this->package = $package ? : $this->getPackage();
+
+		$this->config['name'] = $this->getName();
+		$this->config['package.name'] = $this->package->getName();
+		$this->config['package.path'] = $this->package->getDir();
 
 		return $this;
 	}

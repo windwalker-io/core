@@ -10,11 +10,7 @@ namespace Windwalker\Core\Model;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Storage\RuntimeStorage;
-use Windwalker\Core\Ioc;
-use Windwalker\Database\Driver\DatabaseAwareTrait;
-use Windwalker\Database\Driver\DatabaseDriver;
 use Windwalker\Model\AbstractModel;
-use Windwalker\Model\DatabaseModelInterface;
 use Windwalker\Registry\Registry;
 
 /**
@@ -37,6 +33,13 @@ class Model extends AbstractModel
 	 * @var  Registry
 	 */
 	protected $config = null;
+
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = null;
 
 	/**
 	 * Property magicMethodPrefix.
@@ -128,6 +131,44 @@ class Model extends AbstractModel
 	public function setConfig($config)
 	{
 		$this->config = $config instanceof Registry ? $config : new Registry($config);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Name
+	 *
+	 * @return  string
+	 */
+	public function getName()
+	{
+		if (!$this->name)
+		{
+			if ($this->config['name'])
+			{
+				return $this->name = $this->config['name'];
+			}
+
+			$ref = new \ReflectionClass(get_called_class());
+
+			$name = substr($ref->getShortName(), 0, -5);
+
+			return $this->name = strtolower($name);
+		}
+
+		return $this->name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
 
 		return $this;
 	}

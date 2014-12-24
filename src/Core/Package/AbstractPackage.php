@@ -226,9 +226,9 @@ class AbstractPackage
 	 * @throws  \RuntimeException
 	 * @return  array
 	 */
-	public static function loadConfig()
+	public function loadConfig()
 	{
-		$file = static::getDir() . '/config.yml';
+		$file = $this->getDir() . '/config.yml';
 
 		if (!is_file($file))
 		{
@@ -243,9 +243,9 @@ class AbstractPackage
 	 *
 	 * @return  mixed
 	 */
-	public static function loadRouting()
+	public function loadRouting()
 	{
-		$file = static::getDir() . '/routing.yml';
+		$file = $this->getDir() . '/routing.yml';
 
 		if (!is_file($file))
 		{
@@ -263,7 +263,7 @@ class AbstractPackage
 	 *
 	 * @return  string
 	 */
-	public static function getFile()
+	public function getFile()
 	{
 		$ref = new \ReflectionClass(get_called_class());
 
@@ -275,9 +275,9 @@ class AbstractPackage
 	 *
 	 * @return  string
 	 */
-	public static function getDir()
+	public function getDir()
 	{
-		return dirname(static::getFile());
+		return dirname($this->getFile());
 	}
 
 	/**

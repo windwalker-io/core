@@ -10,6 +10,8 @@ namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Migration\Command\Migration;
+use Windwalker\Database\DatabaseFactory;
+use Windwalker\Ioc;
 
 /**
  * The MigrationCommand class.
@@ -72,6 +74,21 @@ class MigrationCommand extends Command
 		$options = $this->getOptionSet(true);
 
 		$options['p']->defaultValue($this->app->get('path.migrations'));
+
+		$config = Ioc::getConfig();
+
+		// Auto create database
+		$name = $config['database.name'];
+
+		$config['database.name'] = null;
+
+		$db = Ioc::getDatabase();
+
+		$db->getDatabase($name)->create(true);
+
+		$db->select($name);
+
+		$config['database.name'] = $name;
 	}
 
 	/**

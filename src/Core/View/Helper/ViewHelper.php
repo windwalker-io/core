@@ -11,6 +11,7 @@ namespace Windwalker\Core\View\Helper;
 use Joomla\Date\Date;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\View\Helper\Set\HelperSet;
+use Windwalker\Core\View\HtmlView;
 
 /**
  * Class RendererHelper
@@ -29,9 +30,11 @@ class ViewHelper extends AbstractHelper
 	/**
 	 * getGlobalVariables
 	 *
-	 * @return  array
+	 * @param string $package
+	 *
+	 * @return array
 	 */
-	public static function getGlobalVariables()
+	public static function getGlobalVariables($package = null)
 	{
 		if (!static::$flashes)
 		{
@@ -41,7 +44,7 @@ class ViewHelper extends AbstractHelper
 		return array(
 			'uri' => Ioc::get('uri'),
 			'app' => Ioc::getApplication(),
-			'container' => Ioc::getContainer(),
+			'container' => Ioc::getContainer($package),
 			'helper' => new HelperSet,
 			'flashes' => static::$flashes,
 			'datetime' => new Date('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))

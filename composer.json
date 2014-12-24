@@ -12,7 +12,8 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Windwalker\\" : "src/"
+			"Windwalker\\" : "src/",
+			"Windwalker\\Core\\Test\\": "test/"
 		}
 	},
 	"extra": {

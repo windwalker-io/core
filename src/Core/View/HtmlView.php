@@ -8,10 +8,13 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Filesystem\Path;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
@@ -48,19 +51,30 @@ class HtmlView extends \Windwalker\View\HtmlView
 	protected $config;
 
 	/**
+	 * Property model.
+	 *
+	 * @var Model
+	 */
+	protected $model;
+
+	/**
+	 * Property models.
+	 *
+	 * @var Model[]
+	 */
+	protected $models;
+
+	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   AbstractPackage   $package  The package object.
 	 * @param   array             $data     The data array.
 	 * @param   RendererInterface $renderer The renderer engine.
 	 */
-	public function __construct(AbstractPackage $package = null, $data = array(), RendererInterface $renderer = null)
+	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
-		$this->package = $package ? : new NullPackage;
+		$this->models = new Data;
 
 		parent::__construct($data, $renderer);
-
-		$this->registerPaths();
 
 		$this->initialise();
 	}
@@ -123,7 +137,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function render()
 	{
-		$this->getName();
+		$this->registerPaths();
 
 		$data = $this->getData();
 
@@ -137,29 +151,41 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * registerPaths
 	 *
-	 * @return  void
+	 * @return void
 	 */
 	protected function registerPaths()
 	{
+		if ($this->config['path.registered'])
+		{
+			return;
+		}
+
 		$paths = $this->renderer->getPaths();
 		$config = Ioc::getConfig();
 
-		$viewTmpls = array();
+		$ref = new \ReflectionClass($this);
 
-		$viewTmpls[] = $this->package->getDir() . '/Templates/' . $this->getName();
-		$viewTmpls[] = $config->get('path.templates') . '/' . $this->package->getName() . '/' . $this->getName();
+		$package = $this->getPackage();
 
-		foreach ($viewTmpls as $tmpl)
+		if ($this->config['package.path'])
 		{
-			$paths->insert($tmpl, Priority::NORMAL);
+			$paths->insert(Path::clean($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
+		}
+		else
+		{
+			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
 		}
 
-		$paths = Priority::createQueue(
-			array_merge(iterator_to_array($paths), iterator_to_array(RendererHelper::getGlobalPaths())),
-			Priority::LOW
-		);
+		$paths->insert(Path::clean($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
+
+		foreach (RendererHelper::getGlobalPaths() as $i => $path)
+		{
+			$paths->insert($path, Priority::MIN - ($i * 10));
+		}
 
 		$this->renderer->setPaths($paths);
+
+		$this->config['path.registered'] = true;
 	}
 
 	/**
@@ -173,6 +199,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	{
 		if (!$this->name)
 		{
+			if ($this->config['name'])
+			{
+				return $this->name = $this->config['name'];
+			}
+
 			$class = get_called_class();
 
 			// If we are using this class as default view, return default name.
@@ -204,16 +235,47 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Method to get property Package
 	 *
-	 * @return string
+	 * @param int $backwards
+	 *
+	 * @return AbstractPackage
 	 */
-	public function getPackage()
+	public function getPackage($backwards = 4)
 	{
 		if (!$this->package)
 		{
-			$this->package = new NullPackage;
+			// Get package name or guess it.
+			$name = $this->config['package.name'] ? : MvcHelper::guessPackage(get_called_class(), $backwards);
+
+			// Get package object
+			if ($name)
+			{
+				$this->package = PackageHelper::getPackage($name);
+			}
+
+			// If package not found, use NullPackage instead.
+			if (!$this->package)
+			{
+				$this->package = new NullPackage;
+
+				$this->package->setName($name);
+			}
 		}
 
 		return $this->package;
+	}
+
+	/**
+	 * Method to set property package
+	 *
+	 * @param   AbstractPackage $package
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPackage(AbstractPackage $package)
+	{
+		$this->package = $package;
+
+		return $this;
 	}
 
 	/**
@@ -230,7 +292,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
 
-		$data->bind(ViewHelper::getGlobalVariables());
+		$globals = ViewHelper::getGlobalVariables($this->config['package.name']);
+
+		$data->bind($globals);
 	}
 
 	/**
@@ -240,6 +304,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function getConfig()
 	{
+		if (!$this->config)
+		{
+			$this->config = new Registry;
+		}
+
 		return $this->config;
 	}
 
@@ -253,6 +322,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 	public function setConfig($config)
 	{
 		$this->config = $config instanceof Registry ? $config : new Registry($config);
+
+		$this->name = $this->config['name'];
+		$this->package = $this->getPackage();
 
 		return $this;
 	}
@@ -273,5 +345,55 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		return null;
 	}
+
+	/**
+	 * Method to get property Model
+	 *
+	 * @param  string $name
+	 *
+	 * @return Model
+	 */
+	public function getModel($name = null)
+	{
+		if ($name)
+		{
+			return $this->models[$name];
+		}
+
+		return $this->model;
+	}
+
+	/**
+	 * Method to set property model
+	 *
+	 * @param   Model   $model
+	 * @param   bool    $default
+	 *
+	 * @return static Return self to support chaining.
+	 */
+	public function setModel(Model $model, $default = false)
+	{
+		if ($default || !$this->model)
+		{
+			$this->model = $model;
+		}
+
+		$this->models[$model->getName()] = $model;
+
+		return $this;
+	}
+
+	/**
+	 * removeModel
+	 *
+	 * @param string $name
+	 *
+	 * @return  static
+	 */
+	public function removeModel($name)
+	{
+		unset($this->model[$name]);
+
+		return $this;
+	}
 }
- 

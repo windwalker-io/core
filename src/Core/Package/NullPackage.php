@@ -21,6 +21,13 @@ use Windwalker\Event\Dispatcher;
 class NullPackage extends AbstractPackage implements SilencerInterface
 {
 	/**
+	 * Property dir.
+	 *
+	 * @var string
+	 */
+	public $dir;
+
+	/**
 	 * __get
 	 *
 	 * @param $name
@@ -162,6 +169,8 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 */
 	public function setName($name)
 	{
+		$this->name = $name;
+
 		return $this;
 	}
 
@@ -241,7 +250,7 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 * @throws  \RuntimeException
 	 * @return  array
 	 */
-	public static function loadConfig()
+	public function loadConfig()
 	{
 		return array();
 	}
@@ -251,7 +260,7 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 *
 	 * @return  mixed
 	 */
-	public static function loadRouting()
+	public function loadRouting()
 	{
 		return array();
 	}
@@ -261,7 +270,7 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 *
 	 * @return  string
 	 */
-	public static function getFile()
+	public function getFile()
 	{
 		return null;
 	}
@@ -271,9 +280,9 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 *
 	 * @return  string
 	 */
-	public static function getDir()
+	public function getDir()
 	{
-		return null;
+		return $this->dir;
 	}
 
 	/**
