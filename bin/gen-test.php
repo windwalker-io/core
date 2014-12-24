@@ -83,7 +83,7 @@ class GenTest extends AbstractCliApplication
 			$skelgen = '../../phpunit/phpunit-skeleton-generator/phpunit-skelgen';
 		}
 
-		echo $command = sprintf(
+		$command = sprintf(
 			$skelgen . ' generate-test --bootstrap="%s" %s %s %s %s',
 			$autoload,
 			$class,
@@ -91,7 +91,7 @@ class GenTest extends AbstractCliApplication
 			$realTestClass,
 			$testFile
 		);
-// die;
+
 		$command = 'php ' . WINDWALKER_ROOT . '/' . $command;
 
 		if (!defined('PHP_WINDOWS_VERSION_MAJOR'))

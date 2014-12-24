@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\View\Twig\WindwalkerExtension;
+use Windwalker\Data\Data;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\Priority;
 
@@ -18,6 +20,13 @@ use Windwalker\Utilities\Queue\Priority;
  */
 class TwigHtmlView extends HtmlView
 {
+	/**
+	 * Property renderer.
+	 *
+	 * @var TwigRenderer
+	 */
+	protected $renderer;
+
 	/**
 	 * Class init.
 	 *
@@ -54,6 +63,24 @@ class TwigHtmlView extends HtmlView
 		}
 
 		$this->renderer->setPaths($newPaths);
+	}
+
+	/**
+	 * prepareGlobals
+	 *
+	 * @param \Windwalker\Data\Data $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareGlobals($data)
+	{
+		$data->view = new Data;
+
+		$data->view->name = $this->getName();
+		$data->view->layout = $this->getLayout();
+
+		$this->renderer->getEngine()
+			->addExtension(new WindwalkerExtension);
 	}
 }
  

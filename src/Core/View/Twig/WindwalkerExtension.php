@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE
  */
 
-namespace Windwalker\View\Twig;
+namespace Windwalker\Core\View\Twig;
 
 use Windwalker\Core\View\Helper\ViewHelper;
 
@@ -24,7 +24,7 @@ class WindwalkerExtension extends \Twig_Extension
 	 */
 	public function getName()
 	{
-		return 'formosa';
+		return 'windwalker';
 	}
 
 	/**

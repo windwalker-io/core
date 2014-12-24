@@ -400,7 +400,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 			$route['extra']['package'] = $package->getName();
 
-			$routing[$package->name . ':' . $key] = $route;
+			$routing[$package->getName() . ':' . $key] = $route;
 		}
 
 		$packageObject = $this->container->get('package.' . $packageName);

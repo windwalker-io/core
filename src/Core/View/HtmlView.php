@@ -73,19 +73,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
 		$this->models = new Data;
+		$this->config = new Registry;
 
 		parent::__construct($data, $renderer);
-
-		$this->initialise();
-	}
-
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	protected function initialise()
-	{
 	}
 
 	/**
