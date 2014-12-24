@@ -11,7 +11,6 @@ namespace Windwalker\Core\Authenticate;
 use Windwalker\Authenticate\Authenticate;
 use Windwalker\Authenticate\Credential;
 use Windwalker\Authenticate\Method\MethodInterface;
-use Windwalker\Core\Authenticate\Exception\AuthenticateException;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
 use Windwalker\Core\Facade\Facade;
 use Windwalker\Core\Ioc;

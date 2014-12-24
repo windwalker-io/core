@@ -16,18 +16,18 @@ namespace Windwalker\Core\Authenticate;
 interface UserDataInterface
 {
 	/**
-	 * isLogin
+	 * isGuest
 	 *
 	 * @return  boolean
 	 */
-	public function isLogin();
+	public function isGuest();
 
 	/**
-	 * notLogin
+	 * isMember
 	 *
 	 * @return  boolean
 	 */
-	public function notLogin();
+	public function isMember();
 
 	/**
 	 * toArray

@@ -22,9 +22,9 @@ class UserData extends Data implements UserDataInterface
 	 *
 	 * @return  boolean
 	 */
-	public function isLogin()
+	public function isGuest()
 	{
-		return (bool) $this->id;
+		return count($this);
 	}
 
 	/**
@@ -32,9 +32,9 @@ class UserData extends Data implements UserDataInterface
 	 *
 	 * @return  boolean
 	 */
-	public function notLogin()
+	public function isMember()
 	{
-		return !$this->id;
+		return !$this->isGuest();
 	}
 
 	/**
