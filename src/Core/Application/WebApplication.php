@@ -398,18 +398,14 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 		{
 			$route['pattern'] = rtrim($pattern, '/ ') . '/' . ltrim($route['pattern'], '/ ');
 
-			$route['pattern'] = ltrim($route['pattern'], '/ ');
-
-			$route['pattern'] = $route['pattern'] ? : '/';
+			$route['pattern'] = '/' . ltrim($route['pattern'], '/ ');
 
 			$route['extra']['package'] = $package->name;
 
-			$routing[$prefix . ':' . $key] = $route;
+			$routing[$package->name . ':' . $key] = $route;
 		}
 
 		$packageObject = $this->container->get('package.' . $packageName);
-
-		$packageObject->setRoutingPrefix($prefix);
 
 		return $routing;
 	}

@@ -40,13 +40,6 @@ class AbstractPackage
 	protected $name = null;
 
 	/**
-	 * Property routingPrefix.
-	 *
-	 * @var  string
-	 */
-	protected $routingPrefix = null;
-
-	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -84,7 +77,7 @@ class AbstractPackage
 		}
 		elseif (!$package)
 		{
-			$route = $this->getRoutingPrefix() . ':' . $route;
+			$route = $this->getName() . ':' . $route;
 		}
 		else
 		{
@@ -177,30 +170,6 @@ class AbstractPackage
 	public function set($name, $value)
 	{
 		$this->container->get('system.config')->set('package.' . $this->getName() . '.config.' . $name, $value);
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property RoutingPrefix
-	 *
-	 * @return  string
-	 */
-	public function getRoutingPrefix()
-	{
-		return $this->routingPrefix ? : $this->getName();
-	}
-
-	/**
-	 * Method to set property routingPrefix
-	 *
-	 * @param   string $routingPrefix
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRoutingPrefix($routingPrefix)
-	{
-		$this->routingPrefix = $routingPrefix;
 
 		return $this;
 	}
