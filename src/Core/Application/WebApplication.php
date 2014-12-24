@@ -13,7 +13,7 @@ use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Controller\MultiActionController;
-use Windwalker\Core\Error\SimpleErrorHandler;
+use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -117,7 +117,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 		if ($this->config->get('system.debug'))
 		{
-			SimpleErrorHandler::registerErrorHandler();
+			ErrorHandler::register();
 		}
 
 		static::registerProviders($this->container);

@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Error\SimpleErrorHandler;
+use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Provider\AuthenticateProvider;
 use Windwalker\Core\Provider\CacheProvider;
@@ -42,7 +42,7 @@ class TestApplication extends WebApplication
 
 		parent::initialise();
 
-		SimpleErrorHandler::restore();
+		ErrorHandler::restore();
 
 		// Resolve DB info
 		$dsn = DsnResolver::getDsn($this->get('database.driver'));
