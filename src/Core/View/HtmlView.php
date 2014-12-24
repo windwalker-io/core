@@ -15,7 +15,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Filesystem\Path;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
@@ -29,6 +29,11 @@ use Windwalker\Core\View\Helper\ViewHelper;
  */
 class HtmlView extends \Windwalker\View\HtmlView
 {
+	/**
+	 * @const boolean
+	 */
+	const DEFAULT_MODEL = true;
+
 	/**
 	 * Property name.
 	 *
@@ -161,6 +166,10 @@ class HtmlView extends \Windwalker\View\HtmlView
 		{
 			$paths->insert(Path::clean($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
 		}
+		elseif (!($package instanceof NullPackage))
+		{
+			$paths->insert(Path::clean($package->getDir() . '/Templates/' . $this->getName()), Priority::LOW);
+		}
 		else
 		{
 			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
@@ -265,6 +274,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 	{
 		$this->package = $package;
 
+		$this->config['package.name'] = $package->getName();
+		$this->config['package.path'] = $package->getDir();
+
 		return $this;
 	}
 
@@ -368,7 +380,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 			$this->model = $model;
 		}
 
-		$this->models[$model->getName()] = $model;
+		$this->models[$model->getName() ? : uniqid()] = $model;
 
 		return $this;
 	}
@@ -382,7 +394,13 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function removeModel($name)
 	{
-		unset($this->model[$name]);
+		// If is default model, remove it.
+		if ($this->models[$name] === $this->model)
+		{
+			$this->model = null;
+		}
+
+		unset($this->models[$name]);
 
 		return $this;
 	}

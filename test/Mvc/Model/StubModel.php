@@ -6,34 +6,34 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate\Model;
+namespace Windwalker\Core\Test\Mvc\Model;
 
-use Windwalker\Core\Model\DatabaseModel;
+use Windwalker\Core\Model\Model;
 
 /**
  * The StubModel class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class FlowerModel extends DatabaseModel
+class StubModel extends Model
 {
 	/**
-	 * getSakura
+	 * getItem
 	 *
 	 * @return  string
 	 */
-	public function getSakura()
+	public function getItem()
 	{
-		return 'Sakura';
+		return 'Item';
 	}
 
 	/**
-	 * getFlower
+	 * getList
 	 *
-	 * @return  string
+	 * @return  array
 	 */
-	public function getFlower()
+	public function getList()
 	{
-		return 'Flower';
+		return array(1, 2, 3, 4);
 	}
 }

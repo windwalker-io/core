@@ -33,5 +33,29 @@ class AbstractHelper
 	{
 		$this->parent = $parent;
 	}
+
+	/**
+	 * Method to get property Parent
+	 *
+	 * @return  HelperSet
+	 */
+	public function getParent()
+	{
+		return $this->parent;
+	}
+
+	/**
+	 * Method to set property parent
+	 *
+	 * @param   HelperSet $parent
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setParent($parent)
+	{
+		$this->parent = $parent;
+
+		return $this;
+	}
 }
  

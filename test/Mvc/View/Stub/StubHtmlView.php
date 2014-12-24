@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate\View\Stub;
+namespace Windwalker\Core\Test\Mvc\View\Stub;
 
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\HtmlView;

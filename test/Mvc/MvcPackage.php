@@ -6,24 +6,21 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate\Controller\Stub;
+namespace Windwalker\Core\Test\Mvc;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Package\AbstractPackage;
 
 /**
- * The StubController class.
+ * The StubPackage class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class StubController extends Controller
+class MvcPackage extends AbstractPackage
 {
 	/**
-	 * doExecute
+	 * Property name.
 	 *
-	 * @return  mixed
+	 * @var  string
 	 */
-	protected function doExecute()
-	{
-
-	}
+	protected $name = 'mvc';
 }

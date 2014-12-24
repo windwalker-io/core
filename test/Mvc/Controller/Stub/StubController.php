@@ -6,21 +6,24 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate;
+namespace Windwalker\Core\Test\Mvc\Controller\Stub;
 
-use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Controller\Controller;
 
 /**
- * The StubPackage class.
+ * The StubController class.
  * 
  * @since  {DEPLOY_VERSION}
  */
-class IntegratePackage extends AbstractPackage
+class StubController extends Controller
 {
 	/**
-	 * Property name.
+	 * doExecute
 	 *
-	 * @var  string
+	 * @return  mixed
 	 */
-	protected $name = 'integrate';
+	protected function doExecute()
+	{
+
+	}
 }

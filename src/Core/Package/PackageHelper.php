@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\DI\Container;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 
 /**

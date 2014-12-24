@@ -6,13 +6,13 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate;
+namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Test\AbstractBaseTestCase;
-use Windwalker\Core\Test\Integrate\Model\FlowerModel;
-use Windwalker\Core\Test\Integrate\Model\StubModel;
-use Windwalker\Core\Test\Integrate\View\Stub\StubHtmlView;
+use Windwalker\Core\Test\Mvc\Model\FlowerModel;
+use Windwalker\Core\Test\Mvc\Model\StubModel;
+use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;

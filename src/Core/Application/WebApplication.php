@@ -18,6 +18,7 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Provider\CacheProvider;
+use Windwalker\Core\Provider\DateTimeProvider;
 use Windwalker\Core\Provider\EventProvider;
 use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
@@ -155,6 +156,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			'router'  => new RouterProvider,
 			'cache'   => new CacheProvider,
 			'session' => new SessionProvider,
+			'datetime' => new DateTimeProvider,
 		);
 	}
 

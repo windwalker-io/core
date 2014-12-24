@@ -11,7 +11,7 @@ namespace Windwalker\Core\Migration\Command;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Database\DatabaseFactory;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 
 /**
  * The MigrationCommand class.

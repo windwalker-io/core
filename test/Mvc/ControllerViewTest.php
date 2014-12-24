@@ -6,16 +6,16 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate;
+namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Test\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
-use Windwalker\Core\Test\Integrate\Controller\Stub\StubController;
-use Windwalker\Core\Test\Integrate\View\Stub\StubHtmlView;
+use Windwalker\Core\Test\Mvc\Controller\Stub\StubController;
+use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Filesystem\Path;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Test\TestHelper;
 
 /**
@@ -41,7 +41,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 	{
 		$this->instance = new StubController;
 
-		$this->instance->setPackage(new IntegratePackage);
+		$this->instance->setPackage(new MvcPackage);
 	}
 
 	/**
@@ -88,12 +88,12 @@ class ControllerViewTest extends AbstractBaseTestCase
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);
 		$this->assertEquals('stub', $view->getName());
-		$this->assertEquals('integrate', $view->getPackage()->getName());
+		$this->assertEquals('mvc', $view->getPackage()->getName());
 
 		$config = $view->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		$this->assertEquals($this->getPath($this->instance->getPackage()), Path::clean($config['package.path']));
 
 		$paths = $view->getRegisteredPaths();
@@ -101,7 +101,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$paths = array_values(iterator_to_array($paths));
 
 		$this->assertPathEquals($this->getPath($this->instance->getPackage()) . '/Templates/stub', $paths[0]);
-		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/integrate/stub', $paths[1]);
+		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', $paths[1]);
 		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', $paths[2]);
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), $paths[3]);
 
@@ -121,7 +121,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);
 		$this->assertEquals('stub', $view->getName());
-		$this->assertEquals('integrate', $view->getPackage()->getName());
+		$this->assertEquals('mvc', $view->getPackage()->getName());
 
 		$config = $view->getConfig();
 
@@ -134,7 +134,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$paths = array_values(iterator_to_array($paths));
 
 		$this->assertPathEquals($this->getPath($view) . '/../../Templates/stub', $paths[0]);
-		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/integrate/stub', $paths[1]);
+		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', $paths[1]);
 		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', $paths[2]);
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), $paths[3]);
 
@@ -156,12 +156,12 @@ class ControllerViewTest extends AbstractBaseTestCase
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);
 		$this->assertEquals('stub', $view->getName());
-		$this->assertEquals('integrate', $view->getPackage()->getName());
+		$this->assertEquals('mvc', $view->getPackage()->getName());
 
 		$config = $view->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		$this->assertEquals($this->getPath($this->instance->getPackage()), Path::clean($config['package.path']));
 
 		$paths = $view->getRegisteredPaths();
@@ -169,7 +169,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$paths = array_values(iterator_to_array($paths));
 
 		$this->assertPathEquals($this->getPath($this->instance->getPackage()) . '/Templates/stub', $paths[0]);
-		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/integrate/stub', $paths[1]);
+		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', $paths[1]);
 		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', $paths[2]);
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), $paths[3]);
 
@@ -190,12 +190,12 @@ class ControllerViewTest extends AbstractBaseTestCase
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);
 		$this->assertEquals('stub', $view->getName());
-		$this->assertEquals('integrate', $view->getPackage()->getName());
+		$this->assertEquals('mvc', $view->getPackage()->getName());
 
 		$config = $view->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		// $this->assertEquals($this->getPackagePath($this->instance->getPackage()), Path::clean($config['package.path']));
 
 		$paths = $view->getRegisteredPaths();
@@ -203,7 +203,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$paths = array_values(iterator_to_array(clone $paths));
 
 		$this->assertPathEquals($this->getPath($this->instance->getPackage()) . '/Templates/stub', $paths[0]);
-		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/integrate/stub', $paths[1]);
+		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', $paths[1]);
 		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', $paths[2]);
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), $paths[3]);
 
@@ -224,12 +224,12 @@ class ControllerViewTest extends AbstractBaseTestCase
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);
 		$this->assertEquals('stub', $view->getName());
-		$this->assertEquals('integrate', $view->getPackage()->getName());
+		$this->assertEquals('mvc', $view->getPackage()->getName());
 
 		$config = $view->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		// $this->assertEquals($this->getPackagePath($this->instance->getPackage()), Path::clean($config['package.path']));
 
 		TestHelper::invoke($view, 'registerPaths');
@@ -238,7 +238,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$paths = array_values(iterator_to_array(clone $paths));
 
 		$this->assertPathEquals($this->getPath($this->instance->getPackage()) . '/Templates/stub', $paths[0]);
-		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/integrate/stub', $paths[1]);
+		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', $paths[1]);
 		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', $paths[2]);
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), $paths[3]);
 

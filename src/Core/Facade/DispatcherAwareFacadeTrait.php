@@ -10,7 +10,7 @@ namespace Windwalker\Core\Facade;
 
 use Windwalker\Core\Event\DispatcherAwareStaticTrait;
 use Windwalker\Event\Dispatcher;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 
 /**
  * The DispatcherAwareStaticTrait class.

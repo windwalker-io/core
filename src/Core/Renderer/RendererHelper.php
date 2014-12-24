@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Renderer;
 
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Utilities\Queue\Priority;
 
 /**

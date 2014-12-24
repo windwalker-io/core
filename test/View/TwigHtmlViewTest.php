@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\View;
 
-use Joomla\Date\Date;
+use Joomla\DateTime\DateTime;
 use Twig_SimpleFunction;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Test\View\Stub\StubExtension;
@@ -93,6 +93,6 @@ class TwigHtmlViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($globals['container'] instanceof Container);
 		$this->assertTrue($globals['helper'] instanceof HelperSet);
 		$this->assertTrue(is_array($globals['flashes']));
-		$this->assertTrue($globals['datetime'] instanceof Date);
+		$this->assertTrue($globals['datetime'] instanceof DateTime);
 	}
 }

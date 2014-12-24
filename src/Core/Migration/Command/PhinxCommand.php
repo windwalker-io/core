@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 
 /**
  * Class Migration

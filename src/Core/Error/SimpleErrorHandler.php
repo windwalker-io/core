@@ -11,7 +11,7 @@ namespace Windwalker\Core\Error;
 use Windwalker\Application\Web\Response;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Renderer\PhpRenderer;
 
 /**

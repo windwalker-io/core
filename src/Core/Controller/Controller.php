@@ -20,7 +20,7 @@ use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\IO\Input;
-use Windwalker\Ioc;
+use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\View\AbstractView;
 

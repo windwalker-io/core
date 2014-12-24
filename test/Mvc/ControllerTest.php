@@ -6,12 +6,12 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Test\Integrate;
+namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Test\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
-use Windwalker\Core\Test\Integrate\Controller\Stub\StubController;
+use Windwalker\Core\Test\Mvc\Controller\Stub\StubController;
 use Windwalker\Filesystem\Path;
 
 /**
@@ -37,7 +37,7 @@ class ControllerTest extends AbstractBaseTestCase
 	{
 		$this->instance = new StubController;
 
-		$this->instance->setPackage(new IntegratePackage);
+		$this->instance->setPackage(new MvcPackage);
 	}
 
 	/**
@@ -85,7 +85,7 @@ class ControllerTest extends AbstractBaseTestCase
 		$config = $this->instance->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		$this->assertEquals($this->getPath($this->instance->getPackage()), Path::clean($config['package.path']));
 	}
 
@@ -96,12 +96,12 @@ class ControllerTest extends AbstractBaseTestCase
 	 */
 	public function testWithPackage()
 	{
-		$this->assertTrue($this->instance->getPackage() instanceof IntegratePackage);
+		$this->assertTrue($this->instance->getPackage() instanceof MvcPackage);
 
 		$config = $this->instance->getConfig();
 
 		$this->assertEquals('stub', $config['name']);
-		$this->assertEquals('integrate', $config['package.name']);
+		$this->assertEquals('mvc', $config['package.name']);
 		$this->assertEquals($this->getPath($this->instance->getPackage()), Path::clean($config['package.path']));
 	}
 }

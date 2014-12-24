@@ -9,6 +9,9 @@
 		"symfony/yaml" : "2.*@stable"
 	},
 	"require-dev" : {
+		"joomla/datetime": "2.*@stable",
+		"twig/twig": "1.*@stable",
+		"illuminate/view": "4.*@stable"
 	},
 	"autoload" : {
 		"psr-4" : {
