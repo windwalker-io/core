@@ -57,6 +57,11 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetBladeRenderer()
 	{
+		if (!class_exists('Illuminate\View\Environment'))
+		{
+			$this->markTestSkipped('Illuminate not installed');
+		}
+
 		$this->assertTrue(RendererHelper::getBladeRenderer() instanceof BladeRenderer);
 
 		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getBladeRenderer()->getPaths());

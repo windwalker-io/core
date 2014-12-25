@@ -1,0 +1,193 @@
+<?php
+/**
+ * Part of starter project.
+ *
+ * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later;
+ */
+
+namespace Windwalker\Core\Utilities\Iterator;
+
+use Windwalker\Utilities\Queue\Priority;
+
+/**
+ * The PriorityQueue class.
+ *
+ * A modified version of ZF2.
+ *
+ * @since  {DEPLOY_VERSION}
+ */
+class PriorityQueue extends \SplPriorityQueue implements \Serializable
+{
+	/**
+	 * @var int Seed used to ensure queue order for items of the same priority
+	 */
+	protected $serial = PHP_INT_MAX;
+
+	/**
+	 * Class init.
+	 *
+	 * @param array $array
+	 * @param int   $priority
+	 */
+	public function __construct($array = array(), $priority = Priority::NORMAL)
+	{
+		$this->bind($array, $priority);
+	}
+
+	/**
+	 * bind
+	 *
+	 * @param array $array
+	 * @param int   $priority
+	 *
+	 * @return  void
+	 */
+	public function bind($array = array(), $priority = Priority::NORMAL)
+	{
+		if (is_object($array))
+		{
+			$array = get_object_vars($array);
+		}
+
+		$array = (array) $array;
+
+		foreach ($array as $item)
+		{
+			$this->insert($item, $priority);
+		}
+	}
+
+	/**
+	 * Insert a value with a given priority
+	 *
+	 * Utilizes {@var $serial} to ensure that values of equal priority are
+	 * emitted in the same order in which they are inserted.
+	 *
+	 * @param  mixed $datum
+	 * @param  mixed $priority
+	 *
+	 * @return void
+	 */
+	public function insert($datum, $priority)
+	{
+		if (!is_array($priority))
+		{
+			$priority = array($priority, $this->serial--);
+		}
+		else
+		{
+			$priority[] = $this->serial--;
+		}
+
+		parent::insert($datum, $priority);
+	}
+
+	/**
+	 * Serialize to an array
+	 *
+	 * Array will be priority => data pairs
+	 *
+	 * @return array
+	 */
+	public function toArray()
+	{
+		$array = array();
+
+		foreach (clone $this as $item)
+		{
+			$array[] = $item;
+		}
+
+		return $array;
+	}
+
+	/**
+	 * Serialize
+	 *
+	 * @return string
+	 */
+	public function serialize()
+	{
+		$clone = clone $this;
+
+		$clone->setExtractFlags(self::EXTR_BOTH);
+
+		$data = array();
+
+		foreach ($clone as $item)
+		{
+			$data[] = $item;
+		}
+
+		return serialize($data);
+	}
+
+	/**
+	 * Deserialize
+	 *
+	 * @param  string $data
+	 *
+	 * @return void
+	 */
+	public function unserialize($data)
+	{
+		foreach (unserialize($data) as $item)
+		{
+			$this->insert($item['data'], $item['priority']);
+		}
+	}
+
+	/**
+	 * merge
+	 *
+	 * @return static;
+	 */
+	public function merge()
+	{
+		$args = func_get_args();
+
+		foreach ($args as $arg)
+		{
+			if (!($arg instanceof \SplPriorityQueue))
+			{
+				throw new \InvalidArgumentException('Only \SplPriorityQueue can merge.');
+			}
+
+			$queue = clone $arg;
+
+			$queue->setExtractFlags(self::EXTR_BOTH);
+
+			foreach ($queue as $item)
+			{
+				$this->insert($item['data'], $item['priority']);
+			}
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Serial
+	 *
+	 * @return  int
+	 */
+	public function getSerial()
+	{
+		return $this->serial;
+	}
+
+	/**
+	 * Method to set property serial
+	 *
+	 * @param   int $serial
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setSerial($serial)
+	{
+		$this->serial = $serial;
+
+		return $this;
+	}
+}
