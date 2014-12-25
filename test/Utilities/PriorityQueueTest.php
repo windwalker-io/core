@@ -52,6 +52,27 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 	{
 	}
 
+	public function testConstruct()
+	{
+		$queue = new PriorityQueue(array('a', 'b', 'c', 'd', 'e'));
+
+		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $queue)));
+		$this->assertEquals($this->instance, $queue);
+
+		$queue = new \SplPriorityQueue;
+
+		$queue->insert('a', 5);
+		$queue->insert('b', 4);
+		$queue->insert('c', 3);
+		$queue->insert('d', 2);
+		$queue->insert('e', 1);
+
+		$queue = new PriorityQueue($queue);
+
+		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $queue)));
+		$this->assertEquals($this->instance, $queue);
+	}
+
 	/**
 	 * Method to test insert().
 	 *

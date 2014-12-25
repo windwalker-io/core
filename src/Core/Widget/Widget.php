@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Widget;
 
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
@@ -52,13 +53,16 @@ class Widget implements WidgetInterface
 	/**
 	 * Class init.
 	 *
-	 * @param string              $layout
+	 * @param string            $layout
 	 * @param RendererInterface $renderer
 	 */
 	public function __construct($layout, RendererInterface $renderer = null)
 	{
 		$this->layout = $layout;
 		$this->renderer = $renderer ? : new PhpRenderer;
+
+		// Create PriorityQueue
+		$this->createPriorityQueue();
 
 		$this->initialise();
 	}
@@ -153,10 +157,9 @@ class Widget implements WidgetInterface
 	{
 		if (!$this->pathRegistered)
 		{
-			foreach (RendererHelper::getGlobalPaths() as $i => $path)
-			{
-				$this->renderer->addPath($path, Priority::LOW - (10 * $i));
-			}
+			$paths = RendererHelper::getGlobalPaths()->merge($this->renderer->getPaths());
+
+			$this->renderer->setPaths($paths);
 
 			$this->pathRegistered = true;
 		}
@@ -182,7 +185,7 @@ class Widget implements WidgetInterface
 	/**
 	 * getPaths
 	 *
-	 * @return  \SplPriorityQueue
+	 * @return  PriorityQueue
 	 */
 	public function getPaths()
 	{
@@ -199,6 +202,8 @@ class Widget implements WidgetInterface
 	public function setPaths($paths)
 	{
 		$this->renderer->setPaths($paths);
+
+		$this->createPriorityQueue();
 
 		return $this;
 	}
@@ -223,6 +228,25 @@ class Widget implements WidgetInterface
 	public function setDebug($debug)
 	{
 		$this->debug = $debug;
+
+		return $this;
+	}
+
+	/**
+	 * createPriorityQueue
+	 *
+	 * @return  static
+	 */
+	protected function createPriorityQueue()
+	{
+		$paths = $this->renderer->getPaths();
+
+		if (!($paths instanceof PriorityQueue))
+		{
+			$paths = new PriorityQueue($paths);
+
+			$this->renderer->setPaths($paths);
+		}
 
 		return $this;
 	}

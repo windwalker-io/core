@@ -13,7 +13,9 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
+use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\ViewModel;
 use Windwalker\Data\Data;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
@@ -51,6 +53,19 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function tearDown()
 	{
+	}
+
+	/**
+	 * testConstruct
+	 *
+	 * @return  void
+	 */
+	public function testConstruct()
+	{
+		$view = new HtmlView;
+
+		$this->assertTrue($view->getRenderer()->getPaths() instanceof PriorityQueue);
+		$this->assertTrue($view->model instanceof ViewModel);
 	}
 
 	/**

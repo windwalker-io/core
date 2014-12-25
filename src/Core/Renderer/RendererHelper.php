@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Renderer;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
@@ -25,7 +26,7 @@ abstract class RendererHelper
 	/**
 	 * Property paths.
 	 *
-	 * @var  \SplPriorityQueue
+	 * @var  PriorityQueue
 	 */
 	protected static $paths;
 
@@ -81,7 +82,7 @@ abstract class RendererHelper
 	/**
 	 * getGlobalPaths
 	 *
-	 * @return  \SplPriorityQueue
+	 * @return  PriorityQueue
 	 */
 	public static function getGlobalPaths()
 	{
@@ -104,13 +105,13 @@ abstract class RendererHelper
 	/**
 	 * getPaths
 	 *
-	 * @return  \SplPriorityQueue
+	 * @return  PriorityQueue
 	 */
 	protected static function getPaths()
 	{
 		if (!static::$paths)
 		{
-			static::$paths = new \SplPriorityQueue;
+			static::$paths = new PriorityQueue;
 
 			static::registerPaths();
 		}
@@ -136,7 +137,7 @@ abstract class RendererHelper
 		// Priority (2)
 		static::$paths->insert(
 			realpath(__DIR__ . '/../Resources/Templates'),
-			Priority::LOW - 10
+			Priority::LOW
 		);
 
 		// Priority (3)
