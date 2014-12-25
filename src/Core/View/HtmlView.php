@@ -58,16 +58,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 	/**
 	 * Property model.
 	 *
-	 * @var Model
+	 * @var ViewModel
 	 */
 	protected $model;
-
-	/**
-	 * Property models.
-	 *
-	 * @var Model[]
-	 */
-	protected $models;
 
 	/**
 	 * Method to instantiate the view.
@@ -77,8 +70,8 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function __construct($data = array(), RendererInterface $renderer = null)
 	{
-		$this->models = new Data;
 		$this->config = new Registry;
+		$this->model = new ViewModel;
 
 		parent::__construct($data, $renderer);
 	}
@@ -345,6 +338,11 @@ class HtmlView extends \Windwalker\View\HtmlView
 			return $this->config;
 		}
 
+		if ($name == 'model')
+		{
+			return $this->model;
+		}
+
 		return null;
 	}
 
@@ -357,12 +355,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function getModel($name = null)
 	{
-		if ($name)
-		{
-			return $this->models[$name];
-		}
-
-		return $this->model;
+		return $this->model->getModel($name);
 	}
 
 	/**
@@ -375,12 +368,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function setModel(Model $model, $default = false)
 	{
-		if ($default || !$this->model)
-		{
-			$this->model = $model;
-		}
-
-		$this->models[$model->getName() ? : uniqid()] = $model;
+		$this->model->setModel($model, $default);
 
 		return $this;
 	}
@@ -394,13 +382,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 	 */
 	public function removeModel($name)
 	{
-		// If is default model, remove it.
-		if ($this->models[$name] === $this->model)
-		{
-			$this->model = null;
-		}
-
-		unset($this->models[$name]);
+		$this->model->removeModel($name);
 
 		return $this;
 	}

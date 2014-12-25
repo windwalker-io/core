@@ -227,7 +227,7 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$view->removeModel('stub');
 
-		$this->assertNull($view->getModel());
-		$this->assertNull($view->getModel('stub'));
+		$this->assertTrue($view->getModel()->get('is.null'));
+		$this->assertTrue($view->getModel('stub')->get('is.null'));
 	}
 }

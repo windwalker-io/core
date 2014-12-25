@@ -35,4 +35,27 @@ interface UserDataInterface
 	 * @return  array
 	 */
 	public function dump();
+
+	/**
+	 * bind
+	 *
+	 * @param array $data
+	 *
+	 * @return  mixed
+	 */
+	public function bind($data);
+
+	/**
+	 * isNull
+	 *
+	 * @return  boolean
+	 */
+	public function isNull();
+
+	/**
+	 * notNull
+	 *
+	 * @return  boolean
+	 */
+	public function notNull();
 }

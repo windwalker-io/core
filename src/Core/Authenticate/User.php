@@ -133,7 +133,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 			$user = new UserData($user);
 		}
 
-		if (!$user->dump())
+		if ($user->isNull())
 		{
 			return false;
 		}

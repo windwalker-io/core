@@ -97,14 +97,16 @@ class ViewModelTest extends AbstractBaseTestCase
 			$this->assertInstanceOf('BadMethodCallException', $e);
 		}
 
-		$this->assertEquals('Flower', $this->view->models['flower']->getFlower());
-		$this->assertEquals('Sakura', $this->view->models['flower']->getSakura());
-		$this->assertEquals(null, $this->view->models['flower']->getData());
-		$this->assertEquals(null, $this->view->models['flower']->loadData());
+		$this->assertEquals('Flower', $this->view->model['flower']->getFlower());
+		$this->assertEquals('Sakura', $this->view->model['flower']->getSakura());
+		$this->assertEquals(null, $this->view->model['flower']->getData());
+		$this->assertEquals(null, $this->view->model['flower']->loadData());
+		$this->assertEquals(null, $this->view->model['none']->loadData());
+		$this->assertEquals(null, $this->view->model['none']->getData());
 
 		try
 		{
-			$this->view->models['flower']->fetchData();
+			$this->view->model['flower']->fetchData();
 		}
 		catch (\Exception $e)
 		{

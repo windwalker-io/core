@@ -10,6 +10,7 @@ namespace Windwalker\Core\Test\Mvc\View\Stub;
 
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\ViewModel;
 
 /**
  * The StubHtmlView class.
@@ -21,16 +22,9 @@ class StubHtmlView extends HtmlView
 	/**
 	 * Property model.
 	 *
-	 * @var Model
+	 * @var ViewModel
 	 */
 	public $model;
-
-	/**
-	 * Property models.
-	 *
-	 * @var Model[]
-	 */
-	public $models;
 
 	/**
 	 * getRegisteredPaths

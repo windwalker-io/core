@@ -9,6 +9,10 @@
 namespace Windwalker\Core\Renderer;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Renderer\BladeRenderer;
+use Windwalker\Renderer\PhpRenderer;
+use Windwalker\Renderer\RendererInterface;
+use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\Priority;
 
 /**
@@ -24,6 +28,55 @@ abstract class RendererHelper
 	 * @var  \SplPriorityQueue
 	 */
 	protected static $paths;
+
+	/**
+	 * getRenderer
+	 *
+	 * @param string $type
+	 *
+	 * @return  RendererInterface
+	 */
+	public static function getRenderer($type = 'php')
+	{
+		$class = sprintf('Windwalker\Renderer\%sRenderer', ucfirst($type));
+
+		if (!class_exists($class))
+		{
+			throw new \DomainException(sprintf('%s renderer not supported.', $type));
+		}
+
+		return new $class(static::getGlobalPaths());
+	}
+
+	/**
+	 * getPhpRenderer
+	 *
+	 * @return  PhpRenderer
+	 */
+	public static function getPhpRenderer()
+	{
+		return static::getRenderer('php');
+	}
+
+	/**
+	 * getBladeRenderer
+	 *
+	 * @return  BladeRenderer
+	 */
+	public static function getBladeRenderer()
+	{
+		return static::getRenderer('blade');
+	}
+
+	/**
+	 * getTwigRenderer
+	 *
+	 * @return  TwigRenderer
+	 */
+	public static function getTwigRenderer()
+	{
+		return static::getRenderer('twig');
+	}
 
 	/**
 	 * getGlobalPaths
