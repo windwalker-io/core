@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Application;
 
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventInterface;
 
@@ -53,4 +54,11 @@ interface WindwalkerApplicationInterface
 	 * @since   {DEPLOY_VERSION}
 	 */
 	public function triggerEvent($event, $args = array());
+
+	/**
+	 * Method to get property Container
+	 *
+	 * @return  Container
+	 */
+	public function getContainer();
 }

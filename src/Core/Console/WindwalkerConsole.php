@@ -216,5 +216,29 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 
 		return null;
 	}
+
+	/**
+	 * Method to set property container
+	 *
+	 * @param   Container $container
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setContainer($container)
+	{
+		$this->container = $container;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Container
+	 *
+	 * @return  Container
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
 }
  

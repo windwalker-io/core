@@ -12,6 +12,7 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\DataHandlerInterface;
 use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
+use Windwalker\Registry\Registry;
 
 /**
  * The CacheFactory class.
@@ -57,11 +58,11 @@ abstract class CacheFactory
 	/**
 	 * getStorage
 	 *
-	 * @param string $storage
-	 * @param array  $options
-	 * @param string $name
+	 * @param string   $storage
+	 * @param array    $options
+	 * @param string   $name
 	 *
-	 * @return  CacheStorageInterface
+	 * @return CacheStorageInterface
 	 */
 	public static function getStorage($storage, $options = array(), $name = 'windwalker')
 	{
@@ -74,12 +75,12 @@ abstract class CacheFactory
 
 		$config = Ioc::getConfig();
 
-		$ttl = $config->get('cache.time');
+		$ttl = isset($options['cache_time']) ? $options['cache_time'] : $config->get('cache.time');
 
 		switch (strtolower($storage))
 		{
-			case 'file' :
-				$path = $config->get('cache.dir');
+			case 'file':
+				$path = isset($options['cache_dir']) ? $options['cache_dir'] : $config->get('cache.dir');
 
 				if (!is_dir($path))
 				{

@@ -37,19 +37,21 @@ abstract class Language extends Facade
 	 */
 	public static function load($file, $package = null)
 	{
-		$config = Ioc::getConfig();
+		$container = static::getContainer();
+
+		$config = $container->get('system.config');
 
 		$format  = $config['language.format']  ? : 'ini';
 		$default = $config['language.default'] ? : 'en-GB';
 		$locale  = $config['language.locale']  ? : 'en-GB';
 
 		$default = LanguageNormalize::toLanguageTag($default);
-		$locale = LanguageNormalize::toLanguageTag($locale);
+		$locale  = LanguageNormalize::toLanguageTag($locale);
 
 		// If package name exists, we load package language first, that global can override it.
 		if ($package)
 		{
-			$package = Ioc::get('package.' . $package);
+			$package = $container->get('package.' . $package);
 
 			$path = $package->getDir() . '/Languages/%s/%s.%s';
 
@@ -89,7 +91,9 @@ abstract class Language extends Facade
 		{
 			static::getInstance()->load($file, $format);
 
-			$config = Ioc::getConfig();
+			$container = static::getContainer();
+
+			$config = $container->get('system.config');
 
 			$loaded = $config['language.loaded'];
 

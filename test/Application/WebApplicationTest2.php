@@ -102,7 +102,7 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Application\WebApplication::getController
+	 * @covers Windwalker\Core\Application\WebApplication::route
 	 * @TODO   Implement testGetController().
 	 */
 	public function testGetController()

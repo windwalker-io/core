@@ -313,7 +313,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	{
 		if (!static::$dispatcher)
 		{
-			static::$dispatcher = Ioc::getDispatcher();
+			static::$dispatcher = static::getContainer()->get('system.dispatcher');
 		}
 
 		return static::$dispatcher->triggerEvent($event, $args);

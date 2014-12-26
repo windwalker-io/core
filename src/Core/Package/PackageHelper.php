@@ -100,7 +100,7 @@ abstract class PackageHelper
 
 		$package->setContainer($subContainer)->initialise();
 
-		$application = $container->get('system.app');
+		$application = $container->get('system.application');
 
 		// If in Console mode, register commands.
 		if ($application instanceof Console)
@@ -122,16 +122,43 @@ abstract class PackageHelper
 	 *
 	 * @return  AbstractPackage
 	 */
-	public static function getPackage($name)
+	public static function getPackage($name, Container $container = null)
 	{
+		$container = $container ? : Ioc::getContainer();
+
 		$key = 'package.' . strtolower($name);
 
-		if (Ioc::exists($key))
+		if ($container->exists($key))
 		{
-			return Ioc::get($key);
+			return $container->get($key);
 		}
 
 		return null;
+	}
+
+	/**
+	 * getPackages
+	 *
+	 * @param Container $container
+	 *
+	 * @return  array
+	 */
+	public static function getPackages(Container $container = null)
+	{
+		$container = $container ? : Ioc::getContainer();
+
+		$config = $container->get('system.config');
+
+		$packages = $config->get('package');
+
+		$return = array();
+
+		foreach ((array) $packages as $pkg)
+		{
+			$return[$pkg->name] = static::getPackage($pkg->name);
+		}
+
+		return $return;
 	}
 
 	/**

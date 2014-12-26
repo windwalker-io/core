@@ -30,7 +30,8 @@ class CacheProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
+			$config  = $container->get('system.config');
+			$options = array();
 
 			$enabled = $config->get('cache.enabled', false);
 			$debug   = $config->get('system.debug', false);
@@ -40,7 +41,15 @@ class CacheProvider implements ServiceProviderInterface
 
 			$storage = ($enabled && !$debug) ? $storage : 'null';
 
-			return CacheFactory::getCache('windwalker', $storage, $handler);
+			// Options
+			$options['cache_time'] = $config->get('cache.time');
+
+			if ($storage == 'file')
+			{
+				$options['cache_dir'] = $config->get('cache.dir');
+			}
+
+			return CacheFactory::getCache('windwalker', $storage, $handler, $options);
 		};
 
 		$container->share('system.cache', $closure)

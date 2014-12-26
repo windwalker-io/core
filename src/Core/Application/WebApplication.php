@@ -125,7 +125,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		PackageHelper::registerPackages($this->loadPackages(), $this->container);
 
-		$this->triggerEvent('onAfterInitialise');
+		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 	}
 
 	/**
@@ -182,21 +182,21 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$this->prepareExecute();
 
-		$this->triggerEvent('onBeforeExecute');
+		$this->triggerEvent('onBeforeExecute', array('app' => $this));
 
 		// Perform application routines.
 		$this->doExecute();
 
-		$this->triggerEvent('onAfterExecute');
+		$this->triggerEvent('onAfterExecute', array('app' => $this));
 
 		$this->postExecute();
 
-		$this->triggerEvent('onBeforeRespond');
+		$this->triggerEvent('onBeforeRespond', array('app' => $this));
 
 		// Send the application response.
 		$this->respond();
 
-		$this->triggerEvent('onAfterRespond');
+		$this->triggerEvent('onAfterRespond', array('app' => $this));
 	}
 
 	/**
@@ -209,25 +209,21 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function doExecute()
 	{
-		$this->triggerEvent('onBeforeRouting');
+		$this->triggerEvent('onBeforeRouting', array('app' => $this));
 
-		$controller = $this->getController();
+		$this->route();
 
-		$this->container->share('main.controller', $controller);
+		$this->triggerEvent('onAfterRouting', array('app' => $this));
 
-		$this->triggerEvent('onAfterRouting');
+		$this->triggerEvent('onBeforeRender', array('app' => $this));
 
-		$this->triggerEvent('onBeforeRender');
+		$this->setBody($this->render());
 
-		$this->setBody($controller->execute());
-
-		$this->triggerEvent('onAfterRender');
-
-		$controller->redirect();
+		$this->triggerEvent('onAfterRender', array('app' => $this));
 	}
 
 	/**
-	 * getController
+	 * Routing.
 	 *
 	 * @param string $route
 	 *
@@ -235,7 +231,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * @throws  \UnexpectedValueException
 	 * @return  mixed
 	 */
-	public function getController($route = null)
+	public function route($route = null)
 	{
 		$route = $route ? : $this->container->get('uri')->get('route');
 
@@ -290,7 +286,27 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		$this->config->loadArray(array('extra' => $extra));
 
-		return $controller;
+		$this->container->set('main.controller', $controller);
+
+		return $this;
+	}
+
+	/**
+	 * render
+	 *
+	 * @param Controller $controller
+	 *
+	 * @return mixed
+	 */
+	public function render(Controller $controller = null)
+	{
+		$controller = $controller ? : $this->container->get('main.controller');
+
+		$output = $controller->execute();
+
+		$controller->redirect();
+
+		return $output;
 	}
 
 	/**
@@ -464,7 +480,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function addFlash($msg, $type = 'info')
 	{
 		/** @var \Windwalker\Session\Session $session */
-		$session = Ioc::getSession();
+		$session = $this->container->get('system.session');
 
 		$session->getFlashBag()->add($msg, $type);
 
@@ -562,5 +578,29 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function prepareSystemPath($config)
 	{
+	}
+
+	/**
+	 * Method to get property Container
+	 *
+	 * @return  Container
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+
+	/**
+	 * Method to set property container
+	 *
+	 * @param   Container $container
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setContainer($container)
+	{
+		$this->container = $container;
+
+		return $this;
 	}
 }
