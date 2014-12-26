@@ -45,7 +45,7 @@ class ViewHelper extends AbstractHelper
 		return array(
 			'uri' => Ioc::get('uri'),
 			'app' => Ioc::getApplication(),
-			'container' => Ioc::getContainer($package),
+			'container' => Ioc::factory($package),
 			'helper' => new HelperSet,
 			'flashes' => static::$flashes,
 			'datetime' => new DateTime('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))

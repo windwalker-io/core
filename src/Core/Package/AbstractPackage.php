@@ -107,7 +107,7 @@ class AbstractPackage
 	{
 		if (!$this->container)
 		{
-			$this->container = Ioc::getContainer($this->getName());
+			$this->container = Ioc::factory($this->getName());
 		}
 
 		return $this->container;

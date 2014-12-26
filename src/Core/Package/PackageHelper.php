@@ -31,7 +31,7 @@ abstract class PackageHelper
 	 */
 	public static function registerPackages($packages, Container $container = null)
 	{
-		$container = $container ? : Ioc::getContainer();
+		$container = $container ? : Ioc::factory();
 
 		foreach ($packages as $alias => $package)
 		{
@@ -50,7 +50,7 @@ abstract class PackageHelper
 	 */
 	public static function addPackage($alias, $package, Container $container = null)
 	{
-		$container = $container ? : Ioc::getContainer();
+		$container = $container ? : Ioc::factory();
 		$config = $container->get('system.config');
 
 		if (is_string($package))
@@ -124,7 +124,7 @@ abstract class PackageHelper
 	 */
 	public static function getPackage($name, Container $container = null)
 	{
-		$container = $container ? : Ioc::getContainer();
+		$container = $container ? : Ioc::factory();
 
 		$key = 'package.' . strtolower($name);
 
@@ -145,7 +145,7 @@ abstract class PackageHelper
 	 */
 	public static function getPackages(Container $container = null)
 	{
-		$container = $container ? : Ioc::getContainer();
+		$container = $container ? : Ioc::factory();
 
 		$config = $container->get('system.config');
 

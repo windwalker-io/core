@@ -9,8 +9,8 @@
 namespace Windwalker\Core\Console;
 
 use Windwalker\Console\Console;
+use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
-use Windwalker\Core\Console\Descriptor\CommandDescriptor;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Package\AbstractPackage;
@@ -65,6 +65,20 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	public $config;
 
 	/**
+	 * Class init.
+	 *
+	 * @param   Container    $container  The DI Container object.
+	 * @param   IOInterface  $io         The Input and output handler.
+	 * @param   Registry     $config     Application's config object.
+	 */
+	public function __construct(Container $container = null, IOInterface $io = null, Registry $config = null)
+	{
+		$this->container = $container instanceof Container ? $container : Ioc::factory();
+
+		parent::__construct($io, $config);
+	}
+
+	/**
 	 * initialise
 	 *
 	 * @return  void
@@ -77,9 +91,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 		// Register the root command to let packages can add child commands
 		$this->registerRootCommand();
 
-		// Init container and register system providers
-		$this->container = Ioc::getContainer();
-
+		// Register system providers
 		$this->container->registerServiceProvider(new SystemProvider($this))
 			->registerServiceProvider(new ConsoleProvider($this));
 

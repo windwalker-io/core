@@ -74,23 +74,23 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * Class constructor.
 	 *
+	 * @param   Container          $container    The DI container object.
 	 * @param   Input              $input        An optional argument to provide dependency injection for the application's
-	 *                                           input object.  If the argument is a Input object that object will become
-	 *                                           the application's input object, otherwise a default input object is created.
+	 *                                           input object.
 	 * @param   Registry           $config       An optional argument to provide dependency injection for the application's
-	 *                                           config object.  If the argument is a Registry object that object will become
-	 *                                           the application's config object, otherwise a default config object is created.
+	 *                                           config object.
 	 * @param   WebEnvironment     $environment  An optional argument to provide dependency injection for the application's
-	 *                                           client object.  If the argument is a Web\WebEnvironment object that object will become
-	 *                                           the application's client object, otherwise a default client object is created.
+	 *                                           environment object.
 	 * @param   ResponseInterface  $response     The response object.
 	 */
-	public function __construct(Input $input = null, Registry $config = null, WebEnvironment $environment = null, ResponseInterface $response = null)
+	public function __construct(Container $container = null, Input $input = null, Registry $config = null,
+		WebEnvironment $environment = null, ResponseInterface $response = null)
 	{
 		$this->environment = $environment instanceof WebEnvironment    ? $environment : new WebEnvironment;
 		$this->response    = $response    instanceof ResponseInterface ? $response    : new Response;
 		$this->input       = $input       instanceof Input             ? $input       : new Input;
 		$this->config      = $config      instanceof Registry          ? $config      : new Registry;
+		$this->container   = $container   instanceof Container         ? $container   : Ioc::factory();
 
 		$this->initialise();
 
@@ -107,8 +107,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	protected function initialise()
 	{
 		$this->prepareSystemPath($this->config);
-
-		$this->container = Ioc::getContainer();
 
 		$this->loadConfiguration($this->config);
 

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -19,50 +20,60 @@ use Windwalker\Utilities\ArrayHelper;
 abstract class Ioc
 {
 	/**
-	 * Property container.
+	 * Property profile.
 	 *
-	 * @var Container
+	 * @var  string
 	 */
-	public static $container;
+	protected static $profile = 'windwalker';
 
 	/**
-	 * Property subContainers.
+	 * Property containers.
 	 *
-	 * @var  Container[]
+	 * @var  array
 	 */
-	public static $subContainers = array();
+	protected static $containers = array(
+		'windwalker' => array(
+			'root' => null,
+			'children' => array()
+		)
+	);
 
 	/**
 	 * getInstance
 	 *
 	 * @param string $name
+	 * @param string $profile
 	 *
-	 * @return  Container
+	 * @return Container
 	 */
-	public static function factory($name = null)
+	public static function factory($name = null, $profile = null)
 	{
+		$profile = $profile ? : static::$profile;
+
 		// No name, return root container.
 		if (!$name)
 		{
-			if (!(self::$container instanceof Container))
+			if (empty(self::$containers[$profile]['root']))
 			{
-				self::$container = new Container;
+				$container = new Container;
 
-				self::$container->name = 'windwalker.main';
+				$container->name = 'windwalker.root';
+
+				self::$containers[$profile]['root'] = $container;
 			}
 
-			return self::$container;
+			return self::$containers[$profile]['root'];
 		}
 
 		// Has name, we return children container.
-		if (empty(self::$subContainers[$name]) || !(self::$subContainers[$name] instanceof Container))
+		if (empty(self::$containers[$profile][$name]) || !(self::$containers[$profile][$name] instanceof Container))
 		{
-			self::$subContainers[$name] = new Container(static::getContainer());
+			self::$containers[$profile][$name] = new Container(static::getContainer());
 
-			self::$subContainers[$name]->name = $name;
+			self::$containers[$profile][$name]->name = $name;
 		}
 
-		return self::$subContainers[$name];
+		return self::$containers[$profile][$name];
 	}
 
 	/**
@@ -75,6 +86,59 @@ abstract class Ioc
 	public static function getContainer($name = null)
 	{
 		return self::factory($name);
+	}
+
+	/**
+	 * setProfile
+	 *
+	 * @param string $name
+	 *
+	 * @return  void
+	 */
+	public static function setProfile($name = 'windwalker')
+	{
+		$name = strtolower($name);
+
+		if (!isset(static::$containers[$name]))
+		{
+			static::$containers[$name] = array(
+				'root' => null,
+				'children' => array()
+			);
+		}
+
+		static::$profile = $name;
+	}
+
+	/**
+	 * Method to get property Profile
+	 *
+	 * @return  string
+	 */
+	public static function getProfile()
+	{
+		return static::$profile;
+	}
+
+	/**
+	 * reset
+	 *
+	 * @param string $profile
+	 *
+	 * @return  void
+	 */
+	public static function reset($profile = null)
+	{
+		if (!$profile)
+		{
+			static::$containers = array();
+
+			return;
+		}
+
+		static::$containers[$profile] = array();
+
+		return;
 	}
 
 	/**
@@ -290,8 +354,8 @@ abstract class Ioc
 	 *
 	 * @return  string
 	 */
-	public static function dump($level = 10, $name = null)
+	public static function dump($level = 10, $name = null, $profile = null)
 	{
-		return ArrayHelper::dump(static::factory($name), $level);
+		return ArrayHelper::dump(static::factory($name, $profile), $level);
 	}
 }
