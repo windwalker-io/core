@@ -24,6 +24,7 @@ use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
+use Windwalker\Router\Router;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Web\WebEnvironment;
@@ -338,44 +339,58 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		if (!$registered || $new)
 		{
-			$routes = $this->loadRoutingConfiguration();
-
-			// Replace package routing
-			foreach ($routes as $name => $route)
-			{
-				if (!isset($route['package']))
-				{
-					continue;
-				}
-
-				$pattern = ArrayHelper::getValue($route, 'pattern');
-
-				$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
-
-				unset($routes[$name]);
-			}
-
-			// Register routes
-			foreach ($routes as $name => $route)
-			{
-				$pattern = ArrayHelper::getValue($route, 'pattern');
-				$variables = ArrayHelper::getValue($route, 'variables', array());
-				$allowMethods = ArrayHelper::getValue($route, 'method', array());
-
-				if (isset($route['controller']))
-				{
-					$route['extra']['controller'] = $route['controller'];
-				}
-
-				if (isset($route['action']))
-				{
-					$route['extra']['action'] = $route['action'];
-				}
-
-				$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
-			}
+			$this->registerRouting($router);
 
 			$registered = true;
+		}
+
+		return $router;
+	}
+
+	/**
+	 * loadRouter
+	 *
+	 * @param Router $router
+	 *
+	 * @return Router
+	 */
+	public function registerRouting(Router $router)
+	{
+		$routes = $this->loadRoutingConfiguration();
+
+		// Replace package routing
+		foreach ($routes as $name => $route)
+		{
+			if (!isset($route['package']))
+			{
+				continue;
+			}
+
+			$pattern = ArrayHelper::getValue($route, 'pattern');
+
+			$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
+
+			unset($routes[$name]);
+		}
+
+		// Register routes
+		foreach ($routes as $name => $route)
+		{
+			$pattern = ArrayHelper::getValue($route, 'pattern');
+			$variables = ArrayHelper::getValue($route, 'variables', array());
+			$allowMethods = ArrayHelper::getValue($route, 'method', array());
+
+			if (isset($route['controller']))
+			{
+				$route['extra']['controller'] = $route['controller'];
+			}
+
+			if (isset($route['action']))
+			{
+				$route['extra']['action'] = $route['action'];
+			}
+
+			$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
 		}
 
 		return $router;
@@ -391,7 +406,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  array
 	 */
-	protected function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
+	public function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
 	{
 		$package = $this->getPackage($packageName);
 

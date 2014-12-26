@@ -8,16 +8,19 @@
 
 namespace Windwalker\Core\Test\Widget;
 
+use Windwalker\Core\Test\AbstractBaseTestCase;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\PhpRenderer;
+use Windwalker\Test\TestHelper;
+use Windwalker\Utilities\Queue\Priority;
 
 /**
  * Test class of Widget
  *
  * @since {DEPLOY_VERSION}
  */
-class WidgetTest extends \PHPUnit_Framework_TestCase
+class WidgetTest extends AbstractBaseTestCase
 {
 	/**
 	 * Test instance.
@@ -113,14 +116,18 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Widget\Widget::addPath
-	 * @TODO   Implement testAddPath().
 	 */
 	public function testAddPath()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$this->instance->addPath('foo/bar/baz', Priority::LOW);
+		$this->instance->addPath('flower/sakura', Priority::NORMAL);
+
+		TestHelper::invoke($this->instance, 'registerPaths');
+
+		$paths = $this->instance->getPaths()->toArray();
+
+		$this->assertPathEquals('flower/sakura', $paths[0]);
+		$this->assertPathEquals('foo/bar/baz', $paths[1]);
 	}
 
 	/**

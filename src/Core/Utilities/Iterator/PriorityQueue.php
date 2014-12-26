@@ -27,12 +27,19 @@ class PriorityQueue extends \SplPriorityQueue implements \Serializable
 	/**
 	 * Class init.
 	 *
-	 * @param array $array
-	 * @param int   $priority
+	 * @param array|\SplPriorityQueue $array
+	 * @param int                     $priority
 	 */
 	public function __construct($array = array(), $priority = Priority::NORMAL)
 	{
-		$this->bind($array, $priority);
+		if ($array instanceof \SplPriorityQueue)
+		{
+			$this->merge($array);
+		}
+		else
+		{
+			$this->bind($array, $priority);
+		}
 	}
 
 	/**

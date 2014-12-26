@@ -14,6 +14,7 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Filesystem\Path;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
@@ -74,6 +75,16 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$this->model = new ViewModel;
 
 		parent::__construct($data, $renderer);
+
+		// Create PriorityQueue
+		$paths = $this->renderer->getPaths();
+
+		if (!($paths instanceof PriorityQueue))
+		{
+			$paths = new PriorityQueue($paths);
+
+			$this->renderer->setPaths($paths);
+		}
 	}
 
 	/**
@@ -148,11 +159,10 @@ class HtmlView extends \Windwalker\View\HtmlView
 			return;
 		}
 
-		$paths = $this->renderer->getPaths();
-		$config = Ioc::getConfig();
-
-		$ref = new \ReflectionClass($this);
-
+		/** @var PriorityQueue $paths */
+		$paths   = $this->renderer->getPaths();
+		$config  = Ioc::getConfig();
+		$ref     = new \ReflectionClass($this);
 		$package = $this->getPackage();
 
 		if ($this->config['package.path'])
@@ -170,10 +180,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		$paths->insert(Path::clean($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
 
-		foreach (RendererHelper::getGlobalPaths() as $i => $path)
-		{
-			$paths->insert($path, Priority::MIN - ($i * 10));
-		}
+		$paths = RendererHelper::getGlobalPaths()->merge($paths);
 
 		$this->renderer->setPaths($paths);
 
