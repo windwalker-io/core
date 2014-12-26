@@ -68,13 +68,16 @@ class RestfulRouter extends Router
 		$url = parent::build($route, $queries);
 		$uri = $this->getUri();
 
+		$script = $uri->get('script');
+		$script = $script ? $script . '/' : null;
+
 		if ($type == static::TYPE_PATH)
 		{
-			$url = $uri->get('base.path') . ltrim($url, '/');
+			$url = $uri->get('base.path') . $script . ltrim($url, '/');
 		}
 		elseif ($type == static::TYPE_FULL)
 		{
-			$url = $uri->get('base.full') . $url;
+			$url = $uri->get('base.full') . $script . $url;
 		}
 
 		if ($xhtml)

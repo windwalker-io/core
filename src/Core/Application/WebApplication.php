@@ -47,7 +47,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @var  string
 	 */
-	public $mode = 'prod';
+	protected $mode = 'prod';
 
 	/**
 	 * Property router.
@@ -382,7 +382,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 			$pattern = ArrayHelper::getValue($route, 'pattern');
 
-			$this->loadPackageRouting($routes, $route['package'], $name, $pattern);
+			$this->loadPackageRouting($routes, $route['package'], $pattern);
 
 			unset($routes[$name]);
 		}
@@ -415,12 +415,12 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @param array  $routing
 	 * @param string $packageName
-	 * @param string $prefix
 	 * @param string $pattern
 	 *
-	 * @return  array
+	 * @return array
+	 * @internal param string $prefix
 	 */
-	public function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
+	public function loadPackageRouting(&$routing, $packageName, $pattern)
 	{
 		$package = $this->getPackage($packageName);
 
@@ -533,6 +533,23 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * loadSystemUris
+	 *
+	 * @param   string $requestUri
+	 *
+	 * @return  void
+	 */
+	protected function loadSystemUris($requestUri = null)
+	{
+		parent::loadSystemUris($requestUri);
+
+		if ($this->get('uri.script') == 'index.php')
+		{
+			$this->set('uri.script', null);
+		}
+	}
+
+	/**
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
@@ -600,6 +617,30 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function setContainer($container)
 	{
 		$this->container = $container;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Mode
+	 *
+	 * @return  string
+	 */
+	public function getMode()
+	{
+		return $this->mode;
+	}
+
+	/**
+	 * Method to set property mode
+	 *
+	 * @param   string $mode
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMode($mode)
+	{
+		$this->mode = $mode;
 
 		return $this;
 	}
