@@ -9,9 +9,11 @@
 namespace Windwalker\Core\Console;
 
 use Windwalker\Console\Console;
+use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Console\Descriptor\CommandDescriptor;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Seeder\Command\SeedCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
@@ -32,7 +34,7 @@ use Windwalker\Registry\Registry;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class WindwalkerConsole extends Console implements DispatcherAwareInterface
+class WindwalkerConsole extends Console implements WindwalkerApplicationInterface, DispatcherAwareInterface
 {
 	/**
 	 * The Console title.
@@ -88,7 +90,7 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 		$this->registerCommands();
 
 		// Load packages
-		PackageHelper::registerPackages($this, $this->getPackages(), $this->container);
+		PackageHelper::registerPackages($this, $this->loadPackages(), $this->container);
 	}
 
 	/**
@@ -112,7 +114,7 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	 */
 	public function registerProviders(Container $container)
 	{
-		$providers = static::loadProviders();
+		$providers = $this->loadProviders();
 
 		foreach ($providers as $provider)
 		{
@@ -125,7 +127,7 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public static function loadProviders()
+	public function loadProviders()
 	{
 		return array(
 			'event'    => new EventProvider,
@@ -140,7 +142,7 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 	 *
 	 * @return  array
 	 */
-	public function getPackages()
+	public function loadPackages()
 	{
 		return array();
 	}
@@ -194,6 +196,25 @@ class WindwalkerConsole extends Console implements DispatcherAwareInterface
 		$dispatcher->triggerEvent($event);
 
 		return $this;
+	}
+
+	/**
+	 * getPackage
+	 *
+	 * @param string $name
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getPackage($name)
+	{
+		$key = 'package.' . strtolower($name);
+
+		if ($this->container->exists($key))
+		{
+			return $this->container->get($key);
+		}
+
+		return null;
 	}
 }
  

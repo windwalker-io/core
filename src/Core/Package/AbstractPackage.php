@@ -40,6 +40,13 @@ class AbstractPackage
 	protected $name = null;
 
 	/**
+	 * Property enabled.
+	 *
+	 * @var  boolean
+	 */
+	protected $isEnabled = true;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -278,6 +285,40 @@ class AbstractPackage
 	public function getDir()
 	{
 		return dirname($this->getFile());
+	}
+
+	/**
+	 * enable
+	 *
+	 * @return  static
+	 */
+	public function enable()
+	{
+		$this->isEnabled = true;
+
+		return $this;
+	}
+
+	/**
+	 * disable
+	 *
+	 * @return  static
+	 */
+	public function disable()
+	{
+		$this->isEnabled = false;
+
+		return $this;
+	}
+
+	/**
+	 * isEnabled
+	 *
+	 * @return  bool
+	 */
+	public function isEnabled()
+	{
+		return $this->isEnabled;
 	}
 
 	/**

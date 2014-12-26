@@ -64,7 +64,7 @@ class TestApplication extends WebApplication
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public static function loadProviders()
+	public function loadProviders()
 	{
 		$providers = parent::loadProviders();
 

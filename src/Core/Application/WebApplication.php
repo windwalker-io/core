@@ -39,7 +39,7 @@ use Windwalker\Utilities\ArrayHelper;
  * 
  * @since  {DEPLOY_VERSION}
  */
-class WebApplication extends AbstractWebApplication implements DispatcherAwareInterface
+class WebApplication extends AbstractWebApplication implements WindwalkerApplicationInterface, DispatcherAwareInterface
 {
 	/**
 	 * Property env.
@@ -120,9 +120,9 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 			ErrorHandler::register();
 		}
 
-		static::registerProviders($this->container);
+		$this->registerProviders($this->container);
 
-		PackageHelper::registerPackages($this, $this->loadPackages(), $this->container);
+		PackageHelper::registerPackages($this->loadPackages(), $this->container);
 
 		$this->triggerEvent('onAfterInitialise');
 	}
@@ -134,9 +134,9 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @return  void
 	 */
-	protected static function registerProviders(Container $container)
+	protected function registerProviders(Container $container)
 	{
-		$providers = static::loadProviders();
+		$providers = $this->loadProviders();
 
 		foreach ($providers as $provider)
 		{
@@ -149,7 +149,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public static function loadProviders()
+	public function loadProviders()
 	{
 		return array(
 			'event'   => new EventProvider,
@@ -326,15 +326,17 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	/**
 	 * getRouter
 	 *
-	 * @return  \Windwalker\Router\Router
+	 * @param boolean $new
+	 *
+	 * @return \Windwalker\Router\Router
 	 */
-	public function getRouter()
+	public function getRouter($new = false)
 	{
 		static $registered = false;
 
-		$router = $this->container->get('system.router');
+		$router = $this->container->get('system.router', $new);
 
-		if (!$registered)
+		if (!$registered || $new)
 		{
 			$routes = $this->loadRoutingConfiguration();
 
@@ -391,7 +393,12 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 */
 	protected function loadPackageRouting(&$routing, $packageName, $prefix, $pattern)
 	{
-		$package = PackageHelper::getPackage($packageName);
+		$package = $this->getPackage($packageName);
+
+		if (!$package || !$package->isEnabled())
+		{
+			return $routing;
+		}
 
 		/** @var AbstractPackage $class */
 		$routes = $package->loadRouting();
@@ -406,8 +413,6 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 
 			$routing[$package->getName() . ':' . $key] = $route;
 		}
-
-		$packageObject = $this->container->get('package.' . $packageName);
 
 		return $routing;
 	}
@@ -511,9 +516,26 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('system.dispatcher');
 
-		$dispatcher->triggerEvent($event, $args);
+		return $dispatcher->triggerEvent($event, $args);
+	}
 
-		return $this;
+	/**
+	 * getPackage
+	 *
+	 * @param string $name
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getPackage($name)
+	{
+		$key = 'package.' . strtolower($name);
+
+		if ($this->container->exists($key))
+		{
+			return $this->container->get($key);
+		}
+
+		return null;
 	}
 
 	/**
@@ -523,7 +545,7 @@ class WebApplication extends AbstractWebApplication implements DispatcherAwareIn
 	 *
 	 * @return  void
 	 */
-	public static function prepareSystemPath(Registry $config)
+	protected function prepareSystemPath($config)
 	{
 	}
 }
