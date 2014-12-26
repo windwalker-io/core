@@ -10,6 +10,9 @@ namespace Windwalker\Core\Test\View;
 
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\NullPackage;
+use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\RestfulRouter;
+use Windwalker\Core\Router\Router;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
@@ -19,6 +22,8 @@ use Windwalker\Core\View\ViewModel;
 use Windwalker\Data\Data;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
+use Windwalker\Router\Route;
+use Windwalker\Test\TestHelper;
 
 /**
  * Test class of HtmlView
@@ -244,5 +249,40 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertTrue($view->getModel()->get('is.null'));
 		$this->assertTrue($view->getModel('stub')->get('is.null'));
+	}
+
+	/**
+	 * testBuildRoute
+	 *
+	 * @return  void
+	 */
+	public function testBuildRoute()
+	{
+		$package = new MvcPackage;
+		$package->initialise();
+
+		$this->instance->setPackage($package);
+
+		$this->assertTrue($package->router instanceof PackageRouter);
+
+		/** @var RestfulRouter $router */
+		$router = Ioc::getRouter();
+
+		$router->addRoute(new Route('mvc:flower', '/flower/(id)', array('foo' => 'bar'), null, array('extra' => array('controller' => 'Bar'))));
+		$router->addRoute(new Route('mvc:sakura', '/sakura/(id)', array('foo' => 'baz'), null, array('extra' => array('controller' => 'Baz'))));
+
+		// $this->assertEquals('flower/12', $router->build('mvc:flower', array('id' => 12)));
+
+		$package->router->setRouter($router);
+
+		$this->assertEquals('flower/12', $package->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
+
+		// Test global variables
+		TestHelper::invoke($this->instance, 'prepareGlobals', $this->instance->getData());
+
+		$data = $this->instance->getData();
+
+		$this->assertEquals('flower/12', $data->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->package->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
 	}
 }

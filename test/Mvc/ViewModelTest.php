@@ -84,9 +84,11 @@ class ViewModelTest extends AbstractBaseTestCase
 		$this->view->setModel(new FlowerModel);
 
 		$this->assertEquals('Item', $this->view->model->getItem());
+		$this->assertEquals('Item', $this->view->model->get('Item'));
 		$this->assertEquals(array(1,2,3,4), $this->view->model->getList());
 		$this->assertEquals(null, $this->view->model->getData());
 		$this->assertEquals(null, $this->view->model->loadData());
+		$this->assertEquals(null, $this->view->model->load('Data'));
 
 		try
 		{
@@ -99,6 +101,8 @@ class ViewModelTest extends AbstractBaseTestCase
 
 		$this->assertEquals('Flower', $this->view->model['flower']->getFlower());
 		$this->assertEquals('Sakura', $this->view->model['flower']->getSakura());
+		$this->assertEquals('Flower', $this->view->model->get('Flower', 'flower'));
+		$this->assertEquals('Sakura', $this->view->model->get('Sakura', 'flower'));
 		$this->assertEquals(null, $this->view->model['flower']->getData());
 		$this->assertEquals(null, $this->view->model['flower']->loadData());
 		$this->assertEquals(null, $this->view->model['none']->loadData());

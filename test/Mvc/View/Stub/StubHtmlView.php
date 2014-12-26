@@ -20,13 +20,6 @@ use Windwalker\Core\View\ViewModel;
 class StubHtmlView extends HtmlView
 {
 	/**
-	 * Property model.
-	 *
-	 * @var ViewModel
-	 */
-	public $model;
-
-	/**
 	 * getRegisteredPaths
 	 *
 	 * @return  \SplPriorityQueue

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Utilities\ArrayHelper;
@@ -19,6 +20,10 @@ use Windwalker\Utilities\ArrayHelper;
  */
 class RestfulRouter extends Router
 {
+	const TYPE_RAW = 'raw';
+	const TYPE_PATH = 'path';
+	const TYPE_FULL = 'full';
+
 	/**
 	 * An array of HTTP Method => controller suffix pairs for routing the request.
 	 *
@@ -40,6 +45,73 @@ class RestfulRouter extends Router
 	 * @var  string
 	 */
 	protected $controller = null;
+
+	/**
+	 * Property uri.
+	 *
+	 * @var Registry
+	 */
+	protected $uri;
+
+	/**
+	 * build
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 * @param bool   $xhtml
+	 *
+	 * @return  string
+	 */
+	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
+	{
+		$url = parent::build($route, $queries);
+		$uri = $this->getUri();
+
+		if ($type == static::TYPE_PATH)
+		{
+			$url = $uri->get('base.path') . ltrim($url, '/');
+		}
+		elseif ($type == static::TYPE_FULL)
+		{
+			$url = $uri->get('base.full') . $url;
+		}
+
+		if ($xhtml)
+		{
+			$url = htmlspecialchars($url);
+		}
+
+		return $url;
+	}
+
+	/**
+	 * buildHtml
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type, true);
+	}
+
+	/**
+	 * buildHttp
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type, false);
+	}
 
 	/**
 	 * match
@@ -162,5 +234,34 @@ class RestfulRouter extends Router
 	public function getController()
 	{
 		return $this->controller;
+	}
+
+	/**
+	 * Method to get property Uri
+	 *
+	 * @return  Registry
+	 */
+	public function getUri()
+	{
+		if (!$this->uri)
+		{
+			throw new \LogicException('No uri object set to Router.');
+		}
+
+		return $this->uri;
+	}
+
+	/**
+	 * Method to set property uri
+	 *
+	 * @param   Registry $uri
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setUri(Registry $uri)
+	{
+		$this->uri = $uri;
+
+		return $this;
 	}
 }

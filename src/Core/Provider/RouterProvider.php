@@ -40,7 +40,11 @@ class RouterProvider implements ServiceProviderInterface
 
 			$matcher = strtolower($matcher) == 'default' ? 'sequential' : $matcher;
 
-			return new RestfulRouter(array(), $self->getMatcher($matcher));
+			$router = new RestfulRouter(array(), $self->getMatcher($matcher));
+
+			$router->setUri($container->get('system.uri'));
+
+			return $router;
 		};
 
 		$container->share('system.router', $closure)

@@ -26,6 +26,9 @@ use Windwalker\Core\View\Helper\ViewHelper;
 /**
  * Class HtmlView
  *
+ * @property-read  ViewModel  $model   The ViewModel object.
+ * @property-read  Registry   $config  Config object.
+ *
  * @since 1.0
  */
 class HtmlView extends \Windwalker\View\HtmlView
@@ -293,6 +296,9 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
+
+		$data->package = $this->getPackage();
+		$data->router  = $data->package->getRouter();
 
 		$globals = ViewHelper::getGlobalVariables($this->config['package.name']);
 

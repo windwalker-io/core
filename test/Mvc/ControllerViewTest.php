@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Test\Mvc;
 
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Test\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
@@ -108,6 +109,10 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('_global.test')->render()));
+
+		// Routing
+		$this->assertTrue($view->getData()->router instanceof PackageRouter);
+		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
 	}
 
 	/**
@@ -141,6 +146,10 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('_global.test')->render()));
+
+		// Routing
+		$this->assertTrue($view->getData()->router instanceof PackageRouter);
+		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
 	}
 
 	/**
@@ -176,6 +185,10 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('_global.test')->render()));
+
+		// Routing
+		$this->assertTrue($view->getData()->router instanceof PackageRouter);
+		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
 	}
 
 	/**
@@ -210,6 +223,10 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('_global.test')->render()));
+
+		// Routing
+		$this->assertTrue($view->getData()->router instanceof PackageRouter);
+		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
 	}
 
 	/**
@@ -245,5 +262,9 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('_global.test')->render()));
+
+		// Routing
+		$this->assertTrue($view->getData()->router instanceof PackageRouter);
+		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
 	}
 }

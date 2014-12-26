@@ -74,13 +74,10 @@ class TwigHtmlView extends HtmlView
 	 */
 	protected function prepareGlobals($data)
 	{
-		$data->view = new Data;
-
-		$data->view->name = $this->getName();
-		$data->view->layout = $this->getLayout();
+		parent::prepareGlobals($data);
 
 		$this->renderer->getEngine()
-			->addExtension(new WindwalkerExtension);
+			->addExtension(new WindwalkerExtension($this));
 	}
 }
  

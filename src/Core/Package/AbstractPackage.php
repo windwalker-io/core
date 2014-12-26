@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Router\Router;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\ListenerPriority;
@@ -20,6 +20,8 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractPackage class.
+ *
+ * @property-read  PackageRouter  $router
  * 
  * @since  {DEPLOY_VERSION}
  */
@@ -47,6 +49,13 @@ class AbstractPackage
 	protected $isEnabled = true;
 
 	/**
+	 * Property router.
+	 *
+	 * @var PackageRouter
+	 */
+	protected $router;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -66,32 +75,8 @@ class AbstractPackage
 		$this->registerProviders($container);
 
 		$this->registerListeners($container->get('system.dispatcher'));
-	}
 
-	/**
-	 * buildRoute
-	 *
-	 * @param string         $route
-	 * @param boolean|string $package
-	 *
-	 * @return  string
-	 */
-	public function buildRoute($route, $package = null)
-	{
-		if ($package === false)
-		{
-			// Nothing
-		}
-		elseif (!$package)
-		{
-			$route = $this->getName() . ':' . $route;
-		}
-		else
-		{
-			$route = $package . ':' . $route;
-		}
-
-		return Router::build($route);
+		$this->getRouter();
 	}
 
 	/**
@@ -125,6 +110,35 @@ class AbstractPackage
 	public function setContainer(Container $container)
 	{
 		$this->container = $container;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Router
+	 *
+	 * @return  PackageRouter
+	 */
+	public function getRouter()
+	{
+		if (!$this->router)
+		{
+			$this->router = new PackageRouter($this, $this->getContainer()->get('system.router'));
+		}
+
+		return $this->router;
+	}
+
+	/**
+	 * Method to set property router
+	 *
+	 * @param   PackageRouter $router
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRouter(PackageRouter $router)
+	{
+		$this->router = $router;
 
 		return $this;
 	}
@@ -360,5 +374,22 @@ class AbstractPackage
 				$console->addCommand(new $class);
 			}
 		}
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		if ($name == 'router')
+		{
+			return $this->getRouter();
+		}
+
+		return null;
 	}
 }

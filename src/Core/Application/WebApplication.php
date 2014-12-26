@@ -512,9 +512,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * initUri
 	 *
-	 * @return  object
+	 * @param string $uri
+	 *
+	 * @return object
 	 */
-	public function initUri()
+	public function initUri($uri = null)
 	{
 		static $inited = false;
 
@@ -523,7 +525,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			return $this->get('uri');
 		}
 
-		$this->loadSystemUris();
+		$this->loadSystemUris($uri);
 
 		$inited = true;
 

@@ -17,8 +17,8 @@ include_once $autoload;
 
 include_once __DIR__ . '/define.php';
 
+$_SERVER['HTTP_HOST'] = 'windwalker.io';
+
 new \Windwalker\Core\Test\TestApplication;
 
 define('WINDWALKER_DEBUG', true);
-
-$_SERVER['HTTP_HOST'] = 'windwalker.io';

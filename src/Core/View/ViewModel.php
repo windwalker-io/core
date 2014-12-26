@@ -81,6 +81,70 @@ class ViewModel implements \ArrayAccess
 	}
 
 	/**
+	 * get
+	 *
+	 * @param string $name
+	 * @param string $modelName
+	 *
+	 * @return  mixed
+	 */
+	public function get($name, $modelName = null)
+	{
+		$model = $this->getModel($modelName);
+
+		if (!$model)
+		{
+			return null;
+		}
+
+		$method = 'get' . ucfirst($name);
+
+		if (!is_callable(array($model, $method)))
+		{
+			return null;
+		}
+
+		$args = func_get_args();
+
+		array_shift($args);
+		array_shift($args);
+
+		return call_user_func_array(array($model, $method), $args);
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $name
+	 * @param string $modelName
+	 *
+	 * @return  mixed
+	 */
+	public function load($name, $modelName = null)
+	{
+		$model = $this->getModel($modelName);
+
+		if (!$model)
+		{
+			return null;
+		}
+
+		$method = 'load' . ucfirst($name);
+
+		if (!is_callable(array($model, $method)))
+		{
+			return null;
+		}
+
+		$args = func_get_args();
+
+		array_shift($args);
+		array_shift($args);
+
+		return call_user_func_array(array($model, $method), $args);
+	}
+
+	/**
 	 * removeModel
 	 *
 	 * @param string $name

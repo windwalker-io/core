@@ -16,6 +16,8 @@ use Windwalker\Registry\Registry;
 /**
  * Class DatabaseModel
  *
+ * @property-read  Registry  $config  Config object.
+ *
  * @since 1.0
  */
 class Model extends AbstractModel

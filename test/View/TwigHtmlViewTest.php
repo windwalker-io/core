@@ -86,6 +86,8 @@ class TwigHtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals('show', $functions[0]->getName());
 
+		/* We use prepareGlobals() instead, this block will be remove soon
+
 		$globals = $wwExt->getGlobals();
 
 		$this->assertTrue($globals['uri'] instanceof Registry);
@@ -94,5 +96,6 @@ class TwigHtmlViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($globals['helper'] instanceof HelperSet);
 		$this->assertTrue(is_array($globals['flashes']));
 		$this->assertTrue($globals['datetime'] instanceof DateTime);
+		*/
 	}
 }

@@ -13,7 +13,6 @@ use Windwalker\Authenticate\Credential;
 use Windwalker\Authenticate\Method\MethodInterface;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
 use Windwalker\Core\Facade\Facade;
-use Windwalker\Core\Ioc;
 use Windwalker\Data\Data;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\Event;
@@ -184,7 +183,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 *
 	 * @param array $conditions
 	 *
-	 * @return  UserDataInterface
+	 * @return  UserData|UserDataInterface
 	 */
 	public static function get($conditions = array())
 	{

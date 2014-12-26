@@ -9,6 +9,8 @@
 namespace Windwalker\Core\View\Twig;
 
 use Windwalker\Core\View\Helper\ViewHelper;
+use Windwalker\Core\View\HtmlView;
+use Windwalker\Data\Data;
 
 /**
  * Class FormosaExtension
@@ -17,6 +19,23 @@ use Windwalker\Core\View\Helper\ViewHelper;
  */
 class WindwalkerExtension extends \Twig_Extension
 {
+	/**
+	 * Property view.
+	 *
+	 * @var  HtmlView
+	 */
+	protected $view;
+
+	/**
+	 * Class init
+	 *
+	 * @param HtmlView $view
+	 */
+	public function __construct(HtmlView $view = null)
+	{
+		$this->view = $view ? : new HtmlView;
+	}
+
 	/**
 	 * Returns the name of the extension.
 	 *
@@ -34,7 +53,7 @@ class WindwalkerExtension extends \Twig_Extension
 	 */
 	public function getGlobals()
 	{
-		return ViewHelper::getGlobalVariables();
+		return array();
 	}
 
 	/**
@@ -47,6 +66,30 @@ class WindwalkerExtension extends \Twig_Extension
 		return array(
 			new \Twig_SimpleFunction('show', 'show')
 		);
+	}
+
+	/**
+	 * Method to get property View
+	 *
+	 * @return  HtmlView
+	 */
+	public function getView()
+	{
+		return $this->view;
+	}
+
+	/**
+	 * Method to set property view
+	 *
+	 * @param   HtmlView $view
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setView($view)
+	{
+		$this->view = $view;
+
+		return $this;
 	}
 }
  

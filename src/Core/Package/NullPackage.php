@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Object\SilencerInterface;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
 
@@ -36,6 +38,16 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	 */
 	public function __get($name)
 	{
+		if ($name == 'router')
+		{
+			if (!$this->router)
+			{
+				$this->router = new PackageRouter($this, Ioc::getRouter());
+			}
+
+			return $this->router;
+		}
+
 		return null;
 	}
 
@@ -120,20 +132,6 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 	public function buildRoute($route, $package = null)
 	{
 		return null;
-	}
-
-	/**
-	 * Get the DI container.
-	 *
-	 * @return  Container
-	 *
-	 * @since   1.0
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
-	 */
-	public function getContainer()
-	{
-		return $this->container;
 	}
 
 	/**

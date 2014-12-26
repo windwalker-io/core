@@ -26,6 +26,8 @@ use Windwalker\View\AbstractView;
 
 /**
  * The Controller class.
+ *
+ * @property-read  Registry  $config  Config object.
  * 
  * @since  {DEPLOY_VERSION}
  */
