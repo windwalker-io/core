@@ -65,7 +65,7 @@ class StatusCommand extends AbstractCommand
 	{
 		$migration = new MigrationsModel;
 
-		$migration['path'] = $this->getOption('p');
+		$migration['path'] = $this->app->get('migration.dir');
 
 		$migrations = $migration->getMigrations();
 

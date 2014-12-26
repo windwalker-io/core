@@ -67,7 +67,7 @@ class MigrateCommand extends AbstractCommand
 
 		$migration->setCommand($this);
 
-		$migration['path'] = $this->getOption('p');
+		$migration['path'] = $this->app->get('migration.dir');
 
 		$migration->migrate($this->getArgument(0, null));
 

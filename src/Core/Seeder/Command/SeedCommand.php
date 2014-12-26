@@ -66,7 +66,7 @@ class SeedCommand extends Command
 
 		$this->addGlobalOption('p')
 			->alias('package')
-			->description('Package name');
+			->description('Package name to import seeder.');
 
 		parent::initialise();
 	}
@@ -78,8 +78,6 @@ class SeedCommand extends Command
 	 */
 	protected function prepareExecute()
 	{
-		show($this->globalOptions);die;
-
 		$packageName = $this->getOption('package');
 
 		$package = $this->app->getPackage($packageName);

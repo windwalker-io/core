@@ -10,6 +10,7 @@ namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Migration\Command\Migration;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Core\Ioc;
 
@@ -59,9 +60,13 @@ class MigrationCommand extends Command
 		$this->addCommand(new Migration\StatusCommand);
 		$this->addCommand(new Migration\MigrateCommand);
 
+		$this->addGlobalOption('d')
+			->alias('dir')
+			->description('Set migration file directory.');
+
 		$this->addGlobalOption('p')
-			->alias('path')
-			->description('Set migration file path.');
+			->alias('package')
+			->description('Package to run migration.');
 	}
 
 	/**
@@ -71,10 +76,6 @@ class MigrationCommand extends Command
 	 */
 	protected function prepareExecute()
 	{
-		$options = $this->getOptionSet(true);
-
-		$options['p']->defaultValue($this->app->get('path.migrations'));
-
 		$config = Ioc::getConfig();
 
 		// Auto create database
@@ -89,6 +90,25 @@ class MigrationCommand extends Command
 		$db->select($name);
 
 		$config['database.name'] = $name;
+
+		// Prepare migration path
+		$packageName = $this->getOption('p');
+
+		/** @var AbstractPackage $package */
+		$package = $this->app->getPackage($packageName);
+
+		if ($package)
+		{
+			$dir = $package->getDir() . '/Migration';
+		}
+		else
+		{
+			$dir = $this->getOption('d');
+		}
+
+		$dir = $dir ? : $this->app->get('path.migrations');
+
+		$this->app->set('migration.dir', $dir);
 	}
 
 	/**

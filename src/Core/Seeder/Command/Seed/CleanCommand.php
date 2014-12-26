@@ -51,8 +51,6 @@ class CleanCommand extends Command
 	 */
 	public function initialise()
 	{
-		// $this->addArgument();
-
 		parent::initialise();
 	}
 
@@ -63,22 +61,7 @@ class CleanCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$class = $this->getOption('class');
-
-		if (!class_exists($class))
-		{
-			include_once Ioc::getConfig()->get('path.seeders') . '/' . $class . '.php';
-		}
-
-		if (!class_exists($class))
-		{
-			throw new \RuntimeException('Class: ' . $class . ' not exists.');
-		}
-
-		if (!is_subclass_of($class, 'Windwalker\Core\Seeder\AbstractSeeder'))
-		{
-			throw new \RuntimeException('Class: ' . $class . ' should be sub class of Windwalker\Core\Seeder\AbstractSeeder.');
-		}
+		$class = $this->app->get('seed.class');
 
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
 		$seeder = new $class(Ioc::getDatabase(), $this);

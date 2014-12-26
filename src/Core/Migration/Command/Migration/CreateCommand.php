@@ -66,7 +66,7 @@ class CreateCommand extends AbstractCommand
 	{
 		$migration = new MigrationsModel;
 
-		$migration['path'] = $this->getOption('p');
+		$migration['path'] = $this->app->get('migration.dir');
 
 		$migrations = $migration->getMigrations();
 
@@ -82,7 +82,7 @@ class CreateCommand extends AbstractCommand
 		{
 			if (strtolower($name) == strtolower($migItem['name']))
 			{
-				throw new \RuntimeException('Migration: ' . $name . ' has exists.');
+				throw new \RuntimeException('Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" . $migItem['path'] . '</info>');
 			}
 		}
 
@@ -91,12 +91,12 @@ class CreateCommand extends AbstractCommand
 		$file = $date . '_' . ucfirst($name) . '.php';
 
 		// Get template
-		$tmpl = file_get_contents(__DIR__ . '/../../../Resources/Template/migration/migration.php.dist');
+		$tmpl = file_get_contents(__DIR__ . '/../../../Resources/Templates/migration/migration.php.dist');
 
 		$tmpl = String::parseVariable($tmpl, array('version' => $date, 'className' => ucfirst($name)));
 
 		// Get file path
-		$filePath = $this->getOption('p') . '/' . $file;
+		$filePath = $this->app->get('migration.dir') . '/' . $file;
 
 		if (is_file($filePath))
 		{
@@ -107,6 +107,7 @@ class CreateCommand extends AbstractCommand
 		File::write($filePath, $tmpl);
 
 		$this->out()->out('Migration version: <info>' . $file . '</info> created.');
+		$this->out('File path: <info>' . realpath($filePath). '</info>');
 
 		return true;
 	}
