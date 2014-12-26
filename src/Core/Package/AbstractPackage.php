@@ -75,8 +75,6 @@ class AbstractPackage
 		$this->registerProviders($container);
 
 		$this->registerListeners($container->get('system.dispatcher'));
-
-		$this->getRouter();
 	}
 
 	/**

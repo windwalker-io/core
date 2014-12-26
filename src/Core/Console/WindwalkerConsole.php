@@ -102,7 +102,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 		$this->registerCommands();
 
 		// Load packages
-		PackageHelper::registerPackages($this, $this->loadPackages(), $this->container);
+		PackageHelper::registerPackages($this->loadPackages(), $this->container);
 	}
 
 	/**

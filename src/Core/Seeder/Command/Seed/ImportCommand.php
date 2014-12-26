@@ -10,6 +10,8 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -62,24 +64,7 @@ class ImportCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$class = $this->getOption('class');
-
-		$class = StringNormalise::toClassNamespace($class);
-
-		if (!class_exists($class))
-		{
-			include_once Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
-		}
-
-		if (!class_exists($class))
-		{
-			throw new \RuntimeException('Class: ' . $class . ' not exists.');
-		}
-
-		if (!is_subclass_of($class, 'Windwalker\Core\Seeder\AbstractSeeder'))
-		{
-			throw new \RuntimeException('Class: ' . $class . ' should be sub class of Windwalker\Core\Seeder\AbstractSeeder.');
-		}
+		$class = $this->app->get('seed.class');
 
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
 		$seeder = new $class(Ioc::getDatabase(), $this);
