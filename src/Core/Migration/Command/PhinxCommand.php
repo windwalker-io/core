@@ -21,7 +21,7 @@ class PhinxCommand extends Command
 	 *
 	 * @var bool
 	 */
-	public static $isEnabled = true;
+	public static $isEnabled = false;
 
 	/**
 	 * Console(Argument) name.

@@ -112,7 +112,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 */
 	public function registerCommands()
 	{
-		$this->addCommand(new PhinxCommand);
+		// $this->addCommand(new PhinxCommand);
 		$this->addCommand(new MigrationCommand);
 		$this->addCommand(new SeedCommand);
 	}
