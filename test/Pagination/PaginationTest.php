@@ -136,7 +136,7 @@ HTML;
 
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
-		$html = $renderer->render('pagination.test', array('pagination' => $pagination->getResult()));
+		$html = $renderer->render('windwalker.pagination.test', array('pagination' => $pagination->getResult()));
 
 		$this->assertStringDataEquals($compare, $html);
 	}

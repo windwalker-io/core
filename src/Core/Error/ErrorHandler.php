@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of formosa project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2011 - 2014 SMS Taiwan, Inc. All rights reserved.
  * @license    GNU General Public License version 2 or later; see LICENSE
@@ -47,7 +47,7 @@ class ErrorHandler
 	 *
 	 * @var  string
 	 */
-	protected static $errorTemplate = 'error.error';
+	protected static $errorTemplate = 'windwalker.error.default';
 
 	/**
 	 * The error handler.

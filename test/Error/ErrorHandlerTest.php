@@ -115,7 +115,7 @@ TXT;
 	 *
 	 * @covers Windwalker\Core\Error\ErrorHandler::setErrorTemplate
 	 */
-	public function testSetErrorTemplate($tmpl)
+	public function testSetErrorTemplate()
 	{
 		StubErrorHandler::setErrorTemplate('flower.error.test');
 

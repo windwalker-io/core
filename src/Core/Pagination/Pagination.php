@@ -332,7 +332,7 @@ class Pagination
 	 *
 	 * @return string
 	 */
-	public function render($route, $template = 'pagination.default')
+	public function render($route, $template = 'windwalker.pagination.default')
 	{
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
