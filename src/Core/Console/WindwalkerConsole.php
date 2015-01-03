@@ -103,6 +103,8 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 
 		// Load packages
 		PackageHelper::registerPackages($this->loadPackages(), $this->container);
+
+		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 	}
 
 	/**
@@ -168,6 +170,8 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 */
 	public function execute()
 	{
+		$this->prepareExecute();
+
 		$this->triggerEvent('onBeforeExecute');
 
 		// Perform application routines.
@@ -175,7 +179,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 
 		$this->triggerEvent('onAfterExecute');
 
-		return $exitCode;
+		return $this->postExecute($exitCode);
 	}
 
 	/**

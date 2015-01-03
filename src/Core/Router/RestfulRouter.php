@@ -137,7 +137,7 @@ class RestfulRouter extends Router
 
 		if (!$controller)
 		{
-			throw new \UnexpectedValueException('Route profile should have "controller" element');
+			throw new \UnexpectedValueException('Route profile should have "controller" element, the matched route: ' . $route->getName());
 		}
 
 		// Suffix
