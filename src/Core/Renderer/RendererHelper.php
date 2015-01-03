@@ -36,13 +36,13 @@ abstract class RendererHelper
 	/**
 	 * Create a renderer object and auto inject the global paths.
 	 *
-	 * @param   string  $type  Render engine name, php, blade, twig or mustache.
+	 * @param   string  $type    Renderer engine name, php, blade, twig or mustache.
+	 * @param   array   $config  Renderer config array.
 	 *
-	 * @return  PhpRenderer|BladeRenderer|TwigRenderer|MustacheRenderer
-	 *
+	 * @return BladeRenderer|MustacheRenderer|PhpRenderer|TwigRenderer
 	 * @since   2.0
 	 */
-	public static function getRenderer($type = 'php')
+	public static function getRenderer($type = 'php', $config = array())
 	{
 		$class = sprintf('Windwalker\Renderer\%sRenderer', ucfirst($type));
 
@@ -51,55 +51,71 @@ abstract class RendererHelper
 			throw new \DomainException(sprintf('%s renderer not supported.', $type));
 		}
 
-		return new $class(static::getGlobalPaths());
+		if ($type == 'blade')
+		{
+			if (empty($config['cache_path']))
+			{
+				$config['cache_path'] = WINDWALKER_CACHE . '/renderer';
+			}
+		}
+
+		return new $class(static::getGlobalPaths(), $config);
 	}
 
 	/**
-	 * getPhpRenderer
+	 * Create php renderer.
+	 *
+	 * @param   array  $config  Renderer config array.
 	 *
 	 * @return  PhpRenderer
 	 *
 	 * @since   2.0
 	 */
-	public static function getPhpRenderer()
+	public static function getPhpRenderer($config = array())
 	{
-		return static::getRenderer('php');
+		return static::getRenderer('php', $config);
 	}
 
 	/**
-	 * getBladeRenderer
+	 * Create blade renderer.
+	 *
+	 * @param   array  $config  Renderer config array.
 	 *
 	 * @return  BladeRenderer
 	 *
 	 * @since   2.0
 	 */
-	public static function getBladeRenderer()
+	public static function getBladeRenderer($config = array())
 	{
-		return static::getRenderer('blade');
+		return static::getRenderer('blade', $config);
 	}
 
 	/**
-	 * getTwigRenderer
+	 * Create twig renderer.
+	 *
+	 * @param   array  $config  Renderer config array.
 	 *
 	 * @return  TwigRenderer
 	 *
 	 * @since   2.0
 	 */
-	public static function getTwigRenderer()
+	public static function getTwigRenderer($config = array())
 	{
-		return static::getRenderer('twig');
+		return static::getRenderer('twig', $config);
 	}
 
 	/**
-	 * getMustacheRenderer
+	 * Create mustache renderer.
+	 *
+	 * @param   array  $config  Renderer config array.
 	 *
 	 * @return  MustacheRenderer
 	 *
 	 * @since   2.0
 	 */
-	public static function getMustacheRenderer()
+	public static function getMustacheRenderer($config = array())
 	{
-		return static::getRenderer('mustache');
+		return static::getRenderer('mustache', $config);
 	}
 
 	/**
