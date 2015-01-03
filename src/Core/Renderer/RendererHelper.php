@@ -11,31 +11,36 @@ namespace Windwalker\Core\Renderer;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Renderer\BladeRenderer;
+use Windwalker\Renderer\MustacheRenderer;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\Priority;
 
 /**
- * The RendererFactory class.
+ * RendererHelper.
  * 
  * @since  2.0
  */
 abstract class RendererHelper
 {
 	/**
-	 * Property paths.
+	 * A PriorityQueue which extends the SplPriorityQueue.
 	 *
-	 * @var  PriorityQueue
+	 * @var  PriorityQueue.
+	 *
+	 * @since  2.0
 	 */
 	protected static $paths;
 
 	/**
-	 * getRenderer
+	 * Create a renderer object and auto inject the global paths.
 	 *
-	 * @param string $type
+	 * @param   string  $type  Render engine name, php, blade, twig or mustache.
 	 *
-	 * @return  RendererInterface
+	 * @return  PhpRenderer|BladeRenderer|TwigRenderer|MustacheRenderer
+	 *
+	 * @since   2.0
 	 */
 	public static function getRenderer($type = 'php')
 	{
@@ -53,6 +58,8 @@ abstract class RendererHelper
 	 * getPhpRenderer
 	 *
 	 * @return  PhpRenderer
+	 *
+	 * @since   2.0
 	 */
 	public static function getPhpRenderer()
 	{
@@ -63,6 +70,8 @@ abstract class RendererHelper
 	 * getBladeRenderer
 	 *
 	 * @return  BladeRenderer
+	 *
+	 * @since   2.0
 	 */
 	public static function getBladeRenderer()
 	{
@@ -73,6 +82,8 @@ abstract class RendererHelper
 	 * getTwigRenderer
 	 *
 	 * @return  TwigRenderer
+	 *
+	 * @since   2.0
 	 */
 	public static function getTwigRenderer()
 	{
@@ -80,9 +91,23 @@ abstract class RendererHelper
 	}
 
 	/**
-	 * getGlobalPaths
+	 * getMustacheRenderer
+	 *
+	 * @return  MustacheRenderer
+	 *
+	 * @since   2.0
+	 */
+	public static function getMustacheRenderer()
+	{
+		return static::getRenderer('mustache');
+	}
+
+	/**
+	 * Get a clone of global paths.
 	 *
 	 * @return  PriorityQueue
+	 *
+	 * @since   2.0
 	 */
 	public static function getGlobalPaths()
 	{
@@ -90,22 +115,41 @@ abstract class RendererHelper
 	}
 
 	/**
-	 * addPath
+	 * Add a global path for Renderer search.
 	 *
-	 * @param string $path
-	 * @param int    $priority
+	 * @param   string  $path      The path you want to set.
+	 * @param   int     $priority  Priority flag to order paths.
 	 *
 	 * @return  void
+	 *
+	 * @since   2.0
 	 */
-	public static function addPath($path, $priority = Priority::LOW)
+	public static function addGlobalPath($path, $priority = Priority::LOW)
 	{
 		static::getPaths()->insert($path, $priority);
 	}
 
 	/**
-	 * getPaths
+	 * An alias of getGlobalPath()
+	 *
+	 * @param   string  $path      The path you want to set.
+	 * @param   int     $priority  Priority flag to order paths.
+	 *
+	 * @return  void
+	 *
+	 * @since   2.0
+	 */
+	public static function addPath($path, $priority = Priority::LOW)
+	{
+		static::addGlobalPath($path, $priority);
+	}
+
+	/**
+	 * Get or create paths queue.
 	 *
 	 * @return  PriorityQueue
+	 *
+	 * @since   2.0
 	 */
 	protected static function getPaths()
 	{
@@ -120,9 +164,11 @@ abstract class RendererHelper
 	}
 
 	/**
-	 * registerPaths
+	 * Register default global paths.
 	 *
 	 * @return  void
+	 *
+	 * @since   2.0
 	 */
 	protected static function registerPaths()
 	{
@@ -139,20 +185,16 @@ abstract class RendererHelper
 			realpath(__DIR__ . '/../Resources/Templates'),
 			Priority::LOW
 		);
-
-		// Priority (3)
-//		static::$paths->insert(
-//			realpath($config->get('path.templates') . '/_global'),
-//			Priority::LOW - 20
-//		);
 	}
 
 	/**
-	 * reset
+	 * Reset all paths.
 	 *
 	 * @return  void
+	 *
+	 * @since   2.0
 	 */
-	public function reset()
+	public static function reset()
 	{
 		static::$paths = null;
 	}

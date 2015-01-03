@@ -9,9 +9,9 @@
 namespace Windwalker\Core\Test\Renderer;
 
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Renderer\BladeRenderer;
-use Windwalker\Renderer\PhpRenderer;
-use Windwalker\Renderer\TwigRenderer;
+use Windwalker\Core\Utilities\Iterator\PriorityQueue;
+use Windwalker\Filesystem\Path;
+use Windwalker\Utilities\Queue\Priority;
 
 /**
  * Test class of RendererHelper
@@ -29,7 +29,11 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetRenderer()
 	{
-		$this->assertTrue(RendererHelper::getRenderer() instanceof PhpRenderer);
+		$this->assertInstanceOf('Windwalker\Renderer\PhpRenderer', RendererHelper::getRenderer());
+		$this->assertInstanceOf('Windwalker\Renderer\PhpRenderer', RendererHelper::getRenderer('php'));
+		$this->assertInstanceOf('Windwalker\Renderer\BladeRenderer', RendererHelper::getRenderer('blade'));
+		$this->assertInstanceOf('Windwalker\Renderer\TwigRenderer', RendererHelper::getRenderer('twig'));
+		$this->assertInstanceOf('Windwalker\Renderer\MustacheRenderer', RendererHelper::getRenderer('mustache'));
 
 		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getRenderer()->getPaths());
 	}
@@ -43,9 +47,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetPhpRenderer()
 	{
-		$this->assertTrue(RendererHelper::getPhpRenderer() instanceof PhpRenderer);
-
-		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getPhpRenderer()->getPaths());
+		$this->assertInstanceOf('Windwalker\Renderer\PhpRenderer', RendererHelper::getPhpRenderer());
 	}
 
 	/**
@@ -57,14 +59,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetBladeRenderer()
 	{
-		if (!class_exists('Illuminate\View\Environment'))
-		{
-			$this->markTestSkipped('Illuminate not installed');
-		}
-
-		$this->assertTrue(RendererHelper::getBladeRenderer() instanceof BladeRenderer);
-
-		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getBladeRenderer()->getPaths());
+		$this->assertInstanceOf('Windwalker\Renderer\BladeRenderer', RendererHelper::getBladeRenderer());
 	}
 
 	/**
@@ -76,9 +71,19 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetTwigRenderer()
 	{
-		$this->assertTrue(RendererHelper::getTwigRenderer() instanceof TwigRenderer);
+		$this->assertInstanceOf('Windwalker\Renderer\TwigRenderer', RendererHelper::getTwigRenderer());
+	}
 
-		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getTwigRenderer()->getPaths());
+	/**
+	 * Method to test getMustacheRenderer().
+	 *
+	 * @return void
+	 *
+	 * @covers Windwalker\Core\Renderer\RendererHelper::getMustacheRenderer
+	 */
+	public function testGetMustacheRenderer()
+	{
+		$this->assertInstanceOf('Windwalker\Renderer\MustacheRenderer', RendererHelper::getMustacheRenderer());
 	}
 
 	/**
@@ -87,30 +92,36 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Renderer\RendererHelper::getGlobalPaths
-	 * @TODO   Implement testGetGlobalPaths().
 	 */
 	public function testGetGlobalPaths()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
+		$paths = RendererHelper::getGlobalPaths();
+
+		$this->assertTrue($paths instanceof PriorityQueue);
+
+		$array = array(
+			Path::clean(WINDWALKER_TEMPLATES),
+			realpath(WINDWALKER_SOURCE . '/../src/Core/Resources/Templates')
 		);
+
+		$this->assertEquals($array, $paths->toArray());
 	}
 
 	/**
-	 * Method to test addPath().
+	 * Method to test addGlobalPath().
 	 *
 	 * @return void
 	 *
+	 * @covers Windwalker\Core\Renderer\RendererHelper::addGlobalPath
 	 * @covers Windwalker\Core\Renderer\RendererHelper::addPath
-	 * @TODO   Implement testAddPath().
 	 */
-	public function testAddPath()
+	public function testAddGlobalPath()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		RendererHelper::addGlobalPath(WINDWALKER_CACHE, Priority::HIGH);
+
+		$paths = RendererHelper::getGlobalPaths();
+
+		$this->assertEquals(WINDWALKER_CACHE, $paths->current());
 	}
 
 	/**
@@ -119,13 +130,19 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Renderer\RendererHelper::reset
-	 * @TODO   Implement testReset().
 	 */
 	public function testReset()
 	{
-		// Remove the following lines when you implement this test.
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		RendererHelper::addGlobalPath(WINDWALKER_TEMP, Priority::MAX);
+
+		$paths = RendererHelper::getGlobalPaths();
+
+		$this->assertEquals(WINDWALKER_TEMP, $paths->current());
+
+		RendererHelper::reset();
+
+		$paths = RendererHelper::getGlobalPaths();
+
+		$this->assertNotEquals(WINDWALKER_TEMP, $paths->current());
 	}
 }
