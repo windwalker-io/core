@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -32,7 +32,7 @@ use Windwalker\Registry\Registry;
 /**
  * The Console class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 class WindwalkerConsole extends Console implements WindwalkerApplicationInterface, DispatcherAwareInterface
 {
@@ -164,7 +164,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 *
 	 * @return  int  The Unix Console/Shell exit code.
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function execute()
 	{
@@ -198,7 +198,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function triggerEvent($event, $args = array())
 	{

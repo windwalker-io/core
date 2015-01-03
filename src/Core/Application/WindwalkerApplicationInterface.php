@@ -16,7 +16,7 @@ use Windwalker\Event\EventInterface;
 /**
  * Interface WindwalkerApplicationInterface
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 interface WindwalkerApplicationInterface
 {
@@ -51,7 +51,7 @@ interface WindwalkerApplicationInterface
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function triggerEvent($event, $args = array());
 

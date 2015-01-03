@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -16,7 +16,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The AuthenticateProvider class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 class AuthenticateProvider implements ServiceProviderInterface
 {
@@ -34,6 +34,10 @@ class AuthenticateProvider implements ServiceProviderInterface
 			$auth = new Authenticate;
 
 			$auth->addMethod('database', new DatabaseMethod);
+
+			$dispatcher = $container->get('system.dispatcher');
+
+			$dispatcher->triggerEvent('onLoadAuthenticateMethods', array('authenticate' => $auth));
 
 			return $auth;
 		};

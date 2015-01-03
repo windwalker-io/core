@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -38,7 +38,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The WebApplication class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 class WebApplication extends AbstractWebApplication implements WindwalkerApplicationInterface, DispatcherAwareInterface
 {
@@ -67,7 +67,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * The application configuration object.
 	 *
 	 * @var    Registry
-	 * @since  {DEPLOY_VERSION}
+	 * @since  2.0
 	 */
 	public $config;
 
@@ -174,7 +174,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  void
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function execute()
 	{
@@ -203,7 +203,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  void
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	protected function doExecute()
 	{
@@ -497,7 +497,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  void
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function redirect($url, $moved = false)
 	{
@@ -557,7 +557,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
-	 * @since   {DEPLOY_VERSION}
+	 * @since   2.0
 	 */
 	public function triggerEvent($event, $args = array())
 	{

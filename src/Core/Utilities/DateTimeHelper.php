@@ -11,7 +11,7 @@ namespace Windwalker\Core\Utilities;
 /**
  * The DateTimeHelper class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 abstract class DateTimeHelper
 {

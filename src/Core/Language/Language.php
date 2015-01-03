@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -16,7 +16,7 @@ use Windwalker\Language\LanguageNormalize;
 /**
  * The LanguageHelper class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 abstract class Language extends Facade
 {

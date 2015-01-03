@@ -16,7 +16,7 @@ use Windwalker\Renderer\PhpRenderer;
  *
  * @note   Based on https://github.com/Kilte/pagination
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 class Pagination
 {

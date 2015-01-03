@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -14,7 +14,7 @@ use Windwalker\Core\Ioc;
 /**
  * The Router class.
  * 
- * @since  {DEPLOY_VERSION}.
+ * @since  2.0.
  *
  * @method  static  string  build()      build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
  * @method  static  string  buildHttp()  buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)

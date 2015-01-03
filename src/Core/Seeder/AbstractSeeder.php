@@ -15,7 +15,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The AbstractSeeder class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 abstract class AbstractSeeder
 {

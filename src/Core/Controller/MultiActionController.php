@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of starter project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -11,9 +11,9 @@ namespace Windwalker\Core\Controller;
 /**
  * The MultiActionController class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
-class MultiActionController extends Controller
+abstract class MultiActionController extends Controller
 {
 	/**
 	 * Property task.
@@ -35,7 +35,7 @@ class MultiActionController extends Controller
 	 * @throws  \LogicException
 	 * @return  mixed Return executed result.
 	 */
-	public function execute()
+	public function doExecute()
 	{
 		$action = $this->action ? : 'indexAction';
 

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Pagination;
 /**
  * The PaginationResult class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.0
  */
 class PaginationResult
 {
