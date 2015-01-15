@@ -213,9 +213,9 @@ class User extends Facade implements DispatcherAwareStaticInterface
 			throw new \InvalidArgumentException('User data should be array or object.');
 		}
 
-		if (!($user instanceof Data))
+		if (!($user instanceof UserData))
 		{
-			$user = new Data($user);
+			$user = new UserData($user);
 		}
 
 		$options = ($options instanceof Registry) ? $options : new Registry($options);
