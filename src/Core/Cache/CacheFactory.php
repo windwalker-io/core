@@ -38,6 +38,13 @@ class CacheFactory
 	protected $config;
 
 	/**
+	 * Property ignoreGlobal.
+	 *
+	 * @var  bool
+	 */
+	protected $ignoreGlobal = false;
+
+	/**
 	 * Class init.
 	 *
 	 * @param  $config  Registry  The Config object.
@@ -64,7 +71,7 @@ class CacheFactory
 		$debug = $this->config->get('system.debug', false);
 		$enabled = $this->config->get('cache.enabled', false);
 
-		if (!$debug && $enabled && !ArrayHelper::getValue($options, 'ignore_global', false))
+		if (($debug || !$enabled) && !$this->ignoreGlobal)
 		{
 			$storage = 'null';
 			$dataHandler = 'string';
@@ -88,7 +95,7 @@ class CacheFactory
 		$storage = $storage ? : 'runtime';
 		$dataHandler = $dataHandler ? : 'serialize';
 
-		$hash = sha1($name . $storage . $dataHandler);
+		$hash = sha1($name . $storage . $dataHandler . serialize($options));
 
 		if (!empty(static::$instances[$hash]))
 		{
@@ -129,6 +136,7 @@ class CacheFactory
 		{
 			case 'file':
 				$path = isset($options['cache_dir']) ? $options['cache_dir'] : $config->get('cache.dir');
+				$denyAccess = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
 
 				if (!is_dir($path))
 				{
@@ -142,7 +150,7 @@ class CacheFactory
 
 				$group = ($name == 'windwalker') ? null : $name;
 
-				return new $class($path, $group, false, $ttl, $options);
+				return new $class($path, $group, $denyAccess, $ttl, $options);
 				break;
 
 			case 'redis':
@@ -173,5 +181,65 @@ class CacheFactory
 		}
 
 		return new $class;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property IgnoreGlobal
+	 *
+	 * @param boolean $bool
+	 *
+	 * @return boolean
+	 */
+	public function ignoreGlobal($bool = null)
+	{
+		if ($bool === null)
+		{
+			return $this->ignoreGlobal;
+		}
+
+		$this->ignoreGlobal = (bool) $bool;
+
+		return $bool;
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		if ($name == 'config')
+		{
+			return $this->$name;
+		}
+
+		throw new \LogicException('Property ' . $name . ' acnnot access.');
 	}
 }

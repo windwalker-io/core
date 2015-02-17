@@ -28,32 +28,26 @@ class CacheProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
+		// Get cache factory object.
 		$closure = function(Container $container)
 		{
-			$config  = $container->get('system.config');
-			$options = array();
+			$config = $container->get('system.config');
 
-			$enabled = $config->get('cache.enabled', false);
-			$debug   = $config->get('system.debug', false);
+			return new CacheFactory($config);
+		};
+
+		$container->share('system.cache.factory', $closure)
+			->alias('cache.factory', 'system.cache');
+
+		// Get global cache object.
+		$container->share('system.cache', function(Container $container)
+		{
+			$config  = $container->get('system.config');
 
 			$storage = $config->get('cache.storage', 'file');
 			$handler = $config->get('cache.handler', 'serialized');
 
-			$storage = ($enabled && !$debug) ? $storage : 'null';
-
-			// Options
-			$options['cache_time'] = $config->get('cache.time');
-
-			if ($storage == 'file')
-			{
-				$options['cache_dir'] = $config->get('cache.dir');
-			}
-
-			return CacheFactory::getCache('windwalker', $storage, $handler, $options);
-		};
-
-		$container->share('system.cache', $closure)
-			->alias('cache', 'system.cache');
+			return $container->get('system.cache.factory')->create('windwalker', $storage, $handler);
+		})->alias('cache', 'system.cache');
 	}
 }
- 
