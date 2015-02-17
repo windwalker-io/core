@@ -12,14 +12,16 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\DataHandlerInterface;
 use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
+use Windwalker\DI\Container;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The CacheFactory class.
  * 
  * @since  2.0
  */
-abstract class CacheFactory
+class CacheFactory
 {
 	/**
 	 * Property instances.
@@ -27,6 +29,49 @@ abstract class CacheFactory
 	 * @var  Cache[]
 	 */
 	protected static $instances = array();
+
+	/**
+	 * Property container.
+	 *
+	 * @var  Registry
+	 */
+	protected $config;
+
+	/**
+	 * Class init.
+	 *
+	 * @param  $config  Registry  The Config object.
+	 *
+	 * @since  2.0.5
+	 */
+	public function __construct(Registry $config = null)
+	{
+		$this->config = $config ? : Ioc::getConfig();
+	}
+
+	/**
+	 * Create cache object.
+	 *
+	 * @param string $name
+	 * @param string $storage
+	 * @param string $dataHandler
+	 * @param array  $options
+	 *
+	 * @return  Cache
+	 */
+	public function create($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
+	{
+		$debug = $this->config->get('system.debug', false);
+		$enabled = $this->config->get('cache.enabled', false);
+
+		if (!$debug && $enabled && !ArrayHelper::getValue($options, 'ignore_global', false))
+		{
+			$storage = 'null';
+			$dataHandler = 'string';
+		}
+
+		return static::getCache($name, $storage, $dataHandler, $options);
+	}
 
 	/**
 	 * getCache
@@ -40,6 +85,9 @@ abstract class CacheFactory
 	 */
 	public static function getCache($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
 	{
+		$storage = $storage ? : 'runtime';
+		$dataHandler = $dataHandler ? : 'serialize';
+
 		$hash = sha1($name . $storage . $dataHandler);
 
 		if (!empty(static::$instances[$hash]))
@@ -127,4 +175,3 @@ abstract class CacheFactory
 		return new $class;
 	}
 }
- 
