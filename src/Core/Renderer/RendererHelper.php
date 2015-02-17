@@ -24,6 +24,11 @@ use Windwalker\Utilities\Queue\Priority;
  */
 abstract class RendererHelper
 {
+	const ENGINE_PHP      = 'php';
+	const ENGINE_BLADE    = 'blade';
+	const ENGINE_TWIG     = 'twig';
+	const ENGINE_MUSTACHE = 'mustache';
+
 	/**
 	 * A PriorityQueue which extends the SplPriorityQueue.
 	 *
@@ -42,7 +47,7 @@ abstract class RendererHelper
 	 * @return BladeRenderer|MustacheRenderer|PhpRenderer|TwigRenderer
 	 * @since   2.0
 	 */
-	public static function getRenderer($type = 'php', $config = array())
+	public static function getRenderer($type = self::ENGINE_PHP, $config = array())
 	{
 		$class = sprintf('Windwalker\Renderer\%sRenderer', ucfirst($type));
 
