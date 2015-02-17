@@ -372,6 +372,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$routes = $this->loadRoutingConfiguration();
 
+		// @TODO Move all routing rules to listeners.
+
 		// Replace package routing
 		foreach ($routes as $name => $route)
 		{
@@ -386,6 +388,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 			unset($routes[$name]);
 		}
+
+		$this->triggerEvent('onAfterLoadPackagesRouting', array('router' => $router, 'app' => $this));
 
 		// Register routes
 		foreach ($routes as $name => $route)
@@ -406,6 +410,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 			$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
 		}
+
+		$this->triggerEvent('onRegisterRouting', array('router' => $router, 'app' => $this));
 
 		return $router;
 	}
