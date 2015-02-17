@@ -8,11 +8,8 @@
 
 namespace Windwalker\Core\View\Helper;
 
-use Joomla\Date\Date;
-use Joomla\DateTime\DateTime;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\View\Helper\Set\HelperSet;
-use Windwalker\Core\View\HtmlView;
 
 /**
  * Class RendererHelper
@@ -48,7 +45,7 @@ class ViewHelper extends AbstractHelper
 			'container' => Ioc::factory($package),
 			'helper' => new HelperSet,
 			'flashes' => static::$flashes,
-			'datetime' => new DateTime('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
+			'datetime' => new \DateTime('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
 		);
 	}
 

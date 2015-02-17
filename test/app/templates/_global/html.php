@@ -78,7 +78,7 @@ Contnet
 				<hr />
 
 				<footer>
-					&copy; Formosa <?php echo $data->datetime->year; ?>
+					&copy; Formosa <?php echo $data->datetime->format('Y'); ?>
 				</footer>
 			</div>
 		</div>
