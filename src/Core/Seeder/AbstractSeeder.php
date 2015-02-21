@@ -66,7 +66,7 @@ abstract class AbstractSeeder
 		$seeder->setDb($this->db)
 			->setCommand($this->command);
 
-		$this->command->out('Import seeder ' . get_called_class());
+		$this->command->out('Import seeder ' . get_class($seeder));
 
 		$seeder->doExecute();
 
@@ -101,7 +101,7 @@ abstract class AbstractSeeder
 		$seeder->setDb($this->db);
 		$seeder->setCommand($this->command);
 
-		$this->command->out('Clean seeder ' . get_called_class());
+		$this->command->out('Clean seeder ' . get_class($seeder));
 
 		$seeder->doClean();
 
