@@ -216,7 +216,7 @@ class MigrationsModel extends DatabaseModel
 		{
 			$tran->rollback();
 
-			throw new $e;
+			throw $e;
 		}
 
 		$tran->commit();
