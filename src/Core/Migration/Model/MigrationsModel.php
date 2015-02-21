@@ -210,6 +210,7 @@ class MigrationsModel extends DatabaseModel
 
 		try
 		{
+			// Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite dose.
 			$migration->$direction();
 		}
 		catch (\Exception $e)
