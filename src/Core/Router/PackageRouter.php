@@ -48,12 +48,12 @@ class PackageRouter
 	 *
 	 * @param string $route
 	 * @param array  $queries
-	 * @param int    $type
+	 * @param string $type
 	 * @param bool   $xhtml
 	 *
 	 * @return  string
 	 */
-	public function build($route, $queries = array(), $type = Router::TYPE_RAW, $xhtml = false)
+	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
 		if (count(explode(':', $route, 2)) < 2)
 		{
@@ -68,11 +68,11 @@ class PackageRouter
 	 *
 	 * @param string $route
 	 * @param array  $queries
-	 * @param int    $type
+	 * @param string $type
 	 *
 	 * @return  string
 	 */
-	public function buildHtml($route, $queries = array(), $type = Router::TYPE_PATH)
+	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, true);
 	}
@@ -82,11 +82,11 @@ class PackageRouter
 	 *
 	 * @param string $route
 	 * @param array  $queries
-	 * @param int    $type
+	 * @param string $type
 	 *
 	 * @return  string
 	 */
-	public function buildHttp($route, $queries = array(), $type = Router::TYPE_PATH)
+	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
 	}
