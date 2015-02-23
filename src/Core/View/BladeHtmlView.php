@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Ioc;
 use Windwalker\Renderer\BladeRenderer;
 
 /**
@@ -25,9 +26,8 @@ class BladeHtmlView extends HtmlView
 	 */
 	public function __construct($data = array(), BladeRenderer $renderer = null)
 	{
-		$renderer = $renderer ? : new BladeRenderer(null, array('cache_path' => WINDWALKER_CACHE . '/view'));
+		$renderer = $renderer ? : new BladeRenderer(null, array('cache_path' => Ioc::getConfig()->get('path.cache') . '/view'));
 
 		parent::__construct($data, $renderer);
 	}
 }
- 
