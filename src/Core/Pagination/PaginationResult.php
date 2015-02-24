@@ -336,7 +336,10 @@ class PaginationResult
 			$pages[$lower] = Pagination::LOWER;
 		}
 
-		$pages[$this->getCurrent()] = Pagination::CURRENT;
+		if ($this->getCurrent())
+		{
+			$pages[$this->getCurrent()] = Pagination::CURRENT;
+		}
 
 		foreach ($this->getHighers() as $higher)
 		{

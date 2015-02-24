@@ -8,8 +8,12 @@
 
 namespace Windwalker\Core\Pagination;
 
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Router\RestfulRouter;
+use Windwalker\Core\Router\Router;
 use Windwalker\Renderer\PhpRenderer;
+use Windwalker\Uri\Uri;
 
 /**
  * The Pagination class.
@@ -130,7 +134,7 @@ class Pagination
 	 * @throws \LogicException
 	 * @return self
 	 */
-	public function __construct($total, $current, $limit = 1, $neighbours = 4)
+	public function __construct($total, $current, $limit = 10, $neighbours = 4)
 	{
 		$this->total   = (int) $total;
 		$this->current = (int) $current;
@@ -327,15 +331,47 @@ class Pagination
 	/**
 	 * render
 	 *
-	 * @param string $route
-	 * @param string $template
+	 * @param string|\Closure $route
+	 * @param string          $template
 	 *
 	 * @return string
 	 */
-	public function render($route, $template = 'windwalker.pagination.default')
+	public function render($route = null, $template = 'windwalker.pagination.default')
 	{
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
-		return $renderer->render($template, array('pagination' => $this->getResult(), 'route' => $route));
+		$result = $this->getResult();
+
+		if (!$result->getPages())
+		{
+			return null;
+		}
+
+		if ($route === null)
+		{
+			$uri = Ioc::get('system.uri')->get('route');
+
+			$route = function ($queries) use ($uri)
+			{
+				$uri = new Uri($uri);
+
+				foreach ($queries as $k => $v)
+				{
+					$uri->setVar($k, $v);
+				}
+
+				return $uri->toString();
+			};
+		}
+
+		if (!($route instanceof \Closure))
+		{
+			$route = function ($queries, $type = RestfulRouter::TYPE_PATH) use ($route)
+			{
+				return Router::buildHtml($route, $queries, $type);
+			};
+		}
+
+		return $renderer->render($template, array('pagination' => $result, 'route' => $route));
 	}
 }

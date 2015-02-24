@@ -112,6 +112,11 @@ class PaginationTest extends AbstractBaseTestCase
 		$this->assertEquals($output, $result->getAll());
 	}
 
+	/**
+	 * testTemplate
+	 *
+	 * @return  void
+	 */
 	public function testTemplate()
 	{
 		$pagination = new Pagination(500, 20, 10, 4);
@@ -139,5 +144,9 @@ HTML;
 		$html = $renderer->render('windwalker.pagination.test', array('pagination' => $pagination->getResult()));
 
 		$this->assertStringDataEquals($compare, $html);
+
+		$pagination = new Pagination(5, 20, 10, 4);
+
+		$this->assertNull($pagination->render('route'));
 	}
 }
