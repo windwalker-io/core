@@ -90,17 +90,12 @@ class MigrationsModel extends DatabaseModel
 	{
 		$this->initLogTable();
 
-		$db = $this->db;
+		$query = $this->db->getQuery(true)
+			->select('version')
+			->from($this->logTable)
+			->order('version ASC');
 
-		return $this->fetch('versions', function() use ($db)
-		{
-			$query = $this->db->getQuery(true)
-				->select('version')
-				->from($this->logTable)
-				->order('version ASC');
-
-			return $this->db->setQuery($query)->loadColumn();
-		});
+		return $this->db->setQuery($query)->loadColumn();
 	}
 
 	/**

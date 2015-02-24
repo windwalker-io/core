@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Console\IO\IO;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 
@@ -54,6 +55,9 @@ class MigrateCommand extends AbstractCommand
 	 */
 	public function initialise()
 	{
+		$this->addOption('s')
+			->alias('seed')
+			->description('Also import seeds.');
 	}
 
 	/**
@@ -96,6 +100,20 @@ LOG;
 		else
 		{
 			$this->out('No change.');
+		}
+
+		if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0')
+		{
+			$io = clone $this->io;
+
+			$io->setArguments(array('seed', 'import'));
+
+//			foreach ($this->io->getOptions() as $k => $v)
+//			{
+//				$io->setOption($k, $v);
+//			}
+
+			$this->app->getRootCommand()->setIO($io)->execute();
 		}
 
 		return true;

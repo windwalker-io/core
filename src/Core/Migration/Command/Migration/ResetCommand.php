@@ -1,0 +1,98 @@
+<?php
+/**
+ * Part of Windwalker project.
+ *
+ * @copyright  Copyright (C) 2014 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later;
+ */
+
+namespace Windwalker\Core\Migration\Command\Migration;
+
+use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Console\IO\IO;
+use Windwalker\Core\Migration\Model\MigrationsModel;
+use Windwalker\Filesystem\File;
+use Windwalker\String\String;
+
+/**
+ * The CreateCommand class.
+ * 
+ * @since  2.0
+ */
+class ResetCommand extends AbstractCommand
+{
+	/**
+	 * An enabled flag.
+	 *
+	 * @var bool
+	 */
+	public static $isEnabled = true;
+
+	/**
+	 * Console(Argument) name.
+	 *
+	 * @var  string
+	 */
+	protected $name = 'reset';
+
+	/**
+	 * The command description.
+	 *
+	 * @var  string
+	 */
+	protected $description = 'Reset all migrations.';
+
+	/**
+	 * The usage to tell user how to use this command.
+	 *
+	 * @var string
+	 */
+	protected $usage = 'create <cmd><command></cmd> <option>[option]</option>';
+
+	/**
+	 * Configure command information.
+	 *
+	 * @return void
+	 */
+	public function initialise()
+	{
+		$this->addOption('s')
+			->alias('seed')
+			->description('Also import seeds.');
+	}
+
+	/**
+	 * Execute this command.
+	 *
+	 * @return int|void
+	 */
+	protected function doExecute()
+	{
+		$this->executeCommand(array('migration', 'migrate', '0'));
+
+		$this->executeCommand(array('migration', 'migrate'));
+
+		return true;
+	}
+
+	/**
+	 * executeCommand
+	 *
+	 * @param array  $args
+	 *
+	 * @return  boolean
+	 */
+	protected function executeCommand($args)
+	{
+		$io = clone $this->io;
+
+		$io->setArguments($args);
+
+//		foreach ($this->io->getOptions() as $k => $v)
+//		{
+//			$io->setOption($k, $v);
+//		}
+
+		return $this->app->getRootCommand()->setIO($io)->execute();
+	}
+}
