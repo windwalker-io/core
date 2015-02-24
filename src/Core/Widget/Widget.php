@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Widget;
 
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Data\Data;
@@ -51,14 +52,23 @@ class Widget implements WidgetInterface
 	protected $debug = false;
 
 	/**
+	 * Property package.
+	 *
+	 * @var  string
+	 */
+	private $package;
+
+	/**
 	 * Class init.
 	 *
 	 * @param string            $layout
 	 * @param RendererInterface $renderer
+	 * @param string            $package
 	 */
-	public function __construct($layout, RendererInterface $renderer = null)
+	public function __construct($layout, RendererInterface $renderer = null, $package = null)
 	{
-		$this->layout = $layout;
+		$this->layout   = $layout;
+		$this->package  = $package;
 		$this->renderer = $renderer ? : new PhpRenderer;
 
 		// Create PriorityQueue
@@ -161,6 +171,14 @@ class Widget implements WidgetInterface
 
 			$this->renderer->setPaths($paths);
 
+			// Set package path
+			if ($this->package)
+			{
+				$package = PackageHelper::getPackage($this->package);
+
+				$this->renderer->addPath($package->getDir() . '/Templates', Priority::BELOW_NORMAL);
+			}
+
 			$this->pathRegistered = true;
 		}
 
@@ -247,6 +265,49 @@ class Widget implements WidgetInterface
 
 			$this->renderer->setPaths($paths);
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Package
+	 *
+	 * @return  string
+	 */
+	public function getPackage()
+	{
+		return $this->package;
+	}
+
+	/**
+	 * Method to set property package
+	 *
+	 * @param   string $package
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPackage($package)
+	{
+		$this->package = $package;
+
+		return $this;
+	}
+
+	/**
+	 * reset
+	 *
+	 * @return  static
+	 */
+	public function reset()
+	{
+		$this->pathRegistered = false;
+
+		if ($this->renderer instanceof PhpRenderer)
+		{
+			$this->renderer->reset();
+		}
+
+		$this->renderer->setPaths(array());
 
 		return $this;
 	}

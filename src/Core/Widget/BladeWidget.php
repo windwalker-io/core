@@ -28,10 +28,15 @@ class BladeWidget extends Widget
 	/**
 	 * Class init.
 	 *
-	 * @param string  $layout
+	 * @param string $layout
+	 * @param string $package
 	 */
-	public function __construct($layout)
+	public function __construct($layout, $package = null)
 	{
-		parent::__construct($layout, new BladeRenderer(null, array('cache_path' => Ioc::getConfig()->get('path.cache') . '/view')));
+		parent::__construct(
+			$layout,
+			new BladeRenderer(null, array('cache_path' => Ioc::getConfig()->get('path.cache') . '/view')),
+			$package
+		);
 	}
 }

@@ -171,14 +171,17 @@ class HtmlView extends \Windwalker\View\HtmlView
 		if ($this->config['package.path'])
 		{
 			$paths->insert(Path::clean($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
+			$paths->insert(Path::clean($this->config['package.path'] . '/Templates'), Priority::LOW);
 		}
 		elseif (!($package instanceof NullPackage))
 		{
 			$paths->insert(Path::clean($package->getDir() . '/Templates/' . $this->getName()), Priority::LOW);
+			$paths->insert(Path::clean($package->getDir() . '/Templates'), Priority::LOW);
 		}
 		else
 		{
 			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
+			$paths->insert(Path::clean(dirname($ref->getFileName()) . '/../../Templates'), Priority::LOW);
 		}
 
 		$paths->insert(Path::clean($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);

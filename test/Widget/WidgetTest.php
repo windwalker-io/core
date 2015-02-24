@@ -130,6 +130,26 @@ class WidgetTest extends AbstractBaseTestCase
 		$this->assertPathEquals('foo/bar/baz', $paths[1]);
 	}
 
+	public function testDefaultPaths()
+	{
+		TestHelper::invoke($this->instance, 'registerPaths');
+
+		$paths = $this->instance->getPaths()->toArray();
+
+		$this->assertPathEquals(WINDWALKER_ROOT . '/templates', $paths[0]);
+		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../../src/Core/Resources/Templates'), $paths[1]);
+
+		$this->instance->reset()->setPackage('mvc');
+
+		TestHelper::invoke($this->instance, 'registerPaths');
+
+		$paths = $this->instance->getPaths()->toArray();
+
+		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../Mvc/Templates'), $paths[0]);
+		$this->assertPathEquals(WINDWALKER_ROOT . '/templates', $paths[1]);
+		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../../src/Core/Resources/Templates'), $paths[2]);
+	}
+
 	/**
 	 * Method to test getPaths().
 	 *

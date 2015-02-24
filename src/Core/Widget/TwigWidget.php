@@ -29,11 +29,12 @@ class TwigWidget extends Widget
 	/**
 	 * Class init.
 	 *
-	 * @param string  $layout
+	 * @param string $layout
+	 * @param string $package
 	 */
-	public function __construct($layout)
+	public function __construct($layout, $package = null)
 	{
-		parent::__construct($layout, new TwigRenderer);
+		parent::__construct($layout, new TwigRenderer, $package);
 	}
 
 	/**
