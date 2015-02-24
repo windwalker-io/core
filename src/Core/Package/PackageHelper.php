@@ -96,7 +96,7 @@ abstract class PackageHelper
 		$config->set('package.' . $name, (object) $pkgConfig);
 
 		// Set container and init it
-		$subContainer = $container->createChild($name);
+		$subContainer = Ioc::factory($name);
 
 		$package->setContainer($subContainer)->initialise();
 
