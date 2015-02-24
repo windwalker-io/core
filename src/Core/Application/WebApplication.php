@@ -282,7 +282,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			);
 		}
 
-		$this->config->loadArray(array('extra' => $extra));
+		$this->config->loadArray(array('route' => array('extra' => $extra)));
+		$this->config['route.matched'] = $route->getName();
+		$this->config['route.package'] = $package ? $package->getName() : null;
 
 		$this->container->set('main.controller', $controller);
 
