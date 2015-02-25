@@ -24,7 +24,7 @@ class UserData extends Data implements UserDataInterface
 	 */
 	public function isGuest()
 	{
-		return count($this);
+		return !count($this);
 	}
 
 	/**
