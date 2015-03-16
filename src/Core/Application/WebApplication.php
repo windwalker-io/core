@@ -233,6 +233,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$route = $route ? : $this->container->get('uri')->get('route');
 
+		$route = rtrim($route, '/');
+
 		$route = $this->matchRoute($route);
 
 		$variables = $route->getVariables();
