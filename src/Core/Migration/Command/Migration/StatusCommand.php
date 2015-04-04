@@ -80,6 +80,8 @@ class StatusCommand extends AbstractCommand
 
 		$versions = $migration->getVersions();
 
+		$migrations->ksort();
+
 		foreach ($migrations as $migItem)
 		{
 			$status = (in_array($migItem['id'], $versions)) ? '    <info>up</info>' : '  <error>down</error>';

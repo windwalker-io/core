@@ -189,6 +189,8 @@ class MigrationsModel extends DatabaseModel
 	 * @param Data   $migrationItem
 	 * @param string $direction
 	 *
+	 * @throws  \Exception
+	 *
 	 * @return  void
 	 */
 	public function executeMigration(Data $migrationItem, $direction = 'up')
