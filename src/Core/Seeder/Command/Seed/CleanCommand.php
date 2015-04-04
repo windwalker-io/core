@@ -10,6 +10,7 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Migration\Model\BackupModel;
 
 /**
  * Class Seed
@@ -61,6 +62,9 @@ class CleanCommand extends Command
 	 */
 	protected function doExecute()
 	{
+		// backup
+		BackupModel::getInstance()->setCommand($this)->backup();
+
 		$class = $this->app->get('seed.class');
 
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */

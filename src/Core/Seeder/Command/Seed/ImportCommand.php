@@ -10,6 +10,7 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Migration\Model\BackupModel;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\String\StringNormalise;
@@ -64,6 +65,12 @@ class ImportCommand extends Command
 	 */
 	protected function doExecute()
 	{
+		if (!$this->io->getOption('no-backup'))
+		{
+			// backup
+			BackupModel::getInstance()->setCommand($this)->backup();
+		}
+
 		$class = $this->app->get('seed.class');
 
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */

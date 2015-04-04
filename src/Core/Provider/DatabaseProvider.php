@@ -57,6 +57,20 @@ class DatabaseProvider implements ServiceProviderInterface
 				return new WindwalkerAdapter($container->get('db'));
 			}
 		);
+
+		// For Exporter
+		$closure = function(Container $container)
+		{
+			$config = $container->get('system.config');
+
+			$driver = $config->get('database.driver', 'mysql');
+
+			$class = 'Windwalker\Core\Database\Exporter\\' . ucfirst($driver) . 'Exporter';
+
+			return new $class;
+		};
+
+		$container->share('sql.exporter', $closure);
 	}
 }
  

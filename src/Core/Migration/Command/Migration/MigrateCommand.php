@@ -9,8 +9,8 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Console\IO\IO;
-use Windwalker\Core\Ioc;
+use Windwalker\Console\Prompter\BooleanPrompter;
+use Windwalker\Core\Migration\Model\BackupModel;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 
 /**
@@ -69,51 +69,74 @@ class MigrateCommand extends AbstractCommand
 	{
 		$migration = new MigrationsModel;
 
+		if (!$this->io->getOption('no-backup'))
+		{
+			// backup
+			BackupModel::getInstance()->setCommand($this)->backup();
+		}
+
 		$migration->setCommand($this);
 
 		$migration['path'] = $this->app->get('migration.dir');
 
-		$migration->migrate($this->getArgument(0, null));
-
-		$logs = (array) $migration['log'];
-
-		if ($logs)
+		try
 		{
-			$tmpl = <<<LOG
+			$migration->migrate($this->getArgument(0, null));
 
-Migration <cmd>%s</cmd> the version: <info>%s_%s</info>
-------------------------------------------------------------
-<option>Success</option>
+			$logs = (array) $migration['log'];
+
+			if ($logs)
+			{
+				$tmpl = <<<LOG
+
+	Migration <cmd>%s</cmd> the version: <info>%s_%s</info>
+	------------------------------------------------------------
+	<option>Success</option>
 
 LOG;
 
-			foreach ($logs as $log)
+				foreach ($logs as $log)
+				{
+					$this->out(sprintf(
+						$tmpl,
+						strtoupper($log['direction']),
+						$log['id'],
+						$log['name']
+					));
+				}
+			}
+			else
 			{
-				$this->out(sprintf(
-					$tmpl,
-					strtoupper($log['direction']),
-					$log['id'],
-					$log['name']
-				));
+				$this->out('No change.');
+			}
+
+			if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0')
+			{
+				$io = clone $this->io;
+
+				$io->setArguments(array('seed', 'import'));
+				$io->setOption('no-backup', true);
+
+	//			foreach ($this->io->getOptions() as $k => $v)
+	//			{
+	//				$io->setOption($k, $v);
+	//			}
+
+				$this->app->getRootCommand()->setIO($io)->execute();
 			}
 		}
-		else
+		catch (\Exception $e)
 		{
-			$this->out('No change.');
-		}
+			$prompter = new BooleanPrompter;
 
-		if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0')
-		{
-			$io = clone $this->io;
+			$this->out()->out('<error>An error occurred: ' . $e->getMessage() . '</error>');
 
-			$io->setArguments(array('seed', 'import'));
+			if ($prompter->ask('Do you want to restore to last backup? [Y/n] (Y): ', true))
+			{
+				BackupModel::getInstance()->restoreLatest();
+			}
 
-//			foreach ($this->io->getOptions() as $k => $v)
-//			{
-//				$io->setOption($k, $v);
-//			}
-
-			$this->app->getRootCommand()->setIO($io)->execute();
+			throw $e;
 		}
 
 		return true;

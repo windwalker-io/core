@@ -10,6 +10,7 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Console\IO\IO;
+use Windwalker\Core\Migration\Model\BackupModel;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 use Windwalker\Filesystem\File;
 use Windwalker\String\String;
@@ -68,7 +69,14 @@ class ResetCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
+		// backup
+		BackupModel::getInstance()->setCommand($this)->backup();
+
+		$this->out('<cmd>Rollback to 0 version...</cmd>');
+
 		$this->executeCommand(array('migration', 'migrate', '0'));
+
+		$this->out('<cmd>Migrating to latest version...</cmd>');
 
 		$this->executeCommand(array('migration', 'migrate'));
 
@@ -87,6 +95,7 @@ class ResetCommand extends AbstractCommand
 		$io = clone $this->io;
 
 		$io->setArguments($args);
+		$io->setOption('no-backup', true);
 
 //		foreach ($this->io->getOptions() as $k => $v)
 //		{
