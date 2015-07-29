@@ -243,10 +243,10 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		// Save for input
 		foreach ($variables as $name => $value)
 		{
-			$this->input->def($name, $value);
+			$this->input->def($name, urldecode($value));
 
 			// Don't forget to do an explicit set on the GET superglobal.
-			$this->input->get->def($name, $value);
+			$this->input->get->def($name, urldecode($value));
 		}
 
 		$controller = $extra['controller'];
