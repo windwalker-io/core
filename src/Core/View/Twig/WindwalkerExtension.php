@@ -13,7 +13,7 @@ use Windwalker\Core\View\HtmlView;
 use Windwalker\Data\Data;
 
 /**
- * Class FormosaExtension
+ * Class WindwalkerExtension
  *
  * @since 1.0
  */
