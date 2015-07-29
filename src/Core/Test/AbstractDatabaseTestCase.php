@@ -74,7 +74,7 @@ class AbstractDatabaseTestCase extends AbstractBaseTestCase
 		static::$dsn = $dsn = $config['database.dsn'];
 		static::$dbname = $dbname = $dsn['dbname'];
 
-		// Id db exists, return.
+		// If db exists, return.
 		if (static::$dbo)
 		{
 			static::$dbo->select($dbname);
