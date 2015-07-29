@@ -67,9 +67,11 @@ class BackupModel extends DatabaseModel
 
 		$this->lastBackup = $sql = $this->getSQLExport();
 
-		Folder::create(WINDWALKER_TEMP . '/sql-backup');
+		$config = Ioc::getConfig();
 
-		$file = WINDWALKER_TEMP . '/sql-backup/sql-backup-' . gmdate('Y-m-d-H-i-s-') . uniqid() . '.sql';
+		Folder::create($config->get('path.temp') . '/sql-backup');
+
+		$file = $config->get('path.temp') . '/sql-backup/sql-backup-' . gmdate('Y-m-d-H-i-s-') . uniqid() . '.sql';
 
 		file_put_contents($file, $sql);
 

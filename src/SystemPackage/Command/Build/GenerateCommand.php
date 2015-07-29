@@ -10,6 +10,7 @@
 namespace Windwalker\SystemPackage\Command\Build;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Core\Ioc;
 use Windwalker\Filesystem\File;
 
 /**
@@ -184,7 +185,9 @@ TMPL;
 
 		$content = strtr($this->template, $replace);
 
-		$file = WINDWALKER_ROOT . '/src/' . $namespace . '/' . $class . 'Command.php';
+		$config = Ioc::getConfig();
+
+		$file = $config->get('path.root') . '/src/' . $namespace . '/' . $class . 'Command.php';
 
 		$file = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $file);
 
@@ -197,6 +200,6 @@ TMPL;
 
 		$this->out('File generated: ' . $file);
 
-		return;
+		return true;
 	}
 }

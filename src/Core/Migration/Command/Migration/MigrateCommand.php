@@ -64,6 +64,7 @@ class MigrateCommand extends AbstractCommand
 	 * Execute this command.
 	 *
 	 * @return int|void
+	 * @throws \Exception
 	 */
 	protected function doExecute()
 	{

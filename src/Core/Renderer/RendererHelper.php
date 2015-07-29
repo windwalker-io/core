@@ -60,7 +60,9 @@ abstract class RendererHelper
 		{
 			if (empty($config['cache_path']))
 			{
-				$config['cache_path'] = WINDWALKER_CACHE . '/renderer';
+				$config = Ioc::getConfig();
+
+				$config['cache_path'] = $config->get('path.cache') . '/renderer';
 			}
 		}
 
