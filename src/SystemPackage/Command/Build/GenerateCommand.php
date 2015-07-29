@@ -3,7 +3,7 @@
  * @package     Joomla.Cli
  * @subpackage  JConsole
  *
- * @copyright   Copyright (C) 2005 - 2013 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2014 - 2015 LYRASOFT Source Matters, Inc. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -56,8 +56,8 @@ class GenerateCommand extends Command
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2011 - 2014 SMS Taiwan, Inc. All rights reserved.
- * @license    GNU General Public License version 2 or later; see LICENSE
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT Taiwan, Inc. All rights reserved.
+ * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
 namespace {{NAMESPACE}};
