@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Test\Mvc\Model\FlowerModel;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;

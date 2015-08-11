@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test\Error;
 
 use Windwalker\Core\Error\ErrorHandler;
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 
 /**
  * Test class of ErrorHandler

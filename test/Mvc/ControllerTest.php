@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Mvc;
 
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Test\Mvc\Controller\Stub\StubController;

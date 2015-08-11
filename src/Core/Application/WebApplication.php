@@ -24,6 +24,7 @@ use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\Core\Provider\WebProvider;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Router\Router;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -651,6 +652,30 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function setMode($mode)
 	{
 		$this->mode = $mode;
+
+		return $this;
+	}
+
+	/**
+	 * getDispatcher
+	 *
+	 * @return  DispatcherInterface
+	 */
+	public function getDispatcher()
+	{
+		return $this->container->get('system.dispatcher');
+	}
+
+	/**
+	 * setDispatcher
+	 *
+	 * @param   DispatcherInterface $dispatcher
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDispatcher(DispatcherInterface $dispatcher)
+	{
+		$this->container->share('system.dispatcher', $dispatcher);
 
 		return $this;
 	}

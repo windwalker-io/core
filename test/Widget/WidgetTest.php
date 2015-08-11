@@ -8,7 +8,8 @@
 
 namespace Windwalker\Core\Test\Widget;
 
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Filesystem\Path;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\PhpRenderer;
@@ -211,6 +212,24 @@ class WidgetTest extends AbstractBaseTestCase
 		// Remove the following lines when you implement this test.
 		$this->markTestIncomplete(
 			'This test has not been implemented yet.'
+		);
+	}
+
+	/**
+	 * assertPathEquals
+	 *
+	 * @param  mixed   $expected
+	 * @param  mixed   $actual
+	 * @param  string  $msg
+	 *
+	 * @return  void
+	 */
+	protected function assertPathEquals($expected, $actual, $msg = null)
+	{
+		$this->assertEquals(
+			Path::clean($expected),
+			Path::clean($actual),
+			$msg
 		);
 	}
 }

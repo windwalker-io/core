@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Controller;
 
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Test\Controller\Stub\StubMultiActionController;
 
 /**

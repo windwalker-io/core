@@ -10,7 +10,7 @@ namespace Windwalker\Core\Test\Session;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Provider\SessionProvider;
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Session\Session;
 use Windwalker\Test\TestHelper;
 

@@ -10,6 +10,7 @@ namespace Windwalker\Core\Model;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Database\Driver\DatabaseDriver;
 use Windwalker\Model\AbstractModel;
 use Windwalker\Registry\Registry;
 
@@ -42,6 +43,13 @@ class Model extends AbstractModel
 	 * @var  string
 	 */
 	protected $name = null;
+
+	/**
+	 * Property db.
+	 *
+	 * @var  DatabaseDriver
+	 */
+	protected $db;
 
 	/**
 	 * Property magicMethodPrefix.

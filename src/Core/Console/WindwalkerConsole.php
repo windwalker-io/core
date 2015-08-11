@@ -26,6 +26,7 @@ use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
 
@@ -256,5 +257,28 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	{
 		return $this->container;
 	}
+
+	/**
+	 * getDispatcher
+	 *
+	 * @return  DispatcherInterface
+	 */
+	public function getDispatcher()
+	{
+		return $this->container->get('system.dispatcher');
+	}
+
+	/**
+	 * setDispatcher
+	 *
+	 * @param   DispatcherInterface $dispatcher
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDispatcher(DispatcherInterface $dispatcher)
+	{
+		$this->container->share('system.dispatcher', $dispatcher);
+
+		return $this;
+	}
 }
- 

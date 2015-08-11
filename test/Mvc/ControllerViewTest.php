@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test\Mvc;
 
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Test\Mvc\Controller\Stub\StubController;
@@ -271,5 +271,23 @@ class ControllerViewTest extends AbstractBaseTestCase
 		// Routing
 		$this->assertTrue($view->getData()->router instanceof PackageRouter);
 		$this->assertEquals($view->getPackage()->getName(), $view->getData()->router->getPackage()->getName());
+	}
+
+	/**
+	 * assertPathEquals
+	 *
+	 * @param  mixed   $expected
+	 * @param  mixed   $actual
+	 * @param  string  $msg
+	 *
+	 * @return  void
+	 */
+	protected function assertPathEquals($expected, $actual, $msg = null)
+	{
+		$this->assertEquals(
+			Path::clean($expected),
+			Path::clean($actual),
+			$msg
+		);
 	}
 }

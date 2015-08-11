@@ -10,7 +10,7 @@ namespace Windwalker\Core\Test\Pagination;
 
 use Windwalker\Core\Pagination\Pagination;
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Test\AbstractBaseTestCase;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Renderer\PhpRenderer;
 
 /**

@@ -10,7 +10,7 @@ namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Database\Driver\DatabaseDriver;
-use Windwalker\Database\Test\DsnResolver;
+use Windwalker\Test\TestCase\AbstractBaseTestCase;
 
 /**
  * The AbstractDatabaseTestCase class.
@@ -84,6 +84,8 @@ class AbstractDatabaseTestCase extends AbstractBaseTestCase
 
 		// Use factory create dbo, only create once and will be singleton.
 		$db = Ioc::getDatabase();
+
+		$db->getDatabase($dbname)->drop(true);
 
 		$db->getDatabase($dbname)->create(true);
 

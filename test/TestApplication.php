@@ -18,10 +18,8 @@ use Windwalker\Core\Provider\EventProvider;
 use Windwalker\Core\Provider\LanguageProvider;
 use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
-use Windwalker\Core\Provider\WhoopsProvider;
-use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Windwalker;
-use Windwalker\Database\Test\DsnResolver;
+use Windwalker\Database\Test\TestDsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;
 
@@ -46,7 +44,7 @@ class TestApplication extends WebApplication
 		ErrorHandler::restore();
 
 		// Resolve DB info
-		$dsn = DsnResolver::getDsn($this->get('database.driver'));
+		$dsn = TestDsnResolver::getDsn($this->get('database.driver'));
 
 		$this->config['database.host'] = $dsn['host'];
 		// $this->config['database.name'] = $dsn['dbname'];
