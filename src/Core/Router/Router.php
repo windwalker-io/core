@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
-use Windwalker\Core\Facade\Facade;
-use Windwalker\Core\Ioc;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 
 /**
  * The Router class.
@@ -23,12 +22,19 @@ use Windwalker\Core\Ioc;
  * @see \Windwalker\Router\Router
  * @see \Windwalker\Core\Router\RestfulRouter
  */
-abstract class Router extends Facade
+abstract class Router extends AbstractProxyFacade
 {
+	const TYPE_RAW = 'raw';
+	const TYPE_PATH = 'path';
+	const TYPE_FULL = 'full';
+
 	/**
-	 * Property key.
+	 * Method to get property DiKey
 	 *
-	 * @var  string
+	 * @return  string
 	 */
-	protected static $key = 'system.router';
+	public static function getDIKey()
+	{
+		return 'system.router';
+	}
 }

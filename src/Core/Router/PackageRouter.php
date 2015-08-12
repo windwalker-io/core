@@ -11,7 +11,7 @@ namespace Windwalker\Core\Router;
 use Windwalker\Core\Package\AbstractPackage;
 
 /**
- * The PackageRouter class.
+ * The PackageRouter class, it is a decoration pattern to wrap package and router object.
  * 
  * @since  2.0
  */

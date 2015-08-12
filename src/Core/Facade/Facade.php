@@ -15,6 +15,8 @@ use Windwalker\DI\Container;
  * The AbstractFacade class.
  * 
  * @since  2.0
+ *
+ * @deprecated  3.0  Use AbstractProxyFacade instead
  */
 abstract class Facade
 {

@@ -10,12 +10,18 @@ namespace Windwalker\Core\Package;
 
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
+use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\ControllerResolver;
+use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
+use Windwalker\IO\Input;
+use Windwalker\Registry\Registry;
+use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -56,6 +62,20 @@ class AbstractPackage
 	protected $router;
 
 	/**
+	 * Property task.
+	 *
+	 * @var  string
+	 */
+	protected $task;
+
+	/**
+	 * Property config.
+	 *
+	 * @var  array
+	 */
+	protected $variables;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -75,6 +95,66 @@ class AbstractPackage
 		$this->registerProviders($container);
 
 		$this->registerListeners($container->get('system.dispatcher'));
+	}
+
+	/**
+	 * getController
+	 *
+	 * @param string  $task
+	 * @param array   $variables
+	 *
+	 * @return  Controller
+	 */
+	public function getController($task = null, $variables = array())
+	{
+		if ($variables instanceof Input)
+		{
+			$variables = $variables->getArray();
+		}
+
+		$controller = $task ? : $this->getTask();
+
+		list($controller, $action) = StringHelper::explode('::', $controller, 2);
+
+		$class = ControllerResolver::getController($this, $controller);
+
+		$container = $this->getContainer();
+
+		$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
+
+		if (!($controller instanceof Controller))
+		{
+			throw new \UnexpectedValueException(
+				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
+			);
+		}
+
+		if ($controller instanceof MultiActionController)
+		{
+			$controller->setActionName($action);
+			$controller->setArguments($variables ? : $this->variables);
+		}
+
+		return $controller;
+	}
+
+	/**
+	 * execute
+	 *
+	 * @param string $task
+	 * @param array  $variables
+	 *
+	 * @return mixed
+	 */
+	public function execute($task = null, $variables = array())
+	{
+		$controller = $this->getController($task, $variables);
+
+		$result = $controller->execute();
+
+		$controller->redirect();
+
+		return $result;
 	}
 
 	/**
@@ -389,5 +469,53 @@ class AbstractPackage
 		}
 
 		return null;
+	}
+
+	/**
+	 * Method to get property Task
+	 *
+	 * @return  string
+	 */
+	public function getTask()
+	{
+		return $this->task;
+	}
+
+	/**
+	 * Method to set property task
+	 *
+	 * @param   string $task
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setTask($task)
+	{
+		$this->task = $task;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Variables
+	 *
+	 * @return  array
+	 */
+	public function getVariables()
+	{
+		return $this->variables;
+	}
+
+	/**
+	 * Method to set property variables
+	 *
+	 * @param   array $variables
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setVariables($variables)
+	{
+		$this->variables = $variables;
+
+		return $this;
 	}
 }

@@ -402,4 +402,14 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		return $this;
 	}
+
+	/**
+	 * getRouter
+	 *
+	 * @return  \Windwalker\Core\Router\RestfulRouter
+	 */
+	public function getRouter()
+	{
+		return $this->getPackage()->getRouter();
+	}
 }

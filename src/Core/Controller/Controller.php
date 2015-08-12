@@ -119,30 +119,33 @@ abstract class Controller extends AbstractController
 	/**
 	 * hmvc
 	 *
-	 * @param Controller|string $controller
+	 * @param string|Controller $controller
 	 * @param Input|array       $input
+	 * @param string            $package
 	 *
-	 * @return  mixed
+	 * @return mixed
+	 * @internal param string|Controller $controller
 	 */
-	public function hmvc($controller, $input = null)
+	public function hmvc($task, $input = null, $package = null)
 	{
-		if (is_string($controller))
+		if ($task instanceof Controller)
 		{
-			$controller = new $controller;
+			if (is_array($input))
+			{
+				$input = new Input($input);
+			}
+
+			$controller = $task->setContainer($this->container)
+				->setPackage($this->package)
+				->setInput($input)
+				->setApplication($this->app);
+
+			return $controller->execute();
 		}
 
-		if (is_array($input))
-		{
-			$input = new Input($input);
-		}
+		$package = $package ? $this->app->getPackage($package) : $this->package;
 
-		/** @var Controller $controller */
-		$controller->setContainer($this->container)
-			->setPackage($this->package)
-			->setApplication($this->app)
-			->setInput($input);
-
-		return $controller->execute();
+		return $package->execute($task, $input);
 	}
 
 	/**
@@ -243,7 +246,7 @@ abstract class Controller extends AbstractController
 			}
 
 			/** @var HtmlView $view */
-			$view = new $class($this->package);
+			$view = new $class;
 
 			$view->setConfig($this->config);
 

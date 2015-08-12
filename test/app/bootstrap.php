@@ -10,6 +10,11 @@ $autoload = __DIR__ . '/../../vendor/autoload.php';
 
 if (!is_file($autoload))
 {
+	$autoload = __DIR__ . '/../../../../autoload.php';
+}
+
+if (!is_file($autoload))
+{
 	exit('Please run <code>$ composer install</code> First.');
 }
 

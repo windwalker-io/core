@@ -130,7 +130,6 @@ class RestfulRouter extends Router
 	{
 		$route = parent::match($route, $method, $options);
 
-		$variables = $route->getVariables();
 		$extra = $route->getExtra();
 
 		$controller = ArrayHelper::getValue($extra, 'controller');
