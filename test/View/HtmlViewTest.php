@@ -100,7 +100,7 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRender()
 	{
-		Ioc::factory()->set('package.mvc', new MvcPackage);
+		Ioc::get('package.resolver')->addPackage('mvc', new MvcPackage);
 
 		$config = new Registry(
 			array(

@@ -285,8 +285,8 @@ class ControllerViewTest extends AbstractBaseTestCase
 	protected function assertPathEquals($expected, $actual, $msg = null)
 	{
 		$this->assertEquals(
-			Path::clean($expected),
-			Path::clean($actual),
+			Path::normalize($expected),
+			Path::normalize($actual),
 			$msg
 		);
 	}
