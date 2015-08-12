@@ -6,11 +6,11 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authenticate\Method;
+namespace Windwalker\Core\Authentication\Method;
 
-use Windwalker\Authenticate\Authenticate;
-use Windwalker\Authenticate\Credential;
-use Windwalker\Authenticate\Method\AbstractMethod;
+use Windwalker\Authentication\Authentication;
+use Windwalker\Authentication\Credential;
+use Windwalker\Authentication\Method\AbstractMethod;
 use Windwalker\Crypt\Password;
 use Windwalker\DataMapper\DataMapper;
 
@@ -32,7 +32,7 @@ class DatabaseMethod extends AbstractMethod
 	{
 		if (!$credential->username || !$credential->password)
 		{
-			$this->status = Authenticate::EMPTY_CREDENTIAL;
+			$this->status = Authentication::EMPTY_CREDENTIAL;
 
 			return false;
 		}
@@ -43,7 +43,7 @@ class DatabaseMethod extends AbstractMethod
 
 		if ($user->isNull())
 		{
-			$this->status = Authenticate::USER_NOT_FOUND;
+			$this->status = Authentication::USER_NOT_FOUND;
 
 			return false;
 		}
@@ -52,14 +52,14 @@ class DatabaseMethod extends AbstractMethod
 
 		if (!$password->verify($credential->password, $user->password))
 		{
-			$this->status = Authenticate::INVALID_CREDENTIAL;
+			$this->status = Authentication::INVALID_CREDENTIAL;
 
 			return false;
 		}
 
 		$credential->bind($user);
 
-		$this->status = Authenticate::SUCCESS;
+		$this->status = Authentication::SUCCESS;
 
 		return true;
 	}

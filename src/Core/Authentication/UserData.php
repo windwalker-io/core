@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authenticate;
+namespace Windwalker\Core\Authentication;
 
 use Windwalker\Data\Data;
 

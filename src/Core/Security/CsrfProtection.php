@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Security;
 
-use Windwalker\Core\Authenticate\User;
+use Windwalker\Core\Authentication\User;
 use Windwalker\Core\Ioc;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Filter\InputFilter;

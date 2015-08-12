@@ -6,9 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authenticate;
-
-use Windwalker\Data\Data;
+namespace Windwalker\Core\Authentication;
 
 /**
  * The UserHandlerInterface class.

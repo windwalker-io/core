@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authenticate\Exception;
+namespace Windwalker\Core\Authentication\Exception;
 
 /**
  * The UserLogoutException class.

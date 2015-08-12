@@ -6,11 +6,11 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authenticate;
+namespace Windwalker\Core\Authentication;
 
-use Windwalker\Authenticate\Authenticate;
-use Windwalker\Authenticate\Credential;
-use Windwalker\Authenticate\Method\MethodInterface;
+use Windwalker\Authentication\Authentication;
+use Windwalker\Authentication\Credential;
+use Windwalker\Authentication\Method\MethodInterface;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
 use Windwalker\Core\Facade\Facade;
 use Windwalker\Data\Data;
@@ -23,14 +23,14 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The User class.
  *
- * @see \Windwalker\Authenticate\Authenticate
+ * @see \Windwalker\Authentication\Authentication
  *
  * @method static boolean          authenticate()   authenticate(Credential $credential)
  * @method static integer[]        getResults()     getResults()
  * @method static Credential       getCredential()  getCredential()
  * @method static MethodInterface  getMethod()      getMethod($name)
- * @method static Authenticate     removeMethod()   removeMethod($name)
- * @method static Authenticate     addMethod()      addMethod($name, MethodInterface $method)
+ * @method static Authentication   removeMethod()   removeMethod($name)
+ * @method static Authentication   addMethod()      addMethod($name, MethodInterface $method)
  *
  * @since  2.0
  */
