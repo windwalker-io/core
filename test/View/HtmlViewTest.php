@@ -275,14 +275,14 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$package->router->setRouter($router);
 
-		$this->assertEquals('flower/12', $package->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $package->router->http('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
 
 		// Test global variables
 		TestHelper::invoke($this->instance, 'prepareGlobals', $this->instance->getData());
 
 		$data = $this->instance->getData();
 
-		$this->assertEquals('flower/12', $data->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
-		$this->assertEquals('flower/12', $data->package->router->buildHttp('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->router->http('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->package->router->http('flower', array('id' => 12), RestfulRouter::TYPE_RAW));
 	}
 }

@@ -17,7 +17,9 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * @method  static  string  build()      build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
  * @method  static  string  buildHttp()  buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  http()       http($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
  * @method  static  string  buildHtml()  buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  html()       html($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
  *
  * @see \Windwalker\Router\Router
  * @see \Windwalker\Core\Router\RestfulRouter

@@ -55,12 +55,14 @@ class PackageRouter
 	 */
 	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
-		if (count(explode(':', $route, 2)) < 2)
+		try
 		{
-			$route = $this->package->getName() .':' . $route;
+			return $this->router->build($this->package->getName() . ':' . $route, $queries, $type, $xhtml);
 		}
-
-		return $this->router->build($route, $queries, $type, $xhtml);
+		catch (\OutOfRangeException $e)
+		{
+			return $this->router->build($route, $queries, $type, $xhtml);
+		}
 	}
 
 	/**
@@ -87,6 +89,34 @@ class PackageRouter
 	 * @return  string
 	 */
 	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type, false);
+	}
+
+	/**
+	 * buildHtml
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return  string
+	 */
+	public function html($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type, true);
+	}
+
+	/**
+	 * buildHttp
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return  string
+	 */
+	public function http($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
 	}

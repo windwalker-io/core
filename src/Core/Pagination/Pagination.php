@@ -368,7 +368,7 @@ class Pagination
 		{
 			$route = function ($queries, $type = RestfulRouter::TYPE_PATH) use ($route)
 			{
-				return Router::buildHtml($route, $queries, $type);
+				return Router::html($route, $queries, $type);
 			};
 		}
 

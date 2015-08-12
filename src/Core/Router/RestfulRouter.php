@@ -97,7 +97,7 @@ class RestfulRouter extends Router
 	 *
 	 * @return  string
 	 */
-	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function html($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, true);
 	}
@@ -111,9 +111,37 @@ class RestfulRouter extends Router
 	 *
 	 * @return  string
 	 */
-	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function http($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
+	}
+
+	/**
+	 * buildHtml
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->html($route, $queries, $type);
+	}
+
+	/**
+	 * buildHttp
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	{
+		return $this->http($route, $queries, $type);
 	}
 
 	/**
