@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Joomla\DateTime\DateTime;
-use Windwalker\Core\Utilities\DateTimeHelper;
+use Windwalker\Core\DateTime\DateTimeHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 

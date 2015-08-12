@@ -11,6 +11,8 @@ namespace Windwalker\Core\Utilities\Iterator;
 /**
  * The ArrayObject class. Based on ZF2.
  *
+ * @deprecated  Use \Windwalker\Utilities\Iterator\ArrayObject instead.
+ *
  * @since  2.0
  */
 class ArrayObject implements \IteratorAggregate, \ArrayAccess, \Serializable, \Countable

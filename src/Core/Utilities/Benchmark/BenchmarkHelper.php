@@ -18,6 +18,20 @@ use Windwalker\Profiler\Benchmark;
 abstract class BenchmarkHelper
 {
 	/**
+	 * Property times.
+	 *
+	 * @var  integer
+	 */
+	protected static $times = 5000;
+
+	/**
+	 * Property round.
+	 *
+	 * @var  integer
+	 */
+	protected static $round = 10;
+
+	/**
 	 * execute
 	 *
 	 * @return  string
@@ -35,6 +49,50 @@ abstract class BenchmarkHelper
 			$benchmark->addTask('Task-' . ($k + 1), $arg);
 		}
 
-		return $benchmark->execute(5000)->render(10);
+		return $benchmark->execute(static::$times)->render(static::$round);
+	}
+
+	/**
+	 * Method to get property Times
+	 *
+	 * @return  int
+	 */
+	public static function getTimes()
+	{
+		return static::$times;
+	}
+
+	/**
+	 * Method to set property times
+	 *
+	 * @param   int $times
+	 *
+	 * @return  void
+	 */
+	public static function setTimes($times)
+	{
+		static::$times = $times;
+	}
+
+	/**
+	 * Method to get property Round
+	 *
+	 * @return  int
+	 */
+	public static function getRound()
+	{
+		return static::$round;
+	}
+
+	/**
+	 * Method to set property round
+	 *
+	 * @param   int $round
+	 *
+	 * @return  void
+	 */
+	public static function setRound($round)
+	{
+		static::$round = $round;
 	}
 }

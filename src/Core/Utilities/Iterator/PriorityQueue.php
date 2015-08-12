@@ -15,6 +15,8 @@ use Windwalker\Utilities\Queue\Priority;
  *
  * A modified version of ZF2.
  *
+ * @deprecated  Use \Windwalker\Utilities\Queue\PriorityQueue  instead.
+ *
  * @since  2.0
  */
 class PriorityQueue extends \SplPriorityQueue implements \Serializable
