@@ -26,8 +26,14 @@ class BladeHtmlView extends HtmlView
 	 */
 	public function __construct($data = array(), BladeRenderer $renderer = null)
 	{
-		$renderer = $renderer ? : new BladeRenderer(null, array('cache_path' => Ioc::getConfig()->get('path.cache') . '/view'));
+		$renderer = $renderer ? : new BladeRenderer;
 
 		parent::__construct($data, $renderer);
+
+		$container = $this->getPackage()->getContainer() ? : Ioc::factory();
+
+		$path = $container->get('system.config')->get('path.cache') . '/view';
+
+		$this->renderer->config->set('cache_path', $path);
 	}
 }

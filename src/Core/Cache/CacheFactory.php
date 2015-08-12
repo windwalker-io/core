@@ -13,6 +13,7 @@ use Windwalker\Cache\DataHandler\DataHandlerInterface;
 use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
+use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -21,7 +22,7 @@ use Windwalker\Utilities\ArrayHelper;
  * 
  * @since  2.0
  */
-class CacheFactory
+class CacheFactory implements ContainerAwareInterface
 {
 	/**
 	 * Property instances.
@@ -31,13 +32,6 @@ class CacheFactory
 	protected static $instances = array();
 
 	/**
-	 * Property container.
-	 *
-	 * @var  Registry
-	 */
-	protected $config;
-
-	/**
 	 * Property ignoreGlobal.
 	 *
 	 * @var  bool
@@ -45,15 +39,22 @@ class CacheFactory
 	protected $ignoreGlobal = false;
 
 	/**
+	 * Property container.
+	 *
+	 * @var  Container
+	 */
+	protected $container;
+
+	/**
 	 * Class init.
 	 *
-	 * @param  $config  Registry  The Config object.
+	 * @param Container $container
 	 *
 	 * @since  2.0.5
 	 */
-	public function __construct(Registry $config = null)
+	public function __construct(Container $container = null)
 	{
-		$this->config = $config ? : Ioc::getConfig();
+		$this->container = $container ? : Ioc::factory();
 	}
 
 	/**
@@ -68,14 +69,20 @@ class CacheFactory
 	 */
 	public function create($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
 	{
-		$debug = $this->config->get('system.debug', false);
-		$enabled = $this->config->get('cache.enabled', false);
+		$config = $this->container->get('system.config');
+
+		$debug = $config->get('system.debug', false);
+		$enabled = $config->get('cache.enabled', false);
 
 		if (($debug || !$enabled) && !$this->ignoreGlobal)
 		{
 			$storage = 'null';
 			$dataHandler = 'string';
 		}
+
+		$options['cache_time']  = isset($options['cache_time'])  ? $options['cache_time']  : $config->get('cache.time');
+		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('cache.dir');
+		$options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
 
 		return static::getCache($name, $storage, $dataHandler, $options);
 	}
@@ -94,6 +101,8 @@ class CacheFactory
 	{
 		$storage = $storage ? : 'runtime';
 		$dataHandler = $dataHandler ? : 'serialize';
+
+		ksort($options);
 
 		$hash = sha1($name . $storage . $dataHandler . serialize($options));
 
@@ -128,18 +137,15 @@ class CacheFactory
 			throw new \DomainException(sprintf('Cache Storage: %s not supported.', ucfirst($storage)));
 		}
 
-		$config = Ioc::getConfig();
-
-		$ttl = isset($options['cache_time']) ? $options['cache_time'] : $config->get('cache.time');
-
 		switch (strtolower($storage))
 		{
 			case 'file':
-				$path = isset($options['cache_dir']) ? $options['cache_dir'] : $config->get('cache.dir');
-				$denyAccess = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
+				$path = $options['cache_dir'];
+				$denyAccess = ['deny_access'];
 
 				if (!is_dir($path))
 				{
+					// Try add root
 					$path = Ioc::getEnvironment()->server->getRoot() . '/../' . $path;
 				}
 
@@ -150,16 +156,16 @@ class CacheFactory
 
 				$group = ($name == 'windwalker') ? null : $name;
 
-				return new $class($path, $group, $denyAccess, $ttl, $options);
+				return new $class($path, $group, $denyAccess, $options['cache_time'], $options);
 				break;
 
 			case 'redis':
 			case 'memcached':
-				return new $class(null, $ttl, $options);
+				return new $class(null, $options['cache_time'], $options);
 				break;
 
 			default:
-				return new $class($ttl, $options);
+				return new $class($options['cache_time'], $options);
 				break;
 		}
 	}
@@ -184,30 +190,6 @@ class CacheFactory
 	}
 
 	/**
-	 * Method to get property Config
-	 *
-	 * @return  Registry
-	 */
-	public function getConfig()
-	{
-		return $this->config;
-	}
-
-	/**
-	 * Method to set property config
-	 *
-	 * @param   Registry $config
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setConfig($config)
-	{
-		$this->config = $config;
-
-		return $this;
-	}
-
-	/**
 	 * Method to get property IgnoreGlobal
 	 *
 	 * @param boolean $bool
@@ -227,19 +209,33 @@ class CacheFactory
 	}
 
 	/**
-	 * __get
+	 * Get the DI container.
 	 *
-	 * @param string $name
+	 * @return  Container
 	 *
-	 * @return  mixed
+	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
 	 */
-	public function __get($name)
+	public function getContainer()
 	{
-		if ($name == 'config')
+		if (!$this->container)
 		{
-			return $this->$name;
+			$this->container = Ioc::factory();
 		}
 
-		throw new \LogicException('Property ' . $name . ' acnnot access.');
+		return $this->container;
+	}
+
+	/**
+	 * Set the DI container.
+	 *
+	 * @param   Container $container The DI container.
+	 *
+	 * @return  static
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
 	}
 }

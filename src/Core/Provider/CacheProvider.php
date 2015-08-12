@@ -37,7 +37,7 @@ class CacheProvider implements ServiceProviderInterface
 		};
 
 		$container->share('system.cache.factory', $closure)
-			->alias('cache.factory', 'system.cache');
+			->alias('cache.factory', 'system.cache.factory');
 
 		// Get global cache object.
 		$container->share('system.cache', function(Container $container)

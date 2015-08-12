@@ -41,7 +41,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->instance = new CacheFactory;
 
-		$config = $this->instance->getConfig();
+		$config = Ioc::getConfig();
 
 		$config->set('system.debug', false);
 		$config->set('cache.enabled', true);
@@ -66,6 +66,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testCreate()
 	{
+		$config = Ioc::getConfig();
 		$cache = $this->instance->create();
 
 		// Test correct type.
@@ -84,7 +85,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($this->instance->create('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE))->getStorage() instanceof FileStorage);
 
 		// Test FileStorage Denycode
-		$this->instance->config->set('cache.denyAccess', true);
+		$config->set('cache.denyAccess', true);
 		$fileStorage = $this->instance->create('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE, 'deny_code' => 'FOO'))->getStorage();
 
 		$optinos = $fileStorage->getOptions();
@@ -101,7 +102,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testCreateIfDebug()
 	{
-		$config = $this->instance->getConfig();
+		$config = Ioc::getConfig();
 
 		// Debug true, Enabled true
 		$config['system.debug'] = true;
@@ -139,7 +140,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testCreateIfNotEnabled()
 	{
-		$config = $this->instance->getConfig();
+		$config = Ioc::getConfig();
 
 		// Debug true, Enabled true
 		$config['system.debug'] = false;
