@@ -31,4 +31,3 @@ class GridHelper extends AbstractHelper
 		return '<span class="glyphicon glyphicon-' . $icon . ' ' . $color . '"></span>';
 	}
 }
- 

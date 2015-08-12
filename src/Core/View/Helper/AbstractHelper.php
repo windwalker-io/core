@@ -58,4 +58,3 @@ class AbstractHelper
 		return $this;
 	}
 }
- 

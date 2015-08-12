@@ -76,4 +76,3 @@ class PageHelper extends AbstractHelper
 		return $html;
 	}
 }
- 

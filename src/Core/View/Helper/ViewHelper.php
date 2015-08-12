@@ -13,7 +13,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 
 /**
- * Class RendererHelper
+ * Class ViewHelper
  *
  * @since 1.0
  */
@@ -45,8 +45,9 @@ class ViewHelper extends AbstractHelper
 		return array(
 			'uri'       => $container->get('uri'),
 			'app'       => $container->get('system.application'),
-			'container' => $container,
-			'helper'    => new HelperSet,
+			// 'container' => $container,
+			'package'   => $package,
+			'router'    => $package->getRouter(),
 			'flashes'   => static::$flashes,
 			'datetime'  => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);

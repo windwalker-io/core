@@ -15,6 +15,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Core\Utilities\Iterator\PriorityQueue;
+use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Filesystem\Path;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
@@ -329,8 +330,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
 
-		$data->package = $this->getPackage();
-		$data->router  = $data->package->getRouter();
+		$data->helper = new HelperSet($this);
 
 		$globals = ViewHelper::getGlobalVariables($this->getPackage());
 
