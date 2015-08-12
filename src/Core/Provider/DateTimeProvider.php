@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Joomla\DateTime\DateTime;
-use Windwalker\Core\DateTime\DateTimeHelper;
+use Windwalker\Core\DateTime\DateTime;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -20,8 +19,6 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class DateTimeProvider implements ServiceProviderInterface
 {
-
-
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -31,7 +28,7 @@ class DateTimeProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		DateTimeHelper::setDefaultTimezone();
+		DateTime::setDefaultTimezone();
 
 		$closure = function(Container $container)
 		{
