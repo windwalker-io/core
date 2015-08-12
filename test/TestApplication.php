@@ -53,8 +53,6 @@ class TestApplication extends WebApplication
 		$this->config['database.prefix'] = $dsn['prefix'];
 		$this->config['database.dsn'] = $dsn;
 
-		show($this->config);die;
-
 		// Start session
 		Ioc::getSession();
 	}

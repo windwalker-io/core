@@ -11,19 +11,11 @@ namespace Windwalker\Core\Application;
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
-use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Provider\CacheProvider;
-use Windwalker\Core\Provider\DateTimeProvider;
-use Windwalker\Core\Provider\EventProvider;
-use Windwalker\Core\Provider\RouterProvider;
-use Windwalker\Core\Provider\SessionProvider;
-use Windwalker\Core\Provider\SystemProvider;
-use Windwalker\Core\Provider\WebProvider;
+use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Core\Provider;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Router\Router;
 use Windwalker\DI\Container;
@@ -112,8 +104,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$this->loadConfiguration($this->config);
 
 		// Set System Providers
-		$this->container->registerServiceProvider(new SystemProvider($this));
-		$this->container->registerServiceProvider(new WebProvider($this));
+		$this->container->registerServiceProvider(new Provider\SystemProvider($this));
+		$this->container->registerServiceProvider(new Provider\WebProvider($this));
 
 		if ($this->config->get('system.debug'))
 		{
@@ -122,7 +114,10 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		$this->registerProviders($this->container);
 
-		PackageHelper::registerPackages($this->loadPackages(), $this->container);
+		/** @var PackageResolver $packageResolver */
+		$packageResolver = $this->container->get('package.resolver');
+
+		$packageResolver->registerPackages($this->loadPackages());
 
 		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 	}
@@ -152,11 +147,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function loadProviders()
 	{
 		return array(
-			'event'   => new EventProvider,
-			'router'  => new RouterProvider,
-			'cache'   => new CacheProvider,
-			'session' => new SessionProvider,
-			'datetime' => new DateTimeProvider,
+			'event'   => new Provider\EventProvider,
+			'router'  => new Provider\RouterProvider,
+			'cache'   => new Provider\CacheProvider,
+			'session' => new Provider\SessionProvider,
+			'datetime' => new Provider\DateTimeProvider,
 		);
 	}
 
@@ -250,46 +245,21 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			$this->input->get->def($name, urldecode($value));
 		}
 
-		$controller = $extra['controller'];
-		$controller = explode('::', $controller);
-
-		$action = isset($controller[1]) ? $controller[1] : null;
-		$controller = $controller[0];
-
-		if (!class_exists($controller))
-		{
-			throw new \LogicException('Controller: ' . $controller . ' not found.');
-		}
-
 		$package = ArrayHelper::getValue($extra, 'package');
 
 		// Get package
-		if ($package)
-		{
-			$package = $this->container->get('package.' . $package);
-		}
+		/** @var AbstractPackage $package */
+		$package = $this->container->get('package.resolver')->resolvePackage($package);
 
-		/** @var Controller|MultiActionController $controller */
-		$controller = new $controller($this->input, $this, $this->container, $package);
+		$package->setTask(ArrayHelper::getValue($extra, 'controller'));
+		$package->setVariables($variables);
 
-		if ($controller instanceof MultiActionController)
-		{
-			$controller->setActionName($action);
-			$controller->setArguments($variables);
-		}
-
-		if (!($controller instanceof Controller))
-		{
-			throw new \UnexpectedValueException(
-				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
-			);
-		}
-
-		$this->config->loadArray(array('route' => array('extra' => $extra)));
+		$this->config['route.extra']   = $extra;
 		$this->config['route.matched'] = $route->getName();
 		$this->config['route.package'] = $package ? $package->getName() : null;
 
-		$this->container->set('main.controller', $controller);
+		$this->container->share('current.package', $package);
+		$this->container->share('current.route', $route);
 
 		return $this;
 	}
@@ -297,17 +267,16 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * render
 	 *
-	 * @param Controller $controller
+	 * @param AbstractPackage $package
 	 *
 	 * @return mixed
 	 */
-	public function render(Controller $controller = null)
+	public function render(AbstractPackage $package = null)
 	{
-		$controller = $controller ? : $this->container->get('main.controller');
+		/** @var AbstractPackage $package */
+		$package = $package ? : $this->container->get('current.package');
 
-		$output = $controller->execute();
-
-		$controller->redirect();
+		$output = $package->execute();
 
 		return $output;
 	}
@@ -458,6 +427,18 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * getPackage
+	 *
+	 * @param string $package
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getPackage($package)
+	{
+		return $this->container->get('package.resolver')->getPackage($package);
+	}
+
+	/**
 	 * loadConfiguration
 	 *
 	 * @param Registry $config
@@ -576,25 +557,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$dispatcher = $this->container->get('system.dispatcher');
 
 		return $dispatcher->triggerEvent($event, $args);
-	}
-
-	/**
-	 * getPackage
-	 *
-	 * @param string $name
-	 *
-	 * @return  AbstractPackage
-	 */
-	public function getPackage($name)
-	{
-		$key = 'package.' . strtolower($name);
-
-		if ($this->container->exists($key))
-		{
-			return $this->container->get($key);
-		}
-
-		return null;
 	}
 
 	/**
