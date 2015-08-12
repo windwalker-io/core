@@ -9,6 +9,7 @@
 namespace Windwalker\Core\View\Helper;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 
 /**
@@ -28,24 +29,26 @@ class ViewHelper extends AbstractHelper
 	/**
 	 * getGlobalVariables
 	 *
-	 * @param string $package
+	 * @param AbstractPackage $package
 	 *
 	 * @return array
 	 */
-	public static function getGlobalVariables($package = null)
+	public static function getGlobalVariables(AbstractPackage $package = null)
 	{
 		if (!static::$flashes)
 		{
 			static::$flashes = Ioc::getSession()->getFlashBag()->takeAll();
 		}
 
+		$container = $package->getContainer();
+
 		return array(
-			'uri' => Ioc::get('uri'),
-			'app' => Ioc::getApplication(),
-			'container' => Ioc::factory($package),
-			'helper' => new HelperSet,
-			'flashes' => static::$flashes,
-			'datetime' => new \DateTime('now', new \DateTimeZone(Ioc::getConfig()->get('system.timezone', 'UTC')))
+			'uri'       => $container->get('uri'),
+			'app'       => $container->get('system.application'),
+			'container' => $container,
+			'helper'    => new HelperSet,
+			'flashes'   => static::$flashes,
+			'datetime'  => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 	}
 

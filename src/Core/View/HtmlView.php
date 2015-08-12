@@ -91,6 +91,17 @@ class HtmlView extends \Windwalker\View\HtmlView
 	}
 
 	/**
+	 * prepareRender
+	 *
+	 * @param   Data  $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareRender($data)
+	{
+	}
+
+	/**
 	 * prepareData
 	 *
 	 * @param \Windwalker\Data\Data $data
@@ -143,11 +154,29 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		$data = $this->getData();
 
+		$this->prepareRender($data);
+
 		$this->prepareData($data);
 
 		$this->prepareGlobals($data);
 
-		return $this->renderer->render($this->getLayout(), (array) $data);
+		$output = $this->renderer->render($this->getLayout(), (array) $data);
+
+		$output = $this->postRender($output);
+
+		return $output;
+	}
+
+	/**
+	 * postRender
+	 *
+	 * @param   string  $output
+	 *
+	 * @return  string
+	 */
+	protected function postRender($output)
+	{
+		return $output;
 	}
 
 	/**
@@ -303,7 +332,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 		$data->package = $this->getPackage();
 		$data->router  = $data->package->getRouter();
 
-		$globals = ViewHelper::getGlobalVariables($this->config['package.name']);
+		$globals = ViewHelper::getGlobalVariables($this->getPackage());
 
 		$data->bind($globals);
 	}
