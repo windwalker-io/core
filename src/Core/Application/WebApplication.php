@@ -163,6 +163,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'cache'   => new Provider\CacheProvider,
 			'session' => new Provider\SessionProvider,
 			'datetime' => new Provider\DateTimeProvider,
+			'security' => new Provider\SecurityProvider,
 		);
 	}
 

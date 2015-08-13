@@ -187,7 +187,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 */
 	public static function get($conditions = array())
 	{
-		$user = static::$handler->load($conditions);
+		$user = static::getHandler()->load($conditions);
 
 		if (!($user instanceof UserDataInterface))
 		{
@@ -285,6 +285,11 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 */
 	public static function getHandler()
 	{
+		if (!static::$handler)
+		{
+			throw new \LogicException('No User handler.');
+		}
+
 		return static::$handler;
 	}
 

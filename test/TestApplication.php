@@ -11,13 +11,8 @@ namespace Windwalker\Core\Test;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Provider\AuthenticationProvider;
-use Windwalker\Core\Provider\CacheProvider;
-use Windwalker\Core\Provider\DatabaseProvider;
-use Windwalker\Core\Provider\EventProvider;
-use Windwalker\Core\Provider\LanguageProvider;
-use Windwalker\Core\Provider\RouterProvider;
-use Windwalker\Core\Provider\SessionProvider;
+use Windwalker\Core\Provider;
+use Windwalker\Core\Test\Mock\MockSessionProvider;
 use Windwalker\Core\Test\TestWindwalker as Windwalker;
 use Windwalker\Database\Test\TestDsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
@@ -54,7 +49,7 @@ class TestApplication extends WebApplication
 		$this->config['database.dsn'] = $dsn;
 
 		// Start session
-		Ioc::getSession();
+		Ioc::getSession()->start();
 	}
 
 	/**
@@ -73,14 +68,15 @@ class TestApplication extends WebApplication
 		 * But you can replace with yours, Make sure all the needed container key has
 		 * registered in your own providers.
 		 */
-		// $providers['debug']    = new WhoopsProvider;
-		$providers['event']    = new EventProvider;
-		$providers['database'] = new DatabaseProvider;
-		$providers['router']   = new RouterProvider;
-		$providers['lang']     = new LanguageProvider;
-		$providers['cache']    = new CacheProvider;
-		$providers['session']  = new SessionProvider;
-		$providers['auth']     = new AuthenticationProvider;
+		// $providers['debug']    = new Provider\WhoopsProvider;
+		$providers['event']    = new Provider\EventProvider;
+		$providers['database'] = new Provider\DatabaseProvider;
+		$providers['router']   = new Provider\RouterProvider;
+		$providers['lang']     = new Provider\LanguageProvider;
+		$providers['cache']    = new Provider\CacheProvider;
+		$providers['session']  = new MockSessionProvider;
+		$providers['auth']     = new Provider\AuthenticationProvider;
+		$providers['security'] = new Provider\SecurityProvider;
 
 		/*
 		 * Custom Providers:

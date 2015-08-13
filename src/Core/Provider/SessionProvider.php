@@ -76,4 +76,3 @@ class SessionProvider implements ServiceProviderInterface
 		return new $class;
 	}
 }
- 
