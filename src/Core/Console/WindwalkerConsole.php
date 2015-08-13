@@ -72,11 +72,14 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 * @param   IOInterface  $io         The Input and output handler.
 	 * @param   Registry     $config     Application's config object.
 	 */
-	public function __construct(Container $container = null, IOInterface $io = null, Registry $config = null)
+	public function __construct(Container $container = null, IOInterface $io = null, $config = null)
 	{
+		$this->config    = $config    instanceof Registry  ? $config    : new Registry($config);
 		$this->container = $container instanceof Container ? $container : new Container;
 
-		Ioc::setContainer($this->name, $container);
+		$this->name = $this->config->get('name', $this->name);
+
+		Ioc::setContainer($this->name, $this->container);
 
 		parent::__construct($io, $config);
 	}

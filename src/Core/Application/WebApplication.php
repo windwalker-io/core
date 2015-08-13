@@ -83,16 +83,18 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *                                           environment object.
 	 * @param   ResponseInterface  $response     The response object.
 	 */
-	public function __construct(Container $container = null, Input $input = null, Registry $config = null,
+	public function __construct(Container $container = null, Input $input = null, $config = null,
 		WebEnvironment $environment = null, ResponseInterface $response = null)
 	{
 		$this->environment = $environment instanceof WebEnvironment    ? $environment : new WebEnvironment;
 		$this->response    = $response    instanceof ResponseInterface ? $response    : new Response;
 		$this->input       = $input       instanceof Input             ? $input       : new Input;
-		$this->config      = $config      instanceof Registry          ? $config      : new Registry;
+		$this->config      = $config      instanceof Registry          ? $config      : new Registry($config);
 		$this->container   = $container   instanceof Container         ? $container   : new Container;
 
-		Ioc::setContainer($this->name, $container);
+		$this->name = $this->config->get('name', $this->name);
+
+		Ioc::setContainer($this->name, $this->container);
 
 		$this->initialise();
 

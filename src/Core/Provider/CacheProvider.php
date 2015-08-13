@@ -31,9 +31,7 @@ class CacheProvider implements ServiceProviderInterface
 		// Get cache factory object.
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
-
-			return new CacheFactory($config);
+			return CacheFactory::getInstance($container);
 		};
 
 		$container->share('system.cache.factory', $closure)
