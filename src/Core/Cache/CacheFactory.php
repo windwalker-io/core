@@ -61,7 +61,7 @@ class CacheFactory implements ContainerAwareInterface
 	 */
 	public function __construct(Container $container = null)
 	{
-		$this->container = $container ? : Ioc::factory();
+		$this->container = $container ? : $this->getContainer();
 	}
 
 	/**

@@ -42,7 +42,7 @@ class NullPackage extends AbstractPackage implements SilencerInterface
 		{
 			if (!$this->router)
 			{
-				$this->router = new PackageRouter($this, Ioc::getRouter());
+				$this->router = $this->getRouter();
 			}
 
 			return $this->router;

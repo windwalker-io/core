@@ -37,7 +37,10 @@ class ViewHelper extends AbstractHelper
 	{
 		if (!static::$flashes)
 		{
-			static::$flashes = Ioc::getSession()->getFlashBag()->takeAll();
+			static::$flashes = $package->getContainer()
+				->get('session')
+				->getFlashBag()
+				->takeAll();
 		}
 
 		$container = $package->getContainer();

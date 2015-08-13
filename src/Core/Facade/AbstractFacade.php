@@ -39,7 +39,7 @@ abstract class AbstractFacade implements FacadeInterface
 	 */
 	public static function getContainer($child = null)
 	{
-		return Ioc::factory($child ? : static::getContainerName());
+		return Ioc::factory($child ? : static::getContainerName(), static::getIocProfile());
 	}
 
 	/**
@@ -48,6 +48,16 @@ abstract class AbstractFacade implements FacadeInterface
 	 * @return  string
 	 */
 	public static function getContainerName()
+	{
+		return null;
+	}
+
+	/**
+	 * Get Ioc profile.
+	 *
+	 * @return  string
+	 */
+	public static function getIocProfile()
 	{
 		return null;
 	}

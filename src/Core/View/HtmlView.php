@@ -192,9 +192,12 @@ class HtmlView extends \Windwalker\View\HtmlView
 			return;
 		}
 
-		/** @var PriorityQueue $paths */
+		/**
+		 * @var PriorityQueue $paths
+		 * @var Registry      $config
+		 */
 		$paths   = $this->renderer->getPaths();
-		$config  = Ioc::getConfig();
+		$config  = $this->getPackage()->getContainer()->get('config');
 		$ref     = new \ReflectionClass($this);
 		$package = $this->getPackage();
 

@@ -465,9 +465,7 @@ abstract class Controller extends AbstractController
 		{
 			$package = $this->getPackage();
 
-			$name = ($package instanceof AbstractPackage) ? $package->getName() : null;
-
-			$this->container = Ioc::factory($name);
+			$this->container = $package->getContainer();
 		}
 
 		return $this->container;

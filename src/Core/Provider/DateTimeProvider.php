@@ -20,6 +20,23 @@ use Windwalker\DI\ServiceProviderInterface;
 class DateTimeProvider implements ServiceProviderInterface
 {
 	/**
+	 * Property tz.
+	 *
+	 * @var  string
+	 */
+	protected $tz;
+
+	/**
+	 * DateTimeProvider constructor.
+	 *
+	 * @param  string  $tz
+	 */
+	public function __construct($tz = 'UTC')
+	{
+		$this->tz = $tz ? : 'UTC';
+	}
+
+	/**
 	 * Registers the service provider with a DI container.
 	 *
 	 * @param   Container $container The DI container.
@@ -28,11 +45,13 @@ class DateTimeProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		DateTime::setDefaultTimezone();
+		$tz = $this->tz;
 
-		$closure = function(Container $container)
+		DateTime::setDefaultTimezone($tz);
+
+		$closure = function(Container $container) use ($tz)
 		{
-			$tz = $container->get('system.config')->get('system.timezone', 'UTC');
+			$tz = $container->get('system.config')->get('system.timezone', $tz);
 
 			return new DateTime('now', new \DateTimeZone($tz));
 		};
