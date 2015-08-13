@@ -25,11 +25,18 @@ use Windwalker\Utilities\ArrayHelper;
 class CacheFactory implements ContainerAwareInterface
 {
 	/**
+	 * Property instance.
+	 *
+	 * @var  static
+	 */
+	protected static $instance;
+
+	/**
 	 * Property instances.
 	 *
 	 * @var  Cache[]
 	 */
-	protected static $instances = array();
+	protected static $caches = array();
 
 	/**
 	 * Property ignoreGlobal.
@@ -55,6 +62,35 @@ class CacheFactory implements ContainerAwareInterface
 	public function __construct(Container $container = null)
 	{
 		$this->container = $container ? : Ioc::factory();
+	}
+
+	/**
+	 * getInstance
+	 *
+	 * @param Container $container
+	 *
+	 * @return  static
+	 */
+	public static function getInstance(Container $container = null)
+	{
+		if (!static::$instance)
+		{
+			static::$instance = new CacheFactory($container);
+		}
+
+		return static::$instance;
+	}
+
+	/**
+	 * setInstance
+	 *
+	 * @param   CacheFactory  $instance
+	 *
+	 * @return  void
+	 */
+	public static function setInstance(CacheFactory $instance)
+	{
+		static::$instance = $instance;
 	}
 
 	/**
@@ -106,9 +142,9 @@ class CacheFactory implements ContainerAwareInterface
 
 		$hash = sha1($name . $storage . $dataHandler . serialize($options));
 
-		if (!empty(static::$instances[$hash]))
+		if (!empty(static::$caches[$hash]))
 		{
-			return static::$instances[$hash];
+			return static::$caches[$hash];
 		}
 
 		$storage = static::getStorage($storage, $options, $name);
@@ -116,7 +152,7 @@ class CacheFactory implements ContainerAwareInterface
 
 		$cache = new Cache($storage, $handler);
 
-		return static::$instances[$hash] = $cache;
+		return static::$caches[$hash] = $cache;
 	}
 
 	/**
@@ -146,7 +182,10 @@ class CacheFactory implements ContainerAwareInterface
 				if (!is_dir($path))
 				{
 					// Try add root
-					$path = Ioc::getEnvironment()->server->getRoot() . '/../' . $path;
+					$container = static::getInstance()->getContainer();
+					$env = $container->get('system.environment');
+
+					$path = $env->server->getRoot() . '/../' . $path;
 				}
 
 				if (is_dir($path))
