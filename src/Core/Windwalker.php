@@ -8,20 +8,27 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;
 use Windwalker\SystemPackage\SystemPackage;
+use Windwalker\Core\Provider;
 
 /**
- * The Windwalker class.
- * 
+ * The main Windwalker instantiate class.
+ *
+ * This class will load in both Web and Console. Write some configuration if you want to use in all environment.
+ *
  * @since  2.0
  */
 abstract class Windwalker
 {
 	/**
-	 * getPackages
+	 * Load packages.
 	 *
-	 * @return  array
+	 * If you want some packages run in both Web and Console, register them here.
+	 *
+	 * @return  AbstractPackage[]
 	 */
 	public static function loadPackages()
 	{
@@ -31,11 +38,24 @@ abstract class Windwalker
 	}
 
 	/**
-	 * loadConfiguration
+	 * Load providers.
 	 *
-	 * @param Registry $config
+	 * If you want seom 3rd libraries tun in both Web and Console, register them here.
+	 *
+	 * @return  ServiceProviderInterface[]
+	 */
+	public static function loadProviders()
+	{
+		return array();
+	}
+
+	/**
+	 * Load configuration files.
+	 *
+	 * @param   Registry  $config  The config registry object.
 	 *
 	 * @throws  \RuntimeException
+	 *
 	 * @return  void
 	 */
 	public static function loadConfiguration(Registry $config)
@@ -44,7 +64,7 @@ abstract class Windwalker
 	}
 
 	/**
-	 * loadRouting
+	 * Load routing profiles as an array.
 	 *
 	 * @return  array
 	 */
@@ -54,27 +74,29 @@ abstract class Windwalker
 	}
 
 	/**
-	 * prepareSystemPath
+	 * Prepare system path.
 	 *
-	 * @param Registry $config
+	 * Write your custom path to $config['path.xxx'].
+	 *
+	 * @param   Registry  $config  The config registry object.
 	 *
 	 * @return  void
 	 */
 	public static function prepareSystemPath(Registry $config)
 	{
-		$config['path.root']       = WINDWALKER_ROOT;
-		$config['path.bin']        = WINDWALKER_BIN;
-		$config['path.cache']      = WINDWALKER_CACHE;
-		$config['path.etc']        = WINDWALKER_ETC;
-		$config['path.logs']       = WINDWALKER_LOGS;
-		$config['path.resources']  = WINDWALKER_RESOURCES;
-		$config['path.source']     = WINDWALKER_SOURCE;
-		$config['path.temp']       = WINDWALKER_TEMP;
-		$config['path.templates']  = WINDWALKER_TEMPLATES;
-		$config['path.vendor']     = WINDWALKER_VENDOR;
-		$config['path.public']     = WINDWALKER_PUBLIC;
-		$config['path.migrations'] = WINDWALKER_MIGRATIONS;
-		$config['path.seeders']    = WINDWALKER_SEEDERS;
-		$config['path.languages']  = WINDWALKER_LANGUAGES;
+		$config['path.root']       = null;
+		$config['path.bin']        = null;
+		$config['path.cache']      = null;
+		$config['path.etc']        = null;
+		$config['path.logs']       = null;
+		$config['path.resources']  = null;
+		$config['path.source']     = null;
+		$config['path.temp']       = null;
+		$config['path.templates']  = null;
+		$config['path.vendor']     = null;
+		$config['path.public']     = null;
+		$config['path.migrations'] = null;
+		$config['path.seeders']    = null;
+		$config['path.languages']  = null;
 	}
 }

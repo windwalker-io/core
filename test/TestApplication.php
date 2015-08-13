@@ -18,7 +18,7 @@ use Windwalker\Core\Provider\EventProvider;
 use Windwalker\Core\Provider\LanguageProvider;
 use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Core\Provider\SessionProvider;
-use Windwalker\Core\Windwalker;
+use Windwalker\Core\Test\TestWindwalker as Windwalker;
 use Windwalker\Database\Test\TestDsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;

@@ -39,20 +39,29 @@ class AuthenticationProvider implements ServiceProviderInterface
 
 			$dispatcher = $container->get('system.dispatcher');
 
+			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('authentication' => $auth));
+
+			// 2.0 legacy
 			$dispatcher->triggerEvent('onLoadAuthenticateMethods', array('authenticate' => $auth));
 
 			return $auth;
 		};
 
-		$container->share('system.authenticate', $closure)
-			->alias('authenticate', 'system.authenticate')
-			->alias('auth', 'system.authenticate');
+		$container->share('system.authentication', $closure)
+			->alias('authentication', 'system.authentication')
+			->alias('auth', 'system.authentication');
+
+		// Legacy 2.0
+		$container->alias('system.authenticate', 'system.authentication')
+			->alias('authenticate', 'system.authentication');
 	}
 
 	/**
-	 * prepareAlias
+	 * Prepare alias for 2.0 legacy.
 	 *
 	 * @return  void
+	 *
+	 * @deprecated  3.0
 	 */
 	protected function prepareAlias()
 	{
