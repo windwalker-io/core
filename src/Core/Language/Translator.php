@@ -14,14 +14,21 @@ use Windwalker\Language\LanguageNormalize;
 /**
  * The Translator class.
  *
- * @method  static  string  translate()
- * @method  static  string  sprintf()
- * @method  static  string  plural()
+ * @method  static  string  translate($string)
+ * @method  static  string  sprintf($string, ...$more)
+ * @method  static  string  plural($string, $number)
  *
  * @since  2.0
  */
 abstract class Translator extends AbstractProxyFacade
 {
+	/**
+	 * Property _key.
+	 *
+	 * @var  string
+	 */
+	protected static $_key = 'system.language';
+
 	/**
 	 * load
 	 *
@@ -109,15 +116,4 @@ abstract class Translator extends AbstractProxyFacade
 	{
 		return static::translate($string);
 	}
-
-	/**
-	 * Method to get property DiKey
-	 *
-	 * @return  string
-	 */
-	public static function getDIKey()
-	{
-		return 'system.language';
-	}
 }
- 

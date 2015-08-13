@@ -31,12 +31,9 @@ abstract class CsrfProtection extends AbstractProxyFacade
 	const TOKEN_KEY = 'form.token';
 
 	/**
-	 * Method to get property DiKey
+	 * Property _key.
 	 *
-	 * @return  string
+	 * @var  string
 	 */
-	public static function getDIKey()
-	{
-		return 'system.security.csrf';
-	}
+	protected static $_key = 'system.security.csrf';
 }

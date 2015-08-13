@@ -25,6 +25,13 @@ use Windwalker\Registry\Registry;
 class PackageHelper extends AbstractFacade
 {
 	/**
+	 * Property _key.
+	 *
+	 * @var  string
+	 */
+	protected static $_key = 'package.resolver';
+
+	/**
 	 * getPackage
 	 *
 	 * @param string $name
@@ -85,7 +92,7 @@ class PackageHelper extends AbstractFacade
 	 */
 	public static function getConfig($package)
 	{
-		return static::getInstance()->getConfig();
+		return static::getInstance()->getConfig($package);
 	}
 
 	/**
@@ -100,15 +107,5 @@ class PackageHelper extends AbstractFacade
 	public static function exists($package)
 	{
 		return static::getInstance()->exists($package);
-	}
-
-	/**
-	 * Method to get property DiKey
-	 *
-	 * @return  string
-	 */
-	public static function getDIKey()
-	{
-		return 'package.resolver';
 	}
 }

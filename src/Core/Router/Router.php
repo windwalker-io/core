@@ -15,11 +15,11 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * 
  * @since  2.0.
  *
- * @method  static  string  build()      build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
- * @method  static  string  buildHttp()  buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
- * @method  static  string  http()       http($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
- * @method  static  string  buildHtml()  buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
- * @method  static  string  html()       html($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
+ * @method  static  string  buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  http($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  string  html($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
  *
  * @see \Windwalker\Router\Router
  * @see \Windwalker\Core\Router\RestfulRouter
@@ -31,12 +31,9 @@ abstract class Router extends AbstractProxyFacade
 	const TYPE_FULL = 'full';
 
 	/**
-	 * Method to get property DiKey
+	 * Property _key.
 	 *
-	 * @return  string
+	 * @var  string
 	 */
-	public static function getDIKey()
-	{
-		return 'system.router';
-	}
+	protected static $_key = 'system.router';
 }
