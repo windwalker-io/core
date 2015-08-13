@@ -10,6 +10,7 @@ namespace Windwalker\Core;
 
 use Windwalker\Data\Data;
 use Windwalker\DI\Container;
+use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -27,16 +28,11 @@ abstract class Ioc
 	protected static $profile = 'windwalker';
 
 	/**
-	 * Property containers.
+	 * Property instances.
 	 *
-	 * @var  array
+	 * @var  Container[]
 	 */
-	protected static $containers = array(
-		'windwalker' => array(
-			'root' => null,
-			'children' => array()
-		)
-	);
+	protected static $instances = array();
 
 	/**
 	 * getInstance
@@ -48,44 +44,67 @@ abstract class Ioc
 	 */
 	public static function factory($name = null, $profile = null)
 	{
-		$profile = $profile ? : static::$profile;
+		$profile = $profile ? : self::$profile;
 
-		// No name, return root container.
+		$profile = strtolower(StringNormalise::toDashSeparated($profile));
+
+		// Get Root container.
+		if (!isset(self::$instances[$profile]))
+		{
+			$container = new Container;
+
+			$container->name    = 'windwalker.root';
+			$container->profile = $profile;
+
+			self::$instances[$profile] = $container;
+		}
+
+		$mainContainer = self::$instances[$profile];
+
 		if (!$name)
 		{
-			if (empty(self::$containers[$profile]['root']))
-			{
-				$container = new Container;
-
-				$container->name = 'windwalker.root';
-
-				self::$containers[$profile]['root'] = $container;
-			}
-
-			return self::$containers[$profile]['root'];
+			return $mainContainer;
 		}
 
-		// Has name, we return children container.
-		if (empty(self::$containers[$profile][$name]) || !(self::$containers[$profile][$name] instanceof Container))
+		if (!$mainContainer->hasChild($name))
 		{
-			self::$containers[$profile][$name] = new Container(static::getContainer());
+			$subContainer = $mainContainer->createChild($name);
 
-			self::$containers[$profile][$name]->name = $name;
+			$subContainer->name    = $name;
+			$subContainer->profile = $profile;
 		}
 
-		return self::$containers[$profile][$name];
+		return $mainContainer->getChild($name);
 	}
 
 	/**
 	 * getContainer
 	 *
-	 * @param string $name
+	 * @param   string  $name
+	 * @param   string  $profile
 	 *
 	 * @return  Container
 	 */
-	public static function getContainer($name = null)
+	public static function getContainer($name = null, $profile = null)
 	{
-		return self::factory($name);
+		return static::factory($name, $profile);
+	}
+
+	/**
+	 * setContainer
+	 *
+	 * @param   string     $profile
+	 * @param   Container  $container
+	 *
+	 * @return  void
+	 */
+	public static function setContainer($profile, Container $container)
+	{
+		$profile = $profile ? : self::$profile;
+
+		$profile = strtolower(StringNormalise::toDashSeparated($profile));
+
+		self::$instances[$profile] = $container;
 	}
 
 	/**
@@ -97,17 +116,9 @@ abstract class Ioc
 	 */
 	public static function setProfile($name = 'windwalker')
 	{
-		$name = strtolower($name);
+		$name = strtolower(StringNormalise::toDashSeparated($name));
 
-		if (!isset(static::$containers[$name]))
-		{
-			static::$containers[$name] = array(
-				'root' => null,
-				'children' => array()
-			);
-		}
-
-		static::$profile = $name;
+		self::$profile = $name;
 	}
 
 	/**
@@ -117,7 +128,7 @@ abstract class Ioc
 	 */
 	public static function getProfile()
 	{
-		return static::$profile;
+		return self::$profile;
 	}
 
 	/**
@@ -129,16 +140,14 @@ abstract class Ioc
 	 */
 	public static function reset($profile = null)
 	{
-		if (!$profile)
+		$profile = $profile ? : self::$profile;
+
+		$profile = strtolower(StringNormalise::toDashSeparated($profile));
+
+		if (isset(self::$instances[$profile]))
 		{
-			static::$containers = array();
-
-			return;
+			unset(self::$instances[$profile]);
 		}
-
-		static::$containers[$profile] = array();
-
-		return;
 	}
 
 	/**
@@ -317,7 +326,7 @@ abstract class Ioc
 	 */
 	public function share($key, $callback, $name = null)
 	{
-		return static::factory($name, $key, $callback);
+		return static::factory($name)->share($key, $callback);
 	}
 
 	/**
@@ -343,7 +352,7 @@ abstract class Ioc
 	 */
 	public static function exists($key, $child = null)
 	{
-		return static::getContainer($child)->exists($key);
+		return static::factory($child)->exists($key);
 	}
 
 	/**

@@ -17,15 +17,8 @@ use Windwalker\Registry\Registry;
  * 
  * @since  2.0
  */
-class PackageProvider implements ServiceProviderInterface
+abstract class AbstractPackageProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property config.
-	 *
-	 * @var string
-	 */
-	protected $name;
-
 	/**
 	 * Property package.
 	 *
@@ -36,12 +29,10 @@ class PackageProvider implements ServiceProviderInterface
 	/**
 	 * Class init.
 	 *
-	 * @param string          $name
 	 * @param AbstractPackage $package
 	 */
-	public function __construct($name, AbstractPackage $package)
+	public function __construct(AbstractPackage $package)
 	{
-		$this->name  = $name;
 		$this->package = $package;
 	}
 

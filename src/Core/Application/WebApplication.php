@@ -36,6 +36,13 @@ use Windwalker\Utilities\ArrayHelper;
 class WebApplication extends AbstractWebApplication implements WindwalkerApplicationInterface, DispatcherAwareInterface
 {
 	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = 'windwalker';
+
+	/**
 	 * Property env.
 	 *
 	 * @var  string
@@ -83,7 +90,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$this->response    = $response    instanceof ResponseInterface ? $response    : new Response;
 		$this->input       = $input       instanceof Input             ? $input       : new Input;
 		$this->config      = $config      instanceof Registry          ? $config      : new Registry;
-		$this->container   = $container   instanceof Container         ? $container   : Ioc::factory();
+		$this->container   = $container   instanceof Container         ? $container   : new Container;
+
+		Ioc::setContainer($this->name, $container);
 
 		$this->initialise();
 
@@ -439,6 +448,21 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * addPackage
+	 *
+	 * @param string          $name
+	 * @param AbstractPackage $package
+	 *
+	 * @return  static
+	 */
+	public function addPackage($name, AbstractPackage $package)
+	{
+		$this->container->get('package.resolver')->addPackage($name, $package);
+
+		return $this;
+	}
+
+	/**
 	 * loadConfiguration
 	 *
 	 * @param Registry $config
@@ -638,6 +662,30 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function setDispatcher(DispatcherInterface $dispatcher)
 	{
 		$this->container->share('system.dispatcher', $dispatcher);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Name
+	 *
+	 * @return  string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
 
 		return $this;
 	}

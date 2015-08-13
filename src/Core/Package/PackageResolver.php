@@ -99,7 +99,7 @@ class PackageResolver implements ContainerAwareInterface
 		$pkgConfig = new Registry($package->loadConfig());
 
 		// Legacy to override package config from global config
-		$pkgConfig->loadObject($config->get('package.' . $name, array()));
+		$pkgConfig->load($config->get('package.' . $name, array()));
 
 		// Override package config from etc
 		$file = $config->get('path.etc') . '/' . $name . '/config.yml';
@@ -118,7 +118,7 @@ class PackageResolver implements ContainerAwareInterface
 		$config->set('package.' . $name, (object) $pkgConfig);
 
 		// Set container and init it
-		$subContainer = Ioc::factory($name);
+		$subContainer = $container->createChild($name);
 
 		$package->setContainer($subContainer)->initialise();
 

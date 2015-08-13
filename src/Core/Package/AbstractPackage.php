@@ -90,7 +90,7 @@ class AbstractPackage
 
 		$container = $this->getContainer();
 
-		$container->registerServiceProvider(new PackageProvider($this->getName(), $this));
+		// $container->registerServiceProvider(new AbstractPackageProvider($this->getName(), $this));
 
 		$this->registerProviders($container);
 

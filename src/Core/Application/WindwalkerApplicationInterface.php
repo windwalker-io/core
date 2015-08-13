@@ -30,6 +30,16 @@ interface WindwalkerApplicationInterface
 	public function getPackage($name);
 
 	/**
+	 * addPackage
+	 *
+	 * @param string          $name
+	 * @param AbstractPackage $package
+	 *
+	 * @return  static
+	 */
+	public function addPackage($name, AbstractPackage $package);
+
+	/**
 	 * loadProviders
 	 *
 	 * @return  ServiceProviderInterface[]
@@ -61,4 +71,11 @@ interface WindwalkerApplicationInterface
 	 * @return  Container
 	 */
 	public function getContainer();
+
+	/**
+	 * getName
+	 *
+	 * @return  string
+	 */
+	public function getName();
 }

@@ -74,9 +74,35 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 */
 	public function __construct(Container $container = null, IOInterface $io = null, Registry $config = null)
 	{
-		$this->container = $container instanceof Container ? $container : Ioc::factory();
+		$this->container = $container instanceof Container ? $container : new Container;
+
+		Ioc::setContainer($this->name, $container);
 
 		parent::__construct($io, $config);
+	}
+
+	/**
+	 * Method to get property Name
+	 *
+	 * @return  string
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+
+		return $this;
 	}
 
 	/**
@@ -232,6 +258,21 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 		}
 
 		return null;
+	}
+
+	/**
+	 * addPackage
+	 *
+	 * @param string          $name
+	 * @param AbstractPackage $package
+	 *
+	 * @return  static
+	 */
+	public function addPackage($name, AbstractPackage $package)
+	{
+		$this->container->get('package.resolver')->addPackage($name, $package);
+
+		return $this;
 	}
 
 	/**
