@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core;
 
-use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\ArrayHelper;
@@ -258,6 +257,16 @@ abstract class Ioc
 	public static function getLanguage()
 	{
 		return static::get('system.language');
+	}
+
+	/**
+	 * getUriData
+	 *
+	 * @return  \Windwalker\Registry\Registry
+	 */
+	public static function getUriData()
+	{
+		return static::get('uri');
 	}
 
 	/**
