@@ -59,4 +59,4 @@ trait DispatcherAwareStaticTrait
 	{
 		static::$dispatcher = $dispatcher;
 	}
-} 
+}

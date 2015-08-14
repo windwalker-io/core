@@ -27,4 +27,3 @@ interface DispatcherAwareStaticInterface
 	 */
 	public static function triggerEvent($event, $args = array());
 }
- 
