@@ -130,11 +130,6 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 */
 	public function addDispatcher($name, DispatcherInterface $dispatcher)
 	{
-		if (!$dispatcher instanceof DispatcherInterface)
-		{
-			throw new \InvalidArgumentException('This object should be DispatcherInterface');
-		}
-
 		$name = strtolower($name);
 
 		$dispatcher->name = $name;
@@ -230,7 +225,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 */
 	public function getIterator()
 	{
-		return new \ArrayIterator($this);
+		return new \ArrayIterator($this->dispatchers);
 	}
 
 	/**

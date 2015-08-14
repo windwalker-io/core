@@ -75,11 +75,11 @@ class NullObject implements NullObjectInterface
 	/**
 	 * __toString
 	 *
-	 * @return  mixed
+	 * @return  string
 	 */
 	public function __toString()
 	{
-		return null;
+		return '';
 	}
 
 	/**
