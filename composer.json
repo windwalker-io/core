@@ -1,26 +1,27 @@
 {
-	"name": "windwalker/core",
-	"description": "A modern PHP framework.",
-	"homepage": "https://github.com/ventoviro/windwalker-core",
-	"license": "GNU Lesser General Public License",
-	"minimum-stability": "beta",
-	"require" : {
-		"windwalker/framework": "~2.0",
-		"symfony/yaml" : "2.*@stable"
-	},
-	"require-dev" : {
-		"twig/twig": "1.*@stable",
-		"illuminate/view": "4.*@stable"
-	},
-	"autoload" : {
-		"psr-4" : {
-			"Windwalker\\" : "src/",
-			"Windwalker\\Core\\Test\\": "test/"
-		}
-	},
-	"extra": {
-		"branch-alias": {
-			"dev-master" : "2.1-dev"
-		}
-	}
+    "name": "windwalker/core",
+    "description": "A modern PHP framework.",
+    "homepage": "https://github.com/ventoviro/windwalker-core",
+    "license": "GNU Lesser General Public License",
+    "minimum-stability": "beta",
+    "require": {
+        "windwalker/framework": "~2.0",
+        "symfony/yaml": "~2.0",
+        "monolog/monolog": "~1.0"
+    },
+    "require-dev" : {
+        "twig/twig": "~1.0",
+        "illuminate/view": "~4.0"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Windwalker\\" : "src/",
+            "Windwalker\\Core\\Test\\": "test/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1-dev"
+        }
+    }
 }
