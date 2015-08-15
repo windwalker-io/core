@@ -11,6 +11,7 @@ namespace Windwalker\Core\Console;
 use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
+use Windwalker\Core\Asset\Command\AssetCommand;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Package\AbstractPackage;
@@ -145,7 +146,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 */
 	public function registerCommands()
 	{
-		// $this->addCommand(new PhinxCommand);
+		$this->addCommand(new AssetCommand);
 		$this->addCommand(new MigrationCommand);
 		$this->addCommand(new SeedCommand);
 	}
@@ -172,7 +173,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public function loadProviders()
+	public static function loadProviders()
 	{
 		return array(
 			'event'    => new EventProvider,
@@ -187,7 +188,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 *
 	 * @return  array
 	 */
-	public function loadPackages()
+	public static function loadPackages()
 	{
 		return array();
 	}

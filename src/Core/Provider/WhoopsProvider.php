@@ -37,6 +37,13 @@ class WhoopsProvider implements ServiceProviderInterface
 
 			$handler = new \Whoops\Handler\PrettyPageHandler;
 
+			$whoops->pushHandler(function($exception, $inspector, $run) use ($container)
+			{
+				$collector = $container->get('system.collector');
+
+				$collector['exception'] = $exception;
+			});
+
 			$whoops->pushHandler($handler);
 
 			$whoops->register();

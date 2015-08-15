@@ -27,7 +27,7 @@ interface WindwalkerApplicationInterface
 	 *
 	 * @return  AbstractPackage
 	 */
-	public function getPackage($name);
+	public function getPackage($name = null);
 
 	/**
 	 * addPackage
@@ -44,14 +44,14 @@ interface WindwalkerApplicationInterface
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public function loadProviders();
+	public static function loadProviders();
 
 	/**
 	 * getPackages
 	 *
 	 * @return  AbstractPackage[]
 	 */
-	public function loadPackages();
+	public static function loadPackages();
 
 	/**
 	 * Trigger an event.

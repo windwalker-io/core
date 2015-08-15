@@ -17,7 +17,6 @@ use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Filesystem\Path;
-use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
@@ -27,8 +26,8 @@ use Windwalker\Core\View\Helper\ViewHelper;
 /**
  * Class HtmlView
  *
- * @property-read  ViewModel  $model   The ViewModel object.
- * @property-read  Registry   $config  Config object.
+ * @property-read  ViewModel|mixed  $model   The ViewModel object.
+ * @property-read  Registry         $config  Config object.
  *
  * @since 1.0
  */

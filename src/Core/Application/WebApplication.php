@@ -155,7 +155,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  ServiceProviderInterface[]
 	 */
-	public function loadProviders()
+	public static function loadProviders()
 	{
 		$providers['logger']   = new Provider\LoggerProvider;
 		$providers['event']    = new Provider\EventProvider;
@@ -176,7 +176,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  array
 	 */
-	public function loadPackages()
+	public static function loadPackages()
 	{
 		return array();
 	}
@@ -449,8 +449,18 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  AbstractPackage
 	 */
-	public function getPackage($package)
+	public function getPackage($package = null)
 	{
+		if (!$package)
+		{
+			if ($this->container->exists('current.package'))
+			{
+				return $this->container->get('current.package');
+			}
+
+			return null;
+		}
+
 		return $this->container->get('package.resolver')->getPackage($package);
 	}
 

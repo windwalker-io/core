@@ -44,7 +44,9 @@ class ProfilerListener
 		$collector = $container->get('system.collector');
 		$profiler  = $container->get('system.profiler');
 
-		$collector['time'] = DateTime::create('now', DateTime::TZ_LOCALE);
+		$collector['time']  = DateTime::create('now', DateTime::TZ_LOCALE);
+		$collector['uri']   = $container->get('uri');
+		$collector['input'] = $container->get('system.input');
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -122,6 +124,23 @@ class ProfilerListener
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'package.process'
 		));
+	}
+
+	public function onBeforeRedirect(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Collector $collector
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$collector = $container->get('system.collector');
+		$profiler  = $container->get('system.profiler');
+
+		$collector['redirect'] = array(
+			'url' => $event['url'],
+			'moved' => $event['moved']
+		);
 	}
 
 	public function onAfterRender(Event $event)

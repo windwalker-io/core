@@ -10,6 +10,7 @@ namespace Windwalker\Core\Error;
 
 use Windwalker\Application\Web\Response;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Profiler\Point\Collector;
 use Windwalker\Renderer\PhpRenderer;
 
 /**
