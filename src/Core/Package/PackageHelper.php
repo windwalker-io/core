@@ -48,7 +48,7 @@ class PackageHelper extends AbstractFacade
 	 *
 	 * @see  PackageResolver::getPackages
 	 *
-	 * @return  array
+	 * @return  AbstractPackage[]
 	 */
 	public static function getPackages()
 	{

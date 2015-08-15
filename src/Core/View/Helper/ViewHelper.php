@@ -81,6 +81,30 @@ class ViewHelper extends AbstractHelper
 	}
 
 	/**
+	 * isActiveRoute
+	 *
+	 * @param   string  $route
+	 *
+	 * @return  bool|string
+	 */
+	public function isActiveRoute($route)
+	{
+		$package = $this->getParent()
+			->getView()
+			->getPackage();
+
+		$config = $package->getContainer()
+			->get('config');
+
+		if (count(explode(':', $route)) < 2)
+		{
+			$route = $package->getName() . ':' . $route;
+		}
+
+		return $config->get('route.matched') == $route ? 'active' : false;
+	}
+
+	/**
 	 * showFlash
 	 *
 	 * @param array $flashes

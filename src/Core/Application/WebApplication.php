@@ -96,6 +96,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		Ioc::setContainer($this->name, $this->container);
 
+		$this->set('execution.start', microtime(true));
+		$this->set('execution.memory', memory_get_usage(false));
+
 		$this->initialise();
 
 		// Set the execution datetime and timestamp;
@@ -166,7 +169,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$providers['session']  = new Provider\SessionProvider;
 		$providers['auth']     = new Provider\AuthenticationProvider;
 		$providers['security'] = new Provider\SecurityProvider;
-		$providers['profiler'] = new Provider\ProfilerProvider;
 
 		return $providers;
 	}
