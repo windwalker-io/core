@@ -145,10 +145,11 @@ class AbstractPackage implements DispatcherAwareInterface
 	 *
 	 * @param string $task
 	 * @param array  $variables
+	 * @param bool   $hmvc
 	 *
 	 * @return mixed
 	 */
-	public function execute($task = null, $variables = array())
+	public function execute($task = null, $variables = array(), $hmvc = false)
 	{
 		$controller = $this->getController($task, $variables);
 
@@ -156,14 +157,19 @@ class AbstractPackage implements DispatcherAwareInterface
 			'package'    => $this,
 			'controller' => &$controller,
 			'task'       => $task,
-			'variables'  => $variables
+			'variables'  => $variables,
+			'hmvc'       => $hmvc
 		));
 
 		$result = $controller->execute();
 
 		$this->getDispatcher()->triggerEvent('onAfterPackageExecute', array(
 			'package'    => $this,
-			'controller' => $controller
+			'controller' => $controller,
+			'task'       => $task,
+			'variables'  => $variables,
+			'hmvc'       => $hmvc,
+			'result'     => &$result
 		));
 
 		$controller->redirect();

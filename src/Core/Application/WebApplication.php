@@ -430,7 +430,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		foreach ((array) $routes as $key => $route)
 		{
-			$route['pattern'] = rtrim($pattern, '/ ') . '/' . ltrim($route['pattern'], '/ ');
+			$route['pattern'] = rtrim($pattern, '/ ') . $route['pattern'];
 
 			$route['pattern'] = '/' . ltrim($route['pattern'], '/ ');
 

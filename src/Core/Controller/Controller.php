@@ -135,6 +135,8 @@ abstract class Controller extends AbstractController
 				$input = new Input($input);
 			}
 
+			$input->set('hmvc', true);
+
 			$controller = $task->setContainer($this->container)
 				->setPackage($this->package)
 				->setInput($input)
@@ -145,7 +147,7 @@ abstract class Controller extends AbstractController
 
 		$package = $package ? $this->app->getPackage($package) : $this->package;
 
-		return $package->execute($task, $input);
+		return $package->execute($task, $input, true);
 	}
 
 	/**
