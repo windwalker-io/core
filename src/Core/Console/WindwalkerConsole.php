@@ -253,7 +253,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	 *
 	 * @return  AbstractPackage
 	 */
-	public function getPackage($name)
+	public function getPackage($name = null)
 	{
 		$key = 'package.' . strtolower($name);
 
