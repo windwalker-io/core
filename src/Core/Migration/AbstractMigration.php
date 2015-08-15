@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Database\Driver\DatabaseDriver;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
  * The AbstractMigration class.
@@ -24,7 +24,7 @@ abstract class AbstractMigration
 	/**
 	 * Property db.
 	 *
-	 * @var  DatabaseDriver
+	 * @var  AbstractDatabaseDriver
 	 */
 	protected $db;
 
@@ -45,10 +45,10 @@ abstract class AbstractMigration
 	/**
 	 * Class init.
 	 *
-	 * @param AbstractCommand $command
-	 * @param DatabaseDriver  $db
+	 * @param AbstractCommand         $command
+	 * @param AbstractDatabaseDriver  $db
 	 */
-	public function __construct(AbstractCommand $command, DatabaseDriver $db)
+	public function __construct(AbstractCommand $command, AbstractDatabaseDriver $db)
 	{
 		$this->command = $command;
 

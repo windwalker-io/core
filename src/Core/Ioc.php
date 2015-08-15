@@ -314,11 +314,6 @@ abstract class Ioc
 	{
 		$container = static::getContainer($child);
 
-		if (!$container->exists($key))
-		{
-			return null;
-		}
-
 		return $container->get($key, $forceNew);
 	}
 

@@ -9,8 +9,7 @@
 namespace Windwalker\Core\Seeder;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Database\Driver\DatabaseDriver;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
  * The AbstractSeeder class.
@@ -22,7 +21,7 @@ abstract class AbstractSeeder
 	/**
 	 * Property db.
 	 *
-	 * @var DatabaseDriver
+	 * @var AbstractDatabaseDriver
 	 */
 	protected $db;
 
@@ -36,10 +35,10 @@ abstract class AbstractSeeder
 	/**
 	 * Class init.
 	 *
-	 * @param DatabaseDriver $db
-	 * @param Command        $command
+	 * @param AbstractDatabaseDriver $db
+	 * @param Command                $command
 	 */
-	public function __construct(DatabaseDriver $db = null, Command $command = null)
+	public function __construct(AbstractDatabaseDriver $db = null, Command $command = null)
 	{
 		$this->db = $db;
 		$this->command = $command;

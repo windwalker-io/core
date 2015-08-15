@@ -40,7 +40,7 @@ class ControllerResolver
 		{
 			$namespace = MvcHelper::getPackageNamespace($package, 1);
 
-			$class = $namespace . '\\' . $controller;
+			$class = $namespace . '\Controller\\' . $controller;
 		}
 
 		if (!class_exists($class))
@@ -48,6 +48,6 @@ class ControllerResolver
 			throw new \UnexpectedValueException('Controller: ' . $controller . ' not found.', 404);
 		}
 
-		return $controller;
+		return $class;
 	}
 }

@@ -92,6 +92,7 @@ class DateTime extends \DateTime
 			{
 				$config = Ioc::getConfig();
 				$tz = $config->get('system.timezone');
+				$tz = new \DateTimeZone($tz);
 			}
 		}
 

@@ -79,6 +79,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 
 		$this->name = $this->config->get('name', $this->name);
 
+		Ioc::setProfile($this->name);
 		Ioc::setContainer($this->name, $this->container);
 
 		parent::__construct($io, $config);
@@ -132,7 +133,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 		$this->registerCommands();
 
 		// Load packages
-		PackageHelper::registerPackages($this->loadPackages(), $this->container);
+		$this->container->get('package.resolver')->registerPackages($this->loadPackages(), $this->container);
 
 		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 	}

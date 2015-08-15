@@ -157,14 +157,18 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function loadProviders()
 	{
-		return array(
-			'event'   => new Provider\EventProvider,
-			'router'  => new Provider\RouterProvider,
-			'cache'   => new Provider\CacheProvider,
-			'session' => new Provider\SessionProvider,
-			'datetime' => new Provider\DateTimeProvider,
-			'security' => new Provider\SecurityProvider,
-		);
+		$providers['logger']   = new Provider\LoggerProvider;
+		$providers['event']    = new Provider\EventProvider;
+		$providers['database'] = new Provider\DatabaseProvider;
+		$providers['router']   = new Provider\RouterProvider;
+		$providers['lang']     = new Provider\LanguageProvider;
+		$providers['cache']    = new Provider\CacheProvider;
+		$providers['session']  = new Provider\SessionProvider;
+		$providers['auth']     = new Provider\AuthenticationProvider;
+		$providers['security'] = new Provider\SecurityProvider;
+		$providers['profiler'] = new Provider\ProfilerProvider;
+
+		return $providers;
 	}
 
 	/**
@@ -520,7 +524,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function redirect($url, $moved = false)
 	{
-		$this->triggerEvent('onBeforeRedirect');
+		$this->triggerEvent('onBeforeRedirect', array(
+			'app'   => $this,
+			'url'   => &$url,
+			'moved' => &$moved
+		));
 
 		// Init Uri
 		$this->container->get('uri');

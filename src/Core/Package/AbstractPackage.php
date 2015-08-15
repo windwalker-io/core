@@ -17,6 +17,8 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
+use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
@@ -31,7 +33,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * 
  * @since  2.0
  */
-class AbstractPackage
+class AbstractPackage implements DispatcherAwareInterface
 {
 	/**
 	 * DI Container.
@@ -150,7 +152,19 @@ class AbstractPackage
 	{
 		$controller = $this->getController($task, $variables);
 
+		$this->getDispatcher()->triggerEvent('onBeforePackageExecute', array(
+			'package'    => $this,
+			'controller' => &$controller,
+			'task'       => $task,
+			'variables'  => $variables
+		));
+
 		$result = $controller->execute();
+
+		$this->getDispatcher()->triggerEvent('onAfterPackageExecute', array(
+			'package'    => $this,
+			'controller' => $controller
+		));
 
 		$controller->redirect();
 
@@ -515,6 +529,30 @@ class AbstractPackage
 	public function setVariables($variables)
 	{
 		$this->variables = $variables;
+
+		return $this;
+	}
+
+	/**
+	 * getDispatcher
+	 *
+	 * @return  DispatcherInterface
+	 */
+	public function getDispatcher()
+	{
+		return $this->getContainer()->get('system.dispatcher');
+	}
+
+	/**
+	 * setDispatcher
+	 *
+	 * @param   DispatcherInterface $dispatcher
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDispatcher(DispatcherInterface $dispatcher)
+	{
+		$this->getContainer()->set('system.dispatcher', $dispatcher);
 
 		return $this;
 	}
