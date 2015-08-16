@@ -10,7 +10,7 @@ namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Object\SilencerInterface;
+use Windwalker\Core\Object\SilencerObjectInterface;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
@@ -20,7 +20,7 @@ use Windwalker\Event\Dispatcher;
  * 
  * @since  2.0
  */
-class NullPackage extends AbstractPackage implements SilencerInterface
+class NullPackage extends AbstractPackage implements SilencerObjectInterface
 {
 	/**
 	 * Property dir.

@@ -13,7 +13,7 @@ namespace Windwalker\Core\Object;
  * 
  * @since  2.0
  */
-interface SilencerInterface
+interface SilencerObjectInterface
 {
 	/**
 	 * __get

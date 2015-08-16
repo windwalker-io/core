@@ -11,7 +11,7 @@ namespace Windwalker\Core\Object;
 /**
  * The Null Object Interface
  */
-interface NullObjectInterface extends SilencerInterface
+interface NullObjectInterface extends SilencerObjectInterface
 {
 	/**
 	 * Is this object not contain any values.

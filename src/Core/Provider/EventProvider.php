@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Dispatcher;
@@ -30,7 +31,11 @@ class EventProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			return new Dispatcher;
+			$dispatcher = new EventDispatcher;
+
+			$dispatcher->setDebug($container->get('system.config')->get('system.debug'));
+
+			return $dispatcher;
 		};
 
 		$container->share('system.dispatcher', $closure);

@@ -13,7 +13,7 @@ namespace Windwalker\Core\Object;
  * 
  * @since  2.0
  */
-class NullObject implements NullObjectInterface
+class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
 {
 	/**
 	 * Is this object not contain any values.
@@ -105,5 +105,77 @@ class NullObject implements NullObjectInterface
 	public function __call($name, $args)
 	{
 		return null;
+	}
+
+	/**
+	 * Retrieve an external iterator
+	 *
+	 * @return \Traversable An instance of an object implementing Iterator or Traversable
+	 */
+	public function getIterator()
+	{
+		return new \ArrayIterator(array());
+	}
+
+	/**
+	 * Is a property exists or not.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @return  boolean
+	 */
+	public function offsetExists($offset)
+	{
+		return false;
+	}
+
+	/**
+	 * Get a property.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  mixed The value to return.
+	 */
+	public function offsetGet($offset)
+	{
+		return null;
+	}
+
+	/**
+	 * Set a value to property.
+	 *
+	 * @param mixed $offset Offset key.
+	 * @param mixed $value  The value to set.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		return;
+	}
+
+	/**
+	 * Unset a property.
+	 *
+	 * @param mixed $offset Offset key to unset.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetUnset($offset)
+	{
+		return;
+	}
+
+	/**
+	 * Count this object.
+	 *
+	 * @return  int
+	 */
+	public function count()
+	{
+		return 0;
 	}
 }
