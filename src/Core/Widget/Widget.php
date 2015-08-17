@@ -8,9 +8,12 @@
 
 namespace Windwalker\Core\Widget;
 
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Utilities\Iterator\PriorityQueue;
+use Windwalker\Utilities\Queue\PriorityQueue;
+use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
@@ -54,9 +57,9 @@ class Widget implements WidgetInterface
 	/**
 	 * Property package.
 	 *
-	 * @var  string
+	 * @var  AbstractPackage
 	 */
-	private $package;
+	protected $package;
 
 	/**
 	 * Class init.
@@ -68,8 +71,9 @@ class Widget implements WidgetInterface
 	public function __construct($layout, RendererInterface $renderer = null, $package = null)
 	{
 		$this->layout   = $layout;
-		$this->package  = $package;
 		$this->renderer = $renderer ? : new PhpRenderer;
+
+		$this->package = PackageHelper::getPackage($package);
 
 		// Create PriorityQueue
 		$this->createPriorityQueue();
@@ -99,8 +103,7 @@ class Widget implements WidgetInterface
 
 		$data = new Data($data);
 
-		$data->layout = $this->layout;
-		$data->renderer = get_class($this->renderer);
+		$this->prepareGlobals($data);
 
 		if ($this->isDebug())
 		{
@@ -159,6 +162,23 @@ class Widget implements WidgetInterface
 	}
 
 	/**
+	 * prepareGlobals
+	 *
+	 * @param Data $data
+	 *
+	 * @return  static
+	 */
+	protected function prepareGlobals(Data $data)
+	{
+		$data->layout = $this->layout;
+		$data->renderer = get_class($this->renderer);
+
+		$data->bind(ViewHelper::getGlobalVariables($this->getPackage()));
+
+		return $this;
+	}
+
+	/**
 	 * registerPaths
 	 *
 	 * @return  static
@@ -172,10 +192,10 @@ class Widget implements WidgetInterface
 			$this->renderer->setPaths($paths);
 
 			// Set package path
-			if ($this->package)
-			{
-				$package = PackageHelper::getPackage($this->package);
+			$package = $this->getPackage();
 
+			if (!$package instanceof NullPackage)
+			{
 				$this->renderer->addPath($package->getDir() . '/Templates', Priority::BELOW_NORMAL);
 			}
 
@@ -272,21 +292,26 @@ class Widget implements WidgetInterface
 	/**
 	 * Method to get property Package
 	 *
-	 * @return  string
+	 * @return  AbstractPackage
 	 */
 	public function getPackage()
 	{
+		if (!$this->package)
+		{
+			$this->package = new NullPackage;
+		}
+
 		return $this->package;
 	}
 
 	/**
 	 * Method to set property package
 	 *
-	 * @param   string $package
+	 * @param   AbstractPackage $package
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setPackage($package)
+	public function setPackage(AbstractPackage $package)
 	{
 		$this->package = $package;
 
