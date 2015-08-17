@@ -307,13 +307,13 @@ class Widget implements WidgetInterface
 	/**
 	 * Method to set property package
 	 *
-	 * @param   AbstractPackage $package
+	 * @param   AbstractPackage|string $package
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setPackage(AbstractPackage $package)
+	public function setPackage($package)
 	{
-		$this->package = $package;
+		$this->package = PackageHelper::getPackage($package);
 
 		return $this;
 	}

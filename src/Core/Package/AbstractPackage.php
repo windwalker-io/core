@@ -23,6 +23,7 @@ use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
+use Windwalker\Registry\RegistryHelper;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -76,6 +77,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @var  array
 	 */
 	protected $variables;
+
+	/**
+	 * Property config.
+	 *
+	 * @var  Registry
+	 */
+	protected $config;
 
 	/**
 	 * initialise
@@ -342,19 +350,22 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * loadConfiguration
 	 *
-	 * @throws  \RuntimeException
-	 * @return  array
+	 * @param   Registry  $config
+	 *
+	 * @return  static
 	 */
-	public function loadConfig()
+	public function loadConfig(Registry $config)
 	{
 		$file = $this->getDir() . '/config.yml';
 
 		if (!is_file($file))
 		{
-			return null;
+			return $this;
 		}
 
-		return Yaml::parse(file_get_contents($file));
+		$config->loadFile($file, 'yaml');
+
+		return $this;
 	}
 
 	/**
@@ -488,6 +499,11 @@ class AbstractPackage implements DispatcherAwareInterface
 			return $this->getRouter();
 		}
 
+		if ($name == 'config')
+		{
+			return $this->getConfig();
+		}
+
 		return null;
 	}
 
@@ -495,6 +511,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * Method to get property Task
 	 *
 	 * @return  string
+	 *
+	 * @since   2.1
 	 */
 	public function getTask()
 	{
@@ -507,6 +525,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @param   string $task
 	 *
 	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
 	 */
 	public function setTask($task)
 	{
@@ -519,6 +539,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * Method to get property Variables
 	 *
 	 * @return  array
+	 *
+	 * @since   2.1
 	 */
 	public function getVariables()
 	{
@@ -531,6 +553,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @param   array $variables
 	 *
 	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
 	 */
 	public function setVariables($variables)
 	{
@@ -559,6 +583,41 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function setDispatcher(DispatcherInterface $dispatcher)
 	{
 		$this->getContainer()->set('system.dispatcher', $dispatcher);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 *
+	 * @since   2.1
+	 */
+	public function getConfig()
+	{
+		if (!$this->config)
+		{
+			$this->config = new Registry;
+
+			$this->loadConfig($this->config);
+		}
+
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config;
 
 		return $this;
 	}

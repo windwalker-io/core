@@ -14,6 +14,7 @@ use Windwalker\Core\Object\SilencerObjectInterface;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
+use Windwalker\Registry\Registry;
 
 /**
  * The NullPackage class.
@@ -245,12 +246,13 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * loadConfiguration
 	 *
-	 * @throws  \RuntimeException
-	 * @return  array
+	 * @param Registry $config
+	 *
+	 * @return static
 	 */
-	public function loadConfig()
+	public function loadConfig(Registry $config)
 	{
-		return array();
+		return $this;
 	}
 
 	/**
@@ -292,5 +294,66 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 */
 	public static function registerCommands(Console $console)
 	{
+	}
+
+	/**
+	 * Method to set property task
+	 *
+	 * @param   string $task
+	 *
+	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
+	 */
+	public function setTask($task)
+	{
+		return $this;
+	}
+
+	/**
+	 * Method to set property variables
+	 *
+	 * @param   array $variables
+	 *
+	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
+	 */
+	public function setVariables($variables)
+	{
+		return $this;
+	}
+
+	/**
+	 * Method to get property Config
+	 *
+	 * @return  Registry
+	 *
+	 * @since   2.1
+	 */
+	public function getConfig()
+	{
+		if (!$this->config)
+		{
+			$this->config = new Registry;
+
+			$this->loadConfig($this->config);
+		}
+
+		return $this->config;
+	}
+
+	/**
+	 * Method to set property config
+	 *
+	 * @param   Registry $config
+	 *
+	 * @return  static  Return self to support chaining.
+	 *
+	 * @since   2.1
+	 */
+	public function setConfig($config)
+	{
+		return $this;
 	}
 }

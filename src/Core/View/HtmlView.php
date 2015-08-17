@@ -217,6 +217,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 		}
 
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
+		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), Priority::LOW - 10);
 
 		$paths = RendererHelper::getGlobalPaths()->merge($paths);
 

@@ -95,27 +95,13 @@ class PackageResolver implements ContainerAwareInterface
 		// Get package identify name.
 		$name = $package->getName();
 
-		// Get global config to override package config
-		$pkgConfig = new Registry($package->loadConfig());
-
-		// Legacy to override package config from global config
-		$pkgConfig->load($config->get('package.' . $name, array()));
-
 		// Override package config from etc
-		$file = $config->get('path.etc') . '/' . $name . '/config.yml';
+		$file = $config->get('path.etc') . '/packages/' . $name . '.yml';
 
 		if (is_file($file))
 		{
-			$pkgConfig->loadFile($file);
+			$package->getConfig()->loadFile($file);
 		}
-
-		$pkgConfig = array(
-			'name' => $name,
-			'class' => get_class($package),
-			'config' => $pkgConfig->getRaw()
-		);
-
-		$config->set('package.' . $name, (object) $pkgConfig);
 
 		// Set container and init it
 		$subContainer = $container->createChild($name);
