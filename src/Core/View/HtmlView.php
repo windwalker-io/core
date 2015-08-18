@@ -160,9 +160,22 @@ class HtmlView extends \Windwalker\View\HtmlView
 
 		$this->prepareGlobals($data);
 
+		$dispatcher = $this->getPackage()->getDispatcher();
+
+		$dispatcher->triggerEvent('onViewBeforeRender', array(
+			'data' => $this->data,
+			'view' => $this
+		));
+
 		$output = $this->renderer->render($this->getLayout(), (array) $data);
 
 		$output = $this->postRender($output);
+
+		$dispatcher->triggerEvent('onViewAfterRender', array(
+			'data'   => $this->data,
+			'view'   => $this,
+			'output' => &$output
+		));
 
 		return $output;
 	}

@@ -57,6 +57,8 @@ class WhoopsProvider implements ServiceProviderInterface
 					'line'    => $exception->getLine(),
 					'trace'   => $exception->getTrace()
 				);
+
+				http_response_code($exception->getCode());
 			});
 
 			$whoops->register();
