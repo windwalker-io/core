@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Model;
 
 use Windwalker\Core\Ioc;
-use Windwalker\Database\Driver\DatabaseDriver;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Model\DatabaseModelInterface;
 use Windwalker\Registry\Registry;
 
@@ -23,19 +23,19 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	/**
 	 * Property db.
 	 *
-	 * @var  DatabaseDriver
+	 * @var  AbstractDatabaseDriver
 	 */
 	protected $db = null;
 
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry       $state The model state.
-	 * @param   DatabaseDriver $db    The database adapter.
+	 * @param   Registry               $state The model state.
+	 * @param   AbstractDatabaseDriver $db    The database adapter.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct(Registry $state = null, DatabaseDriver $db = null)
+	public function __construct(Registry $state = null, AbstractDatabaseDriver $db = null)
 	{
 		$this->db = $db ? : Ioc::getDatabase();
 
@@ -45,7 +45,7 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	/**
 	 * getDb
 	 *
-	 * @return  DatabaseDriver
+	 * @return  AbstractDatabaseDriver
 	 */
 	public function getDb()
 	{
@@ -55,15 +55,61 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	/**
 	 * setDb
 	 *
-	 * @param   DatabaseDriver $db
+	 * @param   AbstractDatabaseDriver $db
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setDb($db)
 	{
+		if (!$db instanceof AbstractDatabaseDriver)
+		{
+			throw new \InvalidArgumentException('$db should be AbstractDatabaseDriver.');
+		}
+
 		$this->db = $db;
 
 		return $this;
 	}
+
+	/**
+	 * transactionStart
+	 *
+	 * @param boolean $nested
+	 *
+	 * @return  static
+	 */
+	public function transactionStart($nested = true)
+	{
+		$this->db->getTransaction($nested)->start();
+
+		return $this;
+	}
+
+	/**
+	 * transactionCommit
+	 *
+	 * @param boolean $nested
+	 *
+	 * @return  static
+	 */
+	public function transactionCommit($nested = true)
+	{
+		$this->db->getTransaction($nested)->commit();
+
+		return $this;
+	}
+
+	/**
+	 * transactionRollback
+	 *
+	 * @param boolean $nested
+	 *
+	 * @return  static
+	 */
+	public function transactionRollback($nested = true)
+	{
+		$this->db->getTransaction($nested)->start();
+
+		return $this;
+	}
 }
- 
