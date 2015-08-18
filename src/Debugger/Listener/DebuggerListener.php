@@ -69,13 +69,13 @@ class DebuggerListener
 	}
 
 	/**
-	 * onBeforePackageExecute
+	 * onPackageBeforeExecute
 	 *
 	 * @param Event $event
 	 *
 	 * @return  void
 	 */
-	public function onBeforePackageExecute(Event $event)
+	public function onPackageBeforeExecute(Event $event)
 	{
 		if ($event['hmvc'])
 		{

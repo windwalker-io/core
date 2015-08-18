@@ -161,7 +161,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		$controller = $this->getController($task, $variables);
 
-		$this->getDispatcher()->triggerEvent('onBeforePackageExecute', array(
+		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
 			'package'    => $this,
 			'controller' => &$controller,
 			'task'       => $task,
@@ -171,7 +171,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$result = $controller->execute();
 
-		$this->getDispatcher()->triggerEvent('onAfterPackageExecute', array(
+		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
 			'package'    => $this,
 			'controller' => $controller,
 			'task'       => $task,

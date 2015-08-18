@@ -19,6 +19,11 @@ use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
+use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherInterface;
+use Windwalker\Event\Event;
+use Windwalker\Event\EventInterface;
+use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
@@ -31,7 +36,7 @@ use Windwalker\View\AbstractView;
  * 
  * @since  2.0
  */
-abstract class Controller extends AbstractController
+abstract class Controller extends AbstractController implements EventTriggerableInterface
 {
 	/**
 	 * Property name.
@@ -190,9 +195,20 @@ abstract class Controller extends AbstractController
 	{
 		$this->prepareExecute();
 
+		$this->triggerEvent('onControllerBeforeExecute', array(
+			'controller' => $this
+		));
+
 		$result = $this->doExecute();
 
-		return $this->postExecute($result);
+		$result = $this->postExecute($result);
+
+		$this->triggerEvent('onControllerAfterExecute', array(
+			'controller' => $this,
+			'result'     => &$result
+		));
+
+		return $result;
 	}
 
 	/**
@@ -467,7 +483,7 @@ abstract class Controller extends AbstractController
 		{
 			$package = $this->getPackage();
 
-			$this->container = $package->getContainer();
+			$this->container = $package->getContainer() ? : Ioc::factory();
 		}
 
 		return $this->container;
@@ -575,5 +591,29 @@ abstract class Controller extends AbstractController
 		$this->config = $config;
 
 		return $this;
+	}
+
+	/**
+	 * Trigger an event.
+	 *
+	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments to set in event.
+	 *
+	 * @return  EventInterface  The event after being passed through all listeners.
+	 *
+	 * @since   2.0
+	 */
+	public function triggerEvent($event, $args = array())
+	{
+		$container = $this->getContainer();
+
+		if (!$container->exists('system.dispatcher'))
+		{
+			return null;
+		}
+
+		$dispatcher = $container->get('system.dispatcher');
+
+		return $dispatcher->triggerEvent($event, $args);
 	}
 }

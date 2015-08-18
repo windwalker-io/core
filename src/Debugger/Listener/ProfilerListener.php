@@ -103,13 +103,13 @@ class ProfilerListener
 	}
 
 	/**
-	 * onAfterPackageExecute
+	 * onPackageAfterExecute
 	 *
 	 * @param Event $event
 	 *
 	 * @return  void
 	 */
-	public function onAfterPackageExecute(Event $event)
+	public function onPackageAfterExecute(Event $event)
 	{
 		/**
 		 * @var AbstractPackage $package
