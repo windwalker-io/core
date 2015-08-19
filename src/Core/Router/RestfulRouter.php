@@ -65,6 +65,25 @@ class RestfulRouter extends Router
 	 */
 	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
+		if (!array_key_exists($route, $this->routes))
+		{
+			throw new \OutOfRangeException('Route: ' . $route . ' not found.');
+		}
+
+		// Hook
+		$extra = $this->routes[$route]->getExtra();
+
+		if (isset($extra['hook']['build']))
+		{
+			if (!is_callable($extra['hook']['build']))
+			{
+				throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
+			}
+
+			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
+		}
+
+		// Build
 		$url = parent::build($route, $queries);
 		$uri = $this->getUri();
 
@@ -180,6 +199,17 @@ class RestfulRouter extends Router
 		$extra['controller'] = $this->controller = $controller;
 
 		$route->setExtra($extra);
+
+		// Hooks
+		if (isset($extra['hook']['match']))
+		{
+			if (!is_callable($extra['hook']['match']))
+			{
+				throw new \LogicException(sprintf('The match hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['match']), $route->getName()));
+			}
+
+			call_user_func($extra['hook']['match'], $this, $route, $method, $options);
+		}
 
 		return $route;
 	}

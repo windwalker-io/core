@@ -400,6 +400,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 				$route['extra']['action'] = $route['action'];
 			}
 
+			if (isset($route['hook']))
+			{
+				$route['extra']['hook'] = $route['hook'];
+			}
+
 			$router->addRoute(new Route($name, $pattern, $variables, $allowMethods, $route));
 		}
 
