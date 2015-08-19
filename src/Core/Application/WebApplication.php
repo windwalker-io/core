@@ -26,10 +26,14 @@ use Windwalker\Event\EventInterface;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
+use Windwalker\Session\Session;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The WebApplication class.
+ *
+ * @property-read  Session  $session
+ * @property-read  Router   $router
  * 
  * @since  2.0
  */
@@ -69,7 +73,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * @var    Registry
 	 * @since  2.0
 	 */
-	public $config;
+	protected $config;
 
 	/**
 	 * Class constructor.
@@ -594,6 +598,16 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * getSession
+	 *
+	 * @return  Session
+	 */
+	public function getSession()
+	{
+		return $this->container->get('system.session');
+	}
+
+	/**
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
@@ -716,5 +730,22 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$this->name = $name;
 
 		return $this;
+	}
+
+	/**
+	 * is utilized for reading data from inaccessible members.
+	 *
+	 * @param   $name  string
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		if ($name == 'session')
+		{
+			return $this->getSession();
+		}
+
+		return parent::__get($name);
 	}
 }
