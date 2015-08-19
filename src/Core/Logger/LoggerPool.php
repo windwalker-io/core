@@ -8,16 +8,22 @@
 
 namespace Windwalker\Core\Logger;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger as Monolog;
+use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use Windwalker\Core\Logger\Monolog\GlobalContainer;
+use Windwalker\DI\Container;
+use Windwalker\DI\ContainerAwareInterface;
 
 /**
  * The LoggerFactory class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
+class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, ContainerAwareInterface
 {
 	/**
 	 * Property loggers.
@@ -34,13 +40,30 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	protected $nullLogger;
 
 	/**
+	 * Property container.
+	 *
+	 * @var  Container
+	 */
+	protected $container;
+
+	/**
+	 * LoggerPool constructor.
+	 *
+	 * @param Container $container
+	 */
+	public function __construct(Container $container)
+	{
+		$this->container = $container;
+	}
+
+	/**
 	 * System is unusable.
 	 *
 	 * @param string $category
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function emergency($category, $message, array $context = array())
 	{
@@ -59,7 +82,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function alert($category, $message, array $context = array())
 	{
@@ -77,7 +100,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function critical($category, $message, array $context = array())
 	{
@@ -94,7 +117,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function error($category, $message, array $context = array())
 	{
@@ -113,7 +136,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function warning($category, $message, array $context = array())
 	{
@@ -129,7 +152,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function notice($category, $message, array $context = array())
 	{
@@ -147,7 +170,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function info($category, $message, array $context = array())
 	{
@@ -163,7 +186,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function debug($category, $message, array $context = array())
 	{
@@ -180,7 +203,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param string $message
 	 * @param array  $context
 	 *
-	 * @return null
+	 * @return static
 	 */
 	public function log($category, $level, $message, array $context = array())
 	{
@@ -219,7 +242,32 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 
 		if (!isset($this->loggers[$category]))
 		{
-			return $this->getNullLogger();
+			if (class_exists('Monolog\Logger'))
+			{
+				$logger = new Monolog($category);
+
+				$handler = new StreamHandler($this->container->get('system.config')->get('path.logs') . '/' . $category . '.log');
+				$logger->pushProcessor(new PsrLogMessageProcessor);
+
+				// Basic string handler
+				$logger->pushHandler($handler);
+
+				foreach (GlobalContainer::getHandlers() as $handler)
+				{
+					$logger->pushHandler(clone $handler);
+				}
+
+				foreach (GlobalContainer::getProcessors() as $processor)
+				{
+					$logger->pushProcessor(clone $processor);
+				}
+
+				return $logger;
+			}
+			else
+			{
+				return $this->getNullLogger();
+			}
 		}
 
 		return $this->loggers[$category];
@@ -368,5 +416,31 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate
 	public function count()
 	{
 		return count($this->loggers);
+	}
+
+	/**
+	 * Get the DI container.
+	 *
+	 * @return  Container
+	 *
+	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+
+	/**
+	 * Set the DI container.
+	 *
+	 * @param   Container $container The DI container.
+	 *
+	 * @return  mixed
+	 */
+	public function setContainer(Container $container)
+	{
+		$this->container = $container;
+
+		return $this;
 	}
 }
