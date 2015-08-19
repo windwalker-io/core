@@ -24,6 +24,7 @@ use Windwalker\Filesystem\Folder;
 use Windwalker\IO\Input;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
+use Windwalker\Registry\Registry;
 
 /**
  * The DebuggerListener class.
@@ -164,7 +165,13 @@ class DebuggerListener
 	 */
 	public function onViewBeforeRender(Event $event)
 	{
-		$theme = $this->package->getDir() . '/Resources/media/css/theme.css';
+		$theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
+
+		if (!is_file($theme))
+		{
+			$theme = $this->package->getDir() . '/Resources/media/css/theme.css';
+		}
+
 		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
 
 		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
@@ -221,10 +228,10 @@ class DebuggerListener
 	/**
 	 * pushDebugConsole
 	 *
-	 * @param Collector $collector
+	 * @param Registry  $collector
 	 * @param Profiler  $profiler
 	 */
-	protected function pushDebugConsole(Collector $collector, Profiler $profiler)
+	protected function pushDebugConsole(Registry $collector, Profiler $profiler)
 	{
 		// Prepare CSS
 		$style = $this->package->getDir() . '/Resources/media/css/console/style.css';

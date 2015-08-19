@@ -66,7 +66,7 @@ class ProfilerProvider implements ServiceProviderInterface
 
 			if ($config->get('system.debug'))
 			{
-				return new Collector;
+				return new Registry;
 			}
 			else
 			{
@@ -80,7 +80,6 @@ class ProfilerProvider implements ServiceProviderInterface
 		{
 			$this->registerProfilerListener($container, $container->get('system.config'));
 			$this->registerDatabaseProfiler($container, $container->get('system.config'));
-			$this->registerEventProfiler($container, $container->get('system.config'));
 			$this->registerEmailProfiler($container, $container->get('system.config'));
 			$this->registerLogsProfiler($container, $container->get('system.config'));
 		}
@@ -103,7 +102,7 @@ class ProfilerProvider implements ServiceProviderInterface
 		$collector['database.query.times'] = 0;
 		$collector['database.query.total.time'] = 0;
 		$collector['database.query.total.memory'] = 0;
-		$collector['database.queries'] = new DataSet;
+		$collector['database.queries'] = array();
 
 		$db = $container->get('system.database');
 
@@ -124,7 +123,7 @@ class ProfilerProvider implements ServiceProviderInterface
 					'memory' => array('start' => memory_get_usage(false))
 				);
 			},
-			function (AbstractDatabaseDriver $db, $sql, $rows) use ($container, $collector, &$queryData)
+			function (AbstractDatabaseDriver $db, $sql) use ($container, $collector, &$queryData)
 			{
 				if (stripos(trim($sql), 'EXPLAIN') === 0)
 				{
@@ -136,8 +135,9 @@ class ProfilerProvider implements ServiceProviderInterface
 				$queryData['memory']['end'] = memory_get_usage(false);
 				$queryData['memory']['duration'] = abs($queryData['memory']['end'] - $queryData['memory']['start']);
 				$queryData['query'] = $sql;
+				$queryData['rows'] = $db->getReader()->countAffected();
 
-				$collector['database.queries']->push($queryData);
+				$collector->push('database.queries', $queryData);
 
 				$collector['database.query.total.time'] = $collector['database.query.total.time'] + $queryData['time']['duration'];
 				$collector['database.query.total.memory'] = $collector['database.query.total.memory'] + $queryData['memory']['duration'];
@@ -160,19 +160,6 @@ class ProfilerProvider implements ServiceProviderInterface
 		$dispatcher->setDebug(true);
 
 		$dispatcher->addListener(new ProfilerListener, ListenerPriority::LOW);
-	}
-
-	/**
-	 * registerEventProfiler
-	 *
-	 * @param Container $container
-	 * @param Registry  $config
-	 *
-	 * @return  void
-	 */
-	protected function registerEventProfiler(Container $container, Registry $config)
-	{
-		$dispatcher = $container->get('system.dispatcher');
 	}
 
 	/**

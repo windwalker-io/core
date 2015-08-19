@@ -31,6 +31,13 @@ abstract class DebuggerHelper extends AbstractFacade
 	protected static $_key = 'system.collector';
 
 	/**
+	 * Property objectStorage.
+	 *
+	 * @var \SplObjectStorage
+	 */
+	private static $objectStorage;
+
+	/**
 	 * addData
 	 *
 	 * @param   string $key

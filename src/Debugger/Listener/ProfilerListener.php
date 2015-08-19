@@ -22,6 +22,7 @@ use Windwalker\DI\Container;
 use Windwalker\Event\Event;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
+use Windwalker\Registry\RegistryHelper;
 
 /**
  * The ProfilerListender class.
@@ -49,12 +50,12 @@ class ProfilerListener
 		$profiler  = $container->get('system.profiler');
 		$input     = $container->get('system.input');
 
-		$collector['time']   = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::$format);
-		$collector['uri']    = $container->get('uri')->toArray();
-		$collector['ip']     = $input->server->getString('REMOTE_ADDR');
-		$collector['app.name'] = $event['app']->getName();
-		$collector['method'] = $input->getMethod();
-		$collector['custom_method'] = strtoupper($input->get('_method'));
+		$collector['system.name'] = $event['app']->getName();
+		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::$format);
+		$collector['system.uri']  = $container->get('uri')->toArray();
+		$collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
+		$collector['system.method.http']   = $input->getMethod();
+		$collector['system.method.custom'] = strtoupper($input->get('_method'));
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -82,20 +83,12 @@ class ProfilerListener
 		/** @var RestfulRouter $router */
 		$router = $event['app']->getRouter();
 
-		$collector['package.name']  = $container->get('current.package')->getName();
-		$collector['package.class'] = get_class($container->get('current.package'));
-		$collector['main.controller'] = $container->get('current.package')->getTask();
-		$collector['route.matcher'] = get_class($router->getMatcher());
-		$collector['route.matched'] = iterator_to_array($container->get('current.route'));
-
-		$routes = array();
-
-		foreach ($router->getRoutes() as $route)
-		{
-			$routes[] = iterator_to_array($route);
-		}
-
-		$collector['routes'] = $routes;
+		$collector['package.name']    = $container->get('current.package')->getName();
+		$collector['package.class']   = get_class($container->get('current.package'));
+		$collector['controller.main'] = $container->get('current.package')->getTask();
+		$collector['routing.matcher'] = get_class($router->getMatcher());
+		$collector['routing.matched'] = iterator_to_array($container->get('current.route'));
+		$collector['routing.routes']  = RegistryHelper::dumpObjectValues($router->getRoutes());
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -127,12 +120,7 @@ class ProfilerListener
 		$collector = $container->get('system.collector');
 		$profiler  = $container->get('system.profiler');
 
-		if (!$collector['controllers'])
-		{
-			$collector['controllers'] = new DataSet;
-		}
-
-		$collector['controllers'][] = new Data(array(
+		$collector->push('controller.executed', array(
 			'controller' => get_class($controller),
 			'task'       => $event['task'],
 			'input'      => $controller->getInput()->getArray(),
@@ -240,13 +228,13 @@ class ProfilerListener
 		}
 
 		// Windwalker Information
+		$collector['windwalker.version.framework'] = ComposerInformation::getInstalledVersion('windwalker/framework');
+		$collector['windwalker.version.core'] = ComposerInformation::getInstalledVersion('windwalker/core');
 		$collector['windwalker.config'] = Ioc::getConfig()->toArray();
-		$collector['windwalker.framework.version'] = ComposerInformation::getInstalledVersion('windwalker/framework');
-		$collector['windwalker.core.version'] = ComposerInformation::getInstalledVersion('windwalker/core');
 
 		// PHP
-		$collector['php.version']    = PHP_VERSION;
-		$collector['php.extensions'] = get_loaded_extensions();
+		$collector['system.php.version']    = PHP_VERSION;
+		$collector['system.php.extensions'] = get_loaded_extensions();
 
 		// Load all inputs
 		$collector['request'] = Ioc::getInput()->dumpAllInputs();
@@ -255,9 +243,14 @@ class ProfilerListener
 		$queries = $collector['database.queries'];
 		$db = Ioc::getDatabase();
 
-		foreach ($queries as $data)
+		foreach ($queries as $k => $data)
 		{
-			$data['explain'] = $db->setQuery('EXPLAIN ' . $data['query'])->loadAll();
+			if (stripos(trim($data['query']), 'SELECT') !== 0)
+			{
+				continue;
+			}
+
+			$collector['database.queries.' . $k . '.explain'] = $db->setQuery('EXPLAIN ' . $data['query'])->loadAll();
 		}
 
 		// Database Information
@@ -301,7 +294,7 @@ class ProfilerListener
 		$collector['event.listeners'] = $listenersMapping;
 
 		// Headers
-		$collector['http.status'] = $collector['exception'] ? $collector['exception']['code'] : http_response_code();
-		$collector['headers'] = headers_list();
+		$collector['system.http.status'] = $collector['exception'] ? $collector['exception']['code'] : http_response_code();
+		$collector['system.http.headers'] = headers_list();
 	}
 }

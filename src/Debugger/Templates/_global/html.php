@@ -16,7 +16,7 @@ use Windwalker\Registry\Registry;
  * @var PackageRouter   $router
  */
 ?><!doctype html>
-<html lang="zh-tw">
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title><?php $this->block('page_title'); ?><?php $this->endblock(); ?></title>
@@ -114,8 +114,8 @@ use Windwalker\Registry\Registry;
 			/
 			ID: <span class="text-muted"><?php echo $item->id; ?></span>
 			/
-			<a class="text-muted" href="<?php echo $item['collector']['uri']['full'] ?>" target="_blank">
-				<?php echo $item['collector']['uri']['full'] ?>
+			<a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?>" target="_blank">
+				<?php echo $item['collector']['system.uri.full'] ?>
 				<svg style="height: 15px" class="icon icon-share">
 					<use xlink:href="#icon-share"></use>
 					<symbol id="icon-share" viewBox="0 0 1024 1024">

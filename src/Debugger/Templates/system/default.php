@@ -29,7 +29,7 @@ $this->extend('_global.html');
 			Framework Version
 		</td>
 		<td>
-			<?php echo $collector['windwalker.framework.version']; ?>
+			<?php echo $collector['windwalker.version.framework']; ?>
 		</td>
 	</tr>
 	<tr>
@@ -37,7 +37,7 @@ $this->extend('_global.html');
 			Core Version
 		</td>
 		<td>
-			<?php echo $collector['windwalker.core.version']; ?>
+			<?php echo $collector['windwalker.version.core']; ?>
 		</td>
 	</tr>
 	<tr>
@@ -45,7 +45,7 @@ $this->extend('_global.html');
 			PHP
 		</td>
 		<td>
-			<?php echo $collector['php.version']; ?>
+			<?php echo $collector['system.php.version']; ?>
 		</td>
 	</tr>
 	</tbody>

@@ -27,8 +27,8 @@ $this->extend('_global.html');
 <?php
 echo BootstrapKeyValueGrid::create()
 	->addHeader()
-	->addItem('Request Method', $collector['method'])
-	->addItem('Route Matcher', new HtmlElement('code', $collector['route.matcher']))
+	->addItem('Request Method', $collector['system.method.http'])
+	->addItem('Route Matcher', new HtmlElement('code', $collector['routing.matcher']))
 	->addItem('Route Number', count($routes))
 	->addItem('Matched Route', $matchedRoute->name)
 	->addItem('Package Name', $collector['package.name'])
@@ -42,12 +42,12 @@ echo BootstrapKeyValueGrid::create()
 
 <?php
 
-if ($collector['uri'])
+if ($collector['system.uri'])
 {
 	echo BootstrapKeyValueGrid::create()
 		->addHeader()
 		->configure(
-			ArrayHelper::flatten($collector['uri']),
+			ArrayHelper::flatten($collector['system.uri']),
 			function (BootstrapKeyValueGrid $grid, $key, $value)
 			{
 				$grid->addItem(new HtmlElement('code', $key), $value);
@@ -83,7 +83,7 @@ else
 		<?php echo $route->package; ?>
 	</td>
 	<td>
-		<?php echo $route->name; ?>
+		<code><?php echo $route->name; ?></code>
 	</td>
 	<td>
 		<code><?php echo $route->pattern; ?></code>

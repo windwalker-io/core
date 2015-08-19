@@ -22,7 +22,7 @@ use Windwalker\Data\DataSet;
 		Memory: <span class="label label-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'], 3) ?> MB</span>
 		Return Rows: <span class="label label-info"><?php echo $timeline['data']['rows'] ?></span>
 	</div>
-	<?php if ($timeline['data']['explain']): ?>
+	<?php if (isset($timeline['data']['explain'])): ?>
 		<table class="table table-striped">
 			<thead>
 			<tr>

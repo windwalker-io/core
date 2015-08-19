@@ -38,16 +38,6 @@ class EventDispatcher extends Dispatcher
 	protected $collector = array();
 
 	/**
-	 * Class init.
-	 *
-	 * @param  Profiler  $profiler
-	 */
-	public function __construct(Profiler $profiler = null)
-	{
-		$this->profiler = $profiler;
-	}
-
-	/**
 	 * Trigger an event.
 	 *
 	 * @param   Event|string $event The event object or name.
@@ -157,7 +147,7 @@ class EventDispatcher extends Dispatcher
 	/**
 	 * Method to get property Collector
 	 *
-	 * @return  Collector
+	 * @return  array
 	 */
 	public function getCollector()
 	{
@@ -167,7 +157,7 @@ class EventDispatcher extends Dispatcher
 	/**
 	 * Method to set property collector
 	 *
-	 * @param   Collector $collector
+	 * @param   array  $collector
 	 *
 	 * @return  static  Return self to support chaining.
 	 */

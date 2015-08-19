@@ -38,13 +38,13 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 			$item = new Data($item);
 			$collector = $item['collector'];
 
-			$item->url  = $collector['uri']['full'];
+			$item->url  = $collector['system.uri.full'];
 			$item->link = $router->html('system', array('id' => $item->id));
-			$item->method = $collector['method'];
-			$item->ip   = $collector['ip'];
-			$item->time = $collector['time'];
+			$item->method = $collector['system.method.custom'] ? : $collector['system.method.http'];
+			$item->ip   = $collector['system.ip'];
+			$item->time = $collector['system.time'];
 
-			$item->status = $collector['http.status'];
+			$item->status = $collector['system.http.status'];
 
 			if ($item->status == 200)
 			{

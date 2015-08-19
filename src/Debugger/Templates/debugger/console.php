@@ -26,7 +26,7 @@
 		<a class="windwalker-debugger-link" href="<?php echo $data->router->html('system', array('id' => $data->collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
-					V <?php echo $this->escape($data->collector['windwalker.framework.version']); ?>
+					V <?php echo $this->escape($data->collector['windwalker.version.framework']); ?>
 				</span>
 			</div>
 		</a>
@@ -37,7 +37,7 @@
 		<a class="windwalker-debugger-link" href="<?php echo $data->router->html('request', array('id' => $data->collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
-					<?php echo $this->escape($data->collector['method']); ?>
+					<?php echo $this->escape($data->collector['system.method.custom'] ? : $data->collector['system.method.http']); ?>
 				</span>
 			</div>
 
@@ -45,10 +45,10 @@
 			<div class="windwalker-debugger-drop-menu">
 				<dl>
 					<dt>HTTP Method</dt>
-					<dd><?php echo $this->escape($data->collector['custom_method'] ? : $data->collector['method']); ?></dd>
+					<dd><?php echo $this->escape($data->collector['system.method.http']); ?></dd>
 
 					<dt>Custom Method</dt>
-					<dd><?php echo$this->escape($data->collector['custom_method'] ? : 'None'); ?></dd>
+					<dd><?php echo$this->escape($data->collector['system.method.custom'] ? : 'None'); ?></dd>
 				</dl>
 			</div>
 		</a>
@@ -59,12 +59,12 @@
 		<a class="windwalker-debugger-link" href="<?php echo $data->router->html('routing', array('id' => $data->collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
-					<?php echo $this->escape($data->collector['http.status']); ?>
+					<?php echo $this->escape($data->collector['system.http.status']); ?>
 				</span>
 				&nbsp;
 				Route:
-				<abbr title="<?php echo $this->escape($data->collector['main.controller']); ?>">
-					<code><?php echo $this->escape($data->collector['route.matched']['name']); ?></code>
+				<abbr title="<?php echo $this->escape($data->collector['controller.main']); ?>">
+					<code><?php echo $this->escape($data->collector['routing.matched']['name']); ?></code>
 				</abbr>
 			</div>
 
@@ -74,15 +74,15 @@
 					<dt>Status</dt>
 					<dd>
 						<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
-							<?php echo $this->escape($data->collector['http.status']); ?>
+							<?php echo $this->escape($data->collector['system.http.status']); ?>
 						</span>
 					</dd>
 
 					<dt>Route Name</dt>
-					<dd><code><?php echo $this->escape($data->collector['route.matched']['name']); ?></code></dd>
+					<dd><code><?php echo $this->escape($data->collector['routing.matched.name']); ?></code></dd>
 
 					<dt>Controller</dt>
-					<dd><code><?php echo $this->escape($data->collector['main.controller']); ?></code></dd>
+					<dd class="windwalker-debugger-controller"><code><?php echo $this->escape($data->collector['controller.main']); ?></code></dd>
 				</dl>
 			</div>
 		</a>

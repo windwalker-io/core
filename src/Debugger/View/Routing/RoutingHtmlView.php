@@ -32,9 +32,9 @@ class RoutingHtmlView extends AbstractDebuggerHtmlView
 	{
 		$data->collector = $data->item['collector'];
 		$data->routes = new DataSet;
-		$data->matchedRoute = new Data($data->collector['route.matched']);
+		$data->matchedRoute = new Data($data->collector['routing.matched']);
 
-		foreach ((array) $data->collector['routes'] as $name => $route)
+		foreach ((array) $data->collector['routing.routes'] as $name => $route)
 		{
 			$route = new Data($route);
 
@@ -47,9 +47,6 @@ class RoutingHtmlView extends AbstractDebuggerHtmlView
 		}
 
 		// Controller
-		if (isset($data->collector['controllers'][0]->controller))
-		{
-			$data->controller = $data->collector['controllers'][0]->controller;
-		}
+		$data->controller = $data->collector['controller.main'];
 	}
 }
