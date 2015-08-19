@@ -24,7 +24,7 @@ class WebProvider implements ServiceProviderInterface
 	/**
 	 * Property app.
 	 *
-	 * @var AbstractWebApplication|WindwalkerWebApplication
+	 * @var AbstractWebApplication
 	 */
 	protected $app;
 

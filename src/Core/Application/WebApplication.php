@@ -190,7 +190,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * Execute the application.
 	 *
-	 * @return  void
+	 * @return  string
 	 *
 	 * @since   2.0
 	 */
@@ -210,9 +210,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$this->triggerEvent('onBeforeRespond', array('app' => $this));
 
 		// Send the application response.
-		$this->respond();
+		$output = $this->respond($this->get('return_body', false));
 
-		$this->triggerEvent('onAfterRespond', array('app' => $this));
+		$this->triggerEvent('onAfterRespond', array('app' => $this, 'output' => &$output));
+
+		return $output;
 	}
 
 	/**
