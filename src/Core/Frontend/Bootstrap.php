@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Frontend;
 
+use Windwalker\Core\Widget\WidgetHelper;
+
 /**
  * The Bootstrap class.
  *
@@ -19,4 +21,23 @@ class Bootstrap
 	const MSG_INFO    = 'info';
 	const MSG_WARNING = 'warning';
 	const MSG_DANGER  = 'danger';
+
+	/**
+	 * renderFields
+	 *
+	 * @param array  $fields
+	 * @param string $labelCols
+	 * @param string $inputCols
+	 * @param string $tmpl
+	 *
+	 * @return  string
+	 */
+	public static function renderFields(array $fields, $labelCols = 'col-md-3', $inputCols = 'col-md-9', $tmpl = 'bootstrap.form.fields')
+	{
+		return WidgetHelper::render($tmpl, array(
+			'fields' => $fields,
+			'label_cols' => $labelCols,
+			'input_cols' => $inputCols
+		));
+	}
 }

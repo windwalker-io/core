@@ -7,6 +7,8 @@
  */
 
 use Windwalker\Core\Migration\AbstractMigration;
+use Windwalker\Database\Schema\Column;
+use Windwalker\Database\Schema\DataType;
 
 /**
  * Migration class, version: {{version}}

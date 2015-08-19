@@ -258,9 +258,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
 
-			if ($class instanceof AbstractView)
+			if (!class_exists($class))
 			{
-				throw new \LogicException($class . ' should be child of Windwalker\View\AbstractView');
+				$class = 'Windwalker\Core\View\HtmlView';
 			}
 
 			/** @var HtmlView $view */
