@@ -90,7 +90,7 @@ class MigrateCommand extends AbstractCommand
 			{
 				$tmpl = <<<LOG
 
-	Migration <cmd>%s</cmd> the version: <info>%s_%s</info>
+	Migrate <cmd>%s</cmd> the version: <info>%s_%s</info>
 	------------------------------------------------------------
 	<option>Success</option>
 

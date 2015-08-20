@@ -169,6 +169,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$providers['database'] = new Provider\DatabaseProvider;
 		$providers['router']   = new Provider\RouterProvider;
 		$providers['lang']     = new Provider\LanguageProvider;
+		$providers['template'] = new Provider\TemplateEngineProvider;
 		$providers['cache']    = new Provider\CacheProvider;
 		$providers['session']  = new Provider\SessionProvider;
 		$providers['auth']     = new Provider\AuthenticationProvider;

@@ -11,6 +11,7 @@ namespace Windwalker\Core\View\Twig;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Data\Data;
+use Windwalker\DI\Container;
 
 /**
  * Class WindwalkerExtension
@@ -20,20 +21,20 @@ use Windwalker\Data\Data;
 class WindwalkerExtension extends \Twig_Extension
 {
 	/**
-	 * Property view.
+	 * Property container.
 	 *
-	 * @var  HtmlView
+	 * @var  Container
 	 */
-	protected $view;
+	protected $container;
 
 	/**
-	 * Class init
+	 * WindwalkerExtension constructor.
 	 *
-	 * @param HtmlView $view
+	 * @param Container $container
 	 */
-	public function __construct(HtmlView $view = null)
+	public function __construct(Container $container)
 	{
-		$this->view = $view ? : new HtmlView;
+		$this->container = $container;
 	}
 
 	/**
@@ -69,27 +70,55 @@ class WindwalkerExtension extends \Twig_Extension
 	}
 
 	/**
-	 * Method to get property View
+	 * Returns a list of filters to add to the existing list.
 	 *
-	 * @return  HtmlView
+	 * @return array An array of filters
 	 */
-	public function getView()
+	public function getFilters()
 	{
-		return $this->view;
+		$language = $this->container->get('system.language');
+
+		return array(
+			new \Twig_SimpleFilter('trans', array($language, 'translate')),
+			new \Twig_SimpleFilter('lang', array($language, 'translate')),
+			new \Twig_SimpleFilter('translate', array($language, 'translate')),
+			new \Twig_SimpleFilter('_', array($language, 'translate')),
+			new \Twig_SimpleFilter('sprintf', function () use ($language)
+			{
+				$args = func_get_args();
+
+				return call_user_func_array(array($language, 'sprintf'), $args);
+			}),
+			new \Twig_SimpleFilter('plural', function () use ($language)
+			{
+				$args = func_get_args();
+
+				return call_user_func_array(array($language, 'plural'), $args);
+			})
+		);
 	}
 
 	/**
-	 * Method to set property view
+	 * Method to get property Container
 	 *
-	 * @param   HtmlView $view
+	 * @return  Container
+	 */
+	public function getContainer()
+	{
+		return $this->container;
+	}
+
+	/**
+	 * Method to set property container
+	 *
+	 * @param   Container $container
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setView($view)
+	public function setContainer($container)
 	{
-		$this->view = $view;
+		$this->container = $container;
 
 		return $this;
 	}
 }
- 

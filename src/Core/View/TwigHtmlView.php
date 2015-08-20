@@ -35,49 +35,33 @@ class TwigHtmlView extends HtmlView
 	 */
 	public function __construct($data = array(), TwigRenderer $renderer = null)
 	{
-		$renderer = $renderer ? : new TwigRenderer;
+		$renderer = $renderer ? : new TwigRenderer(null, array('path_separator' => '.'));
 
 		parent::__construct($data, $renderer);
 	}
 
-	/**
-	 * registerPaths
-	 *
-	 * @return  void
-	 */
-	protected function registerPaths()
-	{
-		parent::registerPaths();
-
-		// Remove non-existing folders because Twig will throw error.
-		$paths = $this->renderer->getPaths();
-
-		$newPaths = new \SplPriorityQueue;
-
-		foreach ($paths as $i => $path)
-		{
-			if (is_dir($path))
-			{
-				$newPaths->insert($path, Priority::LOW - ($i * 10));
-			}
-		}
-
-		$this->renderer->setPaths($newPaths);
-	}
-
-	/**
-	 * prepareGlobals
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareGlobals($data)
-	{
-		parent::prepareGlobals($data);
-
-		$this->renderer->getEngine()
-			->addExtension(new WindwalkerExtension($this));
-	}
+//	/**
+//	 * registerPaths
+//	 *
+//	 * @return  void
+//	 */
+//	protected function registerPaths()
+//	{
+//		parent::registerPaths();
+//
+//		// Remove non-existing folders because Twig will throw error.
+//		$paths = $this->renderer->getPaths();
+//
+//		$newPaths = new \SplPriorityQueue;
+//
+//		foreach ($paths as $i => $path)
+//		{
+//			if (is_dir($path))
+//			{
+//				$newPaths->insert($path, Priority::LOW - ($i * 10));
+//			}
+//		}
+//
+//		$this->renderer->setPaths($newPaths);
+//	}
 }
- 

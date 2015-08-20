@@ -31,7 +31,7 @@ $this->extend('_global.html');
 	echo BootstrapKeyValueGrid::create()
 		->addHeader()
 		->addItem('Type', $exception->type)
-		->addItem('Message', $exception->message)
+		->addItem('Message', $this->escape($exception->message))
 		->addItem('File', $exception->file . ' (' . $exception->line . ')');
 	?>
 

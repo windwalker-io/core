@@ -319,9 +319,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			$class = sprintf($ns . '\Model\%sModel', ucfirst($name), ucfirst($name));
 
-			if ($class instanceof Model)
+			if (!class_exists($class))
 			{
-				throw new \LogicException($class . ' should be child of Windwalker\Model\Model');
+				$class = 'Windwalker\Core\Model\Model';
 			}
 
 			$model = new $class($this->config);

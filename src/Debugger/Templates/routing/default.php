@@ -51,7 +51,7 @@ if ($collector['system.uri'])
 			ArrayHelper::flatten($collector['system.uri']),
 			function (BootstrapKeyValueGrid $grid, $key, $value)
 			{
-				$grid->addItem(new HtmlElement('code', $key), $value);
+				$grid->addItem(new HtmlElement('code', $key), $this->escape($value));
 			}
 		);
 }

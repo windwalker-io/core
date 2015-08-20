@@ -66,6 +66,14 @@ abstract class RendererHelper
 			}
 		}
 
+		if ($type == 'twig')
+		{
+			if (empty($config['path_separator']))
+			{
+				$config['path_separator'] = '.';
+			}
+		}
+
 		return new $class(static::getGlobalPaths(), $config);
 	}
 

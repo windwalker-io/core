@@ -29,11 +29,5 @@ class BladeHtmlView extends HtmlView
 		$renderer = $renderer ? : new BladeRenderer;
 
 		parent::__construct($data, $renderer);
-
-		$container = $this->getPackage()->getContainer() ? : Ioc::factory();
-
-		$path = $container->get('system.config')->get('path.cache') . '/view';
-
-		$this->renderer->config->set('cache_path', $path);
 	}
 }
