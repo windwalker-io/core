@@ -12,13 +12,12 @@ use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
-use Windwalker\Core\Facade\Facade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Data\Data;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\Event;
 use Windwalker\Event\EventInterface;
 use Windwalker\Registry\Registry;
-use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The User class.
@@ -34,14 +33,14 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  2.0
  */
-class User extends Facade implements DispatcherAwareStaticInterface
+class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 {
 	/**
 	 * Property key.
 	 *
 	 * @var  string
 	 */
-	protected static $key = 'system.authenticate';
+	protected static $_key = 'system.authenticate';
 
 	/**
 	 * Property handler.
@@ -85,10 +84,10 @@ class User extends Facade implements DispatcherAwareStaticInterface
 		$result = false;
 
 		// Before login event
-		$event = static::triggerEvent('onUserBeforeLogin', array('credential' => $user, 'options' => $options));
+		$event = static::triggerEvent('onUserBeforeLogin', array('user' => &$user, 'options' => &$options));
 
 		// Do login
-		if (static::authenticate($event['credential']))
+		if (static::authenticate($event['user']))
 		{
 			$user = static::getCredential();
 
@@ -96,17 +95,16 @@ class User extends Facade implements DispatcherAwareStaticInterface
 		}
 
 		// After login event
-		$event['user'] = $user;
-		$event['result'] = $result;
-
-		$event = static::triggerEvent('onUserAfterLogin', $event->getArguments());
+		static::triggerEvent('onUserAfterLogin', array(
+			'user'    => $user,
+			'options' => $options,
+			'result'  => &$result
+		));
 
 		// Fail event
-		if (!$event['result'])
+		if (!$result)
 		{
-			$event['results'] = static::getResults();
-
-			static::triggerEvent('onUserLoginFailure', $event->getArguments());
+			static::triggerEvent('onUserLoginFailure', array('user' => $user, 'options' => $options, 'results' => static::getResults()));
 
 			return false;
 		}
@@ -157,20 +155,23 @@ class User extends Facade implements DispatcherAwareStaticInterface
 		$user = User::get($conditions);
 
 		// Before logout event
-		$event = static::triggerEvent('onUserBeforeLogout', array('user' => $user, 'conditions' => $conditions, 'options' => $options));
+		$event = static::triggerEvent('onUserBeforeLogout', array('user' => $user, 'conditions' => &$conditions, 'options' => &$options));
 
 		// Do logout
 		$result = static::$handler->logout($event['user']);
 
 		// After logout event
-		$event['result'] = $result;
-
-		$event = static::triggerEvent('onUserAfterLogout', $event->getArguments());
+		$event = static::triggerEvent('onUserAfterLogout', array(
+			'user'       => $user,
+			'conditions' => $conditions,
+			'options'    => &$options,
+			'result'     => &$result
+		));
 
 		// Fail event
 		if (!$event['result'])
 		{
-			static::triggerEvent('onUserLogoutFailure', $event->getArguments());
+			static::triggerEvent('onUserLogoutFailure', array('user' => $user, 'conditions' => $conditions, 'options' => &$options));
 
 			return false;
 		}
@@ -220,7 +221,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$options = ($options instanceof Registry) ? $options : new Registry($options);
 
-		static::triggerEvent('onUserBeforeSave', array('user' => $user, 'options' => $options));
+		static::triggerEvent('onUserBeforeSave', array('user' => $user, 'options' => &$options));
 
 		try
 		{
@@ -260,7 +261,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 
 		$options = ($options instanceof Registry) ? $options : new Registry($options);
 
-		static::triggerEvent('onUserBeforeDelete', array('conditions' => $conditions, 'options' => $options));
+		static::triggerEvent('onUserBeforeDelete', array('conditions' => &$conditions, 'options' => &$options));
 
 		try
 		{

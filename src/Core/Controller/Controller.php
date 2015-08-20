@@ -216,6 +216,27 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	}
 
 	/**
+	 * delegate
+	 *
+	 * @param   string $task
+	 *
+	 * @return  mixed
+	 */
+	protected function delegate($task)
+	{
+		if (is_callable(array($this, $task)))
+		{
+			$args = func_get_args();
+
+			array_shift($args);
+
+			return call_user_func(array($this, $task), $args);
+		}
+
+		throw new \LogicException('Task: ' . $task . ' not found.');
+	}
+
+	/**
 	 * renderView
 	 *
 	 * @param HtmlView $view

@@ -134,7 +134,7 @@ use Windwalker\Registry\Registry;
 	<?php $this->endblock(); ?>
 </div>
 
-<?php $this->block('copyblock') ?>
+<?php $this->block('copyright') ?>
 <div id="copyright">
 	<div class="container">
 		<div class="row">

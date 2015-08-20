@@ -3,7 +3,7 @@
 <html lang="zh-tw">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('siteTitle')</title>
+    <title>@yield('page_title')</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['base.path'] }}media/images/favicon.ico" />
     <meta name="generator" content="Windwalker | Windwalker Framework" />
