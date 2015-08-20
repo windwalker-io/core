@@ -14,6 +14,7 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\HtmlView;
@@ -32,8 +33,11 @@ use Windwalker\View\AbstractView;
 /**
  * The Controller class.
  *
- * @property-read  Registry  $config  Config object.
- * 
+ * @property-read  Registry        $config  Config object.
+ * @property-read  WebApplication  $app     The application object.
+ * @property-read  Input           $input   The input object.
+ * @property-read  PackageRouter   $router  Router of this package.
+ *
  * @since  2.0
  */
 abstract class Controller extends AbstractController implements EventTriggerableInterface
@@ -124,7 +128,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	/**
 	 * hmvc
 	 *
-	 * @param string|Controller $controller
+	 * @param string|Controller $task
 	 * @param Input|array       $input
 	 * @param string            $package
 	 *
@@ -594,6 +598,16 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	}
 
 	/**
+	 * getRouter
+	 *
+	 * @return  \Windwalker\Core\Router\PackageRouter
+	 */
+	public function getRouter()
+	{
+		return $this->package->getRouter();
+	}
+
+	/**
 	 * Trigger an event.
 	 *
 	 * @param   EventInterface|string $event The event object or name.
@@ -615,5 +629,37 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$dispatcher = $container->get('system.dispatcher');
 
 		return $dispatcher->triggerEvent($event, $args);
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		if ($name == 'input')
+		{
+			return $this->input;
+		}
+
+		if ($name == 'app' || $name == 'application')
+		{
+			return $this->app;
+		}
+
+		if ($name == 'config')
+		{
+			return $this->config;
+		}
+
+		if ($name == 'router')
+		{
+			return $this->getRouter();
+		}
+
+		throw new \OutOfRangeException('Property: ' . $name . ' not exists.');
 	}
 }

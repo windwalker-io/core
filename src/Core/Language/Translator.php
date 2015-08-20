@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Language;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Language\LanguageNormalize;
 
 /**
@@ -51,11 +52,14 @@ abstract class Translator extends AbstractProxyFacade
 		$locale  = LanguageNormalize::toLanguageTag($locale);
 
 		// If package name exists, we load package language first, that global can override it.
-		if ($package)
+		if (is_string($package))
 		{
-			$package = $container->get('package.' . $package);
+			$package = $container->get('package.resolver')->getPackage($package);
+		}
 
-			$path = $package->getDir() . '/Languages/%s/%s.%s';
+		if ($package instanceof AbstractPackage)
+		{
+			$path = $package->getDir() . '/Resources/language/%s/%s.%s';
 
 			// Get Package language
 			static::loadFile(sprintf($path, $default, $file, $format), $format);

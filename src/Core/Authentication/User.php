@@ -183,7 +183,7 @@ class User extends Facade implements DispatcherAwareStaticInterface
 	 *
 	 * @param array $conditions
 	 *
-	 * @return  UserData|UserDataInterface
+	 * @return  UserDataInterface
 	 */
 	public static function get($conditions = array())
 	{
