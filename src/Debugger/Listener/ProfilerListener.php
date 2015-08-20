@@ -85,7 +85,7 @@ class ProfilerListener
 
 		$collector['package.name']    = $container->get('current.package')->getName();
 		$collector['package.class']   = get_class($container->get('current.package'));
-		$collector['controller.main'] = $container->get('current.package')->getTask();
+		$collector['controller.task'] = $container->get('current.package')->getTask();
 		$collector['routing.matcher'] = get_class($router->getMatcher());
 		$collector['routing.matched'] = iterator_to_array($container->get('current.route'));
 		$collector['routing.routes']  = RegistryHelper::dumpObjectValues($router->getRoutes());
@@ -119,6 +119,8 @@ class ProfilerListener
 		$container = $package->getContainer();
 		$collector = $container->get('system.collector');
 		$profiler  = $container->get('system.profiler');
+
+		$collector['controller.main'] = get_class($controller);
 
 		$collector->push('controller.executed', array(
 			'controller' => get_class($controller),

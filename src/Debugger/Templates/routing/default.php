@@ -33,7 +33,8 @@ echo BootstrapKeyValueGrid::create()
 	->addItem('Matched Route', $matchedRoute->name)
 	->addItem('Package Name', $collector['package.name'])
 	->addItem('Package Class', new HtmlElement('code', $collector['package.class']))
-	->addItem('Controller', new HtmlElement('code', $data->controller));
+	->addItem('Controller', new HtmlElement('code', $data->controller))
+	->addItem('Task', new HtmlElement('code', $collector['controller.task']));
 ?>
 
 <br /><br />
