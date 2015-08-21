@@ -19,7 +19,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @method  static  Collector  getInstance()
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class DebuggerHelper extends AbstractFacade
 {

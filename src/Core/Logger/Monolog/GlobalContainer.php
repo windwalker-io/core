@@ -14,7 +14,7 @@ use Monolog\Handler\HandlerInterface;
 /**
  * The MonologContainer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class GlobalContainer
 {

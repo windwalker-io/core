@@ -16,7 +16,7 @@ use Windwalker\Renderer\PhpRenderer;
 /**
  * The StubErrorHandler class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class StubErrorHandler extends ErrorHandler
 {

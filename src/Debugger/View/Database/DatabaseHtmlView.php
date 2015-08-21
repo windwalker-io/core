@@ -15,7 +15,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 /**
  * The SystemHtmlView class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DatabaseHtmlView extends AbstractDebuggerHtmlView
 {

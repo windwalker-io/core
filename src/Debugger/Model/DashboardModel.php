@@ -15,7 +15,7 @@ use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
 /**
  * The DashboardModel class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DashboardModel extends Model
 {

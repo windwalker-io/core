@@ -13,7 +13,7 @@ namespace Windwalker\Core\Language;
  *
  * @deprecated  3.0  Use Windwalker\Core\Language\Translator instead.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class Language extends Translator
 {

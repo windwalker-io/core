@@ -14,7 +14,7 @@ use Windwalker\Test\TestCase\AbstractBaseTestCase;
 /**
  * Test class of ErrorHandler
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class ErrorHandlerTest extends AbstractBaseTestCase
 {

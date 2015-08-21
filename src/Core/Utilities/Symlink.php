@@ -13,7 +13,7 @@ use Windwalker\Environment\ServerHelper;
 /**
  * The Symlink class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class Symlink
 {

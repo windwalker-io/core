@@ -15,7 +15,7 @@ use Windwalker\Core\Test\Mvc\MvcPackage;
 /**
  * Test class of AbstractPackage
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 {

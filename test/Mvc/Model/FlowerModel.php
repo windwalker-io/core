@@ -13,7 +13,7 @@ use Windwalker\Core\Model\DatabaseModel;
 /**
  * The StubModel class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class FlowerModel extends DatabaseModel
 {

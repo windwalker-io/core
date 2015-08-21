@@ -11,7 +11,7 @@ namespace Windwalker\Core\Facade;
 /**
  * The AbstractProxyFacade class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class AbstractProxyFacade extends AbstractFacade
 {

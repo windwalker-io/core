@@ -13,7 +13,7 @@ use Windwalker\Core\Facade\Facade;
 /**
  * The StubConfigFacade class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class StubConfigFacade extends Facade
 {

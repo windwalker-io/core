@@ -11,7 +11,7 @@ namespace Windwalker\Core\Object;
 /**
  * The SilencerArrayAccessInterface interface.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 interface SilencerArrayAccessInterface extends \ArrayAccess, \IteratorAggregate, \Countable
 {

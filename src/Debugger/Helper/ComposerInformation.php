@@ -14,7 +14,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The ComposerInformation class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ComposerInformation
 {

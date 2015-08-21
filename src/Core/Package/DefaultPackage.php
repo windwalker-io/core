@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 /**
  * The DefaultPackage class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DefaultPackage extends AbstractPackage
 {

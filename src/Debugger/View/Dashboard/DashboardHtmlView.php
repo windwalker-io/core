@@ -16,7 +16,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 /**
  * The DashboardHtmlView class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DashboardHtmlView extends AbstractDebuggerHtmlView
 {

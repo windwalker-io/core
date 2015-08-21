@@ -16,7 +16,7 @@ use Windwalker\Utilities\Queue\Priority;
 /**
  * Test class of RendererHelper
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class RendererHelperTest extends \PHPUnit_Framework_TestCase
 {

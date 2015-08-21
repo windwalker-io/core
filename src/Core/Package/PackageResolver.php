@@ -17,7 +17,7 @@ use Windwalker\Registry\Registry;
 /**
  * The PackageResolver class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class PackageResolver implements ContainerAwareInterface
 {

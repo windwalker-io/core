@@ -24,7 +24,7 @@ use Windwalker\Test\TestHelper;
 /**
  * Test class of TwigHtmlView
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class TwigHtmlViewTest extends \PHPUnit_Framework_TestCase
 {

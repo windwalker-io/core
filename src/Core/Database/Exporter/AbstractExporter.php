@@ -13,7 +13,7 @@ use Windwalker\Core\Model\DatabaseModel;
 /**
  * The AbstractExporter class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 abstract class AbstractExporter extends DatabaseModel
 {

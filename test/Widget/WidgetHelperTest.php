@@ -13,7 +13,7 @@ use Windwalker\Core\Widget\WidgetHelper;
 /**
  * Test class of WidgetHelper
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class WidgetHelperTest extends \PHPUnit_Framework_TestCase
 {

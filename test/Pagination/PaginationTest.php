@@ -16,7 +16,7 @@ use Windwalker\Renderer\PhpRenderer;
 /**
  * The PaginationTest class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class PaginationTest extends AbstractBaseTestCase
 {

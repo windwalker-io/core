@@ -19,7 +19,7 @@ use Windwalker\Profiler\ProfilerInterface;
 /**
  * The EventDispatcher class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class EventDispatcher extends Dispatcher
 {

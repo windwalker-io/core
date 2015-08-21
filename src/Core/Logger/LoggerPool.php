@@ -21,7 +21,7 @@ use Windwalker\DI\ContainerAwareInterface;
 /**
  * The LoggerFactory class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, ContainerAwareInterface
 {

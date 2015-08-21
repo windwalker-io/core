@@ -24,7 +24,7 @@ use Windwalker\Registry\Registry;
 /**
  * The ProfilerProvider class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ProfilerProvider implements ServiceProviderInterface
 {

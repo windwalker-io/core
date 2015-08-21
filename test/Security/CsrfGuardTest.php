@@ -17,7 +17,7 @@ use Windwalker\Session\Session;
 /**
  * Test class of CsrfGuard
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class CsrfGuardTest extends \PHPUnit_Framework_TestCase
 {

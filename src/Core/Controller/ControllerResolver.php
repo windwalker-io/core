@@ -15,7 +15,7 @@ use Windwalker\Core\Utilities\Classes\MvcHelper;
 /**
  * The ControllerResolver class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ControllerResolver
 {

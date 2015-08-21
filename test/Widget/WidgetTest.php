@@ -19,7 +19,7 @@ use Windwalker\Utilities\Queue\Priority;
 /**
  * Test class of Widget
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class WidgetTest extends AbstractBaseTestCase
 {

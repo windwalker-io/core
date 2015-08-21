@@ -15,7 +15,7 @@ use Windwalker\Core\View\ViewModel;
 /**
  * The StubHtmlView class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class StubHtmlView extends HtmlView
 {

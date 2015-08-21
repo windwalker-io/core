@@ -14,7 +14,7 @@ use Windwalker\Utilities\Queue\Priority;
 /**
  * Test class of PriorityQueue
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 {

@@ -13,7 +13,7 @@ use Windwalker\Core\View\TwigHtmlView;
 /**
  * The StubTwigHtmlView class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class StubTwigHtmlView extends TwigHtmlView
 {

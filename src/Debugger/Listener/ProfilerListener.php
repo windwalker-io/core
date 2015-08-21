@@ -27,7 +27,7 @@ use Windwalker\Registry\RegistryHelper;
 /**
  * The ProfilerListender class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ProfilerListener
 {

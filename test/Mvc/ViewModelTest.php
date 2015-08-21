@@ -20,7 +20,7 @@ use Windwalker\Registry\Registry;
 /**
  * The ControllerViewTest class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ViewModelTest extends AbstractBaseTestCase
 {

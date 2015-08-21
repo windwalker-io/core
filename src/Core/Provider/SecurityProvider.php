@@ -15,7 +15,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The SecurityProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class SecurityProvider implements ServiceProviderInterface
 {

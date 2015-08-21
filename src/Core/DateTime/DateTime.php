@@ -16,7 +16,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
  *
  * Port of Joomla JDate and will be re-write after 3.0.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DateTime extends \DateTime
 {

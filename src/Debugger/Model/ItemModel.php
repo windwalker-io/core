@@ -16,7 +16,7 @@ use Windwalker\Debugger\Helper\PageRecordHelper;
 /**
  * The ItemModel class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ItemModel extends Model
 {

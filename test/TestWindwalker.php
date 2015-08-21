@@ -14,7 +14,7 @@ use Windwalker\Registry\Registry;
 /**
  * The TestWindwalker class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class TestWindwalker extends Windwalker
 {

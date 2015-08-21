@@ -30,7 +30,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  LoggerInterface    getLogger($category)
  * @method  static  LoggerInterface[]  getLoggers()
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class Logger extends AbstractProxyFacade
 {

@@ -18,7 +18,7 @@ use Windwalker\Event\EventInterface;
 /**
  * The CompositeDispatcher class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, \ArrayAccess, \Countable, \IteratorAggregate
 {

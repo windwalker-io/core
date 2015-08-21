@@ -16,7 +16,7 @@ use Windwalker\Renderer;
 /**
  * The TemplateEngineProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class TemplateEngineProvider implements ServiceProviderInterface
 {

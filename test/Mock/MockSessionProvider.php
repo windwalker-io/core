@@ -17,7 +17,7 @@ use Windwalker\Session\Test\Mock\MockArrayBridge;
 /**
  * The MockSessionProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class MockSessionProvider implements ServiceProviderInterface
 {

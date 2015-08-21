@@ -13,7 +13,7 @@ use Windwalker\Core\Package\AbstractPackage;
 /**
  * The MockPackage class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class MockPackage extends AbstractPackage
 {

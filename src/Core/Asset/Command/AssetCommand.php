@@ -15,7 +15,7 @@ use Windwalker\Console\Command\Command;
 /**
  * The AssetCommand class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class AssetCommand extends Command
 {

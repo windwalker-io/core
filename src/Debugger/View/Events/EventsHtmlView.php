@@ -15,7 +15,7 @@ use Windwalker\Registry\Registry;
 /**
  * The SystemHtmlView class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class EventsHtmlView extends AbstractDebuggerHtmlView
 {

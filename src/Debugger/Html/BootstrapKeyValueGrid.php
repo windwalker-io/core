@@ -13,7 +13,7 @@ use Windwalker\Html\Grid\KeyValueGrid;
 /**
  * The BootstrapKeyValueGrid class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class BootstrapKeyValueGrid extends KeyValueGrid
 {

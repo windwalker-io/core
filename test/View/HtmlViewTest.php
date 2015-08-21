@@ -28,7 +28,7 @@ use Windwalker\Test\TestHelper;
 /**
  * Test class of HtmlView
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class HtmlViewTest extends \PHPUnit_Framework_TestCase
 {

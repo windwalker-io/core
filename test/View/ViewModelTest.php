@@ -17,7 +17,7 @@ use Windwalker\Registry\Registry;
 /**
  * Test class of ViewModel
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class ViewModelTest extends \PHPUnit_Framework_TestCase
 {

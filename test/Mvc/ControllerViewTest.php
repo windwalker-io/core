@@ -22,7 +22,7 @@ use Windwalker\Test\TestHelper;
 /**
  * The ControllerViewTest class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ControllerViewTest extends AbstractBaseTestCase
 {

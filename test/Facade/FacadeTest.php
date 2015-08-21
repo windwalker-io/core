@@ -17,7 +17,7 @@ use Windwalker\Core\Test\Mvc\MvcPackage;
 /**
  * Test class of Facade
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class FacadeTest extends \PHPUnit_Framework_TestCase
 {

@@ -17,7 +17,7 @@ use Windwalker\Filesystem\Path;
 /**
  * The IntegrateTest class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class ControllerTest extends AbstractBaseTestCase
 {

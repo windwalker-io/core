@@ -16,7 +16,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * Test class of WebApplication
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class WebApplicationTest extends \PHPUnit_Framework_TestCase
 {

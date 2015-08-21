@@ -18,7 +18,7 @@ use Windwalker\Core\Utilities\Symlink;
 /**
  * The SyncCommand class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class SyncCommand extends Command
 {

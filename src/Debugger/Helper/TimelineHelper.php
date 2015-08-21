@@ -17,7 +17,7 @@ use Windwalker\Profiler\Profiler;
 /**
  * The TimelineHelper class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class TimelineHelper
 {
