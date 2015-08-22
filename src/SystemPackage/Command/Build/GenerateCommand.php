@@ -1,7 +1,59 @@
 <?php
 /**
- * @package     Joomla.Cli
- * @subpackage  JConsole
+ * Part of Windwalker project.
+ *
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+namespace Windwalker\SystemPackage\Command\Build;
+
+use Windwalker\Console\Command\Command;
+use Windwalker\Core\Ioc;
+use Windwalker\Filesystem\File;
+
+/**
+ * Class GenerateCommand
+ */
+class GenerateCommand extends Command
+{
+	/**
+	 * An enabled flag.
+	 *
+	 * @var bool
+	 */
+	public static $isEnabled = true;
+
+	/**
+	 * Console(Argument) name.
+	 *
+	 * @var  string
+	 */
+	protected $name = 'gen-command';
+
+	/**
+	 * The command description.
+	 *
+	 * @var  string
+	 */
+	protected $description = 'Generate a command class.';
+
+	/**
+	 * The usage to tell user how to use this command.
+	 *
+	 * @var string
+	 */
+	protected $usage = 'gen-command <command name> <namespace> [-d=description]';
+
+	/**
+	 * Template to generate command.
+	 *
+	 * @var string
+	 */
+	protected $template = <<<TMPL
+<?php
+/**
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later.
