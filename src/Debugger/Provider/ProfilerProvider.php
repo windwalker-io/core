@@ -37,6 +37,8 @@ class ProfilerProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
+		$container = $container->getParent();
+
 		// System profiler
 		$closure = function(Container $container)
 		{
