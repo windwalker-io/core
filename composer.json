@@ -3,7 +3,7 @@
     "description": "A modern PHP framework.",
     "homepage": "https://github.com/ventoviro/windwalker-core",
     "license": "GNU Lesser General Public License",
-    "minimum-stability": "stable",
+    "minimum-stability": "beta",
     "require": {
         "windwalker/framework": "~2.0",
         "symfony/yaml": "~2.0",
