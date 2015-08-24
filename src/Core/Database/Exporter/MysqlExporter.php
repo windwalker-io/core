@@ -14,7 +14,7 @@ use Windwalker\Query\Mysql\MysqlQueryBuilder;
 /**
  * The Exporter class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class MysqlExporter extends AbstractExporter
 {

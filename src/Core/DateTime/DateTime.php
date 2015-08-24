@@ -1,8 +1,8 @@
 <?php
 /**
- * Part of starter project.
+ * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2015 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
@@ -16,7 +16,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
  *
  * Port of Joomla JDate and will be re-write after 3.0.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class DateTime extends \DateTime
 {

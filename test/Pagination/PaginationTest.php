@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of Windwalker project. 
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later.
@@ -16,7 +16,7 @@ use Windwalker\Renderer\PhpRenderer;
 /**
  * The PaginationTest class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class PaginationTest extends AbstractBaseTestCase
 {

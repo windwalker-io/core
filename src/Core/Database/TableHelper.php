@@ -13,7 +13,7 @@ use Windwalker\Core\Ioc;
 /**
  * The TableHelper class.
  * 
- * @since  {DEPLOY_VERSION}
+ * @since  2.1.1
  */
 class TableHelper
 {

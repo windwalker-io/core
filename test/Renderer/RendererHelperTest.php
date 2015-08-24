@@ -2,7 +2,7 @@
 /**
  * Part of Windwalker project Test files.
  *
- * @copyright  Copyright (C) 2014 - 2015 LYRASOFT Taiwan, Inc. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
@@ -16,7 +16,7 @@ use Windwalker\Utilities\Queue\Priority;
 /**
  * Test class of RendererHelper
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class RendererHelperTest extends \PHPUnit_Framework_TestCase
 {

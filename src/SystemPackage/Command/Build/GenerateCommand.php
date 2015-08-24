@@ -1,10 +1,9 @@
 <?php
 /**
- * @package     Joomla.Cli
- * @subpackage  JConsole
+ * Part of Windwalker project.
  *
- * @copyright   Copyright (C) 2014 - 2015 LYRASOFT Source Matters, Inc. All rights reserved.
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Windwalker\SystemPackage\Command\Build;
@@ -56,7 +55,7 @@ class GenerateCommand extends Command
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2015 LYRASOFT, Inc. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later.
  */
 

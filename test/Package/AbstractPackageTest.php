@@ -2,7 +2,7 @@
 /**
  * Part of Windwalker project Test files.
  *
- * @copyright  Copyright (C) 2014 - 2015 LYRASOFT Taiwan, Inc. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
@@ -15,7 +15,7 @@ use Windwalker\Core\Test\Mvc\MvcPackage;
 /**
  * Test class of AbstractPackage
  *
- * @since {DEPLOY_VERSION}
+ * @since 2.1.1
  */
 class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 {

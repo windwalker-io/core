@@ -2,13 +2,14 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2015 LYRASOFT Taiwan, Inc. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
 namespace Windwalker\Core\Model;
 
 use Windwalker\Cache\Cache;
+use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
 use Windwalker\Database\Driver\DatabaseDriver;
 use Windwalker\Model\AbstractModel;
@@ -243,7 +244,7 @@ class Model extends AbstractModel
 	 */
 	public function resetCache()
 	{
-		$this->cache = new Cache(new RuntimeStorage);
+		$this->cache = new Cache(new RuntimeStorage, new RawDataHandler);
 
 		return $this;
 	}
