@@ -79,7 +79,7 @@ class PackageResolver implements ContainerAwareInterface
 		{
 			if (!class_exists($package))
 			{
-				throw new \InvalidArgumentException($package . ' is not a valid class.');
+				return null;
 			}
 
 			/** @var \Windwalker\Core\Package\AbstractPackage $package */
