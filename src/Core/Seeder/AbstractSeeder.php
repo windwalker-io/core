@@ -120,7 +120,7 @@ abstract class AbstractSeeder
 	/**
 	 * Method to get property Db
 	 *
-	 * @return  DatabaseDriver
+	 * @return  AbstractDatabaseDriver
 	 */
 	public function getDb()
 	{
@@ -130,11 +130,11 @@ abstract class AbstractSeeder
 	/**
 	 * Method to set property db
 	 *
-	 * @param   DatabaseDriver $db
+	 * @param   AbstractDatabaseDriver $db
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setDb(DatabaseDriver $db)
+	public function setDb(AbstractDatabaseDriver $db)
 	{
 		$this->db = $db;
 
