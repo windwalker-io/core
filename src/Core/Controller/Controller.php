@@ -28,6 +28,7 @@ use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 use Windwalker\View\AbstractView;
 
 /**
@@ -451,6 +452,24 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			if ($name)
 			{
 				$this->package = PackageHelper::getPackage(strtolower($name));
+			}
+
+			// If name not found, find class.
+			if (!$this->package)
+			{
+				$packages = PackageHelper::getPackages();
+
+				foreach ($packages as $package)
+				{
+					$packaheClass = ReflectionHelper::getShortName($package);
+
+					if (strpos($packaheClass, ucfirst($name)) === 0)
+					{
+						$this->package = $package;
+
+						break;
+					}
+				}
 			}
 
 			// If package not found, use NullPackage instead.

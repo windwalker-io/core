@@ -225,7 +225,7 @@ class RestfulRouter extends Router
 	 *
 	 * @since   2.0
 	 */
-	protected function fetchControllerSuffix($method = 'GET', $customSuffix = array())
+	public function fetchControllerSuffix($method = 'GET', $customSuffix = array())
 	{
 		$method = strtoupper($method);
 

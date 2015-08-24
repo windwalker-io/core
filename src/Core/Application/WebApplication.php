@@ -17,6 +17,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider;
 use Windwalker\Event\DispatcherInterface;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Router;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -27,6 +28,7 @@ use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
 use Windwalker\Session\Session;
+use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -334,7 +336,38 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'port' => $_SERVER['SERVER_PORT']
 		);
 
-		return $router->match($route, $method, $options);
+		try
+		{
+			return $router->match($route, $method, $options);
+		}
+		// Auto routing
+		catch (RouteNotFoundException $e)
+		{
+			$route = explode('/', $route);
+			$controller = array_pop($route);
+
+			$class = StringNormalise::toClassNamespace(
+				sprintf(
+					'%s\Controller\%s\%s',
+					implode($route, '\\'),
+					ucfirst($controller),
+					$router->fetchControllerSuffix($method)
+				)
+			);
+
+			if (!class_exists($class))
+			{
+				throw $e;
+			}
+
+			$matched = new Route(implode($route, '.') . ':' . $controller, implode($route, '/'));
+
+			$matched->setExtra(array(
+				'controller' => $class
+			));
+
+			return $matched;
+		}
 	}
 
 	/**
