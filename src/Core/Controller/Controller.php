@@ -302,7 +302,10 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			/** @var HtmlView $view */
 			$view = new $class;
 
-			$view->setConfig($this->config);
+			$config = clone $this->config;
+			$config['name'] = null;
+
+			$view->setConfig($config);
 
 			$this->container->share($class, $view)->alias($key, $class);
 		}
@@ -345,10 +348,13 @@ abstract class Controller extends AbstractController implements EventTriggerable
 				$class = 'Windwalker\Core\Model\Model';
 			}
 
-			$model = new $class($this->config);
+			$config = clone $this->config;
+			$config['name'] = null;
+
+			$model = new $class($config);
 
 			/** @var Model $model */
-			$model->setConfig($this->config);
+			$model->setConfig($config);
 
 			$this->container->share($class, $model)->alias($key, $class);
 		}
