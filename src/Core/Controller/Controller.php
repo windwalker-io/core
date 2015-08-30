@@ -280,7 +280,17 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		if (!$this->container->exists($key) || $forceNew)
 		{
-			$ns = MvcHelper::getPackageNamespace(get_called_class());
+			// Find if package exists
+			$package = $this->getPackage();
+
+			if (!$package instanceof NullPackage)
+			{
+				$ns = ReflectionHelper::getNamespaceName($package);
+			}
+			else
+			{
+				$ns = MvcHelper::getPackageNamespace(get_called_class());
+			}
 
 			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
 
@@ -316,7 +326,17 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		if (!$this->container->exists($key) || $forceNew)
 		{
-			$ns = MvcHelper::getPackageNamespace(get_called_class());
+			// Find if package exists
+			$package = $this->getPackage();
+
+			if (!$package instanceof NullPackage)
+			{
+				$ns = ReflectionHelper::getNamespaceName($package);
+			}
+			else
+			{
+				$ns = MvcHelper::getPackageNamespace(get_called_class());
+			}
 
 			$class = sprintf($ns . '\Model\%sModel', ucfirst($name), ucfirst($name));
 
