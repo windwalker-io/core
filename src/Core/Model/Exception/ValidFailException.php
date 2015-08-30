@@ -11,20 +11,52 @@ namespace Windwalker\Core\Model\Exception;
 /**
  * Class ValidFailException
  *
- * @since 1.0
+ * @since  2.0
  */
 class ValidFailException extends \Exception
 {
 	/**
+	 * Property messages.
+	 *
+	 * @var  array
+	 */
+	protected $messages;
+
+	/**
 	 * Class init.
 	 *
-	 * @param string     $message
-	 * @param int        $code
-	 * @param \Exception $previous
+	 * @param string|array $messages
+	 * @param int          $code
+	 * @param \Exception   $previous
 	 */
-	public function __construct($message = "", $code = 0, \Exception $previous = null)
+	public function __construct($messages = null, $code = 0, \Exception $previous = null)
 	{
-		parent::__construct($message, $code, $previous);
+		$this->messages = (array) $messages;
+
+		parent::__construct(implode(PHP_EOL, (array) $messages), $code, $previous);
+	}
+
+	/**
+	 * Method to get property Messages
+	 *
+	 * @return  array
+	 */
+	public function getMessages()
+	{
+		return $this->messages;
+	}
+
+	/**
+	 * Method to set property messages
+	 *
+	 * @param   array $messages
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMessages($messages)
+	{
+		$this->messages = $messages;
+
+		return $this;
 	}
 }
- 
