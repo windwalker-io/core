@@ -31,7 +31,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * The AbstractPackage class.
  *
  * @property-read  PackageRouter  $router
- * 
+ *
  * @since  2.0
  */
 class AbstractPackage implements DispatcherAwareInterface
@@ -159,6 +159,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		$controller = $this->getController($task, $variables);
 
+		$this->prepareExecute();
+
 		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
 			'package'    => $this,
 			'controller' => &$controller,
@@ -168,6 +170,8 @@ class AbstractPackage implements DispatcherAwareInterface
 		));
 
 		$result = $controller->execute();
+
+		$result = $this->postExecute($result);
 
 		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
 			'package'    => $this,
@@ -180,6 +184,27 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$controller->redirect();
 
+		return $result;
+	}
+
+	/**
+	 * prepareExecute
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+	}
+
+	/**
+	 * postExecute
+	 *
+	 * @param   mixed  $result
+	 *
+	 * @return  mixed
+	 */
+	protected function postExecute($result = null)
+	{
 		return $result;
 	}
 
