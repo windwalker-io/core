@@ -100,7 +100,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 
 		$package = $this->view->getPackage();
 
-		$namespace = MvcHelper::getPackageNamespace($package);
+		$namespace = MvcHelper::getPackageNamespace($package, 1);
 
 		$class = sprintf($namespace . '\Helper\%sHelper', $name);
 
