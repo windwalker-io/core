@@ -372,7 +372,7 @@ class DateTime extends \DateTime
 			$db = Ioc::getDatabase();
 		}
 
-		return $this->format($db->getQuery()->getDateFormat(), $local);
+		return $this->format($db->getQuery(true)->getDateFormat(), $local);
 	}
 
 	/**
