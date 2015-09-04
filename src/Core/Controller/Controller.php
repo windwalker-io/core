@@ -12,6 +12,7 @@ use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\DefaultPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
@@ -303,7 +304,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			$view = new $class;
 
 			$config = clone $this->config;
-			$config['name'] = null;
+
+			if ($name && strcasecmp($name, $this->getName()) !== 0)
+			{
+				$config['name'] = null;
+			}
 
 			$view->setConfig($config);
 
@@ -349,7 +354,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			}
 
 			$config = clone $this->config;
-			$config['name'] = null;
+
+			if ($name && strcasecmp($name, $this->getName()) !== 0)
+			{
+				$config['name'] = null;
+			}
 
 			$model = new $class($config);
 
@@ -469,44 +478,46 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 */
 	public function getPackage($backwards = 4)
 	{
-		if (!$this->package)
+		if (!$this->package || $this->package instanceof DefaultPackage)
 		{
+			$package = null;
+
 			// Guess package name.
 			$name = MvcHelper::guessPackage(get_called_class(), $backwards);
 
 			// Get package object.
 			if ($name)
 			{
-				$this->package = PackageHelper::getPackage(strtolower($name));
+				$package = PackageHelper::getPackage(strtolower($name));
 			}
 
 			// If name not found, find class.
-			if (!$this->package)
+			if (!$package)
 			{
 				$packages = PackageHelper::getPackages();
 
 				foreach ($packages as $package)
 				{
-					$packaheClass = ReflectionHelper::getShortName($package);
+					$packageClass = ReflectionHelper::getShortName($package);
 
-					if (strpos($packaheClass, ucfirst($name)) === 0)
+					if (strpos($packageClass, ucfirst($name)) === 0)
 					{
-						$this->package = $package;
-
 						break;
 					}
 				}
 			}
 
 			// If package not found, use NullPackage instead.
-			if (!$this->package)
+			if (!$package)
 			{
 				$ref = new \ReflectionClass($this);
-				$this->package = new NullPackage;
+				$package = new NullPackage;
 
-				$this->package->setName($name);
-				$this->package->dir = realpath(dirname($ref->getFileName()) . str_repeat('/..', $backwards - 2));
+				$package->setName($name);
+				$package->dir = realpath(dirname($ref->getFileName()) . str_repeat('/..', $backwards - 2));
 			}
+
+			$this->setPackage($package);
 		}
 
 		return $this->package;
@@ -521,11 +532,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 */
 	public function setPackage(AbstractPackage $package)
 	{
-		$this->package = $package ? : $this->getPackage();
-
 		$this->config['name'] = $this->getName();
-		$this->config['package.name'] = $this->package->getName();
-		$this->config['package.path'] = $this->package->getDir();
+		$this->config['package.name'] = $package->getName();
+		$this->config['package.path'] = $package->getDir();
+
+		$this->package = $package;
 
 		return $this;
 	}

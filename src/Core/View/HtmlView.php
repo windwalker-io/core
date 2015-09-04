@@ -14,10 +14,10 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
-use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\RendererInterface;
@@ -218,7 +218,7 @@ class HtmlView extends \Windwalker\View\HtmlView
 			$paths->insert(Path::normalize($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
 			$paths->insert(Path::normalize($this->config['package.path'] . '/Templates'), Priority::LOW);
 		}
-		elseif (!($package instanceof NullPackage))
+		elseif (!$package instanceof NullPackage)
 		{
 			$paths->insert(Path::normalize($package->getDir() . '/Templates/' . $this->getName()), Priority::LOW);
 			$paths->insert(Path::normalize($package->getDir() . '/Templates'), Priority::LOW);
