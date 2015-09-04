@@ -208,13 +208,13 @@ abstract class RendererHelper
 		// Priority (1)
 		static::$paths->insert(
 			realpath($config->get('path.templates')),
-			Priority::LOW
+			Priority::LOW - 20
 		);
 
 		// Priority (2)
 		static::$paths->insert(
 			realpath(__DIR__ . '/../Resources/Templates'),
-			Priority::LOW
+			Priority::LOW - 30
 		);
 	}
 
