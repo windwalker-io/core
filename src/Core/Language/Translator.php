@@ -15,6 +15,8 @@ use Windwalker\Language\LanguageNormalize;
 /**
  * The Translator class.
  *
+ * @see  \Windwalker\Language\Language
+ *
  * @method  static  string  translate($string)
  * @method  static  string  sprintf($string, ...$more)
  * @method  static  string  plural($string, $number)
@@ -33,20 +35,24 @@ abstract class Translator extends AbstractProxyFacade
 	/**
 	 * load
 	 *
-	 * @param string  $file
-	 * @param string  $package
+	 * @param string $file
+	 * @param string $format
+	 * @param string $package
 	 *
-	 * @return  void
+	 * @return void
 	 */
-	public static function load($file, $package = null)
+	public static function loadFile($file, $format = 'ini', $package = null)
 	{
 		$container = static::getContainer();
 
 		$config = $container->get('system.config');
 
-		$format  = $config['language.format']  ? : 'ini';
+		$format = $format ? : $config->get('language.format', 'ini');
+
 		$default = $config['language.default'] ? : 'en-GB';
 		$locale  = $config['language.locale']  ? : 'en-GB';
+
+		$ext = $format == 'yaml' ? 'yml' : $format;
 
 		$default = LanguageNormalize::toLanguageTag($default);
 		$locale  = LanguageNormalize::toLanguageTag($locale);
@@ -62,25 +68,40 @@ abstract class Translator extends AbstractProxyFacade
 			$path = $package->getDir() . '/Resources/language/%s/%s.%s';
 
 			// Get Package language
-			static::loadFile(sprintf($path, $default, $file, $format), $format);
+			static::loadLanguageFile(sprintf($path, $default, $file, $ext), $format);
 
 			// If locale not equals default locale, load it to override default
 			if ($locale != $default)
 			{
-				static::loadFile(sprintf($path, $locale, $file, $format), $format);
+				static::loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
 			}
 		}
 
 		// Get Global language
 		$path = $config->get('path.languages') . '/%s/%s.%s';
 
-		static::loadFile(sprintf($path, $default, $file, $format), $format);
+		static::loadLanguageFile(sprintf($path, $default, $file, $format), $format);
 
 		// If locale not equals default locale, load it to override default
 		if ($locale != $default)
 		{
-			static::loadFile(sprintf($path, $locale, $file, $format), $format);
+			static::loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
 		}
+	}
+
+	/**
+	 * load
+	 *
+	 * @param   string  $file
+	 * @param   string  $package
+	 *
+	 * @deprecated  3.0  Use loadFile() instead.
+	 *
+	 * @return  void
+	 */
+	public static function load($file, $package)
+	{
+		static::loadFile($file, null, $package);
 	}
 
 	/**
@@ -91,7 +112,7 @@ abstract class Translator extends AbstractProxyFacade
 	 *
 	 * @return  void
 	 */
-	protected static function loadFile($file, $format)
+	protected static function loadLanguageFile($file, $format)
 	{
 		if (is_file($file))
 		{
