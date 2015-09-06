@@ -63,7 +63,7 @@ class DateTime extends \DateTime
 	 *
 	 * @var  boolean
 	 */
-	protected static $useStz = false;
+	protected static $useStz = true;
 
 	/**
 	 * Constructor.
@@ -169,7 +169,39 @@ class DateTime extends \DateTime
 
 		$date->setTimezone($to);
 
-		return $date->format($format);
+		return $date->format($format, true);
+	}
+
+	/**
+	 * utcToLocal
+	 *
+	 * @param string $date
+	 * @param string $format
+	 * @param string $to
+	 *
+	 * @return  string
+	 */
+	public static function toLocalTime($date, $format = null, $to = null)
+	{
+		$to = $to ? : Ioc::getConfig()->get('system.timezone');
+
+		return static::convert($date, static::$stz->getName(), $to, $format);
+	}
+
+	/**
+	 * localToUTC
+	 *
+	 * @param string $date
+	 * @param string $format
+	 * @param string $from
+	 *
+	 * @return  string
+	 */
+	public static function toServerTime($date, $format = null, $from = null)
+	{
+		$from = $from ? : Ioc::getConfig()->get('system.timezone');
+
+		return static::convert($date, $from, static::$stz->getName(), $format);
 	}
 
 	/**
@@ -289,7 +321,7 @@ class DateTime extends \DateTime
 		// If the returned time should not be local use GMT.
 		if ($local == false)
 		{
-			parent::setTimezone(self::$gmt);
+			parent::setTimezone(self::$stz);
 		}
 
 		// Format the date.

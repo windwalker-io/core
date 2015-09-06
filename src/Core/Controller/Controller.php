@@ -135,7 +135,6 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @param string            $package
 	 *
 	 * @return mixed
-	 * @internal param string|Controller $controller
 	 */
 	public function hmvc($task, $input = null, $package = null)
 	{

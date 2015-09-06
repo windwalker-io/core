@@ -33,6 +33,11 @@ class ValidFailException extends \Exception
 	{
 		$this->messages = (array) $messages;
 
+		foreach ($messages as &$msgs)
+		{
+			$msgs = implode(PHP_EOL, (array) $msgs);
+		}
+
 		parent::__construct(implode(PHP_EOL, (array) $messages), $code, $previous);
 	}
 
