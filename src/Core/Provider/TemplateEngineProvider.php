@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Illuminate\View\Compilers\BladeCompiler;
 use Windwalker\Core\View\Twig\WindwalkerExtension;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -52,6 +53,20 @@ class TemplateEngineProvider implements ServiceProviderInterface
 		{
 			Renderer\Blade\GlobalContainer::setContentTags('{{', '}}');
 			Renderer\Blade\GlobalContainer::setEscapedTags('{{{', '}}}');
+
+			Renderer\Blade\GlobalContainer::addExtension('rawTag', function($view, BladeCompiler $compiler)
+			{
+				$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', '{!!', '!!}');
+
+				$callback = function ($matches) use ($compiler)
+				{
+					$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
+
+					return $matches[1] ? substr($matches[0], 1) : '<?php echo ' . $compiler->compileEchoDefaults($matches[2]).'; ?>' . $whitespace;
+				};
+
+				return preg_replace_callback($pattern, $callback, $view);
+			});
 		}
 
 		// Twig
