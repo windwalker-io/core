@@ -117,12 +117,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$app   = $app ? : $this->getApplication();
 		$input = $input ? : $this->getInput();
 
+		$this->config = $this->getConfig();
 		$this->container = $container ? : $this->getContainer();
 
-		$package = $package ? : $this->getPackage();
-
-		$this->config = $this->getConfig();
-		$this->setPackage($package);
+		// Guess package
+		$this->getPackage();
 
 		parent::__construct($input, $app);
 	}
@@ -495,12 +494,14 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			{
 				$packages = PackageHelper::getPackages();
 
-				foreach ($packages as $package)
+				foreach ($packages as $pkgObject)
 				{
-					$packageClass = ReflectionHelper::getShortName($package);
+					$packageClass = ReflectionHelper::getShortName($pkgObject);
 
 					if (strpos($packageClass, ucfirst($name)) === 0)
 					{
+						$package = $pkgObject;
+
 						break;
 					}
 				}
@@ -651,9 +652,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 */
 	public function getConfig()
 	{
-		if (!$this->config)
+		if (!$this->config || !$this->config instanceof Registry)
 		{
-			$this->config = new Registry;
+			$this->config = new Registry($this->config);
 		}
 
 		return $this->config;

@@ -12,11 +12,9 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RestfulRouter;
-use Windwalker\Core\Router\Router;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
-use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\ViewModel;
 use Windwalker\Data\Data;
@@ -24,6 +22,7 @@ use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
 use Windwalker\Test\TestHelper;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * Test class of HtmlView
