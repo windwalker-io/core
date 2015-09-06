@@ -58,6 +58,9 @@ class MigrateCommand extends AbstractCommand
 		$this->addOption('s')
 			->alias('seed')
 			->description('Also import seeds.');
+
+		$this->addOption('no-backup')
+			->description('Do not backup database.');
 	}
 
 	/**

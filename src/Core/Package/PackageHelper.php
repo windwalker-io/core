@@ -8,24 +8,28 @@
 
 namespace Windwalker\Core\Package;
 
-use Windwalker\Application\AbstractWebApplication;
-use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Facade\AbstractFacade;
-use Windwalker\DI\Container;
-use Windwalker\Core\Ioc;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
-use Windwalker\Web\Application;
 
 /**
  * The PackageHelper class.
  *
- * @method  static  PackageResolver  getInstance()
- * 
+ * @see  Windwalker\Core\Package\PackageResolver
+ *
+ * @method  static  PackageResolver    getInstance()
+ * @method  static  PackageResolver    registerPackages(array $packages)
+ * @method  static  AbstractPackage    addPackage($alias, $package)
+ * @method  static  AbstractPackage    getPackage($name)
+ * @method  static  AbstractPackage    resolvePackage($name)
+ * @method  static  AbstractPackage[]  getPackages()
+ * @method  static  boolean            exists($package)
+ * @method  static  Registry           getConfig($package)
+ *
  * @since  2.0
  */
-class PackageHelper extends AbstractFacade
+class PackageHelper extends AbstractProxyFacade
 {
 	/**
 	 * Property _key.
@@ -33,42 +37,6 @@ class PackageHelper extends AbstractFacade
 	 * @var  string
 	 */
 	protected static $_key = 'package.resolver';
-
-	/**
-	 * getPackage
-	 *
-	 * @param string $name
-	 *
-	 * @return  AbstractPackage
-	 */
-	public static function getPackage($name)
-	{
-		return static::getInstance()->getPackage($name);
-	}
-
-	/**
-	 * getPackages
-	 *
-	 * @see  PackageResolver::getPackages
-	 *
-	 * @return  AbstractPackage[]
-	 */
-	public static function getPackages()
-	{
-		return static::getInstance()->getPackages();
-	}
-
-	/**
-	 * registerPackages
-	 *
-	 * @param AbstractPackage[] $packages
-	 *
-	 * @return  PackageResolver
-	 */
-	public static function registerPackages(array $packages)
-	{
-		return static::getInstance()->registerPackages($packages);
-	}
 
 	/**
 	 * getPath
@@ -80,6 +48,20 @@ class PackageHelper extends AbstractFacade
 	 * @return  string
 	 */
 	public static function getPath($package)
+	{
+		return static::getDir($package);
+	}
+
+	/**
+	 * getDir
+	 *
+	 * @param string $package
+	 *
+	 * @see  PackageResolver::getPath
+	 *
+	 * @return  string
+	 */
+	public static function getDir($package)
 	{
 		return static::getPackage($package)->getDir();
 	}
@@ -96,32 +78,6 @@ class PackageHelper extends AbstractFacade
 	public static function getClassName($package)
 	{
 		return get_class(static::getPackage($package));
-	}
-
-	/**
-	 * getConfig
-	 *
-	 * @param string $package
-	 *
-	 * @return  Registry
-	 */
-	public static function getConfig($package)
-	{
-		return static::getInstance()->getConfig($package);
-	}
-
-	/**
-	 * has
-	 *
-	 * @param string $package
-	 *
-	 * @see  PackageResolver::exists
-	 *
-	 * @return  boolean
-	 */
-	public static function exists($package)
-	{
-		return static::getInstance()->exists($package);
 	}
 
 	/**

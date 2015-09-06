@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
-use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\Registry\Registry;
@@ -180,7 +179,7 @@ class PackageResolver implements ContainerAwareInterface
 	 *
 	 * @param  string  $package
 	 *
-	 * @return  mixed
+	 * @return  Registry
 	 */
 	public function getConfig($package)
 	{

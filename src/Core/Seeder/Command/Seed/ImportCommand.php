@@ -56,6 +56,9 @@ class ImportCommand extends Command
 	public function initialise()
 	{
 		parent::initialise();
+
+		$this->addOption('no-backup')
+			->description('Do not backup database.');
 	}
 
 	/**
