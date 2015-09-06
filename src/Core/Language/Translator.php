@@ -11,15 +11,20 @@ namespace Windwalker\Core\Language;
 use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Language\LanguageNormalize;
+use Windwalker\Language\Language;
 
 /**
  * The Translator class.
  *
  * @see  \Windwalker\Language\Language
  *
- * @method  static  string  translate($string)
- * @method  static  string  sprintf($string, ...$more)
- * @method  static  string  plural($string, $number)
+ * @method  static  string    translate($string)
+ * @method  static  string    sprintf($string, ...$more)
+ * @method  static  string    plural($string, $number)
+ * @method  static  string    getOrphans()
+ * @method  static  string    setTraceLevelOffset($level)
+ * @method  static  string    getTraceLevelOffset()
+ * @method  static  Language  getInstance()
  *
  * @since  2.0
  */
@@ -139,6 +144,35 @@ abstract class Translator extends AbstractProxyFacade
 	 */
 	public static function _($string)
 	{
-		return static::translate($string);
+		$instance = static::getInstance();
+
+		$instance->setTraceLevelOffset(1);
+
+		$result = $instance->translate($string);
+
+		$instance->setTraceLevelOffset(0);
+
+		return $result;
+	}
+
+	/**
+	 * __callStatic
+	 *
+	 * @param string $method
+	 * @param array  $args
+	 *
+	 * @return  mixed
+	 */
+	public static function __callStatic($method, $args)
+	{
+		$instance = static::getInstance();
+
+		$instance->setTraceLevelOffset(3);
+
+		$result = parent::__callStatic($method, $args);
+
+		$instance->setTraceLevelOffset(0);
+
+		return $result;
 	}
 }

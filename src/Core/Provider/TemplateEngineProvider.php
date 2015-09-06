@@ -47,6 +47,13 @@ class TemplateEngineProvider implements ServiceProviderInterface
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
 
+		// B/C for 4.*
+		if (!method_exists('Illuminate\View\Compilers\BladeCompiler', 'directive'))
+		{
+			Renderer\Blade\GlobalContainer::setContentTags('{{', '}}');
+			Renderer\Blade\GlobalContainer::setEscapedTags('{{{', '}}}');
+		}
+
 		// Twig
 		Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
 	}
