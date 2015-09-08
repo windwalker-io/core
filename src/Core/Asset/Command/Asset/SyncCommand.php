@@ -12,6 +12,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Environment\ServerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Core\Utilities\Symlink;
 
@@ -107,6 +108,11 @@ class SyncCommand extends Command
 		else
 		{
 			$this->out($symlink->make($dir, $target));
+
+			if (!ServerHelper::isWindows())
+			{
+				$this->out('Link success ' . $dir . ' <====> ' . $target);
+			}
 		}
 
 		return true;

@@ -183,6 +183,8 @@ class DateTime extends \DateTime
 	 */
 	public static function toLocalTime($date, $format = null, $to = null)
 	{
+		static::backupTimezone();
+
 		$to = $to ? : Ioc::getConfig()->get('system.timezone');
 
 		return static::convert($date, static::$stz->getName(), $to, $format);
@@ -199,6 +201,8 @@ class DateTime extends \DateTime
 	 */
 	public static function toServerTime($date, $format = null, $from = null)
 	{
+		static::backupTimezone();
+
 		$from = $from ? : Ioc::getConfig()->get('system.timezone');
 
 		return static::convert($date, $from, static::$stz->getName(), $format);
