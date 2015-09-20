@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Test\Widget;
 
+use Windwalker\Core\Ioc;
 use Windwalker\Filesystem\Path;
 use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Widget\Widget;
@@ -131,6 +132,11 @@ class WidgetTest extends AbstractBaseTestCase
 		$this->assertPathEquals('foo/bar/baz', $paths[1]);
 	}
 
+	/**
+	 * testDefaultPaths
+	 *
+	 * @return  void
+	 */
 	public function testDefaultPaths()
 	{
 		TestHelper::invoke($this->instance, 'registerPaths');
@@ -149,6 +155,24 @@ class WidgetTest extends AbstractBaseTestCase
 		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../Mvc/Templates'), $paths[0]);
 		$this->assertPathEquals(WINDWALKER_ROOT . '/templates', $paths[1]);
 		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../../src/Core/Resources/Templates'), $paths[2]);
+	}
+
+	/**
+	 * testDefaultPackage
+	 *
+	 * @return  void
+	 */
+	public function testDefaultPackage()
+	{
+		$config = Ioc::getConfig();
+
+		$config->set('route.package', 'mvc');
+
+		$widget = new Widget('test.test');
+
+		$this->assertEquals('mvc', $widget->getPackage()->getName());
+
+		$config->set('route.package', null);
 	}
 
 	/**

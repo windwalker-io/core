@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Widget;
 
+use Windwalker\Core\Package\AbstractPackage;
+
 /**
  * The WidgetHelper class.
  * 
@@ -23,13 +25,14 @@ abstract class WidgetHelper
 	/**
 	 * render
 	 *
-	 * @param string $layout
-	 * @param array  $data
-	 * @param string $type
+	 * @param string                  $layout
+	 * @param array                   $data
+	 * @param string                  $type
+	 * @param string|AbstractPackage  $package
 	 *
-	 * @return  string
+	 * @return string
 	 */
-	public static function render($layout, $data = array(), $type = self::ENGINE_PHP)
+	public static function render($layout, $data = array(), $type = self::ENGINE_PHP, $package = null)
 	{
 		if ($type == 'php')
 		{
@@ -44,7 +47,7 @@ abstract class WidgetHelper
 		}
 
 		/** @var WidgetInterface $widget */
-		$widget = new $class($layout);
+		$widget = new $class($layout, $package);
 
 		return $widget->render($data);
 	}

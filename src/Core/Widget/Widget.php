@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Widget;
 
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -64,16 +65,29 @@ class Widget implements WidgetInterface
 	/**
 	 * Class init.
 	 *
-	 * @param string            $layout
-	 * @param RendererInterface $renderer
-	 * @param string            $package
+	 * @param string                  $layout
+	 * @param RendererInterface       $renderer
+	 * @param string|AbstractPackage  $package
 	 */
 	public function __construct($layout, RendererInterface $renderer = null, $package = null)
 	{
 		$this->layout   = $layout;
 		$this->renderer = $renderer ? : new PhpRenderer;
 
-		$this->package = PackageHelper::getPackage($package);
+		if (!$package)
+		{
+			$package = Ioc::getConfig()->get('route.package');
+		}
+
+		if (is_string($package))
+		{
+			$package = PackageHelper::getPackage($package);
+		}
+
+		if ($package)
+		{
+			$this->package = $package;
+		}
 
 		// Create PriorityQueue
 		$this->createPriorityQueue();
