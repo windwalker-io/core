@@ -29,6 +29,7 @@ use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
 use Windwalker\Session\Session;
 use Windwalker\String\StringNormalise;
+use Windwalker\Uri\UriHelper;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -266,10 +267,10 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		// Save for input
 		foreach ($variables as $name => $value)
 		{
-			$this->input->def($name, urldecode($value));
+			$this->input->def($name, UriHelper::decode($value));
 
 			// Don't forget to do an explicit set on the GET superglobal.
-			$this->input->get->def($name, urldecode($value));
+			$this->input->get->def($name, UriHelper::decode($value));
 		}
 
 		$package = ArrayHelper::getValue($extra, 'package');
