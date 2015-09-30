@@ -148,7 +148,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 	 *
 	 * @return  boolean
 	 */
-	public static function logout($conditions, $options = array())
+	public static function logout($conditions = array(), $options = array())
 	{
 		$options = $options instanceof Registry ? $options : new Registry($options);
 

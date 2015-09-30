@@ -332,12 +332,19 @@ class Pagination
 	 * render
 	 *
 	 * @param string|\Closure $route
+	 * @param array           $query
 	 * @param string          $template
 	 *
 	 * @return string
 	 */
-	public function render($route = null, $template = 'windwalker.pagination.default')
+	public function render($route = null, $query = array(), $template = 'windwalker.pagination.default')
 	{
+		// B/C
+		if (is_string($query))
+		{
+			$template = $query;
+		}
+
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
 		$result = $this->getResult();
@@ -351,9 +358,11 @@ class Pagination
 		{
 			$uri = Ioc::get('system.uri')->get('route');
 
-			$route = function ($queries) use ($uri)
+			$route = function ($queries) use ($uri, $query)
 			{
 				$uri = new Uri($uri);
+
+				$queries = array_merge($queries, $query);
 
 				foreach ($queries as $k => $v)
 				{
@@ -366,8 +375,10 @@ class Pagination
 
 		if (!($route instanceof \Closure))
 		{
-			$route = function ($queries, $type = RestfulRouter::TYPE_PATH) use ($route)
+			$route = function ($queries, $type = RestfulRouter::TYPE_PATH) use ($route, $query)
 			{
+				$queries = array_merge($queries, $query);
+
 				return Router::html($route, $queries, $type);
 			};
 		}
