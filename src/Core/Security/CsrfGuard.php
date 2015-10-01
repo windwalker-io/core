@@ -168,7 +168,7 @@ class CsrfGuard implements ContainerAwareInterface
 			$input = $input->$method;
 		}
 
-		if ($input->get($token, '', InputFilter::ALNUM))
+		if ($input->get($token, null, InputFilter::ALNUM) !== null)
 		{
 			return true;
 		}
