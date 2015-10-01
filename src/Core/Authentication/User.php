@@ -72,7 +72,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 			throw new \InvalidArgumentException('Credential should be array or object.');
 		}
 
-		if (($user instanceof Credential))
+		if (!($user instanceof Credential))
 		{
 			$user = new Credential($user);
 		}

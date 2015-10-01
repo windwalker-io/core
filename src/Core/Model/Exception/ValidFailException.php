@@ -33,7 +33,7 @@ class ValidFailException extends \Exception
 	{
 		$this->messages = (array) $messages;
 
-		foreach ($messages as &$msgs)
+		foreach ($this->messages as &$msgs)
 		{
 			$msgs = implode(PHP_EOL, (array) $msgs);
 		}
