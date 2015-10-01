@@ -182,6 +182,11 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 		{
 			$class = $this->findHelper($name);
 
+			if ($class === false)
+			{
+				throw new \DomainException(sprintf('Helper: %s not found.', $name));
+			}
+
 			$this->helpers[$name] = new $class($this);
 		}
 

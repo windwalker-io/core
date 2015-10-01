@@ -9,7 +9,6 @@
 namespace Windwalker\Debugger\Helper;
 
 use Windwalker\Core\Facade\AbstractFacade;
-use Windwalker\Data\Data;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Utilities\ArrayHelper;
@@ -31,13 +30,6 @@ abstract class DebuggerHelper extends AbstractFacade
 	protected static $_key = 'system.collector';
 
 	/**
-	 * Property objectStorage.
-	 *
-	 * @var \SplObjectStorage
-	 */
-	private static $objectStorage;
-
-	/**
 	 * addData
 	 *
 	 * @param   string $key
@@ -46,7 +38,14 @@ abstract class DebuggerHelper extends AbstractFacade
 	 */
 	public static function addCustomData($key, $value, $depth = 5)
 	{
-		$collector = static::getInstance();
+		try
+		{
+			$collector = static::getInstance();
+		}
+		catch (\UnexpectedValueException $e)
+		{
+			return;
+		}
 
 		$data = $collector['custom.data'];
 
