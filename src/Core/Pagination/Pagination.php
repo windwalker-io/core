@@ -343,6 +343,8 @@ class Pagination
 		if (is_string($query))
 		{
 			$template = $query;
+			
+			$query = array();
 		}
 
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
