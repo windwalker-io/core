@@ -462,7 +462,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * @param string $pattern
 	 *
 	 * @return array
-	 * @internal param string $prefix
 	 */
 	public function loadPackageRouting(&$routing, $packageName, $pattern)
 	{
