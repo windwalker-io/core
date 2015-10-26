@@ -65,6 +65,19 @@ use Windwalker\Registry\Registry;
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li>
+					<a class="" href="<?php echo $router->html($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
+						data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
+						<svg class="icon icon-spinner11">
+							<use xlink:href="#icon-spinner11"></use>
+							<symbol id="icon-spinner11" viewBox="0 0 1024 1024">
+								<title>spinner11</title>
+								<path class="path1" d="M1024 384h-384l143.53-143.53c-72.53-72.526-168.96-112.47-271.53-112.47s-199 39.944-271.53 112.47c-72.526 72.53-112.47 168.96-112.47 271.53s39.944 199 112.47 271.53c72.53 72.526 168.96 112.47 271.53 112.47s199-39.944 271.528-112.472c6.056-6.054 11.86-12.292 17.456-18.668l96.32 84.282c-93.846 107.166-231.664 174.858-385.304 174.858-282.77 0-512-229.23-512-512s229.23-512 512-512c141.386 0 269.368 57.326 362.016 149.984l149.984-149.984v384z"></path>
+							</symbol>
+						</svg>
+						Refresh
+					</a>
+				</li>
+				<li>
 					<a target="_blank" href="<?php echo $uri['base.path'] . $uri['script']; ?>">
 						<svg class="icon icon-earth">
 							<use xlink:href="#icon-earth"></use>
