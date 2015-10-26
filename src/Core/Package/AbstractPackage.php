@@ -383,12 +383,18 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		$file = $this->getDir() . '/config.yml';
 
-		if (!is_file($file))
+		if (is_file($file))
 		{
-			return $this;
+			$config->loadFile($file, 'yaml');
 		}
 
-		$config->loadFile($file, 'yaml');
+		// Override
+		$file = $this->container->get('system.config')->get('path.etc') . '/package/' . $this->name . '.yml';
+
+		if (is_file($file))
+		{
+			$config->loadFile($file, 'yaml');
+		}
 
 		return $this;
 	}
