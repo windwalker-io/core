@@ -15,6 +15,7 @@ use Windwalker\Core\Asset\Command\AssetCommand;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Provider\DateTimeProvider;
 use Windwalker\Core\Seeder\Command\SeedCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
@@ -180,6 +181,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 			'database' => new DatabaseProvider,
 			'cache'    => new CacheProvider,
 			'lang'     => new LanguageProvider,
+			'datetime' => new DateTimeProvider
 		);
 	}
 
