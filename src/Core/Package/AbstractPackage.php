@@ -98,6 +98,8 @@ class AbstractPackage implements DispatcherAwareInterface
 			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
 		}
 
+		$this->getConfig();
+
 		$container = $this->getContainer();
 
 		$this->registerProviders($container);

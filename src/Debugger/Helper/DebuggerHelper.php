@@ -9,7 +9,9 @@
 namespace Windwalker\Debugger\Helper;
 
 use Windwalker\Core\Facade\AbstractFacade;
+use Windwalker\Debugger\DebuggerPackage;
 use Windwalker\Dom\HtmlElement;
+use Windwalker\Ioc;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -74,5 +76,41 @@ abstract class DebuggerHelper extends AbstractFacade
 		$collector = static::getInstance();
 
 		return $collector['database.queries'];
+	}
+
+	/**
+	 * enableConsole
+	 *
+	 * @return  void
+	 */
+	public static function enableConsole()
+	{
+		if (!Ioc::exists('windwalker.debugger'))
+		{
+			return;
+		}
+
+		/** @var DebuggerPackage $package */
+		$package = Ioc::get('windwalker.debugger');
+
+		$package->enableConsole();
+	}
+
+	/**
+	 * disableConsole
+	 *
+	 * @return  void
+	 */
+	public static function disableConsole()
+	{
+		if (!Ioc::exists('windwalker.debugger'))
+		{
+			return;
+		}
+
+		/** @var DebuggerPackage $package */
+		$package = Ioc::get('windwalker.debugger');
+
+		$package->disableConsole();
 	}
 }

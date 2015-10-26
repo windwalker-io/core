@@ -29,6 +29,18 @@ class DebuggerPackage extends AbstractPackage
 	protected $name = 'debugger';
 
 	/**
+	 * initialise
+	 *
+	 * @return  void
+	 */
+	public function initialise()
+	{
+		parent::initialise();
+
+		$this->container->getParent()->share('windwalker.debugger', $this);
+	}
+
+	/**
 	 * registerProviders
 	 *
 	 * @param Container $container
@@ -52,5 +64,29 @@ class DebuggerPackage extends AbstractPackage
 		parent::registerListeners($dispatcher);
 
 		$dispatcher->addListener(new DebuggerListener($this));
+	}
+
+	/**
+	 * enableConsole
+	 *
+	 * @return  static
+	 */
+	public function enableConsole()
+	{
+		$this->config->set('console.enabled', 1);
+
+		return $this;
+	}
+
+	/**
+	 * disableConsole
+	 *
+	 * @return  static
+	 */
+	public function disableConsole()
+	{
+		$this->config->set('console.enabled', 0);
+
+		return $this;
 	}
 }

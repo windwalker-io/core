@@ -233,6 +233,11 @@ class DebuggerListener
 	 */
 	protected function pushDebugConsole(Registry $collector, Profiler $profiler)
 	{
+		if (!$this->package->config->get('console.enabled', 1))
+		{
+			return;
+		}
+
 		// Prepare CSS
 		$style = $this->package->getDir() . '/Resources/media/css/console/style.css';
 
