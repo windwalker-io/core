@@ -105,6 +105,13 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	protected $mute = false;
 
 	/**
+	 * Property hmvc.
+	 *
+	 * @var  boolean
+	 */
+	protected $hmvc = false;
+
+	/**
 	 * Class init.
 	 *
 	 * @param Input           $input
@@ -144,19 +151,28 @@ abstract class Controller extends AbstractController implements EventTriggerable
 				$input = new Input($input);
 			}
 
-			$input->set('hmvc', true);
+			$this->isHmvc(true);
 
+			/** @var Controller $controller */
 			$controller = $task->setContainer($this->container)
 				->setPackage($this->package)
 				->setInput($input)
 				->setApplication($this->app);
 
-			return $controller->execute();
+			$result = $controller->execute();
+
+			$this->passRedirect($controller);
+
+			return $result;
 		}
 
 		$package = $package ? $this->app->getPackage($package) : $this->package;
 
-		return $package->execute($task, $input, true);
+		$result = $package->execute($task, $input, true);
+
+		$this->passRedirect($package->getCurrentController());
+
+		return $result;
 	}
 
 	/**
@@ -390,6 +406,34 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	}
 
 	/**
+	 * Method to get property RedirectUrl
+	 *
+	 * @param bool $removeKey
+	 *
+	 * @return  array
+	 */
+	public function getRedirect($removeKey = false)
+	{
+		return $removeKey ? array_values($this->redirectUrl) : $this->redirectUrl;
+	}
+
+	/**
+	 * passRedirect
+	 *
+	 * @param Controller $controller
+	 *
+	 * @return  static
+	 */
+	public function passRedirect(Controller $controller)
+	{
+		list($url, $msg, $type) = $controller->getRedirect(true);
+
+		$this->setRedirect($url, $msg, $type);
+
+		return $this;
+	}
+
+	/**
 	 * redirect
 	 *
 	 * @param string $url
@@ -400,6 +444,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 */
 	public function redirect($url = null, $msg = null, $type = 'info')
 	{
+		if ($this->isHmvc())
+		{
+			return;
+		}
+
 		if (!$this->app)
 		{
 			return;
@@ -539,18 +588,6 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$this->package = $package;
 
 		return $this;
-	}
-
-	/**
-	 * Method to get property RedirectUrl
-	 *
-	 * @param bool $removeKey
-	 *
-	 * @return  array
-	 */
-	public function getRedirect($removeKey = false)
-	{
-		return $removeKey ? array_values($this->redirectUrl) : $this->redirectUrl;
 	}
 
 	/**
@@ -706,6 +743,25 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$dispatcher = $container->get('system.dispatcher');
 
 		return $dispatcher->triggerEvent($event, $args);
+	}
+
+	/**
+	 * Check this controller is in HMVC that we can close some behaviors.
+	 *
+	 * @param   boolean $boolean
+	 *
+	 * @return  static|boolean
+	 */
+	public function isHmvc($boolean = null)
+	{
+		if ($boolean === null)
+		{
+			return $this->hmvc;
+		}
+
+		$this->hmvc = (bool) $boolean;
+
+		return $this;
 	}
 
 	/**

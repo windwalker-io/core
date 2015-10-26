@@ -58,6 +58,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected $isEnabled = true;
 
 	/**
+	 * Property currentController.
+	 *
+	 * @var  Controller
+	 */
+	protected $currentController;
+
+	/**
 	 * Property router.
 	 *
 	 * @var PackageRouter
@@ -170,6 +177,8 @@ class AbstractPackage implements DispatcherAwareInterface
 			'variables'  => $variables,
 			'hmvc'       => $hmvc
 		));
+
+		$this->currentController = $controller;
 
 		$result = $controller->execute();
 
@@ -308,7 +317,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function get($name, $default = null)
 	{
-		return $this->container->get('system.config')->get('package.' . $this->getName() . '.config.' . $name, $default);
+		return $this->config->get($name, $default);
 	}
 
 	/**
@@ -321,7 +330,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function set($name, $value)
 	{
-		$this->container->get('system.config')->set('package.' . $this->getName() . '.config.' . $name, $value);
+		$this->config->set($name, $value);
 
 		return $this;
 	}
@@ -651,5 +660,15 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->config = $config;
 
 		return $this;
+	}
+
+	/**
+	 * Method to get property CurrentController
+	 *
+	 * @return  Controller
+	 */
+	public function getCurrentController()
+	{
+		return $this->currentController;
 	}
 }
