@@ -151,10 +151,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 				$input = new Input($input);
 			}
 
-			$this->isHmvc(true);
-
 			/** @var Controller $controller */
 			$controller = $task->setContainer($this->container)
+				->isHmvc(true)
 				->setPackage($this->package)
 				->setInput($input)
 				->setApplication($this->app);
