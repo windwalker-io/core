@@ -117,7 +117,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 	 *
 	 * @param mixed $user
 	 *
-	 * @return  bool
+	 * @return  boolean
 	 */
 	public static function makeUserLogin($user)
 	{
@@ -135,9 +135,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 			return false;
 		}
 
-		static::$handler->login($user);
-
-		return true;
+		return static::$handler->login($user);
 	}
 
 	/**
