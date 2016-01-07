@@ -8,8 +8,12 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Cache\Cache;
+use Windwalker\Cache\DataHandler\RawDataHandler;
+use Windwalker\Cache\Storage\RuntimeStorage;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
+use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Utilities\ArrayHelper;
@@ -55,6 +59,26 @@ class RestfulRouter extends Router
 	protected $uri;
 
 	/**
+	 * Property cache.
+	 *
+	 * @var  Cache
+	 */
+	protected $cache;
+
+	/**
+	 * Class init.
+	 *
+	 * @param array            $routes
+	 * @param MatcherInterface $matcher
+	 */
+	public function __construct(array $routes, MatcherInterface $matcher)
+	{
+		parent::__construct($routes, $matcher);
+
+		$this->cache = new Cache(new RuntimeStorage, new RawDataHandler);
+	}
+
+	/**
 	 * build
 	 *
 	 * @param string $route
@@ -87,15 +111,28 @@ class RestfulRouter extends Router
 		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
 			'route'   => &$route,
 			'queries' => &$queries,
+			'type'    => &$type,
+			'xhtml'   => &$xhtml,
 			'router'  => $this
 		));
+
+		$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
+
+		if ($this->cache->exists($key))
+		{
+			return $this->cache->get($key);
+		}
 
 		// Build
 		$url = parent::build($route, $queries);
 
 		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteBuild', array(
-			'url'   => &$url,
-			'router' => $this
+			'url'     => &$url,
+			'route'   => &$route,
+			'queries' => &$queries,
+			'type'    => &$type,
+			'xhtml'   => &$xhtml,
+			'router'  => $this
 		));
 
 		$uri = $this->getUri();
@@ -116,6 +153,8 @@ class RestfulRouter extends Router
 		{
 			$url = htmlspecialchars($url);
 		}
+
+		$this->cache->set($key, $url);
 
 		return $url;
 	}
@@ -336,5 +375,17 @@ class RestfulRouter extends Router
 		$this->uri = $uri;
 
 		return $this;
+	}
+
+	/**
+	 * getCacheKey
+	 *
+	 * @param   mixed  $data
+	 *
+	 * @return  string
+	 */
+	protected function getCacheKey($data)
+	{
+		return md5(json_encode($data));
 	}
 }
