@@ -168,6 +168,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		$controller = $this->getController($task, $variables);
 
+		$controller->isHmvc($hmvc);
+
 		$this->prepareExecute();
 
 		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
