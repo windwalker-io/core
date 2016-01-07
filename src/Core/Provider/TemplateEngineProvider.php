@@ -33,17 +33,17 @@ class TemplateEngineProvider implements ServiceProviderInterface
 		// Blade
 		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)
 		{
-			return "<?php echo \$language->translate{$expression} ?>";
+			return "<?php echo \$translator->translate{$expression} ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::addCompiler('sprintf', function($expression)
 		{
-			return "<?php echo \$language->sprintf{$expression} ?>";
+			return "<?php echo \$translator->sprintf{$expression} ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::addCompiler('plural', function($expression)
 		{
-			return "<?php echo \$language->plural{$expression} ?>";
+			return "<?php echo \$translator->plural{$expression} ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
