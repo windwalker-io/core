@@ -33,6 +33,8 @@ class WhoopsProvider implements ServiceProviderInterface
 
 		if ($config->get('system.debug'))
 		{
+			error_reporting(32767);
+
 			$whoops = new \Whoops\Run;
 
 			$handler = new \Whoops\Handler\PrettyPageHandler;
@@ -68,6 +70,10 @@ class WhoopsProvider implements ServiceProviderInterface
 				->alias('debugger', 'system.debugger');
 
 			$container->share('whoops.handler', $handler);
+		}
+		else
+		{
+			error_reporting(E_ERROR);
 		}
 	}
 }
