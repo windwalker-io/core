@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
@@ -83,8 +84,20 @@ class RestfulRouter extends Router
 			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
 		}
 
+		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
+			'route'   => &$route,
+			'queries' => &$queries,
+			'router'  => $this
+		));
+
 		// Build
 		$url = parent::build($route, $queries);
+
+		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteBuild', array(
+			'url'   => &$url,
+			'router' => $this
+		));
+
 		$uri = $this->getUri();
 
 		$script = $uri->get('script');
