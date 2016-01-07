@@ -141,6 +141,16 @@ class PackageResolver implements ContainerAwareInterface
 	}
 
 	/**
+	 * getCurrentPackage
+	 *
+	 * @return  AbstractPackage
+	 */
+	public function getCurrentPackage()
+	{
+		return $this->container->get('current.package');
+	}
+
+	/**
 	 * resolvePackage
 	 *
 	 * @param  string  $name
