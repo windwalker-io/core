@@ -38,7 +38,7 @@ class ValidFailException extends \Exception
 			$msgs = implode(PHP_EOL, (array) $msgs);
 		}
 
-		parent::__construct(implode(PHP_EOL, (array) $messages), $code, $previous);
+		parent::__construct(implode(PHP_EOL, (array) $this->messages), $code, $previous);
 	}
 
 	/**
