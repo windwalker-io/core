@@ -15,7 +15,7 @@ use Windwalker\Core\View\PhpHtmlView;
  * 
  * @since  2.1.1
  */
-class AbstractDebuggerPhpHtmlView extends PhpHtmlView
+class AbstractDebuggerHtmlView extends PhpHtmlView
 {
 	/**
 	 * initialise

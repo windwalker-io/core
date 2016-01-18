@@ -307,7 +307,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			}
 
 			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
-show($class);
+
 			if (!class_exists($class))
 			{
 				$class = 'Windwalker\Core\View\HtmlView';
