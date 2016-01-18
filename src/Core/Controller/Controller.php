@@ -17,9 +17,9 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
-use Windwalker\Core\View\BladeHtmlView;
-use Windwalker\Core\View\HtmlView;
-use Windwalker\Core\View\TwigHtmlView;
+use Windwalker\Core\View\BladePhpHtmlView;
+use Windwalker\Core\View\PhpHtmlView;
+use Windwalker\Core\View\TwigPhpHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
@@ -254,9 +254,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	/**
 	 * renderView
 	 *
-	 * @param HtmlView $view
-	 * @param string   $layout
-	 * @param array    $data
+	 * @param PhpHtmlView $view
+	 * @param string      $layout
+	 * @param array       $data
 	 *
 	 * @return string
 	 */
@@ -284,7 +284,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @param string $type
 	 * @param bool   $forceNew
 	 *
-	 * @return  HtmlView|TwigHtmlView|BladeHtmlView
+	 * @return  PhpHtmlView|TwigPhpHtmlView|BladePhpHtmlView
 	 */
 	public function getView($name = null, $type = 'html', $forceNew = false)
 	{
@@ -307,13 +307,13 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			}
 
 			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
-
+show($class);
 			if (!class_exists($class))
 			{
 				$class = 'Windwalker\Core\View\HtmlView';
 			}
 
-			/** @var HtmlView $view */
+			/** @var PhpHtmlView $view */
 			$view = new $class;
 
 			$config = clone $this->config;

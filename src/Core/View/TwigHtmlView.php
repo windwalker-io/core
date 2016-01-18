@@ -18,7 +18,7 @@ use Windwalker\Utilities\Queue\Priority;
  *
  * @since 1.0
  */
-class TwigHtmlView extends HtmlView
+class TwigHtmlView extends PhpHtmlView
 {
 	/**
 	 * Property renderer.

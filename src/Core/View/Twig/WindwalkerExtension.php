@@ -9,7 +9,7 @@
 namespace Windwalker\Core\View\Twig;
 
 use Windwalker\Core\View\Helper\ViewHelper;
-use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 

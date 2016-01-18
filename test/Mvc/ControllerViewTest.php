@@ -14,7 +14,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Test\Mvc\Controller\Stub\StubController;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
-use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Filesystem\Path;
 use Windwalker\Core\Ioc;
 use Windwalker\Test\TestHelper;
@@ -244,7 +244,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 	 */
 	public function testNewDefaultView()
 	{
-		$view = new HtmlView;
+		$view = new PhpHtmlView;
 		$view->setConfig(clone $this->instance->getConfig());
 
 		$this->assertTrue($view->getPackage() instanceof NullPackage);

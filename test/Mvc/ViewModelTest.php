@@ -13,7 +13,7 @@ use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Test\Mvc\Model\FlowerModel;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
-use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;
 
@@ -27,7 +27,7 @@ class ViewModelTest extends AbstractBaseTestCase
 	/**
 	 * Property instance.
 	 *
-	 * @var StubHtmlView
+	 * @var StubPhpHtmlView
 	 */
 	protected $view;
 
@@ -64,13 +64,33 @@ class ViewModelTest extends AbstractBaseTestCase
 		$this->assertTrue($this->view->getModel('stub') instanceof StubModel);
 		$this->assertTrue($this->view->getModel('flower') instanceof DatabaseModel);
 
-		$view = new HtmlView;
+		// Test inject with custom name
+		$this->view->setModel($flowerModel = new FlowerModel, false, 'butterfly');
+
+		$this->assertSame($flowerModel, $this->view->getModel('butterfly'));
+
+		$view = new PhpHtmlView;
 
 		$model = new StubModel;
 		$model->setConfig(new Registry(array('name' => 'foo')));
 		$view->setModel($model);
 
 		$this->assertTrue($view->getModel() instanceof StubModel);
+	}
+
+	/**
+	 * testInjectFirstModelNotDefault
+	 *
+	 * @return  void
+	 */
+	public function testInjectFirstModelNotDefault()
+	{
+		$this->view->setModel($this->model, false);
+		$this->view->setModel($flowerModel = new FlowerModel);
+
+		$this->assertSame($flowerModel, $this->view->getModel());
+		$this->assertSame($flowerModel, $this->view->getModel('flower'));
+		$this->assertSame($this->model, $this->view->getModel('stub'));
 	}
 
 	/**

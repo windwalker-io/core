@@ -16,7 +16,7 @@ use Windwalker\Renderer\BladeRenderer;
  *
  * @since 1.0
  */
-class BladeHtmlView extends HtmlView
+class BladePhpHtmlView extends PhpHtmlView
 {
 	/**
 	 * Class init.

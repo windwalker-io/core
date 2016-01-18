@@ -8,14 +8,14 @@
 
 namespace Windwalker\Debugger\View;
 
-use Windwalker\Core\View\HtmlView;
+use Windwalker\Core\View\PhpHtmlView;
 
 /**
  * The AbstractDebuggerHtmlView class.
  * 
  * @since  2.1.1
  */
-class AbstractDebuggerHtmlView extends HtmlView
+class AbstractDebuggerPhpHtmlView extends PhpHtmlView
 {
 	/**
 	 * initialise

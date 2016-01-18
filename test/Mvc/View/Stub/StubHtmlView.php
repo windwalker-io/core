@@ -8,16 +8,14 @@
 
 namespace Windwalker\Core\Test\Mvc\View\Stub;
 
-use Windwalker\Core\Model\Model;
-use Windwalker\Core\View\HtmlView;
-use Windwalker\Core\View\ViewModel;
+use Windwalker\Core\View\PhpHtmlView;
 
 /**
  * The StubHtmlView class.
  * 
  * @since  2.1.1
  */
-class StubHtmlView extends HtmlView
+class StubHtmlView extends PhpHtmlView
 {
 	/**
 	 * getRegisteredPaths

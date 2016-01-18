@@ -47,6 +47,8 @@ class ViewModel implements \ArrayAccess
 	 */
 	public function getModel($name = null)
 	{
+		$name = strtolower($name);
+
 		if ($name)
 		{
 			if (isset($this->models[$name]))
@@ -65,17 +67,21 @@ class ViewModel implements \ArrayAccess
 	 *
 	 * @param   Model   $model
 	 * @param   bool    $default
+	 * @param   string  $customName
 	 *
 	 * @return static Return self to support chaining.
 	 */
-	public function setModel(Model $model, $default = false)
+	public function setModel(Model $model, $default = null, $customName = null)
 	{
-		if ($default || !$this->model)
+		if ($default === true || ($default === null && !$this->model))
 		{
 			$this->model = $model;
 		}
 
-		$this->models[$model->getName() ? : uniqid()] = $model;
+		$name = $customName ? : $model->getName();
+		$name = $name ? : uniqid();
+
+		$this->models[strtolower($name)] = $model;
 
 		return $this;
 	}
