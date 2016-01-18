@@ -9,6 +9,7 @@
 namespace Windwalker\Core\View\Helper\Set;
 
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\PhpHtmlView;
 
@@ -29,7 +30,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Property view.
 	 *
-	 * @var  PhpHtmlView
+	 * @var  AbstractView
 	 */
 	protected $view;
 
@@ -43,9 +44,9 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * HelperSet constructor.
 	 *
-	 * @param PhpHtmlView $view
+	 * @param AbstractView $view
 	 */
-	public function __construct(PhpHtmlView $view)
+	public function __construct(AbstractView $view)
 	{
 		$this->view = $view;
 	}
@@ -196,7 +197,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Method to get property View
 	 *
-	 * @return  PhpHtmlView
+	 * @return  AbstractView
 	 */
 	public function getView()
 	{
@@ -206,11 +207,11 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Method to set property view
 	 *
-	 * @param   PhpHtmlView $view
+	 * @param   AbstractView $view
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setView($view)
+	public function setView(AbstractView $view)
 	{
 		$this->view = $view;
 

@@ -15,6 +15,7 @@ use Windwalker\Core\Router\RestfulRouter;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\MvcPackage;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
+use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Core\View\ViewModel;
 use Windwalker\Data\Data;
@@ -25,11 +26,11 @@ use Windwalker\Test\TestHelper;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
- * Test class of HtmlView
+ * Test class of PhpHtmlView & AbstractView
  *
  * @since 2.1.1
  */
-class HtmlViewTest extends \PHPUnit_Framework_TestCase
+class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 {
 	/**
 	 * Test instance.
@@ -225,7 +226,7 @@ class HtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$model = new Model;
 
-		$view->setModel($model, PhpHtmlView::DEFAULT_MODEL);
+		$view->setModel($model, AbstractView::DEFAULT_MODEL);
 
 		// Get default model
 		$this->assertSame($model, $view->getModel());

@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Ioc;
 use Windwalker\Renderer\BladeRenderer;
 
 /**
@@ -16,7 +15,7 @@ use Windwalker\Renderer\BladeRenderer;
  *
  * @since 1.0
  */
-class BladePhpHtmlView extends PhpHtmlView
+class BladeHtmlView extends PhpHtmlView
 {
 	/**
 	 * Class init.

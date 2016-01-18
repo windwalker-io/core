@@ -23,6 +23,8 @@ include_once $autoload;
 define('WINDWALKER_ROOT', realpath(__DIR__ . '/..'));
 define('WINDWALKER_CORE_ROOT', realpath(__DIR__ . '/../vendor/windwalker/core'));
 
+date_default_timezone_set('UTC');
+
 /**
  * Class GenTest
  *

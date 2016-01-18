@@ -17,20 +17,17 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
-use Windwalker\Core\View\BladePhpHtmlView;
+use Windwalker\Core\View\AbstractView;
+use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\PhpHtmlView;
-use Windwalker\Core\View\TwigPhpHtmlView;
+use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
-use Windwalker\Event\DispatcherAwareInterface;
-use Windwalker\Event\DispatcherInterface;
-use Windwalker\Event\Event;
 use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
-use Windwalker\View\AbstractView;
 
 /**
  * The Controller class.
@@ -260,7 +257,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 *
 	 * @return string
 	 */
-	public function renderView($view, $layout = 'default', $data = array())
+	public function renderView(PhpHtmlView $view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{
@@ -284,7 +281,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @param string $type
 	 * @param bool   $forceNew
 	 *
-	 * @return  PhpHtmlView|TwigPhpHtmlView|BladePhpHtmlView
+	 * @return  PhpHtmlView|TwigHtmlView|BladeHtmlView|AbstractView
 	 */
 	public function getView($name = null, $type = 'html', $forceNew = false)
 	{
