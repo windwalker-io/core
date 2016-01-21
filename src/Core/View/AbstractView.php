@@ -12,6 +12,7 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Helper\ViewHelper;
@@ -24,6 +25,7 @@ use Windwalker\View\HtmlView;
  *
  * @property-read  ViewModel|mixed  $model   The ViewModel object.
  * @property-read  Registry         $config  Config object.
+ * @property-read  PackageRouter    $router  Router object.
  *
  * @since  2.1.5.3
  */
@@ -326,6 +328,11 @@ abstract class AbstractView extends HtmlView
 			return $this->model;
 		}
 
+		if ($name == 'router')
+		{
+			return $this->getRouter();
+		}
+
 		return null;
 	}
 
@@ -390,7 +397,7 @@ abstract class AbstractView extends HtmlView
 	/**
 	 * getRouter
 	 *
-	 * @return  \Windwalker\Core\Router\RestfulRouter
+	 * @return  PackageRouter
 	 */
 	public function getRouter()
 	{
