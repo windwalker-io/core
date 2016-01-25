@@ -103,7 +103,7 @@ abstract class AbstractMigration
 	 */
 	public function drop($name)
 	{
-		$this->getTable($name)->drop();
+		$this->getTable($name)->drop(true);
 
 		return $this;
 	}
