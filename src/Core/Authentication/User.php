@@ -91,7 +91,17 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 		{
 			$user = static::getCredential();
 
-			$result = static::makeUserLogin($user);
+			// Authorise event
+			static::triggerEvent('onUserAuthorisation', array(
+				'user'    => &$user,
+				'options' => &$options,
+				'result'  => &$result
+			));
+
+			if ($result)
+			{
+				$result = static::makeUserLogin($user);
+			}
 		}
 
 		// After login event
