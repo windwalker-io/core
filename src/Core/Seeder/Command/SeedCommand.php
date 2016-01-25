@@ -13,8 +13,12 @@ use Windwalker\Console\Option\Option;
 use Windwalker\Core\Seeder\Command\Seed\CleanCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
 use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;
+use Windwalker\Loader\ClassLoader;
 use Windwalker\String\StringNormalise;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * Class Seed
@@ -111,6 +115,19 @@ class SeedCommand extends Command
 		if (!is_subclass_of($class, 'Windwalker\Core\Seeder\AbstractSeeder'))
 		{
 			throw new \RuntimeException('Class: ' . $class . ' should be sub class of Windwalker\Core\Seeder\AbstractSeeder.');
+		}
+
+		// Auto include classes
+		$path = dirname(ReflectionHelper::getPath($class));
+
+		$files = Filesystem::files($path);
+		$loader = new ClassLoader;
+		$loader->register();
+
+		/** @var \SplFileInfo $file */
+		foreach ($files as $file)
+		{
+			$loader->addMap($file->getBasename('.php'), $file->getPathname());
 		}
 
 		$this->app->set('seed.class', $class);

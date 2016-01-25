@@ -70,6 +70,9 @@ class TemplateEngineProvider implements ServiceProviderInterface
 		}
 
 		// Twig
-		Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
+		if (class_exists('Twig_Extension'))
+		{
+			Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
+		}
 	}
 }
