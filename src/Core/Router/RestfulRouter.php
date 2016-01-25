@@ -90,57 +90,41 @@ class RestfulRouter extends Router
 	 */
 	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
-		try
+		if (!array_key_exists($route, $this->routes))
 		{
-			if (!array_key_exists($route, $this->routes))
-			{
-				throw new \OutOfRangeException('Route: ' . $route . ' not found.');
-			}
-
-			// Hook
-			$extra = $this->routes[$route]->getExtra();
-
-			if (isset($extra['hook']['build']))
-			{
-				if (!is_callable($extra['hook']['build']))
-				{
-					throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
-				}
-
-				call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
-			}
-
-			Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
-				'route'   => &$route,
-				'queries' => &$queries,
-				'type'    => &$type,
-				'xhtml'   => &$xhtml,
-				'router'  => $this
-			));
-
-			$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
-
-			if ($this->cache->exists($key))
-			{
-				return $this->cache->get($key);
-			}
-
-			// Build
-			$url = parent::build($route, $queries);
+			throw new \OutOfRangeException('Route: ' . $route . ' not found.');
 		}
-		catch (\OutOfRangeException $e)
+
+		// Hook
+		$extra = $this->routes[$route]->getExtra();
+
+		if (isset($extra['hook']['build']))
 		{
-			if (Ioc::getConfig()->get('routing.debug', false))
+			if (!is_callable($extra['hook']['build']))
 			{
-				throw $e;
-			}
-			elseif (Ioc::getConfig()->get('system.debug', false))
-			{
-				return sprintf('javascript:alert(\'%s\')', $e->getMessage());
+				throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
 			}
 
-			return '#';
+			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
 		}
+
+		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
+			'route'   => &$route,
+			'queries' => &$queries,
+			'type'    => &$type,
+			'xhtml'   => &$xhtml,
+			'router'  => $this
+		));
+
+		$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
+
+		if ($this->cache->exists($key))
+		{
+			return $this->cache->get($key);
+		}
+
+		// Build
+		$url = parent::build($route, $queries);
 
 		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteBuild', array(
 			'url'     => &$url,
