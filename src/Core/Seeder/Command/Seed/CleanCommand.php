@@ -71,8 +71,8 @@ class CleanCommand extends Command
 		$seeder = new $class(Ioc::getDatabase(), $this);
 
 		$seeder->doClean();
-		
-		$this->out('Database clean.');
+
+		$this->out('All data has been cleared.');
 
 		return true;
 	}

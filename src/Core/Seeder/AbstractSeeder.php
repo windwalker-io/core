@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Seeder;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
@@ -115,6 +116,32 @@ abstract class AbstractSeeder
 	public function doClean()
 	{
 		// Override it.
+	}
+
+	/**
+	 * Get DB table.
+	 *
+	 * @param $name
+	 *
+	 * @return  AbstractTable
+	 */
+	public function getTable($name)
+	{
+		return $this->db->getTable($name, true);
+	}
+
+	/**
+	 * truncate
+	 *
+	 * @param $name
+	 *
+	 * @return  static
+	 */
+	public function truncate($name)
+	{
+		$this->getTable($name)->truncate();
+
+		return $this;
 	}
 
 	/**

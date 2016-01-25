@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
@@ -70,9 +71,47 @@ abstract class AbstractMigration
 	abstract public function down();
 
 	/**
+	 * Get DB table object.
+	 *
+	 * @param string   $name
+	 * @param \Closure $callback
+	 *
+	 * @return  AbstractTable
+	 */
+	public function getTable($name, \Closure $callback = null)
+	{
+		$table = $this->db->getTable($name, true);
+
+		if (!$callback)
+		{
+			return $table;
+		}
+
+		$schema = new Schema($table);
+
+		$callback($schema);
+
+		return $schema->getTable();
+	}
+
+	/**
+	 * Drop a table.
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  static
+	 */
+	public function drop($name)
+	{
+		$this->getTable($name)->drop();
+
+		return $this;
+	}
+
+	/**
 	 * Method to get property Db
 	 *
-	 * @return  DatabaseDriver
+	 * @return  AbstractDatabaseDriver
 	 */
 	public function getDb()
 	{
@@ -82,7 +121,7 @@ abstract class AbstractMigration
 	/**
 	 * Method to set property db
 	 *
-	 * @param   DatabaseDriver $db
+	 * @param   AbstractDatabaseDriver $db
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
