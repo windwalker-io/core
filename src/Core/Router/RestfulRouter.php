@@ -20,7 +20,7 @@ use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The Router class.
- * 
+ *
  * @since  2.0
  */
 class RestfulRouter extends Router
@@ -218,16 +218,31 @@ class RestfulRouter extends Router
 	/**
 	 * match
 	 *
-	 * @param string $route
+	 * @param string $rawRoute
 	 * @param string $method
 	 * @param array  $options
 	 *
 	 * @throws  \UnexpectedValueException
 	 * @return  Route
 	 */
-	public function match($route, $method = 'GET', $options = array())
+	public function match($rawRoute, $method = 'GET', $options = array())
 	{
-		$route = parent::match($route, $method, $options);
+		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteMatch', array(
+			'route'   => &$rawRoute,
+			'method'  => &$method,
+			'options' => &$options,
+			'router'  => $this
+		));
+
+		$route = parent::match($rawRoute, $method, $options);
+
+		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteMatch', array(
+			'route'   => &$rawRoute,
+			'matched' => $route,
+			'method'  => &$method,
+			'options' => &$options,
+			'router'  => $this
+		));
 
 		$extra = $route->getExtra();
 
