@@ -152,6 +152,11 @@ class PackageResolver implements ContainerAwareInterface
 	 */
 	public function getCurrentPackage()
 	{
+		if (!$this->container->exists('current.package'))
+		{
+			return null;
+		}
+
 		return $this->container->get('current.package');
 	}
 
@@ -164,7 +169,12 @@ class PackageResolver implements ContainerAwareInterface
 	 */
 	public function resolvePackage($name)
 	{
-		return $this->getPackage($name) ? : new DefaultPackage;
+		if ($this->exists($name))
+		{
+			return $this->getPackage($name);
+		}
+
+		return new DefaultPackage;
 	}
 
 	/**
