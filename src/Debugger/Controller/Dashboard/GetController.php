@@ -28,7 +28,7 @@ class GetController extends Controller
 
 		$view->setModel($model = $this->getModel(), true);
 
-		$view['item'] = $this->getModel('Item')->getItem($this->input->get('id'));
+		$view['item'] = $this->getModel('Profiler')->getItem($this->input->get('id'));
 
 		return $view->render();
 	}
