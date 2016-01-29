@@ -10,6 +10,8 @@ namespace Windwalker\Core\Package;
 
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
+use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Controller\Controller;
 use Windwalker\Core\Controller\ControllerResolver;
 use Windwalker\Core\Controller\MultiActionController;
@@ -23,19 +25,27 @@ use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
-use Windwalker\Registry\RegistryHelper;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractPackage class.
  *
- * @property-read  PackageRouter  $router
+ * @property-read  Registry                          $config
+ * @property-read  PackageRouter                     $router
+ * @property-read  WebApplication|WindwalkerConsole  $app
  *
  * @since  2.0
  */
 class AbstractPackage implements DispatcherAwareInterface
 {
+	/**
+	 * Property app.
+	 *
+	 * @var  WebApplication|WindwalkerConsole
+	 */
+	protected $app = null;
+
 	/**
 	 * DI Container.
 	 *
@@ -106,6 +116,8 @@ class AbstractPackage implements DispatcherAwareInterface
 		}
 
 		$container = $this->getContainer();
+
+		$this->getApplication();
 
 		$this->getConfig();
 
@@ -546,6 +558,12 @@ class AbstractPackage implements DispatcherAwareInterface
 			return $this->getConfig();
 		}
 
+
+		if ($name == 'app')
+		{
+			return $this->app;
+		}
+
 		return null;
 	}
 
@@ -672,5 +690,39 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function getCurrentController()
 	{
 		return $this->currentController;
+	}
+
+	/**
+	 * Method to get property App
+	 *
+	 * @return  WebApplication|WindwalkerConsole
+	 */
+	public function getApplication()
+	{
+		if (!$this->app)
+		{
+			$this->app = $this->getContainer()->get('system.application');
+		}
+
+		return $this->app;
+	}
+
+	/**
+	 * Method to set property app
+	 *
+	 * @param   WebApplication|WindwalkerConsole $app
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setApplication($app)
+	{
+		if (!$app instanceof  WebApplication || !$app instanceof WindwalkerConsole)
+		{
+			throw new \InvalidArgumentException('$app should be instance of WebApplication or WindwalkerConsole');
+		}
+
+		$this->app = $app;
+
+		return $this;
 	}
 }
