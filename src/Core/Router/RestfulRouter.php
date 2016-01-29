@@ -11,6 +11,10 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherInterface;
+use Windwalker\Event\EventInterface;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 use Windwalker\Router\Matcher\MatcherInterface;
@@ -23,7 +27,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  2.0
  */
-class RestfulRouter extends Router
+class RestfulRouter extends Router implements DispatcherAwareInterface, DispatcherInterface
 {
 	const TYPE_RAW = 'raw';
 	const TYPE_PATH = 'path';
@@ -64,6 +68,13 @@ class RestfulRouter extends Router
 	 * @var  Cache
 	 */
 	protected $cache;
+
+	/**
+	 * Property dispatcher.
+	 *
+	 * @var  DispatcherInterface
+	 */
+	protected $dispatcher;
 
 	/**
 	 * Class init.
@@ -108,7 +119,7 @@ class RestfulRouter extends Router
 			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
 		}
 
-		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
+		$this->triggerEvent('onRouterBeforeRouteBuild', array(
 			'route'   => &$route,
 			'queries' => &$queries,
 			'type'    => &$type,
@@ -126,7 +137,7 @@ class RestfulRouter extends Router
 		// Build
 		$url = parent::build($route, $queries);
 
-		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteBuild', array(
+		$this->triggerEvent('onRouterAfterRouteBuild', array(
 			'url'     => &$url,
 			'route'   => &$route,
 			'queries' => &$queries,
@@ -227,7 +238,7 @@ class RestfulRouter extends Router
 	 */
 	public function match($rawRoute, $method = 'GET', $options = array())
 	{
-		Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteMatch', array(
+		$this->triggerEvent('onRouterBeforeRouteMatch', array(
 			'route'   => &$rawRoute,
 			'method'  => &$method,
 			'options' => &$options,
@@ -236,7 +247,7 @@ class RestfulRouter extends Router
 
 		$route = parent::match($rawRoute, $method, $options);
 
-		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteMatch', array(
+		$this->triggerEvent('onRouterAfterRouteMatch', array(
 			'route'   => &$rawRoute,
 			'matched' => $route,
 			'method'  => &$method,
@@ -402,5 +413,69 @@ class RestfulRouter extends Router
 	protected function getCacheKey($data)
 	{
 		return md5(json_encode($data));
+	}
+
+	/**
+	 * getDispatcher
+	 *
+	 * @return  DispatcherInterface
+	 */
+	public function getDispatcher()
+	{
+		if (!$this->dispatcher)
+		{
+			$this->dispatcher = Ioc::getDispatcher();
+		}
+
+		return $this->dispatcher;
+	}
+
+	/**
+	 * setDispatcher
+	 *
+	 * @param   DispatcherInterface $dispatcher
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDispatcher(DispatcherInterface $dispatcher)
+	{
+		$this->dispatcher = $dispatcher;
+
+		return $this;
+	}
+
+	/**
+	 * Trigger an event.
+	 *
+	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments.
+	 *
+	 * @return  EventInterface  The event after being passed through all listeners.
+	 */
+	public function triggerEvent($event, $args = array())
+	{
+		return $this->getDispatcher()->triggerEvent($event, $args);
+	}
+
+	/**
+	 * Add a listener to this dispatcher, only if not already registered to these events.
+	 * If no events are specified, it will be registered to all events matching it's methods name.
+	 * In the case of a closure, you must specify at least one event name.
+	 *
+	 * @param   object|\Closure $listener     The listener
+	 * @param   array|integer   $priorities   An associative array of event names as keys
+	 *                                        and the corresponding listener priority as values.
+	 *
+	 * @return  DispatcherInterface  This method is chainable.
+	 *
+	 * @throws  \InvalidArgumentException
+	 *
+	 * @since   2.0
+	 */
+	public function addListener($listener, $priorities = array())
+	{
+		$this->getDispatcher()->addListener($listener, $priorities);
+
+		return $this;
 	}
 }
