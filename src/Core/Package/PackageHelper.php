@@ -21,7 +21,7 @@ use Windwalker\Registry\Registry;
  * @method  static  PackageResolver    getInstance()
  * @method  static  PackageResolver    registerPackages(array $packages)
  * @method  static  AbstractPackage    addPackage($alias, $package)
- * @method  static  AbstractPackage    getPackage($name)
+ * @method  static  AbstractPackage    getPackage($name = null)
  * @method  static  AbstractPackage    getCurrentPackage()
  * @method  static  AbstractPackage    resolvePackage($name)
  * @method  static  AbstractPackage[]  getPackages()

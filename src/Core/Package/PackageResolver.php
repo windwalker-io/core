@@ -130,8 +130,13 @@ class PackageResolver implements ContainerAwareInterface
 	 *
 	 * @return  AbstractPackage
 	 */
-	public function getPackage($name)
+	public function getPackage($name = null)
 	{
+		if (!$name)
+		{
+			return $this->getCurrentPackage();
+		}
+
 		if (isset($this->packages[$name]))
 		{
 			return $this->packages[$name];
