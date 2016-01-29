@@ -17,6 +17,7 @@ use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
@@ -310,7 +311,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 		// Validate that we have a map to handle the given HTTP method.
 		if (!isset($this->suffixMap[$method]))
 		{
-			throw new \RuntimeException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
+			// throw new \RuntimeException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
 		}
 
 		if (isset($customSuffix['*']))
@@ -320,7 +321,30 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 
 		$customSuffix = array_change_key_case($customSuffix, CASE_UPPER);
 
+		// Split GET|POST|PUT format
+		foreach ($customSuffix as $key => $value)
+		{
+			$keyArray = explode('|', $key);
+
+			if (count($keyArray) <= 1)
+			{
+				continue;
+			}
+
+			foreach ($keyArray as $splitedMethod)
+			{
+				$customSuffix[$splitedMethod] = $value;
+			}
+
+			unset($customSuffix[$key]);
+		}
+
 		$suffix = array_merge($this->suffixMap, $customSuffix);
+
+		if (!isset($suffix[$method]))
+		{
+			throw new RouteNotFoundException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
+		}
 
 		return trim($suffix[$method], '\\');
 	}
