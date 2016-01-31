@@ -180,17 +180,18 @@ class ErrorHandler
 	 * registerErrorHandler
 	 *
 	 * @param bool $restore
+	 * @param int  $type
 	 *
-	 * @return void
+	 * @return  void
 	 */
-	public static function register($restore = true)
+	public static function register($restore = true, $type = E_ALL | E_STRICT)
 	{
 		if ($restore)
 		{
 			static::restore();
 		}
 
-		set_error_handler(array(get_called_class(), 'error'));
+		set_error_handler(array(get_called_class(), 'error'), $type);
 		set_exception_handler(array(get_called_class(), 'exception'));
 	}
 

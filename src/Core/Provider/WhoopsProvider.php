@@ -33,7 +33,7 @@ class WhoopsProvider implements ServiceProviderInterface
 
 		if ($config->get('system.debug'))
 		{
-			error_reporting(32767);
+			error_reporting($config->get('system.error_reporting', -1));
 
 			$whoops = new \Whoops\Run;
 
@@ -73,7 +73,7 @@ class WhoopsProvider implements ServiceProviderInterface
 		}
 		else
 		{
-			error_reporting(E_ERROR);
+			error_reporting($config->get('system.error_reporting', 0));
 		}
 	}
 }
