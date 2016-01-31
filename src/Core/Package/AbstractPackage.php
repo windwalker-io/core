@@ -34,6 +34,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * @property-read  Registry                          $config
  * @property-read  PackageRouter                     $router
  * @property-read  WebApplication|WindwalkerConsole  $app
+ * @property-read  string                            $name
  *
  * @since  2.0
  */
@@ -561,7 +562,12 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if ($name == 'app')
 		{
-			return $this->app;
+			return $this->getApplication();
+		}
+
+		if ($name == 'name')
+		{
+			return $this->getName();
 		}
 
 		return null;
