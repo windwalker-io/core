@@ -25,7 +25,7 @@ class GetController extends Controller
 	protected function doExecute()
 	{
 		$view = $this->getView();
-		$model = $this->getModel('Item');
+		$model = $this->getModel('Profiler');
 
 		$view['item'] = $model->getItem($this->input->get('id'));
 

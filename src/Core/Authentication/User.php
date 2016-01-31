@@ -81,13 +81,11 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 
 		$options['remember'] = $remember;
 
-		$result = false;
-
 		// Before login event
 		$event = static::triggerEvent('onUserBeforeLogin', array('user' => &$user, 'options' => &$options));
 
 		// Do login
-		if (static::authenticate($event['user']))
+		if ($result = static::authenticate($event['user']))
 		{
 			$user = static::getCredential();
 

@@ -61,7 +61,25 @@ class PackageRouter
 		}
 		catch (\OutOfRangeException $e)
 		{
-			return $this->router->build($route, $queries, $type, $xhtml);
+			try
+			{
+				return $this->router->build($route, $queries, $type, $xhtml);
+			}
+			catch (\OutOfRangeException $e)
+			{
+				$config = $this->package->getContainer()->get('system.config');
+
+				if ($config->get('routing.debug', false))
+				{
+					throw $e;
+				}
+				elseif ($config->get('system.debug', false))
+				{
+					return sprintf('javascript:alert(\'%s\')', $e->getMessage());
+				}
+
+				return '#';
+			}
 		}
 	}
 

@@ -11,8 +11,13 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherInterface;
+use Windwalker\Event\EventInterface;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
@@ -20,10 +25,10 @@ use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The Router class.
- * 
+ *
  * @since  2.0
  */
-class RestfulRouter extends Router
+class RestfulRouter extends Router implements DispatcherAwareInterface, DispatcherInterface
 {
 	const TYPE_RAW = 'raw';
 	const TYPE_PATH = 'path';
@@ -66,6 +71,13 @@ class RestfulRouter extends Router
 	protected $cache;
 
 	/**
+	 * Property dispatcher.
+	 *
+	 * @var  DispatcherInterface
+	 */
+	protected $dispatcher;
+
+	/**
 	 * Class init.
 	 *
 	 * @param array            $routes
@@ -90,59 +102,43 @@ class RestfulRouter extends Router
 	 */
 	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
-		try
+		if (!array_key_exists($route, $this->routes))
 		{
-			if (!array_key_exists($route, $this->routes))
-			{
-				throw new \OutOfRangeException('Route: ' . $route . ' not found.');
-			}
-
-			// Hook
-			$extra = $this->routes[$route]->getExtra();
-
-			if (isset($extra['hook']['build']))
-			{
-				if (!is_callable($extra['hook']['build']))
-				{
-					throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
-				}
-
-				call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
-			}
-
-			Ioc::getDispatcher()->triggerEvent('onRouterBeforeRouteBuild', array(
-				'route'   => &$route,
-				'queries' => &$queries,
-				'type'    => &$type,
-				'xhtml'   => &$xhtml,
-				'router'  => $this
-			));
-
-			$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
-
-			if ($this->cache->exists($key))
-			{
-				return $this->cache->get($key);
-			}
-
-			// Build
-			$url = parent::build($route, $queries);
-		}
-		catch (\OutOfRangeException $e)
-		{
-			if (Ioc::getConfig()->get('routing.debug', false))
-			{
-				throw $e;
-			}
-			elseif (Ioc::getConfig()->get('system.debug', false))
-			{
-				return sprintf('javascript:alert(\'%s\')', $e->getMessage());
-			}
-
-			return '#';
+			throw new \OutOfRangeException('Route: ' . $route . ' not found.');
 		}
 
-		Ioc::getDispatcher()->triggerEvent('onRouterAfterRouteBuild', array(
+		// Hook
+		$extra = $this->routes[$route]->getExtra();
+
+		if (isset($extra['hook']['build']))
+		{
+			if (!is_callable($extra['hook']['build']))
+			{
+				throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
+			}
+
+			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
+		}
+
+		$this->triggerEvent('onRouterBeforeRouteBuild', array(
+			'route'   => &$route,
+			'queries' => &$queries,
+			'type'    => &$type,
+			'xhtml'   => &$xhtml,
+			'router'  => $this
+		));
+
+		$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
+
+		if ($this->cache->exists($key))
+		{
+			return $this->cache->get($key);
+		}
+
+		// Build
+		$url = parent::build($route, $queries);
+
+		$this->triggerEvent('onRouterAfterRouteBuild', array(
 			'url'     => &$url,
 			'route'   => &$route,
 			'queries' => &$queries,
@@ -234,16 +230,31 @@ class RestfulRouter extends Router
 	/**
 	 * match
 	 *
-	 * @param string $route
+	 * @param string $rawRoute
 	 * @param string $method
 	 * @param array  $options
 	 *
 	 * @throws  \UnexpectedValueException
 	 * @return  Route
 	 */
-	public function match($route, $method = 'GET', $options = array())
+	public function match($rawRoute, $method = 'GET', $options = array())
 	{
-		$route = parent::match($route, $method, $options);
+		$this->triggerEvent('onRouterBeforeRouteMatch', array(
+			'route'   => &$rawRoute,
+			'method'  => &$method,
+			'options' => &$options,
+			'router'  => $this
+		));
+
+		$route = parent::match($rawRoute, $method, $options);
+
+		$this->triggerEvent('onRouterAfterRouteMatch', array(
+			'route'   => &$rawRoute,
+			'matched' => $route,
+			'method'  => &$method,
+			'options' => &$options,
+			'router'  => $this
+		));
 
 		$extra = $route->getExtra();
 
@@ -300,7 +311,7 @@ class RestfulRouter extends Router
 		// Validate that we have a map to handle the given HTTP method.
 		if (!isset($this->suffixMap[$method]))
 		{
-			throw new \RuntimeException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
+			// throw new \RuntimeException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
 		}
 
 		if (isset($customSuffix['*']))
@@ -310,7 +321,30 @@ class RestfulRouter extends Router
 
 		$customSuffix = array_change_key_case($customSuffix, CASE_UPPER);
 
+		// Split GET|POST|PUT format
+		foreach ($customSuffix as $key => $value)
+		{
+			$keyArray = explode('|', $key);
+
+			if (count($keyArray) <= 1)
+			{
+				continue;
+			}
+
+			foreach ($keyArray as $splitedMethod)
+			{
+				$customSuffix[$splitedMethod] = $value;
+			}
+
+			unset($customSuffix[$key]);
+		}
+
 		$suffix = array_merge($this->suffixMap, $customSuffix);
+
+		if (!isset($suffix[$method]))
+		{
+			throw new RouteNotFoundException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
+		}
 
 		return trim($suffix[$method], '\\');
 	}
@@ -403,5 +437,69 @@ class RestfulRouter extends Router
 	protected function getCacheKey($data)
 	{
 		return md5(json_encode($data));
+	}
+
+	/**
+	 * getDispatcher
+	 *
+	 * @return  DispatcherInterface
+	 */
+	public function getDispatcher()
+	{
+		if (!$this->dispatcher)
+		{
+			$this->dispatcher = Ioc::getDispatcher();
+		}
+
+		return $this->dispatcher;
+	}
+
+	/**
+	 * setDispatcher
+	 *
+	 * @param   DispatcherInterface $dispatcher
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDispatcher(DispatcherInterface $dispatcher)
+	{
+		$this->dispatcher = $dispatcher;
+
+		return $this;
+	}
+
+	/**
+	 * Trigger an event.
+	 *
+	 * @param   EventInterface|string $event The event object or name.
+	 * @param   array                 $args  The arguments.
+	 *
+	 * @return  EventInterface  The event after being passed through all listeners.
+	 */
+	public function triggerEvent($event, $args = array())
+	{
+		return $this->getDispatcher()->triggerEvent($event, $args);
+	}
+
+	/**
+	 * Add a listener to this dispatcher, only if not already registered to these events.
+	 * If no events are specified, it will be registered to all events matching it's methods name.
+	 * In the case of a closure, you must specify at least one event name.
+	 *
+	 * @param   object|\Closure $listener     The listener
+	 * @param   array|integer   $priorities   An associative array of event names as keys
+	 *                                        and the corresponding listener priority as values.
+	 *
+	 * @return  DispatcherInterface  This method is chainable.
+	 *
+	 * @throws  \InvalidArgumentException
+	 *
+	 * @since   2.0
+	 */
+	public function addListener($listener, $priorities = array())
+	{
+		$this->getDispatcher()->addListener($listener, $priorities);
+
+		return $this;
 	}
 }

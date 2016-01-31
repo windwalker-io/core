@@ -42,7 +42,8 @@ class RouterProvider implements ServiceProviderInterface
 
 			$router = new RestfulRouter(array(), $self->getMatcher($matcher));
 
-			$router->setUri($container->get('system.uri'));
+			$router->setUri($container->get('system.uri'))
+				->setDispatcher($container->get('system.dispatcher'));
 
 			return $router;
 		};

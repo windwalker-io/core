@@ -18,7 +18,7 @@ use Windwalker\Debugger\Helper\PageRecordHelper;
  * 
  * @since  2.1.1
  */
-class ItemModel extends Model
+class ProfilerModel extends Model
 {
 	/**
 	 * getItem

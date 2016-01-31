@@ -144,7 +144,7 @@ class DebuggerListener
 			return;
 		}
 
-		$itemModel = $controller->getModel('Item');
+		$itemModel = $controller->getModel('Profiler');
 
 		if (!$itemModel->hasItem($id))
 		{
