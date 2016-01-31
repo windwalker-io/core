@@ -14,13 +14,13 @@ use Windwalker\Dom\HtmlElement;
 
 <?php if (!empty($collector['request'][$type])): ?>
 	<?php
-	$grid = BootstrapKeyValueGrid::create()->addHeader();
+	$gridObject = BootstrapKeyValueGrid::create()->addHeader();
 
 	foreach ($collector['request'][$type] as $bagName => $bagValue)
 	{
 		if (is_array($bagValue) || is_object($bagValue))
 		{
-			$grid->addTitle(new HtmlElement('strong', $bagName));
+            $gridObject->addTitle(new HtmlElement('strong', $bagName));
 
 			if ($bagValue)
 			{
@@ -31,22 +31,22 @@ use Windwalker\Dom\HtmlElement;
 						$value = new HtmlElement('pre', print_r($value, 1));
 					}
 
-					$grid->addItem($key, $value);
+                    $gridObject->addItem($key, $value);
 				}
 			}
 			else
 			{
-				$grid->addRow()
+                $gridObject->addRow()
 					->setRowCell('key', 'No Data', array('colspan' => 3));
 			}
 		}
 		else
 		{
-			$grid->addItem($bagName, $bagValue);
+            $gridObject->addItem($bagName, $bagValue);
 		}
 	}
 
-	echo $grid;
+	echo $gridObject;
 	?>
 	<br /><br />
 <?php else: ?>

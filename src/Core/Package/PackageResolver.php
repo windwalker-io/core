@@ -12,6 +12,7 @@ use Windwalker\Console\Console;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\Registry\Registry;
+use Windwalker\String\StringNormalise;
 
 /**
  * The PackageResolver class.
@@ -33,6 +34,13 @@ class PackageResolver implements ContainerAwareInterface
 	 * @var  AbstractPackage[]
 	 */
 	protected $packages = array();
+
+	/**
+	 * Property aliases.
+	 *
+	 * @var  array
+	 */
+	protected $aliases = array();
 
 	/**
 	 * PackageResolver constructor.
@@ -120,6 +128,9 @@ class PackageResolver implements ContainerAwareInterface
 
 		$subContainer->alias('package', 'package.' . $name);
 
+		// Add alias map
+		$this->aliases[get_class($package)] = $name;
+
 		return $package;
 	}
 
@@ -148,6 +159,36 @@ class PackageResolver implements ContainerAwareInterface
 	public function getCurrentPackage()
 	{
 		return $this->container->get('current.package');
+	}
+
+	/**
+	 * getPackageAlias
+	 *
+	 * @param   string|AbstractPackage $package
+	 *
+	 * @return  string
+	 */
+	public function getAlias($package)
+	{
+		if (is_string($package))
+		{
+			$package = ltrim(StringNormalise::toClassNamespace($package), '\\');
+		}
+		elseif (is_object($package))
+		{
+			$package = get_class($package);
+		}
+		else
+		{
+			throw new \InvalidArgumentException('Please send package object or class name.');
+		}
+
+		if (isset($this->aliases[$package]))
+		{
+			return $this->aliases[$package];
+		}
+
+		return null;
 	}
 
 	/**

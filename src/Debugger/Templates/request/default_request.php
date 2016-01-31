@@ -13,7 +13,7 @@ use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 
 <?php if (!empty($collector['request'][$type])): ?>
 	<?php
-	$grid = BootstrapKeyValueGrid::create()->addHeader();
+    $gridObject = BootstrapKeyValueGrid::create()->addHeader();
 
 	foreach ($collector['request'][$type] as $key => $value)
 	{
@@ -22,10 +22,10 @@ use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 			$value = new \Windwalker\Dom\HtmlElement('pre', print_r($value, 1));
 		}
 
-		$grid->addItem($key, $value);
+        $gridObject->addItem($key, $value);
 	}
 
-	echo $grid;
+	echo $gridObject;
 	?>
 	<br /><br />
 <?php else: ?>

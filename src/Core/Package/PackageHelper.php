@@ -18,15 +18,16 @@ use Windwalker\Registry\Registry;
  *
  * @see  Windwalker\Core\Package\PackageResolver
  *
- * @method  static  PackageResolver    getInstance()
- * @method  static  PackageResolver    registerPackages(array $packages)
- * @method  static  AbstractPackage    addPackage($alias, $package)
- * @method  static  AbstractPackage    getPackage($name)
- * @method  static  AbstractPackage    getCurrentPackage()
- * @method  static  AbstractPackage    resolvePackage($name)
- * @method  static  AbstractPackage[]  getPackages()
- * @method  static  boolean            exists($package)
- * @method  static  Registry           getConfig($package)
+ * @method  static  PackageResolver         getInstance()
+ * @method  static  PackageResolver         registerPackages(array $packages)
+ * @method  static  AbstractPackage         addPackage($alias, $package)
+ * @method  static  AbstractPackage         getPackage($name)
+ * @method  static  AbstractPackage         getCurrentPackage()
+ * @method  static  string|AbstractPackage  getAlias($package)
+ * @method  static  AbstractPackage         resolvePackage($name)
+ * @method  static  AbstractPackage[]       getPackages()
+ * @method  static  boolean                 exists($package)
+ * @method  static  Registry                getConfig($package)
  *
  * @since  2.0
  */
