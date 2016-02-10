@@ -69,7 +69,7 @@ class PackageRouter
 			{
 				$config = $this->package->getContainer()->get('system.config');
 
-				if ($config->get('routing.debug', false))
+				if (!$xhtml || $config->get('routing.debug', false))
 				{
 					throw $e;
 				}
