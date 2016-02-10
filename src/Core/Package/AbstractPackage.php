@@ -184,6 +184,8 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$controller->isHmvc($hmvc);
 
+		$this->currentController = $controller;
+
 		$this->prepareExecute();
 
 		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
@@ -193,8 +195,6 @@ class AbstractPackage implements DispatcherAwareInterface
 			'variables'  => $variables,
 			'hmvc'       => $hmvc
 		));
-
-		$this->currentController = $controller;
 
 		$result = $controller->execute();
 
