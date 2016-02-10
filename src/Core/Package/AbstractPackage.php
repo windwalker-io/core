@@ -146,6 +146,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		list($controller, $action) = StringHelper::explode('::', $controller, 2);
 
+		/** @var Controller $class */
 		$class = ControllerResolver::getController($this, $controller);
 
 		$container = $this->getContainer();

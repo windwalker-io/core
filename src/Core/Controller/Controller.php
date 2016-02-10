@@ -124,6 +124,8 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$this->config = $this->getConfig();
 		$this->container = $container ? : $this->getContainer();
 
+		$this->package = $package ? : null;
+
 		// Guess package
 		$this->getPackage();
 
