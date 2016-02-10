@@ -307,7 +307,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			if (!class_exists($class))
 			{
-				$class = 'Windwalker\Core\View\HtmlView';
+				$class = 'Windwalker\Core\View\PhpHtmlView';
 			}
 
 			/** @var PhpHtmlView $view */
