@@ -124,10 +124,15 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		$this->config = $this->getConfig();
 		$this->container = $container ? : $this->getContainer();
 
-		$this->package = $package ? : null;
-
-		// Guess package
-		$this->getPackage();
+		if ($package)
+		{
+			$this->setPackage($package);
+		}
+		else
+		{
+			// Guess package
+			$this->getPackage();
+		}
 
 		parent::__construct($input, $app);
 	}
