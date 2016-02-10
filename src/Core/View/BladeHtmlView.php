@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Renderer\BladeRenderer;
 
 /**
@@ -25,7 +26,7 @@ class BladeHtmlView extends PhpHtmlView
 	 */
 	public function __construct($data = array(), BladeRenderer $renderer = null)
 	{
-		$renderer = $renderer ? : new BladeRenderer;
+		$renderer = $renderer ? : RendererHelper::getBladeRenderer();
 
 		parent::__construct($data, $renderer);
 	}

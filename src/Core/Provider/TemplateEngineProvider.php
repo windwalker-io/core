@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Provider;
 
 use Illuminate\View\Compilers\BladeCompiler;
+use Windwalker\Core\Renderer\Finder\PackageFinder;
+use Windwalker\Core\Renderer\RendererFactory;
 use Windwalker\Core\View\Twig\WindwalkerExtension;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -29,6 +31,44 @@ class TemplateEngineProvider implements ServiceProviderInterface
 	 * @return  void
 	 */
 	public function register(Container $container)
+	{
+		$this->prepareFactory($container);
+
+		$this->prepareExtends($container);
+	}
+
+	/**
+	 * prepareFactory
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareFactory(Container $container)
+	{
+		$closure = function(Container $container)
+		{
+			return new RendererFactory($container);
+		};
+
+		$container->share('renderer.factory', $closure);
+
+		$closure = function(Container $container)
+		{
+			return new PackageFinder($container->get('package.resolver'));
+		};
+
+		$container->share('package.finder', $closure);
+	}
+
+	/**
+	 * prepareExtends
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareExtends(Container $container)
 	{
 		// Blade
 		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)

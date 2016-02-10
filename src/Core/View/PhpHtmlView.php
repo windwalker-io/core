@@ -37,6 +37,8 @@ class PhpHtmlView extends AbstractView
 		$this->config = new Registry;
 		$this->model = new ViewModel;
 
+		$renderer = $renderer ? : RendererHelper::getPhpRenderer();
+
 		parent::__construct($data, $renderer);
 
 		// Create PriorityQueue
@@ -136,8 +138,6 @@ class PhpHtmlView extends AbstractView
 
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), Priority::LOW - 10);
-
-		$paths = RendererHelper::getGlobalPaths()->merge($paths);
 
 		$this->renderer->setPaths($paths);
 
