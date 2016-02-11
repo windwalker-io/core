@@ -12,7 +12,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Console\Option\Option;
 use Windwalker\Core\Seeder\Command\Seed\CleanCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;

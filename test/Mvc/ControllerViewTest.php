@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Test\Mvc;
 
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Test\TestCase\AbstractBaseTestCase;
 use Windwalker\Core\Package\AbstractPackage;

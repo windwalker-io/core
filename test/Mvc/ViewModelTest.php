@@ -27,7 +27,7 @@ class ViewModelTest extends AbstractBaseTestCase
 	/**
 	 * Property instance.
 	 *
-	 * @var StubPhpHtmlView
+	 * @var StubHtmlView
 	 */
 	protected $view;
 

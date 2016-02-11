@@ -11,12 +11,14 @@ namespace Windwalker\Core\Controller;
 use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Model\Model;
+use Windwalker\Core\Mvc\ModelResolver;
+use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\DefaultPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\PhpHtmlView;
@@ -294,23 +296,23 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	{
 		$name = $name ? : $this->getName();
 
-		$key = 'view.' . $name . '.' . $type;
+		$key = ViewResolver::getDIKey($name . '.' . $type);
 
-		if (!$this->container->exists($key) || $forceNew)
+		if (!$this->container->exists($key))
 		{
 			// Find if package exists
 			$package = $this->getPackage();
 
-			if (!$package instanceof NullPackage)
-			{
-				$ns = ReflectionHelper::getNamespaceName($package);
-			}
-			else
+			$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
+
+			$class = $package->getMvcResolver()->resolveView($package, $viewName);
+
+			if (empty($class))
 			{
 				$ns = MvcHelper::getPackageNamespace(get_called_class());
-			}
 
-			$class = sprintf($ns . '\View\%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
+				$class = $ns . '\View\\' . $viewName;
+			}
 
 			if (!class_exists($class))
 			{
@@ -332,7 +334,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			$this->container->share($key, $view)->alias($class, $key);
 		}
 
-		return $this->container->get($key);
+		return $this->container->get($key, $forceNew);
 	}
 
 	/**
@@ -347,23 +349,23 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	{
 		$name = $name ? : $this->getName();
 
-		$key = 'model.' . $name;
+		$key = ModelResolver::getDIKey($name);
 
-		if (!$this->container->exists($key) || $forceNew)
+		if (!$this->container->exists($key))
 		{
 			// Find if package exists
 			$package = $this->getPackage();
 
-			if (!$package instanceof NullPackage)
-			{
-				$ns = ReflectionHelper::getNamespaceName($package);
-			}
-			else
+			$modelName = ucfirst($name) . 'Model';
+
+			$class = $package->getMvcResolver()->resolveModel($package, $modelName);
+
+			if (empty($class))
 			{
 				$ns = MvcHelper::getPackageNamespace(get_called_class());
-			}
 
-			$class = sprintf($ns . '\Model\%sModel', ucfirst($name), ucfirst($name));
+				$class = sprintf($ns . '\Model\\' . $modelName);
+			}
 
 			if (!class_exists($class))
 			{
@@ -385,7 +387,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			$this->container->share($key, $model)->alias($class, $key);
 		}
 
-		return $this->container->get($key);
+		return $this->container->get($key, $forceNew);
 	}
 
 	/**

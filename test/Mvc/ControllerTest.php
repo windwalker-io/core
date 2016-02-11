@@ -79,7 +79,7 @@ class ControllerTest extends AbstractBaseTestCase
 	public function testNoPackage()
 	{
 		$controller = new StubController;
-
+		
 		$this->assertTrue($controller->getPackage() instanceof NullPackage);
 
 		$config = $this->instance->getConfig();

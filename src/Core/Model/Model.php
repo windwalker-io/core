@@ -25,6 +25,13 @@ use Windwalker\Registry\Registry;
 class Model extends AbstractModel
 {
 	/**
+	 * Make sure state at the first to easily debug.
+	 *
+	 * @var  Registry
+	 */
+	protected $state;
+
+	/**
 	 * Property cache.
 	 *
 	 * @var  Cache

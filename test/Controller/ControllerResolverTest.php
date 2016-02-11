@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Controller;
 
-use Windwalker\Core\Controller\ControllerResolver;
+use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Test\Controller\Mock\MockPackage;
 use Windwalker\Core\Test\Mvc\MvcPackage;
@@ -48,6 +48,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function tearDown()
 	{
+		PackageHelper::removePackage('mvc')->removePackage('mock');
 	}
 
 	/**
@@ -61,18 +62,18 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 	{
 		$package = new MvcPackage;
 
-		$class = $this->instance->resolveController($package, 'Stub\StubController');
+		$class = $this->instance->resolve($package, 'Stub\StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Mvc\Controller\Stub\StubController', $class);
 
-		$class = $this->instance->resolveController($package, 'Stub.StubController');
+		$class = $this->instance->resolve($package, 'Stub.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Mvc\Controller\Stub\StubController', $class);
 
 		// Test Get alias
 		PackageHelper::addPackage('mock', new MockPackage);
 
-		$class = $this->instance->resolveController($package, 'mock@Mock.StubController');
+		$class = $this->instance->resolve($package, 'mock@Mock.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController', $class);
 
@@ -83,7 +84,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 			'Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController'
 		);
 
-		$class = $this->instance->resolveController($package, 'Stub.StubController');
+		$class = $this->instance->resolve($package, 'Stub.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController', $class);
 	}
@@ -100,10 +101,10 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 		$this->instance->addNamespace('Flower\Sakura');
 		$this->instance->addNamespace('Windwalker\Core\Test\Controller\Mock\Controller');
 
-		$class = $this->instance->findController('Mock\StubController');
+		$class = $this->instance->find('Mock\StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController', $class);
-		$this->assertFalse($this->instance->findController('Foo\BarController'));
+		$this->assertFalse($this->instance->find('Foo\BarController'));
 	}
 
 	/**

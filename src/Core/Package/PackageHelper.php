@@ -25,6 +25,7 @@ use Windwalker\Registry\Registry;
  * @method  static  AbstractPackage         getCurrentPackage()
  * @method  static  string|AbstractPackage  getAlias($package)
  * @method  static  AbstractPackage         resolvePackage($name)
+ * @method  static  PackageResolver         removePackage($name)
  * @method  static  AbstractPackage[]       getPackages()
  * @method  static  boolean                 exists($package)
  * @method  static  Registry                getConfig($package)

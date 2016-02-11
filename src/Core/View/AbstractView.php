@@ -13,7 +13,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;

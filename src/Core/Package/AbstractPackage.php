@@ -13,9 +13,10 @@ use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Controller\ControllerResolver;
+use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Controller\MultiActionController;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
@@ -148,7 +149,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		list($controller, $action) = StringHelper::explode('::', $controller, 2);
 
-		$resolver = $this->getControllerResolver();
+		$resolver = $this->getMvcResolver()->getControllerResolver();
 
 		$key = $resolver->getDIKey($controller);
 
@@ -157,7 +158,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			try
 			{
 				/** @var Controller $class */
-				$class = $resolver->resolveController($this, $controller);
+				$class = $resolver->resolve($this, $controller);
 
 				if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
 				{
@@ -218,7 +219,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		// Handle error
 		if (!$controller)
 		{
-			$namespaces = $this->getControllerResolver()->dumpNamespaces();
+			$namespaces = $this->getMvcResolver()->getControllerResolver()->dumpNamespaces();
 
 			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($this);
 
@@ -265,13 +266,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
-	 * getControllerResolver
+	 * getMvcResolver
 	 *
-	 * @return  ControllerResolver
+	 * @return  MvcResolver
 	 */
-	public function getControllerResolver()
+	public function getMvcResolver()
 	{
-		return $this->getContainer()->get('controller.resolver');
+		return $this->getContainer()->get('mvc.resolver');
 	}
 
 	/**

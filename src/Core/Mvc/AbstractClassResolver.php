@@ -2,19 +2,16 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU General Public License version 2 or later;
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Controller;
+namespace Windwalker\Core\Mvc;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
-use Windwalker\Core\Utilities\Classes\MvcHelper;
 use Windwalker\DI\Container;
-use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\String\StringHelper;
 use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\Queue\Priority;
@@ -22,11 +19,11 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
- * The ControllerResolver class.
+ * The AbstractResolver class.
  *
- * @since  2.1.1
+ * @since  {DEPLOY_VERSION}
  */
-class ControllerResolver
+abstract class AbstractClassResolver implements ClassResolverInterface
 {
 	/**
 	 * Property container.
@@ -63,16 +60,16 @@ class ControllerResolver
 	}
 
 	/**
-	 * getController
+	 * Resolve class path.
 	 *
-	 * @param   AbstractPackage|string  $package
-	 * @param   string                  $controller
+	 * @param   string|AbstractPackage $package
+	 * @param   string                 $name
 	 *
-	 * @return  string
+	 * @return  string|false
 	 */
-	public function resolveController($package, $controller)
+	public function resolve($package, $name)
 	{
-		$pkg = $this->splitPackage($controller);
+		$pkg = $this->splitPackage($name);
 
 		if ($pkg)
 		{
@@ -84,54 +81,45 @@ class ControllerResolver
 			$package = $this->getPackageResolver()->getPackage($package);
 		}
 
-		$controller = static::normalise($controller);
+		$name = static::normalise($name);
 
-		if (!$class = $this->findController($controller))
+		if (!$class = $this->find($name))
 		{
 			$namespace = ReflectionHelper::getNamespaceName($package);
 
-			$class = $namespace . '\Controller\\' . $controller;
+			$class = $this->getDefaultClass($namespace, $name);
 		}
 
 		if (!class_exists($class = $this->resolveClassAlias($class)))
 		{
-			$namespaces = $this->dumpNamespaces();
-
-			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($package);
-
-			throw new RouteNotFoundException('Controller: ' . $controller . ' not found. Namespaces: ' . implode(', ', $namespaces), 404);
+			return false;
 		}
 
 		return $class;
 	}
 
 	/**
-	 * getController
+	 * If didn't found any exists class, fallback to default class which in current package..
 	 *
-	 * @param   AbstractPackage|string  $package
-	 * @param   string                  $controller
+	 * @param   string  $namespace  The package namespace.
+	 * @param   string  $name       The class task name.
 	 *
-	 * @return  string
-	 *
-	 * @deprecated  Use resolveController() instead.
+	 * @return  string  Found class name.
 	 */
-	public static function getController($package, $controller)
-	{
-		return Ioc::get('controller.resolver')->resolveController($package, $controller);
-	}
+	abstract protected function getDefaultClass($namespace, $name);
 
 	/**
 	 * findController
 	 *
-	 * @param   string  $controller
+	 * @param   string $name
 	 *
 	 * @return  string|false
 	 */
-	public function findController($controller)
+	public function find($name)
 	{
 		foreach (clone $this->namespaces as $ns)
 		{
-			$class = $ns . '\\' . $controller;
+			$class = $ns . '\\' . $name;
 
 			if (class_exists($class = $this->resolveClassAlias($class)))
 			{
@@ -169,7 +157,7 @@ class ControllerResolver
 
 		$name = StringNormalise::toDotSeparated($name);
 
-		return 'controller.' . $name;
+		return strtolower(static::getPrefix() . '.' . $name);
 	}
 
 	/**
@@ -226,6 +214,19 @@ class ControllerResolver
 	public function dumpNamespaces()
 	{
 		return $this->namespaces->toArray();
+	}
+
+	/**
+	 * reset
+	 *
+	 * @return  static
+	 */
+	public function reset()
+	{
+		$this->setNamespaces(new PriorityQueue);
+		$this->setClassAliases(array());
+
+		return $this;
 	}
 
 	/**

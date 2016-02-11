@@ -219,6 +219,31 @@ class PackageResolver implements ContainerAwareInterface
 	}
 
 	/**
+	 * removePackage
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  static
+	 */
+	public function removePackage($name)
+	{
+		if ($this->exists($name))
+		{
+			$package = $this->getPackage($name);
+
+			unset($this->aliases[get_class($package)]);
+
+			unset($this->packages[$name]);
+
+			$this->container->removeChild($name);
+
+			$this->container->remove('package.' . $name);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * getPackages
 	 *
 	 * @return  AbstractPackage[]

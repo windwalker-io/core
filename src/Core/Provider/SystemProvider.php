@@ -10,7 +10,10 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Console\Console;
-use Windwalker\Core\Controller\ControllerResolver;
+use Windwalker\Core\Mvc\ControllerResolver;
+use Windwalker\Core\Mvc\ModelResolver;
+use Windwalker\Core\Mvc\MvcResolver;
+use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -63,6 +66,25 @@ class SystemProvider implements ServiceProviderInterface
 		$container->share('controller.resolver', function(Container $container)
 		{
 			return new ControllerResolver($container);
+		});
+
+		$container->share('model.resolver', function(Container $container)
+		{
+			return new ModelResolver($container);
+		});
+
+		$container->share('view.resolver', function(Container $container)
+		{
+			return new ViewResolver($container);
+		});
+
+		$container->share('mvc.resolver', function(Container $container)
+		{
+			return new MvcResolver(
+				$container->get('controller.resolver'),
+				$container->get('model.resolver'),
+				$container->get('view.resolver')
+			);
 		});
 	}
 }

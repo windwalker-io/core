@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View\Helper\Set;
 
-use Windwalker\Core\Utilities\Classes\MvcHelper;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\PhpHtmlView;
