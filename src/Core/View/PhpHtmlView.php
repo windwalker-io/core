@@ -122,19 +122,22 @@ class PhpHtmlView extends AbstractView
 
 		if ($this->config['package.path'])
 		{
-			$paths->insert(Path::normalize($this->config['package.path'] . '/Templates/' . $this->getName()), Priority::LOW);
-			$paths->insert(Path::normalize($this->config['package.path'] . '/Templates'), Priority::LOW);
+			$this->config['tmpl_path.view'] = Path::normalize($this->config['package.path'] . '/Templates/' . $this->getName());
+			$this->config['tmpl_path.package'] = Path::normalize($this->config['package.path'] . '/Templates');
 		}
 		elseif (!$package instanceof NullPackage)
 		{
-			$paths->insert(Path::normalize($package->getDir() . '/Templates/' . $this->getName()), Priority::LOW);
-			$paths->insert(Path::normalize($package->getDir() . '/Templates'), Priority::LOW);
+			$this->config['tmpl_path.view'] = Path::normalize($package->getDir() . '/Templates/' . $this->getName());
+			$this->config['tmpl_path.package'] = Path::normalize($package->getDir() . '/Templates');
 		}
 		else
 		{
-			$paths->insert(Path::normalize(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName()), Priority::LOW);
-			$paths->insert(Path::normalize(dirname($ref->getFileName()) . '/../../Templates'), Priority::LOW);
+			$this->config['tmpl_path.view'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName());
+			$this->config['tmpl_path.package'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates');
 		}
+
+		$paths->insert($this->config['tmpl_path.view'], Priority::LOW);
+		$paths->insert($this->config['tmpl_path.package'], Priority::LOW);
 
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), Priority::LOW - 10);
@@ -142,5 +145,44 @@ class PhpHtmlView extends AbstractView
 		$this->renderer->setPaths($paths);
 
 		$this->config['path.registered'] = true;
+	}
+
+	/**
+	 * registerMultilingualPaths
+	 *
+	 * @return  void
+	 */
+	public function registerMultilingualPaths()
+	{
+		if ($this->config['path.multilingual_registered'])
+		{
+			return;
+		}
+
+		$this->registerPaths();
+
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.locale'), Priority::BELOW_NORMAL);
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.default'), Priority::BELOW_NORMAL);
+
+		$this->config['path.multilingual_registered'] = true;
+	}
+
+	/**
+	 * dumpPaths
+	 *
+	 * @param bool $multilingual
+	 *
+	 * @return  array
+	 */
+	public function dumpPaths($multilingual = false)
+	{
+		$this->registerPaths();
+
+		if ($multilingual)
+		{
+			$this->registerMultilingualPaths();
+		}
+
+		return $this->renderer->dumpPaths();
 	}
 }

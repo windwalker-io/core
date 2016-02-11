@@ -102,14 +102,6 @@ class PackageResolver implements ContainerAwareInterface
 		// Get package identify name.
 		$name = $package->getName();
 
-		// Override package config from etc
-		$file = $config->get('path.etc') . '/packages/' . $name . '.yml';
-
-		if (is_file($file))
-		{
-			$package->getConfig()->loadFile($file);
-		}
-
 		// Set container and init it
 		$subContainer = $container->createChild($name);
 
