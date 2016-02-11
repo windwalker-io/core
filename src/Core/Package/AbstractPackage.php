@@ -148,14 +148,16 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		list($controller, $action) = StringHelper::explode('::', $controller, 2);
 
-		$key = $this->getControllerResolver()->getDIKey($controller);
+		$resolver = $this->getControllerResolver();
+
+		$key = $resolver->getDIKey($controller);
 
 		if ($this->container->exists($key) || $forceNew)
 		{
-			/** @var Controller $class */
 			try
 			{
-				$class = $this->getControllerResolver()->resolveController($this, $controller);
+				/** @var Controller $class */
+				$class = $resolver->resolveController($this, $controller);
 
 				if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
 				{

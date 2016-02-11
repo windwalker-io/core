@@ -329,7 +329,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			$view->setConfig($config);
 
-			$this->container->share($class, $view)->alias($key, $class);
+			$this->container->share($key, $view)->alias($class, $key);
 		}
 
 		return $this->container->get($key);
@@ -382,7 +382,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			/** @var Model $model */
 			$model->setConfig($config);
 
-			$this->container->share($class, $model)->alias($key, $class);
+			$this->container->share($key, $model)->alias($class, $key);
 		}
 
 		return $this->container->get($key);
