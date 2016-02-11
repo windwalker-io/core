@@ -25,6 +25,7 @@ use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
 use Windwalker\Registry\Registry;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\String\StringHelper;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -130,12 +131,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * getController
 	 *
-	 * @param string  $task
-	 * @param array   $variables
+	 * @param string $task
+	 * @param array  $variables
+	 * @param bool   $forceNew
 	 *
-	 * @return  Controller
+	 * @return Controller
 	 */
-	public function getController($task = null, $variables = array())
+	public function getController($task = null, $variables = array(), $forceNew = false)
 	{
 		if ($variables instanceof Input)
 		{
@@ -146,27 +148,42 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		list($controller, $action) = StringHelper::explode('::', $controller, 2);
 
-		/** @var Controller $class */
-		$class = ControllerResolver::getController($this, $controller);
+		$key = $this->getControllerResolver()->getDIKey($controller);
 
-		$container = $this->getContainer();
-
-		$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
-
-		if (!($controller instanceof Controller))
+		if ($this->container->exists($key) || $forceNew)
 		{
-			throw new \UnexpectedValueException(
-				sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $controller)
-			);
+			/** @var Controller $class */
+			try
+			{
+				$class = $this->getControllerResolver()->resolveController($this, $controller);
+
+				if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
+				{
+					throw new \UnexpectedValueException(
+						sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $class)
+					);
+				}
+
+				$container = $this->getContainer();
+
+				$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
+
+				if ($controller instanceof MultiActionController)
+				{
+					$controller->setActionName($action);
+					$controller->setArguments($variables ? : $this->variables);
+				}
+			}
+				// Do not return error, later we'll handle it.
+			catch (RouteNotFoundException $e)
+			{
+				return false;
+			}
+
+			$this->container->share($key, $container);
 		}
 
-		if ($controller instanceof MultiActionController)
-		{
-			$controller->setActionName($action);
-			$controller->setArguments($variables ? : $this->variables);
-		}
-
-		return $controller;
+		return $this->container->get($key);
 	}
 
 	/**
@@ -195,6 +212,16 @@ class AbstractPackage implements DispatcherAwareInterface
 			'variables'  => $variables,
 			'hmvc'       => $hmvc
 		));
+
+		// Handle error
+		if (!$controller)
+		{
+			$namespaces = $this->getControllerResolver()->dumpNamespaces();
+
+			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($this);
+
+			throw new RouteNotFoundException('Controller: ' . $controller . ' not found. Namespaces: ' . implode(', ', $namespaces), 404);
+		}
 
 		$result = $controller->execute();
 
@@ -233,6 +260,16 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected function postExecute($result = null)
 	{
 		return $result;
+	}
+
+	/**
+	 * getControllerResolver
+	 *
+	 * @return  ControllerResolver
+	 */
+	public function getControllerResolver()
+	{
+		return $this->getContainer()->get('controller.resolver');
 	}
 
 	/**

@@ -12,6 +12,8 @@ namespace Windwalker\Core\Controller;
  * The MultiActionController class.
  * 
  * @since  2.0
+ *
+ * @deprecated  3.0 We're drop multi action controller support.
  */
 abstract class MultiActionController extends Controller
 {

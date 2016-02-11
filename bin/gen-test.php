@@ -11,6 +11,8 @@ use Windwalker\Filesystem\Path;
 use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
+date_default_timezone_set('UTC');
+
 $autoload = __DIR__ . '/../vendor/autoload.php';
 
 if (!is_file($autoload))
@@ -22,8 +24,6 @@ include_once $autoload;
 
 define('WINDWALKER_ROOT', realpath(__DIR__ . '/..'));
 define('WINDWALKER_CORE_ROOT', realpath(__DIR__ . '/../vendor/windwalker/core'));
-
-date_default_timezone_set('UTC');
 
 /**
  * Class GenTest

@@ -9,9 +9,9 @@
 namespace Windwalker\Core\Test\Renderer;
 
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Utilities\Iterator\PriorityQueue;
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * Test class of RendererHelper
@@ -33,7 +33,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Windwalker\Renderer\PhpRenderer', RendererHelper::getRenderer('php'));
 		$this->assertInstanceOf('Windwalker\Renderer\BladeRenderer', RendererHelper::getRenderer('blade'));
 		$this->assertInstanceOf('Windwalker\Renderer\TwigRenderer', RendererHelper::getRenderer('twig'));
-		$this->assertInstanceOf('Windwalker\Renderer\MustacheRenderer', RendererHelper::getRenderer('mustache'));
+		// $this->assertInstanceOf('Windwalker\Renderer\MustacheRenderer', RendererHelper::getRenderer('mustache'));
 
 		$this->assertEquals(RendererHelper::getGlobalPaths(), RendererHelper::getRenderer()->getPaths());
 	}
@@ -47,7 +47,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetPhpRenderer()
 	{
-		$this->assertInstanceOf('Windwalker\Renderer\PhpRenderer', RendererHelper::getPhpRenderer());
+		$this->assertInstanceOf('Windwalker\Core\Renderer\PhpRenderer', RendererHelper::getPhpRenderer());
 	}
 
 	/**
@@ -59,7 +59,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetBladeRenderer()
 	{
-		$this->assertInstanceOf('Windwalker\Renderer\BladeRenderer', RendererHelper::getBladeRenderer());
+		$this->assertInstanceOf('Windwalker\Core\Renderer\BladeRenderer', RendererHelper::getBladeRenderer());
 	}
 
 	/**
@@ -71,7 +71,7 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetTwigRenderer()
 	{
-		$this->assertInstanceOf('Windwalker\Renderer\TwigRenderer', RendererHelper::getTwigRenderer());
+		$this->assertInstanceOf('Windwalker\Core\Renderer\TwigRenderer', RendererHelper::getTwigRenderer());
 	}
 
 	/**
@@ -83,6 +83,8 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetMustacheRenderer()
 	{
+		$this->markTestSkipped('Drop Mustache support currently.');
+
 		$this->assertInstanceOf('Windwalker\Renderer\MustacheRenderer', RendererHelper::getMustacheRenderer());
 	}
 
