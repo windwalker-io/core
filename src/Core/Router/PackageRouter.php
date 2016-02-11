@@ -57,7 +57,8 @@ class PackageRouter
 	{
 		try
 		{
-			return $this->router->build($this->package->getName() . ':' . $route, $queries, $type, $xhtml);
+			// TODO: Simplify this process
+			return $this->router->build($this->package->getName() . '@' . $route, $queries, $type, $xhtml);
 		}
 		catch (\OutOfRangeException $e)
 		{

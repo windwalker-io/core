@@ -483,7 +483,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 			$route['extra']['package'] = $package->getName();
 
-			$routing[$package->getName() . ':' . $key] = $route;
+			$routing[$package->getName() . '@' . $key] = $route;
 		}
 
 		return $routing;
