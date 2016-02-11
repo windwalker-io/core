@@ -199,7 +199,10 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		$controller = $this->getController($task, $variables);
 
-		$controller->isHmvc($hmvc);
+		if ($controller)
+		{
+			$controller->isHmvc($hmvc);
+		}
 
 		$this->currentController = $controller;
 
@@ -218,9 +221,11 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			$namespaces = $this->getMvcResolver()->getControllerResolver()->dumpNamespaces();
 
-			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($this);
+			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($this) . '\Controller';
 
-			throw new RouteNotFoundException('Controller: ' . $controller . ' not found. Namespaces: ' . implode(', ', $namespaces), 404);
+			$task = $task ? : $this->getTask();
+
+			throw new RouteNotFoundException('Controller: ' . $task . ' not found. Namespaces: ' . implode(', ', $namespaces), 404);
 		}
 
 		$result = $controller->execute();
