@@ -69,6 +69,11 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	 */
 	public function resolve($package, $name)
 	{
+		if (class_exists($name))
+		{
+			return $name;
+		}
+
 		$pkg = $this->splitPackage($name);
 
 		if ($pkg)
