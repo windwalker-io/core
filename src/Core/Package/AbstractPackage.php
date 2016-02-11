@@ -151,42 +151,39 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$resolver = $this->getMvcResolver()->getControllerResolver();
 
-		$key = $resolver->getDIKey($controller);
+		$key = $resolver::getDIKey($controller);
 
-		if (!$this->container->exists($key) || $forceNew)
+		if (!$this->container->exists($key))
 		{
-			try
-			{
-				/** @var Controller $class */
-				$class = $resolver->resolve($this, $controller);
+			/** @var Controller $class */
+			$class = $resolver->resolve($this, $controller);
 
-				if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
-				{
-					throw new \UnexpectedValueException(
-						sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $class)
-					);
-				}
-
-				$container = $this->getContainer();
-
-				$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
-
-				if ($controller instanceof MultiActionController)
-				{
-					$controller->setActionName($action);
-					$controller->setArguments($variables ? : $this->variables);
-				}
-
-				$this->container->share($key, $controller);
-			}
-				// Do not return error, later we'll handle it.
-			catch (RouteNotFoundException $e)
+			if (!$class)
 			{
 				return false;
 			}
+
+			if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
+			{
+				throw new \UnexpectedValueException(
+					sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $class)
+				);
+			}
+
+			$container = $this->getContainer();
+
+			$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
+
+			if ($controller instanceof MultiActionController)
+			{
+				$controller->setActionName($action);
+				$controller->setArguments($variables ? : $this->variables);
+			}
+
+			$this->container->share($key, $controller);
 		}
 
-		return $this->container->get($key);
+		return $this->container->get($key, $forceNew);
 	}
 
 	/**
