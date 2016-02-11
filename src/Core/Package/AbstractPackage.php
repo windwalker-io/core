@@ -152,7 +152,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$key = $resolver->getDIKey($controller);
 
-		if ($this->container->exists($key) || $forceNew)
+		if (!$this->container->exists($key) || $forceNew)
 		{
 			try
 			{
@@ -175,14 +175,14 @@ class AbstractPackage implements DispatcherAwareInterface
 					$controller->setActionName($action);
 					$controller->setArguments($variables ? : $this->variables);
 				}
+
+				$this->container->share($key, $controller);
 			}
 				// Do not return error, later we'll handle it.
 			catch (RouteNotFoundException $e)
 			{
 				return false;
 			}
-
-			$this->container->share($key, $container);
 		}
 
 		return $this->container->get($key);
