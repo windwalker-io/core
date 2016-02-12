@@ -86,6 +86,11 @@ class TemplateEngineProvider implements ServiceProviderInterface
 			return "<?php echo \$translator->plural{$expression} ?>";
 		});
 
+		Renderer\Blade\GlobalContainer::addCompiler('widget', function($expression)
+		{
+			return "<?php echo \\Windwalker\\Core\\Widget\\BladeWidgetHelper::render{$expression} ?>";
+		});
+
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
 
 		// B/C for 4.*
