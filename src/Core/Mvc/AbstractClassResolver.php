@@ -88,11 +88,11 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 
 		$name = static::normalise($name);
 
-		if (!$class = $this->find($name))
-		{
-			$namespace = ReflectionHelper::getNamespaceName($package);
+		$namespace = ReflectionHelper::getNamespaceName($package);
 
-			$class = $this->getDefaultClass($namespace, $name);
+		if (!class_exists($class = $this->resolveClassAlias($this->getDefaultClass($namespace, $name))))
+		{
+			$class = $this->find($name);
 		}
 
 		if (!class_exists($class = $this->resolveClassAlias($class)))

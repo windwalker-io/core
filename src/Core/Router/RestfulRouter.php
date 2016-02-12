@@ -102,7 +102,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 */
 	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
 	{
-		str_replace(':', '@', $route);
+		$route = str_replace(':', '@', $route);
 
 		if (!array_key_exists($route, $this->routes))
 		{
