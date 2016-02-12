@@ -95,11 +95,6 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 			$class = $this->find($name);
 		}
 
-		if (!class_exists($class = $this->resolveClassAlias($class)))
-		{
-			return false;
-		}
-
 		return $class;
 	}
 

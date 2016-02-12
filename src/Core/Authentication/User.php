@@ -211,7 +211,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 	 * @param array $options
 	 *
 	 * @throws \Exception
-	 * @return  Data
+	 * @return  UserData
 	 */
 	public static function save($user = array(), $options = array())
 	{
