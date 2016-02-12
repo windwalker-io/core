@@ -18,6 +18,7 @@ use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;
 use Windwalker\Registry\Registry;
+use Windwalker\String\StringNormalise;
 use Windwalker\View\HtmlView;
 
 /**
@@ -402,5 +403,35 @@ abstract class AbstractView extends HtmlView
 	public function getRouter()
 	{
 		return $this->getPackage()->getRouter();
+	}
+
+	/**
+	 * delegate
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  mixed
+	 */
+	protected function delegate($name)
+	{
+		$args = func_get_args();
+
+		array_shift($args);
+
+		if (!count($args))
+		{
+			$args[] = $this->getData();
+		}
+
+		$name = str_replace('.', '_', $name);
+
+		$name = StringNormalise::toCamelCase($name);
+
+		if (is_callable(array($this, $name)))
+		{
+			return call_user_func_array(array($this, $name), $args);
+		}
+
+		return null;
 	}
 }
