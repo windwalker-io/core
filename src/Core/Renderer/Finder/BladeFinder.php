@@ -51,7 +51,7 @@ class BladeFinder extends FileViewFinder
 	{
 		$path = $this->finder->find($name);
 
-		if ($path)
+		if ($path && !in_array($path, $this->paths))
 		{
 			array_unshift($this->paths, $path);
 		}

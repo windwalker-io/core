@@ -49,7 +49,7 @@ class TwigFilesystemLoader extends \Windwalker\Renderer\Twig\TwigFilesystemLoade
 	{
 		$path = $this->finder->find($name);
 
-		if ($path)
+		if ($path && in_array($path, $this->paths[static::MAIN_NAMESPACE]))
 		{
 			$this->prependPath($path);
 		}
