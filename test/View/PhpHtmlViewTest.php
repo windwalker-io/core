@@ -268,8 +268,8 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 		/** @var RestfulRouter $router */
 		$router = Ioc::getRouter();
 
-		$router->addRoute(new Route('mvc:flower', '/flower/(id)', array('foo' => 'bar'), null, array('extra' => array('controller' => 'Bar'))));
-		$router->addRoute(new Route('mvc:sakura', '/sakura/(id)', array('foo' => 'baz'), null, array('extra' => array('controller' => 'Baz'))));
+		$router->addRoute(new Route('mvc@flower', '/flower/(id)', array('foo' => 'bar'), null, array('extra' => array('controller' => 'Bar'))));
+		$router->addRoute(new Route('mvc@sakura', '/sakura/(id)', array('foo' => 'baz'), null, array('extra' => array('controller' => 'Baz'))));
 
 		// $this->assertEquals('flower/12', $router->build('mvc:flower', array('id' => 12)));
 
