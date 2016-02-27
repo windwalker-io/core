@@ -210,6 +210,8 @@ class Widget implements WidgetInterface
 
 			if (!$package instanceof NullPackage)
 			{
+				$this->renderer->addPath($package->getDir() . '/Templates/' . $package->app->get('language,locale', 'en-GB'), Priority::BELOW_NORMAL);
+				$this->renderer->addPath($package->getDir() . '/Templates/' . $package->app->get('language,default', 'en-GB'), Priority::BELOW_NORMAL);
 				$this->renderer->addPath($package->getDir() . '/Templates', Priority::BELOW_NORMAL);
 			}
 

@@ -11,6 +11,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\IO\Input;
+use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
 
 /**
@@ -89,19 +90,20 @@ class PackageHelper extends AbstractProxyFacade
 	 * @param string $package
 	 * @param string $task
 	 * @param array  $variables
+	 * @param array  $config
 	 * @param string $appClass
 	 *
-	 * @return  mixed
+	 * @return mixed
 	 */
-	public static function execute($package, $task, $variables = array(), $appClass = 'Windwalker\Web\Application')
+	public static function execute($package, $task, $variables = array(), $config = array(), $appClass = 'Windwalker\Web\Application')
 	{
 		$_SERVER['HTTP_HOST']      = isset($_SERVER['HTTP_HOST'])      ? $_SERVER['HTTP_HOST']      : 'localhost';
 		$_SERVER['REQUEST_METHOD'] = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
 		$_SERVER['SERVER_PORT']    = isset($_SERVER['SERVER_PORT'])    ? $_SERVER['SERVER_PORT']    : '80';
 
-		$package = static::getPackage($package);
+		Ioc::setProfile('console');
 
-		$container = $package->getContainer();
+		$container = Ioc::factory();
 
 		if (!class_exists($appClass))
 		{
@@ -116,10 +118,16 @@ class PackageHelper extends AbstractProxyFacade
 		/** @var WebApplication $app */
 		$app = new $appClass($container, new Input, array('name' => 'cli'));
 
-		$container->share('system.application', $app);
-
 		$app->getRouter();
 
-		return $package->execute($task, $variables);
+		$package = $app->getPackage($package);
+		$container->share('current.package', $package);
+		$container->get('config')->load($config);
+
+		$result = $package->execute($task, $variables);
+
+		Ioc::setProfile('windwalker');
+
+		return $result;
 	}
 }
