@@ -480,7 +480,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			return null;
 		}
 
-		return Yaml::parse(file_get_contents($file));
+		return (array) Yaml::parse(file_get_contents($file));
 	}
 
 	/**

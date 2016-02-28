@@ -10,6 +10,7 @@ namespace Windwalker\Core\Seeder\Command;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Option\Option;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Seeder\Command\Seed\CleanCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
 use Windwalker\Core\Mvc\MvcHelper;
@@ -84,13 +85,17 @@ class SeedCommand extends Command
 	{
 		$packageName = $this->getOption('package');
 
+		/** @var AbstractPackage $package */
 		$package = $this->app->getPackage($packageName);
+
+		$class = null;
 
 		if ($package)
 		{
 			$class = MvcHelper::getPackageNamespace(get_class($package), 1) . '\\Seed\\DatabaseSeeder';
 		}
-		else
+
+		if (!class_exists($class))
 		{
 			$class = $this->getOption('class');
 		}
@@ -99,7 +104,12 @@ class SeedCommand extends Command
 
 		if (!class_exists($class))
 		{
-			$file = Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
+			$file = $package->getDir() . '/Seed/' . $class . '.php';
+
+			if (!is_file($file))
+			{
+				$file = Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
+			}
 
 			if (is_file($file))
 			{
