@@ -35,8 +35,6 @@ class AuthenticationProvider implements ServiceProviderInterface
 		{
 			$auth = new Authentication;
 
-			$auth->addMethod('database', new DatabaseMethod);
-
 			$dispatcher = $container->get('system.dispatcher');
 
 			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('authentication' => $auth));
