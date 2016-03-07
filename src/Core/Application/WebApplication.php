@@ -321,7 +321,17 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		/** @var \Windwalker\Core\Router\RestfulRouter $router */
 		$router = $this->getRouter();
 
-		$method = $this->input->get('_method') ? : $this->input->getMethod();
+		// Handle X-HTTP-Method-Override
+		$headers = getallheaders();
+
+		if (isset($headers['X-HTTP-Method-Override']))
+		{
+			$method = $headers['X-HTTP-Method-Override'];
+		}
+		else
+		{
+			$method = $this->input->get('_method') ? : $this->input->getMethod();
+		}
 
 		// Prepare option data
 		$http = 'http';
