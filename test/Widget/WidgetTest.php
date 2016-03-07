@@ -152,9 +152,12 @@ class WidgetTest extends AbstractBaseTestCase
 
 		$paths = $this->instance->getPaths()->toArray();
 
-		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../Mvc/Templates'), $paths[0]);
-		$this->assertPathEquals(WINDWALKER_ROOT . '/templates', $paths[1]);
-		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../../src/Core/Resources/Templates'), $paths[2]);
+		$locale = $this->instance->getPackage()->app->get('language.locale', 'en-GB');
+
+		$this->assertPathEquals(WINDWALKER_ROOT . '/../Mvc/Templates/' . $locale, $paths[0]);
+		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../Mvc/Templates'), $paths[1]);
+		$this->assertPathEquals(WINDWALKER_ROOT . '/templates', $paths[2]);
+		$this->assertPathEquals(realpath(WINDWALKER_ROOT . '/../../src/Core/Resources/Templates'), $paths[3]);
 	}
 
 	/**
@@ -251,8 +254,8 @@ class WidgetTest extends AbstractBaseTestCase
 	protected function assertPathEquals($expected, $actual, $msg = null)
 	{
 		$this->assertEquals(
-			Path::clean($expected),
-			Path::clean($actual),
+			Path::normalize($expected),
+			Path::normalize($actual),
 			$msg
 		);
 	}
