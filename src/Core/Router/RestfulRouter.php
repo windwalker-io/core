@@ -78,6 +78,13 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	protected $dispatcher;
 
 	/**
+	 * Property matched.
+	 *
+	 * @var  Route
+	 */
+	protected $matched;
+
+	/**
 	 * Class init.
 	 *
 	 * @param array            $routes
@@ -292,6 +299,8 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 			call_user_func($extra['hook']['match'], $this, $route, $method, $options);
 		}
 
+		$this->matched = $route;
+
 		return $route;
 	}
 
@@ -501,6 +510,30 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	public function addListener($listener, $priorities = array())
 	{
 		$this->getDispatcher()->addListener($listener, $priorities);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Matched
+	 *
+	 * @return  Route
+	 */
+	public function getMatched()
+	{
+		return $this->matched;
+	}
+
+	/**
+	 * Method to set property matched
+	 *
+	 * @param   Route $matched
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMatched($matched)
+	{
+		$this->matched = $matched;
 
 		return $this;
 	}
