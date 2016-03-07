@@ -184,8 +184,13 @@ class ErrorHandler
 	 *
 	 * @return  void
 	 */
-	public static function register($restore = true, $type = E_ALL | E_STRICT)
+	public static function register($restore = true, $type = null)
 	{
+		if ($type === null)
+		{
+			$type = E_ALL | E_STRICT;
+		}
+
 		if ($restore)
 		{
 			static::restore();
