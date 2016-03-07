@@ -333,6 +333,13 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			$method = $this->input->get('_method') ? : $this->input->getMethod();
 		}
 
+		// Pass variables to custom method
+		if ($this->input->$method)
+		{
+			$httpMethod = $this->input->getMethod();
+			$this->input->$method->setData($this->input->$httpMethod->getArray());
+		}
+
 		// Prepare option data
 		$http = 'http';
 
