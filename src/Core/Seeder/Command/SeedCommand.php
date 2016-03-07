@@ -104,9 +104,9 @@ class SeedCommand extends Command
 
 		if (!class_exists($class))
 		{
-			$file = $package->getDir() . '/Seed/' . $class . '.php';
+			$file = $package ? $package->getDir() . '/Seed/' . $class . '.php' : null;
 
-			if (!is_file($file))
+			if (!$file || !is_file($file))
 			{
 				$file = Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
 			}
