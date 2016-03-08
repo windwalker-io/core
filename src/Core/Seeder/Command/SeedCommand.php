@@ -69,6 +69,10 @@ class SeedCommand extends Command
 			->defaultValue('DatabaseSeeder')
 			->description('The class to import.');
 
+		$this->addGlobalOption('d')
+			->alias('dir')
+			->description('The directory of this seeder.');
+
 		$this->addGlobalOption('p')
 			->alias('package')
 			->description('Package name to import seeder.');
@@ -108,7 +112,12 @@ class SeedCommand extends Command
 
 			if (!$file || !is_file($file))
 			{
-				$file = Ioc::getConfig()->get('path.seeders') . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
+				$file = $this->getOption('d', Ioc::getConfig()->get('path.seeders')) . '/' . str_replace('\\', DIRECTORY_SEPARATOR , $class) . '.php';
+				
+				if ($file[0] != '/')
+				{
+					$file = WINDWALKER_ROOT . '/' . $file;
+				}
 			}
 
 			if (is_file($file))
