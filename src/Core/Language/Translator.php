@@ -73,7 +73,10 @@ abstract class Translator extends AbstractProxyFacade
 			$path = $package->getDir() . '/Resources/language/%s/%s.%s';
 
 			// Get Package language
-			static::loadLanguageFile(sprintf($path, $default, $file, $ext), $format);
+			if (!$config->get('language.debug') || $locale == $default)
+			{
+				static::loadLanguageFile(sprintf($path, $default, $file, $ext), $format);
+			}
 
 			// If locale not equals default locale, load it to override default
 			if ($locale != $default)
@@ -85,7 +88,10 @@ abstract class Translator extends AbstractProxyFacade
 		// Get Global language
 		$path = $config->get('path.languages') . '/%s/%s.%s';
 
-		static::loadLanguageFile(sprintf($path, $default, $file, $format), $format);
+		if (!$config->get('language.debug') || $locale == $default)
+		{
+			static::loadLanguageFile(sprintf($path, $default, $file, $format), $format);
+		}
 
 		// If locale not equals default locale, load it to override default
 		if ($locale != $default)
