@@ -96,6 +96,90 @@ class ProfilerListener
 	}
 
 	/**
+	 * onControllerBeforeExecute
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onControllerBeforeExecute(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$profiler->mark(__FUNCTION__, array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onControllerAfterExecute
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onControllerAfterExecute(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$profiler->mark(__FUNCTION__, array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onViewBeforeRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onViewBeforeRender(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$profiler->mark(__FUNCTION__, array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onViewAfterRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onViewAfterRender(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$profiler->mark(__FUNCTION__, array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
 	 * onPackageAfterExecute
 	 *
 	 * @param Event $event
