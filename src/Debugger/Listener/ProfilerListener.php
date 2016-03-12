@@ -108,7 +108,7 @@ class ProfilerListener
 		 * @var Container $container
 		 * @var Profiler  $profiler
 		 */
-		$container = $event['app']->getContainer();
+		$container = $event['controller']->getContainer();
 		$profiler  = $container->get('system.profiler');
 
 		$profiler->mark(__FUNCTION__, array(
@@ -129,7 +129,7 @@ class ProfilerListener
 		 * @var Container $container
 		 * @var Profiler  $profiler
 		 */
-		$container = $event['app']->getContainer();
+		$container = $event['controller']->getContainer();
 		$profiler  = $container->get('system.profiler');
 
 		$profiler->mark(__FUNCTION__, array(
@@ -150,7 +150,7 @@ class ProfilerListener
 		 * @var Container $container
 		 * @var Profiler  $profiler
 		 */
-		$container = $event['app']->getContainer();
+		$container = $event['view']->getPackage()->getContainer();
 		$profiler  = $container->get('system.profiler');
 
 		$profiler->mark(__FUNCTION__, array(
@@ -171,7 +171,7 @@ class ProfilerListener
 		 * @var Container $container
 		 * @var Profiler  $profiler
 		 */
-		$container = $event['app']->getContainer();
+		$container = $event['view']->getPackage()->getContainer();
 		$profiler  = $container->get('system.profiler');
 
 		$profiler->mark(__FUNCTION__, array(
