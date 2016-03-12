@@ -23,6 +23,7 @@ use Windwalker\Event\Event;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Registry\RegistryHelper;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The ProfilerListender class.
@@ -111,7 +112,9 @@ class ProfilerListener
 		$container = $event['controller']->getContainer();
 		$profiler  = $container->get('system.profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
 			'tag' => 'package.process'
 		));
 	}
@@ -132,7 +135,9 @@ class ProfilerListener
 		$container = $event['controller']->getContainer();
 		$profiler  = $container->get('system.profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
 			'tag' => 'package.process'
 		));
 	}
@@ -153,7 +158,9 @@ class ProfilerListener
 		$container = $event['view']->getPackage()->getContainer();
 		$profiler  = $container->get('system.profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
 			'tag' => 'package.process'
 		));
 	}
@@ -174,7 +181,9 @@ class ProfilerListener
 		$container = $event['view']->getPackage()->getContainer();
 		$profiler  = $container->get('system.profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
 			'tag' => 'package.process'
 		));
 	}
