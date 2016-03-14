@@ -143,7 +143,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 			return false;
 		}
 
-		return static::$handler->login($user);
+		return static::getHandler()->login($user);
 	}
 
 	/**
@@ -164,7 +164,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 		$event = static::triggerEvent('onUserBeforeLogout', array('user' => $user, 'conditions' => &$conditions, 'options' => &$options));
 
 		// Do logout
-		$result = static::$handler->logout($event['user']);
+		$result = static::getHandler()->logout($event['user']);
 
 		// After logout event
 		$event = static::triggerEvent('onUserAfterLogout', array(
@@ -231,7 +231,7 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 
 		try
 		{
-			static::$handler->save($user);
+			static::getHandler()->save($user);
 		}
 		catch (\Exception $e)
 		{
@@ -310,6 +310,16 @@ class User extends AbstractProxyFacade implements DispatcherAwareStaticInterface
 	public static function setHandler(UserHandlerInterface $handler)
 	{
 		static::$handler = $handler;
+	}
+
+	/**
+	 * hasHandler
+	 *
+	 * @return  boolean
+	 */
+	public static function hasHandler()
+	{
+		return !empty(static::$handler);
 	}
 
 	/**

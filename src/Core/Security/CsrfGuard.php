@@ -141,7 +141,11 @@ class CsrfGuard implements ContainerAwareInterface
 	 */
 	public function getFormToken($userId = null, $forceNew = false)
 	{
-		$userId = $userId ? : User::get()->id;
+		if (User::hasHandler())
+		{
+			$userId = $userId ? : User::get()->id;
+		}
+
 		$userId = $userId ? : $this->container->get('system.session')->getId();
 
 		$config = $this->container->get('system.config');
