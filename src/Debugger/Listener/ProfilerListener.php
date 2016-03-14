@@ -23,6 +23,7 @@ use Windwalker\Event\Event;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Registry\RegistryHelper;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The ProfilerListender class.
@@ -92,6 +93,98 @@ class ProfilerListener
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
+		));
+	}
+
+	/**
+	 * onControllerBeforeExecute
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onControllerBeforeExecute(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['controller']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onControllerAfterExecute
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onControllerAfterExecute(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['controller']->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onViewBeforeRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onViewBeforeRender(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['view']->getPackage()->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+			'tag' => 'package.process'
+		));
+	}
+
+	/**
+	 * onViewAfterRender
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onViewAfterRender(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['view']->getPackage()->getContainer();
+		$profiler  = $container->get('system.profiler');
+
+		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+			'tag' => 'package.process'
 		));
 	}
 
