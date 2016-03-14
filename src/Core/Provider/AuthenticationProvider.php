@@ -10,6 +10,8 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Authentication\Authentication;
 use Windwalker\Core\Authentication\Method\DatabaseMethod;
+use Windwalker\Core\Authentication\NullUserHandler;
+use Windwalker\Core\Authentication\User;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -52,6 +54,8 @@ class AuthenticationProvider implements ServiceProviderInterface
 		// Legacy 2.0
 		$container->alias('system.authenticate', 'system.authentication')
 			->alias('authenticate', 'system.authentication');
+
+		User::setHandler(new NullUserHandler);
 	}
 
 	/**
