@@ -18,6 +18,7 @@ use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;
 use Windwalker\Registry\Registry;
+use Windwalker\Renderer\RendererInterface;
 use Windwalker\String\StringNormalise;
 use Windwalker\View\HtmlView;
 
@@ -64,6 +65,17 @@ abstract class AbstractView extends HtmlView
 	 * @var ViewModel
 	 */
 	protected $model;
+
+	/**
+	 * Method to instantiate the view.
+	 *
+	 * @param   array             $data     The data array.
+	 * @param   RendererInterface $renderer The renderer engine.
+	 */
+	public function __construct(array $data = null, RendererInterface $renderer = null)
+	{
+		parent::__construct($data, $renderer);
+	}
 
 	/**
 	 * prepareRender
