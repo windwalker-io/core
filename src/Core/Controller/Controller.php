@@ -137,6 +137,17 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		}
 
 		parent::__construct($input, $app);
+
+		$this->initialise();
+	}
+
+	/**
+	 * initialise
+	 *
+	 * @return  void
+	 */
+	protected function initialise()
+	{
 	}
 
 	/**
