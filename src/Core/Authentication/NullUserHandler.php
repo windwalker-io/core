@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -36,7 +36,7 @@ class NullUserHandler implements UserHandlerInterface
 	 */
 	public function save(UserDataInterface $user)
 	{
-		return new UserData;
+		return $user;
 	}
 
 	/**
@@ -48,7 +48,7 @@ class NullUserHandler implements UserHandlerInterface
 	 */
 	public function delete(UserDataInterface $user)
 	{
-		return true;
+		return $user;
 	}
 
 	/**

@@ -84,17 +84,6 @@ class Model extends AbstractModel
 		$this->resetCache();
 
 		parent::__construct($state);
-
-		$this->initialise();
-	}
-
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	protected function initialise()
-	{
 	}
 
 	/**
