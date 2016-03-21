@@ -102,7 +102,7 @@ abstract class AbstractMigration
 	 * @param bool     $ifNotExists
 	 * @param array    $options
 	 *
-	 * @return static
+	 * @return AbstractTable
 	 */
 	public function createTable($name, \Closure $callback, $ifNotExists = true, $options = array())
 	{
@@ -115,7 +115,7 @@ abstract class AbstractMigration
 	 * @param string   $name
 	 * @param \Closure $callback
 	 *
-	 * @return  static
+	 * @return  AbstractTable
 	 */
 	public function updateTable($name, \Closure $callback)
 	{
@@ -130,7 +130,7 @@ abstract class AbstractMigration
 	 * @param bool     $ifNotExists
 	 * @param array    $options
 	 *
-	 * @return static
+	 * @return AbstractTable
 	 */
 	public function saveTable($name, \Closure $callback, $ifNotExists = true, $options = array())
 	{
