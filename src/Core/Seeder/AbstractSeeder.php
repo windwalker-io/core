@@ -81,13 +81,13 @@ abstract class AbstractSeeder
 	abstract public function doExecute();
 
 	/**
-	 * clean
+	 * clear
 	 *
 	 * @param AbstractSeeder|string $seeder
 	 *
 	 * @return  static
 	 */
-	public function clean($seeder = null)
+	public function clear($seeder = null)
 	{
 		if (is_string($seeder))
 		{
@@ -103,19 +103,45 @@ abstract class AbstractSeeder
 
 		$this->command->out('Clean seeder ' . get_class($seeder));
 
-		$seeder->doClean();
+		$seeder->doClear();
 
 		return $this;
+	}
+
+	/**
+	 * clean
+	 *
+	 * @param AbstractSeeder|string $seeder
+	 *
+	 * @return  static
+	 *
+	 * @deprecated  3.0  Use clear() instead.
+	 */
+	public function clean($seeder = null)
+	{
+		return $this->clear($seeder);
 	}
 
 	/**
 	 * doClean
 	 *
 	 * @return  void
+	 *
+	 * @deprecated  3.0  Use doClear() instead.
 	 */
 	public function doClean()
 	{
 		// Override it.
+	}
+
+	/**
+	 * doClear
+	 *
+	 * @return  void
+	 */
+	public function doClear()
+	{
+		$this->doClean();
 	}
 
 	/**
