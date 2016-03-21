@@ -11,14 +11,11 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
-use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Mvc\MvcHelper;
-use Windwalker\String\StringNormalise;
 
 /**
  * Class Seed
  */
-class ImportCommand extends Command
+class ClearCommand extends Command
 {
 	/**
 	 * An enabled flag.
@@ -32,21 +29,21 @@ class ImportCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $name = 'import';
+	protected $name = 'clear';
 
 	/**
 	 * The command description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Import seeders.';
+	protected $description = 'Clear seeders.';
 
 	/**
 	 * The usage to tell user how to use this command.
 	 *
 	 * @var string
 	 */
-	protected $usage = 'import <cmd><command></cmd> <option>[option]</option>';
+	protected $usage = 'clear <cmd><command></cmd> <option>[option]</option>';
 
 	/**
 	 * Initialise command information.
@@ -56,9 +53,6 @@ class ImportCommand extends Command
 	public function initialise()
 	{
 		parent::initialise();
-
-		$this->addOption('no-backup')
-			->description('Do not backup database.');
 	}
 
 	/**
@@ -68,18 +62,17 @@ class ImportCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		if (!$this->io->getOption('no-backup'))
-		{
-			// backup
-			BackupModel::getInstance()->setCommand($this)->backup();
-		}
+		// backup
+		BackupModel::getInstance()->setCommand($this)->backup();
 
 		$class = $this->app->get('seed.class');
 
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
 		$seeder = new $class(Ioc::getDatabase(), $this);
 
-		$seeder->doExecute();
+		$seeder->doClear();
+
+		$this->out('All data has been cleared.');
 
 		return true;
 	}

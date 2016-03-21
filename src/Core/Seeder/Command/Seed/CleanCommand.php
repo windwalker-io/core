@@ -36,7 +36,7 @@ class CleanCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Clean seed';
+	protected $description = 'An alias of clear command.';
 
 	/**
 	 * The usage to tell user how to use this command.
@@ -70,7 +70,7 @@ class CleanCommand extends Command
 		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
 		$seeder = new $class(Ioc::getDatabase(), $this);
 
-		$seeder->doClean();
+		$seeder->doClear();
 
 		$this->out('All data has been cleared.');
 

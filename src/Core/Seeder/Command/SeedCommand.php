@@ -12,6 +12,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Console\Option\Option;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Seeder\Command\Seed\CleanCommand;
+use Windwalker\Core\Seeder\Command\Seed\ClearCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Filesystem\Filesystem;
@@ -62,6 +63,7 @@ class SeedCommand extends Command
 	public function initialise()
 	{
 		$this->addCommand(new ImportCommand);
+		$this->addCommand(new ClearCommand);
 		$this->addCommand(new CleanCommand);
 
 		$this->addGlobalOption('c')
