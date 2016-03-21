@@ -177,6 +177,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$providers['session']  = new Provider\SessionProvider;
 		$providers['auth']     = new Provider\AuthenticationProvider;
 		$providers['security'] = new Provider\SecurityProvider;
+		$providers['datetime'] = new Provider\DateTimeProvider;
 
 		return $providers;
 	}
