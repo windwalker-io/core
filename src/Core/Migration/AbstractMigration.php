@@ -95,6 +95,49 @@ abstract class AbstractMigration
 	}
 
 	/**
+	 * createTable
+	 *
+	 * @param string   $name
+	 * @param \Closure $callback
+	 * @param bool     $ifNotExists
+	 * @param array    $options
+	 *
+	 * @return AbstractTable
+	 */
+	public function createTable($name, \Closure $callback, $ifNotExists = true, $options = array())
+	{
+		return $this->getTable($name, $callback)->create($ifNotExists, $options);
+	}
+
+	/**
+	 * updateTable
+	 *
+	 * @param string   $name
+	 * @param \Closure $callback
+	 *
+	 * @return  AbstractTable
+	 */
+	public function updateTable($name, \Closure $callback)
+	{
+		return $this->getTable($name, $callback)->update();
+	}
+
+	/**
+	 * saveTable
+	 *
+	 * @param string   $name
+	 * @param \Closure $callback
+	 * @param bool     $ifNotExists
+	 * @param array    $options
+	 *
+	 * @return AbstractTable
+	 */
+	public function saveTable($name, \Closure $callback, $ifNotExists = true, $options = array())
+	{
+		return $this->getTable($name, $callback)->save($ifNotExists, $options);
+	}
+
+	/**
 	 * Drop a table.
 	 *
 	 * @param   string  $name
