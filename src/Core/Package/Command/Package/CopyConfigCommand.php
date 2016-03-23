@@ -93,7 +93,7 @@ class CopyConfigCommand extends Command
 				File::delete($target);
 			}
 
-			if (!is_file($target) && File::copy($file, $target . '/' . $pkgName . '.yml'))
+			if (!is_file($target) && File::copy($file, $target))
 			{
 				$this->out('Copy to <info>etc/package/' . $pkgName . '.yml</info> successfully.');
 			}
@@ -106,7 +106,7 @@ class CopyConfigCommand extends Command
 		{
 			$secret = file_get_contents($target);
 			$new = file_get_contents($file);
-			$secret = $secret . "\n\n# " . $pkgName . "\n" . $new;
+			$secret = $secret . "\n\n# " . $pkgName . "\n" . ltrim($new);
 
 			file_put_contents($target, $secret);
 
