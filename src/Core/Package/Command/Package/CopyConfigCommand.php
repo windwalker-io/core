@@ -10,7 +10,6 @@ namespace Windwalker\Core\Package\Command\Package;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
-use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Filesystem\File;
 
@@ -19,21 +18,21 @@ use Windwalker\Filesystem\File;
  *
  * @since  {DEPLOY_VERSION}
  */
-class InstallCommand extends Command
+class CopyConfigCommand extends Command
 {
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = 'install';
+	protected $name = 'copy-config';
 
 	/**
 	 * Property description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Install package config';
+	protected $description = 'Copy package config to etc';
 
 	/**
 	 * Initialise command.

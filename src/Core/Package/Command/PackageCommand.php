@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Package\Command;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Core\Package\Command\Package\InstallCommand;
+use Windwalker\Core\Package\Command\Package\CopyConfigCommand;
 
 /**
  * The PackageCommand class.
@@ -41,7 +41,7 @@ class PackageCommand extends Command
 	 */
 	protected function initialise()
 	{
-		$this->addCommand(new InstallCommand);
+		$this->addCommand(new CopyConfigCommand);
 
 		$this->addGlobalOption('e')
 			->alias('env')
