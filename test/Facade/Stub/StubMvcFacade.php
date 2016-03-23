@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Test\Facade\Stub;
 
-use Windwalker\Core\Facade\Facade;
+use Windwalker\Core\Facade\AbstractFacade;
 
 /**
  * The StubMvcFacade class.
  * 
  * @since  2.1.1
  */
-abstract class StubMvcFacade extends Facade
+abstract class StubMvcFacade extends AbstractFacade
 {
 	/**
 	 * Property key.

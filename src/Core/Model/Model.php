@@ -11,7 +11,7 @@ namespace Windwalker\Core\Model;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
-use Windwalker\Database\Driver\DatabaseDriver;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Model\AbstractModel;
 use Windwalker\Registry\Registry;
 
@@ -55,7 +55,7 @@ class Model extends AbstractModel
 	/**
 	 * Property db.
 	 *
-	 * @var  DatabaseDriver
+	 * @var  AbstractDatabaseDriver
 	 */
 	protected $db;
 

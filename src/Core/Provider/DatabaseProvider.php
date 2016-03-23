@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Database\DatabaseFactory;
-use Windwalker\DataMapper\Adapter\DatabaseAdapter;
+use Windwalker\DataMapper\Adapter\AbstractDatabaseAdapter;
 use Windwalker\DataMapper\Adapter\WindwalkerAdapter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -51,7 +51,7 @@ class DatabaseProvider implements ServiceProviderInterface
 			->alias('db', 'system.database');
 
 		// For DataMapper
-		DatabaseAdapter::setInstance(
+		AbstractDatabaseAdapter::setInstance(
 			function() use ($container)
 			{
 				return new WindwalkerAdapter($container->get('db'));

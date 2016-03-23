@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Ioc;
-use Windwalker\Database\Driver\DatabaseDriver;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Test\TestCase\AbstractBaseTestCase;
 
 /**
@@ -22,14 +22,14 @@ class AbstractDatabaseTestCase extends AbstractBaseTestCase
 	/**
 	 * Property db.
 	 *
-	 * @var  DatabaseDriver
+	 * @var  AbstractDatabaseDriver
 	 */
 	protected static $dbo = null;
 
 	/**
 	 * Property db.
 	 *
-	 * @var  DatabaseDriver
+	 * @var  AbstractDatabaseDriver
 	 */
 	protected $db = null;
 

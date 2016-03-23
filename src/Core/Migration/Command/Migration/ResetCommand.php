@@ -9,11 +9,7 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Console\IO\IO;
 use Windwalker\Core\Migration\Model\BackupModel;
-use Windwalker\Core\Migration\Model\MigrationsModel;
-use Windwalker\Filesystem\File;
-use Windwalker\String\String;
 
 /**
  * The CreateCommand class.

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 use Windwalker\Filesystem\File;
-use Windwalker\String\String;
+use Windwalker\String\StringHelper;
 
 /**
  * The CreateCommand class.
@@ -93,7 +93,7 @@ class CreateCommand extends AbstractCommand
 		// Get template
 		$tmpl = file_get_contents(__DIR__ . '/../../../Resources/Templates/migration/migration.php.dist');
 
-		$tmpl = String::parseVariable($tmpl, array('version' => $date, 'className' => ucfirst($name)));
+		$tmpl = StringHelper::parseVariable($tmpl, array('version' => $date, 'className' => ucfirst($name)));
 
 		// Get file path
 		$filePath = $this->app->get('migration.dir') . '/' . $file;
