@@ -574,7 +574,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  static
 	 *
-	 * @deprecated  Use addMessage() instead.
+	 * @deprecated  3.0  Use addMessage() instead.
 	 */
 	public function addFlash($msg, $type = 'info')
 	{

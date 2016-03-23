@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller;
 
 use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\ViewResolver;
@@ -484,7 +485,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		if ($msg)
 		{
-			$this->app->addFlash($msg, $type);
+			$this->app->addMessage($msg, $type);
 		}
 
 		$this->app->redirect($url);
@@ -497,12 +498,29 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @param string $type
 	 *
 	 * @return  static
+	 *
+	 * @deprecated  3.0  Use addMessage() instead.
 	 */
-	public function addFlash($msg, $type = 'info')
+	public function addFlash($msg, $type = Bootstrap::MSG_INFO)
+	{
+		$this->addMessage($msg, $type);
+
+		return $this;
+	}
+
+	/**
+	 * addMessage
+	 *
+	 * @param string $messages
+	 * @param string $type
+	 *
+	 * @return  static
+	 */
+	public function addMessage($messages, $type = Bootstrap::MSG_INFO)
 	{
 		if (!$this->mute)
 		{
-			$this->app->addFlash($msg, $type);
+			$this->app->addMessage($messages, $type);
 		}
 
 		return $this;
