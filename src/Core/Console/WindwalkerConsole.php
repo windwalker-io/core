@@ -15,6 +15,7 @@ use Windwalker\Core\Asset\Command\AssetCommand;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\Command\PackageCommand;
 use Windwalker\Core\Provider\DateTimeProvider;
 use Windwalker\Core\Seeder\Command\SeedCommand;
 use Windwalker\Core\Ioc;
@@ -150,6 +151,7 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 		$this->addCommand(new AssetCommand);
 		$this->addCommand(new MigrationCommand);
 		$this->addCommand(new SeedCommand);
+		$this->addCommand(new PackageCommand);
 	}
 
 	/**
