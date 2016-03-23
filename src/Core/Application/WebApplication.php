@@ -12,6 +12,7 @@ use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Application\Web\Response;
 use Windwalker\Application\Web\ResponseInterface;
 use Windwalker\Core\Error\ErrorHandler;
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
@@ -572,13 +573,30 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * @param string $type
 	 *
 	 * @return  static
+	 *
+	 * @deprecated  Use addMessage() instead.
 	 */
 	public function addFlash($msg, $type = 'info')
+	{
+		$this->addMessage($msg, $type);
+
+		return $this;
+	}
+
+	/**
+	 * addMessage
+	 *
+	 * @param array|string $messages
+	 * @param string       $type
+	 *
+	 * @return  static
+	 */
+	public function addMessage($messages, $type = Bootstrap::MSG_INFO)
 	{
 		/** @var \Windwalker\Session\Session $session */
 		$session = $this->container->get('system.session');
 
-		$session->getFlashBag()->add($msg, $type);
+		$session->getFlashBag()->add($messages, $type);
 
 		return $this;
 	}

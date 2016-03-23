@@ -12,6 +12,7 @@ use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Asset\Command\AssetCommand;
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Migration\Command\MigrationCommand;
 use Windwalker\Core\Migration\Command\PhinxCommand;
 use Windwalker\Core\Package\AbstractPackage;
@@ -328,6 +329,54 @@ class WindwalkerConsole extends Console implements WindwalkerApplicationInterfac
 	public function setDispatcher(DispatcherInterface $dispatcher)
 	{
 		$this->container->share('system.dispatcher', $dispatcher);
+
+		return $this;
+	}
+
+	/**
+	 * addMessage
+	 *
+	 * @param string|array $messages
+	 * @param string       $type
+	 *
+	 * @return  static
+	 */
+	public function addMessage($messages, $type = null)
+	{
+		switch ($type)
+		{
+			case 'success':
+			case 'green':
+				$tag = '<info>%s</info>';
+				break;
+
+			case 'warning':
+			case 'yellow':
+				$tag = '<comment>%s</comment>';
+				break;
+
+			case 'info':
+			case 'blue':
+				$tag = '<option>%s</option>';
+				break;
+
+			case 'error':
+			case 'danger':
+			case 'red':
+				$tag = '<error>%s</error>';
+				break;
+
+			default:
+				$tag = '%s';
+				break;
+		}
+
+		foreach ((array) $messages as $message)
+		{
+			$time = gmdate('Y-m-d H:i:s');
+
+			$this->out(sprintf('[%s] ' . $tag, $time, $message));
+		}
 
 		return $this;
 	}

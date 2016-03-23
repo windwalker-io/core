@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Application;
 
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -78,4 +79,14 @@ interface WindwalkerApplicationInterface
 	 * @return  string
 	 */
 	public function getName();
+
+	/**
+	 * addMessage
+	 *
+	 * @param string|array $messages
+	 * @param string       $type
+	 *
+	 * @return  static
+	 */
+	public function addMessage($messages, $type = Bootstrap::MSG_INFO);
 }
