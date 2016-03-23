@@ -173,4 +173,20 @@ class Schema
 	{
 		return $this->getTable()->getName();
 	}
+
+	/**
+	 * indexName
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  string
+	 */
+	public function indexName($name)
+	{
+		$tableName = $this->getTableName();
+
+		$tableName = str_replace('#__', '', $tableName);
+
+		return 'idx_' . $tableName . '_' . $name;
+	}
 }
