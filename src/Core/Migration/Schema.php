@@ -87,7 +87,7 @@ class Schema
 			return $key;
 		}
 
-		$this->addIndex($key = new Key(Key::TYPE_INDEX, $name, $columns));
+		$this->getTable()->addIndex($key = new Key(Key::TYPE_INDEX, $name, $columns));
 
 		return $key;
 	}
@@ -162,5 +162,15 @@ class Schema
 		$this->table = $table;
 
 		return $this;
+	}
+
+	/**
+	 * getTableName
+	 *
+	 * @return  string
+	 */
+	public function getTableName()
+	{
+		return $this->getTable()->getName();
 	}
 }
