@@ -93,15 +93,15 @@ class ErrorHandler
 		{
 			static::respond($exception);
 		}
-		catch (\Exception $e)
-		{
-			$msg = "Infinity loop in exception handler. \nException:\n" . $e;
-
-			exit($msg);
-		}
 		catch (\Throwable $e)
 		{
 			$msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;
+
+			exit($msg);
+		}
+		catch (\Exception $e)
+		{
+			$msg = "Infinity loop in exception handler. \nException:\n" . $e;
 
 			exit($msg);
 		}
