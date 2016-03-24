@@ -66,6 +66,11 @@ class ErrorHandler
 	 */
 	public static function error($code ,$message ,$file, $line, $context)
 	{
+		if (error_reporting() === 0)
+		{
+			return;
+		}
+
 		$content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
 		$exception = new \ErrorException($content, $code, 1, $file, $line);
@@ -76,13 +81,13 @@ class ErrorHandler
 	/**
 	 * The exception handler.
 	 *
-	 * @param \Exception $exception The exception object.
+	 * @param \Throwable|\Exception $exception The exception object.
 	 *
 	 * @return  void
 	 *
-	 * @see  http://php.net/manual/en/function.set-exception-handler.php
+	 * @link  http://php.net/manual/en/function.set-exception-handler.php
 	 */
-	public static function exception(\Exception $exception)
+	public static function exception($exception)
 	{
 		try
 		{
@@ -90,7 +95,13 @@ class ErrorHandler
 		}
 		catch (\Exception $e)
 		{
-			$msg = "Infinity loop in exception handler. \n\nException:\n" . $e;
+			$msg = "Infinity loop in exception handler. \nException:\n" . $e;
+
+			exit($msg);
+		}
+		catch (\Throwable $e)
+		{
+			$msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;
 
 			exit($msg);
 		}
@@ -99,7 +110,7 @@ class ErrorHandler
 	/**
 	 * respond
 	 *
-	 * @param \Exception $exception
+	 * @param \Throwable $exception
 	 *
 	 * @return  void
 	 */
