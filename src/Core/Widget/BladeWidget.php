@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Widget;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Renderer\BladeRenderer;
 
 /**
@@ -35,7 +36,7 @@ class BladeWidget extends Widget
 	{
 		parent::__construct(
 			$layout,
-			new BladeRenderer(null, array('cache_path' => Ioc::getConfig()->get('path.cache') . '/view')),
+			RendererHelper::getBladeRenderer(),
 			$package
 		);
 	}

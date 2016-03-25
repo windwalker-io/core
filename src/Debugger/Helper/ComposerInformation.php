@@ -43,7 +43,19 @@ class ComposerInformation
 		{
 			$file = WINDWALKER_ROOT . '/composer.lock';
 
-			static::$lock = new Registry(is_file($file) ? file_get_contents($file) : null);
+			// Ignore unknown PHP7 version caused net::ERR_INCOMPLETE_CHUNKED_ENCODING in debug mode.
+			if (version_compare(PHP_VERSION, 7, '<='))
+			{
+				$data = file_get_contents($file);
+
+				$data = json_decode($data);
+			}
+			else
+			{
+				$data = '{}';
+			}
+
+			static::$lock = new Registry($data);
 		}
 
 		return static::$lock;

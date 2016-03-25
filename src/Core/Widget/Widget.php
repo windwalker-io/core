@@ -72,7 +72,7 @@ class Widget implements WidgetInterface
 	public function __construct($layout, RendererInterface $renderer = null, $package = null)
 	{
 		$this->layout   = $layout;
-		$this->renderer = $renderer ? : new PhpRenderer;
+		$this->renderer = $renderer ? : RendererHelper::getPhpRenderer();
 
 		if (!$package)
 		{

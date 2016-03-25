@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Widget;
 
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\Twig\WindwalkerExtension;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\Priority;
@@ -34,7 +35,7 @@ class TwigWidget extends Widget
 	 */
 	public function __construct($layout, $package = null)
 	{
-		parent::__construct($layout, new TwigRenderer, $package);
+		parent::__construct($layout, RendererHelper::getTwigRenderer(), $package);
 	}
 
 	/**
