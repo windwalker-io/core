@@ -218,6 +218,11 @@ class CacheFactory implements ContainerAwareInterface
 	 */
 	public static function getDataHandler($handler)
 	{
+		if ($handler == 'raw')
+		{
+			$handler = 'RawData';
+		}
+
 		$class = sprintf('Windwalker\Cache\DataHandler\%sHandler', ucfirst($handler));
 
 		if (!class_exists($class))
