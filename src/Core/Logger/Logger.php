@@ -31,6 +31,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  LoggerPool  setLoggers(array $loggers)
  * @method  static  LoggerInterface    getLogger($category, $level = Logger::DEBUG)
  * @method  static  LoggerInterface[]  getLoggers()
+ * @method  static  LoggerInterface    createCategory($category, $level = Logger::DEBUG)
  *
  * @since  2.1.1
  */

@@ -230,6 +230,19 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, Contai
 	}
 
 	/**
+	 * createCategory
+	 *
+	 * @param string  $category
+	 * @param int     $level
+	 *
+	 * @return  LoggerInterface
+	 */
+	public function createCategory($category, $level = Logger::DEBUG)
+	{
+		return $this->getLogger($category, $level);
+	}
+
+	/**
 	 * getLogger
 	 *
 	 * @param   string $category
@@ -262,6 +275,8 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, Contai
 				{
 					$logger->pushProcessor(clone $processor);
 				}
+
+				$this->loggers[$category] = $logger;
 
 				return $logger;
 			}
