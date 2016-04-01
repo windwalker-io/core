@@ -30,3 +30,7 @@ database:
 exception:
     pattern: /exception(/id)
     controller: Exception
+
+asset:
+    pattern: /asset/(type)
+    controller: Asset

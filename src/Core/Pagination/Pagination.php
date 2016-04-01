@@ -132,7 +132,6 @@ class Pagination
 	 * @param int $neighbours  Number of neighboring pages at the left and the right sides
 	 *
 	 * @throws \LogicException
-	 * @return self
 	 */
 	public function __construct($total, $current, $limit = 10, $neighbours = 4)
 	{
@@ -141,7 +140,7 @@ class Pagination
 		$this->limit   = (int) $limit;
 		$this->neighbours = (int) $neighbours;
 
-		if ($this->limit <= 0)
+		if ($this->limit < 0)
 		{
 			throw new \InvalidArgumentException('Items per page must be at least 1');
 		}
@@ -156,7 +155,14 @@ class Pagination
 			$this->current = self::BASE_PAGE;
 		}
 
-		$this->pages = (int) ceil($this->total / $this->limit);
+		if ($this->limit == 0)
+		{
+			$this->pages = 1;
+		}
+		else
+		{
+			$this->pages = (int) ceil($this->total / $this->limit);
+		}
 
 		if ($this->current > $this->pages)
 		{

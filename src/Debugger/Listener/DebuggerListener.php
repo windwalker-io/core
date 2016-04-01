@@ -12,6 +12,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Model\Model;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\DebuggerPackage;
@@ -97,6 +98,11 @@ class DebuggerListener
 		$session = Ioc::getSession();
 		$uri     = Ioc::getUriData();
 
+		if ($app->get('route.matched') == $package->name . '@asset')
+		{
+			return;
+		}
+
 		/** @var Model $model */
 		$model = $controller->getModel('Dashboard');
 
@@ -165,16 +171,21 @@ class DebuggerListener
 	 */
 	public function onViewBeforeRender(Event $event)
 	{
-		$theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
-
-		if (!is_file($theme))
+		if (!PackageHelper::getPackage() instanceof DebuggerPackage)
 		{
-			$theme = $this->package->getDir() . '/Resources/media/css/theme.css';
+			return;
 		}
 
-		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
-
-		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
+//		$theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
+//
+//		if (!is_file($theme))
+//		{
+//			$theme = $this->package->getDir() . '/Resources/media/css/theme.css';
+//		}
+//
+//		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
+//
+//		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
 	}
 
 	/**

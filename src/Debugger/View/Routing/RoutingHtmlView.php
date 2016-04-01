@@ -38,7 +38,7 @@ class RoutingHtmlView extends AbstractDebuggerHtmlView
 		{
 			$route = new Data($route);
 
-			list($packageName, $routeName) = StringHelper::explode(':', $route->name, 2, 'array_unshift');
+			list($packageName, $routeName) = StringHelper::explode('@', $route->name, 2, 'array_unshift');
 
 			$route->package = $packageName;
 			$route->matched = $route->name == $data->matchedRoute->name;

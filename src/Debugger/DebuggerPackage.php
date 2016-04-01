@@ -14,6 +14,8 @@ use Windwalker\Debugger\Provider\ProfilerProvider;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
 
+define('WINDWALKER_DEBUGGER_ROOT', __DIR__);
+
 /**
  * The WebProfilerPackage class.
  * 

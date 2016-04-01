@@ -30,10 +30,3 @@ code {
 footer {
 	margin-bottom: 20px;
 }
-
-.icon {
-	display : inline-block;
-	width   : 1em;
-	height  : 1em;
-	fill    : currentColor;
-}
