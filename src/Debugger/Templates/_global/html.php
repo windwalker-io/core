@@ -130,7 +130,7 @@ use Windwalker\Registry\Registry;
 				<hr />
 
 				<footer>
-					&copy; Windwalker <?php echo $datetime->format('Y'); ?>
+					&copy; Windwalker <?php echo $datetime->format('Y'); ?> - Theme by <a target="_blank" href="https://bootswatch.com/sandstone/">Bootswatch</a>
 				</footer>
 			</div>
 		</div>
