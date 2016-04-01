@@ -72,7 +72,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	 */
 	public function __isset($key)
 	{
-		return isset($this->helpers[$key]);
+		return (bool) $this[$key];
 	}
 
 	/**
