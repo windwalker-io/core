@@ -233,10 +233,11 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, Contai
 	 * getLogger
 	 *
 	 * @param   string $category
+	 * @param   int    $level
 	 *
-	 * @return  LoggerInterface
+	 * @return LoggerInterface
 	 */
-	public function getLogger($category)
+	public function getLogger($category, $level = Logger::DEBUG)
 	{
 		$category = strtolower($category);
 
@@ -246,7 +247,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, Contai
 			{
 				$logger = new Monolog($category);
 
-				$handler = new StreamHandler($this->container->get('system.config')->get('path.logs') . '/' . $category . '.log');
+				$handler = new StreamHandler($this->container->get('system.config')->get('path.logs') . '/' . $category . '.log', $level);
 				$logger->pushProcessor(new PsrLogMessageProcessor);
 
 				// Basic string handler

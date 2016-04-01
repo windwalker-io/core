@@ -14,6 +14,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The Logger class.
  *
+ * @see LoggerPool
+ *
  * @method  static  LoggerPool  emergency($category, $message, array $context = array())
  * @method  static  LoggerPool  alert($category, $message, array $context = array())
  * @method  static  LoggerPool  critical($category, $message, array $context = array())
@@ -27,13 +29,63 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  boolean     hasLogger($category)
  * @method  static  LoggerPool  removeLogger($category)
  * @method  static  LoggerPool  setLoggers(array $loggers)
- * @method  static  LoggerInterface    getLogger($category)
+ * @method  static  LoggerInterface    getLogger($category, $level = Logger::DEBUG)
  * @method  static  LoggerInterface[]  getLoggers()
  *
  * @since  2.1.1
  */
 class Logger extends AbstractProxyFacade
 {
+	/**
+	 * Detailed debug information
+	 */
+	const DEBUG = 100;
+
+	/**
+	 * Interesting events
+	 *
+	 * Examples: User logs in, SQL logs.
+	 */
+	const INFO = 200;
+
+	/**
+	 * Uncommon events
+	 */
+	const NOTICE = 250;
+
+	/**
+	 * Exceptional occurrences that are not errors
+	 *
+	 * Examples: Use of deprecated APIs, poor use of an API,
+	 * undesirable things that are not necessarily wrong.
+	 */
+	const WARNING = 300;
+
+	/**
+	 * Runtime errors
+	 */
+	const ERROR = 400;
+
+	/**
+	 * Critical conditions
+	 *
+	 * Example: Application component unavailable, unexpected exception.
+	 */
+	const CRITICAL = 500;
+
+	/**
+	 * Action must be taken immediately
+	 *
+	 * Example: Entire website down, database unavailable, etc.
+	 * This should trigger the SMS alerts and wake you up.
+	 */
+	const ALERT = 550;
+
+	/**
+	 * Urgent alert.
+	 */
+	const EMERGENCY = 600;
+
 	/**
 	 * Property _key.
 	 *
