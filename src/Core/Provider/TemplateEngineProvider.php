@@ -91,6 +91,11 @@ class TemplateEngineProvider implements ServiceProviderInterface
 			return "<?php echo \\Windwalker\\Core\\Widget\\BladeWidgetHelper::render{$expression} ?>";
 		});
 
+		Renderer\Blade\GlobalContainer::addCompiler('messages', function($expression)
+		{
+			return "<?php echo \\Windwalker\\Core\\Widget\\WidgetHelper::render('windwalker.message.default', array('flashes' => \$flashes)) ?>";
+		});
+
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
 
 		// B/C for 4.*
