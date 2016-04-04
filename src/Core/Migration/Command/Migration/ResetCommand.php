@@ -56,6 +56,9 @@ class ResetCommand extends AbstractCommand
 		$this->addOption('s')
 			->alias('seed')
 			->description('Also import seeds.');
+
+		$this->addOption('no-backup')
+			->description('Do not backup database.');
 	}
 
 	/**
@@ -66,7 +69,10 @@ class ResetCommand extends AbstractCommand
 	protected function doExecute()
 	{
 		// backup
-		BackupModel::getInstance()->setCommand($this)->backup();
+		if (!$this->getOption('no-backup'))
+		{
+			BackupModel::getInstance()->setCommand($this)->backup();
+		}
 
 		$this->out('<cmd>Rollback to 0 version...</cmd>');
 
