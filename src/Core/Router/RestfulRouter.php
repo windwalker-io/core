@@ -12,6 +12,8 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
 use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
@@ -358,6 +360,80 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 		}
 
 		return trim($suffix[$method], '\\');
+	}
+
+	/**
+	 * addRouteByConfig
+	 *
+	 * @param string                 $name
+	 * @param array                  $route
+	 * @param string|AbstractPackage $package
+	 * @param string                 $prefix
+	 *
+	 * @return Route
+	 */
+	public function addRouteByConfig($name, $route, $package = null, $prefix = '/')
+	{
+		if ($package)
+		{
+			if (!$package instanceof AbstractPackage)
+			{
+				$package = PackageHelper::getPackage($package);
+			}
+
+			$pattern = ArrayHelper::getValue($route, 'pattern');
+
+			$route['pattern'] = rtrim($prefix, '/ ') . $pattern;
+
+			$route['pattern'] = '/' . ltrim($route['pattern'], '/ ');
+
+			$route['extra']['package'] = $package->getName();
+
+			$name = $package->getName() . '@' . $name;
+		}
+
+		$pattern = ArrayHelper::getValue($route, 'pattern');
+		$variables = ArrayHelper::getValue($route, 'variables', array());
+		$allowMethods = ArrayHelper::getValue($route, 'method', array());
+
+		if (isset($route['controller']))
+		{
+			$route['extra']['controller'] = $route['controller'];
+		}
+
+		if (isset($route['action']))
+		{
+			$route['extra']['action'] = $route['action'];
+		}
+
+		if (isset($route['hook']))
+		{
+			$route['extra']['hook'] = $route['hook'];
+		}
+
+		$routeObject = new Route($name, $pattern, $variables, $allowMethods, $route);
+
+		$this->addRoute($routeObject);
+
+		return $routeObject;
+	}
+
+	/**
+	 * addRouteByConfigs
+	 *
+	 * @param array                  $routes
+	 * @param string|AbstractPackage $package
+	 *
+	 * @return  static
+	 */
+	public function addRouteByConfigs($routes, $package = null)
+	{
+		foreach ($routes as $key => $route)
+		{
+			$this->addRouteByConfig($key, $route, $package);
+		}
+
+		return $this;
 	}
 
 	/**

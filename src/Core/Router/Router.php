@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Router;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Router\Route;
 
 /**
  * The Router class.
@@ -20,6 +21,12 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string  http($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
  * @method  static  string  buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
  * @method  static  string  html($route, $queries = array(), $type = RestfulRouter::TYPE_RAW)
+ * @method  static  Route   match($rawRoute, $method = 'GET', $options = array())
+ * @method  static  Route   addRouteByConfig($name, $route, $package = null)
+ * @method  static  RestfulRouter  addRouteByConfigs($routes, $package = null)
+ * @method  static  RestfulRouter  addRoute($name, $pattern = null, $variables = array(), $method = array(), $options = array())
+ * @method  static  RestfulRouter  addRoutes(array $routes)
+ * @method  static  Route          getRoute($name)
  *
  * @see \Windwalker\Router\Router
  * @see \Windwalker\Core\Router\RestfulRouter

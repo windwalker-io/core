@@ -38,7 +38,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @property-read  Session  $session
  * @property-read  Router   $router
- * 
+ *
  * @since  2.0
  */
 class WebApplication extends AbstractWebApplication implements WindwalkerApplicationInterface, DispatcherAwareInterface
@@ -135,6 +135,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		}
 
 		$this->registerProviders($this->container);
+
+		// Strict Mode
+		Provider\DatabaseProvider::strictMode($this->container);
 
 		/** @var PackageResolver $packageResolver */
 		$packageResolver = $this->container->get('package.resolver');
@@ -360,7 +363,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		{
 			return $router->match($route, $method, $options);
 		}
-		// Auto routing
+			// Auto routing
 		catch (RouteNotFoundException $e)
 		{
 			$route = explode('/', $route);

@@ -71,13 +71,24 @@ class DatabaseProvider implements ServiceProviderInterface
 		};
 
 		$container->share('sql.exporter', $closure);
+	}
 
-		// MySQL Strict Mode
+	/**
+	 * strictMode
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	public static function strictMode(Container $container)
+	{
 		$config = $container->get('system.config');
 
-		if ($config->get('database.driver') == 'mysql')
+		$mode = $config->get('database.mysql_strict_mode');
+
+		if ($config->get('database.driver') == 'mysql' && $mode !== null)
 		{
-			if ($config->get('database.mysql_strict_mode', false))
+			if ($mode)
 			{
 				$container->get('system.database')->setQuery("SET sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_ALL_TABLES'")->execute();
 			}

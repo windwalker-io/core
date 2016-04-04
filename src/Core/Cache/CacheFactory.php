@@ -116,10 +116,6 @@ class CacheFactory implements ContainerAwareInterface
 			$dataHandler = 'string';
 		}
 
-		$options['cache_time']  = isset($options['cache_time'])  ? $options['cache_time']  : $config->get('cache.time');
-		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('cache.dir');
-		$options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
-
 		return static::getCache($name, $storage, $dataHandler, $options);
 	}
 
@@ -172,6 +168,12 @@ class CacheFactory implements ContainerAwareInterface
 		{
 			throw new \DomainException(sprintf('Cache Storage: %s not supported.', ucfirst($storage)));
 		}
+
+		$config = Ioc::getConfig();
+
+		$options['cache_time']  = isset($options['cache_time'])  ? $options['cache_time']  : $config->get('cache.time');
+		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('cache.dir');
+		$options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
 
 		switch (strtolower($storage))
 		{

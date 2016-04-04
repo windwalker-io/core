@@ -11,12 +11,13 @@ namespace Windwalker\Core\Migration\Command;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Provider\DatabaseProvider;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Core\Ioc;
 
 /**
  * The MigrationCommand class.
- * 
+ *
  * @since  2.0
  */
 class MigrationCommand extends Command
@@ -92,6 +93,8 @@ class MigrationCommand extends Command
 
 		$config['database.name'] = $name;
 
+		DatabaseProvider::strictMode(Ioc::factory());
+
 		// Prepare migration path
 		$packageName = $this->getOption('p');
 
@@ -122,4 +125,3 @@ class MigrationCommand extends Command
 		return parent::doExecute();
 	}
 }
- 
