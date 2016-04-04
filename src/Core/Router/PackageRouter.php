@@ -17,6 +17,10 @@ use Windwalker\Core\Package\AbstractPackage;
  */
 class PackageRouter
 {
+	const TYPE_RAW = 'raw';
+	const TYPE_PATH = 'path';
+	const TYPE_FULL = 'full';
+
 	/**
 	 * Property package.
 	 *
