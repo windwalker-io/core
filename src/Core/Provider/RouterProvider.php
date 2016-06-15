@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Router\RestfulRouter;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Router\Matcher\MatcherInterface;
@@ -40,7 +40,7 @@ class RouterProvider implements ServiceProviderInterface
 
 			$matcher = strtolower($matcher) == 'default' ? 'sequential' : $matcher;
 
-			$router = new RestfulRouter(array(), $self->getMatcher($matcher));
+			$router = new CoreRouter(array(), $self->getMatcher($matcher));
 
 			$router->setUri($container->get('system.uri'))
 				->setDispatcher($container->get('system.dispatcher'));

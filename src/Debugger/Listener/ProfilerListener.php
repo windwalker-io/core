@@ -14,7 +14,7 @@ use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\RestfulRouter;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
 use Windwalker\Debugger\Helper\ComposerInformation;
@@ -81,7 +81,7 @@ class ProfilerListener
 		$collector = $container->get('system.collector');
 		$profiler  = $container->get('system.profiler');
 
-		/** @var RestfulRouter $router */
+		/** @var CoreRouter $router */
 		$router = $event['app']->getRouter();
 
 		$collector['package.name']    = $container->get('current.package')->getName();

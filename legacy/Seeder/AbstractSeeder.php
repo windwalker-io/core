@@ -107,33 +107,6 @@ abstract class AbstractSeeder
 
 		return $this;
 	}
-
-	/**
-	 * clean
-	 *
-	 * @param AbstractSeeder|string $seeder
-	 *
-	 * @return  static
-	 *
-	 * @deprecated  3.0  Use clear() instead.
-	 */
-	public function clean($seeder = null)
-	{
-		return $this->clear($seeder);
-	}
-
-	/**
-	 * doClean
-	 *
-	 * @return  void
-	 *
-	 * @deprecated  3.0  Use doClear() instead.
-	 */
-	public function doClean()
-	{
-		// Override it.
-	}
-
 	/**
 	 * doClear
 	 *
@@ -141,7 +114,6 @@ abstract class AbstractSeeder
 	 */
 	public function doClear()
 	{
-		$this->doClean();
 	}
 
 	/**

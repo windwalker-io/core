@@ -12,6 +12,7 @@ use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\IO\PsrInput;
 use Windwalker\Registry\Registry;
 
 /**
@@ -21,21 +22,9 @@ use Windwalker\Registry\Registry;
  */
 class WebProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property app.
-	 *
-	 * @var AbstractWebApplication
-	 */
-	protected $app;
-
-	/**
-	 * Class init.
-	 *
-	 * @param AbstractWebApplication $app
-	 */
-	public function __construct(AbstractWebApplication $app)
+	public function boot(Container $container)
 	{
-		$this->app = $app;
+
 	}
 
 	/**
@@ -47,18 +36,20 @@ class WebProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$app = $this->app;
+		$app = $container->get('system.application');
 
 		// Input
-		$container->share('system.input', $this->app->input)
-			->alias('input', 'system.input');
+		$container->share('system.input', function (Container $container)
+		{
+		    return PsrInput::create($container->get('system.application')->getRequest());
+		})->alias('input', 'system.input');
 
 		// Environment
-		$container->share('system.environment', $this->app->getEnvironment())
+		$container->share('system.environment', $app->getEnvironment())
 			->alias('environment', 'system.environment');
 
-		$container->share('system.client', $this->app->getEnvironment()->getClient());
-		$container->share('system.server', $this->app->getEnvironment()->getServer());
+		$container->share('system.browser', $app->getEnvironment()->getBrowser());
+		$container->share('system.platform', $app->getEnvironment()->getPlatform());
 
 		// Uri
 		$container->alias('uri', 'system.uri')
@@ -66,7 +57,7 @@ class WebProvider implements ServiceProviderInterface
 				'system.uri',
 				function ($container) use ($app)
 				{
-					return new Registry($app->initUri());
+					return $container->get('system.application')->getServer()->getUriData();
 				}
 			);
 	}

@@ -13,6 +13,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventInterface;
+use Windwalker\Registry\Registry;
 
 /**
  * Interface WindwalkerApplicationInterface
@@ -39,20 +40,6 @@ interface WindwalkerApplicationInterface
 	 * @return  static
 	 */
 	public function addPackage($name, AbstractPackage $package);
-
-	/**
-	 * loadProviders
-	 *
-	 * @return  ServiceProviderInterface[]
-	 */
-	public static function loadProviders();
-
-	/**
-	 * getPackages
-	 *
-	 * @return  AbstractPackage[]
-	 */
-	public static function loadPackages();
 
 	/**
 	 * Trigger an event.

@@ -41,7 +41,7 @@ class SessionProvider implements ServiceProviderInterface
 			$handler  = $config->get('session.handler', 'native');
 			$options  = (array) $config->get('session', array());
 
-			$options['cookie_path'] = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->get('base.path');
+			$options['cookie_path'] = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->root;
 
 			$sesion = new Session($self->getHandler($handler, $container, $options), null, null, null, $options);
 

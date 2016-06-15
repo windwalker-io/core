@@ -213,14 +213,14 @@ class Widget implements WidgetInterface
 				$locale = $package->app->get('language.locale', 'en-GB');
 				$default = $package->app->get('language.default', 'en-GB');
 
-				$this->renderer->addPath($package->getDir() . '/Templates/' . $locale, Priority::BELOW_NORMAL);
+				$this->renderer->addPath($package->getDir() . '/Templates/' . $locale, PriorityQueue::BELOW_NORMAL);
 
 				if ($locale != $default)
 				{
-					$this->renderer->addPath($package->getDir() . '/Templates/' . $default, Priority::BELOW_NORMAL);
+					$this->renderer->addPath($package->getDir() . '/Templates/' . $default, PriorityQueue::BELOW_NORMAL);
 				}
 
-				$this->renderer->addPath($package->getDir() . '/Templates', Priority::BELOW_NORMAL);
+				$this->renderer->addPath($package->getDir() . '/Templates', PriorityQueue::BELOW_NORMAL);
 			}
 
 			$this->pathRegistered = true;
@@ -237,7 +237,7 @@ class Widget implements WidgetInterface
 	 *
 	 * @return  static
 	 */
-	public function addPath($path, $priority = Priority::NORMAL)
+	public function addPath($path, $priority = PriorityQueue::NORMAL)
 	{
 		$this->renderer->addPath($path, $priority);
 

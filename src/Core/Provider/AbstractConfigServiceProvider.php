@@ -35,4 +35,3 @@ abstract class AbstractConfigServiceProvider implements ServiceProviderInterface
 		$this->config = $config ? : new Registry;
 	}
 }
- 

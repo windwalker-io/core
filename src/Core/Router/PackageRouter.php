@@ -39,9 +39,9 @@ class PackageRouter
 	 * Class init.
 	 *
 	 * @param AbstractPackage $package
-	 * @param RestfulRouter   $router
+	 * @param CoreRouter      $router
 	 */
-	public function __construct(AbstractPackage $package, RestfulRouter $router)
+	public function __construct(AbstractPackage $package, CoreRouter $router)
 	{
 		$this->package = $package;
 		$this->router  = $router;
@@ -57,7 +57,7 @@ class PackageRouter
 	 *
 	 * @return  string
 	 */
-	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
+	public function build($route, $queries = array(), $type = CoreRouter::TYPE_RAW, $xhtml = false)
 	{
 		try
 		{
@@ -97,7 +97,7 @@ class PackageRouter
 	 *
 	 * @return  string
 	 */
-	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function buildHtml($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, true);
 	}
@@ -111,7 +111,7 @@ class PackageRouter
 	 *
 	 * @return  string
 	 */
-	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function buildHttp($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
 	}
@@ -125,7 +125,7 @@ class PackageRouter
 	 *
 	 * @return  string
 	 */
-	public function html($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function html($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, true);
 	}
@@ -139,7 +139,7 @@ class PackageRouter
 	 *
 	 * @return  string
 	 */
-	public function http($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function http($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
 	}
@@ -147,7 +147,7 @@ class PackageRouter
 	/**
 	 * Method to get property Router
 	 *
-	 * @return  RestfulRouter
+	 * @return  CoreRouter
 	 */
 	public function getRouter()
 	{
@@ -157,11 +157,11 @@ class PackageRouter
 	/**
 	 * Method to set property router
 	 *
-	 * @param   RestfulRouter $router
+	 * @param   CoreRouter $router
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setRouter(RestfulRouter $router)
+	public function setRouter(CoreRouter $router)
 	{
 		$this->router = $router;
 

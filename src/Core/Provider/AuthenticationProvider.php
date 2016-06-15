@@ -31,8 +31,6 @@ class AuthenticationProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$this->prepareAlias();
-
 		$closure = function(Container $container)
 		{
 			$auth = new Authentication;
@@ -41,9 +39,6 @@ class AuthenticationProvider implements ServiceProviderInterface
 
 			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('authentication' => $auth));
 
-			// 2.0 legacy
-			$dispatcher->triggerEvent('onLoadAuthenticateMethods', array('authenticate' => $auth));
-
 			return $auth;
 		};
 
@@ -51,37 +46,6 @@ class AuthenticationProvider implements ServiceProviderInterface
 			->alias('authentication', 'system.authentication')
 			->alias('auth', 'system.authentication');
 
-		// Legacy 2.0
-		$container->alias('system.authenticate', 'system.authentication')
-			->alias('authenticate', 'system.authentication');
-
 		User::setHandler(new NullUserHandler);
-	}
-
-	/**
-	 * Prepare alias for 2.0 legacy.
-	 *
-	 * @return  void
-	 *
-	 * @deprecated  3.0
-	 */
-	protected function prepareAlias()
-	{
-		static $executed;
-
-		if ($executed)
-		{
-			return;
-		}
-
-		// Make Authentication legacy classes work
-		class_alias('Windwalker\Core\Authentication\User',     'Windwalker\Core\Authenticate\User');
-		class_alias('Windwalker\Core\Authentication\UserData', 'Windwalker\Core\Authenticate\UserData');
-		class_alias('Windwalker\Core\Authentication\UserDataInterface',     'Windwalker\Core\Authenticate\UserDataInterface');
-		class_alias('Windwalker\Core\Authentication\UserHandlerInterface',  'Windwalker\Core\Authenticate\UserHandlerInterface');
-		class_alias('Windwalker\Core\Authentication\Method\DatabaseMethod', 'Windwalker\Core\Authenticate\DatabaseMethod');
-		class_alias('Windwalker\Core\Authentication\Exception\AuthenticateException', 'Windwalker\Core\Authenticate\Exception\AuthenticateException');
-
-		$executed = true;
 	}
 }

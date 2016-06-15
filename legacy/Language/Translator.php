@@ -101,21 +101,6 @@ abstract class Translator extends AbstractProxyFacade
 	}
 
 	/**
-	 * load
-	 *
-	 * @param   string  $file
-	 * @param   string  $package
-	 *
-	 * @deprecated  3.0  Use loadFile() instead.
-	 *
-	 * @return  void
-	 */
-	public static function load($file, $package)
-	{
-		static::loadFile($file, null, $package);
-	}
-
-	/**
 	 * loadFile
 	 *
 	 * @param string $file

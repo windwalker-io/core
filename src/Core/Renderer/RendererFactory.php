@@ -245,13 +245,13 @@ class RendererFactory
 		// Priority (1)
 		$this->addPath(
 			realpath($config->get('path.templates')),
-			Priority::LOW - 20
+			PriorityQueue::LOW - 20
 		);
 
 		// Priority (2)
 		$this->addPath(
 			realpath(__DIR__ . '/../Resources/Templates'),
-			Priority::LOW - 30
+			PriorityQueue::LOW - 30
 		);
 
 		return $this;

@@ -107,7 +107,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), array_shift($paths));
-		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', array_shift($paths));
+		$this->assertPathEquals(__DIR__ . '/../../src', array_shift($paths));
 
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
@@ -146,7 +146,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), array_shift($paths));
-		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', array_shift($paths));
+		$this->assertPathEquals(__DIR__ . '/../../src', array_shift($paths));
 
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
@@ -187,7 +187,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), array_shift($paths));
-		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', array_shift($paths));
+		$this->assertPathEquals(__DIR__ . '/../../src', array_shift($paths));
 
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
@@ -227,7 +227,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), array_shift($paths));
-		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', array_shift($paths));
+		$this->assertPathEquals(__DIR__ . '/../../src', array_shift($paths));
 
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));
@@ -268,7 +268,7 @@ class ControllerViewTest extends AbstractBaseTestCase
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc/stub', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates') . '/mvc', array_shift($paths));
 		$this->assertPathEquals(Ioc::getConfig()->get('path.templates'), array_shift($paths));
-		$this->assertPathEquals(realpath(__DIR__ . '/../../src') . '/Core/Resources/Templates', array_shift($paths));
+		$this->assertPathEquals(__DIR__ . '/../../src', array_shift($paths));
 
 		$this->assertEquals('<h1>Flower</h1>', trim($view->setLayout('flower')->render()));
 		$this->assertEquals('<h1>Test</h1>', trim($view->setLayout('test.test')->render()));

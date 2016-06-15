@@ -33,8 +33,6 @@ class TemplateEngineProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		$this->prepareFactory($container);
-
-		$this->prepareExtends($container);
 	}
 
 	/**
@@ -62,13 +60,13 @@ class TemplateEngineProvider implements ServiceProviderInterface
 	}
 
 	/**
-	 * prepareExtends
+	 * boot
 	 *
 	 * @param Container $container
 	 *
 	 * @return  void
 	 */
-	protected function prepareExtends(Container $container)
+	public function boot(Container $container)
 	{
 		// Blade
 		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)

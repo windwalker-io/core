@@ -11,18 +11,20 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
-use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Event\DispatcherAwareInterface;
+use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
-use Windwalker\Event\EventInterface;
-use Windwalker\Ioc;
+use Windwalker\Event\ListenerPriority;
 use Windwalker\Registry\Registry;
+use Windwalker\Registry\RegistryHelper;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
+use Windwalker\Uri\UriData;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -30,8 +32,10 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  2.0
  */
-class RestfulRouter extends Router implements DispatcherAwareInterface, DispatcherInterface
+class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherInterface
 {
+	use DispatcherAwareTrait;
+	
 	const TYPE_RAW = 'raw';
 	const TYPE_PATH = 'path';
 	const TYPE_FULL = 'full';
@@ -61,7 +65,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	/**
 	 * Property uri.
 	 *
-	 * @var Registry
+	 * @var UriData
 	 */
 	protected $uri;
 
@@ -71,13 +75,6 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 * @var  Cache
 	 */
 	protected $cache;
-
-	/**
-	 * Property dispatcher.
-	 *
-	 * @var  DispatcherInterface
-	 */
-	protected $dispatcher;
 
 	/**
 	 * Property matched.
@@ -109,7 +106,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 *
 	 * @return  string
 	 */
-	public function build($route, $queries = array(), $type = RestfulRouter::TYPE_RAW, $xhtml = false)
+	public function build($route, $queries = array(), $type = CoreRouter::TYPE_RAW, $xhtml = false)
 	{
 		$route = str_replace(':', '@', $route);
 
@@ -160,16 +157,16 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 
 		$uri = $this->getUri();
 
-		$script = $uri->get('script');
+		$script = $uri->script;
 		$script = $script ? $script . '/' : null;
 
 		if ($type == static::TYPE_PATH)
 		{
-			$url = $uri->get('base.path') . $script . ltrim($url, '/');
+			$url = $uri->root . $script . ltrim($url, '/');
 		}
 		elseif ($type == static::TYPE_FULL)
 		{
-			$url = $uri->get('base.full') . $script . $url;
+			$url = $uri->path . $script . $url;
 		}
 
 		if ($xhtml)
@@ -191,7 +188,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 *
 	 * @return  string
 	 */
-	public function html($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function html($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, true);
 	}
@@ -205,7 +202,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 *
 	 * @return  string
 	 */
-	public function http($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function http($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type, false);
 	}
@@ -219,7 +216,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 *
 	 * @return  string
 	 */
-	public function buildHtml($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function buildHtml($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->html($route, $queries, $type);
 	}
@@ -233,7 +230,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 *
 	 * @return  string
 	 */
-	public function buildHttp($route, $queries = array(), $type = RestfulRouter::TYPE_PATH)
+	public function buildHttp($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
 		return $this->http($route, $queries, $type);
 	}
@@ -419,6 +416,67 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	}
 
 	/**
+	 * loadRoutingFromFiles
+	 *
+	 * @param array $files
+	 *
+	 * @return  array
+	 */
+	public static function loadRoutingFromFiles(array $files)
+	{
+		$routing = new Registry;
+
+		foreach ($files as $file)
+		{
+			$routing = $routing->loadFile($file, pathinfo($file, PATHINFO_EXTENSION));
+		}
+
+		return $routing->toArray();
+	}
+
+	/**
+	 * loadRawRouting
+	 *
+	 * @param array           $routes
+	 * @param PackageResolver $resolver
+	 *
+	 * @return  static
+	 */
+	public function registerRawRouting(array $routes, PackageResolver $resolver)
+	{
+		foreach ($routes as $key => &$route)
+		{
+			// Package
+			if (isset($route['package']))
+			{
+				if (!isset($route['pattern']))
+				{
+					throw new \InvalidArgumentException(sprintf('Route need pattern: %s', print_r($route, true)));
+				}
+
+				if (!$resolver->exists($route['package']))
+				{
+					throw new \InvalidArgumentException(sprintf('Package %s not exists.', $route['package']));
+				}
+
+				$package = $resolver->getPackage($route['package']);
+
+				$this->group($route['pattern'], function (CoreRouter $router) use ($package)
+				{
+					$router->addRouteByConfigs($package->loadRouting(), $package->getName());
+				});
+
+				continue;
+			}
+
+			// Simple route
+			$this->addRouteByConfig($key, $route);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * addRouteByConfigs
 	 *
 	 * @param array                  $routes
@@ -488,7 +546,7 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	/**
 	 * Method to get property Uri
 	 *
-	 * @return  Registry
+	 * @return  UriData
 	 */
 	public function getUri()
 	{
@@ -503,11 +561,11 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	/**
 	 * Method to set property uri
 	 *
-	 * @param   Registry $uri
+	 * @param   UriData $uri
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setUri(Registry $uri)
+	public function setUri(UriData $uri)
 	{
 		$this->uri = $uri;
 
@@ -523,71 +581,9 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	 */
 	protected function getCacheKey($data)
 	{
+		ksort($data);
+
 		return md5(json_encode($data));
-	}
-
-	/**
-	 * getDispatcher
-	 *
-	 * @return  DispatcherInterface
-	 */
-	public function getDispatcher()
-	{
-		if (!$this->dispatcher)
-		{
-			$this->dispatcher = Ioc::getDispatcher();
-		}
-
-		return $this->dispatcher;
-	}
-
-	/**
-	 * setDispatcher
-	 *
-	 * @param   DispatcherInterface $dispatcher
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDispatcher(DispatcherInterface $dispatcher)
-	{
-		$this->dispatcher = $dispatcher;
-
-		return $this;
-	}
-
-	/**
-	 * Trigger an event.
-	 *
-	 * @param   EventInterface|string $event The event object or name.
-	 * @param   array                 $args  The arguments.
-	 *
-	 * @return  EventInterface  The event after being passed through all listeners.
-	 */
-	public function triggerEvent($event, $args = array())
-	{
-		return $this->getDispatcher()->triggerEvent($event, $args);
-	}
-
-	/**
-	 * Add a listener to this dispatcher, only if not already registered to these events.
-	 * If no events are specified, it will be registered to all events matching it's methods name.
-	 * In the case of a closure, you must specify at least one event name.
-	 *
-	 * @param   object|\Closure $listener     The listener
-	 * @param   array|integer   $priorities   An associative array of event names as keys
-	 *                                        and the corresponding listener priority as values.
-	 *
-	 * @return  DispatcherInterface  This method is chainable.
-	 *
-	 * @throws  \InvalidArgumentException
-	 *
-	 * @since   2.0
-	 */
-	public function addListener($listener, $priorities = array())
-	{
-		$this->getDispatcher()->addListener($listener, $priorities);
-
-		return $this;
 	}
 
 	/**
@@ -610,6 +606,44 @@ class RestfulRouter extends Router implements DispatcherAwareInterface, Dispatch
 	public function setMatched($matched)
 	{
 		$this->matched = $matched;
+
+		return $this;
+	}
+
+	/**
+	 * Add a listener to this dispatcher, only if not already registered to these events.
+	 * If no events are specified, it will be registered to all events matching it's methods name.
+	 * In the case of a closure, you must specify at least one event name.
+	 *
+	 * @param   object|\Closure $listener     The listener
+	 * @param   array|integer   $priorities   An associative array of event names as keys
+	 *                                        and the corresponding listener priority as values.
+	 *
+	 * @return  static
+	 *
+	 * @throws  \InvalidArgumentException
+	 *
+	 * @since   2.0
+	 */
+	public function addListener($listener, $priorities = array())
+	{
+		$this->getDispatcher()->addListener($listener, $priorities);
+
+		return $this;
+	}
+
+	/**
+	 * on
+	 *
+	 * @param string   $event
+	 * @param callable $callable
+	 * @param int      $priority
+	 *
+	 * @return  static
+	 */
+	public function listen($event, $callable, $priority = ListenerPriority::NORMAL)
+	{
+		$this->addListener($callable, array($event => $priority));
 
 		return $this;
 	}

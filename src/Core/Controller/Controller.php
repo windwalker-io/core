@@ -492,23 +492,6 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	}
 
 	/**
-	 * addFlash
-	 *
-	 * @param string $msg
-	 * @param string $type
-	 *
-	 * @return  static
-	 *
-	 * @deprecated  3.0  Use addMessage() instead.
-	 */
-	public function addFlash($msg, $type = Bootstrap::MSG_INFO)
-	{
-		$this->addMessage($msg, $type);
-
-		return $this;
-	}
-
-	/**
 	 * addMessage
 	 *
 	 * @param string $messages

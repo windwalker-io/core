@@ -136,11 +136,11 @@ class PhpHtmlView extends AbstractView
 			$this->config['tmpl_path.package'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates');
 		}
 
-		$paths->insert($this->config['tmpl_path.view'], Priority::LOW);
-		$paths->insert($this->config['tmpl_path.package'], Priority::LOW);
+		$paths->insert($this->config['tmpl_path.view'], PriorityQueue::LOW);
+		$paths->insert($this->config['tmpl_path.package'], PriorityQueue::LOW);
 
-		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), Priority::LOW - 10);
-		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), Priority::LOW - 10);
+		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), PriorityQueue::LOW - 10);
+		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), PriorityQueue::LOW - 10);
 
 		$this->renderer->setPaths($paths);
 
