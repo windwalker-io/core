@@ -35,9 +35,9 @@ class DebuggerPackage extends AbstractPackage
 	 *
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
-		parent::initialise();
+		parent::boot();
 
 		$this->container->getParent()->share('windwalker.debugger', $this);
 	}

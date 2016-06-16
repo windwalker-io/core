@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Facade;
+namespace Windwalker\Core\Proxy;
 
 use Windwalker\Core\Event\DispatcherAwareStaticTrait;
 use Windwalker\Event\Dispatcher;
@@ -19,7 +19,7 @@ use Windwalker\Core\Ioc;
  */
 trait DispatcherAwareFacadeTrait
 {
-	use DispatcherAwareStaticTrait
+	use DispatcherAwareStaticTrait;
 
 	/**
 	 * Method to get property Dispatcher

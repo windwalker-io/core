@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Helper;
 
-use Windwalker\Core\Facade\AbstractFacade;
+use Windwalker\Core\Proxy\AbstractFacade;
 use Windwalker\Debugger\DebuggerPackage;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Ioc;

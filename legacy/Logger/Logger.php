@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Logger;
 
 use Psr\Log\LoggerInterface;
-use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Core\Proxy\AbstractProxyFacade;
 
 /**
  * The Logger class.

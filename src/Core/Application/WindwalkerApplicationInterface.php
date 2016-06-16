@@ -11,9 +11,7 @@ namespace Windwalker\Core\Application;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
-use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventInterface;
-use Windwalker\Registry\Registry;
 
 /**
  * Interface WindwalkerApplicationInterface
@@ -66,6 +64,13 @@ interface WindwalkerApplicationInterface
 	 * @return  string
 	 */
 	public function getName();
+
+	/**
+	 * Method to get property Mode
+	 *
+	 * @return  string
+	 */
+	public function getMode();
 
 	/**
 	 * addMessage

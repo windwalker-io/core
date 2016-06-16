@@ -8,8 +8,11 @@
 
 namespace Windwalker\Core\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Mvc\ModelResolver;
@@ -24,11 +27,14 @@ use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\BladeHtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Core\View\TwigHtmlView;
+use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
+use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
+use Windwalker\Middleware\Chain\ChainBuilder;
 use Windwalker\Registry\Registry;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -112,6 +118,27 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	protected $hmvc = false;
 
 	/**
+	 * Property request.
+	 *
+	 * @var  ServerRequestInterface
+	 */
+	protected $request;
+
+	/**
+	 * Property response.
+	 *
+	 * @var  ResponseInterface
+	 */
+	protected $response;
+
+	/**
+	 * Property middlewares.
+	 *
+	 * @var  AbstractControllerMiddleware[]|ChainBuilder
+	 */
+	protected $middlewares = [];
+
+	/**
 	 * Class init.
 	 *
 	 * @param Input           $input
@@ -139,7 +166,9 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		parent::__construct($input, $app);
 
-		$this->initialise();
+		$this->registerMiddlewares();
+
+		$this->init();
 	}
 
 	/**
@@ -147,7 +176,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 	}
 
@@ -185,11 +214,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		$package = $package ? $this->app->getPackage($package) : $this->package;
 
-		$result = $package->execute($task, $input, true);
+		$response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response);
 
 		$this->passRedirect($package->getCurrentController());
 
-		return $result;
+		return $response->getBody()->__toString();
 	}
 
 	/**
@@ -229,6 +258,28 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @throws  \RuntimeException
 	 */
 	public function execute()
+	{
+		$data = new Data([
+			'input'    => $this->input,
+			'mute'     => $this->mute,
+			'hmvc'     => $this->hmvc,
+			'app'      => $this->app,
+			'request'  => $this->request,
+			'response' => $this->response,
+			'router'   => $this->router,
+			'container' => $this->container,
+			'package'  => $this->getPackage()
+		]);
+
+		return $this->middlewares->execute($data);
+	}
+
+	/**
+	 * innerExecute
+	 *
+	 * @return  mixed
+	 */
+	protected function innerExecute()
 	{
 		$this->prepareExecute();
 
@@ -317,22 +368,14 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
 
-			$class = $package->getMvcResolver()->resolveView($package, $viewName);
-
-			if (empty($class))
+			try
 			{
-				$ns = MvcHelper::getPackageNamespace(get_called_class());
-
-				$class = $ns . '\View\\' . $viewName;
+				$view = $package->getMvcResolver()->getViewResolver()->create($viewName);
 			}
-
-			if (!class_exists($class))
+			catch (\UnexpectedValueException $e)
 			{
-				$class = 'Windwalker\Core\View\PhpHtmlView';
+				$view = new PhpHtmlView;
 			}
-
-			/** @var PhpHtmlView $view */
-			$view = new $class;
 
 			$config = clone $this->config;
 
@@ -343,7 +386,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 			$view->setConfig($config);
 
-			$this->container->share($key, $view)->alias($class, $key);
+			$this->container->share($key, $view)->alias(get_class($view), $key);
 		}
 
 		return $this->container->get($key, $forceNew);
@@ -608,6 +651,33 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	}
 
 	/**
+	 * registerMiddlewares
+	 */
+	protected function registerMiddlewares()
+	{
+		// Do not remove this if block, otherwise will cause infinity loop.
+		if ($this->middlewares instanceof ChainBuilder)
+		{
+			return;
+		}
+
+		$middlewares = (array) $this->middlewares;
+
+		$this->middlewares = new ChainBuilder;
+		$this->middlewares->add(function ()
+		{
+		    return $this->innerExecute();
+		});
+
+		krsort($middlewares);
+
+		foreach ($middlewares as $middleware)
+		{
+			$this->addMiddleware($middleware);
+		}
+	}
+
+	/**
 	 * Method to get property Container
 	 *
 	 * @return  Container
@@ -735,7 +805,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 */
 	public function getRouter()
 	{
-		return $this->package->getRouter();
+		return $this->package->router;
 	}
 
 	/**
@@ -777,6 +847,103 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		}
 
 		$this->hmvc = (bool) $boolean;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Request
+	 *
+	 * @return  ServerRequestInterface
+	 */
+	public function getRequest()
+	{
+		return $this->request;
+	}
+
+	/**
+	 * Method to set property request
+	 *
+	 * @param   ServerRequestInterface $request
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRequest($request)
+	{
+		$this->request = $request;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Response
+	 *
+	 * @return  ResponseInterface
+	 */
+	public function getResponse()
+	{
+		return $this->response;
+	}
+
+	/**
+	 * Method to set property response
+	 *
+	 * @param   ResponseInterface $response
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setResponse($response)
+	{
+		$this->response = $response;
+
+		return $this;
+	}
+
+	/**
+	 * addMiddleware
+	 *
+	 * @param   callable|AbstractControllerMiddleware  $middleware
+	 *
+	 * @return  static
+	 */
+	public function addMiddleware($middleware)
+	{
+		if (is_string($middleware) && is_subclass_of($middleware, AbstractControllerMiddleware::class))
+		{
+			$middleware = new $middleware($this);
+		}
+		elseif ($middleware instanceof \Closure)
+		{
+			$middleware->bindTo($this);
+		}
+
+		$this->middlewares->add($middleware);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Middlewares
+	 *
+	 * @return  ChainBuilder
+	 */
+	public function getMiddlewares()
+	{
+		$this->registerMiddlewares();
+
+		return $this->middlewares;
+	}
+
+	/**
+	 * Method to set property middlewares
+	 *
+	 * @param   ChainBuilder $middlewares
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMiddlewares($middlewares)
+	{
+		$this->middlewares = $middlewares;
 
 		return $this;
 	}

@@ -15,7 +15,7 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Test\Mvc\MvcPackage;
 
 /**
- * Test class of Facade
+ * Test class of Proxy
  *
  * @since 2.1.1
  */
@@ -57,7 +57,7 @@ class FacadeTest extends \PHPUnit_Framework_TestCase
 	{
 		$mvc = new MvcPackage;
 
-		$mvc->initialise();
+		$mvc->boot();
 
 		if (!Ioc::exists('package.mvc'))
 		{

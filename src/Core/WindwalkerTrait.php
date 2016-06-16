@@ -13,11 +13,8 @@ use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
-use Windwalker\Core\Registry\ConfigRegistry;
 use Windwalker\DI\Container;
-use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;
-use Windwalker\SystemPackage\SystemPackage;
 
 /**
  * The main Windwalker instantiate class.
@@ -28,6 +25,11 @@ use Windwalker\SystemPackage\SystemPackage;
  */
 trait WindwalkerTrait
 {
+	/**
+	 * Property booted.
+	 *
+	 * @var  boolean
+	 */
 	protected $booted = false;
 
 	/**
@@ -62,6 +64,11 @@ trait WindwalkerTrait
 		return $this->config;
 	}
 
+	/**
+	 * boot
+	 *
+	 * @return  void
+	 */
 	protected function boot()
 	{
 		if ($this->booted)
@@ -83,6 +90,14 @@ trait WindwalkerTrait
 		$this->booted = true;
 	}
 
+	/**
+	 * loadConfiguration
+	 *
+	 * @param Registry $config
+	 * @param string   $name
+	 *
+	 * @return  void
+	 */
 	protected function loadConfiguration(Registry $config, $name = null)
 	{
 		$name = $name ? : $this->getName();
@@ -106,6 +121,11 @@ trait WindwalkerTrait
 		// TODO: Variables override
 	}
 
+	/**
+	 * registerProviders
+	 *
+	 * @return  void
+	 */
 	protected function registerProviders()
 	{
 		/** @var Container $container */

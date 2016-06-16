@@ -8,33 +8,33 @@
 
 namespace Windwalker\Core\Package;
 
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\WindwalkerConsole;
 use Windwalker\Core\Controller\Controller;
-use Windwalker\Core\Mvc\ControllerResolver;
-use Windwalker\Core\Controller\MultiActionController;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Mvc\MvcResolver;
+use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
-use Windwalker\Event\Dispatcher;
+use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
+use Windwalker\IO\PsrInput;
+use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Registry\Registry;
-use Windwalker\Router\Exception\RouteNotFoundException;
-use Windwalker\String\StringHelper;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractPackage class.
  *
  * @property-read  Registry                          $config
  * @property-read  PackageRouter                     $router
+ * @property-read  PsrInput                          $input
  * @property-read  WebApplication|WindwalkerConsole  $app
  * @property-read  string                            $name
  *
@@ -42,26 +42,14 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class AbstractPackage implements DispatcherAwareInterface
 {
-	/**
-	 * Property app.
-	 *
-	 * @var  WebApplication|WindwalkerConsole
-	 */
-	protected $app = null;
-
-	/**
-	 * DI Container.
-	 *
-	 * @var Container
-	 */
-	protected $container = null;
+	use ContainerAwareTrait;
 
 	/**
 	 * Bundle name.
 	 *
 	 * @var  string
 	 */
-	protected $name = null;
+	protected $name;
 
 	/**
 	 * Property enabled.
@@ -78,13 +66,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected $currentController;
 
 	/**
-	 * Property router.
-	 *
-	 * @var PackageRouter
-	 */
-	protected $router;
-
-	/**
 	 * Property task.
 	 *
 	 * @var  string
@@ -94,16 +75,16 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Property config.
 	 *
-	 * @var  array
-	 */
-	protected $variables;
-
-	/**
-	 * Property config.
-	 *
 	 * @var  Registry
 	 */
 	protected $config;
+
+	/**
+	 * Property middlewares.
+	 *
+	 * @var  Psr7ChainBuilder
+	 */
+	protected $middlewares;
 
 	/**
 	 * initialise
@@ -111,122 +92,107 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @throws  \LogicException
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
 		if (!$this->name)
 		{
 			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
 		}
 
-		$container = $this->getContainer();
-
-		$this->getApplication();
-
 		$this->getConfig();
 
-		$this->registerProviders($container);
+		$this->registerProviders($this->getContainer());
 
-		$this->registerListeners($container->get('system.dispatcher'));
+		$this->registerListeners($this->getDispatcher());
+
+		$this->registerMiddlewares();
 	}
 
 	/**
 	 * getController
 	 *
-	 * @param string $task
-	 * @param array  $variables
-	 * @param bool   $forceNew
+	 * @param string       $task
+	 * @param array|Input  $input
+	 * @param bool         $forceNew
 	 *
 	 * @return Controller
 	 */
-	public function getController($task = null, $variables = array(), $forceNew = false)
+	public function getController($task, $input = null, $forceNew = false)
 	{
-		if ($variables instanceof Input)
-		{
-			$variables = $variables->getArray();
-		}
-
-		$controller = $task ? : $this->getTask();
-
-		list($controller, $action) = StringHelper::explode('::', $controller, 2);
-
 		$resolver = $this->getMvcResolver()->getControllerResolver();
 
-		$key = $resolver::getDIKey($controller);
+		$key = $resolver::getDIKey($task);
 
-		if (!$this->container->exists($key))
+		$container = $this->getContainer();
+
+		if (!$container->exists($key) || $forceNew)
 		{
-			/** @var Controller $class */
-			$class = $resolver->resolve($this, $controller);
-
-			if (!$class)
+			if ($input !== null && !$input instanceof Input)
 			{
-				return false;
+				$input = new Input($input);
 			}
 
-			if (!is_subclass_of($class, 'Windwalker\Core\Controller\Controller'))
-			{
-				throw new \UnexpectedValueException(
-					sprintf('Controller: %s should be sub class of \Windwalker\Core\Controller\Controller', $class)
-				);
-			}
+			$input = $input ? : $container->get('system.input');
 
-			$container = $this->getContainer();
+			$controller = $resolver->create($task, $input, $container->get('system.application'), $container, $this);
 
-			$controller = new $class($container->get('system.input'), $container->get('system.application'), $container, $this);
-
-			if ($controller instanceof MultiActionController)
-			{
-				$controller->setActionName($action);
-				$controller->setArguments($variables ? : $this->variables);
-			}
-
-			$this->container->share($key, $controller);
+			$container->share($key, $controller);
 		}
 
-		return $this->container->get($key, $forceNew);
+		return $container->get($key);
 	}
 
 	/**
 	 * execute
 	 *
-	 * @param string $task
-	 * @param array  $variables
-	 * @param bool   $hmvc
+	 * @param string|Controller $controller
+	 * @param Request           $request
+	 * @param Response          $response
 	 *
-	 * @return mixed
+	 * @return  Response
 	 */
-	public function execute($task = null, $variables = array(), $hmvc = false)
+	public function execute($controller, Request $request, Response $response)
 	{
-		$controller = $this->getController($task, $variables);
-
-		if ($controller)
+		if (!$controller instanceof Controller)
 		{
-			$controller->isHmvc($hmvc);
+			$controller = $this->getController($controller);
 		}
 
+		$controller->setRequest($request)->setResponse($response);
+
+		// TODO: rewrite hmvc
+//		if ($controller)
+//		{
+//			$controller->isHmvc($hmvc);
+//		}
+
 		$this->currentController = $controller;
+
+		return $this->middlewares->execute($request, $response);
+	}
+
+	/**
+	 * dispatch
+	 *
+	 * @param Request  $request
+	 * @param Response $response
+	 * @param callable $next
+	 *
+	 * @return Response
+	 */
+	public function dispatch(Request $request, Response $response, $next = null)
+	{
+		$controller = $this->currentController;
 
 		$this->prepareExecute();
 
 		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
 			'package'    => $this,
 			'controller' => &$controller,
-			'task'       => $task,
-			'variables'  => $variables,
-			'hmvc'       => $hmvc
+			'task'       => $controller,
+			//			'variables'  => $variables,
+			//			'hmvc'       => $hmvc
 		));
-
-		// Handle error
-		if (!$controller)
-		{
-			$namespaces = $this->getMvcResolver()->getControllerResolver()->dumpNamespaces();
-
-			$namespaces[] = $namespace = ReflectionHelper::getNamespaceName($this) . '\Controller';
-
-			$task = $task ? : $this->getTask();
-
-			throw new RouteNotFoundException('Controller: ' . $task . ' not found. Namespaces: ' . implode(', ', $namespaces), 404);
-		}
 
 		$result = $controller->execute();
 
@@ -235,15 +201,17 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
 			'package'    => $this,
 			'controller' => $controller,
-			'task'       => $task,
-			'variables'  => $variables,
-			'hmvc'       => $hmvc,
+			//			'task'       => $task,
+			//			'variables'  => $variables,
+			//			'hmvc'       => $hmvc,
 			'result'     => &$result
 		));
 
 		$controller->redirect();
 
-		return $result;
+		$response->getBody()->write($result);
+
+		return $response;
 	}
 
 	/**
@@ -274,71 +242,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function getMvcResolver()
 	{
-		return $this->getContainer()->get('mvc.resolver');
-	}
-
-	/**
-	 * Get the DI container.
-	 *
-	 * @return  Container
-	 *
-	 * @since   1.0
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
-	 */
-	public function getContainer()
-	{
-		if (!$this->container)
-		{
-			$this->container = Ioc::factory($this->getName());
-		}
-
-		return $this->container;
-	}
-
-	/**
-	 * Set the DI container.
-	 *
-	 * @param   Container  $container  The DI container.
-	 *
-	 * @return  static Return self to support chaining.
-	 *
-	 * @since   1.0
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property Router
-	 *
-	 * @return  PackageRouter
-	 */
-	public function getRouter()
-	{
-		if (!$this->router)
-		{
-			$this->router = new PackageRouter($this, $this->getContainer()->get('system.router'));
-		}
-
-		return $this->router;
-	}
-
-	/**
-	 * Method to set property router
-	 *
-	 * @param   PackageRouter $router
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRouter(PackageRouter $router)
-	{
-		$this->router = $router;
-
-		return $this;
+		return $this->container->get('mvc.resolver');
 	}
 
 	/**
@@ -402,16 +306,37 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function registerProviders(Container $container)
 	{
+		/** @var Container $container */
+		$container = $this->getContainer();
+
+		$container->registerServiceProvider(new PackageProvider($this));
+
+		$providers = (array) $this->get('providers');
+
+		foreach ($providers as $provider)
+		{
+			if (is_string($provider) && class_exists($provider))
+			{
+				$provider = new $provider;
+			}
+
+			if (is_callable($provider, 'boot'))
+			{
+				$provider->boot($container);
+			}
+
+			$container->registerServiceProvider($provider);
+		}
 	}
 
 	/**
 	 * registerListeners
 	 *
-	 * @param Dispatcher $dispatcher
+	 * @param DispatcherInterface $dispatcher
 	 *
 	 * @return  void
 	 */
-	public function registerListeners(Dispatcher $dispatcher)
+	public function registerListeners(DispatcherInterface $dispatcher)
 	{
 		$listeners = $this->get('listener', array());
 
@@ -435,7 +360,14 @@ class AbstractPackage implements DispatcherAwareInterface
 				continue;
 			}
 
-			$dispatcher->addListener(new $listener['class'], $listener['priority']);
+			if (is_callable($listener['class']) && !is_numeric($name))
+			{
+				$dispatcher->listen($name, $listener['class']);
+			}
+			else
+			{
+				$dispatcher->addListener(new $listener['class'], $listener['priority']);
+			}
 		}
 	}
 
@@ -584,36 +516,47 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
-	 * __get
-	 *
-	 * @param string $name
-	 *
-	 * @return  mixed
+	 * registerMiddlewares
 	 */
-	public function __get($name)
+	protected function registerMiddlewares()
 	{
-		if ($name == 'router')
+		// init middlewares
+		$this->getMiddlewares();
+
+		$middlewares = (array) $this->get('middlewares', []);
+
+		krsort($middlewares);
+
+		foreach ($middlewares as $middleware)
 		{
-			return $this->getRouter();
+			$this->addMiddleware($middleware);
 		}
 
-		if ($name == 'config')
+		// Remove closures
+		$this->set('middlewares', null);
+	}
+
+	/**
+	 * addMiddleware
+	 *
+	 * @param callable $middleware
+	 *
+	 * @return  static
+	 */
+	public function addMiddleware($middleware)
+	{
+		if (is_string($middleware) && is_subclass_of($middleware, AbstractPackageMiddleware::class))
 		{
-			return $this->getConfig();
+			$middleware = new $middleware($this);
+		}
+		elseif ($middleware instanceof \Closure)
+		{
+			$middleware->bindTo($this);
 		}
 
+		$this->getMiddlewares()->add($middleware);
 
-		if ($name == 'app')
-		{
-			return $this->getApplication();
-		}
-
-		if ($name == 'name')
-		{
-			return $this->getName();
-		}
-
-		return null;
+		return $this;
 	}
 
 	/**
@@ -640,34 +583,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function setTask($task)
 	{
 		$this->task = $task;
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property Variables
-	 *
-	 * @return  array
-	 *
-	 * @since   2.1
-	 */
-	public function getVariables()
-	{
-		return $this->variables;
-	}
-
-	/**
-	 * Method to set property variables
-	 *
-	 * @param   array $variables
-	 *
-	 * @return  static  Return self to support chaining.
-	 *
-	 * @since   2.1
-	 */
-	public function setVariables($variables)
-	{
-		$this->variables = $variables;
 
 		return $this;
 	}
@@ -742,36 +657,67 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
-	 * Method to get property App
+	 * Method to get property Middlewares
 	 *
-	 * @return  WebApplication|WindwalkerConsole
+	 * @return  Psr7ChainBuilder
 	 */
-	public function getApplication()
+	public function getMiddlewares()
 	{
-		if (!$this->app)
+		if (!$this->middlewares)
 		{
-			$this->app = $this->getContainer()->get('system.application');
+			$this->middlewares = new Psr7ChainBuilder;
+
+			$this->middlewares->add([$this, 'dispatch']);
 		}
 
-		return $this->app;
+		return $this->middlewares;
 	}
 
 	/**
-	 * Method to set property app
+	 * Method to set property middlewares
 	 *
-	 * @param   WebApplication|WindwalkerConsole $app
+	 * @param   Psr7ChainBuilder $middlewares
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setApplication($app)
+	public function setMiddlewares($middlewares)
 	{
-		if (!$app instanceof  WebApplication || !$app instanceof WindwalkerConsole)
-		{
-			throw new \InvalidArgumentException('$app should be instance of WebApplication or WindwalkerConsole');
-		}
-
-		$this->app = $app;
+		$this->middlewares = $middlewares;
 
 		return $this;
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		$diMapping = [
+			'app'        => 'system.application',
+			'input'      => 'system.input',
+			'dispatcher' => 'system.dispatcher',
+			'router'     => 'system.router'
+		];
+
+		if (isset($diMapping[$name]))
+		{
+			return $this->container->get($diMapping[$name]);
+		}
+
+		if ($name == 'config')
+		{
+			return $this->getConfig();
+		}
+
+		if ($name == 'name')
+		{
+			return $this->getName();
+		}
+
+		return null;
 	}
 }

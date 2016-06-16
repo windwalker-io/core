@@ -8,9 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\String\StringHelper;
-use Windwalker\String\StringNormalise;
-use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Core\Controller\Controller;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -20,6 +18,13 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class ControllerResolver extends AbstractClassResolver
 {
+	/**
+	 * Property baseClass.
+	 *
+	 * @var  string
+	 */
+	protected $baseClass = Controller::class;
+
 	/**
 	 * Get container key prefix.
 	 *
@@ -31,15 +36,12 @@ class ControllerResolver extends AbstractClassResolver
 	}
 
 	/**
-	 * If didn't found any exists class, fallback to default class which in current package..
+	 * getDefaultNamespace
 	 *
-	 * @param   string $namespace The package namespace.
-	 * @param   string $name      The class task name.
-	 *
-	 * @return  string  Found class name.
+	 * @return  string
 	 */
-	protected function getDefaultClass($namespace, $name)
+	protected function getDefaultNamespace()
 	{
-		return $namespace . '\Controller\\' . $name;
+		return ReflectionHelper::getNamespaceName($this->getPackage()) . '\Controller';
 	}
 }

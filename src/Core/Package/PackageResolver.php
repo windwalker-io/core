@@ -105,7 +105,7 @@ class PackageResolver implements ContainerAwareInterface
 		// Set container and init it
 		$subContainer = $container->createChild($name);
 
-		$package->setContainer($subContainer)->initialise();
+		$package->setContainer($subContainer)->boot();
 
 		$application = $container->get('system.application');
 

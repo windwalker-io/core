@@ -52,7 +52,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Package\AbstractPackage::initialise
+	 * @covers Windwalker\Core\Package\AbstractPackage::boot
 	 * @TODO   Implement testInitialise().
 	 */
 	public function testInitialise()
@@ -185,7 +185,7 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 	public function testRegisterProviders()
 	{
 		$mvc = new MvcPackage();
-		$mvc->initialise();
+		$mvc->boot();
 
 		$container = Ioc::factory('mvc');
 

@@ -53,6 +53,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	use DispatcherAwareTrait;
 	use ContainerAwareTrait;
 
+	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
 	protected $name = 'web';
 
 	/**
@@ -149,38 +154,28 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		/** @var AbstractPackage $package */
 		$package = $this->container->get('current.package');
 
-		$output = $package->execute();
+		$response = $package->execute($request->getAttribute('_controller'), $request, $response);
 
-		return $response->getBody()->write($output);
+		return $response;
 	}
 
+	/**
+	 * registerMiddlewares
+	 *
+	 * @return  void
+	 */
 	protected function registerMiddlewares()
 	{
-		if ($this->middlewares)
-		{
-			return;
-		}
+		// Init middlewares
+		$this->getMiddlewares();
 
 		$middlewares = (array) $this->config->get('middlewares', []);
 
 		krsort($middlewares);
 
-		$this->middlewares = new Psr7ChainBuilder;
-
-		$this->middlewares->add([$this, 'dispatch']);
-
 		foreach ($middlewares as $middleware)
 		{
-			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
-			{
-				$middleware = new $middleware($this);
-			}
-			elseif ($middleware instanceof \Closure)
-			{
-				$middleware->bindTo($this);
-			}
-
-			$this->middlewares->add($middleware);
+			$this->addMiddleware($middleware);
 		}
 
 		// Remove closures
@@ -195,9 +190,59 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @return  static
 	 */
-	public function addMessage($messages, $type = Core\Frontend\Bootstrap::MSG_INFO)
+	public function addMessage($messages, $type = 'info')
 	{
+		/** @var \Windwalker\Session\Session $session */
+		$session = $this->container->get('system.session');
 
+		$session->getFlashBag()->add($messages, $type);
+
+		return $this;
+	}
+
+	/**
+	 * clearMessage
+	 *
+	 * @return  static
+	 */
+	public function clearMessage()
+	{
+		/** @var \Windwalker\Session\Session $session */
+		$session = $this->container->get('system.session');
+
+		$session->getFlashBag()->clear();
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Middlewares
+	 *
+	 * @return  Psr7ChainBuilder
+	 */
+	public function getMiddlewares()
+	{
+		if (!$this->middlewares)
+		{
+			$this->middlewares = new Psr7ChainBuilder;
+			$this->middlewares->add([$this, 'dispatch']);
+		}
+
+		return $this->middlewares;
+	}
+
+	/**
+	 * Method to set property middlewares
+	 *
+	 * @param   Psr7ChainBuilder $middlewares
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMiddlewares($middlewares)
+	{
+		$this->middlewares = $middlewares;
+
+		return $this;
 	}
 
 	/**
@@ -209,9 +254,65 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function addMiddleware($middleware)
 	{
-		$this->registerMiddlewares();
+		if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
+		{
+			$middleware = new $middleware($this);
+		}
+		elseif ($middleware instanceof \Closure)
+		{
+			$middleware->bindTo($this);
+		}
 
-		$this->middlewares->add($middleware);
+		$this->getMiddlewares()->add($middleware);
+
+		return $this;
+	}
+
+	/**
+	 * Redirect to another URL.
+	 *
+	 * If the headers have not been sent the redirect will be accomplished using a "301 Moved Permanently"
+	 * or "303 See Other" code in the header pointing to the new location. If the headers have already been
+	 * sent this will be accomplished using a JavaScript statement.
+	 *
+	 * @param   string      $url  The URL to redirect to. Can only be http/https URL
+	 * @param   boolean|int $code True if the page is 301 Permanently Moved, otherwise 303 See Other is assumed.
+	 *
+	 * @return  void
+	 *
+	 * @since   2.0
+	 */
+	public function redirect($url, $code = 303)
+	{
+		$this->triggerEvent('onBeforeRedirect', array(
+			'app'   => $this,
+			'url'   => &$url,
+			'code' => &$code
+		));
+
+		parent::redirect($url, $code);
+	}
+
+	/**
+	 * Method to get property Mode
+	 *
+	 * @return  string
+	 */
+	public function getMode()
+	{
+		return $this->get('system.mode');
+	}
+
+	/**
+	 * Method to set property mode
+	 *
+	 * @param   string $mode
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMode($mode)
+	{
+		$this->set('system.mode', (string) $mode);
 
 		return $this;
 	}

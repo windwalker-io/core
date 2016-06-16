@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Facade\Stub;
 
-use Windwalker\Core\Facade\AbstractFacade;
+use Windwalker\Core\Proxy\AbstractFacade;
 
 /**
  * The StubConfigFacade class.

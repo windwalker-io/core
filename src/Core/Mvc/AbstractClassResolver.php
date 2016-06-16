@@ -8,13 +8,12 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Core\Package\PackageAwareTrait;
 use Windwalker\DI\Container;
-use Windwalker\String\StringHelper;
+use Windwalker\DI\ContainerAwareInterface;
+use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\String\StringNormalise;
-use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -23,14 +22,10 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractClassResolver implements ClassResolverInterface
+abstract class AbstractClassResolver implements ClassResolverInterface, ContainerAwareInterface
 {
-	/**
-	 * Property container.
-	 *
-	 * @var  Container
-	 */
-	protected $container;
+	use ContainerAwareTrait;
+	use PackageAwareTrait;
 
 	/**
 	 * Property namespaces.
@@ -47,14 +42,23 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	protected $classAliases = array();
 
 	/**
+	 * Property baseClass.
+	 *
+	 * @var  string
+	 */
+	protected $baseClass;
+
+	/**
 	 * ControllerResolver constructor.
 	 *
-	 * @param Container $container
-	 * @param array     $namespaces
+	 * @param AbstractPackage $package
+	 * @param Container       $container
+	 * @param array           $namespaces
 	 */
-	public function __construct(Container $container = null, $namespaces = array())
+	public function __construct(AbstractPackage $package, Container $container = null, $namespaces = array())
 	{
-		$this->container = $container ? : $this->getContainer();
+		$this->container = $container;
+		$this->package   = $package;
 
 		$this->setNamespaces($namespaces);
 	}
@@ -62,86 +66,83 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	/**
 	 * Resolve class path.
 	 *
-	 * @param   string|AbstractPackage $package
-	 * @param   string                 $name
+	 * @param   string $name
 	 *
-	 * @return  string|false
+	 * @return  string
 	 */
-	public function resolve($package, $name)
+	public function resolve($name)
 	{
 		if (class_exists($name))
 		{
 			return $name;
 		}
 
-		$pkg = $this->splitPackage($name);
-
-		if ($pkg)
-		{
-			$package = $pkg;
-		}
-
-		if (!$package instanceof AbstractPackage)
-		{
-			$package = $this->getPackageResolver()->getPackage($package);
-		}
-
 		$name = static::normalise($name);
 
-		$namespace = ReflectionHelper::getNamespaceName($package);
+		$namespaces = clone $this->namespaces;
 
-		if (!class_exists($class = $this->resolveClassAlias($this->getDefaultClass($namespace, $name))))
-		{
-			$class = $this->find($name);
-		}
+		$this->registerDefaultNamespace($namespaces);
 
-		return $class;
-	}
-
-	/**
-	 * If didn't found any exists class, fallback to default class which in current package..
-	 *
-	 * @param   string  $namespace  The package namespace.
-	 * @param   string  $name       The class task name.
-	 *
-	 * @return  string  Found class name.
-	 */
-	abstract protected function getDefaultClass($namespace, $name);
-
-	/**
-	 * findController
-	 *
-	 * @param   string $name
-	 *
-	 * @return  string|false
-	 */
-	public function find($name)
-	{
-		foreach (clone $this->namespaces as $ns)
+		foreach (clone $namespaces as $ns)
 		{
 			$class = $ns . '\\' . $name;
 
 			if (class_exists($class = $this->resolveClassAlias($class)))
 			{
+				if ($this->baseClass && !is_subclass_of($class, $this->baseClass))
+				{
+					throw new \UnexpectedValueException(sprintf(
+						'Controller: %s should be sub class of %s',
+						$this->baseClass,
+						$class
+					));
+				}
+
 				return $class;
 			}
 		}
 
-		return false;
+		throw new \UnexpectedValueException(sprintf(
+			'Can not find any classes with name: %s in package: %s, namespaces: ( %s ).',
+			$name,
+			$this->package->getName(),
+			implode(" |\n ", $namespaces->toArray())
+		));
 	}
 
 	/**
-	 * splitPackage
+	 * create
 	 *
-	 * @param   string  $name
+	 * @param string $name
+	 * @param array  ...$args
 	 *
-	 * @return  string
+	 * @return  object
 	 */
-	public function splitPackage(&$name)
+	public function create($name, ...$args)
 	{
-		list($package, $name) = StringHelper::explode('@', $name, 2, 'array_unshift');
+		return ReflectionHelper::newInstanceArgs($this->resolve($name), $args);
+	}
 
-		return $package;
+	/**
+	 * If didn't found any exists class, fallback to default class which in current package..
+	 *
+	 * @return string Found class name.
+	 */
+	abstract protected function getDefaultNamespace();
+
+	/**
+	 * registerDefaultNamespace
+	 *
+	 * @param PriorityQueue $namespaces
+	 * @param int           $priority
+	 *
+	 * @return  static
+	 */
+	protected function registerDefaultNamespace(PriorityQueue $namespaces, $priority = PriorityQueue::NORMAL)
+	{
+		$namespaces->insert($this->getDefaultNamespace(), $priority);
+
+		return $this;
 	}
 
 	/**
@@ -168,7 +169,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	 *
 	 * @return  static
 	 */
-	public function addNamespace($namespace, $priority = Priority::NORMAL)
+	public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
 	{
 		$namespace = static::normalise($namespace);
 
@@ -224,7 +225,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	public function reset()
 	{
 		$this->setNamespaces(new PriorityQueue);
-		$this->setClassAliases(array());
+		$this->setClassAliases([]);
 
 		return $this;
 	}
@@ -300,45 +301,6 @@ abstract class AbstractClassResolver implements ClassResolverInterface
 	public function setClassAliases(array $classAliases)
 	{
 		$this->classAliases = $classAliases;
-
-		return $this;
-	}
-
-	/**
-	 * getPackageResolver
-	 *
-	 * @return  PackageResolver
-	 */
-	public function getPackageResolver()
-	{
-		return $this->container->get('package.resolver');
-	}
-
-	/**
-	 * Method to get property Container
-	 *
-	 * @return  Container
-	 */
-	public function getContainer()
-	{
-		if (!$this->container)
-		{
-			$this->container = Ioc::factory();
-		}
-
-		return $this->container;
-	}
-
-	/**
-	 * Method to set property container
-	 *
-	 * @param   Container $container
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setContainer($container)
-	{
-		$this->container = $container;
 
 		return $this;
 	}

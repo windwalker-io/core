@@ -27,10 +27,11 @@ interface ClassResolverInterface
 	/**
 	 * Resolve class path.
 	 *
-	 * @param   string|AbstractPackage $package
-	 * @param   string                 $name
+	 * @param   string $name
 	 *
-	 * @return  string|false
+	 * @return false|string
+	 * @internal param string|AbstractPackage $package
+	 *
 	 */
-	public function resolve($package, $name);
+	public function resolve($name);
 }

@@ -40,6 +40,22 @@ class MvcResolver
 	protected $viewResolver;
 
 	/**
+	 * create
+	 *
+	 * @param AbstractPackage $package
+	 *
+	 * @return  static
+	 */
+	public static function create(AbstractPackage $package)
+	{
+		return new static(
+			new ControllerResolver($package, $package->getContainer()),
+			new ModelResolver($package, $package->getContainer()),
+			new ViewResolver($package, $package->getContainer())
+		);
+	}
+
+	/**
 	 * MvcResolver constructor.
 	 *
 	 * @param ControllerResolver $controllerResolver
@@ -63,7 +79,7 @@ class MvcResolver
 	 */
 	public function resolveModel($package, $name)
 	{
-		return $this->modelResolver->resolve($package, $name);
+		return $this->modelResolver->resolve($name);
 	}
 
 	/**
@@ -76,7 +92,7 @@ class MvcResolver
 	 */
 	public function resolveView($package, $name)
 	{
-		return $this->viewResolver->resolve($package, $name);
+		return $this->viewResolver->resolve($name);
 	}
 
 	/**
@@ -89,7 +105,7 @@ class MvcResolver
 	 */
 	public function resolveController($package, $name)
 	{
-		return $this->controllerResolver->resolve($package, $name);
+		return $this->controllerResolver->resolve($name);
 	}
 
 	/**

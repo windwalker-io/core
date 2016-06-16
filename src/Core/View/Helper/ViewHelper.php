@@ -48,12 +48,10 @@ class ViewHelper extends AbstractHelper
 		return array(
 			'uri'        => $container->get('uri'),
 			'app'        => $container->get('system.application'),
-			// 'container' => $container,
 			'package'    => $package,
-			'router'     => $package->getRouter(),
+			'router'     => $package->router,
 			'flashes'    => static::$flashes,
 			'translator' => $container->get('system.language'),
-			'language' => $container->get('system.language'), // B/C
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 	}

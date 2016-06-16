@@ -259,7 +259,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	public function testBuildRoute()
 	{
 		$package = new MvcPackage;
-		$package->initialise();
+		$package->boot();
 
 		$this->instance->setPackage($package);
 

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
+use Windwalker\Core\View\AbstractView;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -17,6 +18,13 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class ViewResolver extends AbstractClassResolver
 {
+	/**
+	 * Property baseClass.
+	 *
+	 * @var  string
+	 */
+	protected $baseClass = AbstractView::class;
+
 	/**
 	 * Get container key prefix.
 	 *
@@ -30,13 +38,10 @@ class ViewResolver extends AbstractClassResolver
 	/**
 	 * If didn't found any exists class, fallback to default class which in current package..
 	 *
-	 * @param   string $namespace The package namespace.
-	 * @param   string $name      The class task name.
-	 *
-	 * @return  string  Found class name.
+	 * @return string Found class name.
 	 */
-	protected function getDefaultClass($namespace, $name)
+	protected function getDefaultNamespace()
 	{
-		return $namespace . '\View\\' . $name;
+		return ReflectionHelper::getNamespaceName($this->package) . '\View';
 	}
 }

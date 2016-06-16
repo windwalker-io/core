@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Facade;
+namespace Windwalker\Core\Proxy;
 
 use Windwalker\DI\Container;
 use Windwalker\Core\Ioc;

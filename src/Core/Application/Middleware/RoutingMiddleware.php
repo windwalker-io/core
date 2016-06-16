@@ -44,7 +44,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
 		$route = $this->match($router);
 
-		$this->handleMatched($route);
+		$request = $this->handleMatched($route, $request);
 
 		return $next($request, $response);
 	}
@@ -117,11 +117,12 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	/**
 	 * handleMatched
 	 *
-	 * @param Route $route
+	 * @param Route   $route
+	 * @param Request $request
 	 *
-	 * @return  void
+	 * @return Request
 	 */
-	protected function handleMatched(Route $route)
+	protected function handleMatched(Route $route, Request $request)
 	{
 		$name = $route->getName();
 
@@ -130,7 +131,6 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		$variables = $route->getVariables();
 		$extra     = $route->getExtra();
 		$input     = $this->app->input;
-		$request   = $this->app->server->getRequest();
 
 		// Save to input & ServerRequest
 		foreach ($variables as $name => $value)
@@ -154,9 +154,10 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
 		// Package
 		$package = $this->getPackageResolver()->resolvePackage($packageName);
-		$package->setTask(ArrayHelper::getValue($extra, 'controller'));
 
 		$this->app->container->share('current.package', $package);
 		$this->app->container->share('current.route', $route);
+
+		return $request->withAttribute('_controller', ArrayHelper::getValue($extra, 'controller'));
 	}
 }

@@ -62,18 +62,18 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 	{
 		$package = new MvcPackage;
 
-		$class = $this->instance->resolve($package, 'Stub\StubController');
+		$class = $this->instance->resolve('Stub\StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Mvc\Controller\Stub\StubController', $class);
 
-		$class = $this->instance->resolve($package, 'Stub.StubController');
+		$class = $this->instance->resolve('Stub.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Mvc\Controller\Stub\StubController', $class);
 
 		// Test Get alias
 		PackageHelper::addPackage('mock', new MockPackage);
 
-		$class = $this->instance->resolve($package, 'mock@Mock.StubController');
+		$class = $this->instance->resolve('mock@Mock.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController', $class);
 
@@ -84,7 +84,7 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 			'Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController'
 		);
 
-		$class = $this->instance->resolve($package, 'Stub.StubController');
+		$class = $this->instance->resolve('Stub.StubController');
 
 		$this->assertEquals('Windwalker\Core\Test\Controller\Mock\Controller\Mock\StubController', $class);
 	}

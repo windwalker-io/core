@@ -118,7 +118,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 * @throws  \LogicException
 	 * @return  void
 	 */
-	public function initialise()
+	public function boot()
 	{
 	}
 

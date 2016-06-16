@@ -12,7 +12,7 @@ use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;
 use Windwalker\Core\Event\DispatcherAwareStaticInterface;
-use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Core\Proxy\AbstractProxyFacade;
 use Windwalker\Data\Data;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\Event;

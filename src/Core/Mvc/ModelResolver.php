@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
+use Windwalker\Core\Model\Model;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -18,25 +19,29 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 class ModelResolver extends AbstractClassResolver
 {
 	/**
+	 * Property baseClass.
+	 *
+	 * @var  string
+	 */
+	protected $baseClass = Model::class;
+
+	/**
 	 * Get container key prefix.
 	 *
 	 * @return  string
 	 */
 	public static function getPrefix()
 	{
-		return 'view';
+		return 'model';
 	}
 
 	/**
 	 * If didn't found any exists class, fallback to default class which in current package..
 	 *
-	 * @param   string $namespace The package namespace.
-	 * @param   string $name      The class task name.
-	 *
-	 * @return  string  Found class name.
+	 * @return string Found class name.
 	 */
-	protected function getDefaultClass($namespace, $name)
+	protected function getDefaultNamespace()
 	{
-		return $namespace . '\Model\\' . $name;
+		return ReflectionHelper::getNamespaceName($this->package) . '\Model';
 	}
 }
