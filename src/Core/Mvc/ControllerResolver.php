@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -23,7 +23,7 @@ class ControllerResolver extends AbstractClassResolver
 	 *
 	 * @var  string
 	 */
-	protected $baseClass = Controller::class;
+	protected $baseClass = AbstractController::class;
 
 	/**
 	 * Get container key prefix.

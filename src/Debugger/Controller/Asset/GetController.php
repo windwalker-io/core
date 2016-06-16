@@ -8,14 +8,14 @@
 
 namespace Windwalker\Debugger\Controller\Asset;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 
 /**
  * The GetController class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class GetController extends Controller
+class GetController extends AbstractController
 {
 	/**
 	 * doExecute

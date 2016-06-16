@@ -8,14 +8,14 @@
 
 namespace Windwalker\Debugger\Controller\Request;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 
 /**
  * The GetController class.
  * 
  * @since  2.1.1
  */
-class GetController extends Controller
+class GetController extends AbstractController
 {
 	/**
 	 * doExecute

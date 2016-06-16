@@ -2,44 +2,41 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU Lesser General Public License version 3 or later.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Model;
+namespace Windwalker\Core\Model\Traits;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Model\Model;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
-use Windwalker\Model\DatabaseModelInterface;
-use Windwalker\Registry\Registry;
 
 /**
- * The DatabaseModel class.
- * 
- * @since  2.0
+ * The DatabaseModelTrait class.
+ *
+ * @since  {DEPLOY_VERSION}
  */
-class DatabaseModel extends Model implements DatabaseModelInterface
+trait DatabaseModelTrait
 {
 	/**
 	 * Property db.
 	 *
 	 * @var  AbstractDatabaseDriver
 	 */
-	protected $db = null;
+	protected $db;
 
 	/**
-	 * Instantiate the model.
+	 * bootDatabaseModelTrait
 	 *
-	 * @param   Registry               $state The model state.
-	 * @param   AbstractDatabaseDriver $db    The database adapter.
+	 * @param Model $model
 	 *
-	 * @since   1.0
+	 * @return  void
 	 */
-	public function __construct(Registry $state = null, AbstractDatabaseDriver $db = null)
+	public function bootDatabaseModelTrait(Model $model)
 	{
-		$this->db = $db ? : Ioc::getDatabase();
-
-		parent::__construct($state);
+		// Prepare DB
+		$this->getDb();
 	}
 
 	/**
@@ -49,6 +46,16 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	 */
 	public function getDb()
 	{
+		if (!$this->db)
+		{
+			$this->db = $this->source;
+
+			if (!$this->db instanceof AbstractDatabaseDriver)
+			{
+				$this->db = Ioc::getDatabase();
+			}
+		}
+
 		return $this->db;
 	}
 
@@ -80,7 +87,7 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	 */
 	public function transactionStart($nested = true)
 	{
-		$this->db->getTransaction($nested)->start();
+		$this->getDb()->getTransaction($nested)->start();
 
 		return $this;
 	}
@@ -94,7 +101,7 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	 */
 	public function transactionCommit($nested = true)
 	{
-		$this->db->getTransaction($nested)->commit();
+		$this->getDb()->getTransaction($nested)->commit();
 
 		return $this;
 	}
@@ -108,7 +115,7 @@ class DatabaseModel extends Model implements DatabaseModelInterface
 	 */
 	public function transactionRollback($nested = true)
 	{
-		$this->db->getTransaction($nested)->start();
+		$this->getDb()->getTransaction($nested)->start();
 
 		return $this;
 	}

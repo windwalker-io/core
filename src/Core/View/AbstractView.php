@@ -14,13 +14,12 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Mvc\MvcHelper;
-use Windwalker\Core\View\Helper\Set\HelperSet;
-use Windwalker\Core\View\Helper\ViewHelper;
+use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
 use Windwalker\Registry\Registry;
-use Windwalker\Renderer\RendererInterface;
+use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\String\StringNormalise;
-use Windwalker\View\HtmlView;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractView class.
@@ -31,8 +30,10 @@ use Windwalker\View\HtmlView;
  *
  * @since  2.1.5.3
  */
-abstract class AbstractView extends HtmlView
+abstract class AbstractView implements \ArrayAccess
 {
+	use BootableTrait;
+
 	/**
 	 * @const boolean
 	 */
@@ -44,6 +45,13 @@ abstract class AbstractView extends HtmlView
 	 * @var  string
 	 */
 	protected $name = null;
+
+	/**
+	 * Property data.
+	 *
+	 * @var  array
+	 */
+	protected $data;
 
 	/**
 	 * Property package.
@@ -69,12 +77,26 @@ abstract class AbstractView extends HtmlView
 	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   array             $data     The data array.
-	 * @param   RendererInterface $renderer The renderer engine.
+	 * @param   array   $data  The data array.
 	 */
-	public function __construct(array $data = null, RendererInterface $renderer = null)
+	public function __construct(array $data = null)
 	{
-		parent::__construct($data, $renderer);
+		$this->config = new Registry;
+		$this->model  = new ViewModel;
+		$this->data   = $data;
+
+		$this->bootTraits($this);
+
+		$this->init();
+	}
+
+	/**
+	 * init
+	 *
+	 * @return  void
+	 */
+	protected function init()
+	{
 	}
 
 	/**
@@ -106,24 +128,47 @@ abstract class AbstractView extends HtmlView
 	 */
 	public function getData()
 	{
-		if (!$this->data)
-		{
-			$this->data = new Data;
-		}
-
 		return $this->data;
 	}
 
 	/**
 	 * setData
 	 *
-	 * @param   \Windwalker\Data\Data $data
+	 * @param   array $data
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setData($data)
 	{
-		$this->data = $data;
+		$this->data = (array) $data;
+
+		return $this;
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $key
+	 * @param mixed  $default
+	 *
+	 * @return  null
+	 */
+	public function get($key, $default = null)
+	{
+		return isset($this->data[$key]) ? $this->data[$key] : $default;
+	}
+
+	/**
+	 * set
+	 *
+	 * @param string $key
+	 * @param mixed  $value
+	 *
+	 * @return  $this
+	 */
+	public function set($key, $value)
+	{
+		$this->data[$key] = $value;
 
 		return $this;
 	}
@@ -187,6 +232,78 @@ abstract class AbstractView extends HtmlView
 	}
 
 	/**
+	 * __toString
+	 *
+	 * @return  string
+	 */
+	public function __toString()
+	{
+		try
+		{
+			return (string) $this->render();
+		}
+		catch (\Exception $e)
+		{
+			return (string) $e;
+		}
+	}
+
+	/**
+	 * Is a property exists or not.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @return  boolean
+	 */
+	public function offsetExists($offset)
+	{
+		return isset($this->data[$offset]);
+	}
+
+	/**
+	 * Get a property.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  mixed The value to return.
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->get($offset);
+	}
+
+	/**
+	 * Set a value to property.
+	 *
+	 * @param mixed $offset Offset key.
+	 * @param mixed $value  The value to set.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		$this->set($offset, $value);
+	}
+
+	/**
+	 * Unset a property.
+	 *
+	 * @param mixed $offset Offset key to unset.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetUnset($offset)
+	{
+		if ($this->offsetExists($offset))
+		{
+			unset($this->data[$offset]);
+		}
+	}
+
+	/**
 	 * getName
 	 *
 	 * @param int $backwards
@@ -205,7 +322,7 @@ abstract class AbstractView extends HtmlView
 			$class = get_called_class();
 
 			// If we are using this class as default view, return default name.
-			if ($class == 'Windwalker\Core\View\PhpHtmlView')
+			if ($class == PhpHtmlView::class)
 			{
 				return $this->name = 'default';
 			}

@@ -15,14 +15,14 @@ use Windwalker\Registry\Registry;
  *
  * @since  2.1.5.3
  */
-class PhpJsonView extends AbstractView
+class JsonView extends AbstractView
 {
 	/**
 	 * Property data.
 	 *
 	 * @var  array|Registry
 	 */
-	protected $data = array();
+	protected $data = [];
 
 	/**
 	 * Property options.
@@ -43,24 +43,12 @@ class PhpJsonView extends AbstractView
 	 *
 	 * @param   array  $data  The data array.
 	 */
-	public function __construct(array $data = array())
+	public function __construct(array $data = [])
 	{
+		parent::__construct($data);
+
 		// Init registry object.
 		$this->data = new Registry($data);
-
-		$this->initialise();
-	}
-
-	/**
-	 * prepareData
-	 *
-	 * @param Registry $registry
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($registry)
-	{
-
 	}
 
 	/**
@@ -105,13 +93,13 @@ class PhpJsonView extends AbstractView
 	/**
 	 * setData
 	 *
-	 * @param   Registry $data
+	 * @param   array|Registry  $data
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setData($data)
 	{
-		$this->data = $data;
+		$this->data = $data instanceof Registry ? $data : new Registry($data);
 
 		return $this;
 	}

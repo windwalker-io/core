@@ -92,7 +92,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 				if ($this->baseClass && !is_subclass_of($class, $this->baseClass))
 				{
 					throw new \UnexpectedValueException(sprintf(
-						'Controller: %s should be sub class of %s',
+						'Controller: "%s" should be sub class of %s',
 						$this->baseClass,
 						$class
 					));
@@ -103,7 +103,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 		}
 
 		throw new \UnexpectedValueException(sprintf(
-			'Can not find any classes with name: %s in package: %s, namespaces: ( %s ).',
+			'Can not find any classes with name: "%s" in package: "%s", namespaces: ( %s ).',
 			$name,
 			$this->package->getName(),
 			implode(" |\n ", $namespaces->toArray())

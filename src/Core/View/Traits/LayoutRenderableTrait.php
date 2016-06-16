@@ -2,101 +2,86 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU Lesser General Public License version 3 or later. see LICENSE
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\View;
+namespace Windwalker\Core\View\Traits;
 
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\View\Helper\Set\HelperSet;
-use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;
+use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Utilities\Queue\PriorityQueue;
-use Windwalker\Utilities\Queue\Priority;
-use Windwalker\Data\Data;
-use Windwalker\Renderer\RendererInterface;
 
 /**
- * Class PhpHtmlView
+ * LayoutRenderableTrait
  *
- * @since 2.1.5.3
+ * @since  {DEPLOY_VERSION}
  */
-class PhpHtmlView extends AbstractView
+trait LayoutRenderableTrait
 {
 	/**
-	 * Method to instantiate the view.
+	 * Property renderer.
 	 *
-	 * @param   array             $data     The data array.
-	 * @param   RendererInterface $renderer The renderer engine.
+	 * @var  AbstractRenderer
 	 */
-	public function __construct($data = array(), RendererInterface $renderer = null)
-	{
-		$this->config = new Registry;
-		$this->model = new ViewModel;
-
-		$renderer = $renderer ? : RendererHelper::getPhpRenderer();
-
-		parent::__construct($data, $renderer);
-
-		// Create PriorityQueue
-		$paths = $this->renderer->getPaths();
-
-		if (!($paths instanceof PriorityQueue))
-		{
-			$paths = new PriorityQueue($paths);
-
-			$this->renderer->setPaths($paths);
-		}
-	}
+	protected $renderer;
 
 	/**
-	 * render
+	 * Property layout.
+	 *
+	 * @var  string
+	 */
+	protected $layout = 'default';
+
+	/**
+	 * Method to get property Layout
 	 *
 	 * @return  string
-	 *
-	 * @throws \RuntimeException
 	 */
-	public function render()
+	public function getLayout()
 	{
-		$this->registerPaths();
-
-		return parent::render();
+		return $this->layout;
 	}
 
 	/**
-	 * doRender
+	 * Method to set property layout
 	 *
-	 * @param  Data $data
+	 * @param   string $layout
 	 *
-	 * @return string
+	 * @return  static  Return self to support chaining.
 	 */
-	protected function doRender($data)
+	public function setLayout($layout)
 	{
-		return $this->renderer->render($this->getLayout(), (array) $data);
+		$this->layout = $layout;
+
+		return $this;
 	}
 
 	/**
-	 * prepareGlobals
+	 * Method to get property Renderer
 	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
+	 * @return  AbstractRenderer
 	 */
-	protected function prepareGlobals($data)
+	public function getRenderer()
 	{
-		$data->view = new Data;
+		return $this->renderer;
+	}
 
-		$data->view->name = $this->getName();
-		$data->view->layout = $this->getLayout();
+	/**
+	 * Method to set property renderer
+	 *
+	 * @param   AbstractRenderer|string $renderer
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRenderer($renderer)
+	{
+		$this->renderer = $renderer instanceof AbstractRenderer ? : RendererHelper::getRenderer((string) $renderer);
 
-		$data->helper = new HelperSet($this);
-
-		$globals = ViewHelper::getGlobalVariables($this->getPackage());
-
-		$data->bind($globals);
+		return $this;
 	}
 
 	/**
@@ -161,8 +146,8 @@ class PhpHtmlView extends AbstractView
 
 		$this->registerPaths();
 
-		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.locale'), Priority::BELOW_NORMAL);
-		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.default'), Priority::BELOW_NORMAL);
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.locale'), PriorityQueue::BELOW_NORMAL);
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.default'), PriorityQueue::BELOW_NORMAL);
 
 		$this->config['path.multilingual_registered'] = true;
 	}
@@ -184,5 +169,43 @@ class PhpHtmlView extends AbstractView
 		}
 
 		return $this->renderer->dumpPaths();
+	}
+
+	/**
+	 * addPath
+	 *
+	 * @param string $path
+	 * @param int    $priority
+	 *
+	 * @return  static
+	 */
+	public function addPath($path, $priority = 100)
+	{
+		$renderer = $this->getRenderer();
+
+		if ($renderer instanceof AbstractRenderer)
+		{
+			$renderer->addPath($path, $priority);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * addPaths
+	 *
+	 * @param array $paths
+	 * @param int   $priority
+	 *
+	 * @return  static
+	 */
+	public function addPaths(array $paths, $priority = PriorityQueue::ABOVE_NORMAL)
+	{
+		foreach ($paths as $path)
+		{
+			$this->addPath($path, $priority);
+		}
+
+		return $this;
 	}
 }

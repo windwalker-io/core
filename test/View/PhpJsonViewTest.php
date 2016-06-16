@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\View;
 
-use Windwalker\Core\View\PhpJsonView;
+use Windwalker\Core\View\JsonView;
 
 /**
  * Test class of PhpJsonView
@@ -20,7 +20,7 @@ class PhpJsonViewTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Test instance.
 	 *
-	 * @var PhpJsonView
+	 * @var JsonView
 	 */
 	protected $instance;
 
@@ -32,7 +32,7 @@ class PhpJsonViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$this->instance = new PhpJsonView;
+		$this->instance = new JsonView;
 	}
 
 	/**

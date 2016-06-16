@@ -11,6 +11,7 @@ namespace Windwalker\Core\Model;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Model\AbstractModel;
 use Windwalker\Registry\Registry;
@@ -22,8 +23,10 @@ use Windwalker\Registry\Registry;
  *
  * @since 1.0
  */
-class Model extends AbstractModel
+class Model implements \ArrayAccess
 {
+	use BootableTrait;
+
 	/**
 	 * Make sure state at the first to easily debug.
 	 *
@@ -36,28 +39,28 @@ class Model extends AbstractModel
 	 *
 	 * @var  Cache
 	 */
-	protected $cache = null;
+	protected $cache;
 
 	/**
 	 * Property config.
 	 *
 	 * @var  Registry
 	 */
-	protected $config = null;
+	protected $config;
 
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = null;
+	protected $name;
 
 	/**
-	 * Property db.
+	 * Data source.
 	 *
-	 * @var  AbstractDatabaseDriver
+	 * @var  mixed
 	 */
-	protected $db;
+	protected $source;
 
 	/**
 	 * Property magicMethodPrefix.
@@ -72,18 +75,34 @@ class Model extends AbstractModel
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry|array  $config The model config.
-	 * @param   Registry        $state  The model state.
+	 * @param   Registry|array $config The model config.
+	 * @param   Registry       $state  The model state.
+	 * @param   mixed          $source The data source.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct($config = null, Registry $state = null)
+	public function __construct($config = null, Registry $state = null, $source = null)
 	{
+		$this->state  = ($state instanceof Registry) ? $state : new Registry;
+		$this->source = $source;
+
 		$this->setConfig($config);
 
 		$this->resetCache();
 
-		parent::__construct($state);
+		$this->bootTraits($this);
+
+		$this->init();
+	}
+
+	/**
+	 * initialise
+	 *
+	 * @return  void
+	 */
+	protected function init()
+	{
+		// Override if you need.
 	}
 
 	/**
@@ -256,6 +275,120 @@ class Model extends AbstractModel
 	protected function fetch($id, $closure)
 	{
 		return $this->cache->call($this->getCacheId($id), $closure);
+	}
+
+	/**
+	 * Get the model state.
+	 *
+	 * @return  Registry  The state object.
+	 */
+	public function getState()
+	{
+		return $this->state;
+	}
+
+	/**
+	 * Set the model state.
+	 *
+	 * @param   Registry  $state  The state object.
+	 *
+	 * @return  void
+	 */
+	public function setState(Registry $state)
+	{
+		$this->state = $state;
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $key
+	 * @param mixed  $default
+	 *
+	 * @return  mixed
+	 */
+	public function get($key, $default = null)
+	{
+		return $this->state->get($key, $default);
+	}
+
+	/**
+	 * set
+	 *
+	 * @param string $key
+	 * @param mixed  $value
+	 *
+	 * @return  $this
+	 */
+	public function set($key, $value)
+	{
+		$this->state->set($key, $value);
+
+		return $this;
+	}
+
+	/**
+	 * reset
+	 *
+	 * @return  static
+	 */
+	public function reset()
+	{
+		$this->state->reset();
+
+		return $this;
+	}
+
+	/**
+	 * Is a property exists or not.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @return  boolean
+	 */
+	public function offsetExists($offset)
+	{
+		return $this->state->exists($offset);
+	}
+
+	/**
+	 * Get a property.
+	 *
+	 * @param mixed $offset Offset key.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  mixed The value to return.
+	 */
+	public function offsetGet($offset)
+	{
+		return $this->state->get($offset);
+	}
+
+	/**
+	 * Set a value to property.
+	 *
+	 * @param mixed $offset Offset key.
+	 * @param mixed $value  The value to set.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		$this->state->set($offset, $value);
+	}
+
+	/**
+	 * Unset a property.
+	 *
+	 * @param mixed $offset Offset key to unset.
+	 *
+	 * @throws  \InvalidArgumentException
+	 * @return  void
+	 */
+	public function offsetUnset($offset)
+	{
+		$this->state->set($offset, null);
 	}
 
 	/**

@@ -10,7 +10,6 @@ namespace Windwalker\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Controller\AbstractController;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
@@ -23,10 +22,9 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Mvc\MvcHelper;
+use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\View\AbstractView;
-use Windwalker\Core\View\BladeHtmlView;
-use Windwalker\Core\View\PhpHtmlView;
-use Windwalker\Core\View\TwigHtmlView;
+use Windwalker\Core\View\HtmlView;
 use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventInterface;
@@ -48,49 +46,51 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  *
  * @since  2.0
  */
-abstract class Controller extends AbstractController implements EventTriggerableInterface
+abstract class AbstractController implements EventTriggerableInterface, \Serializable
 {
+	use BootableTrait;
+
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = null;
+	protected $name;
 
 	/**
 	 * Property input.
 	 *
 	 * @var  Input
 	 */
-	protected $input = null;
+	protected $input;
 
 	/**
 	 * Property app.
 	 *
 	 * @var  WebApplication
 	 */
-	protected $app = null;
+	protected $app;
 
 	/**
 	 * Property container.
 	 *
 	 * @var  Container
 	 */
-	protected $container = null;
+	protected $container;
 
 	/**
 	 * Property package.
 	 *
 	 * @var  AbstractPackage
 	 */
-	protected $package = null;
+	protected $package;
 
 	/**
 	 * Property config.
 	 *
 	 * @var  Registry
 	 */
-	protected $config = null;
+	protected $config;
 
 	/**
 	 * Property redirectUrl.
@@ -142,17 +142,12 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * Class init.
 	 *
 	 * @param Input           $input
-	 * @param WebApplication  $app
-	 * @param Container       $container
 	 * @param AbstractPackage $package
+	 * @param Container       $container
 	 */
-	public function __construct(Input $input = null, WebApplication $app = null, Container $container = null, AbstractPackage $package = null)
+	public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
 	{
-		$app   = $app ? : $this->getApplication();
-		$input = $input ? : $this->getInput();
-
 		$this->config = $this->getConfig();
-		$this->container = $container ? : $this->getContainer();
 
 		if ($package)
 		{
@@ -164,9 +159,13 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			$this->getPackage();
 		}
 
-		parent::__construct($input, $app);
+		$this->container = $container ? : $this->getContainer();
+		$this->input = $input ? : $this->getInput();
+		$this->app = $this->getApplication();
 
 		$this->registerMiddlewares();
+
+		$this->bootTraits($this);
 
 		$this->init();
 	}
@@ -183,22 +182,22 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	/**
 	 * hmvc
 	 *
-	 * @param string|Controller $task
-	 * @param Input|array       $input
-	 * @param string            $package
+	 * @param string|AbstractController $task
+	 * @param Input|array               $input
+	 * @param string                    $package
 	 *
 	 * @return mixed
 	 */
 	public function hmvc($task, $input = null, $package = null)
 	{
-		if ($task instanceof Controller)
+		if ($task instanceof AbstractController)
 		{
 			if (is_array($input))
 			{
 				$input = new Input($input);
 			}
 
-			/** @var Controller $controller */
+			/** @var AbstractController $controller */
 			$controller = $task->setContainer($this->container)
 				->isHmvc(true)
 				->setPackage($this->package)
@@ -323,13 +322,13 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	/**
 	 * renderView
 	 *
-	 * @param PhpHtmlView $view
-	 * @param string      $layout
-	 * @param array       $data
+	 * @param HtmlView $view
+	 * @param string   $layout
+	 * @param array    $data
 	 *
 	 * @return string
 	 */
-	public function renderView(PhpHtmlView $view, $layout = 'default', $data = array())
+	public function renderView(HtmlView $view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{
@@ -353,7 +352,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 * @param string $type
 	 * @param bool   $forceNew
 	 *
-	 * @return  PhpHtmlView|TwigHtmlView|BladeHtmlView|AbstractView
+	 * @return  HtmlView|AbstractView
 	 */
 	public function getView($name = null, $type = 'html', $forceNew = false)
 	{
@@ -374,7 +373,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 			}
 			catch (\UnexpectedValueException $e)
 			{
-				$view = new PhpHtmlView;
+				$view = new HtmlView;
 			}
 
 			$config = clone $this->config;
@@ -480,11 +479,11 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	/**
 	 * passRedirect
 	 *
-	 * @param Controller $controller
+	 * @param AbstractController $controller
 	 *
 	 * @return  static
 	 */
-	public function passRedirect(Controller $controller)
+	public function passRedirect(AbstractController $controller)
 	{
 		list($url, $msg, $type) = $controller->getRedirect(true);
 
@@ -516,9 +515,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		if (!$url)
 		{
-			$url = $this->redirectUrl['url'];
-			$msg = $this->redirectUrl['msg'];
-			$type = $this->redirectUrl['type'];
+			list($url, $msg, $type) = array_values($this->redirectUrl);
 		}
 
 		if (!$url)
@@ -528,7 +525,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 
 		if ($msg)
 		{
-			$this->app->addMessage($msg, $type);
+			$this->addMessage($msg, $type);
 		}
 
 		$this->app->redirect($url);
@@ -701,7 +698,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setContainer($container)
+	public function setContainer(Container $container)
 	{
 		$this->container = $container;
 
@@ -717,10 +714,24 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	{
 		if (!$this->app)
 		{
-			$this->app = Ioc::getApplication();
+			$this->app = $this->getPackage()->app ? : $this->container->get('system.application');
 		}
 
 		return $this->app;
+	}
+
+	/**
+	 * setApplication
+	 *
+	 * @param WebApplication $app
+	 *
+	 * @return  static
+	 */
+	public function setApplication(WebApplication $app)
+	{
+		$this->app = $app;
+
+		return $this;
 	}
 
 	/**
@@ -736,6 +747,20 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		}
 
 		return $this->input;
+	}
+
+	/**
+	 * Method to set property input
+	 *
+	 * @param   Input $input
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setInput(Input $input)
+	{
+		$this->input = $input;
+
+		return $this;
 	}
 
 	/**
@@ -791,7 +816,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setConfig($config)
+	public function setConfig(Registry $config)
 	{
 		$this->config = $config;
 
@@ -941,7 +966,7 @@ abstract class Controller extends AbstractController implements EventTriggerable
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setMiddlewares($middlewares)
+	public function setMiddlewares(ChainBuilder $middlewares)
 	{
 		$this->middlewares = $middlewares;
 
@@ -978,5 +1003,33 @@ abstract class Controller extends AbstractController implements EventTriggerable
 		}
 
 		throw new \OutOfRangeException('Property: ' . $name . ' not exists.');
+	}
+
+	/**
+	 * Serialize the controller.
+	 *
+	 * @return  string  The serialized controller.
+	 *
+	 * @since   2.0
+	 */
+	public function serialize()
+	{
+		return serialize($this->getInput());
+	}
+
+	/**
+	 * Unserialize the controller.
+	 *
+	 * @param   string  $input  The serialized controller.
+	 *
+	 * @return  AbstractController  Returns itself to support chaining.
+	 */
+	public function unserialize($input)
+	{
+		$input = unserialize($input);
+
+		$this->setInput($input);
+
+		return $this;
 	}
 }

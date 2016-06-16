@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Listener;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
@@ -198,8 +198,8 @@ class ProfilerListener
 	public function onPackageAfterExecute(Event $event)
 	{
 		/**
-		 * @var AbstractPackage $package
-		 * @var Controller      $controller
+		 * @var AbstractPackage    $package
+		 * @var AbstractController $controller
 		 */
 		$package = $event['package'];
 		$controller = $event['controller'];

@@ -13,7 +13,7 @@ namespace Windwalker\Core\Model\Exception;
  *
  * @since  2.0
  */
-class ValidFailException extends \Exception
+class ValidateFailException extends \RuntimeException
 {
 	/**
 	 * Property messages.

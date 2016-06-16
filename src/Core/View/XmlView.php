@@ -15,12 +15,12 @@ use Windwalker\Registry\Format\XmlFormat;
  *
  * @since  {DEPLOY_VERSION}
  */
-class PhpXmlView extends AbstractView
+class XmlView extends AbstractView
 {
 	/**
 	 * Property data.
 	 *
-	 * @var  array|Registry
+	 * @var  array|\SimpleXMLElement
 	 */
 	protected $data = array();
 
@@ -43,24 +43,19 @@ class PhpXmlView extends AbstractView
 	 *
 	 * @param   array  $data  The data array.
 	 */
-	public function __construct(array $data = array())
+	public function __construct($data = [])
 	{
+		parent::__construct();
+
 		// Init registry object.
-		$this->data = new \SimpleXMLElement(XmlFormat::structToString($data, array('name' => $this->root, 'nodeName' => $this->nodeName)));
-
-		$this->initialise();
-	}
-
-	/**
-	 * prepareData
-	 *
-	 * @param \SimpleXMLElement $registry
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($registry)
-	{
-
+		if ($data instanceof \SimpleXMLElement)
+		{
+			$this->data = $data;
+		}
+		else
+		{
+			$this->data = new \SimpleXMLElement(XmlFormat::structToString($data, array('name' => $this->root, 'nodeName' => $this->nodeName)));
+		}
 	}
 
 	/**
@@ -99,6 +94,11 @@ class PhpXmlView extends AbstractView
 	 */
 	public function setData($data)
 	{
+		if (!$data instanceof \SimpleXMLElement)
+		{
+			throw new \InvalidArgumentException(__METHOD__ . ' argument should be instance of ' . \SimpleXMLElement::class);
+		}
+
 		$this->data = $data;
 
 		return $this;

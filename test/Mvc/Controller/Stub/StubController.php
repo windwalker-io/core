@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Test\Mvc\Controller\Stub;
 
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 
 /**
  * The StubController class.
  * 
  * @since  2.1.1
  */
-class StubController extends Controller
+class StubController extends AbstractController
 {
 	/**
 	 * doExecute

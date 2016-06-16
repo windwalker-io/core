@@ -14,7 +14,7 @@ use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\WindwalkerConsole;
-use Windwalker\Core\Controller\Controller;
+use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
@@ -61,7 +61,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Property currentController.
 	 *
-	 * @var  Controller
+	 * @var  AbstractController
 	 */
 	protected $currentController;
 
@@ -115,7 +115,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @param array|Input  $input
 	 * @param bool         $forceNew
 	 *
-	 * @return Controller
+	 * @return AbstractController
 	 */
 	public function getController($task, $input = null, $forceNew = false)
 	{
@@ -134,7 +134,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 			$input = $input ? : $container->get('system.input');
 
-			$controller = $resolver->create($task, $input, $container->get('system.application'), $container, $this);
+			$controller = $resolver->create($task, $input, $this, $container);
 
 			$container->share($key, $controller);
 		}
@@ -145,15 +145,15 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * execute
 	 *
-	 * @param string|Controller $controller
-	 * @param Request           $request
-	 * @param Response          $response
+	 * @param string|AbstractController $controller
+	 * @param Request                   $request
+	 * @param Response                  $response
 	 *
 	 * @return  Response
 	 */
 	public function execute($controller, Request $request, Response $response)
 	{
-		if (!$controller instanceof Controller)
+		if (!$controller instanceof AbstractController)
 		{
 			$controller = $this->getController($controller);
 		}
@@ -649,7 +649,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Method to get property CurrentController
 	 *
-	 * @return  Controller
+	 * @return  AbstractController
 	 */
 	public function getCurrentController()
 	{

@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Model;
 
-use Windwalker\Core\Model\Exception\ValidFailException;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Test\TestCase\AbstractBaseTestCase;
 
 /**
@@ -21,7 +21,7 @@ class ValidFailExceptionTest extends AbstractBaseTestCase
 	/**
 	 * Property instance.
 	 *
-	 * @var  ValidFailException
+	 * @var  ValidateFailException
 	 */
 	protected $instance;
 
@@ -41,15 +41,15 @@ class ValidFailExceptionTest extends AbstractBaseTestCase
 	 */
 	public function testConstruct()
 	{
-		$e = new ValidFailException('foo');
+		$e = new ValidateFailException('foo');
 
 		$this->assertEquals('foo', $e->getMessage());
 
-		$e = new ValidFailException(array('a', 'b'));
+		$e = new ValidateFailException(array('a', 'b'));
 
 		$this->assertStringSafeEquals("a\nb", $e->getMessage());
 
-		$e = new ValidFailException(array(
+		$e = new ValidateFailException(array(
 			array('a', 'b'),
 			array('c', 'd')
 		));
