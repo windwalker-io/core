@@ -322,13 +322,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * renderView
 	 *
-	 * @param HtmlView $view
-	 * @param string   $layout
-	 * @param array    $data
+	 * @param AbstractView $view
+	 * @param string       $layout
+	 * @param array        $data
 	 *
 	 * @return string
 	 */
-	public function renderView(HtmlView $view, $layout = 'default', $data = array())
+	public function renderView(AbstractView $view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{

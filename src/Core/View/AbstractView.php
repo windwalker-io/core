@@ -121,6 +121,11 @@ abstract class AbstractView implements \ArrayAccess
 	{
 	}
 
+	public function handleData($data)
+	{
+
+	}
+
 	/**
 	 * getData
 	 *

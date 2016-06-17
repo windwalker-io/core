@@ -209,6 +209,8 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$controller->redirect();
 
+		$response = $controller->getResponse();
+
 		$response->getBody()->write($result);
 
 		return $response;
