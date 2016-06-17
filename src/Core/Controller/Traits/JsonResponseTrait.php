@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Http\Response\JsonResponse;
+use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
 
 /**
  * The HtmlResponseTrait class.
@@ -27,6 +27,6 @@ trait JsonResponseTrait
 	 */
 	public function bootJsonResponseTrait(AbstractController $controller)
 	{
-		$controller->setResponse(new JsonResponse);
+		$controller->addMiddleware(JsonResponseMiddleware::class);
 	}
 }

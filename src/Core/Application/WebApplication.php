@@ -24,7 +24,8 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\IO\PsrInput;
 use Windwalker\Language\Language;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
-use Windwalker\Middleware\Psr7MiddlewareInterface;
+use Windwalker\Middleware\Psr7Middleware;
+use Windwalker\Middleware\Psr7InvokableInterface;
 use Windwalker\Registry\Registry;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
@@ -122,7 +123,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function execute()
 	{
 		$this->boot();
-
+Core\Logger\Logger::debug('asd', $this->server->uri->full);
 		$this->registerMiddlewares();
 
 		return parent::execute();
@@ -253,7 +254,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * addMiddleware
 	 *
-	 * @param   callable|Psr7MiddlewareInterface  $middleware
+	 * @param   callable|Psr7InvokableInterface $middleware
 	 *
 	 * @return  static
 	 */
@@ -261,7 +262,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
 		{
-			$middleware = new $middleware($this);
+			$middleware = new Psr7Middleware(new $middleware($this));
 		}
 		elseif ($middleware instanceof \Closure)
 		{
@@ -290,8 +291,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function redirect($url, $code = 303)
 	{
 		$this->triggerEvent('onBeforeRedirect', array(
-			'app'   => $this,
-			'url'   => &$url,
+			'app'  => $this,
+			'url'  => &$url,
 			'code' => &$code
 		));
 

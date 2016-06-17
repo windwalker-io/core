@@ -38,7 +38,7 @@ class ViewHelper extends AbstractHelper
 		if (!static::$messages)
 		{
 			static::$messages = $package->getContainer()
-				->get('session')
+				->get('system.session')
 				->getFlashBag()
 				->takeAll();
 		}

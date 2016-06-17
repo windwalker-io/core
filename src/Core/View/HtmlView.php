@@ -87,35 +87,6 @@ class HtmlView extends AbstractView
 	}
 
 	/**
-	 * getData
-	 *
-	 * @return  \Windwalker\Data\Data
-	 */
-	public function getData()
-	{
-		if (!$this->data)
-		{
-			$this->data = new Data;
-		}
-
-		return $this->data;
-	}
-
-	/**
-	 * setData
-	 *
-	 * @param   array $data
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setData($data)
-	{
-		$this->data = $data instanceof Data ? $data : new Data($data);
-
-		return $this;
-	}
-
-	/**
 	 * prepareGlobals
 	 *
 	 * @param \Windwalker\Data\Data $data

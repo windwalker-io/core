@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
 use Windwalker\Registry\Registry;
 
 /**
@@ -15,8 +16,16 @@ use Windwalker\Registry\Registry;
  *
  * @since  2.1.5.3
  */
-class JsonView extends AbstractView
+class RegistryView extends AbstractView implements \JsonSerializable
 {
+	use OptionAccessTrait;
+
+	const FORMAT_JSON = 'json';
+	const FORMAT_XML  = 'xml';
+	const FORMAT_YAML = 'yaml';
+	const FORMAT_INI  = 'ini';
+	const FORMAT_PHP  = 'php';
+
 	/**
 	 * Property data.
 	 *
@@ -25,30 +34,35 @@ class JsonView extends AbstractView
 	protected $data = [];
 
 	/**
-	 * Property options.
+	 * Property format.
 	 *
-	 * @var integer
+	 * @var  string
 	 */
-	protected $options;
-
-	/**
-	 * Property depth.
-	 *
-	 * @var  integer
-	 */
-	protected $depth = 512;
+	protected $format = self::FORMAT_JSON;
 
 	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   array  $data  The data array.
+	 * @param   array  $data     The data array.
+	 * @param   array  $options  The options array.
 	 */
-	public function __construct(array $data = [])
+	public function __construct(array $data = [], array $options = [])
 	{
 		parent::__construct($data);
 
 		// Init registry object.
 		$this->data = new Registry($data);
+	}
+
+	/**
+	 * prepareData
+	 *
+	 * @param Registry $registry
+	 *
+	 * @return  void
+	 */
+	protected function prepareData($registry)
+	{
 	}
 
 	/**
@@ -62,16 +76,7 @@ class JsonView extends AbstractView
 	{
 		if ($registry instanceof Registry)
 		{
-			return $registry->toString('json', array('options' => $this->options, 'depth' => $this->depth));
-		}
-
-		if (version_compare(PHP_VERSION, '5.5', '<'))
-		{
-			return json_encode($this->data, $this->options);
-		}
-		else
-		{
-			return json_encode($this->data, $this->options, $this->depth);
+			return $registry->toString($this->format, $this->options);
 		}
 	}
 
@@ -105,50 +110,42 @@ class JsonView extends AbstractView
 	}
 
 	/**
-	 * Method to get property Options
+	 * Method to get property Format
 	 *
-	 * @return  int
+	 * @return  string
 	 */
-	public function getOptions()
+	public function getFormat()
 	{
-		return $this->options;
+		return $this->format;
 	}
 
 	/**
-	 * Method to set property options
+	 * Method to set property format
 	 *
-	 * @param   int $options
+	 * @param   string $format
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setOptions($options)
+	public function setFormat($format)
 	{
-		$this->options = $options;
+		$this->format = $format;
 
 		return $this;
 	}
 
 	/**
-	 * Method to get property Depth
+	 * Return data which should be serialized by json_encode().
 	 *
-	 * @return  int
+	 * @return  mixed
 	 */
-	public function getDepth()
+	public function jsonSerialize()
 	{
-		return $this->depth;
-	}
+		$format = $this->format;
 
-	/**
-	 * Method to set property depth
-	 *
-	 * @param   int $depth
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDepth($depth)
-	{
-		$this->depth = $depth;
+		$result = $this->setFormat(static::FORMAT_JSON)->render();
 
-		return $this;
+		$this->format = $format;
+
+		return $result;
 	}
 }

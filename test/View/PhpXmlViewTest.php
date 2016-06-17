@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\View;
 
-use Windwalker\Core\View\XmlView;
+use Windwalker\Core\View\SimpleXmlView;
 
 /**
  * Test class of PhpXmlView
@@ -20,7 +20,7 @@ class PhpXmlViewTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Test instance.
 	 *
-	 * @var XmlView
+	 * @var SimpleXmlView
 	 */
 	protected $instance;
 
@@ -32,7 +32,7 @@ class PhpXmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$this->instance = new XmlView;
+		$this->instance = new SimpleXmlView;
 	}
 
 	/**
@@ -52,7 +52,7 @@ class PhpXmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRender()
 	{
-		$view = new XmlView(array(
+		$view = new SimpleXmlView(array(
 			'foo' => 'bar',
 			'flower' => array(
 				'sakura' => 'beautiful'

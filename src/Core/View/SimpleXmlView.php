@@ -15,14 +15,14 @@ use Windwalker\Registry\Format\XmlFormat;
  *
  * @since  {DEPLOY_VERSION}
  */
-class XmlView extends AbstractView
+class SimpleXmlView extends AbstractView
 {
 	/**
 	 * Property data.
 	 *
 	 * @var  array|\SimpleXMLElement
 	 */
-	protected $data = array();
+	protected $data = [];
 
 	/**
 	 * Property root.
@@ -43,7 +43,7 @@ class XmlView extends AbstractView
 	 *
 	 * @param   array  $data  The data array.
 	 */
-	public function __construct($data = [])
+	public function __construct($data = null)
 	{
 		parent::__construct();
 
@@ -56,6 +56,17 @@ class XmlView extends AbstractView
 		{
 			$this->data = new \SimpleXMLElement(XmlFormat::structToString($data, array('name' => $this->root, 'nodeName' => $this->nodeName)));
 		}
+	}
+
+	/**
+	 * prepareData
+	 *
+	 * @param \SimpleXMLElement $xml
+	 *
+	 * @return  void
+	 */
+	protected function prepareData($xml)
+	{
 	}
 
 	/**

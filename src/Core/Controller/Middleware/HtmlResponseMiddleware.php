@@ -8,30 +8,31 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Windwalker\Core\Response\HtmlViewResponse;
 use Windwalker\Data\Data;
 use Windwalker\Http\Response\HtmlResponse;
 
 /**
- * The ViewRenderMiddleware class.
+ * The HtmlResponseMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ViewRenderMiddleware extends AbstractControllerMiddleware
+class HtmlResponseMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
 	 *
-	 * @param   Data $data
+	 * @param   ControllerData $data
 	 *
-	 * @return  string
+	 * @return  mixed
 	 */
 	public function execute($data = null)
 	{
-		$view = $this->next->execute($data);
+		$this->controller->setResponse(new HtmlResponse('', $data->response->getStatusCode(), $data->response->getHeaders()));
 
-		$this->controller->setResponse(new HtmlResponse);
+		$result = $this->next->execute($data);
 
-		return $view;
+		$this->controller->setRedirect(null);
+
+		return $result;
 	}
 }

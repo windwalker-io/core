@@ -39,9 +39,9 @@ abstract class AbstractControllerMiddleware extends AbstractMiddleware
 	/**
 	 * Call next middleware.
 	 *
-	 * @param   Data $data
+	 * @param   ControllerData $data
 	 *
-	 * @return  string
+	 * @return  mixed
 	 */
 	abstract public function execute($data = null);
 }

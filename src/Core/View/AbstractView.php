@@ -79,11 +79,12 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param   array   $data  The data array.
 	 */
-	public function __construct(array $data = null)
+	public function __construct($data = null)
 	{
 		$this->config = new Registry;
 		$this->model  = new ViewModel;
-		$this->data   = $data;
+
+		$this->setData($data);
 
 		$this->bootTraits($this);
 
@@ -121,9 +122,39 @@ abstract class AbstractView implements \ArrayAccess
 	{
 	}
 
-	public function handleData($data)
+	/**
+	 * handleData
+	 *
+	 * @return  static
+	 */
+	public function handleData()
 	{
+		$data = $this->getData();
 
+		$this->prepareRender($data);
+
+		$this->prepareData($data);
+
+		$this->prepareGlobals($data);
+
+		$dispatcher = $this->getPackage()->getDispatcher();
+
+		$dispatcher->triggerEvent('onViewAfterHandleData', array(
+			'data' => &$data,
+			'view' => $this
+		));
+
+		return $this;
+	}
+
+	/**
+	 * processData
+	 *
+	 * @return  mixed
+	 */
+	public function getHandledData()
+	{
+		return $this->handleData()->getData();
 	}
 
 	/**
@@ -133,6 +164,11 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function getData()
 	{
+		if (!$this->data)
+		{
+			$this->data = new Data;
+		}
+
 		return $this->data;
 	}
 
@@ -145,7 +181,7 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function setData($data)
 	{
-		$this->data = (array) $data;
+		$this->data = $data instanceof Data ? $data : new Data($data);
 
 		return $this;
 	}
@@ -187,13 +223,9 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function render()
 	{
+		$this->handleData();
+
 		$data = $this->getData();
-
-		$this->prepareRender($data);
-
-		$this->prepareData($data);
-
-		$this->prepareGlobals($data);
 
 		$dispatcher = $this->getPackage()->getDispatcher();
 

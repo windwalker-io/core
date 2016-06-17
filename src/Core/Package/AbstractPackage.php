@@ -27,6 +27,7 @@ use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
+use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Registry\Registry;
 
 /**
@@ -211,7 +212,10 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$response = $controller->getResponse();
 
-		$response->getBody()->write($result);
+		if ($result !== null)
+		{
+			$response->getBody()->write((string) $result);
+		}
 
 		return $response;
 	}
@@ -549,7 +553,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		if (is_string($middleware) && is_subclass_of($middleware, AbstractPackageMiddleware::class))
 		{
-			$middleware = new $middleware($this);
+			$middleware = new Psr7Middleware(new $middleware($this));
 		}
 		elseif ($middleware instanceof \Closure)
 		{

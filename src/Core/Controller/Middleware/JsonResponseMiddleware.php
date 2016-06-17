@@ -8,27 +8,33 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
+use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Data\Data;
+use Windwalker\Http\Response\JsonResponse;
 
 /**
- * The TestMiddleware class.
+ * The RenderViewMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class TestMiddleware extends AbstractControllerMiddleware
+class JsonResponseMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
 	 *
 	 * @param   ControllerData $data
 	 *
-	 * @return  string
+	 * @return  mixed
 	 */
 	public function execute($data = null)
 	{
+		$response = $data->response;
+
+		$this->controller->setResponse(new JsonResponse(null, $response->getStatusCode(), $response->getHeaders()));
+
 		$result = $this->next->execute($data);
 
-		$result .= 'test';
+		$this->controller->setRedirect(null);
 
 		return $result;
 	}

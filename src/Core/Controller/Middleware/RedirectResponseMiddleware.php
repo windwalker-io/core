@@ -8,28 +8,30 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Windwalker\Data\Data;
+use Windwalker\Http\Response\RedirectResponse;
 
 /**
- * The TestMiddleware class.
+ * The RedirectResponseMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class TestMiddleware extends AbstractControllerMiddleware
+class RedirectResponseMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
 	 *
 	 * @param   ControllerData $data
 	 *
-	 * @return  string
+	 * @return  mixed
 	 */
 	public function execute($data = null)
 	{
 		$result = $this->next->execute($data);
 
-		$result .= 'test';
+		$response = $data->response;
 
-		return $result;
+		$this->controller->setResponse(new RedirectResponse($result, $response->getStatusCode(), $response->getHeaders()));
+
+		return $this->next->execute($data);
 	}
 }

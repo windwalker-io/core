@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Core\Controller\Middleware\HtmlResponseMiddleware;
 
 /**
  * The HtmlResponseTrait class.
@@ -27,6 +27,6 @@ trait HtmlResponseTrait
 	 */
 	public function bootHtmlResponseTrait(AbstractController $controller)
 	{
-		$controller->setResponse(new HtmlResponse);
+		$controller->addMiddleware(HtmlResponseMiddleware::class);
 	}
 }

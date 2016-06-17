@@ -139,6 +139,20 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	protected $middlewares = [];
 
 	/**
+	 * Property successHandler.
+	 *
+	 * @var  callable
+	 */
+	protected $successHandler;
+
+	/**
+	 * Property failureHandler.
+	 *
+	 * @var  callable
+	 */
+	protected $failureHandler;
+
+	/**
 	 * Class init.
 	 *
 	 * @param Input           $input
@@ -299,6 +313,54 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	}
 
 	/**
+	 * Method to get property SuccessHandler
+	 *
+	 * @return  callable
+	 */
+	public function getSuccessHandler()
+	{
+		return $this->successHandler;
+	}
+
+	/**
+	 * Method to set property successHandler
+	 *
+	 * @param   callable $successHandler
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setSuccessHandler(callable $successHandler)
+	{
+		$this->successHandler = $successHandler;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property FailureHandler
+	 *
+	 * @return  callable
+	 */
+	public function getFailureHandler()
+	{
+		return $this->failureHandler;
+	}
+
+	/**
+	 * Method to set property failureHandler
+	 *
+	 * @param   callable $failureHandler
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setFailureHandler(callable $failureHandler)
+	{
+		$this->failureHandler = $failureHandler;
+
+		return $this;
+	}
+
+	/**
 	 * delegate
 	 *
 	 * @param   string $task
@@ -322,13 +384,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * renderView
 	 *
-	 * @param AbstractView $view
-	 * @param string       $layout
-	 * @param array        $data
+	 * @param HtmlView  $view
+	 * @param string    $layout
+	 * @param array     $data
 	 *
 	 * @return string
 	 */
-	public function renderView(AbstractView $view, $layout = 'default', $data = array())
+	public function renderView($view, $layout = 'default', $data = array())
 	{
 		if (is_string($view))
 		{
@@ -343,6 +405,34 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		}
 
 		return $view->setLayout($layout)->render();
+	}
+
+	/**
+	 * handleSuccess
+	 *
+	 * @param mixed  $data
+	 * @param string $message
+	 * @param string $type
+	 *
+	 * @return  boolean
+	 */
+	public function processSuccess($data = null, $message = null, $type = 'info')
+	{
+		return true;
+	}
+
+	/**
+	 * handleFailure
+	 *
+	 * @param mixed  $data
+	 * @param string $message
+	 * @param string $type
+	 *
+	 * @return  boolean
+	 */
+	public function processFailure($data = null, $message = null, $type = 'warning')
+	{
+		return false;
 	}
 
 	/**
@@ -528,7 +618,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			$this->addMessage($msg, $type);
 		}
 
-		$this->app->redirect($url);
+		$this->app->redirect($url, $this->response->getStatusCode());
 	}
 
 	/**

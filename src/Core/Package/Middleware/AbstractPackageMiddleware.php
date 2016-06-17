@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package\Middleware;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Middleware\AbstractMiddleware;
-use Windwalker\Middleware\Psr7MiddlewareInterface;
+use Windwalker\Middleware\Psr7InvokableInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
@@ -20,7 +20,7 @@ use Psr\Http\Message\ResponseInterface as Response;
  *
  * @since  {DEPLOY_VERSION}
  */
-abstract class AbstractPackageMiddleware extends AbstractMiddleware implements Psr7MiddlewareInterface
+abstract class AbstractPackageMiddleware implements Psr7InvokableInterface
 {
 	/**
 	 * Property app.
@@ -37,18 +37,5 @@ abstract class AbstractPackageMiddleware extends AbstractMiddleware implements P
 	public function __construct(AbstractPackage $package)
 	{
 		$this->package = $package;
-	}
-
-	/**
-	 * Call next middleware.
-	 *
-	 * @param Request  $request
-	 * @param Response $response
-	 *
-	 * @return Response
-	 */
-	public function execute($request = null, $response = null)
-	{
-		return call_user_func($this, $request, $response, $this->next);
 	}
 }

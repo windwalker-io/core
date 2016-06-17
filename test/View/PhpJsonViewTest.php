@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\View;
 
-use Windwalker\Core\View\JsonView;
+use Windwalker\Core\View\RegistryView;
 
 /**
  * Test class of PhpJsonView
@@ -20,7 +20,7 @@ class PhpJsonViewTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Test instance.
 	 *
-	 * @var JsonView
+	 * @var RegistryView
 	 */
 	protected $instance;
 
@@ -32,7 +32,7 @@ class PhpJsonViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$this->instance = new JsonView;
+		$this->instance = new RegistryView;
 	}
 
 	/**
