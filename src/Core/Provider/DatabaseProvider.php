@@ -77,16 +77,13 @@ class DatabaseProvider implements ServiceProviderInterface
 	 * strictMode
 	 *
 	 * @param Container $container
-	 *
-	 * @return  void
+	 * @param boolean   $mode
 	 */
-	public static function strictMode(Container $container)
+	public static function strictMode(Container $container, $mode = null)
 	{
 		$config = $container->get('system.config');
 
-		$mode = $config->get('database.mysql_strict_mode');
-
-		if ($config->get('database.driver') == 'mysql' && $mode !== null)
+		if ($config->get('database.driver') == 'mysql')
 		{
 			if ($mode)
 			{

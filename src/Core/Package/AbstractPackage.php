@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Console\WindwalkerConsole;
+use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
@@ -32,11 +32,11 @@ use Windwalker\Registry\Registry;
 /**
  * The AbstractPackage class.
  *
- * @property-read  Registry                          $config
- * @property-read  PackageRouter                     $router
- * @property-read  PsrInput                          $input
- * @property-read  WebApplication|WindwalkerConsole  $app
- * @property-read  string                            $name
+ * @property-read  Registry                   $config
+ * @property-read  PackageRouter              $router
+ * @property-read  PsrInput                   $input
+ * @property-read  WebApplication|CoreConsole $app
+ * @property-read  string                     $name
  *
  * @since  2.0
  */

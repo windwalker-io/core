@@ -9,7 +9,9 @@
 namespace Windwalker\Core;
 
 use Symfony\Component\Yaml\Yaml;
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
+use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
@@ -87,6 +89,8 @@ trait WindwalkerTrait
 		// Set some default objects
 		$this->dispatcher = $this->container->get('system.dispatcher');
 
+		$this->triggerEvent('onAfterInitialise', array('app' => $this));
+
 		$this->booted = true;
 	}
 
@@ -139,10 +143,10 @@ trait WindwalkerTrait
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = new $provider;
+				$provider = new $provider($this);
 			}
 
-			if (is_callable($provider, 'boot'))
+			if (is_callable([$provider, 'boot']))
 			{
 				$provider->boot($container);
 			}
@@ -237,5 +241,25 @@ trait WindwalkerTrait
 		$config['path.migrations'] = WINDWALKER_MIGRATIONS;
 		$config['path.seeders']    = WINDWALKER_SEEDERS;
 		$config['path.languages']  = WINDWALKER_LANGUAGES;
+	}
+
+	/**
+	 * isConsole
+	 *
+	 * @return  boolean
+	 */
+	public function isConsole()
+	{
+		return $this instanceof CoreConsole;
+	}
+
+	/**
+	 * isWeb
+	 *
+	 * @return  boolean
+	 */
+	public function isWeb()
+	{
+		return $this instanceof WebApplication;
 	}
 }

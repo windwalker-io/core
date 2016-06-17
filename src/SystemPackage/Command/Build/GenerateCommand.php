@@ -101,11 +101,11 @@ class {{CLASS}}Command extends Command
 	 *
 	 * @return void
 	 */
-	public function initialise()
+	public function init()
 	{
 		// \$this->addArgument();
 
-		parent::initialise();
+		parent::init();
 	}
 
 	/**
@@ -126,7 +126,7 @@ TMPL;
 	 *
 	 * @return void
 	 */
-	public function initialise()
+	public function init()
 	{
 		$this->addOption(
 			array('d', 'description'),
@@ -134,7 +134,7 @@ TMPL;
 			'Command description'
 		);
 
-		parent::initialise();
+		parent::init();
 	}
 
 	/**

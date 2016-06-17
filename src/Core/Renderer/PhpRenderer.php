@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Renderer;
 
 use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
+use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 use Windwalker\Utilities\Queue\Priority;
 
 /**
@@ -18,26 +19,7 @@ use Windwalker\Utilities\Queue\Priority;
  */
 class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRendererInterface
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinderInterface
-	 */
-	protected $packageFinder;
-
-	/**
-	 * setRendererFinder
-	 *
-	 * @param PackageFinderInterface $finder
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackageFinder(PackageFinderInterface $finder)
-	{
-		$this->packageFinder = $finder;
-
-		return $this;
-	}
+	use PackageFinderTrait;
 
 	/**
 	 * createSelf

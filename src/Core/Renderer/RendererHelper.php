@@ -35,6 +35,7 @@ abstract class RendererHelper extends AbstractProxyFacade
 {
 	const ENGINE_PHP      = 'php';
 	const ENGINE_BLADE    = 'blade';
+	const ENGINE_EDGE     = 'edge';
 	const ENGINE_TWIG     = 'twig';
 	const ENGINE_MUSTACHE = 'mustache';
 

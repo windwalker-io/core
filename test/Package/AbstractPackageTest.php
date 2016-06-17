@@ -48,14 +48,14 @@ class AbstractPackageTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Method to test initialise().
+	 * Method to test init().
 	 *
 	 * @return void
 	 *
 	 * @covers Windwalker\Core\Package\AbstractPackage::boot
-	 * @TODO   Implement testInitialise().
+	 * @TODO   Implement testinit().
 	 */
-	public function testInitialise()
+	public function testinit()
 	{
 		// Remove the following lines when you implement this test.
 		$this->markTestIncomplete(

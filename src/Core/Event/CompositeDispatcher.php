@@ -10,10 +10,11 @@ namespace Windwalker\Core\Event;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use Windwalker\Core\Logger\LoggerAwareTrait;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
+use Windwalker\Event\ListenerPriority;
 
 /**
  * The CompositeDispatcher class.
@@ -22,6 +23,8 @@ use Windwalker\Event\EventInterface;
  */
 class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, \ArrayAccess, \Countable, \IteratorAggregate
 {
+	use LoggerAwareTrait;
+	
 	/**
 	 * Property dispatchers.
 	 *
@@ -65,6 +68,20 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	}
 
 	/**
+	 * Add single listener.
+	 *
+	 * @param string   $event
+	 * @param callable $callable
+	 * @param int      $priority
+	 *
+	 * @return  static
+	 */
+	public function listen($event, $callable, $priority = ListenerPriority::NORMAL)
+	{
+		return $this->addListener($callable, [$event => $priority]);
+	}
+
+	/**
 	 * Add a listener to this dispatcher, only if not already registered to these events.
 	 * If no events are specified, it will be registered to all events matching it's methods name.
 	 * In the case of a closure, you must specify at least one event name.
@@ -101,6 +118,21 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	public function triggerSubEvent($name, $event, $args = array())
 	{
 		return $this->getDispatcher($name)->triggerEvent($event, $args);
+	}
+
+	/**
+	 * Add single listener.
+	 *
+	 * @param string   $name
+	 * @param string   $event
+	 * @param callable $callable
+	 * @param int      $priority
+	 *
+	 * @return static
+	 */
+	public function subListen($name, $event, $callable, $priority = ListenerPriority::NORMAL)
+	{
+		return $this->addSubListener($name, $callable, [$event => $priority]);
 	}
 
 	/**
@@ -288,35 +320,5 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	public function count()
 	{
 		return count($this->dispatchers);
-	}
-
-	/**
-	 * getLogger
-	 *
-	 * @return  LoggerInterface
-	 */
-	public function getLogger()
-	{
-		// If a logger hasn't been set, use NullLogger
-		if (! ($this->logger instanceof LoggerInterface))
-		{
-			$this->logger = new NullLogger;
-		}
-
-		return $this->logger;
-	}
-
-	/**
-	 * Sets a logger instance on the object
-	 *
-	 * @param LoggerInterface $logger
-	 *
-	 * @return static
-	 */
-	public function setLogger(LoggerInterface $logger)
-	{
-		$this->logger = $logger;
-
-		return $this;
 	}
 }

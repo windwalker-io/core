@@ -24,7 +24,7 @@ class ViewHelper extends AbstractHelper
 	 *
 	 * @var  array
 	 */
-	protected static $flashes = array();
+	protected static $messages = array();
 
 	/**
 	 * getGlobalVariables
@@ -35,9 +35,9 @@ class ViewHelper extends AbstractHelper
 	 */
 	public static function getGlobalVariables(AbstractPackage $package = null)
 	{
-		if (!static::$flashes)
+		if (!static::$messages)
 		{
-			static::$flashes = $package->getContainer()
+			static::$messages = $package->getContainer()
 				->get('session')
 				->getFlashBag()
 				->takeAll();
@@ -50,7 +50,7 @@ class ViewHelper extends AbstractHelper
 			'app'        => $container->get('system.application'),
 			'package'    => $package,
 			'router'     => $package->router,
-			'flashes'    => static::$flashes,
+			'messages'   => static::$messages,
 			'translator' => $container->get('system.language'),
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);

@@ -92,7 +92,7 @@ class Widget implements WidgetInterface
 		// Create PriorityQueue
 		$this->createPriorityQueue();
 
-		$this->initialise();
+		$this->init();
 	}
 
 	/**
@@ -100,7 +100,7 @@ class Widget implements WidgetInterface
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 	}
 

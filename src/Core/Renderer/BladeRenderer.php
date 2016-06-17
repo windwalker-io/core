@@ -11,6 +11,7 @@ namespace Windwalker\Core\Renderer;
 use Illuminate\View\FileViewFinder;
 use Windwalker\Core\Renderer\Finder\BladeFinder;
 use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
+use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 
 /**
  * The BladeRenderer class.
@@ -19,26 +20,7 @@ use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
  */
 class BladeRenderer extends \Windwalker\Renderer\BladeRenderer implements CoreRendererInterface
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinderInterface
-	 */
-	protected $packageFinder;
-
-	/**
-	 * setRendererFinder
-	 *
-	 * @param PackageFinderInterface $finder
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackageFinder(PackageFinderInterface $finder)
-	{
-		$this->packageFinder = $finder;
-
-		return $this;
-	}
+	use PackageFinderTrait;
 
 	/**
 	 * Method to get property Finder

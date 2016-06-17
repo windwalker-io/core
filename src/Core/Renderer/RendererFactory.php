@@ -26,6 +26,7 @@ class RendererFactory
 {
 	const ENGINE_PHP      = 'php';
 	const ENGINE_BLADE    = 'blade';
+	const ENGINE_EDGE     = 'edge';
 	const ENGINE_TWIG     = 'twig';
 	const ENGINE_MUSTACHE = 'mustache';
 
@@ -72,6 +73,8 @@ class RendererFactory
 	 */
 	public function getRenderer($type = self::ENGINE_PHP, $config = array())
 	{
+		$type = strtolower($type);
+
 		$class = sprintf('Windwalker\Core\Renderer\%sRenderer', ucfirst($type));
 
 		if (!class_exists($class))
@@ -87,6 +90,16 @@ class RendererFactory
 		if ($type == 'blade')
 		{
 			if (empty($config['cache_path']))
+			{
+				$config = $this->container->get('system.config');
+
+				$config['cache_path'] = $config->get('path.cache') . '/renderer';
+			}
+		}
+
+		if ($type == 'edge')
+		{
+			if (empty($config['cache_path']) && !isset($config['cache']))
 			{
 				$config = $this->container->get('system.config');
 
@@ -139,6 +152,18 @@ class RendererFactory
 	}
 
 	/**
+	 * getEdgeRenderer
+	 *
+	 * @param array $config
+	 *
+	 * @return  EdgeRenderer
+	 */
+	public function getEdgeRenderer($config = array())
+	{
+		return $this->getRenderer(static::ENGINE_EDGE, $config);
+	}
+
+	/**
 	 * Create twig renderer.
 	 *
 	 * @param   array  $config  Renderer config array.
@@ -188,7 +213,7 @@ class RendererFactory
 	 *
 	 * @since   2.0
 	 */
-	public function addGlobalPath($path, $priority = Priority::LOW)
+	public function addGlobalPath($path, $priority = PriorityQueue::LOW)
 	{
 		$this->getPaths()->insert($path, $priority);
 
@@ -205,7 +230,7 @@ class RendererFactory
 	 *
 	 * @since   2.0
 	 */
-	public function addPath($path, $priority = Priority::LOW)
+	public function addPath($path, $priority = PriorityQueue::LOW)
 	{
 		$this->addGlobalPath($path, $priority);
 

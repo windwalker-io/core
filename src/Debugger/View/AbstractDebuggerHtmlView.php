@@ -22,7 +22,7 @@ class AbstractDebuggerHtmlView extends PhpHtmlView
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->renderer->config->set('local_variables', true);
 	}

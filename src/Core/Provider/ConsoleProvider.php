@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Console\WindwalkerConsole;
+use Windwalker\Core\Console\CoreConsole;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Environment;
@@ -23,16 +23,16 @@ class ConsoleProvider implements ServiceProviderInterface
 	/**
 	 * Property app.
 	 *
-	 * @var WindwalkerConsole
+	 * @var CoreConsole
 	 */
 	protected $app;
 
 	/**
 	 * Class init.
 	 *
-	 * @param WindwalkerConsole $app
+	 * @param CoreConsole $app
 	 */
-	public function __construct(WindwalkerConsole $app)
+	public function __construct(CoreConsole $app)
 	{
 		$this->app = $app;
 	}

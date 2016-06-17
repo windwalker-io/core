@@ -49,7 +49,11 @@ class EventDispatcher extends Dispatcher
 	{
 		if (!is_string($event) && !$event instanceof Event)
 		{
-			throw new \InvalidArgumentException(__METHOD__ . ' only allow Event object or string.');
+			throw new \InvalidArgumentException(sprintf(
+				'%s::%s only allow Event object or string.', 
+				get_called_class(), 
+				__FUNCTION__
+			));
 		}
 
 		if (!($event instanceof Event))

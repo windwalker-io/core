@@ -41,9 +41,9 @@ class CopyConfigCommand extends Command
 	 *
 	 * @since  2.0
 	 */
-	protected function initialise()
+	protected function init()
 	{
-		parent::initialise();
+		parent::init();
 	}
 
 	/**

@@ -68,7 +68,20 @@ class TemplateEngineProvider implements ServiceProviderInterface
 	 */
 	public function boot(Container $container)
 	{
-		// Blade
+		$this->prepareBlade($container);
+		$this->prepareEdge($container);
+		$this->prepareTwig($container);
+	}
+
+	/**
+	 * prepareBlade
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareBlade(Container $container)
+	{
 		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)
 		{
 			return "<?php echo \$translator->translate{$expression} ?>";
@@ -95,28 +108,29 @@ class TemplateEngineProvider implements ServiceProviderInterface
 		});
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
+	}
 
-		// B/C for 4.*
-		if (!method_exists('Illuminate\View\Compilers\BladeCompiler', 'directive'))
-		{
-			Renderer\Blade\GlobalContainer::setContentTags('{{', '}}');
-			Renderer\Blade\GlobalContainer::setEscapedTags('{{{', '}}}');
+	/**
+	 * prepareEdge
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareEdge(Container $container)
+	{
+		Renderer\Edge\GlobalContainer::addExtension(new \Windwalker\Core\Renderer\Edge\WindwalkerExtension);
+	}
 
-			Renderer\Blade\GlobalContainer::addExtension('rawTag', function($view, BladeCompiler $compiler)
-			{
-				$pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', '{!!', '!!}');
-
-				$callback = function ($matches) use ($compiler)
-				{
-					$whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
-
-					return $matches[1] ? substr($matches[0], 1) : '<?php echo ' . $compiler->compileEchoDefaults($matches[2]).'; ?>' . $whitespace;
-				};
-
-				return preg_replace_callback($pattern, $callback, $view);
-			});
-		}
-
+	/**
+	 * prepareTwig
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareTwig(Container $container)
+	{
 		// Twig
 		if (class_exists('Twig_Extension'))
 		{

@@ -162,7 +162,7 @@ abstract class Ioc
 	/**
 	 * getAuthenticate
 	 *
-	 * @return  \Windwalker\Authenticate\Authenticate
+	 * @return  \Windwalker\Authentication\Authentication
 	 */
 	public static function getAuthenticate()
 	{
@@ -182,7 +182,7 @@ abstract class Ioc
 	/**
 	 * getEnvironment
 	 *
-	 * @return  \Windwalker\Environment\Web\WebEnvironment
+	 * @return  \Windwalker\Environment\WebEnvironment
 	 */
 	public static function getEnvironment()
 	{
@@ -224,7 +224,7 @@ abstract class Ioc
 	 *
 	 * @return  \Windwalker\Cache\Cache
 	 */
-	public static function getCache()
+	public static function getGlobalCache()
 	{
 		return static::get('system.cache');
 	}
@@ -232,7 +232,7 @@ abstract class Ioc
 	/**
 	 * getDB
 	 *
-	 * @return  \Windwalker\Database\Driver\DatabaseDriver
+	 * @return  \Windwalker\Database\Driver\AbstractDatabaseDriver
 	 */
 	public static function getDatabase()
 	{

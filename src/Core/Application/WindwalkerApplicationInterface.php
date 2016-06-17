@@ -81,4 +81,18 @@ interface WindwalkerApplicationInterface
 	 * @return  static
 	 */
 	public function addMessage($messages, $type = Bootstrap::MSG_INFO);
+
+	/**
+	 * isConsole
+	 *
+	 * @return  boolean
+	 */
+	public function isConsole();
+
+	/**
+	 * isWeb
+	 *
+	 * @return  boolean
+	 */
+	public function isWeb();
 }

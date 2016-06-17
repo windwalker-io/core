@@ -30,11 +30,11 @@ class TestApplication extends WebApplication
 	 *
 	 * @return  void
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		Windwalker::prepareSystemPath($this->config);
 
-		parent::initialise();
+		parent::init();
 
 		ErrorHandler::restore();
 

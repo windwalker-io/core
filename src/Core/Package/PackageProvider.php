@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Package;
 
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
@@ -69,10 +70,13 @@ class PackageProvider implements ServiceProviderInterface
 			);
 		});
 
-		// Router
-		$container->extend('system.router', function (CoreRouter $router, Container $container)
+		if ($this->package->app->isWeb())
 		{
-			return new PackageRouter($this->package, $router);
-		});
+			// Router
+			$container->extend('system.router', function (CoreRouter $router, Container $container)
+			{
+				return new PackageRouter($this->package, $router);
+			});
+		}
 	}
 }

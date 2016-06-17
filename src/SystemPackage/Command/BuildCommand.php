@@ -33,10 +33,10 @@ class BuildCommand extends Command
 	 */
 	protected $description = 'Some useful tools for building system.';
 
-	protected function initialise()
+	protected function init()
 	{
 		$this->addCommand(new GenerateCommand);
 
-  		parent::initialise();
+  		parent::init();
 	}
 }

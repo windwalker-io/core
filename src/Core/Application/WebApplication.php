@@ -87,6 +87,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function __construct(Request $request = null, Registry $config = null, WebEnvironment $environment = null)
 	{
+		$this->config = $config instanceof Registry ? $config : new Registry($config);
+		$this->name   = $this->config->get('name', $this->name);
+
+		Core\Ioc::setProfile($this->name);
+
 		$this->container = Core\Ioc::factory();
 
 		parent::__construct($request, $config, $environment);

@@ -39,7 +39,7 @@ class PackageCommand extends Command
 	 *
 	 * @since  2.0
 	 */
-	protected function initialise()
+	protected function init()
 	{
 		$this->addCommand(new CopyConfigCommand);
 

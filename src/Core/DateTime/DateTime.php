@@ -14,8 +14,6 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 /**
  * The DateTime class.
  *
- * Port of Joomla JDate and will be re-write after 3.0.
- *
  * @since  2.1.1
  */
 class DateTime extends \DateTime
@@ -23,7 +21,6 @@ class DateTime extends \DateTime
 	const FORMAT_YMD     = 'Y-m-d';
 	const FORMAT_YMD_HI  = 'Y-m-d H:i';
 	const FORMAT_YMD_HIS = 'Y-m-d H:i:s';
-	const FORMAT_SQL     = 'Y-m-d H:i:s';
 
 	const TZ_LOCALE = true;
 
@@ -403,12 +400,7 @@ class DateTime extends \DateTime
 	 */
 	public function toSql($local = false, AbstractDatabaseDriver $db = null)
 	{
-		if ($db === null)
-		{
-			$db = Ioc::getDatabase();
-		}
-
-		return $this->format($db->getQuery(true)->getDateFormat(), $local);
+		return $this->format(static::getSqlFormat($db), $local);
 	}
 
 	/**
@@ -437,5 +429,19 @@ class DateTime extends \DateTime
 	public function toUnix()
 	{
 		return (int) parent::format('U');
+	}
+
+	/**
+	 * getSqlFormat
+	 *
+	 * @param AbstractDatabaseDriver $db
+	 *
+	 * @return  string
+	 */
+	public static function getSqlFormat(AbstractDatabaseDriver $db = null)
+	{
+		$db = $db ? : Ioc::getDatabase();
+
+		return $db->getQuery(true)->getDateFormat();
 	}
 }
