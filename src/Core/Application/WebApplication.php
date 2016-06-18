@@ -62,11 +62,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	protected $name = 'web';
 
 	/**
-	 * Property booted.
+	 * Property configPath.
 	 *
-	 * @var  boolean
+	 * @var  string
 	 */
-	protected $booted = false;
+	protected $configPath;
 
 	/**
 	 * Property middlewares.
@@ -123,7 +123,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function execute()
 	{
 		$this->boot();
-Core\Logger\Logger::debug('asd', $this->server->uri->full);
+
 		$this->registerMiddlewares();
 
 		return parent::execute();
@@ -211,7 +211,7 @@ Core\Logger\Logger::debug('asd', $this->server->uri->full);
 	 *
 	 * @return  static
 	 */
-	public function clearMessage()
+	public function clearMessages()
 	{
 		/** @var \Windwalker\Session\Session $session */
 		$session = $this->container->get('system.session');

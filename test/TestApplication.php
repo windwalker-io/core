@@ -26,17 +26,30 @@ use Windwalker\Registry\Registry;
 class TestApplication extends WebApplication
 {
 	/**
+	 * Property name.
+	 *
+	 * @var  string
+	 */
+	protected $name = 'test';
+
+	/**
+	 * Property configPath.
+	 *
+	 * @var  string
+	 */
+	protected $configPath = WINDWALKER_ETC . '/app';
+
+	/**
 	 * initialise
 	 *
 	 * @return  void
 	 */
 	protected function init()
 	{
-		Windwalker::prepareSystemPath($this->config);
+		$this->boot();
 
-		parent::init();
-
-		ErrorHandler::restore();
+		restore_error_handler();
+		restore_exception_handler();
 
 		// Resolve DB info
 		$dsn = TestDsnResolver::getDsn($this->get('database.driver'));
@@ -50,112 +63,5 @@ class TestApplication extends WebApplication
 
 		// Start session
 		Ioc::getSession()->start();
-	}
-
-	/**
-	 * loadProviders
-	 *
-	 * @return  ServiceProviderInterface[]
-	 */
-	public static function loadProviders()
-	{
-		$providers = parent::loadProviders();
-
-		/*
-		 * Default Providers:
-		 * -----------------------------------------
-		 * This is some default service providers, we don't recommend to remove them,
-		 * But you can replace with yours, Make sure all the needed container key has
-		 * registered in your own providers.
-		 */
-		// $providers['debug']    = new Provider\WhoopsProvider;
-		$providers['event']    = new Provider\EventProvider;
-		$providers['database'] = new Provider\DatabaseProvider;
-		$providers['router']   = new Provider\RouterProvider;
-		$providers['lang']     = new Provider\LanguageProvider;
-		$providers['cache']    = new Provider\CacheProvider;
-		$providers['session']  = new MockSessionProvider;
-		$providers['auth']     = new Provider\AuthenticationProvider;
-		$providers['security'] = new Provider\SecurityProvider;
-
-		/*
-		 * Custom Providers:
-		 * -----------------------------------------
-		 * You can add your own providers here. If you installed a 3rd party packages from composer,
-		 * but this package need some init logic, create a service provider to do this and register it here.
-		 */
-
-		// Custom Providers here...
-
-		return $providers;
-	}
-
-	/**
-	 * getPackages
-	 *
-	 * @return  array
-	 */
-	public static function loadPackages()
-	{
-		/*
-		 * Get Global Packages
-		 * -----------------------------------------
-		 * If you want a package can be use in every applications (for example: Web and Console),
-		 * set it in Windwalker\Windwalker object.
-		 */
-		$packages = Windwalker::loadPackages();
-
-		/*
-		 * Get Packages for This Application
-		 * -----------------------------------------
-		 * If you want a package only use in this application or want to override a global package,
-		 * set it here. Example: $packages[] = new Flower\FlowerPackage;
-		 */
-
-		// Your packages here...
-		// $packages['mvc'] = new MvcPackage;
-
-		return $packages;
-	}
-
-	/**
-	 * Prepare execute hook.
-	 *
-	 * @return  void
-	 */
-	protected function prepareExecute()
-	{
-	}
-
-	/**
-	 * Pose execute hook.
-	 *
-	 * @return  mixed
-	 */
-	protected function postExecute()
-	{
-	}
-
-	/**
-	 * loadConfiguration
-	 *
-	 * @param Registry $config
-	 *
-	 * @throws  \RuntimeException
-	 * @return  void
-	 */
-	protected function loadConfiguration(Registry $config)
-	{
-		Windwalker::loadConfiguration($config);
-	}
-
-	/**
-	 * loadRoutingConfiguration
-	 *
-	 * @return  mixed
-	 */
-	protected function loadRoutingConfiguration()
-	{
-		return Windwalker::loadRouting();
 	}
 }

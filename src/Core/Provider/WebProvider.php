@@ -22,11 +22,6 @@ use Windwalker\Registry\Registry;
  */
 class WebProvider implements ServiceProviderInterface
 {
-	public function boot(Container $container)
-	{
-
-	}
-
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -55,7 +50,7 @@ class WebProvider implements ServiceProviderInterface
 		$container->alias('uri', 'system.uri')
 			->share(
 				'system.uri',
-				function ($container) use ($app)
+				function (Container $container) use ($app)
 				{
 					return $container->get('system.application')->getServer()->getUriData();
 				}

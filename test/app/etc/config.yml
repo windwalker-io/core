@@ -1,5 +1,6 @@
 system:
     debug: 1
+    error_reporting: -1
     timezone: 'UTC'
 database:
     driver: mysql
@@ -8,6 +9,7 @@ database:
     password: ''
     name: null
     prefix: wind_
+    mysql_strict_mode: true
 session:
     handler: native
     expire_time: 15
@@ -23,18 +25,3 @@ language:
     default: en-GB
     format: ini
     path: resources/languages
-ioc:
-    registry:
-        application: system.application
-        authenticate: system.authenticate
-        input: system.input
-        environment: system.environment
-        dispatcher: system.dispatcher
-        config: system.config
-        database: system.database
-        language: system.language
-        log: system.logger
-        router: system.router
-        session: system.session
-        cache: system.cache
-        debugger: whoops

@@ -12,6 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Console\CoreConsole;
+use Windwalker\Core\Object\NullObject;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
@@ -71,11 +72,17 @@ trait WindwalkerTrait
 	 *
 	 * @return  void
 	 */
-	protected function boot()
+	public function boot()
 	{
 		if ($this->booted)
 		{
 			return;
+		}
+
+		// Version check
+		if (version_compare(PHP_VERSION, '5.6', '<'))
+		{
+			exit('Please use PHP 5.6 or later.');
 		}
 
 		$this->bootTraits($this);
@@ -87,7 +94,14 @@ trait WindwalkerTrait
 		$this->registerPackages();
 
 		// Set some default objects
-		$this->dispatcher = $this->container->get('system.dispatcher');
+		if ($this->container->exists('system.dispatcher'))
+		{
+			$this->dispatcher = $this->container->get('system.dispatcher');
+		}
+		else
+		{
+			$this->dispatcher = new NullObject;
+		}
 
 		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 
@@ -106,7 +120,7 @@ trait WindwalkerTrait
 	{
 		$name = $name ? : $this->getName();
 
-		$file = WINDWALKER_ETC . '/app/' . $name . '.php';
+		$file = $this->configPath . '/' . $name . '.php';
 
 		if (is_file($file))
 		{
