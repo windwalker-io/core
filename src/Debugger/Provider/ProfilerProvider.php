@@ -9,6 +9,7 @@
 namespace Windwalker\Debugger\Provider;
 
 use Windwalker\Data\DataSet;
+use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Core\Profiler\NullProfiler;
@@ -106,10 +107,11 @@ class ProfilerProvider implements ServiceProviderInterface
 		$collector['database.query.total.memory'] = 0;
 		$collector['database.queries'] = array();
 
+		/** @var AbstractDatabaseDriver $db */
 		$db = $container->get('system.database');
 
 		// Set profiler to DatabaseDriver
-		$db->setProfilerHandler(
+		$db->addMiddleware(new DbProfilerMiddleware(
 			function (AbstractDatabaseDriver $db, $sql) use ($container, $collector, &$queryData)
 			{
 				if (stripos(trim($sql), 'EXPLAIN') === 0)
@@ -144,7 +146,7 @@ class ProfilerProvider implements ServiceProviderInterface
 				$collector['database.query.total.time'] = $collector['database.query.total.time'] + $queryData['time']['duration'];
 				$collector['database.query.total.memory'] = $collector['database.query.total.memory'] + $queryData['memory']['duration'];
 			}
-		);
+		));
 	}
 
 	/**

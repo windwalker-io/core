@@ -18,7 +18,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  *
  * @since  {DEPLOY_VERSION}
  */
-class DebugHelper
+class BacktraceHelper
 {
 	/**
 	 * whoCallMe

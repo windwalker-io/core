@@ -53,7 +53,7 @@ class ProfilerListener
 
 		$collector['system.name'] = $event['app']->getName();
 		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::$format);
-		$collector['system.uri']  = $container->get('uri')->toArray();
+		$collector['system.uri']  = get_object_vars($container->get('uri'));
 		$collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
 		$collector['system.method.http']   = $input->getMethod();
 		$collector['system.method.custom'] = strtoupper($input->get('_method'));
@@ -218,7 +218,7 @@ class ProfilerListener
 		$collector->push('controller.executed', array(
 			'controller' => get_class($controller),
 			'task'       => $event['task'],
-			'input'      => $controller->getInput()->getArray(),
+			'input'      => $controller->getInput()->toArray(),
 			'variables'  => $event['variables'],
 		));
 

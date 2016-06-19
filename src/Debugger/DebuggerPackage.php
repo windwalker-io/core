@@ -13,6 +13,7 @@ use Windwalker\Debugger\Listener\DebuggerListener;
 use Windwalker\Debugger\Provider\ProfilerProvider;
 use Windwalker\DI\Container;
 use Windwalker\Event\Dispatcher;
+use Windwalker\Event\DispatcherInterface;
 
 define('WINDWALKER_DEBUGGER_ROOT', __DIR__);
 
@@ -39,7 +40,7 @@ class DebuggerPackage extends AbstractPackage
 	{
 		parent::boot();
 
-		$this->container->getParent()->share('windwalker.debugger', $this);
+		$this->getContainer()->getParent()->share('windwalker.debugger', $this);
 	}
 
 	/**
@@ -57,11 +58,11 @@ class DebuggerPackage extends AbstractPackage
 	/**
 	 * registerListeners
 	 *
-	 * @param Dispatcher $dispatcher
+	 * @param DispatcherInterface $dispatcher
 	 *
 	 * @return  void
 	 */
-	public function registerListeners(Dispatcher $dispatcher)
+	public function registerListeners(DispatcherInterface $dispatcher)
 	{
 		parent::registerListeners($dispatcher);
 
