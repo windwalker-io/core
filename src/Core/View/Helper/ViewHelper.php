@@ -50,6 +50,7 @@ class ViewHelper extends AbstractHelper
 			'app'        => $container->get('system.application'),
 			'package'    => $package,
 			'router'     => $package->router,
+			'asset'      => $container->get('system.asset'),
 			'messages'   => static::$messages,
 			'translator' => $container->get('system.language'),
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))

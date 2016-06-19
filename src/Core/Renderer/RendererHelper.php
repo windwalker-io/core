@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Renderer;
 
-use Windwalker\Core\Proxy\AbstractProxyFacade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Utilities\Queue\PriorityQueue;

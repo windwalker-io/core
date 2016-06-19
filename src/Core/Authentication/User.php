@@ -11,7 +11,7 @@ namespace Windwalker\Core\Authentication;
 use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;
-use Windwalker\Core\Proxy\AbstractProxyFacade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 
 /**
  * The User class.

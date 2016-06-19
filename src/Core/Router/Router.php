@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
-use Windwalker\Core\Proxy\AbstractProxyFacade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Router\Route;
 
 /**

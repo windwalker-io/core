@@ -6,13 +6,13 @@ $root = $data->uri->get('base.path');
 	<meta charset="UTF-8">
 	<title><?php $this->block('page_title'); ?><?php $this->endblock(); ?></title>
 
-	<link rel="shortcut icon" type="image/x-icon" href="<?php echo $root; ?>media/images/favicon.ico" />
+	<link rel="shortcut icon" type="image/x-icon" href="<?php echo $root; ?>asset/images/favicon.ico" />
 	<meta name="generator" content="Windwalker | Windwalker Framework" />
 	<?php $this->block('meta'); ?>
 	<?php $this->endblock(); ?>
 
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-	<link rel="stylesheet" href="<?php echo $root; ?>media/css/main.css" />
+	<link rel="stylesheet" href="<?php echo $root; ?>asset/css/main.css" />
 	<?php $this->block('style'); ?>
 	<?php $this->endblock(); ?>
 

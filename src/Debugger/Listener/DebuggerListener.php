@@ -250,7 +250,7 @@ class DebuggerListener
 		}
 
 		// Prepare CSS
-		$style = $this->package->getDir() . '/Resources/media/css/console/style.css';
+		$style = $this->package->getDir() . '/Resources/asset/css/console/style.css';
 
 		// Prepare Time
 		$points = $profiler->getPoints();

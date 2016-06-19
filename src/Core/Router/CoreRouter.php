@@ -304,6 +304,24 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 	}
 
 	/**
+	 * addBase
+	 *
+	 * @param string $uri
+	 * @param string $path
+	 *
+	 * @return  string
+	 */
+	public function addBase($uri, $path = 'path')
+	{
+		if (strpos($uri, 'http') !== 0 && strpos($uri, '/') !== 0)
+		{
+			$uri = $this->uri->$path . $uri;
+		}
+
+		return $uri;
+	}
+
+	/**
 	 * Get the controller class suffix string.
 	 *
 	 * @param string $method

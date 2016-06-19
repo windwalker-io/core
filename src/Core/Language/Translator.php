@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Language;
 
-use Windwalker\Core\Proxy\AbstractProxyFacade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Language\LanguageNormalize;
 use Windwalker\Language\Language;

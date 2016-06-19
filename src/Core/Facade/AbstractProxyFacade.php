@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Core\Proxy;
+namespace Windwalker\Core\Facade;
 
 /**
  * The AbstractProxyFacade class.

@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Proxy\AbstractProxyFacade;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\IO\Input;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;

@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Proxy;
+namespace Windwalker\Core\Facade;
 
 use Windwalker\Core\Event\DispatcherAwareStaticTrait;
 use Windwalker\Event\Dispatcher;

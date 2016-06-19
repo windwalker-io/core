@@ -90,7 +90,7 @@ class SyncCommand extends Command
 
 		$target = $this->getArgument(1, $packageName);
 
-		$target = $this->console->get('path.public') . '/media/' . $target;
+		$target = $this->console->get('path.public') . '/asset/' . $target;
 
 		$symlink = new Symlink;
 

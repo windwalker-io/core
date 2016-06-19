@@ -10,6 +10,7 @@ namespace Windwalker\Core;
 
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
+use Windwalker\Uri\UriData;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -262,7 +263,7 @@ abstract class Ioc
 	/**
 	 * getUriData
 	 *
-	 * @return  \Windwalker\Registry\Registry
+	 * @return  UriData
 	 */
 	public static function getUriData()
 	{

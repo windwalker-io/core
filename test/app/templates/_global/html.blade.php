@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <title>@yield('page_title')</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['base.path'] }}media/images/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $uri['base.path'] }}asset/images/favicon.ico" />
     <meta name="generator" content="Windwalker | Windwalker Framework" />
     @yield('meta')
 
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ $uri['base.path'] }}media/css/acme/main.css" />
+    <link rel="stylesheet" href="{{ $uri['base.path'] }}asset/css/acme/main.css" />
     @yield('style')
 
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>

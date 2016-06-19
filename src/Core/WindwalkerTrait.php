@@ -91,8 +91,6 @@ trait WindwalkerTrait
 
 		$this->registerProviders();
 
-		$this->registerPackages();
-
 		// Set some default objects
 		if ($this->container->exists('system.dispatcher'))
 		{
@@ -102,6 +100,10 @@ trait WindwalkerTrait
 		{
 			$this->dispatcher = new NullObject;
 		}
+
+		$this->registerListeners();
+
+		$this->registerPackages();
 
 		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 
@@ -184,6 +186,26 @@ trait WindwalkerTrait
 		$resolver->registerPackages($packages);
 
 		return $this;
+	}
+
+	/**
+	 * registerListeners
+	 *
+	 * @return  void
+	 */
+	protected function registerListeners()
+	{
+		$listeners = (array) $this->config->get('listeners');
+
+		foreach ($listeners as $listener)
+		{
+			if (is_string($listener) && class_exists($listener))
+			{
+				$listener = new $listener($this);
+			}
+
+			$this->dispatcher->addListener($listener);
+		}
 	}
 
 	/**
