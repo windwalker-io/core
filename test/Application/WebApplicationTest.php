@@ -83,7 +83,6 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
 	* @return void
 	*
 	* @covers Windwalker\Core\Application\WebApplication::execute
-	* @TODO   Implement testExecute().
 	*/
 	public function testExecute()
 	{

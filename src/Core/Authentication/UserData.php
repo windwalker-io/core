@@ -36,14 +36,4 @@ class UserData extends Data implements UserDataInterface
 	{
 		return !$this->isGuest();
 	}
-
-	/**
-	 * toArray
-	 *
-	 * @return  array
-	 */
-	public function dump()
-	{
-		return iterator_to_array($this);
-	}
 }

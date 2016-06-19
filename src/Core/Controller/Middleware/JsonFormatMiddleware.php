@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller\Middleware;
 
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Data\Data;
+use Windwalker\Http\Helper\ResponseHelper;
 
 /**
  * The RenderViewMiddleware class.
@@ -37,7 +38,7 @@ class JsonFormatMiddleware extends AbstractControllerMiddleware
 		{
 			$data = [];
 
-			if (WINDWALKER_DEBUG)
+			if ($this->controller->app->get('system.debug'))
 			{
 				$traces = array();
 
@@ -54,8 +55,15 @@ class JsonFormatMiddleware extends AbstractControllerMiddleware
 				$data['backtrace'] = $traces;
 			}
 
+			$code = $e->getCode();
+
+			if (!ResponseHelper::validateStatus($code))
+			{
+				$code = 500;
+			}
+
 			$this->controller->setResponse(
-				$this->controller->getResponse()->withStatus($e->getCode())
+				$this->controller->getResponse()->withStatus($code)
 			);
 
 			return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());

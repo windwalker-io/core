@@ -8,10 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Authentication\Authentication;
-use Windwalker\Core\Authentication\Method\DatabaseMethod;
-use Windwalker\Core\Authentication\NullUserHandler;
-use Windwalker\Core\Authentication\User;
+use Windwalker\Core\Authentication\UserManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -33,19 +30,18 @@ class AuthenticationProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			$auth = new Authentication;
+			$auth = new UserManager;
 
 			$dispatcher = $container->get('system.dispatcher');
 
-			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('authentication' => $auth));
+			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('auth' => $auth));
 
 			return $auth;
 		};
 
-		$container->share('system.authentication', $closure)
-			->alias('authentication', 'system.authentication')
-			->alias('auth', 'system.authentication');
-
-		User::setHandler(new NullUserHandler);
+		$container->share(UserManager::class, $closure)
+			->alias(UserManager::class, 'system.user.manager')
+			->alias('user.manager', 'system.user.manager')
+			->alias('auth', 'system.user.manager');
 	}
 }

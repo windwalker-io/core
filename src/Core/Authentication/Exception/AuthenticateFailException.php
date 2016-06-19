@@ -8,11 +8,14 @@
 
 namespace Windwalker\Core\Authentication\Exception;
 
+use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
+
 /**
  * The UserLogoutException class.
  * 
  * @since  2.0
  */
-class AuthenticateException extends \RuntimeException
+class AuthenticateFailException extends \RuntimeException
 {
+	use MultiMessagesExceptionTrait;
 }

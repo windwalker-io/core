@@ -8,12 +8,14 @@
 
 namespace Windwalker\Core\Authentication;
 
+use Windwalker\Data\DataInterface;
+
 /**
  * The UserDataInterface class.
  * 
  * @since  2.0
  */
-interface UserDataInterface
+interface UserDataInterface extends DataInterface
 {
 	/**
 	 * isGuest
@@ -28,34 +30,4 @@ interface UserDataInterface
 	 * @return  boolean
 	 */
 	public function isMember();
-
-	/**
-	 * toArray
-	 *
-	 * @return  array
-	 */
-	public function dump();
-
-	/**
-	 * bind
-	 *
-	 * @param array $data
-	 *
-	 * @return  mixed
-	 */
-	public function bind($data);
-
-	/**
-	 * isNull
-	 *
-	 * @return  boolean
-	 */
-	public function isNull();
-
-	/**
-	 * notNull
-	 *
-	 * @return  boolean
-	 */
-	public function notNull();
 }

@@ -42,13 +42,13 @@ class NullUserHandler implements UserHandlerInterface
 	/**
 	 * delete
 	 *
-	 * @param UserDataInterface $user
+	 * @param array $conditions
 	 *
-	 * @return  boolean
+	 * @return boolean
 	 */
-	public function delete(UserDataInterface $user)
+	public function delete($conditions)
 	{
-		return $user;
+		return true;
 	}
 
 	/**

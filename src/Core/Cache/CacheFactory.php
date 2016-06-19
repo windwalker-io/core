@@ -14,8 +14,6 @@ use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
-use Windwalker\Registry\Registry;
-use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The CacheFactory class.
