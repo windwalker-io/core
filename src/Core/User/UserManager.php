@@ -6,11 +6,16 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Authentication;
+namespace Windwalker\Core\User;
 
 use Windwalker\Authentication\Authentication;
+use Windwalker\Authentication\AuthenticationInterface;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;
+use Windwalker\Authorisation\Authorisation;
+use Windwalker\Authorisation\AuthorisationInterface;
+use Windwalker\Authorisation\PolicyInterface;
+use Windwalker\Authorisation\PolicyProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\EventTriggerableInterface;
@@ -21,7 +26,7 @@ use Windwalker\Registry\Registry;
  *
  * @since  {DEPLOY_VERSION}
  */
-class UserManager extends Authentication implements EventTriggerableInterface, DispatcherAwareInterface
+class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 {
 	use DispatcherAwareTrait;
 
@@ -31,18 +36,68 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 	 * @var  UserHandlerInterface
 	 */
 	protected $handler;
+	/**
+	 * Property authentication.
+	 *
+	 * @var  AuthenticationInterface
+	 */
+	private $authentication;
+	/**
+	 * Property authorisation.
+	 *
+	 * @var  AuthorisationInterface
+	 */
+	private $authorisation;
 
 	/**
 	 * UserManager constructor.
 	 *
-	 * @param UserHandlerInterface $handler
-	 * @param MethodInterface[]    $methods
+	 * @param UserHandlerInterface    $handler
+	 * @param AuthenticationInterface $authentication
+	 * @param AuthorisationInterface  $authorisation
 	 */
-	public function __construct(UserHandlerInterface $handler = null, array $methods = [])
+	public function __construct(UserHandlerInterface $handler = null, AuthenticationInterface $authentication = null,
+		AuthorisationInterface $authorisation = null)
 	{
-		$this->handler = $handler;
-		
-		parent::__construct($methods);
+		$this->handler = $handler ? : new NullUserHandler;
+		$this->authentication = $authentication ? : new Authentication;
+		$this->authorisation = $authorisation ? : new Authorisation;
+	}
+
+	/**
+	 * authorise
+	 *
+	 * @param string            $policy
+	 * @param UserDataInterface $user
+	 * @param mixed             ...$data
+	 *
+	 * @return  bool
+	 */
+	public function authorise($policy, UserDataInterface $user, ...$data)
+	{
+		return $this->getAuthorisation()->authorise($policy, $user, ...$data);
+	}
+
+	/**
+	 * authenticate
+	 *
+	 * @param Credential $credential
+	 *
+	 * @return  bool|Credential
+	 */
+	public function authenticate(Credential $credential)
+	{
+		return $this->getAuthentication()->authenticate($credential);
+	}
+
+	/**
+	 * Method to get property Results
+	 *
+	 * @return  array
+	 */
+	public function getAuthResults()
+	{
+		return $this->getAuthentication()->getResults();
 	}
 
 	/**
@@ -74,13 +129,14 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 		$event = $this->triggerEvent('onUserBeforeLogin', ['user' => &$user, 'options' => &$options]);
 
 		// Do login
-		if ($result = $this->authenticate($event['user']))
+		if ($result = $this->authentication->authenticate($event['user']))
 		{
-			$user = $this->getCredential();
+			$user = $this->authentication->getCredential();
 
 			// Authorise event
 			$this->triggerEvent('onUserAuthorisation', [
 				'user'    => &$user,
+				'authorisation' => $this->getAuthorisation(),
 				'options' => &$options,
 				'result'  => &$result
 			]);
@@ -194,6 +250,18 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 	}
 
 	/**
+	 * Alias of getUser().
+	 *
+	 * @param array $conditions
+	 *
+	 * @return  UserDataInterface
+	 */
+	public function get($conditions = array())
+	{
+		return $this->getUser($conditions);
+	}
+
+	/**
 	 * save
 	 *
 	 * @param array $user
@@ -265,6 +333,50 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 	}
 
 	/**
+	 * addPolicy
+	 *
+	 * @param   string                    $name
+	 * @param   callable|PolicyInterface  $handler
+	 *
+	 * @return  static
+	 */
+	public function addPolicy($name, $handler)
+	{
+		$this->getAuthorisation()->addPolicy($name, $handler);
+
+		return $this;
+	}
+
+	/**
+	 * registerPolicyProvider
+	 *
+	 * @param PolicyProviderInterface $provider
+	 *
+	 * @return  static
+	 */
+	public function registerPolicyProvider(PolicyProviderInterface $provider)
+	{
+		$this->getAuthorisation()->registerPolicyProvider($provider);
+
+		return $this;
+	}
+
+	/**
+	 * addAuthMethod
+	 *
+	 * @param string          $name
+	 * @param MethodInterface $method
+	 *
+	 * @return  static
+	 */
+	public function addAuthMethod($name, MethodInterface $method)
+	{
+		$this->getAuthentication()->addMethod($name, $method);
+
+		return $this;
+	}
+
+	/**
 	 * Method to get property Handler
 	 *
 	 * @return  UserHandlerInterface
@@ -284,11 +396,13 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 	 *
 	 * @param   UserHandlerInterface $handler
 	 *
-	 * @return  void
+	 * @return  static
 	 */
 	public function setHandler(UserHandlerInterface $handler)
 	{
 		$this->handler = $handler;
+		
+		return $this;
 	}
 
 	/**
@@ -299,5 +413,53 @@ class UserManager extends Authentication implements EventTriggerableInterface, D
 	public function hasHandler()
 	{
 		return !empty($this->handler);
+	}
+
+	/**
+	 * Method to get property Authorisation
+	 *
+	 * @return  AuthorisationInterface
+	 */
+	public function getAuthorisation()
+	{
+		return $this->authorisation;
+	}
+
+	/**
+	 * Method to set property authorisation
+	 *
+	 * @param   AuthorisationInterface $authorisation
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setAuthorisation($authorisation)
+	{
+		$this->authorisation = $authorisation;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Authentication
+	 *
+	 * @return  AuthenticationInterface
+	 */
+	public function getAuthentication()
+	{
+		return $this->authentication;
+	}
+
+	/**
+	 * Method to set property authentication
+	 *
+	 * @param   AuthenticationInterface $authentication
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setAuthentication($authentication)
+	{
+		$this->authentication = $authentication;
+
+		return $this;
 	}
 }

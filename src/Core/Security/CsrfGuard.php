@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Security;
 
-use Windwalker\Core\Authentication\User;
+use Windwalker\Core\User\User;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;

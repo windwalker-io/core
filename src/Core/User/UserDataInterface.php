@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authentication;
+namespace Windwalker\Core\User;
 
 use Windwalker\Data\DataInterface;
 

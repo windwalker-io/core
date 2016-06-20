@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Authentication\Exception;
+namespace Windwalker\Core\User\Exception;
 
 use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
 

@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Security;
 
-use Windwalker\Core\Authentication\User;
+use Windwalker\Core\User\User;
 use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Core\Ioc;
 use Windwalker\Dom\HtmlElement;
