@@ -11,6 +11,7 @@ namespace Windwalker\Core\Renderer;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
 use Windwalker\Core\Renderer\Finder\TwigFilesystemLoader;
+use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 
 /**
@@ -21,6 +22,7 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 class TwigRenderer extends \Windwalker\Renderer\TwigRenderer implements CoreRendererInterface
 {
 	use PackageFinderTrait;
+	use GlobalVarsTrait;
 
 	/**
 	 * getLoader

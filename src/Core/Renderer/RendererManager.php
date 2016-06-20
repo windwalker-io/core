@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Renderer;
 
+use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
+use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\DI\Container;
 use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Renderer\MustacheRenderer;
@@ -22,8 +24,10 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  *
  * @since  {DEPLOY_VERSION}
  */
-class RendererFactory
+class RendererManager
 {
+	use GlobalVarsTrait;
+
 	const ENGINE_PHP      = 'php';
 	const ENGINE_BLADE    = 'blade';
 	const ENGINE_EDGE     = 'edge';
@@ -38,6 +42,13 @@ class RendererFactory
 	 * @since  2.0
 	 */
 	protected $paths;
+
+	/**
+	 * Property helpers.
+	 *
+	 * @var  AbstractHelper[]
+	 */
+	protected $helpers = [];
 
 	/**
 	 * Property container.
@@ -115,10 +126,11 @@ class RendererFactory
 			}
 		}
 
-		/** @var AbstractRenderer|CoreRendererInterface $renderer */
+		/** @var AbstractRenderer|CoreRendererInterface|GlobalVarsTrait $renderer */
 		$renderer = new $class(static::getGlobalPaths(), $config);
 
 		$renderer->setPackageFinder($this->container->get('package.finder'));
+		$renderer->setGlobals($this->getGlobals());
 
 		return $renderer;
 	}
@@ -157,6 +169,8 @@ class RendererFactory
 	 * @param array $config
 	 *
 	 * @return  EdgeRenderer
+	 *
+	 * @since   3.0
 	 */
 	public function getEdgeRenderer($config = array())
 	{
@@ -311,6 +325,62 @@ class RendererFactory
 		}
 
 		$this->paths = $paths;
+
+		return $this;
+	}
+
+	/**
+	 * addHelper
+	 *
+	 * @param   string $name
+	 * @param   object $helper
+	 *
+	 * @return  static
+	 */
+	public function addHelper($name, $helper)
+	{
+		$this->helpers[$name] = $helper;
+
+		return $this;
+	}
+
+	/**
+	 * getHelper
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  AbstractHelper|object
+	 */
+	public function getHelper($name)
+	{
+		if (empty($this->helpers[$name]))
+		{
+			return null;
+		}
+
+		return $this->helpers[$name];
+	}
+
+	/**
+	 * Method to get property Helpers
+	 *
+	 * @return  \Windwalker\Core\View\Helper\AbstractHelper[]
+	 */
+	public function getHelpers()
+	{
+		return $this->helpers;
+	}
+
+	/**
+	 * Method to set property helpers
+	 *
+	 * @param   \Windwalker\Core\View\Helper\AbstractHelper[] $helpers
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setHelpers($helpers)
+	{
+		$this->helpers = $helpers;
 
 		return $this;
 	}

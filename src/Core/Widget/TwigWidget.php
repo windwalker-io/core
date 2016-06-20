@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Widget;
 
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\View\Twig\WindwalkerExtension;
+use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\Priority;
 

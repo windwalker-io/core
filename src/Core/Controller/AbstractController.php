@@ -459,11 +459,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 			try
 			{
-				$view = $package->getMvcResolver()->getViewResolver()->create($viewName);
+				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, null, $this->getConfig());
 			}
 			catch (\UnexpectedValueException $e)
 			{
-				$view = new HtmlView;
+				$view = new HtmlView(null, $this->getConfig());
 			}
 
 			$config = clone $this->config;
@@ -472,8 +472,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			{
 				$config['name'] = null;
 			}
-
-			$view->setConfig($config);
 
 			$this->container->share($key, $view)->alias(get_class($view), $key);
 		}

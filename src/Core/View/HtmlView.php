@@ -9,12 +9,16 @@
 namespace Windwalker\Core\View;
 
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Renderer\RendererManager;
+use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
+use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Core\View\Traits\LayoutRenderableTrait;
 use Windwalker\Data\Data;
 use Windwalker\Filesystem\Path;
 use Windwalker\Renderer\AbstractRenderer;
+use Windwalker\Renderer\RendererInterface;
 
 /**
  * The AbstractHtmlView class.
@@ -26,23 +30,46 @@ class HtmlView extends AbstractView
 	use LayoutRenderableTrait;
 
 	/**
+	 * Property helperSet.
+	 *
+	 * @var  HelperSet
+	 */
+	protected $helperSet;
+
+	/**
 	 * Method to instantiate the view.
 	 *
 	 * @param   array                   $data     The data array.
+	 * @param   array                   $config   The view config.
 	 * @param   string|AbstractRenderer $renderer The renderer engine.
 	 */
-	public function __construct(array $data = null, $renderer = null)
+	public function __construct(array $data = null, $config = null, $renderer = null)
 	{
+		parent::__construct($data, $config);
+
 		if ($renderer === null)
 		{
-			$renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
+			$this->renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
+		}
+		
+		$this->data = new Data($this->data);
+	}
+
+	/**
+	 * boot
+	 *
+	 * @return  void
+	 */
+	public function boot()
+	{
+		if ($this->booted)
+		{
+			return;
 		}
 
-		$this->setRenderer($renderer);
+		$this->setRenderer($this->renderer);
 
-		parent::__construct($data);
-
-		$this->data = new Data($this->data);
+		$this->booted = true;
 	}
 
 	/**
@@ -69,9 +96,55 @@ class HtmlView extends AbstractView
 	 */
 	public function render()
 	{
+		$this->boot();
+
 		$this->registerPaths();
 
 		return parent::render();
+	}
+
+	/**
+	 * addHelper
+	 *
+	 * @param   string                 $name
+	 * @param   object|AbstractHelper  $helper
+	 *
+	 * @return  static
+	 */
+	public function addHelper($name, $helper)
+	{
+		$this->getHelperSet()->addHelper($name, $helper);
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property HelperSet
+	 *
+	 * @return  HelperSet
+	 */
+	public function getHelperSet()
+	{
+		if (!$this->helperSet)
+		{
+			$this->helperSet = new HelperSet($this);
+		}
+
+		return $this->helperSet;
+	}
+
+	/**
+	 * Method to set property helperSet
+	 *
+	 * @param   HelperSet $helperSet
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setHelperSet($helperSet)
+	{
+		$this->helperSet = $helperSet;
+
+		return $this;
 	}
 
 	/**
@@ -100,9 +173,17 @@ class HtmlView extends AbstractView
 		$data->view->name = $this->getName();
 		$data->view->layout = $this->getLayout();
 
-		$data->helper = new HelperSet($this);
+		$data->helper = $this->getHelperSet();
 
-		$globals = ViewHelper::getGlobalVariables($this->getPackage());
+		foreach ($this->getRendererManager()->getHelpers() as $name => $helper)
+		{
+			$data->helper->addHelper($name, $helper);
+		}
+
+		$globals  = $this->getRendererManager()->getGlobals();
+
+		$globals['package'] = $this->getPackage();
+		$globals['router'] = $this->getPackage()->router;
 
 		$data->bind($globals);
 	}

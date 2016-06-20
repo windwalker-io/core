@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Renderer;
 
 use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
+use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 use Windwalker\Utilities\Queue\Priority;
 
@@ -20,6 +21,7 @@ use Windwalker\Utilities\Queue\Priority;
 class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRendererInterface
 {
 	use PackageFinderTrait;
+	use GlobalVarsTrait;
 
 	/**
 	 * createSelf

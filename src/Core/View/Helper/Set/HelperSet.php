@@ -158,12 +158,12 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * addHelper
 	 *
-	 * @param   string         $name
-	 * @param   AbstractHelper $helper
+	 * @param   string $name
+	 * @param   object $helper
 	 *
 	 * @return  static
 	 */
-	public function addHelper($name, AbstractHelper $helper)
+	public function addHelper($name, $helper)
 	{
 		$this->helpers[$name] = $helper;
 

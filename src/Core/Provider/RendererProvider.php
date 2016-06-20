@@ -9,9 +9,10 @@
 namespace Windwalker\Core\Provider;
 
 use Illuminate\View\Compilers\BladeCompiler;
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Renderer\Finder\PackageFinder;
-use Windwalker\Core\Renderer\RendererFactory;
-use Windwalker\Core\View\Twig\WindwalkerExtension;
+use Windwalker\Core\Renderer\RendererManager;
+use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer;
@@ -21,8 +22,15 @@ use Windwalker\Renderer;
  *
  * @since  2.1.1
  */
-class TemplateEngineProvider implements ServiceProviderInterface
+class RendererProvider implements ServiceProviderInterface
 {
+	/**
+	 * Property messages.
+	 *
+	 * @var  array
+	 */
+	protected static $messages;
+
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -46,17 +54,25 @@ class TemplateEngineProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			return new RendererFactory($container);
+			$manager = new RendererManager($container);
+
+			// Prepare Globals
+			$this->prepareGlobals($container, $manager);
+
+			return $manager;
 		};
 
-		$container->share('renderer.factory', $closure);
+		$container->share(RendererManager::class, $closure)
+			->alias('system.renderer.manager', RendererManager::class)
+			->alias('renderer.manager', RendererManager::class);
 
 		$closure = function(Container $container)
 		{
 			return new PackageFinder($container->get('package.resolver'));
 		};
 
-		$container->share('package.finder', $closure);
+		$container->share(PackageFinder::class, $closure)
+			->alias('package.finder', PackageFinder::class);
 	}
 
 	/**
@@ -136,5 +152,43 @@ class TemplateEngineProvider implements ServiceProviderInterface
 		{
 			Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
 		}
+	}
+
+	/**
+	 * prepareGlobals
+	 *
+	 * @param Container       $container
+	 * @param RendererManager $manager
+	 *
+	 * @return  RendererManager
+	 */
+	protected function prepareGlobals(Container $container, RendererManager $manager)
+	{
+		if (static::$messages === null)
+		{
+			static::$messages = $container->get('system.session')
+				->getFlashBag()
+				->takeAll();
+		}
+
+		$globals = array(
+			'uri'        => $container->get('system.uri'),
+			'app'        => $container->get('system.application'),
+			'asset'      => $container->get('system.asset'),
+			'messages'   => static::$messages,
+			'translator' => $container->get('system.language'),
+			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('system.config')->get('system.timezone', 'UTC')))
+		);
+
+		$manager->setGlobals($globals);
+
+		/** @var EventDispatcher $dispatcher */
+		$dispatcher = $container->get('system.dispatcher');
+
+		$dispatcher->triggerEvent('onRendererPrepareGlobals', [
+			'manager' => $manager
+		]);
+
+		return $manager;
 	}
 }

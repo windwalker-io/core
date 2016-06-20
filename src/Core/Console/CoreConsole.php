@@ -34,7 +34,7 @@ use Windwalker\Session\Session;
  * @property-read  AbstractDatabaseDriver        database
  * @property-read  Core\Router\CoreRouter        router
  * @property-read  Language                      language
- * @property-read  Core\Renderer\RendererFactory renderer
+ * @property-read  Core\Renderer\RendererManager renderer
  * @property-read  Core\Cache\CacheFactory       cache
  * @property-read  Session                       session
  * 

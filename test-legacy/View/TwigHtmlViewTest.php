@@ -14,7 +14,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Test\View\Stub\StubExtension;
 use Windwalker\Core\Test\View\Stub\StubTwigHtmlView;
 use Windwalker\Core\View\Helper\Set\HelperSet;
-use Windwalker\Core\View\Twig\WindwalkerExtension;
+use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
 use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
 use Windwalker\Registry\Registry;

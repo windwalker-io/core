@@ -10,7 +10,7 @@ namespace Windwalker\Core\Renderer;
 
 use Illuminate\View\FileViewFinder;
 use Windwalker\Core\Renderer\Finder\BladeFinder;
-use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
+use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 
 /**
@@ -21,6 +21,7 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 class BladeRenderer extends \Windwalker\Renderer\BladeRenderer implements CoreRendererInterface
 {
 	use PackageFinderTrait;
+	use GlobalVarsTrait;
 
 	/**
 	 * Method to get property Finder

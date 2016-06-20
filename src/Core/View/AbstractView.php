@@ -75,13 +75,21 @@ abstract class AbstractView implements \ArrayAccess
 	protected $model;
 
 	/**
+	 * Property booted.
+	 *
+	 * @var  boolean
+	 */
+	protected $booted = false;
+
+	/**
 	 * Method to instantiate the view.
 	 *
-	 * @param   array   $data  The data array.
+	 * @param   array  $data    The data array.
+	 * @param   array  $config  The view config.
 	 */
-	public function __construct($data = null)
+	public function __construct($data = null, $config = null)
 	{
-		$this->config = new Registry;
+		$this->config = $config instanceof Registry ? $config : new Registry($config);
 		$this->model  = new ViewModel;
 
 		$this->setData($data);
@@ -97,6 +105,15 @@ abstract class AbstractView implements \ArrayAccess
 	 * @return  void
 	 */
 	protected function init()
+	{
+	}
+
+	/**
+	 * boot
+	 *
+	 * @return  void
+	 */
+	public function boot()
 	{
 	}
 
@@ -359,7 +376,7 @@ abstract class AbstractView implements \ArrayAccess
 			$class = get_called_class();
 
 			// If we are using this class as default view, return default name.
-			if ($class == PhpHtmlView::class)
+			if ($class == HtmlView::class)
 			{
 				return $this->name = 'default';
 			}
@@ -568,7 +585,7 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function getRouter()
 	{
-		return $this->getPackage()->getRouter();
+		return $this->getPackage()->router;
 	}
 
 	/**

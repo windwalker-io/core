@@ -10,6 +10,7 @@ namespace Windwalker\Core\View\Traits;
 
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;
 use Windwalker\Renderer\AbstractRenderer;
@@ -23,6 +24,13 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 trait LayoutRenderableTrait
 {
 	/**
+	 * Property layout.
+	 *
+	 * @var  string
+	 */
+	protected $layout = 'default';
+
+	/**
 	 * Property renderer.
 	 *
 	 * @var  AbstractRenderer
@@ -30,11 +38,11 @@ trait LayoutRenderableTrait
 	protected $renderer;
 
 	/**
-	 * Property layout.
+	 * Property rendererManager.
 	 *
-	 * @var  string
+	 * @var  RendererManager
 	 */
-	protected $layout = 'default';
+	protected $rendererManager;
 
 	/**
 	 * Method to get property Layout
@@ -67,6 +75,8 @@ trait LayoutRenderableTrait
 	 */
 	public function getRenderer()
 	{
+		$this->boot();
+
 		return $this->renderer;
 	}
 
@@ -79,7 +89,7 @@ trait LayoutRenderableTrait
 	 */
 	public function setRenderer($renderer)
 	{
-		$this->renderer = $renderer instanceof AbstractRenderer ? : RendererHelper::getRenderer((string) $renderer);
+		$this->renderer = $renderer instanceof AbstractRenderer ? : $this->getRendererManager()->getRenderer((string) $renderer);
 
 		return $this;
 	}
@@ -100,7 +110,7 @@ trait LayoutRenderableTrait
 		 * @var PriorityQueue $paths
 		 * @var Registry      $config
 		 */
-		$paths   = $this->renderer->getPaths();
+		$paths   = $this->getRenderer()->getPaths();
 		$config  = $this->getPackage()->getContainer()->get('config');
 		$ref     = new \ReflectionClass($this);
 		$package = $this->getPackage();
@@ -205,6 +215,35 @@ trait LayoutRenderableTrait
 		{
 			$this->addPath($path, $priority);
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property RendererManager
+	 *
+	 * @return  RendererManager
+	 */
+	public function getRendererManager()
+	{
+		if (!$this->rendererManager)
+		{
+			$this->rendererManager = $this->getPackage()->getContainer()->get('system.renderer.manager');
+		}
+
+		return $this->rendererManager;
+	}
+
+	/**
+	 * Method to set property rendererManager
+	 *
+	 * @param   RendererManager $rendererManager
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRendererManager($rendererManager)
+	{
+		$this->rendererManager = $rendererManager;
 
 		return $this;
 	}

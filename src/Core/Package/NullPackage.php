@@ -9,11 +9,9 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Object\SilencerObjectInterface;
-use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
-use Windwalker\Event\Dispatcher;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Registry\Registry;
 
 /**
@@ -29,28 +27,6 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 * @var string
 	 */
 	public $dir;
-
-	/**
-	 * __get
-	 *
-	 * @param $name
-	 *
-	 * @return  mixed
-	 */
-	public function __get($name)
-	{
-		if ($name == 'router')
-		{
-			if (!$this->router)
-			{
-				$this->router = $this->getRouter();
-			}
-
-			return $this->router;
-		}
-
-		return null;
-	}
 
 	/**
 	 * __set
@@ -123,19 +99,6 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	}
 
 	/**
-	 * buildRoute
-	 *
-	 * @param string         $route
-	 * @param boolean|string $package
-	 *
-	 * @return  string
-	 */
-	public function buildRoute($route, $package = null)
-	{
-		return null;
-	}
-
-	/**
 	 * Set the DI container.
 	 *
 	 * @param   Container  $container  The DI container.
@@ -200,28 +163,6 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	}
 
 	/**
-	 * Method to get property RoutingPrefix
-	 *
-	 * @return  string
-	 */
-	public function getRoutingPrefix()
-	{
-		return '';
-	}
-
-	/**
-	 * Method to set property routingPrefix
-	 *
-	 * @param   string $routingPrefix
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRoutingPrefix($routingPrefix)
-	{
-		return $this;
-	}
-
-	/**
 	 * Register providers.
 	 *
 	 * @param Container $container
@@ -235,11 +176,11 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * registerListeners
 	 *
-	 * @param Dispatcher $dispatcher
+	 * @param DispatcherInterface $dispatcher
 	 *
 	 * @return  void
 	 */
-	public function registerListeners(Dispatcher $dispatcher)
+	public function registerListeners(DispatcherInterface $dispatcher)
 	{
 	}
 
@@ -306,20 +247,6 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 * @since   2.1
 	 */
 	public function setTask($task)
-	{
-		return $this;
-	}
-
-	/**
-	 * Method to set property variables
-	 *
-	 * @param   array $variables
-	 *
-	 * @return  static  Return self to support chaining.
-	 *
-	 * @since   2.1
-	 */
-	public function setVariables($variables)
 	{
 		return $this;
 	}
