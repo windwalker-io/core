@@ -13,8 +13,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Middleware\MiddlewareInterface;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Route;
 use Windwalker\String\StringHelper;
+use Windwalker\String\StringNormalise;
 use Windwalker\Uri\UriHelper;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -91,7 +93,36 @@ class RoutingMiddleware extends AbstractWebMiddleware
 			'port'   => $uri->getPort()
 		);
 
-		return $router->match($route, $method, $options);
+		try
+		{
+			return $router->match($route, $method, $options);
+		}
+		catch (RouteNotFoundException $e)
+		{
+			$route = explode('/', $route);
+			$controller = array_pop($route);
+			$class = StringNormalise::toClassNamespace(
+				sprintf(
+					'%s\Controller\%s\%s',
+					implode($route, '\\'),
+					ucfirst($controller),
+					$router->fetchControllerSuffix($method)
+				)
+			);
+			
+			if (!class_exists($class))
+			{
+				throw new RouteNotFoundException($e->getMessage(), $e->getCode(), $e);
+			}
+			
+			$matched = new Route(implode($route, '.') . '@' . $controller, implode($route, '/'));
+			
+			$matched->setExtra(array(
+				'controller' => $class
+			));
+			
+			return $matched;
+		}
 	}
 
 	/**
