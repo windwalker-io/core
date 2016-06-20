@@ -41,7 +41,9 @@ class AssetProvider implements ServiceProviderInterface
 			$asset = new AssetManager([
 				'uri_path' => rtrim($uri->path, '/') . '/' . $config->get('asset.uri', 'asset'),
 				'uri_root' => rtrim($uri->root, '/') . '/' . $config->get('asset.uri', 'asset'),
-				'public_sys_path' => $config->get('path.public')
+				'public_sys_path' => $config->get('path.public'),
+				'cache_path' => $config->get('path.cache', sys_get_temp_dir()),
+				'debug' => $config->get('system.debug')
 			]);
 			
 			$asset->setDispatcher($container->get('system.dispatcher'));

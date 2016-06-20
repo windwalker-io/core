@@ -305,11 +305,11 @@ class AssetManager implements DispatcherAwareInterface
 			return $this->version;
 		}
 
-		$sumFile = WINDWALKER_CACHE . '/phoenix/asset/MD5SUM';
+		$sumFile = $this->getOption('cache_path') . '/asset/MD5SUM';
 
 		if (!is_file($sumFile))
 		{
-			if (WINDWALKER_DEBUG)
+			if ($this->getOption('debug'))
 			{
 				return $this->version = md5(uniqid());
 			}
@@ -567,7 +567,7 @@ class AssetManager implements DispatcherAwareInterface
 		}
 
 		// Use uncompressed file first
-		if (WINDWALKER_DEBUG)
+		if ($this->getOption('debug'))
 		{
 			if (is_file($root . '/' . $assetFile))
 			{

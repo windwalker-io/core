@@ -82,7 +82,7 @@ class CopyConfigCommand extends Command
 		$dir = $package->getDir();
 
 		// Config
-		$targetFolder = WINDWALKER_ETC . '/package';
+		$targetFolder = $this->console->get('path.etc') . '/package';
 		$file = $dir . '/config.dist.yml';
 		$target = $targetFolder . '/' . $pkgName . '.yml';
 
@@ -100,7 +100,7 @@ class CopyConfigCommand extends Command
 		}
 
 		$file = $dir . '/secret.dist.yml';
-		$target = WINDWALKER_ETC . '/secret.yml';
+		$target = $this->console->get('path.etc') . '/secret.yml';
 
 		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <info>etc/secret.yml</info> [Y/n]: ", true))
 		{

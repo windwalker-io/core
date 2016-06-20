@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
+use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringHelper;
 
 /**
@@ -17,6 +19,8 @@ use Windwalker\String\StringHelper;
  */
 class AssetTemplate
 {
+	use OptionAccessTrait;
+
 	/**
 	 * Property templates.
 	 *
@@ -32,6 +36,16 @@ class AssetTemplate
 	protected $currentName;
 
 	/**
+	 * AssetTemplate constructor.
+	 *
+	 * @param array $options
+	 */
+	public function __construct(array $options = [])
+	{
+		$this->options = $options;
+	}
+
+	/**
 	 * addTemplate
 	 *
 	 * @param string $name
@@ -42,7 +56,7 @@ class AssetTemplate
 	 */
 	public function addTemplate($name, $string, $data = array())
 	{
-		$this->templates[$name] = StringHelper::parseVariable($string, $data);
+		$this->templates[$name] = SimpleTemplate::render($string, $data);
 
 		return $this;
 	}
@@ -85,14 +99,14 @@ class AssetTemplate
 	{
 		$html = '';
 
-		if (WINDWALKER_DEBUG)
+		if ($this->getOption('debug'))
 		{
 			$html .= "\n\n<!-- Start Asset Template -->\n\n";
 		}
 
 		foreach ($this->templates as $name => $template)
 		{
-			if (WINDWALKER_DEBUG)
+			if ($this->getOption('debug'))
 			{
 				$html .= sprintf("\n<!-- $name -->\n");
 			}

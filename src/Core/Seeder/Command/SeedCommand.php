@@ -117,7 +117,7 @@ class SeedCommand extends Command
 
 				if ($file[0] != '/' && substr($file, 1, 2) != ':\\')
 				{
-					$file = WINDWALKER_ROOT . '/' . $file;
+					$file = $this->console->get('path.root') . '/' . $file;
 				}
 			}
 

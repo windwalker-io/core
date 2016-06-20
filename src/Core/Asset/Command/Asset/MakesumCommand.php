@@ -30,7 +30,7 @@ class MakesumCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Make media sum files';
+	protected $description = 'Make asset sum files';
 
 	/**
 	 * initialise
@@ -48,13 +48,15 @@ class MakesumCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		Folder::create(WINDWALKER_CACHE . '/riki');
+		$cachePath = $this->getOption('cache_path');
+
+		Folder::create($cachePath . '/asset');
 
 		$sum = md5(uniqid());
 
-		file_put_contents(WINDWALKER_CACHE . '/riki/MD5SUM', $sum);
+		file_put_contents($cachePath . '/asset/MD5SUM', $sum);
 
-		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . WINDWALKER_CACHE . '/riki/MD5SUM</info>');
+		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . $cachePath . '/asset/MD5SUM</info>');
 
 		return true;
 	}
