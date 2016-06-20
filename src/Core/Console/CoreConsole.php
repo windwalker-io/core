@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Console;
 
 use Windwalker\Console\Console;
+use Windwalker\Console\IO\IOFactory;
 use Windwalker\Console\IO\IOInterface;
+use Windwalker\Console\IO\NullInput;
 use Windwalker\Core;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
@@ -112,6 +114,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	protected function init()
 	{
+
 	}
 
 	/**
@@ -168,6 +171,39 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 		$this->triggerEvent('onAfterExecute');
 
 		return $this->postExecute($exitCode);
+	}
+
+	/**
+	 * Register default command.
+	 *
+	 * @return  static  Return this object to support chaining.
+	 *
+	 * @since  2.0
+	 */
+	public function registerRootCommand()
+	{
+		parent::registerRootCommand();
+
+		$this->getRootCommand()
+			->addGlobalOption('n')
+			->alias('no-interactive')
+			->defaultValue(false)
+			->description('Ignore interactions and assume to yes.');
+
+		return $this;
+	}
+
+	/**
+	 * Prepare execute hook.
+	 *
+	 * @return  void
+	 */
+	protected function prepareExecute()
+	{
+		if ($this->getRootCommand()->getOption('n'))
+		{
+			IOFactory::getIO()->setInput(new NullInput);
+		}
 	}
 
 	/**
