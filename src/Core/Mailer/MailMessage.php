@@ -8,6 +8,10 @@
 
 namespace Windwalker\Core\Mailer;
 
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Renderer\RendererInterface;
+
 /**
  * The MailMessage class.
  *
@@ -220,6 +224,27 @@ class MailMessage
 		}
 
 		$this->files[] = $file;
+
+		return $this;
+	}
+
+	/**
+	 * renderBody
+	 *
+	 * @param string                   $layout
+	 * @param array                    $data
+	 * @param string|RendererInterface $engine
+	 * @param string|AbstractPackage   $package
+	 * @param string                   $prefix
+	 *
+	 * @return static
+	 */
+	public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
+	{
+		$widget = WidgetHelper::createWidget($layout, $engine, $package);
+		$widget->setPathPrefix($prefix);
+
+		$this->body($widget->render($data), true);
 
 		return $this;
 	}

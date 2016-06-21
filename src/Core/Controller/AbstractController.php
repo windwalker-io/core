@@ -439,38 +439,39 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * getView
 	 *
 	 * @param string $name
-	 * @param string $type
+	 * @param string $engine
+	 * @param array  $data
 	 * @param bool   $forceNew
 	 *
-	 * @return  HtmlView|AbstractView
+	 * @return AbstractView|HtmlView
 	 */
-	public function getView($name = null, $type = 'html', $forceNew = false)
+	public function getView($name = null, $engine = null, $data = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
-		$key = ViewResolver::getDIKey($name . '.' . $type);
+		$key = ViewResolver::getDIKey($name . '.' . strtolower($engine));
 
 		if (!$this->container->exists($key))
 		{
 			// Find if package exists
 			$package = $this->getPackage();
 
-			$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($type));
-
-			try
-			{
-				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, null, $this->getConfig());
-			}
-			catch (\UnexpectedValueException $e)
-			{
-				$view = new HtmlView(null, $this->getConfig());
-			}
+			$viewName = sprintf('%s\%sView', ucfirst($name), ucfirst($name));
 
 			$config = clone $this->config;
 
 			if ($name && strcasecmp($name, $this->getName()) !== 0)
 			{
 				$config['name'] = null;
+			}
+			
+			try
+			{
+				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, $data, $config, $engine);
+			}
+			catch (\UnexpectedValueException $e)
+			{
+				$view = new HtmlView($data, $config, $engine);
 			}
 
 			$this->container->share($key, $view)->alias(get_class($view), $key);

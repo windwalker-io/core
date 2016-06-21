@@ -156,8 +156,8 @@ trait LayoutRenderableTrait
 
 		$this->registerPaths();
 
-		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.locale'), PriorityQueue::BELOW_NORMAL);
-		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->package->app->get('language.default'), PriorityQueue::BELOW_NORMAL);
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.locale'), PriorityQueue::BELOW_NORMAL);
+		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.default'), PriorityQueue::BELOW_NORMAL);
 
 		$this->config['path.multilingual_registered'] = true;
 	}

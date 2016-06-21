@@ -13,6 +13,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Utilities\Classes\ArrayAccessTrait;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;
@@ -25,8 +26,10 @@ use Windwalker\Utilities\Queue\Priority;
  * 
  * @since  2.0
  */
-class Widget implements WidgetInterface
+class Widget implements \ArrayAccess
 {
+	use ArrayAccessTrait;
+
 	/**
 	 * Property renderer.
 	 *
@@ -40,6 +43,13 @@ class Widget implements WidgetInterface
 	 * @var string
 	 */
 	protected $layout;
+
+	/**
+	 * Property pathPrefix.
+	 *
+	 * @var  string
+	 */
+	protected $pathPrefix;
 
 	/**
 	 * Property pathRegistered.
@@ -63,16 +73,27 @@ class Widget implements WidgetInterface
 	protected $package;
 
 	/**
+	 * Property shares.
+	 *
+	 * @var  array
+	 */
+	protected $data = [];
+
+	/**
 	 * Class init.
 	 *
-	 * @param string                  $layout
-	 * @param RendererInterface       $renderer
-	 * @param string|AbstractPackage  $package
+	 * @param string                    $layout
+	 * @param string|RendererInterface  $renderer
+	 * @param string|AbstractPackage    $package
 	 */
-	public function __construct($layout, RendererInterface $renderer = null, $package = null)
+	public function __construct($layout, $renderer = null, $package = null)
 	{
-		$this->layout   = $layout;
-		$this->renderer = $renderer ? : RendererHelper::getPhpRenderer();
+		$this->layout = $layout;
+
+		// Prepare renderer
+		$this->renderer = $renderer ? : $this->renderer;
+		$this->renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
+		$this->renderer = $this->renderer instanceof RendererInterface ? $this->renderer : RendererHelper::getPhpRenderer();
 
 		if (!$package)
 		{
@@ -117,6 +138,8 @@ class Widget implements WidgetInterface
 
 		$data = new Data($data);
 
+		$this->prepareData($data);
+
 		$this->prepareGlobals($data);
 
 		if ($this->isDebug())
@@ -125,6 +148,17 @@ class Widget implements WidgetInterface
 		}
 
 		return $this->renderer->render($this->layout, $data);
+	}
+
+	/**
+	 * prepareData
+	 *
+	 * @param   Data  $data
+	 *
+	 * @return  void
+	 */
+	protected function prepareData($data)
+	{
 	}
 
 	/**
@@ -187,7 +221,10 @@ class Widget implements WidgetInterface
 		$data->layout = $this->layout;
 		$data->renderer = get_class($this->renderer);
 
-		$data->bind(ViewHelper::getGlobalVariables($this->getPackage()));
+		$data->package = $this->getPackage();
+		$data->router = $this->getPackage()->router;
+
+		$data->bind($this->getData());
 
 		return $this;
 	}
@@ -195,16 +232,14 @@ class Widget implements WidgetInterface
 	/**
 	 * registerPaths
 	 *
-	 * @return  static
+	 * @param bool $refresh
+	 *
+	 * @return static
 	 */
-	protected function registerPaths()
+	public function registerPaths($refresh = false)
 	{
-		if (!$this->pathRegistered)
+		if (!$this->pathRegistered || $refresh)
 		{
-			$paths = RendererHelper::getGlobalPaths()->merge($this->renderer->getPaths());
-
-			$this->renderer->setPaths($paths);
-
 			// Set package path
 			$package = $this->getPackage();
 
@@ -213,14 +248,21 @@ class Widget implements WidgetInterface
 				$locale = $package->app->get('language.locale', 'en-GB');
 				$default = $package->app->get('language.default', 'en-GB');
 
-				$this->renderer->addPath($package->getDir() . '/Templates/' . $locale, PriorityQueue::BELOW_NORMAL);
+				$prefix = $this->pathPrefix ? '/' . $this->pathPrefix : null;
+
+				$this->renderer->addPath($package->getDir() . '/Templates' . $prefix . '/' . $locale, PriorityQueue::BELOW_NORMAL);
 
 				if ($locale != $default)
 				{
-					$this->renderer->addPath($package->getDir() . '/Templates/' . $default, PriorityQueue::BELOW_NORMAL);
+					$this->renderer->addPath($package->getDir() . '/Templates' . $prefix . '/' . $default, PriorityQueue::BELOW_NORMAL);
 				}
 
-				$this->renderer->addPath($package->getDir() . '/Templates', PriorityQueue::BELOW_NORMAL);
+				$this->renderer->addPath($package->getDir() . '/Templates' . $prefix, PriorityQueue::BELOW_NORMAL);
+
+				if ($this->pathPrefix)
+				{
+					$this->renderer->addPath($package->app->get('path.templates') . '/' . $this->pathPrefix, PriorityQueue::LOW);
+				}
 			}
 
 			$this->pathRegistered = true;
@@ -356,7 +398,111 @@ class Widget implements WidgetInterface
 			$this->renderer->reset();
 		}
 
-		$this->renderer->setPaths(array());
+		$this->renderer->setPaths(new PriorityQueue);
+
+		return $this;
+	}
+
+	/**
+	 * set
+	 *
+	 * @param   string  $name
+	 * @param   mixed   $value
+	 *
+	 * @return  static
+	 */
+	public function set($name, $value)
+	{
+		$this->data[$name] = $value;
+
+		return $this;
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $name
+	 * @param mixed  $default
+	 *
+	 * @return  mixed
+	 */
+	public function get($name, $default = null)
+	{
+		if (isset($this->data[$name]))
+		{
+			return $this->data[$name];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Method to get property Data
+	 *
+	 * @return  array
+	 */
+	public function getData()
+	{
+		return $this->data;
+	}
+
+	/**
+	 * Method to set property data
+	 *
+	 * @param   array $data
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setData($data)
+	{
+		$this->data = $data;
+
+		return $this;
+	}
+
+	/**
+	 * __toString
+	 *
+	 * @return  string
+	 */
+	public function __toString()
+	{
+		try
+		{
+			return $this->render();
+		}
+		catch (\Exception $e)
+		{
+			echo $e;
+		}
+		catch (\Throwable $e)
+		{
+			echo $e;
+		}
+
+		return '';
+	}
+
+	/**
+	 * Method to get property PathPrefix
+	 *
+	 * @return  string
+	 */
+	public function getPathPrefix()
+	{
+		return $this->pathPrefix;
+	}
+
+	/**
+	 * Method to set property pathPrefix
+	 *
+	 * @param   string $pathPrefix
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setPathPrefix($pathPrefix)
+	{
+		$this->pathPrefix = $pathPrefix;
 
 		return $this;
 	}

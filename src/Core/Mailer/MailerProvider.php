@@ -29,7 +29,7 @@ class MailerProvider implements ServiceProviderInterface
 	{
 		$closure = function (Container $container)
 		{
-		    return new MailerManager;
+		    return new MailerManager(null, $container->get('dispatcher'));
 		};
 
 		$container->share(MailerManager::class, $closure)

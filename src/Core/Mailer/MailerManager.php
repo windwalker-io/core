@@ -8,7 +8,9 @@
 
 namespace Windwalker\Core\Mailer;
 
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
+use Windwalker\Event\DispatcherAwareTrait;
 
 /**
  * The Mailer class.
@@ -17,6 +19,8 @@ use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
  */
 class MailerManager
 {
+	use DispatcherAwareTrait;
+
 	/**
 	 * Property adapter.
 	 *
@@ -35,10 +39,12 @@ class MailerManager
 	 * Mailer constructor.
 	 *
 	 * @param MailerAdapterInterface $adapter
+	 * @param EventDispatcher        $dispatcher
 	 */
-	public function __construct(MailerAdapterInterface $adapter = null)
+	public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
 	{
 		$this->adapter = $adapter;
+		$this->dispatcher = $dispatcher;
 	}
 
 	/**
@@ -54,7 +60,14 @@ class MailerManager
 	{
 		$class = $this->messageClass;
 
-		return new $class($subject, $content, $html);
+		$message = new $class($subject, $content, $html);
+
+		$this->triggerEvent('onMailerAfterCreateMessage', [
+			'message' => $message,
+			'manager' => $this
+		]);
+
+		return $message;
 	}
 
 	/**
@@ -66,6 +79,11 @@ class MailerManager
 	 */
 	public function send(MailMessage $message)
 	{
+		$this->triggerEvent('onMailerBeforeSend', [
+			'message' => $message,
+			'manager' => $this
+		]);
+
 		return $this->getAdapter()->send($message);
 	}
 

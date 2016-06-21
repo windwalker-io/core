@@ -47,10 +47,8 @@ class HtmlView extends AbstractView
 	{
 		parent::__construct($data, $config);
 
-		if ($renderer === null)
-		{
-			$this->renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
-		}
+		$this->renderer = $renderer ? : $this->renderer;
+		$this->renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
 		
 		$this->data = new Data($this->data);
 	}

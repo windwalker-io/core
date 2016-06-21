@@ -10,9 +10,11 @@ namespace Windwalker\Core\Provider;
 
 use Illuminate\View\Compilers\BladeCompiler;
 use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Renderer\Finder\PackageFinder;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
+use Windwalker\Core\Widget\WidgetManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer;
@@ -32,6 +34,13 @@ class RendererProvider implements ServiceProviderInterface
 	protected static $messages;
 
 	/**
+	 * Property rendererManager.
+	 *
+	 * @var  RendererManager
+	 */
+	public $rendererManager;
+
+	/**
 	 * Registers the service provider with a DI container.
 	 *
 	 * @param   Container $container The DI container.
@@ -40,7 +49,9 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$this->prepareFactory($container);
+		$this->prepareManager($container);
+
+		$this->getWidgetManager($container);
 	}
 
 	/**
@@ -50,11 +61,20 @@ class RendererProvider implements ServiceProviderInterface
 	 *
 	 * @return  void
 	 */
-	protected function prepareFactory(Container $container)
+	protected function prepareManager(Container $container)
 	{
 		$closure = function(Container $container)
 		{
 			$manager = new RendererManager($container);
+
+			return $manager;
+		};
+
+		$container->share('raw.renderer.manager', $closure);
+
+		$closure = function (Container $container)
+		{
+			$manager = $container->get('raw.renderer.manager');
 
 			// Prepare Globals
 			$this->prepareGlobals($container, $manager);
@@ -73,6 +93,27 @@ class RendererProvider implements ServiceProviderInterface
 
 		$container->share(PackageFinder::class, $closure)
 			->alias('package.finder', PackageFinder::class);
+	}
+
+	/**
+	 * prepareWidget
+	 *
+	 * @param Container       $container
+	 *
+	 * @return WidgetManager
+	 */
+	public function getWidgetManager(Container $container)
+	{
+		$closure = function (Container $container)
+		{
+			/** @var RendererManager $rendererManager */
+			$rendererManager = $container->get('raw.renderer.manager');
+
+			return new WidgetManager($rendererManager);
+		};
+
+		$container->share(WidgetManager::class, $closure)
+			->alias('widget.manager', WidgetManager::class);
 	}
 
 	/**
@@ -115,12 +156,12 @@ class RendererProvider implements ServiceProviderInterface
 
 		Renderer\Blade\GlobalContainer::addCompiler('widget', function($expression)
 		{
-			return "<?php echo \\Windwalker\\Core\\Widget\\BladeWidgetHelper::render{$expression} ?>";
+			return "<?php echo \$widget->render{$expression} ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::addCompiler('messages', function($expression)
 		{
-			return "<?php echo \\Windwalker\\Core\\Widget\\WidgetHelper::render('windwalker.message.default', array('flashes' => \$flashes)) ?>";
+			return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
@@ -177,6 +218,7 @@ class RendererProvider implements ServiceProviderInterface
 			'asset'      => $container->get('asset'),
 			'messages'   => static::$messages,
 			'translator' => $container->get('language'),
+			'widget'     => $container->get('widget.manager'),
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 

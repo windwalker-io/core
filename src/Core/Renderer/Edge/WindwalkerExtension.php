@@ -110,7 +110,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function widget($expression)
 	{
-		return "<?php echo \\Windwalker\\Core\\Widget\\BladeWidgetHelper::render{$expression} ?>";
+		return "<?php echo \$widget->render{$expression} ?>";
 	}
 	
 	/**
@@ -122,6 +122,6 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function messages($expression)
 	{
-		return "<?php echo \\Windwalker\\Core\\Widget\\WidgetHelper::render('windwalker.message.default', array('messages' => \$messages)) ?>";
+		return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
 	}
 }

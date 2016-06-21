@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\Widget;
 
-use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Core\Widget\WidgetManager;
 
 /**
  * Test class of WidgetHelper
@@ -26,6 +26,6 @@ class WidgetHelperTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRender()
 	{
-		$this->assertEquals('<h1>Test</h1>', WidgetHelper::render('test.test'));
+		$this->assertEquals('<h1>Test</h1>', WidgetManager::render('test.test'));
 	}
 }

@@ -2,53 +2,30 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU Lesser General Public License version 3 or later.
+ * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @license    GNU General Public License version 2 or later.
  */
 
 namespace Windwalker\Core\Widget;
 
-use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Facade\AbstractProxyFacade;
 
 /**
  * The WidgetHelper class.
  * 
- * @since  2.1.1
+ * @see  WidgetManager
+ * 
+ * @method  static  string  render($layout, $data = [], $engine = WidgetManager::ENGINE_PHP, $package = null)
+ * @method  static  Widget  createWidget($layout, $engine = null, $package = null)
+ *
+ * @since  {DEPLOY_VERSION}
  */
-abstract class WidgetHelper
+class WidgetHelper extends AbstractProxyFacade
 {
-	const ENGINE_PHP      = 'php';
-	const ENGINE_BLADE    = 'blade';
-	const ENGINE_TWIG     = 'twig';
-	const ENGINE_MUSTACHE = 'mustache';
-
 	/**
-	 * render
+	 * Property _key.
 	 *
-	 * @param string                  $layout
-	 * @param array                   $data
-	 * @param string                  $type
-	 * @param string|AbstractPackage  $package
-	 *
-	 * @return string
+	 * @var  string
 	 */
-	public static function render($layout, $data = array(), $type = self::ENGINE_PHP, $package = null)
-	{
-		if ($type == 'php')
-		{
-			$type = '';
-		}
-
-		$class = 'Windwalker\Core\Widget\\' . ucfirst($type) . 'Widget';
-
-		if (!class_exists($class))
-		{
-			throw new \DomainException('Widget engine: ' . $type . ' not exists.');
-		}
-
-		/** @var WidgetInterface $widget */
-		$widget = new $class($layout, $package);
-
-		return $widget->render($data);
-	}
+	protected static $_key = 'widget.manager';
 }

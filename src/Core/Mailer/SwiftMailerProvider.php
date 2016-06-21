@@ -46,6 +46,11 @@ class SwiftMailerProvider implements ServiceProviderInterface
 
 		$closure = function(MailerManager $mailer, Container $container)
 		{
+			if (!class_exists('Swift_Mailer'))
+			{
+				throw new \LogicException('Please install swiftmailer/swiftmailer 5.* first.');
+			}
+
 			$mailer->setAdapter($container->get('mailer.adapter.swiftmailer'));
 
 			return $mailer;

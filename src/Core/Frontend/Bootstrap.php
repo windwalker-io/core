@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Frontend;
 
-use Windwalker\Core\Widget\WidgetHelper;
+use Windwalker\Core\Widget\WidgetManager;
 
 /**
  * The Bootstrap class.
@@ -34,7 +34,7 @@ class Bootstrap
 	 */
 	public static function renderFields(array $fields, $labelCols = 'col-md-3', $inputCols = 'col-md-9', $tmpl = 'bootstrap.form.fields')
 	{
-		return WidgetHelper::render($tmpl, array(
+		return WidgetManager::render($tmpl, array(
 			'fields' => $fields,
 			'label_cols' => $labelCols,
 			'input_cols' => $inputCols
