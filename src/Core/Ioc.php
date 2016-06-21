@@ -157,7 +157,7 @@ abstract class Ioc
 	 */
 	public static function getApplication()
 	{
-		return static::get('system.application');
+		return static::get('application');
 	}
 
 	/**
@@ -167,7 +167,7 @@ abstract class Ioc
 	 */
 	public static function getAuthenticate()
 	{
-		return static::get('system.authenticate');
+		return static::get('authenticate');
 	}
 
 	/**
@@ -177,7 +177,7 @@ abstract class Ioc
 	 */
 	public static function getConfig()
 	{
-		return static::get('system.config');
+		return static::get('config');
 	}
 
 	/**
@@ -187,7 +187,7 @@ abstract class Ioc
 	 */
 	public static function getEnvironment()
 	{
-		return static::get('system.environment');
+		return static::get('environment');
 	}
 
 	/**
@@ -197,7 +197,7 @@ abstract class Ioc
 	 */
 	public static function getInput()
 	{
-		return static::get('system.input');
+		return static::get('input');
 	}
 
 	/**
@@ -207,7 +207,7 @@ abstract class Ioc
 	 */
 	public static function getDispatcher()
 	{
-		return static::get('system.dispatcher');
+		return static::get('dispatcher');
 	}
 
 	/**
@@ -217,7 +217,7 @@ abstract class Ioc
 	 */
 	public static function getSession()
 	{
-		return static::get('system.session');
+		return static::get('session');
 	}
 
 	/**
@@ -227,7 +227,7 @@ abstract class Ioc
 	 */
 	public static function getGlobalCache()
 	{
-		return static::get('system.cache');
+		return static::get('cache');
 	}
 
 	/**
@@ -247,7 +247,7 @@ abstract class Ioc
 	 */
 	public static function getRouter()
 	{
-		return static::get('system.router');
+		return static::get('router');
 	}
 
 	/**
@@ -257,7 +257,7 @@ abstract class Ioc
 	 */
 	public static function getLanguage()
 	{
-		return static::get('system.language');
+		return static::get('language');
 	}
 
 	/**
@@ -277,7 +277,7 @@ abstract class Ioc
 	 */
 	public static function getDebugger()
 	{
-		return static::get('system.debugger');
+		return static::get('debugger');
 	}
 
 	/**

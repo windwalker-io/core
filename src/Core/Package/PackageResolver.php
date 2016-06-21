@@ -80,7 +80,7 @@ class PackageResolver implements ContainerAwareInterface
 	public function addPackage($alias, $package)
 	{
 		$container = $this->getContainer();
-		$config = $container->get('system.config');
+		$config = $container->get('config');
 
 		if (is_string($package))
 		{
@@ -107,7 +107,7 @@ class PackageResolver implements ContainerAwareInterface
 
 		$package->setContainer($subContainer)->boot();
 
-		$application = $container->get('system.application');
+		$application = $container->get('application');
 
 		// If in Console mode, register commands.
 		if ($application instanceof Console)

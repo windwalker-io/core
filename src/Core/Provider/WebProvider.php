@@ -12,8 +12,13 @@ use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Environment\Browser\Browser;
+use Windwalker\Environment\Environment;
+use Windwalker\Environment\Platform;
+use Windwalker\Environment\WebEnvironment;
 use Windwalker\IO\PsrInput;
 use Windwalker\Registry\Registry;
+use Windwalker\Uri\UriData;
 
 /**
  * The WebProvider class.
@@ -31,28 +36,33 @@ class WebProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$app = $container->get('system.application');
+		$app = $container->get('application');
 
 		// Input
-		$container->share('system.input', function (Container $container)
+		$container->share('input', function (Container $container)
 		{
-		    return PsrInput::create($container->get('system.application')->getRequest());
-		})->alias('input', 'system.input');
+		    return PsrInput::create($container->get('application')->getRequest());
+		});
 
 		// Environment
-		$container->share('system.environment', $app->getEnvironment())
-			->alias('environment', 'system.environment');
+		$container->share(WebEnvironment::class, $app->getEnvironment())
+			->alias('environment', WebEnvironment::class);
 
-		$container->share('system.browser', $app->getEnvironment()->getBrowser());
-		$container->share('system.platform', $app->getEnvironment()->getPlatform());
+		$container
+			->share(Browser::class, $app->getEnvironment()->getBrowser())
+			->alias('browser', Browser::class);
+
+		$container
+			->share(Platform::class, $app->getEnvironment()->getPlatform())
+			->alias('platform', Platform::class);
 
 		// Uri
-		$container->alias('uri', 'system.uri')
+		$container->alias('uri', UriData::class)
 			->share(
-				'system.uri',
+				UriData::class,
 				function (Container $container) use ($app)
 				{
-					return $container->get('system.application')->getServer()->getUriData();
+					return $container->get('application')->getServer()->getUriData();
 				}
 			);
 	}

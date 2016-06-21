@@ -32,7 +32,7 @@ class LanguageProvider implements ServiceProviderInterface
 		$closure = function(Container $container)
 		{
 			/** @var \Windwalker\Registry\Registry $config */
-			$config = $container->get('system.config');
+			$config = $container->get('config');
 
 			$debug     = $config['system.debug'] ? : false;
 			$langDebug = $config['language.debug'] ? : false;
@@ -45,6 +45,6 @@ class LanguageProvider implements ServiceProviderInterface
 			return $language->setDebug(($debug && $langDebug));
 		};
 
-		$container->share('system.language', $closure)->alias('language', 'system.language');
+		$container->share(Language::class, $closure)->alias('language', Language::class);
 	}
 }

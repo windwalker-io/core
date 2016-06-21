@@ -40,12 +40,12 @@ class DateTimeProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			$tz = $container->get('system.config')->get('system.timezone', 'UTC');
+			$tz = $container->get('config')->get('system.timezone', 'UTC');
 
 			return new DateTime('now', new \DateTimeZone($tz));
 		};
 
-		$container->set('datetime', $closure)
-			->alias('date', 'datetime');
+		$container->set(DateTime::class, $closure)
+			->alias('datetime', DateTime::class);
 	}
 }

@@ -29,7 +29,7 @@ class WhoopsProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$config = $container->get('system.config');
+		$config = $container->get('config');
 
 		if ($config->get('system.debug'))
 		{
@@ -48,7 +48,7 @@ class WhoopsProvider implements ServiceProviderInterface
 					return;
 				}
 
-				$collector = $container->get('system.collector');
+				$collector = $container->get('collector');
 
 				/** @var \Exception $exception */
 				$collector['exception'] = array(
@@ -65,9 +65,8 @@ class WhoopsProvider implements ServiceProviderInterface
 
 			$whoops->register();
 
-			$container->share('system.debugger', $whoops)
-				->alias('whoops', 'system.debugger')
-				->alias('debugger', 'system.debugger');
+			$container->share('debugger', $whoops)
+				->alias('whoops', 'debugger');
 
 			$container->share('whoops.handler', $handler);
 		}

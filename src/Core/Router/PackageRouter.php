@@ -72,7 +72,7 @@ class PackageRouter
 			}
 			catch (\OutOfRangeException $e)
 			{
-				$config = $this->package->getContainer()->get('system.config');
+				$config = $this->package->getContainer()->get('config');
 
 				if (!$xhtml || $config->get('routing.debug', false))
 				{

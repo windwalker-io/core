@@ -23,7 +23,7 @@ use Windwalker\DI\ContainerAwareInterface;
  *
  * @since  2.1.1
  */
-class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, ContainerAwareInterface
+class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, ContainerAwareInterface
 {
 	/**
 	 * Property loggers.
@@ -260,7 +260,7 @@ class LoggerPool implements \ArrayAccess, \Countable, \IteratorAggregate, Contai
 			{
 				$logger = new Monolog($category);
 
-				$handler = new StreamHandler($this->container->get('system.config')->get('path.logs') . '/' . $category . '.log', $level);
+				$handler = new StreamHandler($this->container->get('config')->get('path.logs') . '/' . $category . '.log', $level);
 				$logger->pushProcessor(new PsrLogMessageProcessor);
 
 				// Basic string handler

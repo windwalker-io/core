@@ -73,7 +73,7 @@ class PackageProvider implements ServiceProviderInterface
 		if ($this->package->app->isWeb())
 		{
 			// Router
-			$container->extend('system.router', function (CoreRouter $router, Container $container)
+			$container->extend('router', function (CoreRouter $router, Container $container)
 			{
 				return new PackageRouter($this->package, $router);
 			});

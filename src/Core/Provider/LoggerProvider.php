@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Logger\LoggerPool;
+use Windwalker\Core\Logger\LoggerManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -30,10 +30,10 @@ class LoggerProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			return new LoggerPool($container);
+			return new LoggerManager($container);
 		};
 
-		$container->share('system.logger', $closure)
-			->alias('logger', 'system.logger');
+		$container->share(LoggerManager::class, $closure)
+			->alias('logger', LoggerManager::class);
 	}
 }

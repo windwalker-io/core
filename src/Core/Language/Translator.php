@@ -50,7 +50,7 @@ abstract class Translator extends AbstractProxyFacade
 	{
 		$container = static::getContainer();
 
-		$config = $container->get('system.config');
+		$config = $container->get('config');
 
 		$format = $format ? : $config->get('language.format', 'ini');
 
@@ -116,7 +116,7 @@ abstract class Translator extends AbstractProxyFacade
 
 			$container = static::getContainer();
 
-			$config = $container->get('system.config');
+			$config = $container->get('config');
 
 			$loaded = $config['language.loaded'];
 

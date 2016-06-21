@@ -209,8 +209,8 @@ class DebuggerListener
 
 		$container = $this->app->getContainer();
 
-		$profiler = $container->get('system.profiler');
-		$collector = $container->get('system.collector');
+		$profiler = $container->get('profiler');
+		$collector = $container->get('collector');
 
 		$id = uniqid();
 		$collector['id'] = $id;

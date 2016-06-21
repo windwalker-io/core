@@ -35,8 +35,8 @@ class SessionProvider implements ServiceProviderInterface
 		$closure = function(Container $container) use ($self)
 		{
 			/** @var \Windwalker\Registry\Registry $config */
-			$config = $container->get('system.config');
-			$uri = $container->get('system.uri');
+			$config = $container->get('config');
+			$uri = $container->get('uri');
 
 			$handler  = $config->get('session.handler', 'native');
 			$options  = (array) $config->get('session', array());
@@ -48,8 +48,8 @@ class SessionProvider implements ServiceProviderInterface
 			return $sesion;
 		};
 
-		$container->share('system.session', $closure)
-			->alias('session', 'system.session');
+		$container->share(Session::class, $closure)
+			->alias('session', Session::class);
 	}
 
 	/**
@@ -71,7 +71,7 @@ class SessionProvider implements ServiceProviderInterface
 
 		if ($handler == 'database')
 		{
-			$adapter = new WindwalkerAdapter($container->get('system.database'), ArrayHelper::getValue($options, 'database', array()));
+			$adapter = new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', array()));
 
 			return new $class($adapter);
 		}

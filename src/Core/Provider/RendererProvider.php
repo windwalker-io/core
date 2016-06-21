@@ -63,8 +63,8 @@ class RendererProvider implements ServiceProviderInterface
 		};
 
 		$container->share(RendererManager::class, $closure)
-			->alias('system.renderer.manager', RendererManager::class)
-			->alias('renderer.manager', RendererManager::class);
+			->alias('renderer.manager', RendererManager::class)
+			->alias('renderer', RendererManager::class);
 
 		$closure = function(Container $container)
 		{
@@ -123,7 +123,7 @@ class RendererProvider implements ServiceProviderInterface
 			return "<?php echo \\Windwalker\\Core\\Widget\\WidgetHelper::render('windwalker.message.default', array('flashes' => \$flashes)) ?>";
 		});
 
-		Renderer\Blade\GlobalContainer::setCachePath($container->get('system.config')->get('path.cache') . '/view');
+		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
 	}
 
 	/**
@@ -166,24 +166,24 @@ class RendererProvider implements ServiceProviderInterface
 	{
 		if (static::$messages === null)
 		{
-			static::$messages = $container->get('system.session')
+			static::$messages = $container->get('session')
 				->getFlashBag()
 				->takeAll();
 		}
 
 		$globals = array(
-			'uri'        => $container->get('system.uri'),
-			'app'        => $container->get('system.application'),
-			'asset'      => $container->get('system.asset'),
+			'uri'        => $container->get('uri'),
+			'app'        => $container->get('application'),
+			'asset'      => $container->get('asset'),
 			'messages'   => static::$messages,
-			'translator' => $container->get('system.language'),
-			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('system.config')->get('system.timezone', 'UTC')))
+			'translator' => $container->get('language'),
+			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 
 		$manager->setGlobals($globals);
 
 		/** @var EventDispatcher $dispatcher */
-		$dispatcher = $container->get('system.dispatcher');
+		$dispatcher = $container->get('dispatcher');
 
 		$dispatcher->triggerEvent('onRendererPrepareGlobals', [
 			'manager' => $manager

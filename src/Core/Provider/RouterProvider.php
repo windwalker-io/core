@@ -34,7 +34,7 @@ class RouterProvider implements ServiceProviderInterface
 		$closure = function(Container $container) use ($self)
 		{
 			/** @var \Windwalker\Registry\Registry $config */
-			$config = $container->get('system.config');
+			$config = $container->get('config');
 
 			$matcher = $config->get('routing.matcher', 'default');
 
@@ -42,14 +42,14 @@ class RouterProvider implements ServiceProviderInterface
 
 			$router = new CoreRouter(array(), $self->getMatcher($matcher));
 
-			$router->setUri($container->get('system.uri'))
-				->setDispatcher($container->get('system.dispatcher'));
+			$router->setUri($container->get('uri'))
+				->setDispatcher($container->get('dispatcher'));
 
 			return $router;
 		};
 
-		$container->share('system.router', $closure)
-			->alias('router', 'system.router');
+		$container->share(CoreRouter::class, $closure)
+			->alias('router', CoreRouter::class);
 	}
 
 	/**

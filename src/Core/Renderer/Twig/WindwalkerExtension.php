@@ -73,7 +73,7 @@ class WindwalkerExtension extends \Twig_Extension
 	 */
 	public function getFilters()
 	{
-		$language = $this->container->get('system.language');
+		$language = $this->container->get('language');
 
 		return array(
 			new \Twig_SimpleFilter('trans', array($language, 'translate')),

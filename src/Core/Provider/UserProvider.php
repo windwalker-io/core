@@ -41,7 +41,7 @@ class UserProvider implements ServiceProviderInterface
 			$auth = new Authentication;
 
 			/** @var EventDispatcher $dispatcher */
-			$dispatcher = $container->get('system.dispatcher');
+			$dispatcher = $container->get('dispatcher');
 
 			$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('auth' => $auth));
 
@@ -49,7 +49,7 @@ class UserProvider implements ServiceProviderInterface
 		};
 
 		$container->share(Authentication::class, $closure)
-			->alias('system.authentication', Authentication::class)
+			->alias('authentication', Authentication::class)
 			->alias('authentication', Authentication::class)
 			->alias(AuthenticationInterface::class, Authentication::class);
 
@@ -59,7 +59,7 @@ class UserProvider implements ServiceProviderInterface
 			$auth = new Authorisation;
 
 			/** @var EventDispatcher $dispatcher */
-			$dispatcher = $container->get('system.dispatcher');
+			$dispatcher = $container->get('dispatcher');
 
 			$dispatcher->triggerEvent('onLoadAuthorisationPolicies', array('auth' => $auth));
 
@@ -67,7 +67,7 @@ class UserProvider implements ServiceProviderInterface
 		};
 
 		$container->share(Authorisation::class, $closure)
-			->alias('system.authorisation', Authorisation::class)
+			->alias('authorisation', Authorisation::class)
 			->alias('authorisation', Authorisation::class)
 			->alias(AuthorisationInterface::class, Authorisation::class);
 
@@ -84,7 +84,7 @@ class UserProvider implements ServiceProviderInterface
 		};
 
 		$container->share(UserManager::class, $closure)
-			->alias('system.user.manager', UserManager::class)
+			->alias('user.manager', UserManager::class)
 			->alias('user.manager', UserManager::class);
 	}
 }

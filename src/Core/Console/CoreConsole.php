@@ -28,7 +28,7 @@ use Windwalker\Session\Session;
  * The Console class.
  *
  * @property-read  Container                     container
- * @property-read  Core\Logger\LoggerPool        logger
+ * @property-read  Core\Logger\LoggerManager     logger
  * @property-read  Registry                      config
  * @property-read  Core\Event\EventDispatcher    dispatcher
  * @property-read  AbstractDatabaseDriver        database
@@ -219,7 +219,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	public function triggerEvent($event, $args = array())
 	{
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
-		$dispatcher = $this->container->get('system.dispatcher');
+		$dispatcher = $this->container->get('dispatcher');
 
 		$dispatcher->triggerEvent($event);
 
@@ -291,7 +291,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	public function getDispatcher()
 	{
-		return $this->container->get('system.dispatcher');
+		return $this->container->get('dispatcher');
 	}
 
 	/**

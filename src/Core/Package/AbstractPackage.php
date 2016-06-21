@@ -133,7 +133,7 @@ class AbstractPackage implements DispatcherAwareInterface
 				$input = new Input($input);
 			}
 
-			$input = $input ? : $container->get('system.input');
+			$input = $input ? : $container->get('input');
 
 			$controller = $resolver->create($task, $input, $this, $container);
 
@@ -394,7 +394,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		}
 
 		// Override
-		$file = $this->container->get('system.config')->get('path.etc') . '/package/' . $this->name . '.yml';
+		$file = $this->container->get('config')->get('path.etc') . '/package/' . $this->name . '.yml';
 
 		if (is_file($file))
 		{
@@ -600,7 +600,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function getDispatcher()
 	{
-		return $this->getContainer()->get('system.dispatcher');
+		return $this->getContainer()->get('dispatcher');
 	}
 
 	/**
@@ -703,10 +703,10 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function __get($name)
 	{
 		$diMapping = [
-			'app'        => 'system.application',
-			'input'      => 'system.input',
-			'dispatcher' => 'system.dispatcher',
-			'router'     => 'system.router'
+			'app'        => 'application',
+			'input'      => 'input',
+			'dispatcher' => 'dispatcher',
+			'router'     => 'router'
 		];
 
 		if (isset($diMapping[$name]))

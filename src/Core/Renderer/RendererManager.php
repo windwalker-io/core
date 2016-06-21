@@ -102,7 +102,7 @@ class RendererManager
 		{
 			if (empty($config['cache_path']))
 			{
-				$config = $this->container->get('system.config');
+				$config = $this->container->get('config');
 
 				$config['cache_path'] = $config->get('path.cache') . '/renderer';
 			}
@@ -112,7 +112,7 @@ class RendererManager
 		{
 			if (empty($config['cache_path']) && !isset($config['cache']))
 			{
-				$config = $this->container->get('system.config');
+				$config = $this->container->get('config');
 
 				$config['cache_path'] = $config->get('path.cache') . '/renderer';
 			}
@@ -279,7 +279,7 @@ class RendererManager
 	 */
 	protected function registerPaths()
 	{
-		$config = $this->container->get('system.config');
+		$config = $this->container->get('config');
 
 		// Priority (1)
 		$this->addPath(

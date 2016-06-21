@@ -802,7 +802,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	{
 		if (!$this->app)
 		{
-			$this->app = $this->getPackage()->app ? : $this->container->get('system.application');
+			$this->app = $this->getPackage()->app ? : $this->container->get('application');
 		}
 
 		return $this->app;
@@ -940,7 +940,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			return null;
 		}
 
-		$dispatcher = $container->get('system.dispatcher');
+		$dispatcher = $container->get('dispatcher');
 
 		return $dispatcher->triggerEvent($event, $args);
 	}

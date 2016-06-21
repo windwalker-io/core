@@ -8,10 +8,12 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Console\IO\IOInterface;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Environment;
+use Windwalker\Environment\Platform;
 
 /**
  * The ConsoleProvider class.
@@ -47,8 +49,8 @@ class ConsoleProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		// Input
-		$container->share('system.io', $this->app->io)
-			->alias('io', 'system.io');
+		$container->share(IOInterface::class, $this->app->io)
+			->alias('io', IOInterface::class);
 
 		$closure = function(Container $container)
 		{
@@ -56,15 +58,16 @@ class ConsoleProvider implements ServiceProviderInterface
 		};
 
 		// Environment
-		$container->share('system.environment', $closure)
-			->alias('environment', 'system.environment');
+		$container->share(Environment::class, $closure)
+			->alias('environment', Environment::class);
 
 		$closure = function(Container $container)
 		{
-			return $container->get('system.environment')->server;
+			return $container->get('environment')->platform;
 		};
 
-		$container->share('system.server', $closure);
+		$container->share(Platform::class, $closure)
+			->alias('platform', Platform::class);
 	}
 }
  

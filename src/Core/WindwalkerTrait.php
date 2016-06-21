@@ -94,7 +94,7 @@ trait WindwalkerTrait
 		// Set some default objects
 		if ($this->container->exists('system.dispatcher'))
 		{
-			$this->dispatcher = $this->container->get('system.dispatcher');
+			$this->dispatcher = $this->container->get('dispatcher');
 		}
 		else
 		{

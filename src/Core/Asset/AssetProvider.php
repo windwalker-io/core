@@ -35,8 +35,8 @@ class AssetProvider implements ServiceProviderInterface
 			 * @var UriData $uri
 			 * @var ConfigRegistry $config
 			 */
-			$uri = $container->get('system.uri');
-			$config = $container->get('system.config');
+			$uri = $container->get('uri');
+			$config = $container->get('config');
 
 			$asset = new AssetManager([
 				'uri_path' => rtrim($uri->path, '/') . '/' . $config->get('asset.uri', 'asset'),
@@ -46,7 +46,7 @@ class AssetProvider implements ServiceProviderInterface
 				'debug' => $config->get('system.debug')
 			]);
 			
-			$asset->setDispatcher($container->get('system.dispatcher'));
+			$asset->setDispatcher($container->get('dispatcher'));
 
 			return $asset;
 		};
@@ -58,7 +58,7 @@ class AssetProvider implements ServiceProviderInterface
 		// Script
 		$closure = function (Container $container)
 		{
-			return new ScriptManager($container->get('system.asset'));
+			return new ScriptManager($container->get('asset'));
 		};
 
 		$container->share(ScriptManager::class, $closure)
@@ -67,7 +67,7 @@ class AssetProvider implements ServiceProviderInterface
 
 		AbstractScript::$instance = function () use ($container)
 		{
-		    return $container->get('system.script.manager');
+		    return $container->get('script.manager');
 		};
 	}
 }

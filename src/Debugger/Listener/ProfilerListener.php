@@ -47,9 +47,9 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
-		$input     = $container->get('system.input');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
+		$input     = $container->get('input');
 
 		$collector['system.name'] = $event['app']->getName();
 		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::$format);
@@ -78,8 +78,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		/** @var CoreRouter $router */
 		$router = $event['app']->getRouter();
@@ -110,7 +110,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['controller']->getContainer();
-		$profiler  = $container->get('system.profiler');
+		$profiler  = $container->get('profiler');
 
 		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
@@ -133,7 +133,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['controller']->getContainer();
-		$profiler  = $container->get('system.profiler');
+		$profiler  = $container->get('profiler');
 
 		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
@@ -156,7 +156,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['view']->getPackage()->getContainer();
-		$profiler  = $container->get('system.profiler');
+		$profiler  = $container->get('profiler');
 
 		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
@@ -179,7 +179,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['view']->getPackage()->getContainer();
-		$profiler  = $container->get('system.profiler');
+		$profiler  = $container->get('profiler');
 
 		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
@@ -210,8 +210,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $package->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		$collector['controller.main'] = get_class($controller);
 
@@ -242,8 +242,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -265,8 +265,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		$collector['redirect'] = array(
 			'url'   => $event['url'],
@@ -289,8 +289,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -310,8 +310,8 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = Ioc::factory();
-		$collector = $container->get('system.collector');
-		$profiler  = $container->get('system.profiler');
+		$collector = $container->get('collector');
+		$profiler  = $container->get('profiler');
 
 		// Packages
 		$packages = PackageHelper::getPackages();
@@ -360,7 +360,7 @@ class ProfilerListener
 
 		// Events
 		/** @var EventDispatcher $dispatcher */
-		$dispatcher = $container->get('system.dispatcher');
+		$dispatcher = $container->get('dispatcher');
 
 		$collector['event.executed'] = $dispatcher->getCollector();
 

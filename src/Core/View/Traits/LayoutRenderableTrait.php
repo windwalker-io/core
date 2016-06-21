@@ -228,7 +228,7 @@ trait LayoutRenderableTrait
 	{
 		if (!$this->rendererManager)
 		{
-			$this->rendererManager = $this->getPackage()->getContainer()->get('system.renderer.manager');
+			$this->rendererManager = $this->getPackage()->getContainer()->get('renderer.manager');
 		}
 
 		return $this->rendererManager;

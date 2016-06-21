@@ -43,7 +43,7 @@ class ProfilerProvider implements ServiceProviderInterface
 		// System profiler
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
+			$config = $container->get('config');
 
 			if ($config->get('system.debug'))
 			{
@@ -65,7 +65,7 @@ class ProfilerProvider implements ServiceProviderInterface
 		// System collector
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
+			$config = $container->get('config');
 
 			if ($config->get('system.debug'))
 			{
@@ -79,12 +79,12 @@ class ProfilerProvider implements ServiceProviderInterface
 
 		$container->share('system.collector', $closure);
 
-		if ($container->get('system.config')->get('system.debug'))
+		if ($container->get('config')->get('system.debug'))
 		{
-			$this->registerProfilerListener($container, $container->get('system.config'));
-			$this->registerDatabaseProfiler($container, $container->get('system.config'));
-			$this->registerEmailProfiler($container, $container->get('system.config'));
-			$this->registerLogsProfiler($container, $container->get('system.config'));
+			$this->registerProfilerListener($container, $container->get('config'));
+			$this->registerDatabaseProfiler($container, $container->get('config'));
+			$this->registerEmailProfiler($container, $container->get('config'));
+			$this->registerLogsProfiler($container, $container->get('config'));
 		}
 	}
 
@@ -100,7 +100,7 @@ class ProfilerProvider implements ServiceProviderInterface
 	{
 		static $queryData = array();
 
-		$collector = $container->get('system.collector');
+		$collector = $container->get('collector');
 
 		$collector['database.query.times'] = 0;
 		$collector['database.query.total.time'] = 0;
@@ -108,7 +108,7 @@ class ProfilerProvider implements ServiceProviderInterface
 		$collector['database.queries'] = array();
 
 		/** @var AbstractDatabaseDriver $db */
-		$db = $container->get('system.database');
+		$db = $container->get('database');
 
 		// Set profiler to DatabaseDriver
 		$db->addMiddleware(new DbProfilerMiddleware(
@@ -159,7 +159,7 @@ class ProfilerProvider implements ServiceProviderInterface
 	 */
 	protected function registerProfilerListener(Container $container, Registry $config)
 	{
-		$dispatcher = $container->get('system.dispatcher');
+		$dispatcher = $container->get('dispatcher');
 
 		$dispatcher->setDebug(true);
 

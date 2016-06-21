@@ -116,7 +116,7 @@ class CsrfGuard implements ContainerAwareInterface
 	public function getToken($forceNew = false)
 	{
 		/** @var Session $session */
-		$session = $this->container->get('system.session');
+		$session = $this->container->get('session');
 
 		$token = $session->get(static::TOKEN_KEY);
 
@@ -146,9 +146,9 @@ class CsrfGuard implements ContainerAwareInterface
 			$userId = $userId ? : User::get()->id;
 		}
 
-		$userId = $userId ? : $this->container->get('system.session')->getId();
+		$userId = $userId ? : $this->container->get('session')->getId();
 
-		$config = $this->container->get('system.config');
+		$config = $this->container->get('config');
 
 		return md5($config['system.secret'] . $userId . static::getToken($forceNew));
 	}
@@ -164,7 +164,7 @@ class CsrfGuard implements ContainerAwareInterface
 	public function checkToken($userId = null, $method = null)
 	{
 		/** @var Input $input */
-		$input = $this->container->get('system.input');
+		$input = $this->container->get('input');
 		$token = $this->getFormToken($userId);
 
 		if ($method)

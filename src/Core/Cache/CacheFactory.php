@@ -103,7 +103,7 @@ class CacheFactory implements ContainerAwareInterface
 	 */
 	public function create($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
 	{
-		$config = $this->container->get('system.config');
+		$config = $this->container->get('config');
 
 		$debug = $config->get('system.debug', false);
 		$enabled = $config->get('cache.enabled', false);
@@ -158,7 +158,7 @@ class CacheFactory implements ContainerAwareInterface
 	 */
 	public static function getGlobal($forceNew = false)
 	{
-		return static::getInstance()->getContainer()->get('system.cache', $forceNew);
+		return static::getInstance()->getContainer()->get('cache', $forceNew);
 	}
 
 	/**
@@ -195,7 +195,7 @@ class CacheFactory implements ContainerAwareInterface
 				{
 					// Try add root
 					$container = static::getInstance()->getContainer();
-					$config = $container->get('system.config');
+					$config = $container->get('config');
 
 					$path = $config->get('path.root') . '/' . $path;
 				}

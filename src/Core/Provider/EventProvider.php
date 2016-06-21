@@ -33,12 +33,13 @@ class EventProvider implements ServiceProviderInterface
 		{
 			$dispatcher = new EventDispatcher;
 
-			$dispatcher->setDebug($container->get('system.config')->get('system.debug'));
+			$dispatcher->setDebug($container->get('config')->get('system.debug'));
 
 			return $dispatcher;
 		};
 
-		$container->share('system.dispatcher', $closure);
+		$container->share(EventDispatcher::class, $closure)
+			->alias('dispatcher', EventDispatcher::class);
 	}
 }
  

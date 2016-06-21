@@ -11,6 +11,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Registry\Registry;
 
 /**
  * The CacheProvider class.
@@ -34,18 +35,19 @@ class CacheProvider implements ServiceProviderInterface
 			return CacheFactory::getInstance($container);
 		};
 
-		$container->share('system.cache.factory', $closure)
-			->alias('cache.factory', 'system.cache.factory');
+		$container->share(CacheFactory::class, $closure)
+			->alias('cache.factory', CacheFactory::class);
 
 		// Get global cache object.
-		$container->share('system.cache', function(Container $container)
+		$container->share('cache', function(Container $container)
 		{
-			$config  = $container->get('system.config');
+			/** @var Registry $config */
+			$config = $container->get('config');
 
 			$storage = $config->get('cache.storage', 'file');
 			$handler = $config->get('cache.handler', 'serialized');
 
-			return $container->get('system.cache.factory')->create('windwalker', $storage, $handler);
-		})->alias('cache', 'system.cache');
+			return $container->get('cache.factory')->create('windwalker', $storage, $handler);
+		});
 	}
 }

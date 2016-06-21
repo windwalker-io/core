@@ -33,7 +33,7 @@ class SecurityProvider implements ServiceProviderInterface
 			return new CsrfGuard($container);
 		};
 
-		$container->share('system.security.csrf', $closure)
-			->alias('security.csrf', 'system.security.csrf');
+		$container->share(CsrfGuard::class, $closure)
+			->alias('security.csrf', CsrfGuard::class);
 	}
 }

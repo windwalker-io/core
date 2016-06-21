@@ -8,11 +8,14 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Database\Exporter\AbstractExporter;
 use Windwalker\Database\DatabaseFactory;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DataMapper\Adapter\AbstractDatabaseAdapter;
 use Windwalker\DataMapper\Adapter\WindwalkerAdapter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Registry\Registry;
 
 /**
  * Class WhoopsProvider
@@ -32,7 +35,8 @@ class DatabaseProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
+			/** @var Registry $config */
+			$config = $container->get('config');
 
 			$option = array(
 				'driver'   => $config->get('database.driver', 'mysql'),
@@ -46,9 +50,9 @@ class DatabaseProvider implements ServiceProviderInterface
 			return DatabaseFactory::getDbo($option['driver'], $option);
 		};
 
-		$container->share('system.database', $closure)
-			->alias('database', 'system.database')
-			->alias('db', 'system.database');
+		$container->share(AbstractDatabaseDriver::class, $closure)
+			->alias('database', AbstractDatabaseDriver::class)
+			->alias('db', AbstractDatabaseDriver::class);
 
 		// For DataMapper
 		AbstractDatabaseAdapter::setInstance(
@@ -61,7 +65,8 @@ class DatabaseProvider implements ServiceProviderInterface
 		// For Exporter
 		$closure = function(Container $container)
 		{
-			$config = $container->get('system.config');
+			/** @var Registry $config */
+			$config = $container->get('config');
 
 			$driver = $config->get('database.driver', 'mysql');
 
@@ -70,7 +75,8 @@ class DatabaseProvider implements ServiceProviderInterface
 			return new $class;
 		};
 
-		$container->share('sql.exporter', $closure);
+		$container->share(AbstractExporter::class, $closure)
+			->share('sql.exporter', AbstractExporter::class);
 	}
 
 	/**
@@ -81,17 +87,18 @@ class DatabaseProvider implements ServiceProviderInterface
 	 */
 	public static function strictMode(Container $container, $mode = null)
 	{
-		$config = $container->get('system.config');
+		/** @var Registry $config */
+		$config = $container->get('config');
 
 		if ($config->get('database.driver') == 'mysql')
 		{
 			if ($mode)
 			{
-				$container->get('system.database')->setQuery("SET sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_ALL_TABLES'")->execute();
+				$container->get('database')->setQuery("SET sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_ALL_TABLES'")->execute();
 			}
 			else
 			{
-				$container->get('system.database')->setQuery("SET sql_mode = ''")->execute();
+				$container->get('database')->setQuery("SET sql_mode = ''")->execute();
 			}
 		}
 	}

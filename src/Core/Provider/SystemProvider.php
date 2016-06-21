@@ -10,6 +10,7 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Console\Console;
+use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
@@ -51,17 +52,17 @@ class SystemProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share('system.application', $this->app)
-			// ->alias('application', 'system.application')
-			->alias('app', 'system.application');
+		$container->share(WindwalkerApplicationInterface::class, $this->app)
+			->alias('application', WindwalkerApplicationInterface::class)
+			->alias('app', WindwalkerApplicationInterface::class);
 
-		$container->share('system.config', $this->app->config)
-			->alias('config', 'system.config');
+		$container->share('config', $this->app->config)
+			->alias('config', 'config');
 
-		$container->share('package.resolver', function(Container $container)
+		$container->share(PackageResolver::class, function(Container $container)
 		{
 			return new PackageResolver($container);
-		});
+		})->alias('package.resolver', PackageResolver::class);
 	}
 }
  

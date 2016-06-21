@@ -39,7 +39,7 @@ class SessionTest extends AbstractBaseTestCase
 	{
 		$container = Ioc::getContainer();
 
-		$config = $container->get('system.config');
+		$config = $container->get('config');
 
 		$config['session.handler'] = 'database';
 		$config['session.database'] = array(
@@ -51,7 +51,7 @@ class SessionTest extends AbstractBaseTestCase
 
 		$container->registerServiceProvider(new SessionProvider);
 
-		$session = $container->get('system.session');
+		$session = $container->get('session');
 
 		// TODO: Session dose not support get handler now, we'll complete this test after Session support it.
 		// Now we just make sure it will not break.

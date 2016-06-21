@@ -34,7 +34,7 @@ use Windwalker\Uri\UriData;
  * The WebApplication class.
  *
  * @property-read  Container                     container
- * @property-read  Core\Logger\LoggerPool        logger
+ * @property-read  Core\Logger\LoggerManager     logger
  * @property-read  PsrInput                      input
  * @property-read  UriData                       uri
  * @property-read  Core\Event\EventDispatcher    dispatcher
@@ -44,6 +44,7 @@ use Windwalker\Uri\UriData;
  * @property-read  Core\Renderer\RendererManager renderer
  * @property-read  Core\Cache\CacheFactory       cache
  * @property-read  Session                       session
+ * @property-read  Core\Mailer\MailerManager     mailer
  *
  * @since  2.0
  */
@@ -199,7 +200,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function addMessage($messages, $type = 'info')
 	{
 		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('system.session');
+		$session = $this->container->get('session');
 
 		$session->getFlashBag()->add($messages, $type);
 
@@ -214,7 +215,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function clearMessages()
 	{
 		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('system.session');
+		$session = $this->container->get('session');
 
 		$session->getFlashBag()->clear();
 
@@ -333,15 +334,16 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function __get($name)
 	{
 		$diMapping = [
-			'input'      => 'system.input',
-			'uri'        => 'system.uri',
-			'dispatcher' => 'system.dispatcher',
-			'database'   => 'system.database',
-			'router'     => 'system.router',
-			'language'   => 'system.language',
-			'renderer'   => 'system.renderer',
-			'cache'      => 'system.cache',
-			'session'    => 'system.session',
+			'input'      => 'input',
+			'uri'        => 'uri',
+			'dispatcher' => 'dispatcher',
+			'database'   => 'database',
+			'router'     => 'router',
+			'language'   => 'language',
+			'renderer'   => 'renderer',
+			'cache'      => 'cache',
+			'session'    => 'session',
+			'mailer'     => 'mailer'
 		];
 
 		if (isset($diMapping[$name]))

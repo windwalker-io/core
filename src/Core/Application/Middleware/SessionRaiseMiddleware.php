@@ -30,7 +30,7 @@ class SessionRaiseMiddleware extends AbstractWebMiddleware
 	 */
 	public function __invoke(Request $request, Response $response, $next = null)
 	{
-		$this->app->container->get('system.session')->start();
+		$this->app->container->get('session')->start();
 
 		return $next($request, $response);
 	}

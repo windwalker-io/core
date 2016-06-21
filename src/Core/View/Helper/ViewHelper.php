@@ -38,7 +38,7 @@ class ViewHelper extends AbstractHelper
 		if (!static::$messages)
 		{
 			static::$messages = $package->getContainer()
-				->get('system.session')
+				->get('session')
 				->getFlashBag()
 				->takeAll();
 		}
@@ -47,12 +47,12 @@ class ViewHelper extends AbstractHelper
 
 		return array(
 			'uri'        => $container->get('uri'),
-			'app'        => $container->get('system.application'),
+			'app'        => $container->get('application'),
 			'package'    => $package,
 			'router'     => $package->router,
-			'asset'      => $container->get('system.asset'),
+			'asset'      => $container->get('asset'),
 			'messages'   => static::$messages,
-			'translator' => $container->get('system.language'),
+			'translator' => $container->get('language'),
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 	}

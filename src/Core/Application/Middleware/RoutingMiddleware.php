@@ -132,7 +132,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	 */
 	protected function getRouter()
 	{
-		return $this->app->container->get('system.router');
+		return $this->app->container->get('router');
 	}
 
 	/**

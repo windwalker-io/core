@@ -31,7 +31,7 @@ class TestMvcProvider implements ServiceProviderInterface
 
 		$closure = function(Container $container)
 		{
-			return $container->get('system.config');
+			return $container->get('config');
 		};
 
 		$container->share('mvc.config', $closure);
