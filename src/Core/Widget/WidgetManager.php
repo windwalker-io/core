@@ -20,11 +20,11 @@ use Windwalker\Renderer\RendererInterface;
  */
 class WidgetManager
 {
-	const ENGINE_PHP      = 'php';
-	const ENGINE_BLADE    = 'blade';
-	const ENGINE_EDGE     = 'edge';
-	const ENGINE_TWIG     = 'twig';
-	const ENGINE_MUSTACHE = 'mustache';
+	const PHP      = 'php';
+	const BLADE    = 'blade';
+	const EDGE     = 'edge';
+	const TWIG     = 'twig';
+	const MUSTACHE = 'mustache';
 
 	/**
 	 * Property widgetClass.
@@ -60,7 +60,7 @@ class WidgetManager
 	 *
 	 * @return string
 	 */
-	public function render($layout, $data = [], $engine = self::ENGINE_PHP, $package = null)
+	public function render($layout, $data = [], $engine = self::PHP, $package = null)
 	{
 		return $this->createWidget($layout, $engine, $package)->render($data);
 	}
@@ -76,7 +76,7 @@ class WidgetManager
 	 */
 	public function createWidget($layout, $engine = null, $package = null)
 	{
-		$engine = $this->rendererManager->getRenderer($engine ? : static::ENGINE_PHP);
+		$engine = $this->rendererManager->getRenderer($engine ? : static::PHP);
 
 		// Prepare package
 		$package = $package ? : Ioc::get('current.package');

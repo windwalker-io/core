@@ -16,7 +16,6 @@ use Windwalker\Renderer\MustacheRenderer;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\TwigRenderer;
-use Windwalker\Utilities\Queue\Priority;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
@@ -28,11 +27,11 @@ class RendererManager
 {
 	use GlobalVarsTrait;
 
-	const ENGINE_PHP      = 'php';
-	const ENGINE_BLADE    = 'blade';
-	const ENGINE_EDGE     = 'edge';
-	const ENGINE_TWIG     = 'twig';
-	const ENGINE_MUSTACHE = 'mustache';
+	const PHP      = 'php';
+	const BLADE    = 'blade';
+	const EDGE     = 'edge';
+	const TWIG     = 'twig';
+	const MUSTACHE = 'mustache';
 
 	/**
 	 * A PriorityQueue which extends the SplPriorityQueue.
@@ -82,7 +81,7 @@ class RendererManager
 	 * @return  AbstractRenderer|CoreRendererInterface
 	 * @since   2.0
 	 */
-	public function getRenderer($type = self::ENGINE_PHP, $config = array())
+	public function getRenderer($type = self::PHP, $config = array())
 	{
 		$type = strtolower($type);
 
@@ -146,7 +145,7 @@ class RendererManager
 	 */
 	public function getPhpRenderer($config = array())
 	{
-		return $this->getRenderer(static::ENGINE_PHP, $config);
+		return $this->getRenderer(static::PHP, $config);
 	}
 
 	/**
@@ -160,7 +159,7 @@ class RendererManager
 	 */
 	public function getBladeRenderer($config = array())
 	{
-		return $this->getRenderer(static::ENGINE_BLADE, $config);
+		return $this->getRenderer(static::BLADE, $config);
 	}
 
 	/**
@@ -174,7 +173,7 @@ class RendererManager
 	 */
 	public function getEdgeRenderer($config = array())
 	{
-		return $this->getRenderer(static::ENGINE_EDGE, $config);
+		return $this->getRenderer(static::EDGE, $config);
 	}
 
 	/**
@@ -188,7 +187,7 @@ class RendererManager
 	 */
 	public function getTwigRenderer($config = array())
 	{
-		return $this->getRenderer(static::ENGINE_TWIG, $config);
+		return $this->getRenderer(static::TWIG, $config);
 	}
 
 	/**
@@ -202,7 +201,7 @@ class RendererManager
 	 */
 	public function getMustacheRenderer($config = array())
 	{
-		return $this->getRenderer(static::ENGINE_MUSTACHE, $config);
+		return $this->getRenderer(static::MUSTACHE, $config);
 	}
 
 	/**

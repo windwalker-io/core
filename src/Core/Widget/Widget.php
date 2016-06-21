@@ -92,8 +92,8 @@ class Widget implements \ArrayAccess
 
 		// Prepare renderer
 		$this->renderer = $renderer ? : $this->renderer;
-		$this->renderer = $this->renderer ? : RendererHelper::ENGINE_PHP;
-		$this->renderer = $this->renderer instanceof RendererInterface ? $this->renderer : RendererHelper::getPhpRenderer();
+		$this->renderer = $this->renderer ? : RendererHelper::PHP;
+		$this->renderer = $this->renderer instanceof RendererInterface ? $this->renderer : RendererHelper::getRenderer($this->renderer);
 
 		if (!$package)
 		{
@@ -153,7 +153,7 @@ class Widget implements \ArrayAccess
 	/**
 	 * prepareData
 	 *
-	 * @param   Data  $data
+	 * @param  \Windwalker\Data\Data  $data
 	 *
 	 * @return  void
 	 */

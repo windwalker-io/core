@@ -97,13 +97,15 @@ trait LayoutRenderableTrait
 	/**
 	 * registerPaths
 	 *
-	 * @return void
+	 * @param bool $refresh
+	 *
+	 * @return static
 	 */
-	protected function registerPaths()
+	public function registerPaths($refresh = false)
 	{
-		if ($this->config['path.registered'])
+		if ($this->config['path.registered'] && !$refresh)
 		{
-			return;
+			return $this;
 		}
 
 		/**
@@ -140,26 +142,39 @@ trait LayoutRenderableTrait
 		$this->renderer->setPaths($paths);
 
 		$this->config['path.registered'] = true;
+		
+		return $this;
 	}
 
 	/**
 	 * registerMultilingualPaths
 	 *
-	 * @return  void
+	 * @param bool $refresh
+	 *
+	 * @return static
 	 */
-	public function registerMultilingualPaths()
+	public function registerMultilingualPaths($refresh = false)
 	{
-		if ($this->config['path.multilingual_registered'])
+		if ($this->config['path.multilingual_registered'] && !$refresh)
 		{
-			return;
+			return $this;
 		}
 
 		$this->registerPaths();
 
+		$locale = $this->getPackage()->app->get('language.locale');
+		$default = $this->getPackage()->app->get('language.default');
+
 		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.locale'), PriorityQueue::BELOW_NORMAL);
-		$this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.default'), PriorityQueue::BELOW_NORMAL);
+
+		if ($locale != $default)
+		{
+			$this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.default'), PriorityQueue::BELOW_NORMAL);
+		}
 
 		$this->config['path.multilingual_registered'] = true;
+
+		return $this;
 	}
 
 	/**
