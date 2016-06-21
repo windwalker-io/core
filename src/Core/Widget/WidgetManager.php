@@ -76,15 +76,24 @@ class WidgetManager
 	 */
 	public function createWidget($layout, $engine = null, $package = null)
 	{
-		$class = $this->widgetClass;
-
 		$engine = $this->rendererManager->getRenderer($engine ? : static::ENGINE_PHP);
 
 		// Prepare package
 		$package = $package ? : Ioc::get('current.package');
 
-		/** @var Widget $widget */
-		$widget = new $class($layout, $engine, $package);
+		if (class_exists($layout) && is_subclass_of($layout, WidgetComponent::class))
+		{
+			$class = $layout;
+
+			$widget = new $class($package);
+		}
+		else
+		{
+			$class = $this->widgetClass;
+
+			/** @var Widget $widget */
+			$widget = new $class($layout, $engine, $package);
+		}
 
 		$widget->setData($this->rendererManager->getGlobals());
 
