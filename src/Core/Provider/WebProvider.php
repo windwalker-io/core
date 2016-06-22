@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Application\AbstractWebApplication;
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -37,6 +38,8 @@ class WebProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		$app = $container->get('application');
+
+		$container->share(WebApplication::class, $app);
 
 		// Input
 		$container->share('input', function (Container $container)

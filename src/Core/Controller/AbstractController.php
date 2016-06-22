@@ -227,7 +227,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		$package = $package ? $this->app->getPackage($package) : $this->package;
 
-		$response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response);
+		$response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response, true);
 
 		$this->passRedirect($package->getCurrentController());
 

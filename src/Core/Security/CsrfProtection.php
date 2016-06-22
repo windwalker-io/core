@@ -35,5 +35,5 @@ abstract class CsrfProtection extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.security.csrf';
+	protected static $_key = 'security.csrf';
 }

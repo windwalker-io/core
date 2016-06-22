@@ -52,7 +52,7 @@ class ProfilerListener
 		$input     = $container->get('input');
 
 		$collector['system.name'] = $event['app']->getName();
-		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::$format);
+		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::FORMAT_YMD_HIS);
 		$collector['system.uri']  = get_object_vars($container->get('uri'));
 		$collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
 		$collector['system.method.http']   = $input->getMethod();

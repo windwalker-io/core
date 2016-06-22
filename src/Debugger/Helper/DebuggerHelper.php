@@ -29,7 +29,7 @@ abstract class DebuggerHelper extends AbstractFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.collector';
+	protected static $_key = 'collector';
 
 	/**
 	 * addData

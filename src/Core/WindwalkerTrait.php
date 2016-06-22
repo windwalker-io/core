@@ -17,6 +17,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
+use Windwalker\Event\ListenerPriority;
 use Windwalker\Registry\Registry;
 
 /**
@@ -131,8 +132,8 @@ trait WindwalkerTrait
 
 		$configs = (array) $config->get('configs', []);
 
-		krsort($configs);
-
+		ksort($configs);
+		
 		foreach ($configs as $file)
 		{
 			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION));
@@ -195,16 +196,37 @@ trait WindwalkerTrait
 	 */
 	protected function registerListeners()
 	{
-		$listeners = (array) $this->config->get('listeners');
+		$listeners = (array) $this->get('listeners');
+		$dispatcher = $this->getDispatcher();
 
-		foreach ($listeners as $listener)
+		$defaultOptions = array(
+			'class'    => '',
+			'priority' => ListenerPriority::NORMAL,
+			'enabled'  => true
+		);
+
+		foreach ($listeners as $name => $listener)
 		{
-			if (is_string($listener) && class_exists($listener))
+			if (is_string($listener) || is_callable($listener))
 			{
-				$listener = new $listener($this);
+				$listener = array('class' => $listener);
 			}
 
-			$this->dispatcher->addListener($listener);
+			$listener = array_merge($defaultOptions, (array) $listener);
+
+			if (!$listener['enabled'])
+			{
+				continue;
+			}
+
+			if (is_callable($listener['class']) && !is_numeric($name))
+			{
+				$dispatcher->listen($name, $listener['class']);
+			}
+			else
+			{
+				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
+			}
 		}
 	}
 
@@ -239,44 +261,6 @@ trait WindwalkerTrait
 		$resolver->addPackage($name, $package);
 
 		return $this;
-	}
-
-
-	/**
-	 * Load routing profiles as an array.
-	 *
-	 * @return  array
-	 */
-	public static function loadRouting()
-	{
-		return Yaml::parse(file_get_contents(WINDWALKER_ETC . '/routing.yml'));
-	}
-
-	/**
-	 * Prepare system path.
-	 *
-	 * Write your custom path to $config['path.xxx'].
-	 *
-	 * @param   Registry  $config  The config registry object.
-	 *
-	 * @return  void
-	 */
-	public static function prepareSystemPath(Registry $config)
-	{
-		$config['path.root']       = WINDWALKER_ROOT;
-		$config['path.bin']        = WINDWALKER_BIN;
-		$config['path.cache']      = WINDWALKER_CACHE;
-		$config['path.etc']        = WINDWALKER_ETC;
-		$config['path.logs']       = WINDWALKER_LOGS;
-		$config['path.resources']  = WINDWALKER_RESOURCES;
-		$config['path.source']     = WINDWALKER_SOURCE;
-		$config['path.temp']       = WINDWALKER_TEMP;
-		$config['path.templates']  = WINDWALKER_TEMPLATES;
-		$config['path.vendor']     = WINDWALKER_VENDOR;
-		$config['path.public']     = WINDWALKER_PUBLIC;
-		$config['path.migrations'] = WINDWALKER_MIGRATIONS;
-		$config['path.seeders']    = WINDWALKER_SEEDERS;
-		$config['path.languages']  = WINDWALKER_LANGUAGES;
 	}
 
 	/**

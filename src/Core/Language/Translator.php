@@ -35,7 +35,7 @@ abstract class Translator extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.language';
+	protected static $_key = 'language';
 
 	/**
 	 * load

@@ -18,7 +18,6 @@ use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\CoreRoute;
-use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -151,10 +150,11 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @param string|AbstractController $controller
 	 * @param Request                   $request
 	 * @param Response                  $response
+	 * @param bool                      $hmvc
 	 *
-	 * @return  Response
+	 * @return Response
 	 */
-	public function execute($controller, Request $request, Response $response)
+	public function execute($controller, Request $request, Response $response, $hmvc = false)
 	{
 		if (!$controller instanceof AbstractController)
 		{
@@ -163,11 +163,10 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$controller->setRequest($request)->setResponse($response);
 
-		// TODO: rewrite hmvc
-//		if ($controller)
-//		{
-//			$controller->isHmvc($hmvc);
-//		}
+		if ($hmvc)
+		{
+			$controller->isHmvc($hmvc);
+		}
 
 		$this->currentController = $controller;
 
@@ -193,8 +192,6 @@ class AbstractPackage implements DispatcherAwareInterface
 			'package'    => $this,
 			'controller' => &$controller,
 			'task'       => $controller,
-			//			'variables'  => $variables,
-			//			'hmvc'       => $hmvc
 		));
 
 		$result = $controller->execute();
@@ -204,9 +201,6 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
 			'package'    => $this,
 			'controller' => $controller,
-			//			'task'       => $task,
-			//			'variables'  => $variables,
-			//			'hmvc'       => $hmvc,
 			'result'     => &$result
 		));
 
@@ -325,7 +319,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = new $provider;
+				$provider = new $provider($this);
 			}
 
 			if (is_callable($provider, 'boot'))
@@ -346,7 +340,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function registerListeners(DispatcherInterface $dispatcher)
 	{
-		$listeners = $this->get('listener', array());
+		$listeners = (array) $this->get('listeners', array());
 
 		$defaultOptions = array(
 			'class'    => '',
@@ -374,7 +368,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			}
 			else
 			{
-				$dispatcher->addListener(new $listener['class'], $listener['priority']);
+				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
 			}
 		}
 	}
@@ -388,19 +382,19 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function loadConfig(Registry $config)
 	{
-		$file = $this->getDir() . '/config.yml';
+		$file = $this->getDir() . '/Resources/config/config.php';
 
 		if (is_file($file))
 		{
-			$config->loadFile($file, 'yaml');
+			$config->loadFile($file, 'php');
 		}
 
 		// Override
-		$file = $this->container->get('config')->get('path.etc') . '/package/' . $this->name . '.yml';
+		$file = $this->container->get('config')->get('path.etc') . '/package/' . $this->name . '.php';
 
 		if (is_file($file))
 		{
-			$config->loadFile($file, 'yaml');
+			$config->loadFile($file, 'php');
 		}
 
 		return $this;
@@ -417,7 +411,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if (!is_file($file))
 		{
-			return null;
+			return [];
 		}
 
 		return (array) Yaml::parse(file_get_contents($file));
@@ -614,7 +608,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function setDispatcher(DispatcherInterface $dispatcher)
 	{
-		$this->getContainer()->set('system.dispatcher', $dispatcher);
+		$this->getContainer()->set('dispatcher', $dispatcher);
 
 		return $this;
 	}

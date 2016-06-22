@@ -54,7 +54,7 @@ class RouterProvider implements ServiceProviderInterface
 
 		$closure = function (Container $container)
 		{
-		    return $container->createObject(CoreRoute::class);
+		    return $container->createSharedObject(CoreRoute::class);
 		};
 
 		$container->share(CoreRoute::class, $closure)

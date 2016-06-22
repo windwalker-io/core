@@ -114,7 +114,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function init()
 	{
-
+		$this->setFinalHandler([Core\Error\ErrorHandler::class, 'exception']);
 	}
 
 	/**
@@ -170,28 +170,26 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$this->server->setHandler($this->middlewares);
 
-		return $this->server->execute();
+		return $this->server->execute($this->getFinalHandler());
 	}
 
 	/**
 	 * Method as the Psr7 WebHttpServer handler.
 	 *
-	 * @param  Request  $request  The Psr7 ServerRequest to get request params.
-	 * @param  Response $response The Psr7 Response interface to prepare respond data.
-	 * @param  callable $next     The next handler to support middleware pattern.
+	 * @param  Request  $request       The Psr7 ServerRequest to get request params.
+	 * @param  Response $response      The Psr7 Response interface to prepare respond data.
+	 * @param  callable $finalHandler  The next handler to support middleware pattern.
 	 *
 	 * @return  Response  The returned response object.
 	 *
 	 * @since   3.0
 	 */
-	public function dispatch(Request $request, Response $response, $next = null)
+	public function dispatch(Request $request, Response $response, $finalHandler = null)
 	{
 		/** @var AbstractPackage $package */
 		$package = $this->container->get('current.package');
 
-		$response = $package->execute($request->getAttribute('_controller'), $request, $response);
-
-		return $response;
+		return $package->execute($request->getAttribute('_controller'), $request, $response);
 	}
 
 	/**
@@ -206,7 +204,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		$middlewares = (array) $this->config->get('middlewares', []);
 
-		krsort($middlewares);
+		ksort($middlewares);
 
 		foreach ($middlewares as $middleware)
 		{

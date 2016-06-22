@@ -92,5 +92,5 @@ class Logger extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.logger';
+	protected static $_key = 'logger';
 }

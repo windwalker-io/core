@@ -78,7 +78,7 @@ class UserProvider implements ServiceProviderInterface
 		// User Manager
 		$closure = function(Container $container)
 		{
-			return $container->createObject(UserManager::class);
+			return $container->createSharedObject(UserManager::class);
 		};
 
 		$container->share(UserManager::class, $closure)

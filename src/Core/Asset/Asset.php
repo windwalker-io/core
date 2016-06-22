@@ -43,5 +43,5 @@ abstract class Asset extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.asset';
+	protected static $_key = 'asset';
 }

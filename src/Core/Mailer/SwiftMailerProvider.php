@@ -41,7 +41,7 @@ class SwiftMailerProvider implements ServiceProviderInterface
 
 		$container->share(SwiftMailerAdapter::class, function (Container $container)
 		{
-		    return $container->createObject(SwiftMailerAdapter::class);
+		    return $container->createSharedObject(SwiftMailerAdapter::class);
 		})->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class);
 
 		$closure = function(MailerManager $mailer, Container $container)

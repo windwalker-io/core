@@ -77,7 +77,7 @@ use Windwalker\Registry\Registry;use Windwalker\Uri\UriData;
 					</a>
 				</li>
 				<li>
-					<a target="_blank" href="<?php echo $uri->path . $uri->script; ?>">
+					<a target="_blank" href="<?php echo $uri->path . '/' . $uri->script; ?>">
 						<span class="glyphicon glyphicon-globe"></span>
 						Preview
 					</a>

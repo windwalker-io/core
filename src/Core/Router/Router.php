@@ -38,5 +38,5 @@ abstract class Router extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.router';
+	protected static $_key = 'router';
 }

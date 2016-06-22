@@ -436,7 +436,7 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 	 *
 	 * @return  static
 	 */
-	public function addRouteByConfigs($routes, $package = null)
+	public function addRouteByConfigs(array $routes, $package = null)
 	{
 		foreach ($routes as $key => $route)
 		{

@@ -9,11 +9,6 @@
 namespace Windwalker\Debugger;
 
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Debugger\Listener\DebuggerListener;
-use Windwalker\Debugger\Provider\ProfilerProvider;
-use Windwalker\DI\Container;
-use Windwalker\Event\Dispatcher;
-use Windwalker\Event\DispatcherInterface;
 
 define('WINDWALKER_DEBUGGER_ROOT', __DIR__);
 
@@ -29,7 +24,7 @@ class DebuggerPackage extends AbstractPackage
 	 *
 	 * @var  string
 	 */
-	protected $name = 'debugger';
+	protected $name = '_debugger';
 
 	/**
 	 * initialise
@@ -41,34 +36,6 @@ class DebuggerPackage extends AbstractPackage
 		parent::boot();
 
 		$this->getContainer()->getParent()->share('windwalker.debugger', $this);
-	}
-
-	/**
-	 * registerProviders
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	public function registerProviders(Container $container)
-	{
-		parent::registerProviders($container);
-
-		$container->registerServiceProvider(new ProfilerProvider);
-	}
-
-	/**
-	 * registerListeners
-	 *
-	 * @param DispatcherInterface $dispatcher
-	 *
-	 * @return  void
-	 */
-	public function registerListeners(DispatcherInterface $dispatcher)
-	{
-		parent::registerListeners($dispatcher);
-
-		$dispatcher->addListener(new DebuggerListener($this));
 	}
 
 	/**
