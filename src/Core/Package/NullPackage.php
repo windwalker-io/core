@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Object\SilencerObjectInterface;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherInterface;
@@ -96,6 +97,20 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 */
 	public function boot()
 	{
+	}
+
+	/**
+	 * Get the DI container.
+	 *
+	 * @return  Container
+	 *
+	 * @since   2.0
+	 *
+	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
+	 */
+	public function getContainer()
+	{
+		return Ioc::factory();
 	}
 
 	/**

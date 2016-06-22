@@ -85,7 +85,7 @@ class ErrorManager
 
 		if ($error['type'] == E_ERROR)
 		{
-			$this->error(...$error);
+			$this->error(...array_values($error));
 		}
 	}
 
@@ -103,7 +103,7 @@ class ErrorManager
 	 *
 	 * @see  http://php.net/manual/en/function.set-error-handler.php
 	 */
-	public function error($code, $message, $file, $line, $context)
+	public function error($code, $message, $file, $line, $context = null)
 	{
 		if (error_reporting() === 0)
 		{
@@ -139,13 +139,27 @@ class ErrorManager
 		{
 			$msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;
 
-			exit($msg);
+			if ($this->app->get('system.debug'))
+			{
+				exit($msg);
+			}
+			else
+			{
+				exit($e->getMessage());
+			}
 		}
 		catch (\Exception $e)
 		{
 			$msg = "Infinity loop in exception handler. \nException:\n" . $e;
 
-			exit($msg);
+			if ($this->app->get('system.debug'))
+			{
+				exit($msg);
+			}
+			else
+			{
+				exit($e->getMessage());
+			}
 		}
 
 		exit();

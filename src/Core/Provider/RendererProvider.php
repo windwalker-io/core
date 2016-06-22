@@ -166,7 +166,7 @@ class RendererProvider implements ServiceProviderInterface
 
 		Renderer\Blade\GlobalContainer::addCompiler('messages', function($expression)
 		{
-			return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
+			return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), 'php', \$package) ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::addCompiler('route', function($expression)

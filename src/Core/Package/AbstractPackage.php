@@ -707,7 +707,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if (isset($diMapping[$name]))
 		{
-			return $this->container->get($diMapping[$name]);
+			return $this->getContainer()->get($diMapping[$name]);
 		}
 
 		if ($name == 'container')

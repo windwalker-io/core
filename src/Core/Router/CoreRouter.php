@@ -210,10 +210,7 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 		// Suffix
 		$suffix = $this->fetchControllerSuffix($method, ArrayHelper::getValue($extra, 'action', array()));
 
-		if ($suffix[0] != ':')
-		{
-			$suffix = '\\' . $suffix;
-		}
+		$suffix = '\\' . $suffix;
 
 		$controller = trim($controller, '\\') . $suffix;
 

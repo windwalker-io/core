@@ -38,7 +38,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	 */
 	public function __invoke(Request $request, Response $response, $next = null)
 	{
-		$router = $this->getRouter();
+		$router = $this->app->getRouter();
 
 		$this->app->triggerEvent('onBeforeRouting', [
 			'app'      => $this->app,
@@ -46,10 +46,6 @@ class RoutingMiddleware extends AbstractWebMiddleware
 			'request'  => $request,
 			'response' => $response
 		]);
-
-		$routes = $router::loadRoutingFromFiles((array) $this->app->get('routing.files'));
-
-		$router->registerRawRouting($routes, $this->getPackageResolver());
 
 		$route = $this->match($router);
 

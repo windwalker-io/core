@@ -77,6 +77,13 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	protected $middlewares;
 
 	/**
+	 * Property router.
+	 *
+	 * @var  Core\Router\CoreRouter
+	 */
+	protected $router;
+
+	/**
 	 * Class constructor.
 	 *
 	 * @param   Request        $request       An optional argument to provide dependency injection for the Http request object.
@@ -190,6 +197,30 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$package = $this->container->get('current.package');
 
 		return $package->execute($request->getAttribute('_controller'), $request, $response);
+	}
+
+	/**
+	 * getRouter
+	 *
+	 * @param bool $new
+	 *
+	 * @return  Core\Router\CoreRouter
+	 */
+	public function getRouter($new = false)
+	{
+		if (!$this->router || $new)
+		{
+			/** @var Core\Router\CoreRouter $router */
+			$router = $this->container->get('router');
+
+			$routes = $router::loadRoutingFromFiles((array) $this->get('routing.files'));
+
+			$router->registerRawRouting($routes, $this->container->get('package.resolver'));
+
+			$this->router = $router;
+		}
+
+		return $this->router;
 	}
 
 	/**
@@ -364,7 +395,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'uri'        => 'uri',
 			'dispatcher' => 'dispatcher',
 			'database'   => 'database',
-			'router'     => 'router',
 			'language'   => 'language',
 			'renderer'   => 'renderer',
 			'cache'      => 'cache',
@@ -378,12 +408,17 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		}
 
 		$allowNames = array(
-			'container'
+			'container',
 		);
 
 		if (in_array($name, $allowNames))
 		{
 			return $this->$name;
+		}
+
+		if ($name == 'router')
+		{
+			return $this->getRouter();
 		}
 
 		return parent::__get($name);

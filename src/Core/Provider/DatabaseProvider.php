@@ -76,7 +76,7 @@ class DatabaseProvider implements ServiceProviderInterface
 		};
 
 		$container->share(AbstractExporter::class, $closure)
-			->share('sql.exporter', AbstractExporter::class);
+			->alias('sql.exporter', AbstractExporter::class);
 	}
 
 	/**

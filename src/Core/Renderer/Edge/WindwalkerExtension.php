@@ -123,7 +123,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function messages($expression)
 	{
-		return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
+		return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), 'php', \$package) ?>";
 	}
 
 	/**
