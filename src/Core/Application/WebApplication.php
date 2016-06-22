@@ -121,7 +121,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function init()
 	{
-		$this->setFinalHandler([Core\Error\ErrorHandler::class, 'exception']);
 	}
 
 	/**

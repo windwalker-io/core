@@ -106,12 +106,6 @@ trait WindwalkerTrait
 
 		$this->registerPackages();
 
-		// Remove index.php
-		if ($this->uri->script == 'index.php')
-		{
-			$this->uri->script = null;
-		}
-
 		$this->triggerEvent('onAfterInitialise', array('app' => $this));
 
 		$this->booted = true;
