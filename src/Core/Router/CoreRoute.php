@@ -69,6 +69,24 @@ class CoreRoute
 	}
 
 	/**
+	 * secure
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return  string
+	 */
+	public function secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+	{
+		$queries = (array) $queries;
+		$token = $this->package->container->get('security.csrf')->getFormToken();
+		$queries[$token] = 1;
+
+		return $this->get($route, $queries, $type);
+	}
+
+	/**
 	 * buildHtml
 	 *
 	 * @param string $route
@@ -96,6 +114,18 @@ class CoreRoute
 
 			return '#';
 		}
+	}
+
+	/**
+	 * escape
+	 *
+	 * @param   string  $text
+	 *
+	 * @return  string
+	 */
+	public function escape($text)
+	{
+		return htmlspecialchars($text);
 	}
 
 	/**

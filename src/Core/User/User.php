@@ -51,5 +51,5 @@ class User extends AbstractProxyFacade
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'system.user.manager';
+	protected static $_key = 'user.manager';
 }

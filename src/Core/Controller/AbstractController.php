@@ -42,7 +42,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * @property-read  Registry       $config  Config object.
  * @property-read  WebApplication $app     The application object.
  * @property-read  Input          $input   The input object.
- * @property-read  CoreRoute      $router  Router of this package.
+ * @property-read  CoreRoute      $route   Router of this package.
  *
  * @since  2.0
  */
@@ -279,7 +279,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			'app'      => $this->app,
 			'request'  => $this->request,
 			'response' => $this->response,
-			'router'   => $this->router,
+			'route'    => $this->route,
 			'container' => $this->container,
 			'package'  => $this->getPackage()
 		]);
@@ -914,9 +914,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @return  \Windwalker\Core\Router\CoreRoute
 	 */
-	public function getRouter()
+	public function getRoute()
 	{
-		return $this->package->router;
+		return $this->package->route;
 	}
 
 	/**
@@ -1083,9 +1083,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			return $this->config;
 		}
 
-		if ($name == 'router')
+		if ($name == 'route')
 		{
-			return $this->getRouter();
+			return $this->getRoute();
 		}
 
 		throw new \OutOfRangeException('Property: ' . $name . ' not exists.');

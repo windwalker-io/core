@@ -13,10 +13,12 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The Route class.
  *
- * @see  Route
+ * @see  CoreRoute
  *
- * @method  static  string  get($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
- * @method  static  string  encode($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
+ * @method  static  string  get($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+ * @method  static  string  encode($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+ * @method  static  string  secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+ * @method  static  string  escape($text)
  *
  * @since  {DEPLOY_VERSION}
  */
