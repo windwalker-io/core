@@ -42,6 +42,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'choice'    => [$this, 'plural'],
 			'messages'  => [$this, 'messages'],
 			'widget'    => [$this, 'widget'],
+			'route'     => [$this, 'route'],
 		];
 	}
 
@@ -123,5 +124,17 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function messages($expression)
 	{
 		return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
+	}
+
+	/**
+	 * route
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function route($expression)
+	{
+		return "<?php echo \$route->encode{$expression} ?>";
 	}
 }

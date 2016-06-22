@@ -135,7 +135,9 @@ class MailAttachment
 	{
 		if ($this->body instanceof \Closure)
 		{
-			$this->body = call_user_func($this->body);
+			$method = $this->body;
+			
+			$this->body = $method();
 		}
 
 		return $this->body;

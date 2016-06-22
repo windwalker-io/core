@@ -47,7 +47,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 		$input     = $container->get('input');
 
@@ -78,11 +78,11 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		/** @var CoreRouter $router */
-		$router = $event['app']->getRouter();
+		$router = $event['app']->router;
 
 		$collector['package.name']    = $container->get('current.package')->getName();
 		$collector['package.class']   = get_class($container->get('current.package'));
@@ -210,7 +210,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $package->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		$collector['controller.main'] = get_class($controller);
@@ -234,7 +234,7 @@ class ProfilerListener
 	 *
 	 * @return  void
 	 */
-	public function onAfterRender(Event $event)
+	public function onAfterExecute(Event $event)
 	{
 		/**
 		 * @var Container $container
@@ -242,7 +242,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		$profiler->mark(__FUNCTION__, array(
@@ -265,7 +265,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		$collector['redirect'] = array(
@@ -289,7 +289,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = $event['app']->getContainer();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		$profiler->mark(__FUNCTION__, array(
@@ -310,7 +310,7 @@ class ProfilerListener
 		 * @var Profiler  $profiler
 		 */
 		$container = Ioc::factory();
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
 		// Packages

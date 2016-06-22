@@ -17,10 +17,6 @@ use Windwalker\Router\Route;
  * @since  2.0.
  *
  * @method  static  string  build($route, $queries = array(), $type = CoreRouter::TYPE_RAW, $xhtml = false)
- * @method  static  string  buildHttp($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
- * @method  static  string  http($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
- * @method  static  string  buildHtml($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
- * @method  static  string  html($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
  * @method  static  Route   match($rawRoute, $method = 'GET', $options = array())
  * @method  static  Route   addRouteByConfig($name, $route, $package = null)
  * @method  static  CoreRouter  addRouteByConfigs($routes, $package = null)

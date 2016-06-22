@@ -91,10 +91,11 @@ class ViewModel implements \ArrayAccess
 	 *
 	 * @param string $name
 	 * @param string $modelName
+	 * @param array  $args
 	 *
-	 * @return  mixed
+	 * @return mixed
 	 */
-	public function get($name, $modelName = null)
+	public function get($name, $modelName = null, ...$args)
 	{
 		$model = $this->getModel($modelName);
 
@@ -110,12 +111,7 @@ class ViewModel implements \ArrayAccess
 			return null;
 		}
 
-		$args = func_get_args();
-
-		array_shift($args);
-		array_shift($args);
-
-		return call_user_func_array(array($model, $method), $args);
+		return $model->$method(...$args);
 	}
 
 	/**
@@ -123,10 +119,11 @@ class ViewModel implements \ArrayAccess
 	 *
 	 * @param string $name
 	 * @param string $modelName
+	 * @param array  $args
 	 *
-	 * @return  mixed
+	 * @return mixed
 	 */
-	public function load($name, $modelName = null)
+	public function load($name, $modelName = null, ...$args)
 	{
 		$model = $this->getModel($modelName);
 
@@ -142,12 +139,7 @@ class ViewModel implements \ArrayAccess
 			return null;
 		}
 
-		$args = func_get_args();
-
-		array_shift($args);
-		array_shift($args);
-
-		return call_user_func_array(array($model, $method), $args);
+		return $model->$method(...$args);
 	}
 
 	/**
@@ -194,7 +186,7 @@ class ViewModel implements \ArrayAccess
 	{
 		$model = $this->getModel();
 
-		return call_user_func_array(array($model, $name), $args);
+		return $model->$name(...$args);
 	}
 
 	/**

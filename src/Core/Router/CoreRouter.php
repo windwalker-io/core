@@ -102,15 +102,12 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 	 * @param string $route
 	 * @param array  $queries
 	 * @param string $type
-	 * @param bool   $xhtml
 	 *
 	 * @return  string
 	 */
-	public function build($route, $queries = array(), $type = CoreRouter::TYPE_RAW, $xhtml = false)
+	public function build($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
 	{
-		$route = str_replace(':', '@', $route);
-
-		if (!array_key_exists($route, $this->routes))
+		if (!$this->hasRoute($route))
 		{
 			throw new \OutOfRangeException('Route: ' . $route . ' not found.');
 		}
@@ -125,18 +122,17 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 				throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found', implode('::', (array) $extra['hook']['build']), $route));
 			}
 
-			call_user_func($extra['hook']['build'], $this, $route, $queries, $type, $xhtml);
+			call_user_func($extra['hook']['build'], $this, $route, $queries, $type);
 		}
 
 		$this->triggerEvent('onRouterBeforeRouteBuild', array(
 			'route'   => &$route,
 			'queries' => &$queries,
 			'type'    => &$type,
-			'xhtml'   => &$xhtml,
 			'router'  => $this
 		));
 
-		$key = $this->getCacheKey(array($route, $queries, $type, $xhtml));
+		$key = $this->getCacheKey(array($route, $queries, $type));
 
 		if ($this->cache->exists($key))
 		{
@@ -151,7 +147,6 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 			'route'   => &$route,
 			'queries' => &$queries,
 			'type'    => &$type,
-			'xhtml'   => &$xhtml,
 			'router'  => $this
 		));
 
@@ -162,77 +157,16 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 
 		if ($type == static::TYPE_PATH)
 		{
-			$url = $uri->root . $script . ltrim($url, '/');
+			$url = $uri->path . '/' . $script . ltrim($url, '/');
 		}
 		elseif ($type == static::TYPE_FULL)
 		{
-			$url = $uri->path . $script . $url;
-		}
-
-		if ($xhtml)
-		{
-			$url = htmlspecialchars($url);
+			$url = $uri->root . '/' . $script . $url;
 		}
 
 		$this->cache->set($key, $url);
 
 		return $url;
-	}
-
-	/**
-	 * buildHtml
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function html($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		return $this->build($route, $queries, $type, true);
-	}
-
-	/**
-	 * buildHttp
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function http($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		return $this->build($route, $queries, $type, false);
-	}
-
-	/**
-	 * buildHtml
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function buildHtml($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		return $this->html($route, $queries, $type);
-	}
-
-	/**
-	 * buildHttp
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function buildHttp($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		return $this->http($route, $queries, $type);
 	}
 
 	/**

@@ -12,7 +12,7 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
@@ -24,9 +24,9 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The AbstractView class.
  *
- * @property-read  ViewModel|mixed  $model   The ViewModel object.
- * @property-read  Registry         $config  Config object.
- * @property-read  PackageRouter    $router  Router object.
+ * @property-read  ViewModel|mixed $model   The ViewModel object.
+ * @property-read  Registry        $config  Config object.
+ * @property-read  CoreRoute       $router  Router object.
  *
  * @since  2.1.5.3
  */
@@ -581,7 +581,7 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * getRouter
 	 *
-	 * @return  PackageRouter
+	 * @return  CoreRoute
 	 */
 	public function getRouter()
 	{
@@ -591,16 +591,13 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * delegate
 	 *
-	 * @param   string  $name
+	 * @param   string $name
+	 * @param   array  $args
 	 *
-	 * @return  mixed
+	 * @return   mixed
 	 */
-	protected function delegate($name)
+	protected function delegate($name, ...$args)
 	{
-		$args = func_get_args();
-
-		array_shift($args);
-
 		if (!count($args))
 		{
 			$args[] = $this->getData();
@@ -612,7 +609,7 @@ abstract class AbstractView implements \ArrayAccess
 
 		if (is_callable(array($this, $name)))
 		{
-			return call_user_func_array(array($this, $name), $args);
+			return $this->$name(...$args);
 		}
 
 		return null;

@@ -18,7 +18,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
  * 
  * @since  2.1.1
  */
-class DashboardHtmlView extends AbstractDebuggerHtmlView
+class DashboardView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData
@@ -29,7 +29,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$router = $this->getPackage()->getRouter();
+		$route = $this->getPackage()->route;
 
 		$data->items = $this->model->getItems();
 
@@ -39,7 +39,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 			$collector = $item['collector'];
 
 			$item->url  = $collector['system.uri.full'];
-			$item->link = $router->html('system', array('id' => $item->id));
+			$item->link = $route->encode('system', array('id' => $item->id));
 			$item->method = $collector['system.method.custom'] ? : $collector['system.method.http'];
 			$item->ip   = $collector['system.ip'];
 			$item->time = $collector['system.time'];

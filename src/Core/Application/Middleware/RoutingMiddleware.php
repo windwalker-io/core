@@ -40,13 +40,36 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	{
 		$router = $this->getRouter();
 
+		$this->app->triggerEvent('onBeforeRouting', [
+			'app'      => $this->app,
+			'router'   => $router,
+			'request'  => $request,
+			'response' => $response
+		]);
+
 		$routes = $router::loadRoutingFromFiles((array) $this->app->get('routing.files'));
 
 		$router->registerRawRouting($routes, $this->getPackageResolver());
 
 		$route = $this->match($router);
 
+		$this->app->triggerEvent('onAfterRouteMatched', [
+			'app'     => $this->app,
+			'router'  => $router,
+			'matched' => $route,
+			'request' => $request,
+			'response' => $response
+		]);
+
 		$request = $this->handleMatched($route, $request);
+
+		$this->app->triggerEvent('onAfterRouting', [
+			'app'     => $this->app,
+			'router'  => $router,
+			'matched' => $route,
+			'request' => $request,
+			'response' => $response
+		]);
 
 		return $next($request, $response);
 	}
@@ -177,7 +200,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
 		// Store to config
 		$this->app->set('route', [
-			'name'       => $route,
+			'matched'    => $route->getName(),
 			'package'    => $packageName,
 			'short_name' => $routeName,
 			'extra'      => $extra

@@ -97,6 +97,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$this->container = Core\Ioc::factory();
 
 		parent::__construct($request, $config, $environment);
+
+		$this->set('execution.start', microtime(true));
+		$this->set('execution.memory', memory_get_usage());
 	}
 
 	/**
@@ -125,9 +128,34 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$this->boot();
 
+		$this->triggerEvent('onAfterBoot', ['app' => $this]);
+
 		$this->registerMiddlewares();
 
-		return parent::execute();
+		$this->triggerEvent('onAfterRegisterMiddlewares', ['app' => $this, 'middlewares' => $this->getMiddlewares()]);
+
+		$this->prepareExecute();
+
+		// @event onBeforeExecute
+		$this->triggerEvent('onBeforeExecute', ['app' => $this]);
+
+		// Perform application routines.
+		$response = $this->doExecute();
+
+		// @event onAfterExecute
+		$this->triggerEvent('onAfterExecute', ['app' => $this]);
+
+		$this->postExecute();
+
+		// @event onBeforeRespond
+		$this->triggerEvent('onBeforeRespond', ['app' => $this, 'response' => $response]);
+
+		$this->server->getOutput()->respond($response);
+
+		// @event onAfterRespond
+		$this->triggerEvent('onAfterRespond', ['app' => $this, 'response' => $response]);
+
+		return $response;
 	}
 
 	/**

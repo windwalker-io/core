@@ -10,7 +10,7 @@ namespace Windwalker\Core\Test\View;
 
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\NullPackage;
-use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\MvcPackage;
@@ -263,7 +263,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$this->instance->setPackage($package);
 
-		$this->assertTrue($package->router instanceof PackageRouter);
+		$this->assertTrue($package->router instanceof CoreRoute);
 
 		/** @var CoreRouter $router */
 		$router = Ioc::getRouter();
@@ -275,14 +275,14 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$package->router->setRouter($router);
 
-		$this->assertEquals('flower/12', $package->router->http('flower', array('id' => 12), CoreRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $package->route->get('flower', array('id' => 12), CoreRouter::TYPE_RAW));
 
 		// Test global variables
 		TestHelper::invoke($this->instance, 'prepareGlobals', $this->instance->getData());
 
 		$data = $this->instance->getData();
 
-		$this->assertEquals('flower/12', $data->router->http('flower', array('id' => 12), CoreRouter::TYPE_RAW));
-		$this->assertEquals('flower/12', $data->package->router->http('flower', array('id' => 12), CoreRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->route->route('flower', array('id' => 12), CoreRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->package->route->route('flower', array('id' => 12), CoreRouter::TYPE_RAW));
 	}
 }

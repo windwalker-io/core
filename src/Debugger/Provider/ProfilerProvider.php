@@ -49,7 +49,7 @@ class ProfilerProvider implements ServiceProviderInterface
 			{
 				$profiler = new Profiler('windwalker');
 
-				$profiler->setPoint(new Point('start', $config['execution.start'], $config['execution.memory'], array('tag' => 'system.process')));
+				$profiler->setPoint(new Point('start', $config['execution.start'] ? : microtime(true), $config['execution.memory'] ? : memory_get_usage(true), array('tag' => 'system.process')));
 
 				return $profiler;
 			}
@@ -59,8 +59,7 @@ class ProfilerProvider implements ServiceProviderInterface
 			}
 		};
 
-		$container->share('system.profiler', $closure)
-			->alias('profiler', 'system.profiler');
+		$container->share('profiler', $closure);
 
 		// System collector
 		$closure = function(Container $container)
@@ -77,7 +76,7 @@ class ProfilerProvider implements ServiceProviderInterface
 			}
 		};
 
-		$container->share('system.collector', $closure);
+		$container->share('debugger.collector', $closure);
 
 		if ($container->get('config')->get('system.debug'))
 		{
@@ -100,7 +99,7 @@ class ProfilerProvider implements ServiceProviderInterface
 	{
 		static $queryData = array();
 
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 
 		$collector['database.query.times'] = 0;
 		$collector['database.query.total.time'] = 0;

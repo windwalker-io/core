@@ -7,13 +7,14 @@
  */
 
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Registry\Registry;
+use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Registry\Registry;use Windwalker\Uri\UriData;
 
 /**
  * @var Registry        $uri
  * @var AbstractPackage $package
- * @var PackageRouter   $router
+ * @var CoreRoute       $router
+ * @var UriData         $uri
  */
 ?><!doctype html>
 <html lang="en">
@@ -27,11 +28,11 @@ use Windwalker\Registry\Registry;
 	<?php $this->endblock(); ?>
 
 	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,300,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="<?php echo $router->html('asset', array('type' => 'css')); ?>" />
+	<link rel="stylesheet" href="<?php echo $route->encode('asset', array('type' => 'css')); ?>" />
 	<style>
 		@font-face {
 			font-family: 'Glyphicons Halflings';
-			src: url('<?php echo $router->html('asset', array('type' => 'fonts')); ?>');
+			src: url('<?php echo $route->encode('asset', array('type' => 'fonts')); ?>');
 		}
 	</style>
 	<?php $this->block('style'); ?>
@@ -50,33 +51,33 @@ use Windwalker\Registry\Registry;
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="<?php echo $router->html('dashboard'); ?>">
+			<a class="navbar-brand" href="<?php echo $route->encode('dashboard'); ?>">
 				Windwalker Debugger
 			</a>
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
 				<?php $this->block('nav'); ?>
-				<li class="<?php echo $helper->view->isActiveRoute('system') ?>"><a href="<?php echo $router->html('system'); ?>">System</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('request') ?>"><a href="<?php echo $router->html('request'); ?>">Request</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('routing') ?>"><a href="<?php echo $router->html('routing'); ?>">Routing</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('timeline') ?>"><a href="<?php echo $router->html('timeline'); ?>">Timeline</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('events') ?>"><a href="<?php echo $router->html('events'); ?>">Events</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('system') ?>"><a href="<?php echo $route->encode('system'); ?>">System</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('request') ?>"><a href="<?php echo $route->encode('request'); ?>">Request</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('routing') ?>"><a href="<?php echo $route->encode('routing'); ?>">Routing</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('timeline') ?>"><a href="<?php echo $route->encode('timeline'); ?>">Timeline</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('events') ?>"><a href="<?php echo $route->encode('events'); ?>">Events</a></li>
 
-				<li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a href="<?php echo $router->html('database'); ?>">Database</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a href="<?php echo $router->html('exception'); ?>">Exception</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a href="<?php echo $route->encode('database'); ?>">Database</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a href="<?php echo $route->encode('exception'); ?>">Exception</a></li>
 				<?php $this->endblock(); ?>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li>
-					<a class="" href="<?php echo $router->html($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
+					<a class="" href="<?php echo $route->encode($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
 						data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
 						<span class="glyphicon glyphicon-refresh"></span>
 						Refresh
 					</a>
 				</li>
 				<li>
-					<a target="_blank" href="<?php echo $uri['base.path'] . $uri['script']; ?>">
+					<a target="_blank" href="<?php echo $uri->path . $uri->script; ?>">
 						<span class="glyphicon glyphicon-globe"></span>
 						Preview
 					</a>
@@ -96,11 +97,11 @@ use Windwalker\Registry\Registry;
 	<div class="container">
 		<h1><?php $this->block('page_title'); ?><?php $this->endblock(); ?></h1>
 		<p>
-			<a class="btn btn-sm btn-info" href="<?php echo $router->html('dashboard'); ?>"
+			<a class="btn btn-sm btn-info" href="<?php echo $route->encode('dashboard'); ?>"
 				data-toggle="tooltip" data-placement="top" title="Choose other URLs">
 				<span class="glyphicon glyphicon-list"></span>
 			</a>
-			<a class="btn btn-sm btn-success" href="<?php echo $router->html($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
+			<a class="btn btn-sm btn-success" href="<?php echo $route->encode($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
 				data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</a>

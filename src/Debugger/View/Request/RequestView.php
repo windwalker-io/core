@@ -17,7 +17,7 @@ use Windwalker\Registry\Registry;
  * 
  * @since  2.1.1
  */
-class RequestHtmlView extends AbstractDebuggerHtmlView
+class RequestView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData

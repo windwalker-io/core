@@ -20,7 +20,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\DefaultPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\View\AbstractView;
@@ -39,10 +39,10 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The Controller class.
  *
- * @property-read  Registry        $config  Config object.
- * @property-read  WebApplication  $app     The application object.
- * @property-read  Input           $input   The input object.
- * @property-read  PackageRouter   $router  Router of this package.
+ * @property-read  Registry       $config  Config object.
+ * @property-read  WebApplication $app     The application object.
+ * @property-read  Input          $input   The input object.
+ * @property-read  CoreRoute      $router  Router of this package.
  *
  * @since  2.0
  */
@@ -364,18 +364,15 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * delegate
 	 *
 	 * @param   string $task
+	 * @param   array  $args
 	 *
-	 * @return  mixed
+	 * @return mixed
 	 */
-	protected function delegate($task)
+	protected function delegate($task, ...$args)
 	{
 		if (is_callable(array($this, $task)))
 		{
-			$args = func_get_args();
-
-			array_shift($args);
-
-			return call_user_func(array($this, $task), $args);
+			return $this->$task(...$args);
 		}
 
 		throw new \LogicException('Task: ' . $task . ' not found.');
@@ -915,7 +912,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * getRouter
 	 *
-	 * @return  \Windwalker\Core\Router\PackageRouter
+	 * @return  \Windwalker\Core\Router\CoreRoute
 	 */
 	public function getRouter()
 	{
@@ -936,7 +933,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	{
 		$container = $this->getContainer();
 
-		if (!$container->exists('system.dispatcher'))
+		if (!$container->exists('dispatcher'))
 		{
 			return null;
 		}

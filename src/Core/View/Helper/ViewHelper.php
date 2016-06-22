@@ -99,7 +99,7 @@ class ViewHelper extends AbstractHelper
 
 		if (count(explode(':', $route)) < 2)
 		{
-			$route = $package->getName() . ':' . $route;
+			$route = $package->getName() . '@' . $route;
 		}
 
 		return $config->get('route.matched') == $route ? 'active' : false;

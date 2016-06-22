@@ -45,11 +45,11 @@ class HtmlView extends AbstractView
 	 */
 	public function __construct(array $data = null, $config = null, $renderer = null)
 	{
-		parent::__construct($data, $config);
-
 		$this->renderer = $renderer ? : $this->renderer;
 		$this->renderer = $this->renderer ? : RendererHelper::PHP;
-		
+
+		parent::__construct($data, $config);
+
 		$this->data = new Data($this->data);
 	}
 
@@ -181,7 +181,7 @@ class HtmlView extends AbstractView
 		$globals  = $this->getRendererManager()->getGlobals();
 
 		$globals['package'] = $this->getPackage();
-		$globals['router'] = $this->getPackage()->router;
+		$globals['route'] = $this->getPackage()->route;
 
 		$data->bind($globals);
 	}

@@ -31,7 +31,7 @@ trait BootableTrait
 
 			if (method_exists($this, $method))
 			{
-				call_user_func_array([$this, $method], $args);
+				$this->$method(...$args);
 			}
 		}
 	}

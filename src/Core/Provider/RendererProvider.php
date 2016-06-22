@@ -139,6 +139,11 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareBlade(Container $container)
 	{
+		if (!class_exists('Illuminate\View\Compilers\BladeCompiler'))
+		{
+			return;
+		}
+
 		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)
 		{
 			return "<?php echo \$translator->translate{$expression} ?>";
@@ -162,6 +167,11 @@ class RendererProvider implements ServiceProviderInterface
 		Renderer\Blade\GlobalContainer::addCompiler('messages', function($expression)
 		{
 			return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), \$package) ?>";
+		});
+
+		Renderer\Blade\GlobalContainer::addCompiler('route', function($expression)
+		{
+			return "<?php echo \$route->encode{$expression} ?>";
 		});
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');

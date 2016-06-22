@@ -26,7 +26,7 @@ class DateTimeProvider implements ServiceProviderInterface
 	 */
 	public function boot()
 	{
-		DateTime::setDefaultTimezone('UTC');
+		date_default_timezone_set('UTC');
 	}
 
 	/**

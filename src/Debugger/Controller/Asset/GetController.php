@@ -9,6 +9,7 @@
 namespace Windwalker\Debugger\Controller\Asset;
 
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Http\Response\TextResponse;
 
 /**
  * The GetController class.
@@ -26,7 +27,7 @@ class GetController extends AbstractController
 	{
 		$type = $this->input->get('type', 'css');
 
-		$media = WINDWALKER_DEBUGGER_ROOT . '/Resources/media';
+		$media = WINDWALKER_DEBUGGER_ROOT . '/Resources/asset';
 		$content = '';
 		$contentType = 'text/html';
 
@@ -50,8 +51,8 @@ class GetController extends AbstractController
 				break;
 		}
 
-		$this->app->response->setMimeType($contentType)
-			->isCachable(true);
+		$this->response = (new TextResponse)->withContentType($contentType);
+		$this->app->server->cachable(true);
 
 		return $content;
 	}

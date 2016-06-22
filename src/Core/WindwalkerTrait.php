@@ -92,7 +92,7 @@ trait WindwalkerTrait
 		$this->registerProviders();
 
 		// Set some default objects
-		if ($this->container->exists('system.dispatcher'))
+		if ($this->container->exists('dispatcher'))
 		{
 			$this->dispatcher = $this->container->get('dispatcher');
 		}
@@ -162,12 +162,12 @@ trait WindwalkerTrait
 				$provider = new $provider($this);
 			}
 
+			$container->registerServiceProvider($provider);
+
 			if (is_callable([$provider, 'boot']))
 			{
 				$provider->boot($container);
 			}
-
-			$container->registerServiceProvider($provider);
 		}
 	}
 

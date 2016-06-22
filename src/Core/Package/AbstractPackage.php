@@ -17,7 +17,8 @@ use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
-use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -34,10 +35,11 @@ use Windwalker\Registry\Registry;
  * The AbstractPackage class.
  *
  * @property-read  Registry                   $config
- * @property-read  PackageRouter              $router
+ * @property-read  CoreRoute                  $route
  * @property-read  PsrInput                   $input
  * @property-read  WebApplication|CoreConsole $app
  * @property-read  string                     $name
+ * @property-read  Container                  $container
  *
  * @since  2.0
  */
@@ -706,12 +708,17 @@ class AbstractPackage implements DispatcherAwareInterface
 			'app'        => 'application',
 			'input'      => 'input',
 			'dispatcher' => 'dispatcher',
-			'router'     => 'router'
+			'route'      => 'route'
 		];
 
 		if (isset($diMapping[$name]))
 		{
 			return $this->container->get($diMapping[$name]);
+		}
+
+		if ($name == 'container')
+		{
+			return $this->getContainer();
 		}
 
 		if ($name == 'config')

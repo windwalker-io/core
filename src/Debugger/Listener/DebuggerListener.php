@@ -56,6 +56,7 @@ class DebuggerListener
 	public function __construct(DebuggerPackage $package)
 	{
 		$this->package = $package;
+		$this->app = $package->app;
 	}
 
 	/**
@@ -115,7 +116,7 @@ class DebuggerListener
 
 			if ($item)
 			{
-				$app->redirect($package->router->http($app->get('route.matched'), array('id' => $item['id'])));
+				$app->redirect($package->route->get($app->get('route.matched'), array('id' => $item['id'])));
 
 				return;
 			}
@@ -145,7 +146,7 @@ class DebuggerListener
 			// set id to session and redirect
 			$session->set('debugger.current.id', $id);
 
-			$app->redirect($package->router->http($app->get('route.matched'), array('id' => $id)));
+			$app->redirect($package->route->get($app->get('route.matched'), array('id' => $id)));
 
 			return;
 		}
@@ -156,7 +157,7 @@ class DebuggerListener
 		{
 			$session->set('debugger.current.id', null);
 
-			$app->redirect($package->router->http('dashboard'));
+			$app->redirect($package->route->get('dashboard'));
 		}
 
 		$session->set('debugger.current.id', $id);
@@ -210,7 +211,7 @@ class DebuggerListener
 		$container = $this->app->getContainer();
 
 		$profiler = $container->get('profiler');
-		$collector = $container->get('collector');
+		$collector = $container->get('debugger.collector');
 
 		$id = uniqid();
 		$collector['id'] = $id;
@@ -228,12 +229,7 @@ class DebuggerListener
 
 		$dir = WINDWALKER_CACHE . '/profiler/' . PageRecordHelper::getFolderName($id);
 
-		if (!is_dir($dir))
-		{
-			Folder::create($dir);
-		}
-
-		file_put_contents($dir . '/' . $id, $data);
+		File::write($dir . '/' . $id, $data);
 	}
 
 	/**
@@ -271,7 +267,7 @@ class DebuggerListener
 		$data->timeStyle = TimelineHelper::getStateColor($data->time, 250);
 		$data->memoryStyle = TimelineHelper::getStateColor($data->memory, 5);
 
-		$widget = new Widget('debugger.console', null, $this->package->getName());
+		$widget = new Widget('debugger.console', 'php', $this->package->getName());
 
 		echo $widget->render($data);
 	}

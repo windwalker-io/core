@@ -91,7 +91,7 @@ class EventDispatcher extends Dispatcher
 					continue;
 				}
 
-				call_user_func($listener, $event);
+				$listener($event);
 
 				if ($this->debug)
 				{

@@ -52,7 +52,6 @@ class AssetProvider implements ServiceProviderInterface
 		};
 
 		$container->share(AssetManager::class, $closure)
-			->alias('system.asset', AssetManager::class)
 			->alias('asset', AssetManager::class);
 		
 		// Script
@@ -62,7 +61,6 @@ class AssetProvider implements ServiceProviderInterface
 		};
 
 		$container->share(ScriptManager::class, $closure)
-			->alias('system.script.manager', ScriptManager::class)
 			->alias('script.manager', ScriptManager::class);
 
 		AbstractScript::$instance = function () use ($container)

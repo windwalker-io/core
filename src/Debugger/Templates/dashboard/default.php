@@ -66,7 +66,7 @@ $this->extend('_global.html');
 	</tbody>
 </table>
 
-<script src="<?php echo $router->html('asset', array('type' => 'tooltip-js')); ?>"></script>
+<script src="<?php echo $route->encode('asset', array('type' => 'tooltip-js')); ?>"></script>
 <script>
 	$('.hasTooltip').tooltip();
 </script>

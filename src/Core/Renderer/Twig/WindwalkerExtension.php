@@ -80,17 +80,13 @@ class WindwalkerExtension extends \Twig_Extension
 			new \Twig_SimpleFilter('lang', array($language, 'translate')),
 			new \Twig_SimpleFilter('translate', array($language, 'translate')),
 			new \Twig_SimpleFilter('_', array($language, 'translate')),
-			new \Twig_SimpleFilter('sprintf', function () use ($language)
+			new \Twig_SimpleFilter('sprintf', function (...$args) use ($language)
 			{
-				$args = func_get_args();
-
-				return call_user_func_array(array($language, 'sprintf'), $args);
+				return $language->sprintf(...$args);
 			}),
-			new \Twig_SimpleFilter('plural', function () use ($language)
+			new \Twig_SimpleFilter('plural', function (...$args) use ($language)
 			{
-				$args = func_get_args();
-
-				return call_user_func_array(array($language, 'plural'), $args);
+				return $language->plural(...$args);
 			})
 		);
 	}

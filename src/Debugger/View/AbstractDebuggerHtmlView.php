@@ -8,14 +8,14 @@
 
 namespace Windwalker\Debugger\View;
 
-use Windwalker\Core\View\PhpHtmlView;
+use Windwalker\Core\View\HtmlView;
 
 /**
  * The AbstractDebuggerHtmlView class.
  * 
  * @since  2.1.1
  */
-class AbstractDebuggerHtmlView extends PhpHtmlView
+class AbstractDebuggerHtmlView extends HtmlView
 {
 	/**
 	 * initialise
@@ -24,6 +24,10 @@ class AbstractDebuggerHtmlView extends PhpHtmlView
 	 */
 	protected function init()
 	{
+	
+		
+		$this->boot();
+
 		$this->renderer->config->set('local_variables', true);
 	}
 }

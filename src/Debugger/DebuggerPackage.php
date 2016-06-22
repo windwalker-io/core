@@ -52,6 +52,8 @@ class DebuggerPackage extends AbstractPackage
 	 */
 	public function registerProviders(Container $container)
 	{
+		parent::registerProviders($container);
+
 		$container->registerServiceProvider(new ProfilerProvider);
 	}
 

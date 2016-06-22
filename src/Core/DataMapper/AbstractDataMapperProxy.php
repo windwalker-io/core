@@ -70,7 +70,9 @@ class AbstractDataMapperProxy
 	 */
 	public function __call($name, $arguments)
 	{
-		return call_user_func_array(array(static::getInstance(), $name), $arguments);
+		$instance = static::getInstance();
+		
+		return $instance->$name(...$arguments);
 	}
 
 	/**
@@ -84,7 +86,9 @@ class AbstractDataMapperProxy
 	 */
 	public static function __callStatic($name, $arguments)
 	{
-		return call_user_func_array(array(static::getInstance(), $name), $arguments);
+		$instance = static::getInstance();
+
+		return $instance->$name(...$arguments);
 	}
 
 	/**

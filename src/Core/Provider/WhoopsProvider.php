@@ -43,12 +43,12 @@ class WhoopsProvider implements ServiceProviderInterface
 
 			$whoops->pushHandler(function($exception, $inspector, $run) use ($container)
 			{
-				if (!$container->exists('system.collector'))
+				if (!$container->exists('debugger.collector'))
 				{
 					return;
 				}
 
-				$collector = $container->get('collector');
+				$collector = $container->get('debugger.collector');
 
 				/** @var \Exception $exception */
 				$collector['exception'] = array(

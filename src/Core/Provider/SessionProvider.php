@@ -30,9 +30,7 @@ class SessionProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$self = $this;
-
-		$closure = function(Container $container) use ($self)
+		$closure = function(Container $container)
 		{
 			/** @var \Windwalker\Registry\Registry $config */
 			$config = $container->get('config');
@@ -43,7 +41,7 @@ class SessionProvider implements ServiceProviderInterface
 
 			$options['cookie_path'] = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->root;
 
-			$sesion = new Session($self->getHandler($handler, $container, $options), null, null, null, $options);
+			$sesion = new Session($this->getHandler($handler, $container, $options), null, null, null, $options);
 
 			return $sesion;
 		};

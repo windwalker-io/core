@@ -16,7 +16,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
  * 
  * @since  2.1.1
  */
-class ExceptionHtmlView extends AbstractDebuggerHtmlView
+class ExceptionView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData
