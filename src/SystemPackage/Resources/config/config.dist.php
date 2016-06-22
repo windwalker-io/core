@@ -8,12 +8,10 @@
 
 return [
 	'providers' =>[
-		300 => \Windwalker\Debugger\Provider\ProfilerProvider::class
 	],
 
 	'routing' => [
 		'files' => [
-			'debugger' => __DIR__ . '/routing.yml'
 		]
 	],
 
@@ -26,10 +24,10 @@ return [
 	],
 
 	'listeners' => [
-		300 => \Windwalker\Debugger\Listener\DebuggerListener::class
+
 	],
-	
+
 	'commands' => [
-		
+		\Windwalker\SystemPackage\Command\BuildCommand::class
 	]
 ];

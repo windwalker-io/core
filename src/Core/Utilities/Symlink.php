@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Utilities;
 
+use Windwalker\Environment\PlatformHelper;
 use Windwalker\Environment\ServerHelper;
 
 /**
@@ -27,7 +28,7 @@ class Symlink
 	 */
 	public function make($src, $dest)
 	{
-		$windows = ServerHelper::isWindows();
+		$windows = PlatformHelper::isWindows();
 
 		$src    = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $src);
 		$dest = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $dest);

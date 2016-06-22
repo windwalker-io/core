@@ -10,6 +10,7 @@ namespace Windwalker\Core\Package\Command;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Package\Command\Package\CopyConfigCommand;
+use Windwalker\Core\Package\Command\Package\InstallCommand;
 
 /**
  * The PackageCommand class.
@@ -41,11 +42,12 @@ class PackageCommand extends Command
 	 */
 	protected function init()
 	{
-		$this->addCommand(new CopyConfigCommand);
+		$this->addCommand(CopyConfigCommand::class);
+		$this->addCommand(InstallCommand::class);
 
 		$this->addGlobalOption('e')
 			->alias('env')
 			->description('The environment application name or class.')
-			->defaultValue('Windwalker\Web\DevApplication');
+			->defaultValue('dev');
 	}
 }

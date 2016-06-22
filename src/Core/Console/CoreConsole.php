@@ -188,7 +188,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 			->addGlobalOption('n')
 			->alias('no-interactive')
 			->defaultValue(false)
-			->description('Ignore interactions and assume to yes.');
+			->description('Ignore interactions and assume to default value.');
 
 		return $this;
 	}

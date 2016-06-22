@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Package;
 
 use Windwalker\Console\Console;
+use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\Registry\Registry;
@@ -80,7 +81,6 @@ class PackageResolver implements ContainerAwareInterface
 	public function addPackage($alias, $package)
 	{
 		$container = $this->getContainer();
-		$config = $container->get('config');
 
 		if (is_string($package))
 		{
@@ -107,10 +107,11 @@ class PackageResolver implements ContainerAwareInterface
 
 		$package->setContainer($subContainer)->boot();
 
+		/** @var WindwalkerApplicationInterface $application */
 		$application = $container->get('application');
 
 		// If in Console mode, register commands.
-		if ($application instanceof Console)
+		if ($application->isConsole())
 		{
 			$package->registerCommands($application);
 		}

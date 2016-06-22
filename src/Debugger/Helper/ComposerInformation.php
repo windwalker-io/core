@@ -44,7 +44,8 @@ class ComposerInformation
 			$file = WINDWALKER_ROOT . '/composer.lock';
 
 			// Ignore unknown PHP7 version caused net::ERR_INCOMPLETE_CHUNKED_ENCODING in debug mode.
-			if (version_compare(PHP_VERSION, 7, '<='))
+//			if (version_compare(PHP_VERSION, 7, '<='))
+			if (true)
 			{
 				$data = file_get_contents($file);
 

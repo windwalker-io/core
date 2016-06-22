@@ -11,6 +11,7 @@ namespace Windwalker\Core\Package;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Symfony\Component\Yaml\Yaml;
+use Windwalker\Console\Command\Command;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\CoreConsole;
@@ -483,36 +484,15 @@ class AbstractPackage implements DispatcherAwareInterface
 	 *
 	 * @return  void
 	 */
-	public static function registerCommands(Console $console)
+	public function registerCommands(Console $console)
 	{
-		$reflection = new \ReflectionClass(get_called_class());
+		$commands = (array) $this->get('commands');
 
-		$namespace = $reflection->getNamespaceName();
-
-		$path = dirname($reflection->getFileName()) . '/Command';
-
-		if (!is_dir($path))
+		foreach ($commands as $class)
 		{
-			return;
-		}
-
-		$path = new PathLocator($path);
-
-		foreach ($path as $file)
-		{
-			/** @var \SplFileInfo $file */
-			if (!$file->isFile())
+			if (class_exists($class) && is_subclass_of($class, Command::class))
 			{
-				continue;
-			}
-
-			$class = $namespace . '\\Command\\' . $file->getBasename('.php');
-
-			$enabled = property_exists($class, 'isEnabled') ? $class::$isEnabled : true;
-
-			if (class_exists($class) && is_subclass_of($class, 'Windwalker\\Console\\Command\\Command') && $enabled)
-			{
-				$console->addCommand(new $class);
+				$console->addCommand($class);
 			}
 		}
 	}

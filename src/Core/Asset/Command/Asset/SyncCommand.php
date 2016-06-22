@@ -10,8 +10,10 @@ namespace Windwalker\Core\Asset\Command\Asset;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Environment\PlatformHelper;
 use Windwalker\Environment\ServerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Core\Utilities\Symlink;
@@ -63,33 +65,36 @@ class SyncCommand extends Command
 	{
 		$hard = $this->getOption('hard');
 
-		// Prepare migration path
-		$packageName = $this->getArgument(0);
+		// Prepare path
+		$name = $this->io->getArgument(0);
 
 		/** @var WebApplication $env */
 		$env = $this->getOption('env');
 
-		if (!class_exists($env))
+		$resolver = ConsoleHelper::getAllPackagesResolver($env, $this->console);
+
+		if (!$name)
 		{
-			throw new \InvalidArgumentException('Class ' . $env . ' not exists');
+			throw new \InvalidArgumentException('No package input.');
 		}
 
-		/** @var AbstractPackage $package */
-		$resolver = new PackageResolver($this->console->getContainer());
-		$resolver->registerPackages($env::loadPackages());
-		$package = $resolver->getPackage($packageName);
+		$package = $resolver->getPackage($name);
 
 		if ($package)
 		{
-			$dir = $package->getDir() . '/Resources/media';
+			$dir = $package->getDir() . '/Resources/asset';
 		}
 		else
 		{
-			throw new \InvalidArgumentException('Package ' . $packageName . ' not found.');
+			throw new \InvalidArgumentException('Package ' . $name . ' not found.');
 		}
 
-		$target = $this->getArgument(1, $packageName);
+		if (!is_dir($dir))
+		{
+			throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder.');
+		}
 
+		$target = $this->getArgument(1, $name);
 		$target = $this->console->get('path.public') . '/asset/' . $target;
 
 		$symlink = new Symlink;
@@ -109,7 +114,7 @@ class SyncCommand extends Command
 		{
 			$this->out($symlink->make($dir, $target));
 
-			if (!ServerHelper::isWindows())
+			if (!PlatformHelper::isWindows())
 			{
 				$this->out('Link success ' . $dir . ' <====> ' . $target);
 			}

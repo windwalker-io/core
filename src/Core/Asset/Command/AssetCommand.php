@@ -46,6 +46,6 @@ class AssetCommand extends Command
 		$this->addGlobalOption('e')
 			->alias('env')
 			->description('The environment application name or class.')
-			->defaultValue('Windwalker\Web\DevApplication');
+			->defaultValue('dev');
 	}
 }
