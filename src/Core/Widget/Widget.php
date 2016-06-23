@@ -222,9 +222,11 @@ class Widget implements \ArrayAccess
 		$data->renderer = get_class($this->renderer);
 
 		$data->package = $this->getPackage();
-		$data->route = $this->getPackage()->route;
+		$data->route = $data->route ? : $this->getPackage()->route;
 
-		$data->bind($this->getData());
+		$global = new Data($this->getData());
+
+		$data->bind($global->bind($data));
 
 		return $this;
 	}

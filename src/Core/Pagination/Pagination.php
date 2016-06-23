@@ -14,6 +14,7 @@ use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
+use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Uri\Uri;
 
@@ -123,7 +124,14 @@ class Pagination
 	 *
 	 * @var  PaginationResult
 	 */
-	protected $result = null;
+	protected $result;
+
+	/**
+	 * Property route.
+	 *
+	 * @var  CoreRoute
+	 */
+	protected $route;
 
 	/**
 	 * Create instance
@@ -345,17 +353,16 @@ class Pagination
 	 *
 	 * @return string
 	 */
-	public function render($route = null, $query = array(), $template = 'windwalker.pagination.default')
+	public function render($route = null, $query = [], $template = 'windwalker.pagination.default')
 	{
-		// B/C
-		if (is_string($query))
+		if (is_callable($template))
 		{
-			$template = $query;
-			
-			$query = array();
+			$widget = $template($route, $query, $this);
 		}
-
-		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
+		else
+		{
+			$widget = WidgetHelper::createWidget($template, 'php');
+		}
 
 		$result = $this->getResult();
 
@@ -364,35 +371,73 @@ class Pagination
 			return null;
 		}
 
+		// If not route provided, use current route.
 		if ($route === null)
 		{
-			$uri = Ioc::get('system.uri')->get('route');
-
-			$route = function ($queries) use ($uri, $query)
+			$route = function ($queries, $type = CoreRoute::TYPE_PATH) use ($query)
 			{
-				$uri = new Uri($uri);
+				$queries = array_merge((array) $queries, (array) $query);
 
-				$queries = array_merge($queries, $query);
-
-				foreach ($queries as $k => $v)
+				if ($this->getRoute())
 				{
-					$uri->setVar($k, $v);
+					$uri = new Uri(Ioc::get('uri')->full);
+
+					foreach ($queries as $k => $v)
+					{
+						$uri->setVar($k, $v);
+					}
+
+					return $uri->toString(['path', 'query', 'fragment']);
 				}
 
-				return $uri->toString();
+				$route = Ioc::getConfig()->get('route.matched');
+
+				return $this->getRoute()->encode($route, $queries, $type);
 			};
 		}
 
-		if (!($route instanceof \Closure))
+		// If route is string, wrap it as a callback
+		if (!$route instanceof \Closure)
 		{
 			$route = function ($queries, $type = CoreRoute::TYPE_PATH) use ($route, $query)
 			{
-				$queries = array_merge($queries, $query);
+				$queries = array_merge((array) $queries, (array) $query);
 
-				return Route::encode($route, $queries, $type);
+				if (!$this->getRoute())
+				{
+					// CoreRoute object not exists, we use global Route object.
+					return Route::encode($route, $queries, $type);
+				}
+
+				// Use custom Route object.
+				return $this->getRoute()->encode($route, $queries, $type);
 			};
 		}
 
-		return $renderer->render($template, array('pagination' => $result, 'route' => $route));
+		return $widget->render(array('pagination' => $result, 'route' => $route));
+	}
+
+	/**
+	 * Method to get property Route
+	 *
+	 * @return  CoreRoute
+	 */
+	public function getRoute()
+	{
+		return $this->route;
+	}
+
+	/**
+	 * Method to set property route
+	 *
+	 * @param   CoreRoute $route
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRoute(CoreRoute $route)
+	{
+		$this->route = $route;
+
+		return $this;
 	}
 }
