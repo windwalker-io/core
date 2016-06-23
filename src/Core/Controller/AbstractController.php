@@ -272,6 +272,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	public function execute()
 	{
+		$this->prepareExecute();
+
+		$this->triggerEvent('onControllerBeforeExecute', array(
+			'controller' => $this
+		));
+
 		$data = new Data([
 			'input'    => $this->input,
 			'mute'     => $this->mute,
@@ -284,23 +290,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			'package'  => $this->getPackage()
 		]);
 
-		return $this->middlewares->execute($data);
-	}
-
-	/**
-	 * innerExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function innerExecute()
-	{
-		$this->prepareExecute();
-
-		$this->triggerEvent('onControllerBeforeExecute', array(
-			'controller' => $this
-		));
-
-		$result = $this->doExecute();
+		$result = $this->middlewares->execute($data);
 
 		$result = $this->postExecute($result);
 
@@ -310,6 +300,16 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		));
 
 		return $result;
+	}
+
+	/**
+	 * innerExecute
+	 *
+	 * @return  mixed
+	 */
+	protected function innerExecute()
+	{
+		return $this->doExecute();
 	}
 
 	/**
@@ -471,7 +471,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				$view = new HtmlView($data, $config, $engine);
 			}
 
-			$this->container->share($key, $view)->alias(get_class($view), $key);
+			$class = get_class($view);
+
+			$this->container->share($class, $view)->alias($key, $class);
 		}
 
 		return $this->container->get($key, $forceNew);
@@ -498,20 +500,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 			$modelName = ucfirst($name) . 'Model';
 
-			$class = $package->getMvcResolver()->resolveModel($package, $modelName);
-
-			if (empty($class))
-			{
-				$ns = MvcHelper::getPackageNamespace(get_called_class());
-
-				$class = sprintf($ns . '\Model\\' . $modelName);
-			}
-
-			if (!class_exists($class))
-			{
-				$class = 'Windwalker\Core\Model\Model';
-			}
-
 			$config = clone $this->config;
 
 			if ($name && strcasecmp($name, $this->getName()) !== 0)
@@ -519,12 +507,18 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				$config['name'] = null;
 			}
 
-			$model = new $class($config);
+			try
+			{
+				$model = $package->getMvcResolver()->getModelResolver()->create($modelName, $config, null, $this->container->get('database'));
+			}
+			catch (\UnexpectedValueException $e)
+			{
+				$model = new Model($config);
+			}
 
-			/** @var Model $model */
-			$model->setConfig($config);
+			$class = get_class($model);
 
-			$this->container->share($key, $model)->alias($class, $key);
+			$this->container->share($class, $model)->alias($key, $class);
 		}
 
 		return $this->container->get($key, $forceNew);
@@ -749,7 +743,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		$this->middlewares = new ChainBuilder;
 		$this->middlewares->add(function ()
 		{
-		    return $this->innerExecute();
+		    return $this->doExecute();
 		});
 
 		krsort($middlewares);

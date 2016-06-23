@@ -20,7 +20,7 @@ use Windwalker\Language\Language;
  *
  * @method  static  string    translate($string)
  * @method  static  string    sprintf($string, ...$more)
- * @method  static  string    plural($string, $number)
+ * @method  static  string    plural($string, ...$number)
  * @method  static  string    getOrphans()
  * @method  static  string    setTraceLevelOffset($level)
  * @method  static  string    getTraceLevelOffset()
