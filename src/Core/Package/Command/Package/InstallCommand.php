@@ -138,8 +138,22 @@ class InstallCommand extends CoreCommand
 		}
 	}
 
+	/**
+	 * syncAssets
+	 *
+	 * @param AbstractPackage $package
+	 *
+	 * @return  void
+	 */
 	public function syncAssets(AbstractPackage $package)
 	{
-		$this->console->executeByPath('asset sync ' . $package->name, ['hard' => $this->getOption('hard')]);
+		try
+		{
+			$this->console->executeByPath('asset sync ' . $package->name, ['hard' => $this->getOption('hard')]);
+		}
+		catch (\Exception $e)
+		{
+			$this->err($e->getMessage());
+		}
 	}
 }

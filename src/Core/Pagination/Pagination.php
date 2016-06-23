@@ -10,7 +10,9 @@ namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Renderer\RendererHelper;
+use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Uri\Uri;
@@ -383,11 +385,11 @@ class Pagination
 
 		if (!($route instanceof \Closure))
 		{
-			$route = function ($queries, $type = CoreRouter::TYPE_PATH) use ($route, $query)
+			$route = function ($queries, $type = CoreRoute::TYPE_PATH) use ($route, $query)
 			{
 				$queries = array_merge($queries, $query);
 
-				return Router::html($route, $queries, $type);
+				return Route::encode($route, $queries, $type);
 			};
 		}
 

@@ -5,6 +5,7 @@
     "license": "GNU Lesser General Public License",
     "minimum-stability": "beta",
     "require": {
+        "php": ">=5.6",
         "windwalker/framework": "~3.0",
         "symfony/yaml": "~3.0",
         "monolog/monolog": "~1.0",

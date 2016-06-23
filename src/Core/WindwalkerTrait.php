@@ -136,6 +136,11 @@ trait WindwalkerTrait
 		
 		foreach ($configs as $file)
 		{
+			if (!is_file($file))
+			{
+				throw new \RuntimeException(sprintf('Config file: %s not exists', $file));
+			}
+
 			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION));
 		}
 

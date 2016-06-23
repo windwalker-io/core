@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Utilities\ArrayHelper;
+
 /**
  * The ScriptManager class.
  *
@@ -109,6 +111,47 @@ abstract class AbstractScript
 	public static function internalJS($content)
 	{
 		return static::getAsset()->internalJS($content);
+	}
+
+	/**
+	 * getJSObject
+	 *
+	 * @param mixed   ...$data
+	 * @param boolean $quoteKey
+	 *
+	 * @return  string
+	 */
+	public function getJSObject(...$data)
+	{
+		$quote = array_pop($data);
+
+		if (!is_bool($quote))
+		{
+			array_push($data, $quote);
+		}
+
+		$result = [];
+
+		foreach ($data as $array)
+		{
+			$result = static::mergeOptions($result, $array);
+		}
+
+		return static::getAsset()->getJSObject($result, $quote);
+	}
+
+	/**
+	 * mergeOptions
+	 *
+	 * @param array $options1
+	 * @param array $options2
+	 * @param bool  $recursive
+	 *
+	 * @return  array
+	 */
+	public function mergeOptions($options1, $options2, $recursive = true)
+	{
+		return ArrayHelper::merge($options1, $options2, $recursive);
 	}
 
 	/**

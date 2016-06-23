@@ -248,7 +248,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 *
 	 * @return  void
 	 */
-	public static function registerCommands(Console $console)
+	public function registerCommands(Console $console)
 	{
 	}
 
