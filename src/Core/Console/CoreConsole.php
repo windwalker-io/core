@@ -138,7 +138,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	public function registerCommands()
 	{
-		$commands = (array) $this->get('commends');
+		$commands = (array) $this->get('console.commends');
 
 		foreach ($commands as $command)
 		{

@@ -11,10 +11,11 @@ namespace Windwalker\Core\Seeder;
 use Windwalker\Console\Command\Command;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Environment\PlatformHelper;
 
 /**
  * The AbstractSeeder class.
- * 
+ *
  * @since  2.0
  */
 abstract class AbstractSeeder
@@ -32,6 +33,13 @@ abstract class AbstractSeeder
 	 * @var Command
 	 */
 	protected $command;
+
+	/**
+	 * Property count.
+	 *
+	 * @var  int
+	 */
+	protected $count = 0;
 
 	/**
 	 * Class init.
@@ -66,7 +74,7 @@ abstract class AbstractSeeder
 		$seeder->setDb($this->db)
 			->setCommand($this->command);
 
-		$this->command->out('Import seeder ' . get_class($seeder));
+		$this->command->out()->out('Import seeder <info>' . get_class($seeder) . '</info>');
 
 		$seeder->doExecute();
 
@@ -101,7 +109,7 @@ abstract class AbstractSeeder
 		$seeder->setDb($this->db);
 		$seeder->setCommand($this->command);
 
-		$this->command->out('Clear seeder ' . get_class($seeder));
+		$this->command->out('Clear seeder <comment>' . get_class($seeder) . '</comment>');
 
 		$seeder->doClear();
 
@@ -188,5 +196,31 @@ abstract class AbstractSeeder
 		$this->command = $command;
 
 		return $this;
+	}
+
+	/**
+	 * outCounting
+	 *
+	 * @return  Command
+	 */
+	public function outCounting()
+	{
+		// @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
+		if (PlatformHelper::isWindows())
+		{
+			$loading = ['|', '/', '-', '\\'];
+		}
+		else
+		{
+			$loading = ['◐','◓','◑','◒'];
+		}
+
+		$this->count++;
+
+		$icon = $loading[$this->count % count($loading) - 1];
+
+		$this->command->out("\r  ({$this->count}) $icon", false);
+
+		return $this->command;
 	}
 }

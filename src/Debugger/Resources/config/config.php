@@ -13,7 +13,7 @@ return [
 
 	'routing' => [
 		'files' => [
-			'debugger' => __DIR__ . '/routing.yml'
+			'debugger' => WINDWALKER_DEBUGGER_ROOT . '/routing.yml'
 		]
 	],
 
@@ -28,8 +28,10 @@ return [
 	'listeners' => [
 		300 => \Windwalker\Debugger\Listener\DebuggerListener::class
 	],
-	
-	'commands' => [
+
+	'console' => [
+		'commands' => [
 		
+		]
 	]
 ];

@@ -27,7 +27,9 @@ return [
 
 	],
 
-	'commands' => [
-		\Windwalker\SystemPackage\Command\BuildCommand::class
+	'console' => [
+		'commands' => [
+			\Windwalker\SystemPackage\Command\BuildCommand::class
+		]
 	]
 ];

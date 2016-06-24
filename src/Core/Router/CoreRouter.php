@@ -405,15 +405,12 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 
 				if (!$resolver->exists($route['package']))
 				{
-					throw new \InvalidArgumentException(sprintf('Package %s not exists.', $route['package']));
+					throw new \InvalidArgumentException(sprintf('Package %s not exists when register touting: %s.', $route['package'], $key));
 				}
 
 				$package = $resolver->getPackage($route['package']);
 
-				$this->group($route['pattern'], function (CoreRouter $router) use ($package)
-				{
-					$router->addRouteByConfigs($package->loadRouting(), $package->getName());
-				});
+				$package->loadRouting($this, $route['pattern']);
 
 				continue;
 			}

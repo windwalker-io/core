@@ -19,6 +19,7 @@ use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -30,6 +31,7 @@ use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Registry\Registry;
+use Windwalker\Registry\RegistryHelper;
 
 /**
  * The AbstractPackage class.
@@ -404,25 +406,28 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * loadRouting
 	 *
-	 * @return  mixed
+	 * @param CoreRouter $router
+	 * @param string     $group
+	 *
+	 * @return CoreRouter
 	 */
-	public function loadRouting()
+	public function loadRouting(CoreRouter $router, $group = null)
 	{
-		$file = $this->getDir() . '/routing.yml';
+		$routing = (array) $this->get('routing.files');
 
-		if (!is_file($file))
+		$router->group($group, function (CoreRouter $router) use ($routing)
 		{
-			return [];
-		}
+			$router->addRouteByConfigs(
+				$router::loadRoutingFromFiles($routing),
+				$this->getName()
+			);
+		});
 
-		return (array) Yaml::parse(file_get_contents($file));
+		return $router;
 	}
 
 	/**
-	 * getRoot
-	 *
-	 * @note Reflection does not need to cache.
-	 * @see https://gist.github.com/mindplay-dk/3359812
+	 * getFile
 	 *
 	 * @return  string
 	 */
@@ -486,7 +491,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function registerCommands(Console $console)
 	{
-		$commands = (array) $this->get('commands');
+		$commands = (array) $this->get('console.commands');
 
 		foreach ($commands as $class)
 		{

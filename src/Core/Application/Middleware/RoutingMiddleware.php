@@ -118,6 +118,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		}
 		catch (RouteNotFoundException $e)
 		{
+			// Simple routing
 			$route = explode('/', $route);
 			$controller = array_pop($route);
 			$class = StringNormalise::toClassNamespace(

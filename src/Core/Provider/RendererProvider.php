@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Illuminate\View\Compilers\BladeCompiler;
+use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Renderer\Finder\PackageFinder;
@@ -229,7 +230,7 @@ class RendererProvider implements ServiceProviderInterface
 			'messages'   => static::$messages,
 			'translator' => $container->get('language'),
 			'widget'     => $container->get('widget.manager'),
-			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
+			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 
 		$manager->setGlobals($globals);
