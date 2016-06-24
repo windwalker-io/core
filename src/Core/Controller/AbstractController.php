@@ -565,9 +565,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	public function passRedirect(AbstractController $controller)
 	{
-		list($url, $msg, $type) = $controller->getRedirect(true);
-
-		$this->setRedirect($url, $msg, $type);
+		$this->setRedirect(...$controller->getRedirect(true));
 
 		return $this;
 	}
