@@ -47,6 +47,8 @@ class ConsoleHelper
 	 */
 	public static function getAllPackagesResolver($env = 'dev', CoreConsole $console = null)
 	{
+		$console = $console ? : Ioc::getApplication();
+
 		$resolver = new PackageResolver($console->container);
 
 		foreach (static::loadPackages($env, $console) as $name => $package)

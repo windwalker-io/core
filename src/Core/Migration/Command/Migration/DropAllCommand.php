@@ -8,8 +8,9 @@
 
 namespace Windwalker\Core\Migration\Command\Migration;
 
+use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
-use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
 
@@ -18,8 +19,10 @@ use Windwalker\Core\Migration\Model\BackupModel;
  *
  * @since  {DEPLOY_VERSION}
  */
-class DropAllCommand extends CoreCommand
+class DropAllCommand extends Command
 {
+	use CoreCommandTrait;
+	
 	/**
 	 * Console(Argument) name.
 	 *

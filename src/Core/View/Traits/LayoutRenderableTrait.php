@@ -142,6 +142,8 @@ trait LayoutRenderableTrait
 		$this->renderer->setPaths($paths);
 
 		$this->config['path.registered'] = true;
+
+		$this->registerMultilingualPaths();
 		
 		return $this;
 	}

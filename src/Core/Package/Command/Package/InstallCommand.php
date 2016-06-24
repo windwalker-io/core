@@ -11,19 +11,19 @@ namespace Windwalker\Core\Package\Command\Package;
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\ConsoleHelper;
-use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Filesystem\File;
-use Windwalker\Registry\Registry;
 
 /**
  * The InstallCommand class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class InstallCommand extends CoreCommand
+class InstallCommand extends Command
 {
+	use CoreCommandTrait;
+
 	/**
 	 * Property name.
 	 *
