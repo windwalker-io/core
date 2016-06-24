@@ -91,7 +91,7 @@ class SyncCommand extends Command
 
 		if (!is_dir($dir))
 		{
-			throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder.');
+			throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder so nothing synced.');
 		}
 
 		$target = $this->getArgument(1, $name);

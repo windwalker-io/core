@@ -91,6 +91,9 @@ class RunCommand extends Command
 
 		foreach ($profiles as $profile)
 		{
+			$this->out()->out('Start Custom Script: <info>' . $profile . '</info>')
+				->out('---------------------------------------');
+
 			if (isset($scripts[$profile]))
 			{
 				$this->executeScriptProfile($scripts[$profile]);
@@ -111,6 +114,13 @@ class RunCommand extends Command
 	 */
 	protected function executeScriptProfile($scripts)
 	{
+		if (ArrayHelper::getColumn($scripts, 'in'))
+		{
+			$msg = "We noticed you entered input data for auto answer the prompt. \nPlease install symfony/process ~3.0 to support auto answer by custom input.";
+
+			$this->out('<fg=black;bg=yellow>' . $msg . '</fg=black;bg=yellow>');
+		}
+
 		foreach ($scripts as $script)
 		{
 			if (!is_array($script))
@@ -141,7 +151,7 @@ class RunCommand extends Command
 		$this->out()->out();
 		$this->console->addMessage('>>> ' . $script, 'info');
 
-		if (class_exists('Symfony\Component\Process\Process'))
+		if (class_exists(Process::class))
 		{
 			$process = new Process($script);
 
@@ -164,11 +174,6 @@ class RunCommand extends Command
 		}
 		else
 		{
-			if ($input !== null)
-			{
-				$this->out('<comment>Please install symfony/process ~3.0 to support auto answer.</comment>')->out();
-			}
-
 			system($script);
 		}
 

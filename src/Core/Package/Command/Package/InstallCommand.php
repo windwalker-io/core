@@ -10,6 +10,7 @@ namespace Windwalker\Core\Package\Command\Package;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
+use Windwalker\Console\Prompter\TextPrompter;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Package\AbstractPackage;
@@ -84,6 +85,7 @@ class InstallCommand extends Command
 			}
 
 			$this->installConfig($package);
+			$this->installRouting($package);
 			$this->syncAssets($package);
 		}
 
@@ -139,6 +141,43 @@ class InstallCommand extends Command
 	}
 
 	/**
+	 * installRouting
+	 *
+	 * @param   AbstractPackage  $package
+	 *
+	 * @return  void
+	 */
+	protected function installRouting(AbstractPackage $package)
+	{
+		if (!(new BooleanPrompter)->ask('Do your want to add routing profile to <comment>etc/routing.yml</comment>? [Y/n]: ', true))
+		{
+			return;
+		}
+
+		$pattern = (new TextPrompter)->ask('The URL pattern prefix [<info>/' . $package->name . '</info>]: ', '/' . $package->name);
+
+		$routing = <<<ROUTE
+
+# Routing of package: %s
+%s:
+    pattern: %s
+    package: %s
+
+ROUTE;
+
+		$routing = sprintf($routing, $package->name, $package->name, $pattern, $package->name);
+
+		$target = $this->console->get('path.etc') . '/routing.yml';
+
+		$content = file_get_contents($target);
+		$content .= $routing;
+
+		file_put_contents($target, $content);
+
+		$this->out()->out('  Added routing profile to <comment>etc/routing.yml</comment>');
+	}
+
+	/**
 	 * syncAssets
 	 *
 	 * @param AbstractPackage $package
@@ -147,6 +186,8 @@ class InstallCommand extends Command
 	 */
 	public function syncAssets(AbstractPackage $package)
 	{
+		$this->out();
+
 		try
 		{
 			$this->console->executeByPath('asset sync ' . $package->name, ['hard' => $this->getOption('hard')]);
