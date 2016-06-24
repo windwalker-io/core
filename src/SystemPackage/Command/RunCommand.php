@@ -8,9 +8,11 @@
 
 namespace Windwalker\SystemPackage\Command;
 
+use Symfony\Component\Process\Process;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The DeployCommand class.
@@ -36,12 +38,25 @@ class RunCommand extends Command
 	protected $description = 'Run custom scripts.';
 
 	/**
+	 * The usage to tell user how to use this command.
+	 *
+	 * @var string
+	 *
+	 * @since  2.0
+	 */
+	protected $usage = '%s <cmd><command1></cmd> <cmd><command2></cmd>... <option>[option]</option>';
+
+	/**
 	 * init
 	 *
 	 * @return  void
 	 */
 	protected function init()
 	{
+		$this->addOption('l')
+			->alias('list')
+			->description('List available scripts.')
+			->defaultValue(false);
 	}
 
 	/**
@@ -51,13 +66,6 @@ class RunCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$profiles = $this->io->getArguments();
-
-		if (!$profiles)
-		{
-			throw new \InvalidArgumentException('Please enter at least one profile name.');
-		}
-
 		$resolver = ConsoleHelper::getAllPackagesResolver();
 
 		$scripts = (array) $this->console->get('console.script');
@@ -65,6 +73,20 @@ class RunCommand extends Command
 		foreach ((array) ConsoleHelper::loadPackages() as $name => $package)
 		{
 			$scripts = array_merge($scripts, (array) $resolver->getPackage($name)->get('console.script'));
+		}
+
+		if ($this->getOption('l'))
+		{
+			$this->listScripts($scripts);
+
+			return true;
+		}
+
+		$profiles = $this->io->getArguments();
+
+		if (!$profiles)
+		{
+			throw new \InvalidArgumentException('Please enter at least one profile name.');
 		}
 
 		foreach ($profiles as $profile)
@@ -91,7 +113,15 @@ class RunCommand extends Command
 	{
 		foreach ($scripts as $script)
 		{
-			if ($this->executeScript($script) !== 0)
+			if (!is_array($script))
+			{
+				$script = ['cmd' => $script, 'in' => null];
+			}
+
+			$command = ArrayHelper::getValue($script, 'cmd');
+			$input   = ArrayHelper::getValue($script, 'in');
+
+			if ($this->executeScript($command, $input) !== 0)
 			{
 				throw new \RuntimeException('Running script fail...');
 			}
@@ -102,30 +132,93 @@ class RunCommand extends Command
 	 * executeScript
 	 *
 	 * @param   string  $script
+	 * @param   string  $input
 	 *
-	 * @return  integer
+	 * @return int
 	 */
-	protected function executeScript($script)
+	protected function executeScript($script, $input = null)
 	{
-		$this->console->addMessage('>>> ' . $script);
+		$this->out()->out();
+		$this->console->addMessage('>>> ' . $script, 'info');
 
-		$descriptorspec = array(
-			0 => array("pipe", "r"),   // stdin is a pipe that the child will read from
-			1 => array("pipe", "w"),   // stdout is a pipe that the child will write to
-			2 => array("pipe", "w")    // stderr is a pipe that the child will write to
-		);
-
-		flush();
-		$process = proc_open($script, $descriptorspec, $pipes, realpath('./'), array());
-
-		if (is_resource($process))
+		if (class_exists('Symfony\Component\Process\Process'))
 		{
-			while ($s = fgets($pipes[1])) {
-				print $s;
-				flush();
+			$process = new Process($script);
+
+			if ($input !== null)
+			{
+				$process->setInput($input);
 			}
+
+			$process->run(function ($type, $buffer)
+			{
+				if (Process::ERR === $type)
+				{
+					$this->err($buffer, false);
+				}
+				else
+				{
+					$this->out($buffer, false);
+				}
+			});
+		}
+		else
+		{
+			if ($input !== null)
+			{
+				$this->out('<comment>Please install symfony/process ~3.0 to support auto answer.</comment>')->out();
+			}
+
+			system($script);
 		}
 
-		return $code;
+		return 0;
+	}
+
+	/**
+	 * listScripts
+	 *
+	 * @param   array  $scripts
+	 *
+	 * @return  void
+	 */
+	protected function listScripts($scripts)
+	{
+		if (!$scripts)
+		{
+			$this->out()->out('No custom scripts.');
+
+			return;
+		}
+
+		$this->out()->out('<comment>Available Scripts</comment>')
+			->out('-----------------------------');
+
+		foreach ($scripts as $name => $script)
+		{
+			$this->out(sprintf('<info>%s</info>', $name));
+
+			foreach ($script as $cmd)
+			{
+				if (!is_array($cmd))
+				{
+					$cmd = ['cmd' => $cmd, 'in' => null];
+				}
+
+				$input = ArrayHelper::getValue($cmd, 'in');
+				$cmd   = ArrayHelper::getValue($cmd, 'cmd');
+
+				$this->out('    <comment>$</comment> ' . $cmd, false);
+
+				if ($input !== null)
+				{
+					$this->out(sprintf('  <option>(Input: %s)</option>', preg_replace('/\s+/', ' ', $input)), false);
+				}
+
+				$this->out();
+			}
+
+			$this->out();
+		}
 	}
 }
