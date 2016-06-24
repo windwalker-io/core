@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Router\CoreRouter;
@@ -405,8 +406,10 @@ class Pagination
 
 				if (!$this->getRoute())
 				{
+					$package = PackageHelper::getPackage();
+
 					// CoreRoute object not exists, we use global Route object.
-					return Route::encode($route, $queries, $type);
+					return $package->route->encode($route, $queries, $type);
 				}
 
 				// Use custom Route object.
