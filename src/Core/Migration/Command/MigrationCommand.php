@@ -61,6 +61,7 @@ class MigrationCommand extends Command
 		$this->addCommand(new Migration\StatusCommand);
 		$this->addCommand(new Migration\MigrateCommand);
 		$this->addCommand(new Migration\ResetCommand);
+		$this->addCommand(new Migration\DropAllCommand);
 
 		$this->addGlobalOption('d')
 			->alias('dir')
