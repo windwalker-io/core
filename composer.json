@@ -15,6 +15,9 @@
         "twig/twig": "~1.0",
         "illuminate/view": "~5.0"
     },
+    "suggest": {
+        "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts."
+    },
     "autoload" : {
         "psr-4" : {
             "Windwalker\\" : "src/",
