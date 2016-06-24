@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Language\CoreLanguage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Language\Language;
@@ -37,10 +38,7 @@ class LanguageProvider implements ServiceProviderInterface
 			$debug     = $config['system.debug'] ? : false;
 			$langDebug = $config['language.debug'] ? : false;
 
-			$language = new Language(
-				$config->get('language.locale', 'en-GB'),
-				$config->get('language.default', 'en-GB')
-			);
+			$language = new CoreLanguage($config, $container);
 
 			return $language->setDebug(($debug && $langDebug));
 		};

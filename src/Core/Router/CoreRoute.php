@@ -101,11 +101,11 @@ class CoreRoute
 		{
 			return htmlspecialchars($this->get($route, $queries, $type));
 		}
-		catch (\OutOfBoundsException $e)
+		catch (\OutOfRangeException $e)
 		{
-			if (!$this->package->app->get('routing.debug', false))
+			if ($this->package->app->get('routing.debug', false))
 			{
-				throw $e;
+				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
 			}
 			elseif ($this->package->app->get('system.debug', false))
 			{

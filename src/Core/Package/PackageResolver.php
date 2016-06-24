@@ -208,7 +208,13 @@ class PackageResolver implements ContainerAwareInterface
 			return $this->getPackage($name);
 		}
 
-		return new DefaultPackage;
+		$package = new DefaultPackage;
+
+		$package->setContainer($this->container->createChild('_default'));
+
+		$package->boot();
+
+		return $package;
 	}
 
 	/**

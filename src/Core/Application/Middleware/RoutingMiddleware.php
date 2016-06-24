@@ -118,6 +118,11 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		}
 		catch (RouteNotFoundException $e)
 		{
+			if (!$this->app->get('routing.simple_route', false))
+			{
+				throw $e;
+			}
+
 			// Simple routing
 			$route = explode('/', $route);
 			$controller = array_pop($route);
@@ -130,13 +135,21 @@ class RoutingMiddleware extends AbstractWebMiddleware
 				)
 			);
 			
+			// Find package
+			$ns = implode('\\', array_map('ucfirst', $route)) . '\\' . ucfirst(end($route)) . 'Package';
+			
+			$resolver = $this->getPackageResolver();
+			$package = $resolver->resolvePackage($resolver->getAlias($ns));
+			
+			$packageName = $package ? $package->getName() : implode('.', $route);
+
 			if (!class_exists($class))
 			{
 				throw new RouteNotFoundException($e->getMessage(), $e->getCode(), $e);
 			}
-			
-			$matched = new Route(implode($route, '.') . '@' . $controller, implode($route, '/'));
-			
+
+			$matched = new Route($packageName . '@' . $controller, implode($route, '/'));
+
 			$matched->setExtra(array(
 				'controller' => $class
 			));
