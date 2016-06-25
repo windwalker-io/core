@@ -217,7 +217,7 @@ abstract class AbstractSeeder
 
 		$this->count++;
 
-		$icon = $loading[$this->count % count($loading) - 1];
+		$icon = $loading[$this->count % count($loading)];
 
 		$this->command->out("\r  ({$this->count}) $icon", false);
 
