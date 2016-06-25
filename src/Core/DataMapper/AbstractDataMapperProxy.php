@@ -60,6 +60,13 @@ class AbstractDataMapperProxy
 	protected static $instances = array();
 
 	/**
+	 * Property dataClass.
+	 *
+	 * @var  string
+	 */
+	protected static $dataClass;
+
+	/**
 	 * is triggered when invoking inaccessible methods in an object context.
 	 *
 	 * @param $name      string
@@ -133,6 +140,11 @@ class AbstractDataMapperProxy
 		$table = $table ? : static::$table;
 
 		$mapper = new DataMapper($table);
+
+		if (static::$dataClass)
+		{
+			$mapper->setDataClass(static::$dataClass);
+		}
 
 		$mapper->getDispatcher()->addListener(new static);
 
