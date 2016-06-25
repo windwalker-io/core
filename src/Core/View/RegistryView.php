@@ -18,8 +18,6 @@ use Windwalker\Registry\Registry;
  */
 class RegistryView extends AbstractView implements \JsonSerializable
 {
-	use OptionAccessTrait;
-
 	const FORMAT_JSON = 'json';
 	const FORMAT_XML  = 'xml';
 	const FORMAT_YAML = 'yaml';
@@ -44,11 +42,11 @@ class RegistryView extends AbstractView implements \JsonSerializable
 	 * Method to instantiate the view.
 	 *
 	 * @param   array  $data     The data array.
-	 * @param   array  $options  The options array.
+	 * @param   array  $config  The options array.
 	 */
-	public function __construct(array $data = [], array $options = [])
+	public function __construct(array $data = [], $config = null)
 	{
-		parent::__construct($data);
+		parent::__construct($data, $config);
 
 		// Init registry object.
 		$this->data = new Registry($data);
@@ -76,7 +74,7 @@ class RegistryView extends AbstractView implements \JsonSerializable
 	{
 		if ($registry instanceof Registry)
 		{
-			return $registry->toString($this->format, $this->options);
+			return $registry->toString($this->format, (array) $this->config->get('options', []));
 		}
 	}
 
@@ -136,7 +134,9 @@ class RegistryView extends AbstractView implements \JsonSerializable
 	/**
 	 * Return data which should be serialized by json_encode().
 	 *
-	 * @return  mixed
+	 * @return  string
+	 *
+	 * @throws \RuntimeException
 	 */
 	public function jsonSerialize()
 	{

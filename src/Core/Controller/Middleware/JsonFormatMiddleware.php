@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller\Middleware;
 
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Data\Data;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Helper\ResponseHelper;
 
 /**
@@ -28,6 +29,8 @@ class JsonFormatMiddleware extends AbstractControllerMiddleware
 	 */
 	public function execute($data = null)
 	{
+		DebuggerHelper::disableConsole();
+
 		try
 		{
 			$result = $this->next->execute($data);

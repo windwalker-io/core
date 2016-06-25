@@ -15,7 +15,6 @@ use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\String\StringNormalise;
 use Windwalker\Utilities\Queue\PriorityQueue;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractResolver class.
@@ -69,6 +68,8 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 * @param   string $name
 	 *
 	 * @return  string
+	 *
+	 * @throws \UnexpectedValueException
 	 */
 	public function resolve($name)
 	{
@@ -117,10 +118,14 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 * @param array  ...$args
 	 *
 	 * @return  object
+	 *
+	 * @throws \UnexpectedValueException
 	 */
 	public function create($name, ...$args)
 	{
-		return ReflectionHelper::newInstanceArgs($this->resolve($name), $args);
+		$class = $this->resolve($name);
+
+		return new $class(...$args);
 	}
 
 	/**

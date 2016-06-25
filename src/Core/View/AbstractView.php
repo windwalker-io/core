@@ -300,6 +300,10 @@ abstract class AbstractView implements \ArrayAccess
 		{
 			return (string) $e;
 		}
+		catch (\Throwable $e)
+		{
+			trigger_error($e->getMessage(), E_ERROR);
+		}
 	}
 
 	/**
@@ -376,7 +380,7 @@ abstract class AbstractView implements \ArrayAccess
 			$class = get_called_class();
 
 			// If we are using this class as default view, return default name.
-			if ($class == HtmlView::class)
+			if ($class === HtmlView::class)
 			{
 				return $this->name = 'default';
 			}
@@ -502,17 +506,17 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function __get($name)
 	{
-		if ($name == 'config')
+		if ($name === 'config')
 		{
 			return $this->config;
 		}
 
-		if ($name == 'model')
+		if ($name === 'model')
 		{
 			return $this->model;
 		}
 
-		if ($name == 'router')
+		if ($name === 'router')
 		{
 			return $this->getRouter();
 		}

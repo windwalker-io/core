@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Controller\Middleware;
 
 use Windwalker\Core\Response\Buffer\JsonBuffer;
+use Windwalker\Core\View\AbstractView;
 use Windwalker\Data\Data;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response\JsonResponse;
 
 /**
@@ -28,6 +30,11 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 	 */
 	public function execute($data = null)
 	{
+		if (class_exists(DebuggerHelper::class))
+		{
+			DebuggerHelper::disableConsole();
+		}
+
 		$response = $data->response;
 
 		$this->controller->setResponse(new JsonResponse(null, $response->getStatusCode(), $response->getHeaders()));

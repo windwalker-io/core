@@ -381,11 +381,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * renderView
 	 *
-	 * @param HtmlView  $view
-	 * @param string    $layout
-	 * @param array     $data
+	 * @param HtmlView $view
+	 * @param string   $layout
+	 * @param array    $data
 	 *
 	 * @return string
+	 * @throws \RuntimeException
 	 */
 	public function renderView($view, $layout = 'default', $data = array())
 	{
@@ -436,24 +437,26 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * getView
 	 *
 	 * @param string $name
+	 * @param string $format
 	 * @param string $engine
-	 * @param array  $data
 	 * @param bool   $forceNew
 	 *
 	 * @return AbstractView|HtmlView
+	 *
+	 * @throws \UnexpectedValueException
 	 */
-	public function getView($name = null, $engine = null, $data = null, $forceNew = false)
+	public function getView($name = null, $format = null, $engine = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
-		$key = ViewResolver::getDIKey($name . '.' . strtolower($engine));
+		$key = ViewResolver::getDIKey($name . '.' . strtolower($format));
 
 		if (!$this->container->exists($key))
 		{
 			// Find if package exists
 			$package = $this->getPackage();
 
-			$viewName = sprintf('%s\%sView', ucfirst($name), ucfirst($name));
+			$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($format));
 
 			$config = clone $this->config;
 
@@ -464,11 +467,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			
 			try
 			{
-				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, $data, $config, $engine);
+				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, [], $config, $engine);
 			}
 			catch (\UnexpectedValueException $e)
 			{
-				$view = new HtmlView($data, $config, $engine);
+				$view = new HtmlView([], $config, $engine);
 			}
 
 			$class = get_class($view);
@@ -485,7 +488,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param string $name
 	 * @param bool   $forceNew
 	 *
-	 * @return  mixed
+	 * @return  Model
+	 *
+	 * @throws \UnexpectedValueException
 	 */
 	public function getModel($name = null, $forceNew = false)
 	{
@@ -727,6 +732,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 	/**
 	 * registerMiddlewares
+	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \LogicException
 	 */
 	protected function registerMiddlewares()
 	{
@@ -787,6 +795,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * getApplication
 	 *
 	 * @return  WebApplication
+	 *
+	 * @throws  \UnexpectedValueException
 	 */
 	public function getApplication()
 	{
@@ -919,6 +929,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 *
+	 * @throws \UnexpectedValueException
+	 *
 	 * @since   2.0
 	 */
 	public function triggerEvent($event, $args = array())
@@ -1005,9 +1017,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * addMiddleware
 	 *
-	 * @param   callable|AbstractControllerMiddleware  $middleware
+	 * @param   callable|AbstractControllerMiddleware $middleware
 	 *
 	 * @return  static
+	 * @throws \InvalidArgumentException
 	 */
 	public function addMiddleware($middleware)
 	{
@@ -1054,28 +1067,30 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * __get
 	 *
-	 * @param   string  $name
+	 * @param   string $name
 	 *
 	 * @return  mixed
+	 *
+	 * @throws \OutOfRangeException
 	 */
 	public function __get($name)
 	{
-		if ($name == 'input')
+		if ($name === 'input')
 		{
 			return $this->input;
 		}
 
-		if ($name == 'app' || $name == 'application')
+		if ($name === 'app' || $name === 'application')
 		{
 			return $this->app;
 		}
 
-		if ($name == 'config')
+		if ($name === 'config')
 		{
 			return $this->config;
 		}
 
-		if ($name == 'route')
+		if ($name === 'route')
 		{
 			return $this->getRoute();
 		}
