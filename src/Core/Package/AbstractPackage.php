@@ -417,11 +417,13 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$router->group($group, function (CoreRouter $router) use ($routing)
 		{
-			$router->addRouteByConfigs(
-				$router::loadRoutingFromFiles($routing),
-				$this->getName()
-			);
+			$router->addRouteByFile($routing, $this);
 		});
+
+		if (is_file($this->getDir() . '/routing.yml'))
+		{
+			$router->addRouteByFile($this->getDir() . '/routing.yml', $this);
+		}
 
 		return $router;
 	}

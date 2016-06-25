@@ -371,7 +371,7 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 	 *
 	 * @return  array
 	 */
-	public static function loadRoutingFromFiles(array $files)
+	public static function loadRoutingFiles(array $files)
 	{
 		$routing = new Registry;
 
@@ -381,6 +381,18 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 		}
 
 		return $routing->toArray();
+	}
+
+	/**
+	 * loadRoutingFromFile
+	 *
+	 * @param   array  $file
+	 *
+	 * @return  array
+	 */
+	public static function loadRoutingFile($file)
+	{
+		return static::loadRoutingFiles((array) $file);
 	}
 
 	/**
@@ -438,6 +450,21 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 		}
 
 		return $this;
+	}
+
+	/**
+	 * addRouteByFile
+	 *
+	 * @param string                 $file
+	 * @param string|AbstractPackage $package
+	 *
+	 * @return  CoreRouter
+	 */
+	public function addRouteByFile($file, $package = null)
+	{
+		$routes = static::loadRoutingFile($file);
+
+		return $this->addRouteByConfigs($routes, $package);
 	}
 
 	/**

@@ -212,7 +212,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			/** @var Core\Router\CoreRouter $router */
 			$router = $this->container->get('router');
 
-			$routes = $router::loadRoutingFromFiles((array) $this->get('routing.files'));
+			$routes = $router::loadRoutingFiles((array) $this->get('routing.files'));
 
 			$router->registerRawRouting($routes, $this->container->get('package.resolver'));
 
