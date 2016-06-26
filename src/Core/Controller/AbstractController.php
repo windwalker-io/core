@@ -490,7 +490,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			}
 			catch (\UnexpectedValueException $e)
 			{
-				$view = new HtmlView([], $config, $engine);
+				if ($format == 'html' || !$format)
+				{
+					$view = new HtmlView([], $config, $engine);
+				}
+				else
+				{
+					throw $e;
+				}
 			}
 
 			$class = get_class($view);
