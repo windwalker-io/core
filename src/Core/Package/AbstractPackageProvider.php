@@ -10,7 +10,6 @@ namespace Windwalker\Core\Package;
 
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
 
 /**
  * The PackageProvider class.

@@ -9,7 +9,6 @@
 namespace Windwalker\Debugger\Model;
 
 use Windwalker\Core\Model\Model;
-use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
 
 /**

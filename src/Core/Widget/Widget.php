@@ -15,11 +15,9 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\ArrayAccessTrait;
 use Windwalker\Utilities\Queue\PriorityQueue;
-use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
-use Windwalker\Utilities\Queue\Priority;
 
 /**
  * The Widget class.

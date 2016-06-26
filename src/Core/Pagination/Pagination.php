@@ -10,13 +10,8 @@ namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Router\CoreRoute;
-use Windwalker\Core\Router\CoreRouter;
-use Windwalker\Core\Router\Route;
-use Windwalker\Core\Router\Router;
 use Windwalker\Core\Widget\WidgetHelper;
-use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Uri\Uri;
 
 /**

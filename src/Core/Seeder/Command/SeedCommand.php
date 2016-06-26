@@ -9,14 +9,11 @@
 namespace Windwalker\Core\Seeder\Command;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Console\Option\Option;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Seeder\Command\Seed\CleanCommand;
 use Windwalker\Core\Seeder\Command\Seed\ClearCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Filesystem\Folder;
 use Windwalker\Ioc;
 use Windwalker\Loader\ClassLoader;
 use Windwalker\String\StringNormalise;

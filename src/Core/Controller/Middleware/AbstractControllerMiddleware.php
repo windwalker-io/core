@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Controller\Middleware;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Data\Data;
 use Windwalker\Middleware\AbstractMiddleware;
 
 /**

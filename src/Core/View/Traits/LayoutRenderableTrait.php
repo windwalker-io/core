@@ -9,7 +9,6 @@
 namespace Windwalker\Core\View\Traits;
 
 use Windwalker\Core\Package\NullPackage;
-use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Filesystem\Path;
 use Windwalker\Registry\Registry;

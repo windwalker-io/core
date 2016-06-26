@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Renderer;
 
-use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
 use Windwalker\Core\Renderer\Finder\TwigFilesystemLoader;
 use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\Renderer\Traits\PackageFinderTrait;

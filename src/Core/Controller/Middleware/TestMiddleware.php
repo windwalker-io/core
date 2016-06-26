@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Windwalker\Data\Data;
-
 /**
  * The TestMiddleware class.
  *

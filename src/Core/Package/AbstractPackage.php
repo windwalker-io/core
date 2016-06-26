@@ -10,7 +10,6 @@ namespace Windwalker\Core\Package;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Symfony\Component\Yaml\Yaml;
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
@@ -25,13 +24,11 @@ use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
-use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Registry\Registry;
-use Windwalker\Registry\RegistryHelper;
 
 /**
  * The AbstractPackage class.

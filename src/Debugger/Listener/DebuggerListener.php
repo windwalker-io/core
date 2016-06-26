@@ -9,7 +9,6 @@
 namespace Windwalker\Debugger\Listener;
 
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\PackageHelper;
@@ -21,9 +20,7 @@ use Windwalker\Debugger\Helper\TimelineHelper;
 use Windwalker\Debugger\Model\DashboardModel;
 use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Folder;
 use Windwalker\IO\Input;
-use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Registry\Registry;
 

@@ -15,7 +15,6 @@ use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Renderer\MustacheRenderer;
 use Windwalker\Renderer\BladeRenderer;
 use Windwalker\Renderer\PhpRenderer;
-use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Utilities\Queue\PriorityQueue;
 

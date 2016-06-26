@@ -11,7 +11,6 @@ namespace Windwalker\Core\Provider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Event\EventDispatcher;
-use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Renderer\Finder\PackageFinder;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
@@ -19,6 +18,7 @@ use Windwalker\Core\Widget\WidgetManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer;
+use Windwalker\Session\Session;
 
 /**
  * The TemplateEngineProvider class.
@@ -218,9 +218,10 @@ class RendererProvider implements ServiceProviderInterface
 	{
 		if (static::$messages === null)
 		{
-			static::$messages = $container->get('session')
-				->getFlashBag()
-				->takeAll();
+			/** @var Session $session */
+			$session = $container->get('session');
+
+			static::$messages = $session->getFlashBag()->takeAll();
 		}
 
 		$globals = array(

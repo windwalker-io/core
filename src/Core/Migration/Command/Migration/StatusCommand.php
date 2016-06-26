@@ -10,7 +10,6 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\Model\MigrationsModel;
-use Windwalker\Core\Ioc;
 
 /**
  * The StatusCommand class.

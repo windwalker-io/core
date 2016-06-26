@@ -105,7 +105,7 @@ class AbstractDataMapperProxy
 	 *
 	 * @return  void
 	 */
-	protected static function initialise(AbstractDataMapper $mapper)
+	protected static function init(AbstractDataMapper $mapper)
 	{
 	}
 
@@ -148,7 +148,7 @@ class AbstractDataMapperProxy
 
 		$mapper->getDispatcher()->addListener(new static);
 
-		static::initialise($mapper);
+		static::init($mapper);
 
 		return $mapper;
 	}

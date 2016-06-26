@@ -8,8 +8,9 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
+use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Data\Data;
+use Windwalker\Form\Validate\ValidateResult;
 
 /**
  * The ErrorHandlingMiddleware class.
@@ -31,37 +32,38 @@ class ErrorHandlingMiddleware extends AbstractControllerMiddleware
 	{
 		try
 		{
-			$result = $this->next->execute($data);
-
-			return $this->controller->processSuccess($result);
+			return $this->next->execute($data);
 		}
 		catch (ValidateFailException $e)
 		{
-			$message = $e->getMessage();
+			$messages = $e->getMessages();
 
-			return $this->controller->processFailure(null, $message);
+			if (isset($messages[ValidateResult::STATUS_REQUIRED]))
+			{
+				$this->controller->addMessage((array) $messages[ValidateResult::STATUS_REQUIRED], Bootstrap::MSG_DANGER);
+
+				unset($messages[ValidateResult::STATUS_REQUIRED]);
+			}
+
+			if (isset($messages[ValidateResult::STATUS_FAILURE]))
+			{
+				$this->controller->addMessage((array) $messages[ValidateResult::STATUS_FAILURE], Bootstrap::MSG_WARNING);
+
+				unset($messages[ValidateResult::STATUS_FAILURE]);
+			}
+
+			$this->controller->processFailure($messages);
 		}
 		catch (\Exception $e)
 		{
-			if ($this->controller->app->get('system.debug'))
-			{
-				//throw $e;
-			}
-
-			$message = $e->getMessage();
-
-			return $this->controller->processFailure(null, $message);
-		}
-		catch (\Throwable $e)
-		{
-			if ($this->controller->app->get('system.debug'))
+			if (WINDWALKER_DEBUG)
 			{
 				throw $e;
 			}
 
-			$message = $e->getMessage();
+			$this->controller->processFailure($e->getMessage(), Bootstrap::MSG_WARNING);
 
-			return $this->controller->processFailure(null, $message);
+			return false;
 		}
 	}
 }

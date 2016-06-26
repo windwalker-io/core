@@ -9,7 +9,6 @@
 namespace Windwalker\Debugger\View\System;
 
 use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
-use Windwalker\Registry\Registry;
 
 /**
  * The SystemHtmlView class.

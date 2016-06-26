@@ -11,7 +11,6 @@ namespace Windwalker\Debugger\View\Routing;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
 use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
-use Windwalker\Router\Route;
 use Windwalker\String\StringHelper;
 
 /**

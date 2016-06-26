@@ -12,7 +12,6 @@ use Windwalker\Core\Language\CoreLanguage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Language\Language;
-use Windwalker\Language\Loader\FileLoader;
 
 /**
  * The LanguageProvider class.

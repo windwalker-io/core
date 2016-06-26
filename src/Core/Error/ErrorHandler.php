@@ -8,12 +8,7 @@
 
 namespace Windwalker\Core\Error;
 
-use Windwalker\Application\Web\Response;
 use Windwalker\Core\Facade\AbstractProxyFacade;
-use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Http\Response\HtmlResponse;
-use Windwalker\Profiler\Point\Collector;
-use Windwalker\Renderer\PhpRenderer;
 
 /**
  * Class ErrorHandler

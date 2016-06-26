@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Package;
 
-use Windwalker\Console\Console;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;

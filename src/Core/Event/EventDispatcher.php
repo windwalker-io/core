@@ -8,14 +8,8 @@
 
 namespace Windwalker\Core\Event;
 
-use Windwalker\Core\Profiler\NullProfiler;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\Event;
-use Windwalker\Profiler\Point\Collector;
-use Windwalker\Profiler\Profiler;
-use Windwalker\Profiler\ProfilerAwareInterface;
-use Windwalker\Profiler\ProfilerInterface;
-
 /**
  * The EventDispatcher class.
  * 

@@ -9,16 +9,12 @@
 namespace Windwalker\Core\View;
 
 use Windwalker\Core\Renderer\RendererHelper;
-use Windwalker\Core\Renderer\RendererManager;
-use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
-use Windwalker\Core\View\Helper\ViewHelper;
 use Windwalker\Core\View\Traits\LayoutRenderableTrait;
 use Windwalker\Data\Data;
 use Windwalker\Filesystem\Path;
 use Windwalker\Renderer\AbstractRenderer;
-use Windwalker\Renderer\RendererInterface;
 
 /**
  * The AbstractHtmlView class.

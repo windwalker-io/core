@@ -7,7 +7,6 @@
  */
 
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
-use Windwalker\Html\Grid\KeyValueGrid;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Profiler\Profiler;
 

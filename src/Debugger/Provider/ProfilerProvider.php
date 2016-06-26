@@ -8,7 +8,6 @@
 
 namespace Windwalker\Debugger\Provider;
 
-use Windwalker\Data\DataSet;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\Core\Object\NullObject;
@@ -17,7 +16,6 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\ListenerPriority;
-use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Point\Point;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Registry\Registry;

@@ -8,17 +8,13 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Application\WindwalkerWebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Browser\Browser;
-use Windwalker\Environment\Environment;
 use Windwalker\Environment\Platform;
 use Windwalker\Environment\WebEnvironment;
 use Windwalker\IO\PsrInput;
-use Windwalker\Registry\Registry;
 use Windwalker\Uri\UriData;
 
 /**

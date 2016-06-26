@@ -10,7 +10,6 @@ namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
 use Windwalker\String\SimpleTemplate;
-use Windwalker\String\StringHelper;
 
 /**
  * The AssetTemplate class.

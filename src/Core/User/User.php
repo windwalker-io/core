@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\User;
 
-use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\AuthenticationInterface;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;

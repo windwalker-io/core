@@ -8,9 +8,7 @@
 
 namespace Windwalker\Core\View\Helper;
 
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\View\Helper\Set\HelperSet;
 
 /**
  * Class ViewHelper

@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Renderer\Finder;
 
-use Windwalker\Debugger\Helper\DebuggerHelper;
-
 /**
  * The TwigFilesystemLoader class.
  *

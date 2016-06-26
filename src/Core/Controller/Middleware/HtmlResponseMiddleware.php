@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Windwalker\Data\Data;
 use Windwalker\Http\Response\HtmlResponse;
 
 /**

@@ -8,12 +8,10 @@
 
 namespace Windwalker\Core\Package;
 
-use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Mvc\ViewResolver;
-use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Router\CoreRoute;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

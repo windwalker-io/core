@@ -10,14 +10,11 @@ namespace Windwalker\Core\Migration\Model;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\AbstractMigration;
-use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Model\Traits\CliOutputModelTrait;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
-use Windwalker\Database\Schema\Column\Timestamp;
-use Windwalker\Database\Schema\Column\Varchar;
 use Windwalker\Database\Schema\Schema;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;

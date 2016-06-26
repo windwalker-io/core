@@ -19,7 +19,6 @@ use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Registry\Registry;
-use Windwalker\Registry\RegistryHelper;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;

@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\Core\Package\AbstractPackage;
-
 /**
  * Interface ClassResolverInterface
  *

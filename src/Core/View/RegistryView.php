@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
 use Windwalker\Registry\Registry;
 
 /**

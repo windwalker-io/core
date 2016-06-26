@@ -265,39 +265,60 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Execute the controller.
 	 *
-	 * @return  mixed Return executed result.
+	 * @return mixed Return executed result.
 	 *
-	 * @throws  \LogicException
-	 * @throws  \RuntimeException
+	 * @throws \Exception
+	 * @throws \Throwable
 	 */
 	public function execute()
 	{
-		$this->prepareExecute();
+		try
+		{
+			$this->prepareExecute();
 
-		$this->triggerEvent('onControllerBeforeExecute', array(
-			'controller' => $this
-		));
+			$this->triggerEvent('onControllerBeforeExecute', array(
+				'controller' => $this
+			));
 
-		$data = new Data([
-			'input'    => $this->input,
-			'mute'     => $this->mute,
-			'hmvc'     => $this->hmvc,
-			'app'      => $this->app,
-			'request'  => $this->request,
-			'response' => $this->response,
-			'route'    => $this->route,
-			'container' => $this->container,
-			'package'  => $this->getPackage()
-		]);
+			$data = new Data([
+				'input'    => $this->input,
+				'mute'     => $this->mute,
+				'hmvc'     => $this->hmvc,
+				'app'      => $this->app,
+				'request'  => $this->request,
+				'response' => $this->response,
+				'route'    => $this->route,
+				'container' => $this->container,
+				'package'  => $this->getPackage()
+			]);
 
-		$result = $this->middlewares->execute($data);
+			$data->bind(get_object_vars($this));
 
-		$result = $this->postExecute($result);
+			$result = $this->middlewares->execute($data);
 
-		$this->triggerEvent('onControllerAfterExecute', array(
-			'controller' => $this,
-			'result'     => &$result
-		));
+			$result = $this->postExecute($result);
+
+			$this->triggerEvent('onControllerAfterExecute', array(
+				'controller' => $this,
+				'result'     => &$result
+			));
+
+			$this->processSuccess();
+		}
+		catch (\Exception $e)
+		{
+			$this->processFailure($e->getMessage(), Bootstrap::MSG_DANGER);
+
+			throw new \Exception($e->getMessage(), $e->getCode(), $e);
+		}
+		catch (\Throwable $e)
+		{
+			$this->processFailure();
+
+			throw $e;
+		}
+
+		$this->processSuccess();
 
 		return $result;
 	}
@@ -408,13 +429,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * handleSuccess
 	 *
-	 * @param mixed  $data
 	 * @param string $message
 	 * @param string $type
 	 *
-	 * @return  boolean
+	 * @return bool
 	 */
-	public function processSuccess($data = null, $message = null, $type = 'info')
+	public function processSuccess($message = null, $type = 'info')
 	{
 		return true;
 	}
@@ -422,13 +442,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * handleFailure
 	 *
-	 * @param mixed  $data
 	 * @param string $message
 	 * @param string $type
 	 *
-	 * @return  boolean
+	 * @return bool
 	 */
-	public function processFailure($data = null, $message = null, $type = 'warning')
+	public function processFailure($message = null, $type = 'warning')
 	{
 		return false;
 	}

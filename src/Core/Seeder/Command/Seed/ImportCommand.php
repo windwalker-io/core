@@ -11,9 +11,6 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
-use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Mvc\MvcHelper;
-use Windwalker\String\StringNormalise;
 
 /**
  * Class Seed

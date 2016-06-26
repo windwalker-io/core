@@ -12,8 +12,6 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
-use Windwalker\Database\Driver\AbstractDatabaseDriver;
-use Windwalker\Model\AbstractModel;
 use Windwalker\Registry\Registry;
 
 /**

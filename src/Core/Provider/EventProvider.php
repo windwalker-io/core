@@ -11,7 +11,6 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Event\Dispatcher;
 
 /**
  * The EventProvider class.

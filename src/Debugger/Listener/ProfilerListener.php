@@ -15,7 +15,6 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\CoreRouter;
-use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
 use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;

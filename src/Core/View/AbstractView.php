@@ -17,9 +17,7 @@ use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
 use Windwalker\Registry\Registry;
-use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\String\StringNormalise;
-use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractView class.

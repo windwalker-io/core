@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Logger\Monolog;
 
-use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\HandlerInterface;
 
 /**

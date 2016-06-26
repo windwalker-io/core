@@ -8,10 +8,9 @@
 
 namespace Windwalker\Core\Renderer;
 
-use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
 use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
-use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The PhpRenderer class.
@@ -53,7 +52,7 @@ class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRender
 
 		if ($path && !isset($paths[$path]))
 		{
-			$this->addPath($path, Priority::MAX);
+			$this->addPath($path, PriorityQueue::MAX);
 
 			$paths[$path] = true;
 		}

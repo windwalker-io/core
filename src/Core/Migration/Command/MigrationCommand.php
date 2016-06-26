@@ -12,7 +12,6 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Provider\DatabaseProvider;
-use Windwalker\Database\DatabaseFactory;
 use Windwalker\Core\Ioc;
 
 /**

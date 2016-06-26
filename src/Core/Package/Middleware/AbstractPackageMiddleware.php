@@ -8,12 +8,8 @@
 
 namespace Windwalker\Core\Package\Middleware;
 
-use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Middleware\AbstractMiddleware;
 use Windwalker\Middleware\Psr7InvokableInterface;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 
 /**
  * The AbstractApplicationMiddleware class.

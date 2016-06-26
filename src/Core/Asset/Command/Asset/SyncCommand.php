@@ -11,10 +11,7 @@ namespace Windwalker\Core\Asset\Command\Asset;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\ConsoleHelper;
-use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Environment\PlatformHelper;
-use Windwalker\Environment\ServerHelper;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Core\Utilities\Symlink;
 

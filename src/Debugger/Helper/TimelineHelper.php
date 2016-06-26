@@ -8,7 +8,6 @@
 
 namespace Windwalker\Debugger\Helper;
 
-use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Data\Data;
 use Windwalker\Profiler\Point\Point;
