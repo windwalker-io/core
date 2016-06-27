@@ -16,7 +16,7 @@ use Windwalker\Core\Package\NullPackage;
  * 
  * @since  2.0
  */
-class CoreRoute
+class PackageRouter implements RouteBuilderInterface
 {
 	const TYPE_RAW = 'raw';
 	const TYPE_PATH = 'path';
@@ -58,14 +58,56 @@ class CoreRoute
 	 *
 	 * @return string
 	 */
-	public function get($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
 	{
-		if ($this->router->hasRoute($this->package->getName() . '@' . $route))
+		try
 		{
-			return $this->router->build($this->package->getName() . '@' . $route, $queries, $type);
-		}
+			if ($this->router->hasRoute($this->package->getName() . '@' . $route))
+			{
+				return $this->router->build($this->package->getName() . '@' . $route, $queries, $type);
+			}
 
-		return $this->router->build($route, $queries, $type);
+			return $this->router->build($route, $queries, $type);
+		}
+		catch (\OutOfRangeException $e)
+		{
+			if ($this->package->app->get('routing.debug', false))
+			{
+				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
+			}
+			elseif ($this->package->app->get('system.debug', false))
+			{
+				return sprintf('javascript:alert(\'%s\')', $e->getMessage());
+			}
+
+			return '#';
+		}
+	}
+
+	/**
+	 * fullRoute
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  string
+	 */
+	public function fullRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_FULL);
+	}
+
+	/**
+	 * rawRoute
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  string
+	 */
+	public function rawRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_RAW);
 	}
 
 	/**
@@ -83,37 +125,7 @@ class CoreRoute
 		$token = $this->package->container->get('security.csrf')->getFormToken();
 		$queries[$token] = 1;
 
-		return $this->get($route, $queries, $type);
-	}
-
-	/**
-	 * buildHtml
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return  string
-	 */
-	public function encode($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		try
-		{
-			return htmlspecialchars($this->get($route, $queries, $type));
-		}
-		catch (\OutOfRangeException $e)
-		{
-			if ($this->package->app->get('routing.debug', false))
-			{
-				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
-			}
-			elseif ($this->package->app->get('system.debug', false))
-			{
-				return sprintf('javascript:alert(\'%s\')', $e->getMessage());
-			}
-
-			return '#';
-		}
+		return $this->route($route, $queries, $type);
 	}
 
 	/**

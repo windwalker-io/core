@@ -12,7 +12,7 @@ use Windwalker\Core\Model\Model;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
@@ -24,7 +24,7 @@ use Windwalker\String\StringNormalise;
  *
  * @property-read  ViewModel|mixed $model   The ViewModel object.
  * @property-read  Registry        $config  Config object.
- * @property-read  CoreRoute       $router  Router object.
+ * @property-read  PackageRouter   $router  Router object.
  *
  * @since  2.1.5.3
  */
@@ -583,7 +583,7 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * getRouter
 	 *
-	 * @return  CoreRoute
+	 * @return  PackageRouter
 	 */
 	public function getRouter()
 	{

@@ -16,6 +16,7 @@ use Windwalker\Core;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
@@ -114,7 +115,10 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	protected function init()
 	{
-
+		if (class_exists(ComposerInformation::class))
+		{
+			$this->version = ComposerInformation::getInstalledVersion('windwalker/core');
+		}
 	}
 
 	/**

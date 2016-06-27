@@ -177,7 +177,7 @@ class HtmlView extends AbstractView
 		$globals  = $this->getRendererManager()->getGlobals();
 
 		$globals['package'] = $this->getPackage();
-		$globals['route'] = $this->getPackage()->route;
+		$globals['router'] = $this->getPackage()->router;
 
 		$data->bind($globals);
 	}

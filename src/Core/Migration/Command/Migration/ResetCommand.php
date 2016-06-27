@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Migration\Command\Migration;
 
-use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Model\BackupModel;
 
 /**
@@ -16,7 +16,7 @@ use Windwalker\Core\Migration\Model\BackupModel;
  * 
  * @since  2.0
  */
-class ResetCommand extends AbstractCommand
+class ResetCommand extends CoreCommand
 {
 	/**
 	 * An enabled flag.
@@ -68,6 +68,11 @@ class ResetCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
+		if ($this->console->getMode() != 'dev')
+		{
+			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+		}
+
 		// backup
 		if (!$this->getOption('no-backup'))
 		{

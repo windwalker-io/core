@@ -11,6 +11,7 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
@@ -31,7 +32,7 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @since  2.0
  */
-class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherInterface
+class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwareInterface, DispatcherInterface
 {
 	use DispatcherAwareTrait;
 	
@@ -166,6 +167,64 @@ class CoreRouter extends Router implements DispatcherAwareInterface, DispatcherI
 		$this->cache->set($key, $url);
 
 		return $url;
+	}
+
+	/**
+	 * build
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public function route($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type);
+	}
+
+	/**
+	 * fullRoute
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  string
+	 */
+	public function fullRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_FULL);
+	}
+
+	/**
+	 * rawRoute
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  string
+	 */
+	public function rawRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_RAW);
+	}
+
+	/**
+	 * secure
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return  string
+	 */
+	public function secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
+	{
+		$queries = (array) $queries;
+		$token = Ioc::get('security.csrf')->getFormToken();
+		$queries[$token] = 1;
+
+		return $this->route($route, $queries, $type);
 	}
 
 	/**

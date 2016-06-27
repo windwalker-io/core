@@ -10,7 +10,8 @@ namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\RouteBuilderInterface;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Uri\Uri;
 
@@ -125,7 +126,7 @@ class Pagination
 	/**
 	 * Property route.
 	 *
-	 * @var  CoreRoute
+	 * @var  PackageRouter
 	 */
 	protected $route;
 
@@ -370,7 +371,7 @@ class Pagination
 		// If not route provided, use current route.
 		if ($route === null)
 		{
-			$route = function ($queries, $type = CoreRoute::TYPE_PATH) use ($query)
+			$route = function ($queries, $type = PackageRouter::TYPE_PATH) use ($query)
 			{
 				$queries = array_merge((array) $queries, (array) $query);
 
@@ -388,14 +389,14 @@ class Pagination
 
 				$route = Ioc::getConfig()->get('route.matched');
 
-				return $this->getRoute()->encode($route, $queries, $type);
+				return $this->getRoute()->route($route, $queries, $type);
 			};
 		}
 
 		// If route is string, wrap it as a callback
 		if (!$route instanceof \Closure)
 		{
-			$route = function ($queries, $type = CoreRoute::TYPE_PATH) use ($route, $query)
+			$route = function ($queries, $type = PackageRouter::TYPE_PATH) use ($route, $query)
 			{
 				$queries = array_merge((array) $queries, (array) $query);
 
@@ -404,11 +405,11 @@ class Pagination
 					$package = PackageHelper::getPackage();
 
 					// CoreRoute object not exists, we use global Route object.
-					return $package->route->encode($route, $queries, $type);
+					return $package->router->route($route, $queries, $type);
 				}
 
 				// Use custom Route object.
-				return $this->getRoute()->encode($route, $queries, $type);
+				return $this->getRoute()->route($route, $queries, $type);
 			};
 		}
 
@@ -418,7 +419,7 @@ class Pagination
 	/**
 	 * Method to get property Route
 	 *
-	 * @return  CoreRoute
+	 * @return  RouteBuilderInterface
 	 */
 	public function getRoute()
 	{
@@ -428,11 +429,11 @@ class Pagination
 	/**
 	 * Method to set property route
 	 *
-	 * @param   CoreRoute $route
+	 * @param   RouteBuilderInterface $route
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setRoute(CoreRoute $route)
+	public function setRoute(RouteBuilderInterface $route)
 	{
 		$this->route = $route;
 

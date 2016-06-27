@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Windwalker\SystemPackage\Command\Build;
+namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Ioc;
@@ -55,7 +55,7 @@ class GenerateCommand extends Command
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
@@ -144,15 +144,13 @@ TMPL;
 	 */
 	protected function doExecute()
 	{
-		@$name       = $this->io->getArgument(0) ? : exit("Please enter command name");
-		@$namespace  = $this->io->getArgument(1) ? : exit("Please enter command namespace");
+		$name       = $this->io->getArgument(0) ? : exit("Please enter command name");
+		$namespace  = $this->io->getArgument(1) ? : exit("Please enter command namespace");
 		$description = $this->getOption('d') ? : $name;
 
 		if (!$name || !$namespace)
 		{
-			$this->out('Need name & namespace.');
-
-			return;
+			throw new \InvalidArgumentException('Need name & namespace.');
 		}
 
 		// Regularize Namespace

@@ -944,7 +944,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	public function getRoute()
 	{
-		return $this->package->route;
+		return $this->package->router;
 	}
 
 	/**

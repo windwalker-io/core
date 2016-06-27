@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Migration\Command\Migration;
 
-use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
@@ -19,7 +19,7 @@ use Windwalker\Core\Migration\Model\BackupModel;
  *
  * @since  {DEPLOY_VERSION}
  */
-class DropAllCommand extends Command
+class DropAllCommand extends CoreCommand
 {
 	use CoreCommandTrait;
 	
@@ -60,6 +60,11 @@ class DropAllCommand extends Command
 	 */
 	protected function doExecute()
 	{
+		if ($this->console->getMode() != 'dev')
+		{
+			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+		}
+
 		if (!(new BooleanPrompter)->ask('This action will drop all tables, do you really want to do this? [N/y]', false))
 		{
 			$this->out('  Canceled.');

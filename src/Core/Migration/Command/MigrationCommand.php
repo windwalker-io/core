@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Migration\Command;
 
-use Windwalker\Console\Command\Command;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Provider\DatabaseProvider;
@@ -19,7 +19,7 @@ use Windwalker\Core\Ioc;
  *
  * @since  2.0
  */
-class MigrationCommand extends Command
+class MigrationCommand extends CoreCommand
 {
 	/**
 	 * An enabled flag.

@@ -28,6 +28,6 @@ return [
 	],
 
 	'commands' => [
-		\Windwalker\SystemPackage\Command\BuildCommand::class
+		\Windwalker\SystemPackage\Command\SystemCommand::class
 	]
 ];

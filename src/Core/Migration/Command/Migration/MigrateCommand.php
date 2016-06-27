@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Migration\Command\Migration;
 
-use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Console\Prompter\BooleanPrompter;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Model\BackupModel;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 
@@ -18,7 +18,7 @@ use Windwalker\Core\Migration\Model\MigrationsModel;
  * 
  * @since  2.0
  */
-class MigrateCommand extends AbstractCommand
+class MigrateCommand extends CoreCommand
 {
 	/**
 	 * An enabled flag.
@@ -71,6 +71,11 @@ class MigrateCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
+		if ($this->console->getMode() != 'dev')
+		{
+			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+		}
+
 		$migration = new MigrationsModel;
 		$migration->setIo($this->io);
 

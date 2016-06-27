@@ -12,7 +12,7 @@ use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Mvc\ViewResolver;
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -73,7 +73,7 @@ class PackageProvider implements ServiceProviderInterface
 			// Router
 			$container->share('route', function (Container $container)
 			{
-				return new CoreRoute($container->get('router'), $this->package);
+				return new PackageRouter($container->get('router'), $this->package);
 			});
 		}
 	}

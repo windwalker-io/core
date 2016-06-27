@@ -89,6 +89,8 @@ trait WindwalkerTrait
 
 		$this->loadConfiguration($this->config);
 
+		$this->mode = $this->config->get('system.mode', 'prod');
+
 		$this->registerProviders();
 
 		// Set some default objects

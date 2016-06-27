@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Seeder\Command\Seed;
 
-use Windwalker\Console\Command\Command;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
 
 /**
  * Class Seed
  */
-class ClearCommand extends Command
+class ClearCommand extends CoreCommand
 {
 	/**
 	 * An enabled flag.
@@ -62,6 +62,11 @@ class ClearCommand extends Command
 	 */
 	protected function doExecute()
 	{
+		if ($this->console->getMode() != 'dev')
+		{
+			throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
+		}
+
 		// backup
 		BackupModel::getInstance()->setCommand($this)->backup();
 

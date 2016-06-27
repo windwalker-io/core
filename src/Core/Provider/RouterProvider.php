@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -51,14 +51,6 @@ class RouterProvider implements ServiceProviderInterface
 
 		$container->share(CoreRouter::class, $closure)
 			->alias('router', CoreRouter::class);
-
-		$closure = function (Container $container)
-		{
-		    return $container->createSharedObject(CoreRoute::class);
-		};
-
-		$container->share(CoreRoute::class, $closure)
-			->alias('route', CoreRoute::class);
 	}
 
 	/**

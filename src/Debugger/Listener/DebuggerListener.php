@@ -113,7 +113,7 @@ class DebuggerListener
 
 			if ($item)
 			{
-				$app->redirect($package->route->get($app->get('route.matched'), array('id' => $item['id'])));
+				$app->redirect($package->router->route($app->get('route.matched'), array('id' => $item['id'])));
 
 				return;
 			}
@@ -143,7 +143,7 @@ class DebuggerListener
 			// set id to session and redirect
 			$session->set('debugger.current.id', $id);
 
-			$app->redirect($package->route->get($app->get('route.matched'), array('id' => $id)));
+			$app->redirect($package->router->route($app->get('route.matched'), array('id' => $id)));
 
 			return;
 		}
@@ -154,7 +154,7 @@ class DebuggerListener
 		{
 			$session->set('debugger.current.id', null);
 
-			$app->redirect($package->route->get('dashboard'));
+			$app->redirect($package->router->route('dashboard'));
 		}
 
 		$session->set('debugger.current.id', $id);

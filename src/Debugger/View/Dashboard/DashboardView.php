@@ -27,7 +27,7 @@ class DashboardView extends AbstractDebuggerHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$route = $this->getPackage()->route;
+		$route = $this->getPackage()->router;
 
 		$data->items = $this->model->getItems();
 
@@ -37,7 +37,7 @@ class DashboardView extends AbstractDebuggerHtmlView
 			$collector = $item['collector'];
 
 			$item->url  = $collector['system.uri.full'];
-			$item->link = $route->encode('system', array('id' => $item->id));
+			$item->link = $router->route('system', array('id' => $item->id));
 			$item->method = $collector['system.method.custom'] ? : $collector['system.method.http'];
 			$item->ip   = $collector['system.ip'];
 			$item->time = $collector['system.time'];

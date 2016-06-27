@@ -17,7 +17,7 @@ use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
@@ -34,7 +34,7 @@ use Windwalker\Registry\Registry;
  * The AbstractPackage class.
  *
  * @property-read  Registry                   $config
- * @property-read  CoreRoute                  $route
+ * @property-read  PackageRouter              $router
  * @property-read  PsrInput                   $input
  * @property-read  WebApplication|CoreConsole $app
  * @property-read  string                     $name
@@ -87,6 +87,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	 * @var  Psr7ChainBuilder
 	 */
 	protected $middlewares;
+
+	/**
+	 * Property router.
+	 *
+	 * @var  PackageRouter
+	 */
+	protected $router;
 
 	/**
 	 * initialise
@@ -426,6 +433,35 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
+	 * getRouter
+	 *
+	 * @return  PackageRouter
+	 */
+	public function getRouter()
+	{
+		if (!$this->router)
+		{
+			$this->router = new PackageRouter($this->getContainer()->get('router'), $this);
+		}
+
+		return $this->router;
+	}
+
+	/**
+	 * Method to set property router
+	 *
+	 * @param   PackageRouter $router
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setRouter($router)
+	{
+		$this->router = $router;
+
+		return $this;
+	}
+
+	/**
 	 * getFile
 	 *
 	 * @return  string
@@ -685,8 +721,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		$diMapping = [
 			'app'        => 'application',
 			'input'      => 'input',
-			'dispatcher' => 'dispatcher',
-			'route'      => 'route'
+			'dispatcher' => 'dispatcher'
 		];
 
 		if (isset($diMapping[$name]))
@@ -702,6 +737,11 @@ class AbstractPackage implements DispatcherAwareInterface
 		if ($name == 'config')
 		{
 			return $this->getConfig();
+		}
+
+		if ($name == 'router')
+		{
+			return $this->getRouter();
 		}
 
 		if ($name == 'name')

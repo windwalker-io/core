@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Router\CoreRoute;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\IO\Input;
@@ -26,7 +26,7 @@ use Windwalker\IO\Input;
  * @property WebApplication         app
  * @property ServerRequestInterface request
  * @property ResponseInterface      response
- * @property CoreRoute              router
+ * @property PackageRouter          router
  * @property Container              container
  * @property AbstractPackage        package
  *
