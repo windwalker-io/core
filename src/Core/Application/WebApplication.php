@@ -98,6 +98,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		$this->config = $config instanceof Registry ? $config : new Registry($config);
 		$this->name   = $this->config->get('name', $this->name);
+		$this->configPath = $this->config->get('config_path', $this->configPath);
 
 		Core\Ioc::setProfile($this->name);
 
@@ -126,7 +127,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * Execute the application.
 	 *
-	 * @return  string
+	 * @return  Response
 	 *
 	 * @since   2.0
 	 */
@@ -156,7 +157,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		// @event onBeforeRespond
 		$this->triggerEvent('onBeforeRespond', ['app' => $this, 'response' => $response]);
 
-		$this->server->getOutput()->respond($response);
+		$response = $this->server->getOutput()->respond($response, $this->get('output.return_body', false));
 
 		// @event onAfterRespond
 		$this->triggerEvent('onAfterRespond', ['app' => $this, 'response' => $response]);

@@ -8,8 +8,11 @@
 
 namespace Windwalker\Core\Package;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
 use Windwalker\Ioc;
 use Windwalker\Registry\Registry;
@@ -82,52 +85,5 @@ class PackageHelper extends AbstractProxyFacade
 	public static function getClassName($package)
 	{
 		return get_class(static::getPackage($package));
-	}
-
-	/**
-	 * Execute a package in CLI environment.
-	 *
-	 * @param string $package
-	 * @param string $task
-	 * @param array  $variables
-	 * @param array  $config
-	 * @param string $appClass
-	 *
-	 * @return mixed
-	 */
-	public static function execute($package, $task, $variables = array(), $config = array(), $appClass = 'Windwalker\Web\Application')
-	{
-		$_SERVER['HTTP_HOST']      = isset($_SERVER['HTTP_HOST'])      ? $_SERVER['HTTP_HOST']      : 'localhost';
-		$_SERVER['REQUEST_METHOD'] = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
-		$_SERVER['SERVER_PORT']    = isset($_SERVER['SERVER_PORT'])    ? $_SERVER['SERVER_PORT']    : '80';
-
-		Ioc::setProfile('console');
-
-		$container = Ioc::factory();
-
-		if (!class_exists($appClass))
-		{
-			throw new \LogicException($appClass . ' not found, you have to provide an exists Application class name.');
-		}
-
-		if (!is_subclass_of($appClass, 'Windwalker\Core\Application\WebApplication'))
-		{
-			throw new \LogicException('Application class should be sub class of Windwalker\Core\Application\WebApplication.');
-		}
-
-		/** @var WebApplication $app */
-		$app = new $appClass($container, new Input, array('name' => 'cli'));
-
-		$app->getRouter();
-
-		$package = $app->getPackage($package);
-		$container->share('current.package', $package);
-		$container->get('config')->load($config);
-
-		$result = $package->execute($task, $variables);
-
-		Ioc::setProfile('windwalker');
-
-		return $result;
 	}
 }

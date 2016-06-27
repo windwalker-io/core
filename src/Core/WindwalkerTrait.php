@@ -124,11 +124,6 @@ trait WindwalkerTrait
 	{
 		$name = $name ? : $this->getName();
 
-		// Load library config
-		$configName = $this->isWeb() ? 'web' : 'console';
-
-		$config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php');
-
 		// Load application config
 		$file = $this->configPath . '/' . $name . '.php';
 
