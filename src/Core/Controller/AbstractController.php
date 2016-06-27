@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\Model;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\ViewResolver;
@@ -294,7 +295,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			]);
 
 			$data->bind(get_object_vars($this));
-
+			
 			$result = $this->middlewares->execute($data);
 
 			$result = $this->postExecute($result);
@@ -303,8 +304,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				'controller' => $this,
 				'result'     => &$result
 			));
-
-			$this->processSuccess();
 		}
 		catch (\Exception $e)
 		{
@@ -319,7 +318,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			throw $e;
 		}
 
-		$this->processSuccess();
+		if ($result !== false)
+		{
+			$this->processSuccess();
+		}
+		else
+		{
+			$this->processFailure();
+		}
 
 		return $result;
 	}

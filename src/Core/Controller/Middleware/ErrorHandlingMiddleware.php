@@ -52,7 +52,9 @@ class ErrorHandlingMiddleware extends AbstractControllerMiddleware
 				unset($messages[ValidateResult::STATUS_FAILURE]);
 			}
 
-			$this->controller->processFailure($messages);
+			$this->controller->addMessage($messages, Bootstrap::MSG_DANGER);
+
+			return false;
 		}
 		catch (\Exception $e)
 		{

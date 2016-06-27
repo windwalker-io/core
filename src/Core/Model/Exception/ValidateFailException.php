@@ -11,7 +11,7 @@ namespace Windwalker\Core\Model\Exception;
 use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
 
 /**
- * Class ValidFailException
+ * Class ValidateFailException
  *
  * @since  2.0
  */

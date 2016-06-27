@@ -70,7 +70,7 @@ class NullUserHandler implements UserHandlerInterface
 	 *
 	 * @return bool
 	 */
-	public function logout(UserDataInterface $user)
+	public function logout(UserDataInterface $user = null)
 	{
 		return true;
 	}

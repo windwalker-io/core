@@ -134,7 +134,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function execute()
 	{
 		$this->boot();
-
+		
 		$this->triggerEvent('onAfterBoot', ['app' => $this]);
 
 		$this->registerMiddlewares();
@@ -333,6 +333,18 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * Get the logger.
+	 *
+	 * @return  Core\Logger\LoggerManager
+	 *
+	 * @since   2.0
+	 */
+	public function getLogger()
+	{
+		return $this->container->get('logger');
+	}
+
+	/**
 	 * Redirect to another URL.
 	 *
 	 * If the headers have not been sent the redirect will be accomplished using a "301 Moved Permanently"
@@ -399,7 +411,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'renderer'   => 'renderer',
 			'cache'      => 'cache',
 			'session'    => 'session',
-			'mailer'     => 'mailer'
+			'mailer'     => 'mailer',
 		];
 
 		if (isset($diMapping[$name]))
@@ -419,6 +431,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		if ($name == 'router')
 		{
 			return $this->getRouter();
+		}
+
+		if ($name == 'logger')
+		{
+			return $this->getLogger();
 		}
 
 		return parent::__get($name);

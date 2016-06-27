@@ -103,6 +103,8 @@ trait WindwalkerTrait
 			$this->dispatcher = new NullObject;
 		}
 
+		$this->logger = $this->container->get('logger');
+
 		$this->registerListeners();
 
 		$this->registerPackages();

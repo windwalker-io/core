@@ -12,11 +12,11 @@ use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Test\TestCase\AbstractBaseTestCase;
 
 /**
- * The ValidFailExceptionTest class.
+ * The ValidateFailExceptionTest class.
  *
  * @since  2.1.5.2
  */
-class ValidFailExceptionTest extends AbstractBaseTestCase
+class ValidateFailExceptionTest extends AbstractBaseTestCase
 {
 	/**
 	 * Property instance.

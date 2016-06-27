@@ -231,6 +231,8 @@ class RendererProvider implements ServiceProviderInterface
 			/** @var Session $session */
 			$session = $container->get('session');
 
+			$session->start();
+
 			static::$messages = $session->getFlashBag()->takeAll();
 		}
 

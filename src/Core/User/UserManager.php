@@ -126,10 +126,10 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 		$options['remember'] = $remember;
 
 		// Before login event
-		$event = $this->triggerEvent('onUserBeforeLogin', ['user' => &$user, 'options' => &$options]);
+		$this->triggerEvent('onUserBeforeLogin', ['user' => &$user, 'options' => &$options]);
 
 		// Do login
-		if ($result = $this->authentication->authenticate($event['user']))
+		if ($result = $this->authentication->authenticate($user))
 		{
 			$user = $this->authentication->getCredential();
 

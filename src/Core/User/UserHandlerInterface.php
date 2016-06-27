@@ -58,5 +58,5 @@ interface UserHandlerInterface
 	 *
 	 * @return bool
 	 */
-	public function logout(UserDataInterface $user);
+	public function logout(UserDataInterface $user = null);
 }
