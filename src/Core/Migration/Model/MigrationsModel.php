@@ -174,24 +174,22 @@ class MigrationsModel extends Model
 				$count++;
 			}
 		}
-		else
+
+		ksort($migrations);
+
+		foreach ($migrations as $migration)
 		{
-			ksort($migrations);
-
-			foreach ($migrations as $migration)
+			if ($migration['version'] > $version)
 			{
-				if ($migration['version'] > $version)
-				{
-					break;
-				}
-
-				if (!in_array($migration['version'], $versions))
-				{
-					$this->executeMigration($migration, AbstractMigration::UP);
-				}
-
-				$count++;
+				break;
 			}
+
+			if (!in_array($migration['version'], $versions))
+			{
+				$this->executeMigration($migration, AbstractMigration::UP);
+			}
+
+			$count++;
 		}
 
 		if (!$count)

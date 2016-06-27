@@ -13,13 +13,14 @@ use Windwalker\Core\View\AbstractView;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Helper\ResponseHelper;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The RenderViewMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class JsonFormatMiddleware extends AbstractControllerMiddleware
+class JsonApiMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
@@ -44,7 +45,9 @@ class JsonFormatMiddleware extends AbstractControllerMiddleware
 				$result = $result->getHandledData();
 			}
 
-			return new JsonBuffer(null, $result);
+			$message = $this->getMessage();
+
+			return new JsonBuffer($message, $result);
 		}
 		catch (\Exception $e)
 		{
@@ -80,5 +83,24 @@ class JsonFormatMiddleware extends AbstractControllerMiddleware
 
 			return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
 		}
+	}
+
+	/**
+	 * getMessage
+	 *
+	 * @return  string
+	 */
+	protected function getMessage()
+	{
+		list($url, $msg, $type) = $this->controller->getRedirect(true);
+
+		if (!$msg)
+		{
+			$msg = $this->controller->app->session->getFlashBag()->takeAll();
+
+			$msg = implode("\n", ArrayHelper::flatten($msg));
+		}
+
+		return $msg;
 	}
 }

@@ -10,6 +10,7 @@ namespace Windwalker\Core\Mvc;
 
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Utilities\Queue\Priority;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The MvcResolver class. This is a composite class to wrap Controller, Model, View resolvers.
@@ -116,7 +117,7 @@ class MvcResolver
 	 *
 	 * @return  static
 	 */
-	public function addNamespace($namespace, $priority = Priority::NORMAL)
+	public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
 	{
 		$this->controllerResolver->addNamespace($namespace . '\Controller', $priority);
 		$this->modelResolver->addNamespace($namespace . '\Model', $priority);

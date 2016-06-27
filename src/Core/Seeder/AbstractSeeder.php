@@ -78,6 +78,8 @@ abstract class AbstractSeeder
 
 		$seeder->doExecute();
 
+		$this->command->out()->out('  <option>Import completed...</option>');
+
 		return $this;
 	}
 

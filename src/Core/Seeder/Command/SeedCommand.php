@@ -64,7 +64,7 @@ class SeedCommand extends Command
 
 		$this->addGlobalOption('c')
 			->alias('class')
-			->defaultValue('DatabaseSeeder')
+			->defaultValue('MainSeeder')
 			->description('The class to import.');
 
 		$this->addGlobalOption('d')

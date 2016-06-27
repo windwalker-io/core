@@ -33,6 +33,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  AssetTemplate getTemplate()             getTemplate()
  * @method  static  string        setTemplate()             setTemplate(AssetTemplate $template)
  * @method  static  string        getJSObject()             getJSObject(array $array)
+ * @method  static  string        path()                    path()
+ * @method  static  string        root()                    root()
  *
  * @since  1.0
  */

@@ -29,7 +29,7 @@ use Windwalker\Event\Event;
  * @method  static  Data            createOne($data)
  * @method  static  DataSet|Data[]  update($dataset, $condFields = null, $updateNulls = false)
  * @method  static  Data            updateOne($data, $condFields = null, $updateNulls = false)
- * @method  static  boolean         updateAll($data, $conditions = array())
+ * @method  static  boolean         updateBatch($data, $conditions = array())
  * @method  static  DataSet|Data[]  flush($dataset, $conditions = array())
  * @method  static  DataSet|Data[]  save($dataset, $condFields = null, $updateNulls = false)
  * @method  static  Data            saveOne($data, $condFields = null, $updateNulls = false)

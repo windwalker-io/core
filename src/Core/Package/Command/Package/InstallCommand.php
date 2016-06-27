@@ -81,7 +81,9 @@ class InstallCommand extends Command
 
 			if (!$package)
 			{
-				$this->err('Package: ' . $name . ' not found.');
+				$this->err('<comment>Package: ' . $name . ' not found.</comment>');
+
+				continue;
 			}
 
 			$this->installConfig($package);
@@ -124,7 +126,7 @@ class InstallCommand extends Command
 				$this->out('  Copy to <info>etc/package/' . $package->name . '.php</info> successfully.');
 			}
 		}
-
+ 
 		$file = $dir . '/secret.dist.yml';
 		$target = $this->console->get('path.etc') . '/secret.yml';
 

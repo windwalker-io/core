@@ -19,6 +19,8 @@ use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\View\AbstractView;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -217,6 +219,11 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if ($result !== null)
 		{
+			if ($result instanceof AbstractView)
+			{
+				$result = $result->render();
+			}
+
 			$response->getBody()->write((string) $result);
 		}
 

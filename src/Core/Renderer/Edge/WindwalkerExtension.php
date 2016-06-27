@@ -43,6 +43,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'messages'  => [$this, 'messages'],
 			'widget'    => [$this, 'widget'],
 			'route'     => [$this, 'route'],
+			'assetTemplate' => [$this, 'assetTemplate'],
+			'endTemplate'   => [$this, 'endTemplate'],
 		];
 	}
 
@@ -136,5 +138,29 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function route($expression)
 	{
 		return "<?php echo \$route->encode{$expression} ?>";
+	}
+
+	/**
+	 * route
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function assetTemplate($expression)
+	{
+		return "<?php \$asset->getTemplate()->startTemplate{$expression} ?>";
+	}
+
+	/**
+	 * route
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function endTemplate($expression)
+	{
+		return "<?php \$asset->getTemplate()->endTemplate{$expression} ?>";
 	}
 }

@@ -175,6 +175,16 @@ class RendererProvider implements ServiceProviderInterface
 			return "<?php echo \$route->encode{$expression} ?>";
 		});
 
+		Renderer\Blade\GlobalContainer::addCompiler('assetTemplate', function($expression)
+		{
+			return "<?php \$asset->getTemplate->startTemplate{$expression} ?>";
+		});
+
+		Renderer\Blade\GlobalContainer::addCompiler('endTemplate', function($expression)
+		{
+			return "<?php \$asset->getTemplate->endTemplate{$expression} ?>";
+		});
+
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
 	}
 

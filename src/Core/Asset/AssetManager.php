@@ -747,4 +747,24 @@ class AssetManager implements DispatcherAwareInterface
 
 		return $output;
 	}
+
+	/**
+	 * Method to get property Path
+	 *
+	 * @return  string
+	 */
+	public function path()
+	{
+		return $this->path;
+	}
+
+	/**
+	 * Method to get property Root
+	 *
+	 * @return  string
+	 */
+	public function root()
+	{
+		return $this->root;
+	}
 }

@@ -310,7 +310,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		{
 			$this->processFailure($e->getMessage(), Bootstrap::MSG_DANGER);
 
-			throw new \Exception($e->getMessage(), $e->getCode(), $e);
+			throw $e;
 		}
 		catch (\Throwable $e)
 		{
@@ -579,13 +579,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Method to get property RedirectUrl
 	 *
-	 * @param bool $removeKey
+	 * @param bool $onlyValues
 	 *
 	 * @return  array
 	 */
-	public function getRedirect($removeKey = false)
+	public function getRedirect($onlyValues = false)
 	{
-		return $removeKey ? array_values($this->redirectUrl) : $this->redirectUrl;
+		return $onlyValues ? array_values($this->redirectUrl) : $this->redirectUrl;
 	}
 
 	/**
