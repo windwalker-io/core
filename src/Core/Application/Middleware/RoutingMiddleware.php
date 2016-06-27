@@ -150,7 +150,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
 			$matched = new Route($packageName . '@' . $controller, implode($route, '/'));
 
-			$matched->setExtra(array(
+			$matched->setExtraValues(array(
 				'controller' => $class
 			));
 			
@@ -193,7 +193,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		list($packageName, $routeName) = StringHelper::explode('@', $name, 2, 'array_unshift');
 
 		$variables = $route->getVariables();
-		$extra     = $route->getExtra();
+		$extra     = $route->getExtraValues();
 		$input     = $this->app->input;
 
 		// Save to input & ServerRequest

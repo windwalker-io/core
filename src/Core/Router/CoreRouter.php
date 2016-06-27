@@ -113,7 +113,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		}
 
 		// Hook
-		$extra = $this->routes[$route]->getExtra();
+		$extra = $this->routes[$route]->getExtraValues();
 
 		if (isset($extra['hook']['build']))
 		{
@@ -256,7 +256,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			'router'  => $this
 		));
 
-		$extra = $route->getExtra();
+		$extra = $route->getExtraValues();
 
 		$controller = ArrayHelper::getValue($extra, 'controller');
 
@@ -274,7 +274,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
 		$extra['controller'] = $this->controller = $controller;
 
-		$route->setExtra($extra);
+		$route->setExtraValues($extra);
 
 		// Hooks
 		if (isset($extra['hook']['match']))

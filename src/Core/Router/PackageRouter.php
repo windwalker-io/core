@@ -165,6 +165,16 @@ class PackageRouter implements RouteBuilderInterface
 	}
 
 	/**
+	 * getMatched
+	 *
+	 * @return  \Windwalker\Router\Route
+	 */
+	public function getMatched()
+	{
+		return $this->router->getMatched();
+	}
+
+	/**
 	 * Method to get property Package
 	 *
 	 * @return  AbstractPackage

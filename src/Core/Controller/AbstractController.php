@@ -22,6 +22,7 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Mvc\MvcHelper;
+use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
@@ -42,7 +43,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * @property-read  Registry       $config  Config object.
  * @property-read  WebApplication $app     The application object.
  * @property-read  Input          $input   The input object.
- * @property-read  CoreRoute      $route   Router of this package.
+ * @property-read  PackageRouter  $router  Router of this package.
  *
  * @since  2.0
  */
@@ -287,7 +288,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				'app'      => $this->app,
 				'request'  => $this->request,
 				'response' => $this->response,
-				'route'    => $this->route,
+				'router'    => $this->router,
 				'container' => $this->container,
 				'package'  => $this->getPackage()
 			]);
@@ -940,9 +941,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * getRouter
 	 *
-	 * @return  \Windwalker\Core\Router\CoreRoute
+	 * @return  \Windwalker\Core\Router\PackageRouter
 	 */
-	public function getRoute()
+	public function getRouter()
 	{
 		return $this->package->router;
 	}
@@ -1116,9 +1117,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			return $this->config;
 		}
 
-		if ($name === 'route')
+		if ($name === 'router')
 		{
-			return $this->getRoute();
+			return $this->getRouter();
 		}
 
 		throw new \OutOfRangeException('Property: ' . $name . ' not exists.');
