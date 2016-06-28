@@ -11,11 +11,11 @@ namespace Windwalker\Core\View;
 use Windwalker\Registry\Registry;
 
 /**
- * The PhpJsonView class.
+ * The StructureView class.
  *
- * @since  2.1.5.3
+ * @since  3.0
  */
-class RegistryView extends AbstractView implements \JsonSerializable
+class StructureView extends AbstractView implements \JsonSerializable
 {
 	const FORMAT_JSON = 'json';
 	const FORMAT_XML  = 'xml';

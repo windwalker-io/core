@@ -178,6 +178,8 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$this->currentController = $controller;
 
+		$this->middlewares->setEndMiddleware([$this, 'dispatch']);
+
 		return $this->middlewares->execute($request, $response);
 	}
 
@@ -196,6 +198,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$this->prepareExecute();
 
+		// @event: onPackageBeforeExecute
 		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
 			'package'    => $this,
 			'controller' => &$controller,
@@ -206,6 +209,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$result = $this->postExecute($result);
 
+		// @event: onPackageAfterExecute
 		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
 			'package'    => $this,
 			'controller' => $controller,
@@ -218,6 +222,9 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if ($result !== null)
 		{
+			// Render view if return value is a view object,
+			// don't use (string) keyword to make sure we can get Exception when error occurred.
+			// @see  https://bugs.php.net/bug.php?id=53648
 			if ($result instanceof AbstractView)
 			{
 				$result = $result->render();
@@ -384,7 +391,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			{
 				$dispatcher->listen($name, $listener['class']);
 			}
-			else
+			elseif (class_exists($listener['class']))
 			{
 				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
 			}
@@ -404,7 +411,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if (is_file($file))
 		{
-			$config->loadFile($file, 'php');
+			$config->loadFile($file, 'php', ['load_raw' => true]);
 		}
 
 		// Override
@@ -412,7 +419,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		if (is_file($file))
 		{
-			$config->loadFile($file, 'php');
+			$config->loadFile($file, 'php', ['load_raw' => true]);
 		}
 
 		return $this;
@@ -704,8 +711,6 @@ class AbstractPackage implements DispatcherAwareInterface
 		if (!$this->middlewares)
 		{
 			$this->middlewares = new Psr7ChainBuilder;
-
-			$this->middlewares->add([$this, 'dispatch']);
 		}
 
 		return $this->middlewares;

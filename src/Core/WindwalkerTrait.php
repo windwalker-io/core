@@ -129,14 +129,14 @@ trait WindwalkerTrait
 		// Load library config
 		$configName = $this->isWeb() ? 'web' : 'console';
 
-		$config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php');
+		$config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php', ['load_raw' => true]);
 
 		// Load application config
 		$file = $this->configPath . '/' . $name . '.php';
 
 		if (is_file($file))
 		{
-			$config->loadFile($file, 'php');
+			$config->loadFile($file, 'php', ['load_raw' => true]);
 		}
 
 		$configs = (array) $config->get('configs', []);
@@ -150,7 +150,7 @@ trait WindwalkerTrait
 				throw new \RuntimeException(sprintf('Config file: %s not exists', $file));
 			}
 
-			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION));
+			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
 		}
 
 		// TODO: Variables override

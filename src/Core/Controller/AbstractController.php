@@ -295,7 +295,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			]);
 
 			$data->bind(get_object_vars($this));
-			
+
+			$this->middlewares->setEndMiddleware(function ()
+			{
+				return $this->doExecute();
+			});
+
 			$result = $this->middlewares->execute($data);
 
 			$result = $this->postExecute($result);
@@ -328,16 +333,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		}
 
 		return $result;
-	}
-
-	/**
-	 * innerExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function innerExecute()
-	{
-		return $this->doExecute();
 	}
 
 	/**
@@ -780,10 +775,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		$middlewares = (array) $this->middlewares;
 
 		$this->middlewares = new ChainBuilder;
-		$this->middlewares->add(function ()
-		{
-		    return $this->doExecute();
-		});
 
 		krsort($middlewares);
 

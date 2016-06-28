@@ -175,6 +175,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function doExecute()
 	{
+		$this->middlewares->setEndMiddleware(function (Request $request, Response $response)
+		{
+		    return $this->dispatch($request, $response);
+		});
+
 		$this->server->setHandler($this->middlewares);
 
 		return $this->server->execute($this->getFinalHandler());
@@ -327,7 +332,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		if (!$this->middlewares)
 		{
 			$this->middlewares = new Psr7ChainBuilder;
-			$this->middlewares->add([$this, 'dispatch']);
 		}
 
 		return $this->middlewares;
