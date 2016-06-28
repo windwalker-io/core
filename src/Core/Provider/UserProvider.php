@@ -49,7 +49,6 @@ class UserProvider implements ServiceProviderInterface
 		};
 
 		$container->share(Authentication::class, $closure)
-			->alias('authentication', Authentication::class)
 			->alias(AuthenticationInterface::class, Authentication::class);
 
 		// Authorisation
@@ -66,7 +65,6 @@ class UserProvider implements ServiceProviderInterface
 		};
 
 		$container->share(Authorisation::class, $closure)
-			->alias('authorisation', Authorisation::class)
 			->alias(AuthorisationInterface::class, Authorisation::class);
 
 		// User Handler
@@ -86,7 +84,6 @@ class UserProvider implements ServiceProviderInterface
 			return $manager;
 		};
 
-		$container->share(UserManager::class, $closure)
-			->alias('user.manager', UserManager::class);
+		$container->share(UserManager::class, $closure);
 	}
 }

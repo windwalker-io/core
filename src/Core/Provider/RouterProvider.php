@@ -49,8 +49,7 @@ class RouterProvider implements ServiceProviderInterface
 			return $router;
 		};
 
-		$container->share(CoreRouter::class, $closure)
-			->alias('router', CoreRouter::class);
+		$container->share(CoreRouter::class, $closure);
 	}
 
 	/**

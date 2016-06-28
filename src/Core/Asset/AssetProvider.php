@@ -51,8 +51,7 @@ class AssetProvider implements ServiceProviderInterface
 			return $asset;
 		};
 
-		$container->share(AssetManager::class, $closure)
-			->alias('asset', AssetManager::class);
+		$container->share(AssetManager::class, $closure);
 		
 		// Script
 		$closure = function (Container $container)

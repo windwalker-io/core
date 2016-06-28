@@ -11,6 +11,8 @@ namespace Windwalker\Debugger\Listener\Ide;
 use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Path\PathCollection;
+use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\Registry\Registry;
 use Windwalker\String\StringHelper;
 
@@ -27,7 +29,7 @@ class PhpStormMetaListener
 namespace PHPSTORM_META
 {
 	\$STATIC_METHOD_TYPES = [
-		\Windwalker\Core\Registry\ConfigRegistry::get('') => [
+		\Windwalker\Application\AbstractApplication::get('') => [
 			%s
 		]
 	];
@@ -45,10 +47,10 @@ TMPL;
 	{
 		$config = new Registry;
 
-		$files = Filesystem::files(WINDWALKER_ETC, true);
+		$files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
 
-		/** @var \SplFileInfo $file */
-		foreach ($files as $file)
+		/** @var PathLocator $file */
+		foreach ($files->find('.*\.[php|json|yml|yaml]', true) as $file)
 		{
 			if (!in_array($file->getExtension(), ['php', 'json', 'yml', 'yaml']) || $file->getBasename() == 'define.php')
 			{

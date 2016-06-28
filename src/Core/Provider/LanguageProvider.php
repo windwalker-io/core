@@ -11,7 +11,6 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Language\CoreLanguage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Language\Language;
 
 /**
  * The LanguageProvider class.
@@ -42,6 +41,6 @@ class LanguageProvider implements ServiceProviderInterface
 			return $language->setDebug(($debug && $langDebug));
 		};
 
-		$container->share(Language::class, $closure)->alias('language', Language::class);
+		$container->share(CoreLanguage::class, $closure);
 	}
 }

@@ -92,6 +92,11 @@ class PackageResolver implements ContainerAwareInterface
 			$package = new $package;
 		}
 
+		if (!$package)
+		{
+			return null;
+		}
+
 		// If we set custom name to package, use this as alias.
 		if (!is_numeric($alias))
 		{

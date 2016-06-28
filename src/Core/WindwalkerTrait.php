@@ -166,6 +166,14 @@ trait WindwalkerTrait
 		/** @var Container $container */
 		$container = $this->getContainer();
 
+		// Register Aliases
+		$aliases = (array) $this->get('di.aliases');
+
+		foreach ($aliases as $alias => $target)
+		{
+			$container->alias($alias, $target);
+		}
+
 		$container->registerServiceProvider(new SystemProvider($this));
 
 		$providers = (array) $this->config->get('providers');
@@ -175,6 +183,11 @@ trait WindwalkerTrait
 			if (is_string($provider) && class_exists($provider))
 			{
 				$provider = new $provider($this);
+			}
+			
+			if (!$provider)
+			{
+				continue;
 			}
 
 			$container->registerServiceProvider($provider);

@@ -69,7 +69,6 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 		    return $container->createSharedObject(ErrorManager::class);
 		};
 
-		$container->share(ErrorManager::class, $closure)
-			->alias('error.handler', ErrorManager::class);
+		$container->share(ErrorManager::class, $closure);
 	}
 }

@@ -14,6 +14,7 @@ use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Browser\Browser;
 use Windwalker\Environment\Platform;
 use Windwalker\Environment\WebEnvironment;
+use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Uri\UriData;
 
@@ -38,32 +39,24 @@ class WebProvider implements ServiceProviderInterface
 		$container->share(WebApplication::class, $app);
 
 		// Input
-		$container->share('input', function (Container $container)
+		$container->share(Input::class, function (Container $container)
 		{
 		    return PsrInput::create($container->get('application')->getRequest());
-		});
+		})->alias(PsrInput::class, Input::class);
 
 		// Environment
-		$container->share(WebEnvironment::class, $app->getEnvironment())
-			->alias('environment', WebEnvironment::class);
+		$container->share(WebEnvironment::class, $app->getEnvironment());
+
+		$container->share(Browser::class, $app->getEnvironment()->getBrowser());
 
 		$container
-			->share(Browser::class, $app->getEnvironment()->getBrowser())
-			->alias('browser', Browser::class);
-
-		$container
-			->share(Platform::class, $app->getEnvironment()->getPlatform())
-			->alias('platform', Platform::class);
+			->share(Platform::class, $app->getEnvironment()->getPlatform());
 
 		// Uri
-		$container->alias('uri', UriData::class)
-			->share(
-				UriData::class,
-				function (Container $container) use ($app)
-				{
-					return $container->get('application')->getServer()->getUriData();
-				}
-			);
+		$container->share(UriData::class, function (Container $container) use ($app)
+		{
+			return $container->get('application')->getServer()->getUriData();
+		});
 	}
 }
  

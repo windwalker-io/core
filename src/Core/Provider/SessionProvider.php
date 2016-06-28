@@ -46,8 +46,7 @@ class SessionProvider implements ServiceProviderInterface
 			return $sesion;
 		};
 
-		$container->share(Session::class, $closure)
-			->alias('session', Session::class);
+		$container->share(Session::class, $closure);
 	}
 
 	/**

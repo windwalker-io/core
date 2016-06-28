@@ -50,9 +50,7 @@ class DatabaseProvider implements ServiceProviderInterface
 			return DatabaseFactory::getDbo($option['driver'], $option);
 		};
 
-		$container->share(AbstractDatabaseDriver::class, $closure)
-			->alias('database', AbstractDatabaseDriver::class)
-			->alias('db', AbstractDatabaseDriver::class);
+		$container->share(AbstractDatabaseDriver::class, $closure);
 
 		// For DataMapper
 		AbstractDatabaseAdapter::setInstance(
@@ -75,8 +73,7 @@ class DatabaseProvider implements ServiceProviderInterface
 			return new $class;
 		};
 
-		$container->share(AbstractExporter::class, $closure)
-			->alias('sql.exporter', AbstractExporter::class);
+		$container->share(AbstractExporter::class, $closure);
 	}
 
 	/**

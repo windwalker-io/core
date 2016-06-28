@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Core\User\UserManager;
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
 use Windwalker\Uri\UriData;
@@ -165,9 +166,19 @@ abstract class Ioc
 	 *
 	 * @return  \Windwalker\Authentication\Authentication
 	 */
-	public static function getAuthenticate()
+	public static function getAuthentication()
 	{
-		return static::get('authenticate');
+		return static::get('authentication');
+	}
+
+	/**
+	 * getUserManager
+	 *
+	 * @return  UserManager
+	 */
+	public static function getUserManager()
+	{
+		return static::get('user.manager');
 	}
 
 	/**
@@ -363,10 +374,11 @@ abstract class Ioc
 	/**
 	 * dump
 	 *
-	 * @param int  $level
-	 * @param null $name
+	 * @param int    $level
+	 * @param string $name
+	 * @param string $profile
 	 *
-	 * @return  string
+	 * @return string
 	 */
 	public static function dump($level = 10, $name = null, $profile = null)
 	{

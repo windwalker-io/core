@@ -134,7 +134,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function execute()
 	{
 		$this->boot();
-		
+
 		$this->triggerEvent('onAfterBoot', ['app' => $this]);
 
 		$this->registerMiddlewares();
@@ -224,6 +224,39 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * bootRouting
+	 *
+	 * @param bool $refresh
+	 *
+	 * @return  static
+	 */
+	public function bootRouting($refresh = false)
+	{
+		$this->getRouter($refresh);
+
+		return $this;
+	}
+
+	/**
+	 * setCurrentPackage
+	 *
+	 * @param   string|AbstractPackage  $package
+	 *
+	 * @return  static
+	 */
+	public function setCurrentPackage($package)
+	{
+		if (!$package instanceof AbstractPackage)
+		{
+			$package = $this->container->get('package.resolver')->getPackage($package);
+		}
+
+		$this->container->share('current.package', $package);
+		
+		return $this;
+	}
+
+	/**
 	 * registerMiddlewares
 	 *
 	 * @return  void
@@ -239,6 +272,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		foreach ($middlewares as $middleware)
 		{
+			if (!$middleware)
+			{
+				continue;
+			}
+
 			$this->addMiddleware($middleware);
 		}
 

@@ -33,7 +33,6 @@ class LoggerProvider implements ServiceProviderInterface
 			return new LoggerManager($container);
 		};
 
-		$container->share(LoggerManager::class, $closure)
-			->alias('logger', LoggerManager::class);
+		$container->share(LoggerManager::class, $closure);
 	}
 }

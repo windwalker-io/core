@@ -37,8 +37,7 @@ class EventProvider implements ServiceProviderInterface
 			return $dispatcher;
 		};
 
-		$container->share(EventDispatcher::class, $closure)
-			->alias('dispatcher', EventDispatcher::class);
+		$container->share(EventDispatcher::class, $closure);
 	}
 }
  

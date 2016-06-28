@@ -22,7 +22,6 @@ include_once $autoload;
 
 include_once __DIR__ . '/define.php';
 
-
 $host = defined('WINDWALKER_TEST_HOST') ? WINDWALKER_TEST_HOST : 'windwalker.io';
 $uri = defined('WINDWALKER_TEST_URI') ? WINDWALKER_TEST_URI : '/flower/sakura';
 

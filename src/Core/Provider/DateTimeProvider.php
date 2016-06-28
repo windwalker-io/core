@@ -45,7 +45,6 @@ class DateTimeProvider implements ServiceProviderInterface
 			return new DateTime('now', new \DateTimeZone($tz));
 		};
 
-		$container->set(DateTime::class, $closure)
-			->alias('datetime', DateTime::class);
+		$container->set(DateTime::class, $closure);
 	}
 }

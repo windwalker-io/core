@@ -83,17 +83,14 @@ class RendererProvider implements ServiceProviderInterface
 			return $manager;
 		};
 
-		$container->share(RendererManager::class, $closure)
-			->alias('renderer.manager', RendererManager::class)
-			->alias('renderer', RendererManager::class);
+		$container->share(RendererManager::class, $closure);
 
 		$closure = function(Container $container)
 		{
 			return new PackageFinder($container->get('package.resolver'));
 		};
 
-		$container->share(PackageFinder::class, $closure)
-			->alias('package.finder', PackageFinder::class);
+		$container->share(PackageFinder::class, $closure);
 	}
 
 	/**
@@ -113,8 +110,7 @@ class RendererProvider implements ServiceProviderInterface
 			return new WidgetManager($rendererManager);
 		};
 
-		$container->share(WidgetManager::class, $closure)
-			->alias('widget.manager', WidgetManager::class);
+		$container->share(WidgetManager::class, $closure);
 	}
 
 	/**

@@ -475,7 +475,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
 				if (!$resolver->exists($route['package']))
 				{
-					throw new \InvalidArgumentException(sprintf('Package %s not exists when register touting: %s.', $route['package'], $key));
+					throw new \InvalidArgumentException(sprintf('Package %s not exists when register routing: %s.', $route['package'], $key));
 				}
 
 				$package = $resolver->getPackage($route['package']);

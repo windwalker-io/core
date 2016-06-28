@@ -20,7 +20,6 @@ use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\View\AbstractView;
-use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -336,6 +335,11 @@ class AbstractPackage implements DispatcherAwareInterface
 				$provider = new $provider($this);
 			}
 
+			if (!$provider)
+			{
+				continue;
+			}
+
 			if (is_callable($provider, 'boot'))
 			{
 				$provider->boot($container);
@@ -558,6 +562,11 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		foreach ($middlewares as $middleware)
 		{
+			if (!$middleware)
+			{
+				continue;
+			}
+
 			$this->addMiddleware($middleware);
 		}
 

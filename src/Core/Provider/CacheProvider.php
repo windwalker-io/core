@@ -35,8 +35,7 @@ class CacheProvider implements ServiceProviderInterface
 			return CacheFactory::getInstance($container);
 		};
 
-		$container->share(CacheFactory::class, $closure)
-			->alias('cache.factory', CacheFactory::class);
+		$container->share(CacheFactory::class, $closure);
 
 		// Get global cache object.
 		$container->share('cache', function(Container $container)
