@@ -14,6 +14,7 @@ use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
+use Windwalker\String\StringNormalise;
 
 /**
  * The CacheFactory class.
@@ -172,7 +173,7 @@ class CacheFactory implements ContainerAwareInterface
 	 */
 	public static function getStorage($storage, $options = array(), $name = 'windwalker')
 	{
-		$class = sprintf('Windwalker\Cache\Storage\%sStorage', ucfirst($storage));
+		$class = sprintf('Windwalker\Cache\Storage\%sStorage', StringNormalise::toCamelCase($storage));
 
 		if (!class_exists($class))
 		{
@@ -188,6 +189,7 @@ class CacheFactory implements ContainerAwareInterface
 		switch (strtolower($storage))
 		{
 			case 'file':
+			case 'raw_file':
 				$path = $options['cache_dir'];
 				$denyAccess = $options['deny_access'];
 

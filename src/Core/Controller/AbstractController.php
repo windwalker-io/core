@@ -471,7 +471,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @throws \UnexpectedValueException
 	 */
-	public function getView($name = null, $format = null, $engine = null, $forceNew = false)
+	public function getView($name = null, $format = 'html', $engine = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
