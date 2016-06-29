@@ -11,8 +11,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Database\Exporter\AbstractExporter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
-use Windwalker\DataMapper\Adapter\AbstractDatabaseAdapter;
-use Windwalker\DataMapper\Adapter\WindwalkerAdapter;
+use Windwalker\DataMapper\DatabaseContainer;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Registry\Registry;
@@ -52,13 +51,10 @@ class DatabaseProvider implements ServiceProviderInterface
 
 		$container->share(AbstractDatabaseDriver::class, $closure);
 
-		// For DataMapper
-		AbstractDatabaseAdapter::setInstance(
-			function() use ($container)
-			{
-				return new WindwalkerAdapter($container->get('db'));
-			}
-		);
+		DatabaseContainer::setDb(function () use ($container)
+		{
+		    return $container->get('database');
+		});
 
 		// For Exporter
 		$closure = function(Container $container)
