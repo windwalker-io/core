@@ -45,6 +45,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'route'     => [$this, 'route'],
 			'assetTemplate' => [$this, 'assetTemplate'],
 			'endTemplate'   => [$this, 'endTemplate'],
+			'formToken' => [$this, 'formToken']
 		];
 	}
 
@@ -162,5 +163,17 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function endTemplate($expression)
 	{
 		return "<?php \$asset->getTemplate()->endTemplate{$expression} ?>";
+	}
+
+	/**
+	 * formToken
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function formToken($expression)
+	{
+		return "<?php echo \\Windwalker\\Core\\Security\\CsrfProtection::input{$expression} ?>";
 	}
 }

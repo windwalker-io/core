@@ -180,6 +180,8 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 */
 	public function route($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
+		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
+		
 		return $this->build($route, $queries, $type);
 	}
 
@@ -220,6 +222,8 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 */
 	public function secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
 	{
+		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
+		
 		$queries = (array) $queries;
 		$token = Ioc::get('security.csrf')->getFormToken();
 		$queries[$token] = 1;

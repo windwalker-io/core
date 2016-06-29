@@ -181,6 +181,11 @@ class RendererProvider implements ServiceProviderInterface
 			return "<?php \$asset->getTemplate->endTemplate{$expression} ?>";
 		});
 
+		Renderer\Blade\GlobalContainer::addCompiler('formToken', function($expression)
+		{
+			return "<?php echo \\Windwalker\\Core\\Security\\CsrfProtection::input{$expression} ?>";
+		});
+
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
 	}
 
