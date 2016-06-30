@@ -30,6 +30,7 @@ use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractPackage class.
@@ -85,7 +86,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Property middlewares.
 	 *
-	 * @var  Psr7ChainBuilder
+	 * @var  PriorityQueue
 	 */
 	protected $middlewares;
 
@@ -169,8 +170,6 @@ class AbstractPackage implements DispatcherAwareInterface
 			$controller = $this->getController($controller);
 		}
 
-		$controller->setRequest($request)->setResponse($response);
-
 		if ($hmvc)
 		{
 			$controller->isHmvc($hmvc);
@@ -178,9 +177,9 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$this->currentController = $controller;
 
-		$this->middlewares->setEndMiddleware([$this, 'dispatch']);
+		$chain = $this->getMiddlewareChain()->setEndMiddleware([$this, 'dispatch']);
 
-		return $this->middlewares->execute($request, $response);
+		return $chain->execute($request, $response);
 	}
 
 	/**
@@ -195,6 +194,8 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function dispatch(Request $request, Response $response, $next = null)
 	{
 		$controller = $this->currentController;
+
+		$controller->setRequest($request)->setResponse($response);
 
 		$this->prepareExecute();
 
@@ -258,68 +259,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
-	 * getMvcResolver
-	 *
-	 * @return  MvcResolver
-	 */
-	public function getMvcResolver()
-	{
-		return $this->container->get('mvc.resolver');
-	}
-
-	/**
-	 * Get bundle name.
-	 *
-	 * @return  string  Bundle ame.
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
-
-	/**
-	 * Method to set property name
-	 *
-	 * @param   string $name
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setName($name)
-	{
-		$this->name = $name;
-
-		return $this;
-	}
-
-	/**
-	 * get
-	 *
-	 * @param string $name
-	 * @param mixed  $default
-	 *
-	 * @return  mixed
-	 */
-	public function get($name, $default = null)
-	{
-		return $this->config->get($name, $default);
-	}
-
-	/**
-	 * set
-	 *
-	 * @param string $name
-	 * @param mixed  $value
-	 *
-	 * @return  static
-	 */
-	public function set($name, $value)
-	{
-		$this->config->set($name, $value);
-
-		return $this;
-	}
-
-	/**
 	 * Register providers.
 	 *
 	 * @param Container $container
@@ -333,7 +272,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$sysProvider = new PackageProvider($this);
 		$sysProvider->boot();
-		
+
 		$container->registerServiceProvider($sysProvider);
 
 		$providers = (array) $this->get('providers');
@@ -399,6 +338,114 @@ class AbstractPackage implements DispatcherAwareInterface
 				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
 			}
 		}
+	}
+
+	/**
+	 * Register commands to console.
+	 *
+	 * @param Console $console Windwalker console object.
+	 *
+	 * @return  void
+	 */
+	public function registerCommands(Console $console)
+	{
+		$commands = (array) $this->get('console.commands');
+
+		foreach ($commands as $class)
+		{
+			if (class_exists($class) && is_subclass_of($class, Command::class))
+			{
+				$console->addCommand($class);
+			}
+		}
+	}
+
+	/**
+	 * registerMiddlewares
+	 */
+	protected function registerMiddlewares()
+	{
+		// init middlewares
+		$queue = $this->getMiddlewares();
+
+		$middlewares = (array) $this->get('middlewares', []);
+
+		$queue->insertArray($middlewares);
+
+		// Remove closures
+		$this->set('middlewares', null);
+	}
+
+	/**
+	 * addMiddleware
+	 *
+	 * @param callable $middleware
+	 * @param int      $priority
+	 *
+	 * @return static
+	 */
+	public function addMiddleware($middleware, $priority = PriorityQueue::NORMAL)
+	{
+		$this->getMiddlewares()->insert($middleware, $priority);
+
+		return $this;
+	}
+
+	/**
+	 * getMiddlewareChain
+	 *
+	 * @return  Psr7ChainBuilder
+	 */
+	public function getMiddlewareChain()
+	{
+		$middlewares = array_reverse(iterator_to_array(clone $this->getMiddlewares()));
+
+		$chain = new Psr7ChainBuilder;
+
+		foreach ($middlewares as $middleware)
+		{
+			if (is_string($middleware) && is_subclass_of($middleware, AbstractPackageMiddleware::class))
+			{
+				$middleware = new Psr7Middleware(new $middleware($this));
+			}
+			elseif ($middleware instanceof \Closure)
+			{
+				$middleware->bindTo($this);
+			}
+
+			$chain->add($middleware);
+		}
+
+		return $chain;
+	}
+
+	/**
+	 * Method to get property Middlewares
+	 *
+	 * @return  PriorityQueue
+	 */
+	public function getMiddlewares()
+	{
+		if (!$this->middlewares)
+		{
+			$this->middlewares = new PriorityQueue;
+		}
+
+		return $this->middlewares;
+	}
+
+	/**
+	 * Method to set property middlewares
+	 *
+	 * @param   PriorityQueue $middlewares
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMiddlewares(PriorityQueue $middlewares)
+	{
+		$this->middlewares = $middlewares;
+
+		return $this;
 	}
 
 	/**
@@ -483,6 +530,68 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
+	 * getMvcResolver
+	 *
+	 * @return  MvcResolver
+	 */
+	public function getMvcResolver()
+	{
+		return $this->container->get('mvc.resolver');
+	}
+
+	/**
+	 * Get bundle name.
+	 *
+	 * @return  string  Bundle ame.
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	/**
+	 * Method to set property name
+	 *
+	 * @param   string $name
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setName($name)
+	{
+		$this->name = $name;
+
+		return $this;
+	}
+
+	/**
+	 * get
+	 *
+	 * @param string $name
+	 * @param mixed  $default
+	 *
+	 * @return  mixed
+	 */
+	public function get($name, $default = null)
+	{
+		return $this->config->get($name, $default);
+	}
+
+	/**
+	 * set
+	 *
+	 * @param string $name
+	 * @param mixed  $value
+	 *
+	 * @return  static
+	 */
+	public function set($name, $value)
+	{
+		$this->config->set($name, $value);
+
+		return $this;
+	}
+
+	/**
 	 * getFile
 	 *
 	 * @return  string
@@ -536,75 +645,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function isEnabled()
 	{
 		return $this->isEnabled;
-	}
-
-	/**
-	 * Register commands to console.
-	 *
-	 * @param Console $console Windwalker console object.
-	 *
-	 * @return  void
-	 */
-	public function registerCommands(Console $console)
-	{
-		$commands = (array) $this->get('console.commands');
-
-		foreach ($commands as $class)
-		{
-			if (class_exists($class) && is_subclass_of($class, Command::class))
-			{
-				$console->addCommand($class);
-			}
-		}
-	}
-
-	/**
-	 * registerMiddlewares
-	 */
-	protected function registerMiddlewares()
-	{
-		// init middlewares
-		$this->getMiddlewares();
-
-		$middlewares = (array) $this->get('middlewares', []);
-
-		krsort($middlewares);
-
-		foreach ($middlewares as $middleware)
-		{
-			if (!$middleware)
-			{
-				continue;
-			}
-
-			$this->addMiddleware($middleware);
-		}
-
-		// Remove closures
-		$this->set('middlewares', null);
-	}
-
-	/**
-	 * addMiddleware
-	 *
-	 * @param callable $middleware
-	 *
-	 * @return  static
-	 */
-	public function addMiddleware($middleware)
-	{
-		if (is_string($middleware) && is_subclass_of($middleware, AbstractPackageMiddleware::class))
-		{
-			$middleware = new Psr7Middleware(new $middleware($this));
-		}
-		elseif ($middleware instanceof \Closure)
-		{
-			$middleware->bindTo($this);
-		}
-
-		$this->getMiddlewares()->add($middleware);
-
-		return $this;
 	}
 
 	/**
@@ -702,35 +742,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function getCurrentController()
 	{
 		return $this->currentController;
-	}
-
-	/**
-	 * Method to get property Middlewares
-	 *
-	 * @return  Psr7ChainBuilder
-	 */
-	public function getMiddlewares()
-	{
-		if (!$this->middlewares)
-		{
-			$this->middlewares = new Psr7ChainBuilder;
-		}
-
-		return $this->middlewares;
-	}
-
-	/**
-	 * Method to set property middlewares
-	 *
-	 * @param   Psr7ChainBuilder $middlewares
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMiddlewares($middlewares)
-	{
-		$this->middlewares = $middlewares;
-
-		return $this;
 	}
 
 	/**
