@@ -10,6 +10,7 @@ namespace Windwalker\Core\Cache;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\DataHandlerInterface;
+use Windwalker\Cache\Serializer\SerializerInterface;
 use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
@@ -74,7 +75,7 @@ class CacheFactory implements ContainerAwareInterface
 	{
 		if (!static::$instance)
 		{
-			static::$instance = new CacheFactory($container);
+			static::$instance = new static($container);
 		}
 
 		return static::$instance;
@@ -97,12 +98,12 @@ class CacheFactory implements ContainerAwareInterface
 	 *
 	 * @param string $name
 	 * @param string $storage
-	 * @param string $dataHandler
+	 * @param string $serializer
 	 * @param array  $options
 	 *
 	 * @return  Cache
 	 */
-	public function create($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
+	public function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
 		$config = $this->container->get('config');
 
@@ -111,11 +112,11 @@ class CacheFactory implements ContainerAwareInterface
 
 		if (($debug || !$enabled) && !$this->ignoreGlobal)
 		{
-			$storage = 'null';
-			$dataHandler = 'string';
+			$storage    = 'null';
+			$serializer = 'string';
 		}
 
-		return static::getCache($name, $storage, $dataHandler, $options);
+		return static::getCache($name, $storage, $serializer, $options);
 	}
 
 	/**
@@ -123,19 +124,19 @@ class CacheFactory implements ContainerAwareInterface
 	 *
 	 * @param string $name
 	 * @param string $storage
-	 * @param string $dataHandler
+	 * @param string $serializer
 	 * @param array  $options
 	 *
 	 * @return  Cache
 	 */
-	public static function getCache($name = 'windwalker', $storage = 'runtime', $dataHandler = 'serialize', $options = array())
+	public static function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
-		$storage = $storage ? : 'runtime';
-		$dataHandler = $dataHandler ? : 'serialize';
+		$storage    = $storage ? : 'array';
+		$serializer = $serializer ? : 'php';
 
 		ksort($options);
 
-		$hash = sha1($name . $storage . $dataHandler . serialize($options));
+		$hash = sha1($name . $storage . $serializer . serialize($options));
 
 		if (!empty(static::$caches[$hash]))
 		{
@@ -143,7 +144,7 @@ class CacheFactory implements ContainerAwareInterface
 		}
 
 		$storage = static::getStorage($storage, $options, $name);
-		$handler = static::getDataHandler($dataHandler);
+		$handler = static::setSerializer($serializer);
 
 		$cache = new Cache($storage, $handler);
 
@@ -228,20 +229,15 @@ class CacheFactory implements ContainerAwareInterface
 	 *
 	 * @param $handler
 	 *
-	 * @return  DataHandlerInterface
+	 * @return  SerializerInterface
 	 */
-	public static function getDataHandler($handler)
+	public static function setSerializer($handler)
 	{
-		if ($handler == 'raw')
-		{
-			$handler = 'RawData';
-		}
-
-		$class = sprintf('Windwalker\Cache\DataHandler\%sHandler', ucfirst($handler));
+		$class = sprintf('Windwalker\Cache\DataHandler\%sSerializer', ucfirst($handler));
 
 		if (!class_exists($class))
 		{
-			throw new \DomainException(sprintf('Cache Data Handler: %s not supported.', ucfirst($handler)));
+			throw new \DomainException(sprintf('Cache Serializer: %s not supported.', ucfirst($handler)));
 		}
 
 		return new $class;

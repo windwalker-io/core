@@ -44,7 +44,7 @@ class CacheProvider implements ServiceProviderInterface
 			$config = $container->get('config');
 
 			$storage = $config->get('cache.storage', 'file');
-			$handler = $config->get('cache.handler', 'serialized');
+			$handler = $config->get('cache.serializer', 'php');
 
 			return $container->get('cache.factory')->create('windwalker', $storage, $handler);
 		});

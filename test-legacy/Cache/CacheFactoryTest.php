@@ -206,7 +206,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::getDataHandler
+	 * @covers Windwalker\Core\Cache\CacheFactory::setSerializer
 	 * @TODO   Implement testGetDataHandler().
 	 */
 	public function testGetDataHandler()
