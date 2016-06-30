@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Console;
+use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
@@ -404,9 +405,9 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		foreach ($middlewares as $middleware)
 		{
-			if (is_string($middleware) && is_subclass_of($middleware, AbstractPackageMiddleware::class))
+			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
 			{
-				$middleware = new Psr7Middleware(new $middleware($this));
+				$middleware = new Psr7Middleware(new $middleware($this->app, $this));
 			}
 			elseif ($middleware instanceof \Closure)
 			{

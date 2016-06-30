@@ -29,6 +29,7 @@ use Windwalker\Middleware\Psr7InvokableInterface;
 use Windwalker\Registry\Registry;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The WebApplication class.
@@ -175,12 +176,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	protected function doExecute()
 	{
-		$this->middlewares->setEndMiddleware(function (Request $request, Response $response)
-		{
-		    return $this->dispatch($request, $response);
-		});
+		$chain = $this->getMiddlewareChain()->setEndMiddleware([$this, 'dispatch']);
 
-		$this->server->setHandler($this->middlewares);
+		$this->server->setHandler($chain);
 
 		return $this->server->execute($this->getFinalHandler());
 	}
@@ -199,7 +197,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	public function dispatch(Request $request, Response $response, $finalHandler = null)
 	{
 		/** @var AbstractPackage $package */
-		$package = $this->container->get('current.package');
+		$package = $this->getPackage();
 
 		return $package->execute($request->getAttribute('_controller'), $request, $response);
 	}
@@ -269,24 +267,86 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	protected function registerMiddlewares()
 	{
 		// Init middlewares
-		$this->getMiddlewares();
+		$queue = $this->getMiddlewares();
 
 		$middlewares = (array) $this->config->get('middlewares', []);
 
-		ksort($middlewares);
-
-		foreach ($middlewares as $middleware)
-		{
-			if (!$middleware)
-			{
-				continue;
-			}
-
-			$this->addMiddleware($middleware);
-		}
+		$queue->insertArray($middlewares);
 
 		// Remove closures
 		$this->config->set('middlewares', null);
+	}
+
+	/**
+	 * getMiddlewareChain
+	 *
+	 * @return  Psr7ChainBuilder
+	 */
+	public function getMiddlewareChain()
+	{
+		$middlewares = array_reverse(iterator_to_array(clone $this->getMiddlewares()));
+
+		$chain = new Psr7ChainBuilder;
+
+		foreach ($middlewares as $middleware)
+		{
+			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
+			{
+				$middleware = new Psr7Middleware(new $middleware($this));
+			}
+			elseif ($middleware instanceof \Closure)
+			{
+				$middleware->bindTo($this);
+			}
+
+			$chain->add($middleware);
+		}
+
+		return $chain;
+	}
+
+	/**
+	 * Method to get property Middlewares
+	 *
+	 * @return  PriorityQueue
+	 */
+	public function getMiddlewares()
+	{
+		if (!$this->middlewares)
+		{
+			$this->middlewares = new PriorityQueue;
+		}
+
+		return $this->middlewares;
+	}
+
+	/**
+	 * Method to set property middlewares
+	 *
+	 * @param   PriorityQueue $middlewares
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMiddlewares(PriorityQueue $middlewares)
+	{
+		$this->middlewares = $middlewares;
+
+		return $this;
+	}
+
+	/**
+	 * addMiddleware
+	 *
+	 * @param   callable|Psr7InvokableInterface $middleware
+	 * @param   int                             $priority
+	 *
+	 * @return static
+	 */
+	public function addMiddleware($middleware, $priority = PriorityQueue::NORMAL)
+	{
+		$this->getMiddlewares()->insert($middleware, $priority);
+
+		return $this;
 	}
 
 	/**
@@ -318,58 +378,6 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		$session = $this->container->get('session');
 
 		$session->getFlashBag()->clear();
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property Middlewares
-	 *
-	 * @return  Psr7ChainBuilder
-	 */
-	public function getMiddlewares()
-	{
-		if (!$this->middlewares)
-		{
-			$this->middlewares = new Psr7ChainBuilder;
-		}
-
-		return $this->middlewares;
-	}
-
-	/**
-	 * Method to set property middlewares
-	 *
-	 * @param   Psr7ChainBuilder $middlewares
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMiddlewares($middlewares)
-	{
-		$this->middlewares = $middlewares;
-
-		return $this;
-	}
-
-	/**
-	 * addMiddleware
-	 *
-	 * @param   callable|Psr7InvokableInterface $middleware
-	 *
-	 * @return  static
-	 */
-	public function addMiddleware($middleware)
-	{
-		if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
-		{
-			$middleware = new Psr7Middleware(new $middleware($this));
-		}
-		elseif ($middleware instanceof \Closure)
-		{
-			$middleware->bindTo($this);
-		}
-
-		$this->getMiddlewares()->add($middleware);
 
 		return $this;
 	}
