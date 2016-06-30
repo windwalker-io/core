@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Mailer;
 
 use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 
@@ -83,6 +84,17 @@ class MailerManager
 			'message' => $message,
 			'manager' => $this
 		]);
+
+		// Set default sender
+		if (!$message->getFrom())
+		{
+			$config = Ioc::getConfig();
+
+			if ($config->exists('mail.from.email'))
+			{
+				$message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
+			}
+		}
 
 		return $this->getAdapter()->send($message);
 	}

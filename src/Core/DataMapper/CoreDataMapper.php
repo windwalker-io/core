@@ -35,15 +35,26 @@ use Windwalker\Event\Event;
  * @method  static  Data            saveOne($data, $condFields = null, $updateNulls = false)
  * @method  static  boolean         delete($conditions)
  * @method  static  boolean         useTransaction($yn = null)
- * @method  static  array                getSelectFields()
- * @method  static  AbstractDataMapper   setSelectFields($selectFields)
  * @method  static  Event                triggerEvent($event, $args = array())
  * @method  static  DispatcherInterface  getDispatcher()
  * @method  static  AbstractDataMapper   setDispatcher(DispatcherInterface $dispatcher)
- *
+ * @method  static  DataMapper  call($columns)
+ * @method  static  DataMapper  group($columns)
+ * @method  static  DataMapper  having($conditions, ...$args)
+ * @method  static  DataMapper  innerJoin($table, $condition = array())
+ * @method  static  DataMapper  join($type, $table, $conditions)
+ * @method  static  DataMapper  leftJoin($table, $condition = array())
+ * @method  static  DataMapper  order($columns)
+ * @method  static  DataMapper  limit($limit = null, $offset = null)
+ * @method  static  DataMapper  outerJoin($table, $condition = array())
+ * @method  static  DataMapper  rightJoin($table, $condition = array())
+ * @method  static  DataMapper  select($columns)
+ * @method  static  DataMapper  where($conditions, ...$args)
+ * @method  static  DataMapper  bind($key = null, $value = null, $dataType = \PDO::PARAM_STR, $length = 0, $driverOptions = array())
+ * 
  * @since  2.1.8
  */
-class AbstractDataMapperProxy
+class CoreDataMapper
 {
 	/**
 	 * Property table.

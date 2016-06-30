@@ -14,11 +14,15 @@ use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 /**
  * The Mailer class.
  *
- * @method  static  MailMessage  createMessage($subject = null, $content = null, $html = true)
- * @method  static  boolean      send(MailMessage $message)
- * @method  static  MailerManager   setMessageClass($messageClass)
+ * @see  MailerManager
+ * @see  MailMessage
+ * @see  MailAttachment
+ *
+ * @method  static  MailMessage             createMessage($subject = null, $content = null, $html = true)
+ * @method  static  boolean                 send(MailMessage $message)
+ * @method  static  MailerManager           setMessageClass($messageClass)
  * @method  static  MailerAdapterInterface  getAdapter()
- * @method  static  MailerManager   setAdapter(MailerAdapterInterface $adapter)
+ * @method  static  MailerManager           setAdapter(MailerAdapterInterface $adapter)
  *
  * @since  {DEPLOY_VERSION}
  */
