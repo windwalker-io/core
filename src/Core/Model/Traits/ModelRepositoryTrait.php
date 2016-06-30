@@ -45,8 +45,8 @@ trait ModelRepositoryTrait
 	 */
 	public function bootModelRepositoryTrait()
 	{
-		$this->table = isset($this->table) ? $this->table : null;
-		$this->keys = isset($this->keys) ? $this->keys : null;
+		$this->table = property_exists($this, 'table') ? $this->table : null;
+		$this->keys = property_exists($this, 'keys') ? $this->keys : 'id';
 	}
 	
 	/**

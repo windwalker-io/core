@@ -8,7 +8,9 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
+use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\DebuggerHelper;
@@ -44,6 +46,10 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 			{
 				$result = $result->getHandledData();
 			}
+			elseif ($this->controller instanceof AbstractPostController)
+			{
+				$result = $data->record->dump(true);
+			}
 
 			$message = $this->getMessage();
 
@@ -55,19 +61,7 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 
 			if ($this->controller->app->get('system.debug'))
 			{
-				$traces = array();
-
-				foreach ((array) $e->getTrace() as $trace)
-				{
-					$trace = new Data($trace);
-
-					$traces[] = array(
-						'file' => $trace['file'] ? $trace['file'] . ' (' . $trace['line'] . ')' : null,
-						'function' => ($trace['class'] ? $trace['class'] . '::' : null) . $trace['function'] . '()'
-					);
-				}
-
-				$data['backtrace'] = $traces;
+				$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
 			}
 
 			$code = $e->getCode();

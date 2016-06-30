@@ -36,6 +36,7 @@ use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Middleware\Chain\ChainBuilder;
 use Windwalker\Registry\Registry;
+use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -136,7 +137,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Property middlewares.
 	 *
-	 * @var  AbstractControllerMiddleware[]|ChainBuilder
+	 * @var  AbstractControllerMiddleware[]|PriorityQueue
 	 */
 	protected $middlewares = [];
 
@@ -179,7 +180,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		$this->input = $input ? : $this->getInput();
 		$this->app = $this->getApplication();
 
-		$this->registerMiddlewares();
+		// Prepare middlewares
+		$this->middlewares = (new PriorityQueue)->insertArray((array) $this->middlewares);
 
 		$this->bootTraits($this);
 
@@ -274,41 +276,56 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	public function execute()
 	{
+		$this->prepareExecute();
+
+		$this->triggerEvent('onControllerBeforeExecute', array(
+			'controller' => $this
+		));
+
+		$data = new Data([
+			'input'    => $this->input,
+			'mute'     => $this->mute,
+			'hmvc'     => $this->hmvc,
+			'app'      => $this->app,
+			'request'  => $this->request,
+			'response' => $this->response,
+			'router'    => $this->router,
+			'container' => $this->container,
+			'package'  => $this->getPackage()
+		]);
+
+		$data->bind(get_object_vars($this));
+
+		$chain = $this->getMiddlewareChain()->setEndMiddleware(function ()
+		{
+			return $this->innerExecute();
+		});
+
+		$result = $chain->execute($data);
+
+		$result = $this->postExecute($result);
+
+		$this->triggerEvent('onControllerAfterExecute', array(
+			'controller' => $this,
+			'result'     => &$result
+		));
+
+		return $result;
+	}
+
+	/**
+	 * innerExecute
+	 *
+	 * @return  mixed
+	 *
+	 * @throws \Exception
+	 * @throws \Throwable
+	 */
+	protected function innerExecute()
+	{
 		try
 		{
-			$this->prepareExecute();
-
-			$this->triggerEvent('onControllerBeforeExecute', array(
-				'controller' => $this
-			));
-
-			$data = new Data([
-				'input'    => $this->input,
-				'mute'     => $this->mute,
-				'hmvc'     => $this->hmvc,
-				'app'      => $this->app,
-				'request'  => $this->request,
-				'response' => $this->response,
-				'router'    => $this->router,
-				'container' => $this->container,
-				'package'  => $this->getPackage()
-			]);
-
-			$data->bind(get_object_vars($this));
-
-			$this->middlewares->setEndMiddleware(function ()
-			{
-				return $this->doExecute();
-			});
-
-			$result = $this->middlewares->execute($data);
-
-			$result = $this->postExecute($result);
-
-			$this->triggerEvent('onControllerAfterExecute', array(
-				'controller' => $this,
-				'result'     => &$result
-			));
+			$result = $this->doExecute();
 		}
 		catch (\Exception $e)
 		{
@@ -761,27 +778,29 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * registerMiddlewares
 	 *
-	 * @throws \InvalidArgumentException
-	 * @throws \LogicException
+	 * @return  ChainBuilder
 	 */
-	protected function registerMiddlewares()
+	protected function getMiddlewareChain()
 	{
-		// Do not remove this if block, otherwise will cause infinity loop.
-		if ($this->middlewares instanceof ChainBuilder)
-		{
-			return;
-		}
+		$middlewares = array_reverse(iterator_to_array(clone $this->middlewares));
 
-		$middlewares = (array) $this->middlewares;
-
-		$this->middlewares = new ChainBuilder;
-
-		krsort($middlewares);
+		$chain = new ChainBuilder;
 
 		foreach ($middlewares as $middleware)
 		{
-			$this->addMiddleware($middleware);
+			if (is_string($middleware) && is_subclass_of($middleware, AbstractControllerMiddleware::class))
+			{
+				$middleware = new $middleware($this);
+			}
+			elseif ($middleware instanceof \Closure)
+			{
+				$middleware->bindTo($this);
+			}
+
+			$chain->add($middleware);
 		}
+
+		return $chain;
 	}
 
 	/**
@@ -1042,22 +1061,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * addMiddleware
 	 *
 	 * @param   callable|AbstractControllerMiddleware $middleware
+	 * @param   int                                   $priority
 	 *
-	 * @return  static
-	 * @throws \InvalidArgumentException
+	 * @return static
 	 */
-	public function addMiddleware($middleware)
+	public function addMiddleware($middleware, $priority = PriorityQueue::NORMAL)
 	{
-		if (is_string($middleware) && is_subclass_of($middleware, AbstractControllerMiddleware::class))
-		{
-			$middleware = new $middleware($this);
-		}
-		elseif ($middleware instanceof \Closure)
-		{
-			$middleware->bindTo($this);
-		}
-
-		$this->middlewares->add($middleware);
+		$this->middlewares->insert($middleware, $priority);
 
 		return $this;
 	}
@@ -1065,11 +1075,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Method to get property Middlewares
 	 *
-	 * @return  ChainBuilder
+	 * @return  PriorityQueue
 	 */
 	public function getMiddlewares()
 	{
-		$this->registerMiddlewares();
+		if (!$this->middlewares)
+		{
+			$this->middlewares = new PriorityQueue;
+		}
 
 		return $this->middlewares;
 	}
@@ -1077,11 +1090,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Method to set property middlewares
 	 *
-	 * @param   ChainBuilder $middlewares
+	 * @param   PriorityQueue $middlewares
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setMiddlewares(ChainBuilder $middlewares)
+	public function setMiddlewares(PriorityQueue $middlewares)
 	{
 		$this->middlewares = $middlewares;
 

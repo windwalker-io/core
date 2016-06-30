@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\Middleware\CsrfProtectionMiddleware;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The CsrfProtectionTrait class.
@@ -24,6 +25,6 @@ trait CsrfProtectionTrait
 	 */
 	public function bootCsrfProtectionTrait()
 	{
-		$this->addMiddleware(CsrfProtectionMiddleware::class);
+		$this->addMiddleware(CsrfProtectionMiddleware::class, PriorityQueue::HIGH);
 	}
 }
