@@ -13,6 +13,7 @@ use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
+use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
@@ -53,6 +54,7 @@ class PackageProvider implements ServiceProviderInterface
 		DataMapperResolver::addNamespace($ns . '\DataMapper');
 		FieldHelper::addNamespace($ns . '\Field');
 		ValidatorHelper::addNamespace($ns . 'Validator');
+		FieldDefinitionResolver::addNamespace($ns . '\Form');
 	}
 
 	/**

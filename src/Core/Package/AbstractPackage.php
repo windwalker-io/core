@@ -331,7 +331,10 @@ class AbstractPackage implements DispatcherAwareInterface
 		/** @var Container $container */
 		$container = $this->getContainer();
 
-		$container->registerServiceProvider(new PackageProvider($this));
+		$sysProvider = new PackageProvider($this);
+		$sysProvider->boot();
+		
+		$container->registerServiceProvider($sysProvider);
 
 		$providers = (array) $this->get('providers');
 
