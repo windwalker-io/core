@@ -542,9 +542,9 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	{
 		foreach ($files as $file)
 		{
-			$this->addRouteFromFile($file);
+			$this->addRouteFromFile($file, $package);
 		}
-
+		
 		return $this;
 	}
 
