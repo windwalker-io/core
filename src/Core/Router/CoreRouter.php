@@ -10,7 +10,8 @@ namespace Windwalker\Core\Router;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
-use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Cache\Serializer\RawSerializer;
+use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -93,7 +94,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	{
 		parent::__construct($routes, $matcher);
 
-		$this->cache = new Cache(new RuntimeStorage, new RawDataHandler);
+		$this->cache = new Cache(new ArrayStorage, new RawSerializer);
 	}
 
 	/**

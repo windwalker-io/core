@@ -10,7 +10,8 @@ namespace Windwalker\Core\Model;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\RawDataHandler;
-use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Cache\Serializer\RawSerializer;
+use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Registry\Registry;
 
@@ -257,7 +258,7 @@ class Model implements \ArrayAccess
 	 */
 	public function resetCache()
 	{
-		$this->cache = new Cache(new RuntimeStorage, new RawDataHandler);
+		$this->cache = new Cache(new ArrayStorage, new RawSerializer);
 
 		return $this;
 	}

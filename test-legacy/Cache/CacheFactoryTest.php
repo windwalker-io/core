@@ -12,7 +12,7 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\DataHandler\StringHandler;
 use Windwalker\Cache\Storage\FileStorage;
 use Windwalker\Cache\Storage\NullStorage;
-use Windwalker\Cache\Storage\RuntimeStorage;
+use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\Core\Ioc;
 use Windwalker\Registry\Registry;
@@ -72,7 +72,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		// Test correct type.
 		$this->assertTrue($cache instanceof Cache);
 
-		$this->assertTrue($cache->getStorage() instanceof RuntimeStorage);
+		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 
 		// Test singleton
 		$this->assertSame($cache, $this->instance->create('windwalker'));
@@ -128,7 +128,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 
 		$cache = $this->instance->create();
 
-		$this->assertTrue($cache->getStorage() instanceof RuntimeStorage);
+		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 	}
 
 	/**
@@ -166,7 +166,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 
 		$cache = $this->instance->create();
 
-		$this->assertTrue($cache->getStorage() instanceof RuntimeStorage);
+		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 	}
 
 	/**

@@ -8,10 +8,9 @@
 
 namespace Windwalker\Core\Cache;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Windwalker\Cache\Cache;
-use Windwalker\Cache\DataHandler\DataHandlerInterface;
 use Windwalker\Cache\Serializer\SerializerInterface;
-use Windwalker\Cache\Storage\CacheStorageInterface;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
@@ -170,7 +169,7 @@ class CacheFactory implements ContainerAwareInterface
 	 * @param array    $options
 	 * @param string   $name
 	 *
-	 * @return CacheStorageInterface
+	 * @return CacheItemPoolInterface
 	 */
 	public static function getStorage($storage, $options = array(), $name = 'windwalker')
 	{
