@@ -18,7 +18,7 @@ use Windwalker\String\StringHelper;
  * 
  * @since  2.1.1
  */
-class RoutingView extends AbstractDebuggerHtmlView
+class RoutingHtmlView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData

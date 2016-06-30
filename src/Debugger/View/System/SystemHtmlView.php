@@ -15,7 +15,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
  * 
  * @since  2.1.1
  */
-class SystemView extends AbstractDebuggerHtmlView
+class SystemHtmlView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData

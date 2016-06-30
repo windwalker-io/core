@@ -16,7 +16,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
  * 
  * @since  2.1.1
  */
-class DashboardView extends AbstractDebuggerHtmlView
+class DashboardHtmlView extends AbstractDebuggerHtmlView
 {
 	/**
 	 * prepareData
