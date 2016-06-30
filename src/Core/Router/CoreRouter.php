@@ -523,11 +523,29 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 *
 	 * @return  CoreRouter
 	 */
-	public function addRouteByFile($file, $package = null)
+	public function addRouteFromFile($file, $package = null)
 	{
 		$routes = static::loadRoutingFile($file);
 
 		return $this->addRouteByConfigs($routes, $package);
+	}
+
+	/**
+	 * addRouteByFile
+	 *
+	 * @param array                  $files
+	 * @param string|AbstractPackage $package
+	 *
+	 * @return  CoreRouter
+	 */
+	public function addRouteFromFiles(array $files, $package = null)
+	{
+		foreach ($files as $file)
+		{
+			$this->addRouteFromFile($file);
+		}
+
+		return $this;
 	}
 
 	/**

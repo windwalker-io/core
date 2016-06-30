@@ -12,9 +12,14 @@ use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Mvc\ViewResolver;
+use Windwalker\Core\Package\Resolver\DataMapperResolver;
+use Windwalker\Core\Package\Resolver\RecordResolver;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Form\FieldHelper;
+use Windwalker\Form\ValidatorHelper;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The PackageProvider class.
@@ -33,6 +38,21 @@ class PackageProvider implements ServiceProviderInterface
 	public function __construct(AbstractPackage $package)
 	{
 		$this->package = $package;
+	}
+
+	/**
+	 * boot
+	 *
+	 * @return  void
+	 */
+	public function boot()
+	{
+		$ns = (new \ReflectionClass($this->package))->getNamespaceName();
+
+		RecordResolver::addNamespace($ns . '\Record');
+		DataMapperResolver::addNamespace($ns . '\DataMapper');
+		FieldHelper::addNamespace($ns . '\Field');
+		ValidatorHelper::addNamespace($ns . 'Validator');
 	}
 
 	/**
