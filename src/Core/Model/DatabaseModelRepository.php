@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Model;
 
-use Windwalker\Core\Model\Traits\DatabaseModelRepositoryTrait;
+use Windwalker\Core\Model\Traits\DatabaseRepositoryTrait;
 
 /**
  * The ModelRepository class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class DatabaseDatabaseModelRepository extends ModelRepository implements DatabaseModelRepositoryInterface
+class DatabaseModelRepository extends ModelRepository implements DatabaseRepositoryInterface
 {
-	use DatabaseModelRepositoryTrait;
+	use DatabaseRepositoryTrait;
 }

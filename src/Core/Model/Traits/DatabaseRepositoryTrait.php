@@ -20,7 +20,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-trait DatabaseModelRepositoryTrait
+trait DatabaseRepositoryTrait
 {
 	use DatabaseModelTrait;
 
