@@ -2,42 +2,44 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) 2014 - 2015 LYRASOFT. All rights reserved.
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
 use Windwalker\Core\Pagination\PaginationResult;
-use Windwalker\Core\Router\Router;
-use Windwalker\Data\Data;
 
 /**
- * @var Data             $data
  * @var PaginationResult $pagination
- * @var string           $route
+ * @var callable         $route
  */
-$pagination = $data->pagination;
-$route = $data->route;
 ?>
+<style>
+	.pagination .glyphicon {
+		line-height: inherit;
+	}
+</style>
 <ul class="pagination windwalker-pagination">
 	<?php if ($pagination->getFirst()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getFirst())); ?>">
-				First
+			<a href="<?php echo $route(array('page' => $pagination->getFirst())); ?>">
+				<span class="glyphicon glyphicon-fast-backward"></span>
+				<span class="sr-only">First</span>
 			</a>
 		</li>
 	<?php endif; ?>
 
 	<?php if ($pagination->getPrevious()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getPrevious())); ?>">
-				Previous
+			<a href="<?php echo $route(array('page' => $pagination->getPrevious())); ?>">
+				<span class="glyphicon glyphicon-backward"></span>
+				<span class="sr-only">Previous</span>
 			</a>
 		</li>
 	<?php endif; ?>
 
 	<?php if ($pagination->getLess()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getLess())); ?>">
+			<a href="<?php echo $route(array('page' => $pagination->getLess())); ?>">
 				Less
 			</a>
 		</li>
@@ -47,7 +49,7 @@ $route = $data->route;
 		<?php $active = ($page == 'current') ? 'active' : ''; ?>
 		<li class="<?php echo $active; ?>">
 			<?php if (!$active): ?>
-				<a href="<?php echo Router::html($route, array('page' => $k)); ?>">
+				<a href="<?php echo $route(array('page' => $k)); ?>">
 					<?php echo $k; ?>
 				</a>
 			<?php else: ?>
@@ -60,7 +62,7 @@ $route = $data->route;
 
 	<?php if ($pagination->getMore()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getMore())); ?>">
+			<a href="<?php echo $route(array('page' => $pagination->getMore())); ?>">
 				More
 			</a>
 		</li>
@@ -68,16 +70,18 @@ $route = $data->route;
 
 	<?php if ($pagination->getNext()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getNext())); ?>">
-				Next
+			<a href="<?php echo $route(array('page' => $pagination->getNext())); ?>">
+				<span class="glyphicon glyphicon-forward"></span>
+				<span class="sr-only">Next</span>
 			</a>
 		</li>
 	<?php endif; ?>
 
 	<?php if ($pagination->getLast()): ?>
 		<li>
-			<a href="<?php echo Router::html($route, array('page' => $pagination->getLast())); ?>">
-				Last
+			<a href="<?php echo $route(array('page' => $pagination->getLast())); ?>">
+				<span class="glyphicon glyphicon-fast-forward"></span>
+				<span class="sr-only">Last</span>
 			</a>
 		</li>
 	<?php endif; ?>
