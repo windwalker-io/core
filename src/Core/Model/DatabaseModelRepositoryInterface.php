@@ -17,7 +17,7 @@ use Windwalker\Record\Record;
  *
  * @since  {DEPLOY_VERSION}
  */
-interface ModelRepositoryInterface
+interface DatabaseModelRepositoryInterface
 {
 	/**
 	 * getRecord
