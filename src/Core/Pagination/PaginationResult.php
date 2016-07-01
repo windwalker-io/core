@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Pagination;
 
+use Windwalker\Core\Router\CoreRouter;
+
 /**
  * The PaginationResult class.
  * 

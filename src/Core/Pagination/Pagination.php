@@ -10,6 +10,7 @@ namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RouteBuilderInterface;
 use Windwalker\Core\Widget\WidgetHelper;
@@ -128,19 +129,38 @@ class Pagination
 	 *
 	 * @var  PackageRouter
 	 */
-	protected $route;
+	protected $router;
+
+	/**
+	 * Property template.
+	 *
+	 * @var  array
+	 */
+	protected $template = array(
+		'layout' => 'windwalker.pagination.default',
+		'engine' => 'php'
+	);
+
+	/**
+	 * Property route.
+	 *
+	 * @var  array
+	 */
+	protected $route = [
+		'route' => null,
+		'query' => [],
+		'type' => CoreRouter::TYPE_PATH
+	];
 
 	/**
 	 * Create instance
 	 *
-	 * @param int $total       Total items
-	 * @param int $current     Number of the current page
-	 * @param int $limit       Items per page
-	 * @param int $neighbours  Number of neighboring pages at the left and the right sides
-	 *
-	 * @throws \LogicException
+	 * @param int $current    Number of the current page
+	 * @param int $limit      Items per page
+	 * @param int $total      Total items
+	 * @param int $neighbours Number of neighboring pages at the left and the right sides
 	 */
-	public function __construct($total, $current, $limit = 10, $neighbours = 4)
+	public function __construct($current, $limit = 10, $total = 0, $neighbours = 4)
 	{
 		$this->total   = (int) $total;
 		$this->current = (int) $current;
@@ -171,7 +191,7 @@ class Pagination
 			$this->pages = (int) ceil($this->total / $this->limit);
 		}
 
-		if ($this->current > $this->pages)
+		if ($this->current > $this->pages && $this->pages != 0)
 		{
 			$this->current = $this->pages;
 		}
@@ -188,9 +208,9 @@ class Pagination
 	{
 		$this->result = new PaginationResult;
 
-		if ($this->total == 0 || $this->limit == 0 || $this->pages == 1)
+		if ($this->total === 0 || $this->limit === 0 || $this->pages === 1)
 		{
-			return array();
+			return $this;
 		}
 
 		// Lower
@@ -206,8 +226,9 @@ class Pagination
 		if ($neighbours - static::BASE_PAGE >= 2)
 		{
 			$this->result->setLess($neighbours - 1);
-			$this->result->setPrevious($this->current - 1);
 		}
+
+		$this->result->setPrevious($this->current - 1);
 
 		// First
 		if ($this->current - $this->neighbours > static::BASE_PAGE)
@@ -228,8 +249,9 @@ class Pagination
 		if ($this->pages - $neighbours > 0)
 		{
 			$this->result->setMore($neighbours + 1);
-			$this->result->setNext($this->current + 1);
 		}
+
+		$this->result->setNext($this->current + 1);
 
 		// Last
 		if ($this->current + $this->neighbours < $this->pages)
@@ -260,9 +282,9 @@ class Pagination
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setTotal($total)
+	public function total($total)
 	{
-		$this->total = $total;
+		$this->total = (int) $total;
 
 		return $this;
 	}
@@ -284,9 +306,9 @@ class Pagination
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setCurrent($current)
+	public function currentPage($current)
 	{
-		$this->current = $current;
+		$this->current = (int) $current;
 
 		return $this;
 	}
@@ -308,9 +330,9 @@ class Pagination
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setOffset($offset)
+	public function offset($offset)
 	{
-		$this->offset = $offset;
+		$this->offset = (int) $offset;
 
 		return $this;
 	}
@@ -344,22 +366,15 @@ class Pagination
 	/**
 	 * render
 	 *
-	 * @param string|\Closure $route
-	 * @param array           $query
-	 * @param string          $template
-	 *
 	 * @return string
 	 */
-	public function render($route = null, $query = [], $template = 'windwalker.pagination.default')
+	public function render()
 	{
-		if (is_callable($template))
-		{
-			$widget = $template($route, $query, $this);
-		}
-		else
-		{
-			$widget = WidgetHelper::createWidget($template, 'php');
-		}
+		list($layout, $engine) = array_values($this->getTemplate());
+		
+		$widget = WidgetHelper::createWidget($layout, $engine);
+		
+		list($route, $query, $type) = array_values($this->route);
 
 		$result = $this->getResult();
 
@@ -371,11 +386,11 @@ class Pagination
 		// If not route provided, use current route.
 		if ($route === null)
 		{
-			$route = function ($queries, $type = PackageRouter::TYPE_PATH) use ($query)
+			$route = function ($queries) use ($query, $type)
 			{
 				$queries = array_merge((array) $queries, (array) $query);
 
-				if ($this->getRoute())
+				if ($this->getRouter())
 				{
 					$uri = new Uri(Ioc::get('uri')->full);
 
@@ -389,18 +404,18 @@ class Pagination
 
 				$route = Ioc::getConfig()->get('route.matched');
 
-				return $this->getRoute()->route($route, $queries, $type);
+				return $this->getRouter()->route($route, $queries, $type);
 			};
 		}
 
 		// If route is string, wrap it as a callback
 		if (!$route instanceof \Closure)
 		{
-			$route = function ($queries, $type = PackageRouter::TYPE_PATH) use ($route, $query)
+			$route = function ($queries) use ($route, $query, $type)
 			{
 				$queries = array_merge((array) $queries, (array) $query);
 
-				if (!$this->getRoute())
+				if (!$this->getRouter())
 				{
 					$package = PackageHelper::getPackage();
 
@@ -409,7 +424,7 @@ class Pagination
 				}
 
 				// Use custom Route object.
-				return $this->getRoute()->route($route, $queries, $type);
+				return $this->getRouter()->route($route, $queries, $type);
 			};
 		}
 
@@ -421,21 +436,146 @@ class Pagination
 	 *
 	 * @return  RouteBuilderInterface
 	 */
-	public function getRoute()
+	public function getRouter()
 	{
-		return $this->route;
+		if (!$this->router)
+		{
+			return Ioc::getRouter();
+		}
+
+		return $this->router;
 	}
 
 	/**
 	 * Method to set property route
 	 *
-	 * @param   RouteBuilderInterface $route
+	 * @param   RouteBuilderInterface $router
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setRoute(RouteBuilderInterface $route)
+	public function setRouter(RouteBuilderInterface $router)
 	{
-		$this->route = $route;
+		$this->router = $router;
+
+		return $this;
+	}
+
+	/**
+	 * route
+	 *
+	 * @param string $route
+	 * @param array  $query
+	 * @param string $type
+	 *
+	 * @return  static
+	 */
+	public function route($route, $query = [], $type = CoreRouter::TYPE_PATH)
+	{
+		$this->route = [
+			'route' => $route,
+			'query' => (array) $query,
+			'type' => $type
+		];
+
+		return $this;
+	}
+
+	/**
+	 * Method to set property neighbours
+	 *
+	 * @param   int $neighbours
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function neighbours($neighbours)
+	{
+		$this->neighbours = (int) $neighbours;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Neighbours
+	 *
+	 * @return  int
+	 */
+	public function getNeighbours()
+	{
+		return $this->neighbours;
+	}
+
+	/**
+	 * Method to get property Limit
+	 *
+	 * @return  int
+	 */
+	public function getLimit()
+	{
+		return $this->limit;
+	}
+
+	/**
+	 * Method to set property limit
+	 *
+	 * @param   int $limit
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function limit($limit)
+	{
+		$this->limit = (int) $limit;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Pages
+	 *
+	 * @return  int
+	 */
+	public function getPages()
+	{
+		return $this->pages;
+	}
+
+	/**
+	 * Method to set property pages
+	 *
+	 * @param   int $pages
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function pages($pages)
+	{
+		$this->pages = (int) $pages;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Template
+	 *
+	 * @return  array
+	 */
+	public function getTemplate()
+	{
+		return $this->template;
+	}
+
+	/**
+	 * Method to set property template
+	 *
+	 * @param string $layout
+	 * @param string $engine
+	 *
+	 * @return static Return self to support chaining.
+	 */
+	public function template($layout, $engine = 'php')
+	{
+		$this->template = [
+			'layout' => $layout,
+			'engine' => $engine
+		];
 
 		return $this;
 	}

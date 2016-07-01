@@ -105,7 +105,7 @@ class PaginationTest extends AbstractBaseTestCase
 	 */
 	public function testBuild($total, $current, $perPage, $neighbours, $output)
 	{
-		$pagination = new Pagination($total, $current, $perPage, $neighbours);
+		$pagination = new Pagination($current, $perPage, $total, $neighbours);
 
 		$result = $pagination->getResult();
 
@@ -119,7 +119,7 @@ class PaginationTest extends AbstractBaseTestCase
 	 */
 	public function testTemplate()
 	{
-		$pagination = new Pagination(500, 20, 10, 4);
+		$pagination = new Pagination(20, 10, 500, 4);
 
 		$compare = <<<HTML
 <ul>
@@ -145,7 +145,7 @@ HTML;
 
 		$this->assertStringDataEquals($compare, $html);
 
-		$pagination = new Pagination(5, 20, 10, 4);
+		$pagination = new Pagination(20, 10, 5, 4);
 
 		$this->assertNull($pagination->render('route'));
 	}

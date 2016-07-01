@@ -39,3 +39,7 @@ footer {
 	height  : 1em;
 	fill    : currentColor;
 }
+
+pre {
+    white-space: pre-wrap;
+}

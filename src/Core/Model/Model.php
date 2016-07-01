@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Model;
 
 use Windwalker\Cache\Cache;
-use Windwalker\Cache\DataHandler\RawDataHandler;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;

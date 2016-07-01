@@ -79,7 +79,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$this->assertNotSame($cache, $this->instance->create('foo'));
 
 		// Test handler
-		$this->assertTrue($this->instance->create('windwalker', null, 'string')->getHandler() instanceof StringHandler);
+		$this->assertTrue($this->instance->create('windwalker', null, 'string')->getSerializer() instanceof StringHandler);
 
 		// Test storage
 		$this->assertTrue($this->instance->create('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE))->getStorage() instanceof FileStorage);
