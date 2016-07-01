@@ -334,27 +334,30 @@ class ProfilerListener
 		$collector['request'] = Ioc::getInput()->dumpAllInputs();
 
 		// SQL Explain
-		$queries = $collector['database.queries'];
-		$db = Ioc::getDatabase();
-
-		foreach ($queries as $k => $data)
+		if (Ioc::exists('database'))
 		{
-			if (stripos(trim($data['query']), 'SELECT') !== 0)
+			$queries = $collector['database.queries'];
+			$db = Ioc::getDatabase();
+
+			foreach ($queries as $k => $data)
 			{
-				continue;
+				if (stripos(trim($data['query']), 'SELECT') !== 0)
+				{
+					continue;
+				}
+
+				$collector['database.queries.' . $k . '.explain'] = $db->setQuery('EXPLAIN ' . $data['query'])->loadAll();
 			}
 
-			$collector['database.queries.' . $k . '.explain'] = $db->setQuery('EXPLAIN ' . $data['query'])->loadAll();
-		}
+			// Database Information
+			$collector['database.driver.name'] = $db->getName();
+			$collector['database.driver.class'] = get_class($db);
+			$collector['database.info'] = $db->getOptions();
 
-		// Database Information
-		$collector['database.driver.name'] = $db->getName();
-		$collector['database.driver.class'] = get_class($db);
-		$collector['database.info'] = $db->getOptions();
-
-		if ($queries instanceof DataSet)
-		{
-			$collector['database.queries'] = iterator_to_array($queries);
+			if ($queries instanceof DataSet)
+			{
+				$collector['database.queries'] = iterator_to_array($queries);
+			}
 		}
 
 		// Events

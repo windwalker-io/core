@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The ViewModel class.
@@ -20,21 +20,21 @@ class ViewModel implements \ArrayAccess
 	/**
 	 * Property nullModel.
 	 *
-	 * @var Model
+	 * @var ModelRepository
 	 */
 	protected $nullModel;
 
 	/**
 	 * Property model.
 	 *
-	 * @var Model
+	 * @var ModelRepository
 	 */
 	protected $model;
 
 	/**
 	 * Property models.
 	 *
-	 * @var Model[]
+	 * @var ModelRepository[]
 	 */
 	protected $models;
 
@@ -43,7 +43,7 @@ class ViewModel implements \ArrayAccess
 	 *
 	 * @param  string $name
 	 *
-	 * @return Model
+	 * @return ModelRepository
 	 */
 	public function getModel($name = null)
 	{
@@ -65,13 +65,13 @@ class ViewModel implements \ArrayAccess
 	/**
 	 * Method to set property model
 	 *
-	 * @param   Model   $model
-	 * @param   bool    $default
-	 * @param   string  $customName
+	 * @param   ModelRepository $model
+	 * @param   bool            $default
+	 * @param   string          $customName
 	 *
 	 * @return static Return self to support chaining.
 	 */
-	public function setModel(Model $model, $default = null, $customName = null)
+	public function setModel(ModelRepository $model, $default = null, $customName = null)
 	{
 		if ($default === true || ($default === null && !$this->model))
 		{
@@ -254,13 +254,13 @@ class ViewModel implements \ArrayAccess
 	/**
 	 * Method to get property NullModel
 	 *
-	 * @return  Model
+	 * @return  ModelRepository
 	 */
 	public function getNullModel()
 	{
 		if (!$this->nullModel)
 		{
-			$this->nullModel = new Model;
+			$this->nullModel = new ModelRepository;
 
 			$this->nullModel['is.null'] = true;
 			$this->nullModel['null'] = true;
@@ -274,7 +274,7 @@ class ViewModel implements \ArrayAccess
 	/**
 	 * Method to set property nullModel
 	 *
-	 * @param   Model $nullModel
+	 * @param   ModelRepository $nullModel
 	 *
 	 * @return  static  Return self to support chaining.
 	 */

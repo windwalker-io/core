@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Model\Traits;
 
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
@@ -29,11 +29,11 @@ trait DatabaseModelTrait
 	/**
 	 * bootDatabaseModelTrait
 	 *
-	 * @param Model $model
+	 * @param ModelRepository $model
 	 *
 	 * @return  void
 	 */
-	public function bootDatabaseModelTrait(Model $model)
+	public function bootDatabaseModelTrait(ModelRepository $model)
 	{
 		// Prepare DB
 		$this->getDb();

@@ -227,7 +227,7 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareGlobals(Container $container, RendererManager $manager)
 	{
-		if (static::$messages === null)
+		if (static::$messages === null && $container->exists('session'))
 		{
 			/** @var Session $session */
 			$session = $container->get('session');
@@ -240,21 +240,24 @@ class RendererProvider implements ServiceProviderInterface
 		$globals = array(
 			'uri'        => $container->get('uri'),
 			'app'        => $container->get('application'),
-			'asset'      => $container->get('asset'),
+			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
 			'messages'   => static::$messages,
-			'translator' => $container->get('language'),
-			'widget'     => $container->get('widget.manager'),
+			'translator' => $container->exists('language') ? $container->get('language') : null,
+			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
 			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
 		);
 
 		$manager->setGlobals($globals);
 
 		/** @var EventDispatcher $dispatcher */
-		$dispatcher = $container->get('dispatcher');
+		if ($container->exists('dispatcher'))
+		{
+			$dispatcher = $container->get('dispatcher');
 
-		$dispatcher->triggerEvent('onRendererPrepareGlobals', [
-			'manager' => $manager
-		]);
+			$dispatcher->triggerEvent('onRendererPrepareGlobals', [
+				'manager' => $manager
+			]);
+		}
 
 		return $manager;
 	}

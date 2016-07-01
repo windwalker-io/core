@@ -14,7 +14,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\AbstractPackage;
@@ -533,7 +533,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param string $name
 	 * @param bool   $forceNew
 	 *
-	 * @return  Model
+	 * @return  ModelRepository
 	 *
 	 * @throws \UnexpectedValueException
 	 */
@@ -559,11 +559,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 			try
 			{
-				$model = $package->getMvcResolver()->getModelResolver()->create($modelName, $config, null, $this->container->get('database'));
+				$db = $this->container->exists('database') ? $this->container->get('database') : null;
+
+				$model = $package->getMvcResolver()->getModelResolver()->create($modelName, $config, null, $db);
 			}
 			catch (\UnexpectedValueException $e)
-			{
-				$model = new Model($config);
+			{throw $e;
+				$model = new ModelRepository($config);
 			}
 
 			$class = get_class($model);

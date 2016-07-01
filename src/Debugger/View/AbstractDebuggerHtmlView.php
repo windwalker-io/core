@@ -24,8 +24,6 @@ class AbstractDebuggerHtmlView extends HtmlView
 	 */
 	protected function init()
 	{
-	
-		
 		$this->boot();
 
 		$this->renderer->config->set('local_variables', true);

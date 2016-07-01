@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Test\View;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Router\CoreRoute;
 use Windwalker\Core\Router\CoreRouter;
@@ -216,7 +216,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 
 		$view->setModel(new StubModel);
 
-		$view->setModel(new Model);
+		$view->setModel(new ModelRepository);
 
 		// Get default model
 		$this->assertTrue($view->getModel() instanceof StubModel);
@@ -224,7 +224,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 		// Get by name
 		$this->assertTrue($view->getModel('stub') instanceof StubModel);
 
-		$model = new Model;
+		$model = new ModelRepository;
 
 		$view->setModel($model, AbstractView::DEFAULT_MODEL);
 

@@ -10,7 +10,7 @@ namespace Windwalker\Debugger\Listener;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Data\Data;
@@ -93,7 +93,6 @@ class DebuggerListener
 		$controller = $event['controller'];
 		$input   = $controller->getInput();
 		$app     = Ioc::getApplication();
-		$session = Ioc::getSession();
 		$uri     = Ioc::getUriData();
 
 		if ($app->get('route.matched') == $package->name . '@asset')
@@ -101,13 +100,19 @@ class DebuggerListener
 			return;
 		}
 
-		/** @var Model $model */
+		/** @var ModelRepository $model */
 		$model = $controller->getModel('Dashboard');
 
 		if ($input->get('refresh'))
 		{
+
 			$input->set('id', null);
-			$session->set('debugger.current.id', null);
+
+			if (Ioc::exists('session'))
+			{
+				$session = Ioc::getSession();
+				$session->set('debugger.current.id', null);
+			}
 
 			$item = $model->getLastItem();
 
@@ -121,6 +126,8 @@ class DebuggerListener
 
 		if (!$id = $input->get('id'))
 		{
+			$session = Ioc::getSession();
+
 			// Get id from session
 			$id = $session->get('debugger.current.id');
 
@@ -152,12 +159,17 @@ class DebuggerListener
 
 		if (!$itemModel->hasItem($id))
 		{
+			$session = Ioc::getSession();
 			$session->set('debugger.current.id', null);
 
 			$app->redirect($package->router->route('dashboard'));
 		}
 
-		$session->set('debugger.current.id', $id);
+		if (Ioc::exists('session'))
+		{
+			$session = Ioc::getSession();
+			$session->set('debugger.current.id', $id);
+		}
 	}
 
 	/**

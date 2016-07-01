@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Test\Controller\Mock\Model;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The StubModel class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class StubModel extends Model
+class StubModel extends ModelRepository
 {
 
 }

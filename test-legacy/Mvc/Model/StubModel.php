@@ -8,14 +8,14 @@
 
 namespace Windwalker\Core\Test\Mvc\Model;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 
 /**
  * The StubModel class.
  * 
  * @since  2.1.1
  */
-class StubModel extends Model
+class StubModel extends ModelRepository
 {
 	/**
 	 * getItem

@@ -10,7 +10,7 @@ namespace Windwalker\Core\Migration\Model;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\AbstractMigration;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Model\Traits\CliOutputModelTrait;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Data\Data;
@@ -25,7 +25,7 @@ use Windwalker\String\StringNormalise;
  * 
  * @since  2.0
  */
-class MigrationsModel extends Model
+class MigrationsModel extends ModelRepository
 {
 	use DatabaseModelTrait;
 	use CliOutputModelTrait;

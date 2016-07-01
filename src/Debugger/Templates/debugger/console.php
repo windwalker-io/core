@@ -116,7 +116,7 @@
 			<div class="windwalker-debugger-block-inner">
 				Queries
 				<span class="windwalker-debugger-badge">
-					<?php echo $this->escape($data->queryTimes); ?>
+					<?php echo $this->escape((int) $data->queryTimes); ?>
 				</span>
 			</div>
 
@@ -125,7 +125,7 @@
 				<dl>
 					<dt>DB Queries</dt>
 					<dd>
-						<?php echo $this->escape($data->queryTimes); ?>
+						<?php echo $this->escape((int) $data->queryTimes); ?>
 					</dd>
 
 					<dt>Total Time</dt>

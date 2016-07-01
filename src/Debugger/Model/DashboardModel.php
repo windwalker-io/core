@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Model;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
 
 /**
@@ -16,7 +16,7 @@ use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
  * 
  * @since  2.1.1
  */
-class DashboardModel extends Model
+class DashboardModel extends ModelRepository
 {
 	/**
 	 * getItems

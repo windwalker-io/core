@@ -93,7 +93,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 				if ($this->baseClass && !is_subclass_of($class, $this->baseClass))
 				{
 					throw new \UnexpectedValueException(sprintf(
-						'Controller: "%s" should be sub class of %s',
+						'Class: "%s" should be sub class of %s',
 						$this->baseClass,
 						$class
 					));

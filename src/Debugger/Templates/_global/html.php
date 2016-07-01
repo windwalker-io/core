@@ -58,14 +58,14 @@ use Windwalker\Registry\Registry;use Windwalker\Uri\UriData;
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
 				<?php $this->block('nav'); ?>
-				<li class="<?php echo $helper->view->isActiveRoute('system') ?>"><a href="<?php echo $router->route('system'); ?>">System</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('request') ?>"><a href="<?php echo $router->route('request'); ?>">Request</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('routing') ?>"><a href="<?php echo $router->route('routing'); ?>">Routing</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('timeline') ?>"><a href="<?php echo $router->route('timeline'); ?>">Timeline</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('events') ?>"><a href="<?php echo $router->route('events'); ?>">Events</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('system') ?>"><a href="<?php echo $router->route('system', $item->id); ?>">System</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('request') ?>"><a href="<?php echo $router->route('request', $item->id); ?>">Request</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('routing') ?>"><a href="<?php echo $router->route('routing', $item->id); ?>">Routing</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('timeline') ?>"><a href="<?php echo $router->route('timeline', $item->id); ?>">Timeline</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('events') ?>"><a href="<?php echo $router->route('events', $item->id); ?>">Events</a></li>
 
-				<li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a href="<?php echo $router->route('database'); ?>">Database</a></li>
-				<li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a href="<?php echo $router->route('exception'); ?>">Exception</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a href="<?php echo $router->route('database', $item->id); ?>">Database</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a href="<?php echo $router->route('exception', $item->id); ?>">Exception</a></li>
 				<?php $this->endblock(); ?>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">

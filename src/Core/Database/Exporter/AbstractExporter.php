@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Database\Exporter;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 
 /**
@@ -16,7 +16,7 @@ use Windwalker\Core\Model\Traits\DatabaseModelTrait;
  *
  * @since  2.1.1
  */
-abstract class AbstractExporter extends Model
+abstract class AbstractExporter extends ModelRepository
 {
 	use DatabaseModelTrait;
 

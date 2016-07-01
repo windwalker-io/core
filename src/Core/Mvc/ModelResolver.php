@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -23,7 +23,7 @@ class ModelResolver extends AbstractClassResolver
 	 *
 	 * @var  string
 	 */
-	protected $baseClass = Model::class;
+	protected $baseClass = ModelRepository::class;
 
 	/**
 	 * Get container key prefix.

@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -527,7 +527,7 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param  string $name
 	 *
-	 * @return Model
+	 * @return ModelRepository
 	 */
 	public function getModel($name = null)
 	{
@@ -537,13 +537,13 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * Method to set property model
 	 *
-	 * @param   Model   $model
-	 * @param   bool    $default
-	 * @param   string  $customName
+	 * @param   ModelRepository $model
+	 * @param   bool            $default
+	 * @param   string          $customName
 	 *
 	 * @return static Return self to support chaining.
 	 */
-	public function setModel(Model $model, $default = null, $customName = null)
+	public function setModel(ModelRepository $model, $default = null, $customName = null)
 	{
 		$this->model->setModel($model, $default, $customName);
 
@@ -553,13 +553,13 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * Method to add model with name.
 	 *
-	 * @param string  $name
-	 * @param Model   $model
-	 * @param string  $default
+	 * @param string          $name
+	 * @param ModelRepository $model
+	 * @param string          $default
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function addModel($name, Model $model, $default = null)
+	public function addModel($name, ModelRepository $model, $default = null)
 	{
 		$this->model->setModel($model, $default, $name);
 

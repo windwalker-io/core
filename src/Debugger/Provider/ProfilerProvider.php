@@ -95,6 +95,11 @@ class ProfilerProvider implements ServiceProviderInterface
 	 */
 	protected function registerDatabaseProfiler(Container $container, Registry $config)
 	{
+		if (!$container->exists('database'))
+		{
+			return;
+		}
+
 		static $queryData = array();
 
 		$collector = $container->get('debugger.collector');

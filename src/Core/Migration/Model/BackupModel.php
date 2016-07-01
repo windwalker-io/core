@@ -11,7 +11,7 @@ namespace Windwalker\Core\Migration\Model;
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Model\DatabaseModel;
-use Windwalker\Core\Model\Model;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Filesystem\Folder;
 
@@ -20,7 +20,7 @@ use Windwalker\Filesystem\Folder;
  * 
  * @since  2.1.1
  */
-class BackupModel extends Model
+class BackupModel extends ModelRepository
 {
 	use DatabaseModelTrait;
 
