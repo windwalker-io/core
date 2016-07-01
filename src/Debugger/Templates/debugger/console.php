@@ -8,7 +8,7 @@
 
 ?>
 <style>
-<?php echo $data->style; ?>
+<?php echo $style; ?>
 </style>
 <div id="windwalker-debugger">
 	<!-- LOGO -->
@@ -23,10 +23,10 @@
 
 	<!-- VERSION -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('system', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('system', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
-					V <?php echo $this->escape($data->collector['windwalker.version.framework']); ?>
+					V <?php echo $this->escape($collector['windwalker.version.framework']); ?>
 				</span>
 			</div>
 		</a>
@@ -34,10 +34,10 @@
 
 	<!-- METHOD -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('request', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('request', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
-					<?php echo $this->escape($data->collector['system.method.custom'] ? : $data->collector['system.method.http']); ?>
+					<?php echo $this->escape($collector['system.method.custom'] ? : $collector['system.method.http']); ?>
 				</span>
 			</div>
 
@@ -45,10 +45,10 @@
 			<div class="windwalker-debugger-drop-menu">
 				<dl>
 					<dt>HTTP Method</dt>
-					<dd><?php echo $this->escape($data->collector['system.method.http']); ?></dd>
+					<dd><?php echo $this->escape($collector['system.method.http']); ?></dd>
 
 					<dt>Custom Method</dt>
-					<dd><?php echo$this->escape($data->collector['system.method.custom'] ? : 'None'); ?></dd>
+					<dd><?php echo$this->escape($collector['system.method.custom'] ? : 'None'); ?></dd>
 				</dl>
 			</div>
 		</a>
@@ -56,15 +56,15 @@
 
 	<!-- ROUTING -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('routing', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('routing', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
-					<?php echo $this->escape($data->collector['system.http.status']); ?>
+					<?php echo $this->escape($collector['system.http.status']); ?>
 				</span>
 				&nbsp;
 				Route:
-				<abbr title="<?php echo $this->escape($data->collector['controller.main']); ?>">
-					<code><?php echo $this->escape($data->collector['routing.matched']['name']); ?></code>
+				<abbr title="<?php echo $this->escape($collector['controller.main']); ?>">
+					<code><?php echo $this->escape($collector['routing.matched']['name']); ?></code>
 				</abbr>
 			</div>
 
@@ -74,15 +74,15 @@
 					<dt>Status</dt>
 					<dd>
 						<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
-							<?php echo $this->escape($data->collector['system.http.status']); ?>
+							<?php echo $this->escape($collector['system.http.status']); ?>
 						</span>
 					</dd>
 
 					<dt>Route Name</dt>
-					<dd><code><?php echo $this->escape($data->collector['routing.matched.name']); ?></code></dd>
+					<dd><code><?php echo $this->escape($collector['routing.matched.name']); ?></code></dd>
 
 					<dt>Controller</dt>
-					<dd class="windwalker-debugger-controller"><code><?php echo $this->escape($data->collector['controller.main']); ?></code></dd>
+					<dd class="windwalker-debugger-controller"><code><?php echo $this->escape($collector['controller.main']); ?></code></dd>
 				</dl>
 			</div>
 		</a>
@@ -90,10 +90,10 @@
 
 	<!-- TIME -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('timeline', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
-				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $data->timeStyle; ?>">
-					Time: <?php echo $this->escape(round($data->time, 2)); ?> ms
+				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $timeStyle; ?>">
+					Time: <?php echo $this->escape(round($time, 2)); ?> ms
 				</span>
 			</div>
 		</a>
@@ -101,10 +101,10 @@
 
 	<!-- MEMORY -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('timeline', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
-				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $data->memoryStyle; ?>">
-					Memory: <?php echo $this->escape(round($data->memory, 2)); ?> MB
+				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $memoryStyle; ?>">
+					Memory: <?php echo $this->escape(round($memory, 2)); ?> MB
 				</span>
 			</div>
 		</a>
@@ -112,11 +112,11 @@
 
 	<!-- DATABASE -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $data->router->route('database', array('id' => $data->collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				Queries
 				<span class="windwalker-debugger-badge">
-					<?php echo $this->escape((int) $data->queryTimes); ?>
+					<?php echo $this->escape((int) $queryTimes); ?>
 				</span>
 			</div>
 
@@ -125,14 +125,14 @@
 				<dl>
 					<dt>DB Queries</dt>
 					<dd>
-						<?php echo $this->escape((int) $data->queryTimes); ?>
+						<?php echo $this->escape((int) $queryTimes); ?>
 					</dd>
 
 					<dt>Total Time</dt>
-					<dd><?php echo $this->escape(round($data->queryTotalTime, 2)); ?> ms</dd>
+					<dd><?php echo $this->escape(round($queryTotalTime, 2)); ?> ms</dd>
 
 					<dt>Total Memory</dt>
-					<dd><?php echo $this->escape(round($data->queryTotalMemory, 3)); ?> MB</dd>
+					<dd><?php echo $this->escape(round($queryTotalMemory, 3)); ?> MB</dd>
 				</dl>
 			</div>
 		</a>
