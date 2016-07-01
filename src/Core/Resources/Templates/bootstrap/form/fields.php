@@ -12,14 +12,14 @@ use Windwalker\Form\Field\AbstractField;
  * @var  AbstractField  $field
  */
 ?>
-<?php foreach ($data->fields as $field): ?>
+<?php foreach ($fields as $field): ?>
 	<div class="form-group">
 		<?php
 		$field->set('class', $field->get('class') . ' form-control');
-		$field->set('labelClass', $field->get('labelClass') . ' control-label ' . $data->label_cols);
+		$field->set('labelClass', $field->get('labelClass') . ' control-label ' . $label_cols);
 		?>
 		<?php echo $field->renderLabel(); ?>
-		<div class="<?php echo $data->input_cols; ?>">
+		<div class="<?php echo $input_cols; ?>">
 			<?php echo $field->renderInput(); ?>
 		</div>
 	</div>
