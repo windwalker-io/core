@@ -8,6 +8,9 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Cache\Cache;
+use Windwalker\Cache\Serializer\PhpFileSerializer;
+use Windwalker\Cache\Storage\PhpFileStorage;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Console\CoreConsole;
@@ -126,13 +129,24 @@ trait WindwalkerTrait
 	{
 		$name = $name ? : $this->getName();
 
+		$cache = new Cache(new PhpFileStorage($this->rootPath . '/cache', 'config'), new PhpFileSerializer);
+
+		$startTime = $config['execution'];
+
+		if ($this->getMode() != 'dev' && $this->name != 'dev' && $cache->exists('config.' . $name))
+		{
+			$config->load($cache->get('config.' . $name));
+			$config['execution'] = $startTime;
+			return;
+		}
+
 		// Load library config
 		$configName = $this->isWeb() ? 'web' : 'console';
 
 		$config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php', ['load_raw' => true]);
 
 		// Load application config
-		$file = $this->configPath . '/' . $name . '.php';
+		$file = $this->rootPath . '/etc/app/' . $name . '.php';
 
 		if (is_file($file))
 		{
@@ -152,6 +166,8 @@ trait WindwalkerTrait
 
 			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
 		}
+
+		$cache->set('config.' . $name, $config->toArray());
 
 		// TODO: Variables override
 	}

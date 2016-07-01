@@ -14,6 +14,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
@@ -458,6 +459,17 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function loadConfig(Registry $config)
 	{
+		$cache = CacheFactory::create('config', 'php_file', 'php_file', ['group' => 'config']);
+
+		$cacheKey = 'config.package.' . $this->name;
+
+		if ($this->app->getMode() != 'dev' && $this->app->getName() != 'dev' && $cache->exists($cacheKey))
+		{
+			$config->load($cache->get($cacheKey));
+
+			return $this;
+		}
+
 		$file = $this->getDir() . '/Resources/config/config.php';
 
 		if (is_file($file))
@@ -472,6 +484,8 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			$config->loadFile($file, 'php', ['load_raw' => true]);
 		}
+
+		$cache->set($cacheKey, $config->toArray());
 
 		return $this;
 	}

@@ -68,7 +68,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @var  string
 	 */
-	protected $configPath;
+	protected $rootPath;
 
 	/**
 	 * Property middlewares.
@@ -97,9 +97,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function __construct(Request $request = null, Registry $config = null, WebEnvironment $environment = null)
 	{
-		$this->config = $config instanceof Registry ? $config : new Registry($config);
-		$this->name   = $this->config->get('name', $this->name);
-		$this->configPath = $this->config->get('config_path', $this->configPath);
+		$this->config   = $config instanceof Registry ? $config : new Registry($config);
+		$this->name     = $this->config->get('name', $this->name);
+		$this->rootPath = $this->config->get('path.root', $this->rootPath);
 
 		Core\Ioc::setProfile($this->name);
 

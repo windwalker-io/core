@@ -102,7 +102,7 @@ class CacheFactory implements ContainerAwareInterface
 	 *
 	 * @return  Cache
 	 */
-	public function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
+	public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
 		$config = $this->container->get('config');
 
@@ -112,10 +112,10 @@ class CacheFactory implements ContainerAwareInterface
 		if (($debug || !$enabled) && !$this->ignoreGlobal)
 		{
 			$storage    = 'null';
-			$serializer = 'string';
+			$serializer = 'raw';
 		}
 
-		return static::getCache($name, $storage, $serializer, $options);
+		return static::create($name, $storage, $serializer, $options);
 	}
 
 	/**
@@ -128,7 +128,7 @@ class CacheFactory implements ContainerAwareInterface
 	 *
 	 * @return  Cache
 	 */
-	public static function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
+	public static function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
 		$storage    = $storage ? : 'array';
 		$serializer = $serializer ? : 'php';
@@ -143,7 +143,7 @@ class CacheFactory implements ContainerAwareInterface
 		}
 
 		$storage = static::getStorage($storage, $options, $name);
-		$handler = static::setSerializer($serializer);
+		$handler = static::getSerializer($serializer);
 
 		$cache = new Cache($storage, $handler);
 
@@ -183,13 +183,14 @@ class CacheFactory implements ContainerAwareInterface
 		$config = Ioc::getConfig();
 
 		$options['cache_time']  = isset($options['cache_time'])  ? $options['cache_time']  : $config->get('cache.time');
-		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('cache.dir');
+		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('path.cache');
 		$options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
 
 		switch (strtolower($storage))
 		{
 			case 'file':
 			case 'raw_file':
+			case 'php_file':
 				$path = $options['cache_dir'];
 				$denyAccess = $options['deny_access'];
 
@@ -226,17 +227,17 @@ class CacheFactory implements ContainerAwareInterface
 	/**
 	 * getDataHandler
 	 *
-	 * @param $handler
+	 * @param $serializer
 	 *
 	 * @return  SerializerInterface
 	 */
-	public static function setSerializer($handler)
+	public static function getSerializer($serializer)
 	{
-		$class = sprintf('Windwalker\Cache\DataHandler\%sSerializer', ucfirst($handler));
+		$class = sprintf('Windwalker\Cache\Serializer\%sSerializer', StringNormalise::toCamelCase($serializer));
 
 		if (!class_exists($class))
 		{
-			throw new \DomainException(sprintf('Cache Serializer: %s not supported.', ucfirst($handler)));
+			throw new \DomainException(sprintf('Cache Serializer: %s not supported.', ucfirst($serializer)));
 		}
 
 		return new $class;

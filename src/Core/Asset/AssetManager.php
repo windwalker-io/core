@@ -353,6 +353,11 @@ class AssetManager implements DispatcherAwareInterface
 		/** @var \SplFileInfo $file */
 		foreach ($files as $file)
 		{
+			if ($file->isLink() || $file->isDir())
+			{
+				continue;
+			}
+
 			$time .= $file->getMTime();
 		}
 

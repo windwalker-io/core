@@ -62,12 +62,12 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::create
+	 * @covers Windwalker\Core\Cache\CacheFactory::getCache
 	 */
 	public function testCreate()
 	{
 		$config = Ioc::getConfig();
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		// Test correct type.
 		$this->assertTrue($cache instanceof Cache);
@@ -75,18 +75,18 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 
 		// Test singleton
-		$this->assertSame($cache, $this->instance->create('windwalker'));
-		$this->assertNotSame($cache, $this->instance->create('foo'));
+		$this->assertSame($cache, $this->instance->getCache('windwalker'));
+		$this->assertNotSame($cache, $this->instance->getCache('foo'));
 
 		// Test handler
-		$this->assertTrue($this->instance->create('windwalker', null, 'string')->getSerializer() instanceof StringHandler);
+		$this->assertTrue($this->instance->getCache('windwalker', null, 'string')->getSerializer() instanceof StringHandler);
 
 		// Test storage
-		$this->assertTrue($this->instance->create('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE))->getStorage() instanceof FileStorage);
+		$this->assertTrue($this->instance->getCache('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE))->getStorage() instanceof FileStorage);
 
 		// Test FileStorage Denycode
 		$config->set('cache.denyAccess', true);
-		$fileStorage = $this->instance->create('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE, 'deny_code' => 'FOO'))->getStorage();
+		$fileStorage = $this->instance->getCache('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE, 'deny_code' => 'FOO'))->getStorage();
 
 		$optinos = $fileStorage->getOptions();
 
@@ -98,7 +98,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::create
+	 * @covers Windwalker\Core\Cache\CacheFactory::getCache
 	 */
 	public function testCreateIfDebug()
 	{
@@ -108,7 +108,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$config['system.debug'] = true;
 		$config['cache.enabled'] = true;
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof NullStorage);
 
@@ -116,7 +116,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$config['system.debug'] = true;
 		$config['cache.enabled'] = false;
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof NullStorage);
 
@@ -126,7 +126,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 
 		$this->instance->ignoreGlobal(true);
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 	}
@@ -136,7 +136,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::create
+	 * @covers Windwalker\Core\Cache\CacheFactory::getCache
 	 */
 	public function testCreateIfNotEnabled()
 	{
@@ -146,7 +146,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$config['system.debug'] = false;
 		$config['cache.enabled'] = false;
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof NullStorage);
 
@@ -154,7 +154,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$config['system.debug'] = true;
 		$config['cache.enabled'] = false;
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof NullStorage);
 
@@ -164,7 +164,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 
 		$this->instance->ignoreGlobal(true);
 
-		$cache = $this->instance->create();
+		$cache = $this->instance->getCache();
 
 		$this->assertTrue($cache->getStorage() instanceof ArrayStorage);
 	}
@@ -174,7 +174,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::getCache
+	 * @covers Windwalker\Core\Cache\create::createCache
 	 * @TODO   Implement testGetCache().
 	 */
 	public function testGetCache()
@@ -206,7 +206,7 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Windwalker\Core\Cache\CacheFactory::setSerializer
+	 * @covers Windwalker\Core\Cache\CacheFactory::getSerializer
 	 * @TODO   Implement testGetDataHandler().
 	 */
 	public function testGetDataHandler()

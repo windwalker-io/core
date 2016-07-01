@@ -37,7 +37,7 @@ class TestApplication extends WebApplication
 	 *
 	 * @var  string
 	 */
-	protected $configPath = WINDWALKER_ETC . '/app';
+	protected $rootPath = WINDWALKER_ROOT;
 
 	/**
 	 * initialise
