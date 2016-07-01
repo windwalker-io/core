@@ -22,6 +22,7 @@ use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\View\AbstractView;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -470,7 +471,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			return $this;
 		}
 
-		$file = $this->getDir() . '/Resources/config/config.php';
+		$file = $this->getDir() . '/Resources/config/config.dist.php';
 
 		if (is_file($file))
 		{
@@ -504,13 +505,13 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$router->group($group, function (CoreRouter $router) use ($routing)
 		{
-			$router->addRouteFromFile($routing, $this);
-		});
+			$router->addRouteFromFiles($routing, $this);
 
-		if (is_file($this->getDir() . '/routing.yml'))
-		{
-			$router->addRouteFromFile($this->getDir() . '/routing.yml', $this);
-		}
+			if (is_file($this->getDir() . '/routing.yml'))
+			{
+				$router->addRouteFromFile($this->getDir() . '/routing.yml', $this);
+			}
+		});
 
 		return $router;
 	}
