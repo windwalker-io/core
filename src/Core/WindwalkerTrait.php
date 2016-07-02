@@ -333,7 +333,12 @@ trait WindwalkerTrait
 	 */
 	protected function loadMode()
 	{
-		$file = $this->rootPath . '/mode';
+		if (isset($_ENV['WINDWLAKER_MODE']))
+		{
+			return $_ENV['WINDWLAKER_MODE'];
+		}
+
+		$file = $this->rootPath . '/.mode';
 
 		if (!is_file($file))
 		{
