@@ -101,6 +101,7 @@ class CacheFactory implements ContainerAwareInterface
 	 * @param array  $options
 	 *
 	 * @return  Cache
+	 * @throws \UnexpectedValueException
 	 */
 	public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
@@ -165,11 +166,13 @@ class CacheFactory implements ContainerAwareInterface
 	/**
 	 * getStorage
 	 *
-	 * @param string   $storage
-	 * @param array    $options
-	 * @param string   $name
+	 * @param string $storage
+	 * @param array  $options
+	 * @param string $name
 	 *
 	 * @return CacheItemPoolInterface
+	 * @throws \UnexpectedValueException
+	 * @throws \DomainException
 	 */
 	public static function getStorage($storage, $options = array(), $name = 'windwalker')
 	{
@@ -208,7 +211,7 @@ class CacheFactory implements ContainerAwareInterface
 					$path = realpath($path);
 				}
 
-				$group = ($name == 'windwalker') ? null : $name;
+				$group = ($name === 'windwalker') ? null : $name;
 
 				return new $class($path, $group, $denyAccess, $options['cache_time'], $options);
 				break;
