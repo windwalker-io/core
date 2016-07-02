@@ -346,7 +346,7 @@ trait WindwalkerTrait
 		}
 
 		$mode = trim(file_get_contents($file));
-		$mode = $mode ? : 'prod';
+		$mode = $mode ? : 'dev';
 
 		return $mode;
 	}

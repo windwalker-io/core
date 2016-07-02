@@ -426,7 +426,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function getMode()
 	{
-		return $this->get('system.mode');
+		return $this->mode;
 	}
 
 	/**

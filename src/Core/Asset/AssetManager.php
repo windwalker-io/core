@@ -374,7 +374,7 @@ class AssetManager implements DispatcherAwareInterface
 	protected function addSysPath($assetUri)
 	{
 		$assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-		$base = trim($this->getOption('public_sys_path'), '/\\');
+		$base = rtrim($this->getOption('public_sys_path'), '/\\');
 
 		if (!$base)
 		{
