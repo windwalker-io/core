@@ -105,6 +105,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 * @param string $type
 	 *
 	 * @return  string
+	 * @throws \LogicException
 	 */
 	public function build($route, $queries = array(), $type = CoreRouter::TYPE_RAW)
 	{

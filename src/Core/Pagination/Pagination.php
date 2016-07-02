@@ -390,21 +390,21 @@ class Pagination
 			{
 				$queries = array_merge((array) $queries, (array) $query);
 
-				if ($this->getRouter())
+				$uri = new Uri(Ioc::getUriData()->full);
+
+				foreach ($queries as $k => $v)
 				{
-					$uri = new Uri(Ioc::get('uri')->full);
+					$uri->setVar($k, $v);
+				}
 
-					foreach ($queries as $k => $v)
-					{
-						$uri->setVar($k, $v);
-					}
-
+				if (!$this->getRouter())
+				{
 					return $uri->toString(['path', 'query', 'fragment']);
 				}
 
 				$route = Ioc::getConfig()->get('route.matched');
 
-				return $this->getRouter()->route($route, $queries, $type);
+				return $this->getRouter()->route($route, $uri->getQuery(true), $type);
 			};
 		}
 
@@ -438,11 +438,6 @@ class Pagination
 	 */
 	public function getRouter()
 	{
-		if (!$this->router)
-		{
-			return Ioc::getRouter();
-		}
-
 		return $this->router;
 	}
 
