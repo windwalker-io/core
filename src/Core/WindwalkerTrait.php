@@ -90,9 +90,9 @@ trait WindwalkerTrait
 
 		$this->bootTraits($this);
 
-		$this->loadConfiguration($this->config);
+		$this->mode = $this->loadMode();
 
-		$this->mode = $this->config->get('system.mode', 'prod');
+		$this->loadConfiguration($this->config);
 
 		$this->registerProviders();
 
@@ -324,5 +324,25 @@ trait WindwalkerTrait
 	public function isWeb()
 	{
 		return $this instanceof WebApplication;
+	}
+
+	/**
+	 * loadMode
+	 *
+	 * @return  string
+	 */
+	protected function loadMode()
+	{
+		$file = $this->rootPath . '/mode';
+
+		if (!is_file($file))
+		{
+			return 'dev';
+		}
+
+		$mode = trim(file_get_contents($file));
+		$mode = $mode ? : 'prod';
+
+		return $mode;
 	}
 }
