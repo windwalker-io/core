@@ -15,6 +15,8 @@ use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Folder;
 
 /**
  * The InstallCommand class.
@@ -88,6 +90,8 @@ class InstallCommand extends Command
 
 			$this->installConfig($package);
 			$this->installRouting($package);
+			$this->copyMigration($package);
+			$this->copySeeders($package);
 			$this->syncAssets($package);
 		}
 
@@ -110,7 +114,7 @@ class InstallCommand extends Command
 		$file = $dir . '/config.dist.php';
 		$target = $targetFolder . '/' . $package->name . '.php';
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <info>etc/package/" . $package->name . '.php</info> [Y/n]: ', true))
+		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <comment>etc/package/" . $package->name . '.php</comment> [Y/n]: ', true))
 		{
 			if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ', false))
 			{
@@ -130,7 +134,7 @@ class InstallCommand extends Command
 		$file = $dir . '/secret.dist.yml';
 		$target = $this->console->get('path.etc') . '/secret.yml';
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <info>etc/secret.yml</info> [Y/n]: ", true))
+		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <comment>etc/secret.yml</comment> [Y/n]: ", true))
 		{
 			$secret = ltrim(file_get_contents($target));
 			$new = file_get_contents($file);
@@ -198,5 +202,106 @@ ROUTE;
 		{
 			$this->err($e->getMessage());
 		}
+	}
+
+	/**
+	 * copyMigration
+	 *
+	 * @param AbstractPackage $package
+	 *
+	 * @return  void
+	 */
+	protected function copyMigration(AbstractPackage $package)
+	{
+		$dir = $package->getDir() . '/Migration';
+
+		// Config
+		$targetFolder = $this->console->get('path.resources') . '/migrations';
+
+		$relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
+
+		if (!is_dir($dir))
+		{
+			return;
+		}
+
+		if (!(new BooleanPrompter)->ask('Do your want to copy migrations to <comment>' . $relativePath . '</comment>? [Y/n]: ', true))
+		{
+			return;
+		}
+
+		$files = Folder::files($dir, true, Folder::PATH_RELATIVE);
+
+		/** @var \SplFileInfo $file */
+		foreach ($files as $file)
+		{
+			$dest = new \SplFileInfo($targetFolder . '/' . $file);
+
+			if (is_file($dest->getPathname()))
+			{
+				$this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
+
+				continue;
+			}
+
+			File::copy($dir . '/' . $file, $dest);
+
+			$this->out(sprintf('  [<info>Copied</info>] ' . $file));
+		}
+
+		$this->out()->out('  Copy migrations completed.');
+	}
+
+	/**
+	 * copySeeders
+	 *
+	 * @param   AbstractPackage  $package
+	 *
+	 * @return  void
+	 */
+	protected function copySeeders(AbstractPackage $package)
+	{
+		$dir = $package->getDir() . '/Seed';
+
+		// Config
+		$targetFolder = $this->console->get('path.resources') . '/seeders';
+
+		$relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
+
+		if (!is_dir($dir))
+		{
+			return;
+		}
+
+		if (!(new BooleanPrompter)->ask('Do your want to copy seeders to <comment>' . $relativePath . '</comment>? [Y/n]: ', true))
+		{
+			return;
+		}
+
+		$files = Folder::files($dir, true, Folder::PATH_RELATIVE);
+
+		/** @var \SplFileInfo $file */
+		foreach ($files as $file)
+		{
+			if ($file == 'MainSeeder.php')
+			{
+				continue;
+			}
+
+			$dest = new \SplFileInfo($targetFolder . '/' . $file);
+
+			if (is_file($dest->getPathname()))
+			{
+				$this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
+
+				continue;
+			}
+
+			File::copy($dir . '/' . $file, $dest);
+
+			$this->out(sprintf('  [<info>Copied</info>] ' . $file));
+		}
+
+		$this->out()->out('  Copy seeders completed.');
 	}
 }
