@@ -22,7 +22,7 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Language\Language;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Session\Session;
 
 /**
@@ -30,7 +30,7 @@ use Windwalker\Session\Session;
  *
  * @property-read  Container                     container
  * @property-read  Core\Logger\LoggerManager     logger
- * @property-read  Registry                      config
+ * @property-read  Structure                     config
  * @property-read  Core\Event\EventDispatcher    dispatcher
  * @property-read  AbstractDatabaseDriver        database
  * @property-read  Core\Router\CoreRouter        router
@@ -79,7 +79,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	/**
 	 * Property config.
 	 *
-	 * @var Registry
+	 * @var Structure
 	 */
 	protected $config;
 
@@ -93,12 +93,12 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	/**
 	 * Class init.
 	 *
-	 * @param   IOInterface  $io         The Input and output handler.
-	 * @param   Registry     $config     Application's config object.
+	 * @param   IOInterface $io     The Input and output handler.
+	 * @param   Structure   $config Application's config object.
 	 */
 	public function __construct(IOInterface $io = null, $config = null)
 	{
-		$this->config = $config instanceof Registry ? $config : new Registry($config);
+		$this->config = $config instanceof Structure ? $config : new Structure($config);
 		$this->name   = $this->config->get('name', $this->name);
 
 		Core\Ioc::setProfile($this->name);

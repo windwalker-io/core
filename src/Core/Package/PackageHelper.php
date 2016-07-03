@@ -15,7 +15,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
 use Windwalker\Ioc;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The PackageHelper class.
@@ -32,7 +32,7 @@ use Windwalker\Registry\Registry;
  * @method  static  PackageResolver         removePackage($name)
  * @method  static  AbstractPackage[]       getPackages()
  * @method  static  boolean                 exists($package)
- * @method  static  Registry                getConfig($package)
+ * @method  static  Structure                getConfig($package)
  *
  * @since  2.0
  */

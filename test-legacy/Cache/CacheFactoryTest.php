@@ -15,7 +15,7 @@ use Windwalker\Cache\Storage\NullStorage;
 use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\Core\Ioc;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * Test class of CacheFactory

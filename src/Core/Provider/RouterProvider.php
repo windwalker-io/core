@@ -34,7 +34,7 @@ class RouterProvider implements ServiceProviderInterface
 
 		$closure = function(Container $container) use ($self)
 		{
-			/** @var \Windwalker\Registry\Registry $config */
+			/** @var \Windwalker\Structure\Structure $config */
 			$config = $container->get('config');
 
 			$matcher = $config->get('routing.matcher', 'default');

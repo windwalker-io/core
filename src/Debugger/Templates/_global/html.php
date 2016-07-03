@@ -8,10 +8,10 @@
 
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Registry\Registry;use Windwalker\Uri\UriData;
+use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 
 /**
- * @var Registry        $uri
+ * @var Structure       $uri
  * @var AbstractPackage $package
  * @var PackageRouter   $router
  * @var UriData         $uri

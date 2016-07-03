@@ -34,14 +34,14 @@ use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Middleware\Chain\ChainBuilder;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The Controller class.
  *
- * @property-read  Registry       $config  Config object.
+ * @property-read  Structure      $config  Config object.
  * @property-read  WebApplication $app     The application object.
  * @property-read  Input          $input   The input object.
  * @property-read  PackageRouter  $router  Router of this package.
@@ -90,7 +90,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Config object.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected $config;
 
@@ -934,13 +934,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig()
 	{
-		if (!$this->config || !$this->config instanceof Registry)
+		if (!$this->config || !$this->config instanceof Structure)
 		{
-			$this->config = new Registry($this->config);
+			$this->config = new Structure($this->config);
 		}
 
 		return $this->config;
@@ -949,11 +949,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setConfig(Registry $config)
+	public function setConfig(Structure $config)
 	{
 		$this->config = $config;
 

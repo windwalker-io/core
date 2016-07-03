@@ -15,7 +15,7 @@ use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\Test\Mvc\View\Stub\StubHtmlView;
 use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Filesystem\Path;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The ControllerViewTest class.
@@ -72,7 +72,7 @@ class ViewModelTest extends AbstractBaseTestCase
 		$view = new PhpHtmlView;
 
 		$model = new StubModel;
-		$model->setConfig(new Registry(array('name' => 'foo')));
+		$model->setConfig(new Structure(array('name' => 'foo')));
 		$view->setModel($model);
 
 		$this->assertTrue($view->getModel() instanceof StubModel);

@@ -20,7 +20,7 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
@@ -439,7 +439,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 */
 	public static function loadRoutingFiles(array $files)
 	{
-		$routing = new Registry;
+		$routing = new Structure;
 
 		foreach ($files as $file)
 		{

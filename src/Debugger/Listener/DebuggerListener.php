@@ -22,7 +22,7 @@ use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
 use Windwalker\Profiler\Profiler;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The DebuggerListener class.
@@ -244,10 +244,10 @@ class DebuggerListener
 	/**
 	 * pushDebugConsole
 	 *
-	 * @param Registry  $collector
+	 * @param Structure $collector
 	 * @param Profiler  $profiler
 	 */
-	protected function pushDebugConsole(Registry $collector, Profiler $profiler)
+	protected function pushDebugConsole(Structure $collector, Profiler $profiler)
 	{
 		if (!$this->package->config->get('console.enabled', 1))
 		{

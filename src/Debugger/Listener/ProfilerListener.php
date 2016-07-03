@@ -21,7 +21,7 @@ use Windwalker\DI\Container;
 use Windwalker\Event\Event;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Profiler\Profiler;
-use Windwalker\Registry\RegistryHelper;
+use Windwalker\Structure\StructureHelper;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
@@ -88,7 +88,7 @@ class ProfilerListener
 		$collector['controller.task'] = $container->get('current.package')->getTask();
 		$collector['routing.matcher'] = get_class($router->getMatcher());
 		$collector['routing.matched'] = iterator_to_array($container->get('current.route'));
-		$collector['routing.routes']  = RegistryHelper::dumpObjectValues($router->getRoutes());
+		$collector['routing.routes']  = StructureHelper::dumpObjectValues($router->getRoutes());
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'

@@ -184,7 +184,7 @@ abstract class Ioc
 	/**
 	 * getConfig
 	 *
-	 * @return  \Windwalker\Registry\Registry
+	 * @return  \Windwalker\Structure\Structure
 	 */
 	public static function getConfig()
 	{

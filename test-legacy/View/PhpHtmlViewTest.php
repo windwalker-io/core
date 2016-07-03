@@ -20,7 +20,7 @@ use Windwalker\Core\View\PhpHtmlView;
 use Windwalker\Core\View\ViewModel;
 use Windwalker\Data\Data;
 use Windwalker\Core\Ioc;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Router\Route;
 use Windwalker\Test\TestHelper;
 use Windwalker\Utilities\Queue\PriorityQueue;
@@ -102,7 +102,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	{
 		Ioc::get('package.resolver')->addPackage('mvc', new MvcPackage);
 
-		$config = new Registry(
+		$config = new Structure(
 			array(
 				'name' => 'stub',
 				'package' => array(
@@ -127,7 +127,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	{
 		$this->assertEquals('default', $this->instance->getName());
 
-		$config = new Registry(
+		$config = new Structure(
 			array(
 				'name' => 'foo'
 			)
@@ -170,7 +170,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testGetAndSetConfig()
 	{
-		$config = new Registry(
+		$config = new Structure(
 			array(
 				'name' => 'sakura',
 				'package' => array(
@@ -198,7 +198,7 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function test__get()
 	{
-		$this->assertTrue($this->instance->config instanceof Registry);
+		$this->assertTrue($this->instance->config instanceof Structure);
 
 		$this->assertNull($this->instance->flower);
 	}

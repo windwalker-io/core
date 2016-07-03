@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The AbstractConfigServiceProvider class.
@@ -21,7 +21,7 @@ abstract class AbstractConfigServiceProvider implements ServiceProviderInterface
 	/**
 	 * Property config.
 	 *
-	 * @var \Windwalker\Registry\Registry
+	 * @var \Windwalker\Structure\Structure
 	 */
 	protected $config;
 
@@ -30,8 +30,8 @@ abstract class AbstractConfigServiceProvider implements ServiceProviderInterface
 	 *
 	 * @param $config
 	 */
-	public function __construct(Registry $config = null)
+	public function __construct(Structure $config = null)
 	{
-		$this->config = $config ? : new Registry;
+		$this->config = $config ? : new Structure;
 	}
 }

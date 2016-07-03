@@ -16,14 +16,14 @@ use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
 
 /**
  * The AbstractView class.
  *
  * @property-read  ViewModel|mixed $model   The ViewModel object.
- * @property-read  Registry        $config  Config object.
+ * @property-read  Structure       $config  Config object.
  * @property-read  PackageRouter   $router  Router object.
  *
  * @since  2.1.5.3
@@ -61,7 +61,7 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * Property config.
 	 *
-	 * @var Registry
+	 * @var Structure
 	 */
 	protected $config;
 
@@ -87,7 +87,7 @@ abstract class AbstractView implements \ArrayAccess
 	 */
 	public function __construct($data = null, $config = null)
 	{
-		$this->config = $config instanceof Registry ? $config : new Registry($config);
+		$this->config = $config instanceof Structure ? $config : new Structure($config);
 		$this->model  = new ViewModel;
 
 		$this->setData($data);
@@ -466,13 +466,13 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig()
 	{
 		if (!$this->config)
 		{
-			$this->config = new Registry;
+			$this->config = new Structure;
 		}
 
 		return $this->config;
@@ -481,13 +481,13 @@ abstract class AbstractView implements \ArrayAccess
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setConfig($config)
 	{
-		$this->config = $config instanceof Registry ? $config : new Registry($config);
+		$this->config = $config instanceof Structure ? $config : new Structure($config);
 
 		$this->name = $this->config['name'];
 		$this->package = $this->getPackage();
@@ -500,7 +500,7 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param string $name
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function __get($name)
 	{

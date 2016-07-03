@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -273,7 +273,7 @@ class PackageResolver implements ContainerAwareInterface
 	 *
 	 * @param  string  $package
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig($package)
 	{

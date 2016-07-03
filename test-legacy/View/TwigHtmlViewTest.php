@@ -17,7 +17,7 @@ use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
 use Windwalker\Core\View\TwigHtmlView;
 use Windwalker\DI\Container;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Renderer\TwigRenderer;
 use Windwalker\Test\TestHelper;
 

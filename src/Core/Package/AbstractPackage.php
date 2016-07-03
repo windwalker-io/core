@@ -32,13 +32,13 @@ use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The AbstractPackage class.
  *
- * @property-read  Registry                   $config
+ * @property-read  Structure                  $config
  * @property-read  PackageRouter              $router
  * @property-read  PsrInput                   $input
  * @property-read  WebApplication|CoreConsole $app
@@ -82,7 +82,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Property config.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected $config;
 
@@ -454,11 +454,11 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * loadConfiguration
 	 *
-	 * @param   Registry  $config
+	 * @param   Structure $config
 	 *
 	 * @return  static
 	 */
-	public function loadConfig(Registry $config)
+	public function loadConfig(Structure $config)
 	{
 		$cache = CacheFactory::create('config', 'php_file', 'php_file', ['group' => 'config']);
 
@@ -718,7 +718,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 *
 	 * @since   2.1
 	 */
@@ -726,7 +726,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		if (!$this->config)
 		{
-			$this->config = new Registry;
+			$this->config = new Structure;
 
 			$this->loadConfig($this->config);
 		}
@@ -737,7 +737,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 *

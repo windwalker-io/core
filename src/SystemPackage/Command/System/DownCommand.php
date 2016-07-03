@@ -10,7 +10,7 @@ namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Filesystem\File;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The UpCommand class.
@@ -63,7 +63,7 @@ class DownCommand extends CoreCommand
 			throw new \RuntimeException('File: etc/secret.yml not exists.');
 		}
 
-		$registry = (new Registry)->loadFile($file, 'yaml');
+		$registry = (new Structure)->loadFile($file, 'yaml');
 		$registry->set('system.offline', $this->offline);
 
 		if (!File::write($file, $registry->toString('yaml', ['inline' => 4])))

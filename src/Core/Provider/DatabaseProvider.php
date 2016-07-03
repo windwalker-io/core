@@ -14,7 +14,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DataMapper\DatabaseContainer;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * Class WhoopsProvider
@@ -34,7 +34,7 @@ class DatabaseProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			/** @var Registry $config */
+			/** @var Structure $config */
 			$config = $container->get('config');
 
 			$option = array(
@@ -59,7 +59,7 @@ class DatabaseProvider implements ServiceProviderInterface
 		// For Exporter
 		$closure = function(Container $container)
 		{
-			/** @var Registry $config */
+			/** @var Structure $config */
 			$config = $container->get('config');
 
 			$driver = $config->get('database.driver', 'mysql');
@@ -80,7 +80,7 @@ class DatabaseProvider implements ServiceProviderInterface
 	 */
 	public static function strictMode(Container $container, $mode = null)
 	{
-		/** @var Registry $config */
+		/** @var Structure $config */
 		$config = $container->get('config');
 
 		if ($config->get('database.driver') == 'mysql')

@@ -20,7 +20,7 @@ use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
 use Windwalker\Event\ListenerPriority;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The main Windwalker instantiate class.
@@ -63,7 +63,7 @@ trait WindwalkerTrait
 	/**
 	 * getConfig
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig()
 	{
@@ -120,12 +120,12 @@ trait WindwalkerTrait
 	/**
 	 * loadConfiguration
 	 *
-	 * @param Registry $config
-	 * @param string   $name
+	 * @param Structure $config
+	 * @param string    $name
 	 *
 	 * @return  void
 	 */
-	protected function loadConfiguration(Registry $config, $name = null)
+	protected function loadConfiguration(Structure $config, $name = null)
 	{
 		$name = $name ? : $this->getName();
 
