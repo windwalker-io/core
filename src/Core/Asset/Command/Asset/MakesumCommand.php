@@ -48,7 +48,7 @@ class MakesumCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$cachePath = $this->getOption('cache_path');
+		$cachePath = $this->getOption('cache_path', WINDWALKER_CACHE);
 
 		Folder::create($cachePath . '/asset');
 
