@@ -21,7 +21,7 @@ use Windwalker\Renderer\AbstractRenderer;
  *
  * @since  {DEPLOY_VERSION}
  */
-class HtmlView extends AbstractView
+class HtmlView extends AbstractView implements LayoutRenderableInterface
 {
 	use LayoutRenderableTrait;
 

@@ -44,7 +44,7 @@ abstract class DebuggerHelper extends AbstractFacade
 		{
 			$collector = static::getInstance();
 		}
-		catch (\UnexpectedValueException $e)
+		catch (\OutOfRangeException $e)
 		{
 			return;
 		}

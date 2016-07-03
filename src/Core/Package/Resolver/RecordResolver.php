@@ -35,7 +35,7 @@ class RecordResolver extends AbstractPackageObjectResolver
 	{
 		if (!is_subclass_of($class, Record::class))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of ' . Record::class, $class));
+			throw new \InvalidArgumentException(sprintf('Class: %s is not sub class of ' . Record::class, $class));
 		}
 
 		// TODO: Make Record support set DB after construct.

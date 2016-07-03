@@ -284,8 +284,6 @@ class PackageResolver implements ContainerAwareInterface
 	 * Get the DI container.
 	 *
 	 * @return  Container
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
 	 */
 	public function getContainer()
 	{

@@ -240,8 +240,10 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 * @param string $method
 	 * @param array  $options
 	 *
-	 * @throws  \UnexpectedValueException
 	 * @return  Route
+	 * 
+	 * @throws \Windwalker\Router\Exception\RouteNotFoundException
+	 * @throws \LogicException
 	 */
 	public function match($rawRoute, $method = 'GET', $options = array())
 	{
@@ -268,7 +270,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
 		if (!$controller)
 		{
-			throw new \UnexpectedValueException('Route profile should have "controller" element, the matched route: ' . $route->getName());
+			throw new \LogicException('Route profile should have "controller" element, the matched route: ' . $route->getName());
 		}
 
 		// Suffix
@@ -322,7 +324,7 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 * @param string $method
 	 * @param array  $customSuffix
 	 *
-	 * @throws \RuntimeException
+	 * @throws RouteNotFoundException
 	 * @return  string
 	 *
 	 * @since   2.0

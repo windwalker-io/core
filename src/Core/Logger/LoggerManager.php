@@ -438,8 +438,6 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, Con
 	 * Get the DI container.
 	 *
 	 * @return  Container
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
 	 */
 	public function getContainer()
 	{

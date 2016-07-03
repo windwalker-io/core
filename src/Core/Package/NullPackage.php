@@ -106,8 +106,6 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	 * @return  Container
 	 *
 	 * @since   2.0
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
 	 */
 	public function getContainer()
 	{

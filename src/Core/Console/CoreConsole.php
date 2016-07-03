@@ -376,6 +376,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 * @param   $name  string
 	 *
 	 * @return  mixed
+	 * @throws \OutOfRangeException
 	 */
 	public function __get($name)
 	{
@@ -402,6 +403,6 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 			return $this->$name;
 		}
 
-		throw new \UnexpectedValueException(sprintf('property "%s" not found in %s', $name, get_called_class()));
+		throw new \OutOfRangeException(sprintf('property "%s" not found in %s', $name, get_called_class()));
 	}
 }

@@ -109,9 +109,11 @@ class CsrfGuard implements ContainerAwareInterface
 	/**
 	 * Get form token string.
 	 *
-	 * @param   boolean  $forceNew  Force create new token.
+	 * @param   boolean $forceNew Force create new token.
 	 *
 	 * @return  string
+	 * @throws \OutOfRangeException
+	 * @throws \RuntimeException
 	 */
 	public function getToken($forceNew = false)
 	{
@@ -138,6 +140,8 @@ class CsrfGuard implements ContainerAwareInterface
 	 * @param   boolean $forceNew Force create new token.
 	 *
 	 * @return string
+	 * @throws \RuntimeException
+	 * @throws \OutOfRangeException
 	 */
 	public function getFormToken($userId = null, $forceNew = false)
 	{
@@ -150,16 +154,18 @@ class CsrfGuard implements ContainerAwareInterface
 
 		$config = $this->container->get('config');
 
-		return md5($config['system.secret'] . $userId . static::getToken($forceNew));
+		return md5($config['system.secret'] . $userId . $this->getToken($forceNew));
 	}
 
 	/**
 	 * checkToken
 	 *
-	 * @param  mixed   $userId
-	 * @param  string  $method
+	 * @param  mixed  $userId
+	 * @param  string $method
 	 *
 	 * @return  boolean
+	 * @throws \RuntimeException
+	 * @throws \OutOfRangeException
 	 */
 	public function checkToken($userId = null, $method = null)
 	{
@@ -184,8 +190,6 @@ class CsrfGuard implements ContainerAwareInterface
 	 * Get the DI container.
 	 *
 	 * @return  Container
-	 *
-	 * @throws  \UnexpectedValueException May be thrown if the container has not been set.
 	 */
 	public function getContainer()
 	{

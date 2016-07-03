@@ -24,12 +24,13 @@ class FieldDefinitionResolver extends AbstractPackageObjectResolver
 	 * @param  array  $args
 	 *
 	 * @return FieldDefinitionInterface
+	 * @throws \InvalidArgumentException
 	 */
 	protected static function createObject($class, ...$args)
 	{
 		if (!is_subclass_of($class, 'Windwalker\Form\FieldDefinitionInterface'))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of Windwalker\Form\FieldDefinitionInterface', $class));
+			throw new \InvalidArgumentException(sprintf('Class: %s is not sub class of Windwalker\Form\FieldDefinitionInterface', $class));
 		}
 
 		return new $class(...$args);

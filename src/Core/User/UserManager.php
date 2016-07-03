@@ -236,6 +236,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 * @param array $conditions
 	 *
 	 * @return  UserDataInterface
+	 * @throws \LogicException
 	 */
 	public function getUser($conditions = array())
 	{
@@ -243,7 +244,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 
 		if (!$user instanceof UserDataInterface)
 		{
-			throw new \UnexpectedValueException('User data should be instance of ' . UserDataInterface::class);
+			throw new \LogicException('User data should be instance of ' . UserDataInterface::class);
 		}
 
 		return $user;

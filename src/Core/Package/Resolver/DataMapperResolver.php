@@ -29,12 +29,13 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 * @param  array  $args
 	 *
 	 * @return DataMapper
+	 * @throws \InvalidArgumentException
 	 */
 	protected static function createObject($class, ...$args)
 	{
 		if (!is_subclass_of($class, DataMapper::class) && !is_subclass_of($class, CoreDataMapper::class))
 		{
-			throw new \UnexpectedValueException(sprintf('Class: %s is not sub class of ' . DataMapper::class, $class));
+			throw new \InvalidArgumentException(sprintf('Class: %s is not sub class of ' . DataMapper::class, $class));
 		}
 
 		return new $class(...$args);

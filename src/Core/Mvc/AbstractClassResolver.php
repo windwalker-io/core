@@ -68,8 +68,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 * @param   string $name
 	 *
 	 * @return  string
-	 *
-	 * @throws \UnexpectedValueException
+	 * @throws \DomainException
 	 */
 	public function resolve($name)
 	{
@@ -92,7 +91,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 			{
 				if ($this->baseClass && !is_subclass_of($class, $this->baseClass))
 				{
-					throw new \UnexpectedValueException(sprintf(
+					throw new \DomainException(sprintf(
 						'Class: "%s" should be sub class of %s',
 						$this->baseClass,
 						$class
@@ -103,7 +102,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 			}
 		}
 
-		throw new \UnexpectedValueException(sprintf(
+		throw new \DomainException(sprintf(
 			'Can not find any classes with name: "%s" in package: "%s", namespaces: ( %s ).',
 			$name,
 			$this->package->getName(),
@@ -118,8 +117,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 * @param array  ...$args
 	 *
 	 * @return  object
-	 *
-	 * @throws \UnexpectedValueException
+	 * @throws \DomainException
 	 */
 	public function create($name, ...$args)
 	{
