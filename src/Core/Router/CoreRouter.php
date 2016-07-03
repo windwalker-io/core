@@ -443,6 +443,11 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
 		foreach ($files as $file)
 		{
+			if (!in_array(pathinfo($file, PATHINFO_EXTENSION), ['json', 'yml', 'yaml', 'php']))
+			{
+				continue;
+			}
+
 			$routing = $routing->loadFile($file, pathinfo($file, PATHINFO_EXTENSION));
 		}
 
