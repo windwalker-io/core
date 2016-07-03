@@ -101,7 +101,7 @@ class CacheFactory implements ContainerAwareInterface
 	 * @param array  $options
 	 *
 	 * @return  Cache
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 */
 	public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
@@ -171,7 +171,7 @@ class CacheFactory implements ContainerAwareInterface
 	 * @param string $name
 	 *
 	 * @return CacheItemPoolInterface
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 * @throws \DomainException
 	 */
 	public static function getStorage($storage, $options = array(), $name = 'windwalker')

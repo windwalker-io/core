@@ -462,7 +462,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param bool   $forceNew The Force create new instance.
 	 *
 	 * @return AbstractView|HtmlView
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 *
 	 * @throws \DomainException
 	 */
@@ -527,7 +527,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param bool   $forceNew
 	 *
 	 * @return ModelRepository
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 * @throws \DomainException
 	 */
 	public function getModel($name = null, $source = null, $forceNew = false)
@@ -845,7 +845,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * getApplication
 	 *
 	 * @return  WebApplication
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 */
 	public function getApplication()
 	{
@@ -977,7 +977,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param   array                 $args  The arguments to set in event.
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 *
 	 * @since   2.0
 	 */

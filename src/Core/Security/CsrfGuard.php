@@ -112,7 +112,7 @@ class CsrfGuard implements ContainerAwareInterface
 	 * @param   boolean $forceNew Force create new token.
 	 *
 	 * @return  string
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 * @throws \RuntimeException
 	 */
 	public function getToken($forceNew = false)
@@ -141,7 +141,7 @@ class CsrfGuard implements ContainerAwareInterface
 	 *
 	 * @return string
 	 * @throws \RuntimeException
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 */
 	public function getFormToken($userId = null, $forceNew = false)
 	{
@@ -165,7 +165,7 @@ class CsrfGuard implements ContainerAwareInterface
 	 *
 	 * @return  boolean
 	 * @throws \RuntimeException
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 */
 	public function checkToken($userId = null, $method = null)
 	{

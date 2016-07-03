@@ -45,7 +45,7 @@ abstract class AbstractFacade
 	 * @param bool $forceNew
 	 *
 	 * @return mixed
-	 * @throws \OutOfRangeException
+	 * @throws \UnexpectedValueException
 	 */
 	public static function getInstance($forceNew = false)
 	{
