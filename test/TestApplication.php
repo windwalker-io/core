@@ -16,7 +16,7 @@ use Windwalker\Core\Test\Mock\MockSessionProvider;
 use Windwalker\Core\Test\TestWindwalker as Windwalker;
 use Windwalker\Database\Test\TestDsnResolver;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The TestApplication class.

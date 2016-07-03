@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The StructureView class.
@@ -26,7 +26,7 @@ class StructureView extends AbstractView implements \JsonSerializable
 	/**
 	 * Property data.
 	 *
-	 * @var  array|Registry
+	 * @var  array|Structure
 	 */
 	protected $data = [];
 
@@ -48,13 +48,13 @@ class StructureView extends AbstractView implements \JsonSerializable
 		parent::__construct($data, $config);
 
 		// Init registry object.
-		$this->data = new Registry($data);
+		$this->data = new Structure($data);
 	}
 
 	/**
 	 * prepareData
 	 *
-	 * @param Registry $registry
+	 * @param Structure $registry
 	 *
 	 * @return  void
 	 */
@@ -65,13 +65,13 @@ class StructureView extends AbstractView implements \JsonSerializable
 	/**
 	 * doRender
 	 *
-	 * @param  Registry $registry
+	 * @param  Structure $registry
 	 *
 	 * @return string
 	 */
 	protected function doRender($registry)
 	{
-		if ($registry instanceof Registry)
+		if ($registry instanceof Structure)
 		{
 			return $registry->toString($this->format, (array) $this->config->get('options', []));
 		}
@@ -80,13 +80,13 @@ class StructureView extends AbstractView implements \JsonSerializable
 	/**
 	 * getData
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getData()
 	{
 		if (!$this->data)
 		{
-			$this->data = new Registry;
+			$this->data = new Structure;
 		}
 
 		return $this->data;
@@ -95,13 +95,13 @@ class StructureView extends AbstractView implements \JsonSerializable
 	/**
 	 * setData
 	 *
-	 * @param   array|Registry  $data
+	 * @param   array|Structure $data
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setData($data)
 	{
-		$this->data = $data instanceof Registry ? $data : new Registry($data);
+		$this->data = $data instanceof Structure ? $data : new Structure($data);
 
 		return $this;
 	}

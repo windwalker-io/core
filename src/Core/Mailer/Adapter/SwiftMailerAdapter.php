@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Mailer\Adapter;
 
 use Windwalker\Core\Mailer\MailMessage;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The SwiftMailerAdapter class.
@@ -130,7 +130,7 @@ class SwiftMailerAdapter implements MailerAdapterInterface
 	 */
 	public static function createTransport($transport, array $config)
 	{
-		$config = new Registry($config);
+		$config = new Structure($config);
 
 		switch ($transport)
 		{

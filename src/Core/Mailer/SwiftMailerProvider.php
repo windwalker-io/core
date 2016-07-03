@@ -11,7 +11,7 @@ namespace Windwalker\Core\Mailer;
 use Windwalker\Core\Mailer\Adapter\SwiftMailerAdapter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The MailerProvider class.
@@ -31,7 +31,7 @@ class SwiftMailerProvider implements ServiceProviderInterface
 	{
 		$container->share(\Swift_Mailer::class, function (Container $container)
 		{
-			/** @var Registry $config */
+			/** @var Structure $config */
 			$config = $container->get('config');
 
 			$transport = SwiftMailerAdapter::createTransport($config->get('mail.transport'), (array) $config->get('mail'));

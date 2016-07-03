@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Helper;
 
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -21,21 +21,21 @@ class ComposerInformation
 	/**
 	 * Property cache.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected static $lock;
 
 	/**
 	 * Property json.
 	 *
-	 * @var Registry
+	 * @var Structure
 	 */
 	protected static $json;
 
 	/**
 	 * getLock
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public static function getLock()
 	{
@@ -56,7 +56,7 @@ class ComposerInformation
 				$data = '{}';
 			}
 
-			static::$lock = new Registry($data);
+			static::$lock = new Structure($data);
 		}
 
 		return static::$lock;
@@ -65,7 +65,7 @@ class ComposerInformation
 	/**
 	 * getJson
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public static function getJson()
 	{
@@ -73,7 +73,7 @@ class ComposerInformation
 		{
 			$file = WINDWALKER_ROOT . '/composer.json';
 
-			static::$json = new Registry(is_file($file) ? file_get_contents($file) : null);
+			static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
 		}
 
 		return static::$json;

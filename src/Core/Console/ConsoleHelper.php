@@ -15,7 +15,7 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Http\Output\NoHeaderOutput;
 use Windwalker\Http\Request\ServerRequestFactory;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The ConsoleHelper class.
@@ -36,7 +36,7 @@ class ConsoleHelper
 	{
 		$console = $console ? : Ioc::getApplication();
 
-		return (array) (new Registry)
+		return (array) (new Structure)
 			->loadFile($console->get('path.etc') . '/app/console.php', 'php')
 			->loadFile($console->get('path.etc') . '/app/' . $env . '.php', 'php')
 			->get('packages');

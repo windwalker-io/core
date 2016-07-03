@@ -32,7 +32,7 @@ class SessionProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			/** @var \Windwalker\Registry\Registry $config */
+			/** @var \Windwalker\Structure\Structure $config */
 			$config = $container->get('config');
 			$uri = $container->get('uri');
 

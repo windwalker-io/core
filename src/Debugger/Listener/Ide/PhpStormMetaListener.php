@@ -13,7 +13,7 @@ use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path\PathCollection;
 use Windwalker\Filesystem\Path\PathLocator;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\StringHelper;
 
 /**
@@ -45,7 +45,7 @@ TMPL;
 	 */
 	public function onAfterInitialise(Event $event)
 	{
-		$config = new Registry;
+		$config = new Structure;
 
 		$files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
 

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The CacheProvider class.
@@ -40,7 +40,7 @@ class CacheProvider implements ServiceProviderInterface
 		// Get global cache object.
 		$container->share('cache', function(Container $container)
 		{
-			/** @var Registry $config */
+			/** @var Structure $config */
 			$config = $container->get('config');
 
 			$storage = $config->get('cache.storage', 'file');

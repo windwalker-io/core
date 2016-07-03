@@ -12,7 +12,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
 use Windwalker\Language\Language;
 use Windwalker\Language\LanguageNormalize;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The CoreLanguage class.
@@ -24,7 +24,7 @@ class CoreLanguage extends Language
 	/**
 	 * Property config.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected $config;
 	/**
@@ -37,10 +37,10 @@ class CoreLanguage extends Language
 	/**
 	 * CoreLanguage constructor.
 	 *
-	 * @param Registry  $config
+	 * @param Structure $config
 	 * @param Container $container
 	 */
-	public function __construct(Registry $config, Container $container)
+	public function __construct(Structure $config, Container $container)
 	{
 		$this->config = $config;
 		$this->container = $container;

@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Windwalker;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The TestWindwalker class.
@@ -23,11 +23,11 @@ class TestWindwalker extends Windwalker
 	 *
 	 * Write your custom path to $config['path.xxx'].
 	 *
-	 * @param   Registry  $config  The config registry object.
+	 * @param   Structure $config The config registry object.
 	 *
 	 * @return  void
 	 */
-	public static function prepareSystemPath(Registry $config)
+	public static function prepareSystemPath(Structure $config)
 	{
 		$config['path.root']       = WINDWALKER_ROOT;
 		$config['path.bin']        = WINDWALKER_BIN;

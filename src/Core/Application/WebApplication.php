@@ -26,7 +26,7 @@ use Windwalker\Language\Language;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Middleware\Psr7InvokableInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Queue\PriorityQueue;
@@ -88,16 +88,16 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * Class constructor.
 	 *
 	 * @param   Request        $request       An optional argument to provide dependency injection for the Http request object.
-	 * @param   Registry       $config        An optional argument to provide dependency injection for the application's
+	 * @param   Structure      $config        An optional argument to provide dependency injection for the application's
 	 *                                        config object.
 	 * @param   WebEnvironment $environment   An optional argument to provide dependency injection for the application's
 	 *                                        environment object.
 	 *
 	 * @since   2.0
 	 */
-	public function __construct(Request $request = null, Registry $config = null, WebEnvironment $environment = null)
+	public function __construct(Request $request = null, Structure $config = null, WebEnvironment $environment = null)
 	{
-		$this->config   = $config instanceof Registry ? $config : new Registry($config);
+		$this->config   = $config instanceof Structure ? $config : new Structure($config);
 		$this->name     = $this->config->get('name', $this->name);
 		$this->rootPath = $this->config->get('path.root', $this->rootPath);
 

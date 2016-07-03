@@ -14,7 +14,7 @@ use Windwalker\Core\Object\SilencerObjectInterface;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The NullPackage class.
@@ -201,11 +201,11 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * loadConfiguration
 	 *
-	 * @param Registry $config
+	 * @param Structure $config
 	 *
 	 * @return static
 	 */
-	public function loadConfig(Registry $config)
+	public function loadConfig(Structure $config)
 	{
 		return $this;
 	}
@@ -271,7 +271,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 *
 	 * @since   2.1
 	 */
@@ -279,7 +279,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	{
 		if (!$this->config)
 		{
-			$this->config = new Registry;
+			$this->config = new Structure;
 
 			$this->loadConfig($this->config);
 		}
@@ -290,7 +290,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 *

@@ -8,15 +8,15 @@
 
 namespace Windwalker\Core\Registry;
 
-use Windwalker\Registry\Registry;
-use Windwalker\Registry\RegistryHelper;
+use Windwalker\Structure\Structure;
+use Windwalker\Structure\StructureHelper;
 
 /**
  * The ConfigRegistry class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ConfigRegistry extends Registry
+class ConfigStructure extends Structure
 {
 	/**
 	 * Method to recursively bind data to a parent object.
@@ -32,7 +32,7 @@ class ConfigRegistry extends Registry
 		// Ensure the input data is an array.
 		if (!$raw)
 		{
-			$data = RegistryHelper::toArray($data, true);
+			$data = StructureHelper::toArray($data, true);
 		}
 
 		foreach ($data as $key => $value)
@@ -76,12 +76,12 @@ class ConfigRegistry extends Registry
 		return $value;
 	}
 
-	public static function replaceVariables(Registry $registry)
+	public static function replaceVariables(Structure $registry)
 	{
 		$array = static::doReplaceVariables($registry, $registry->toArray());
 	}
 
-	protected static function doReplaceVariables(Registry $registry, $array)
+	protected static function doReplaceVariables(Structure $registry, $array)
 	{
 		foreach ($array as $key => &$value)
 		{

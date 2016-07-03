@@ -12,12 +12,12 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * Class DatabaseModel
  *
- * @property-read  Registry  $config  Config object.
+ * @property-read  Structure $config  Config object.
  *
  * @since 1.0
  */
@@ -28,7 +28,7 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Make sure state at the first to easily debug.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected $state;
 
@@ -42,7 +42,7 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Property config.
 	 *
-	 * @var  Registry
+	 * @var  Structure
 	 */
 	protected $config;
 
@@ -73,15 +73,15 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Instantiate the model.
 	 *
-	 * @param   Registry|array $config The model config.
-	 * @param   Registry       $state  The model state.
-	 * @param   mixed          $source The data source.
+	 * @param   Structure|array $config The model config.
+	 * @param   Structure       $state  The model state.
+	 * @param   mixed           $source The data source.
 	 *
 	 * @since   1.0
 	 */
-	public function __construct($config = null, Registry $state = null, $source = null)
+	public function __construct($config = null, Structure $state = null, $source = null)
 	{
-		$this->state  = ($state instanceof Registry) ? $state : new Registry;
+		$this->state  = ($state instanceof Structure) ? $state : new Structure;
 		$this->source = $source;
 
 		$this->setConfig($config);
@@ -138,7 +138,7 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Method to get property Config
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function getConfig()
 	{
@@ -148,13 +148,13 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Method to set property config
 	 *
-	 * @param   Registry $config
+	 * @param   Structure $config
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
 	public function setConfig($config)
 	{
-		$this->config = $config instanceof Registry ? $config : new Registry($config);
+		$this->config = $config instanceof Structure ? $config : new Structure($config);
 
 		return $this;
 	}
@@ -278,7 +278,7 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Get the model state.
 	 *
-	 * @return  Registry  The state object.
+	 * @return  Structure  The state object.
 	 */
 	public function getState()
 	{
@@ -288,11 +288,11 @@ class ModelRepository implements \ArrayAccess
 	/**
 	 * Set the model state.
 	 *
-	 * @param   Registry  $state  The state object.
+	 * @param   Structure $state The state object.
 	 *
 	 * @return  void
 	 */
-	public function setState(Registry $state)
+	public function setState(Structure $state)
 	{
 		$this->state = $state;
 	}
@@ -394,7 +394,7 @@ class ModelRepository implements \ArrayAccess
 	 *
 	 * @param string $name
 	 *
-	 * @return  Registry
+	 * @return  Structure
 	 */
 	public function __get($name)
 	{

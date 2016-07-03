@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Registry\Format\XmlFormat;
+use Windwalker\Structure\Format\XmlFormat;
 
 /**
  * The PhpXmlView class.

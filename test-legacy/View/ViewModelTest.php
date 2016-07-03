@@ -12,7 +12,7 @@ use Windwalker\Core\Model\DatabaseModel;
 use Windwalker\Core\Test\Mvc\Model\FlowerModel;
 use Windwalker\Core\Test\Mvc\Model\StubModel;
 use Windwalker\Core\View\ViewModel;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * Test class of ViewModel
@@ -69,7 +69,7 @@ class ViewModelTest extends \PHPUnit_Framework_TestCase
 		$viewModel = new ViewModel;
 
 		$model = new StubModel;
-		$model->setConfig(new Registry(array('name' => 'foo')));
+		$model->setConfig(new Structure(array('name' => 'foo')));
 		$viewModel->setModel($model);
 
 		$this->assertTrue($viewModel->getModel() instanceof StubModel);

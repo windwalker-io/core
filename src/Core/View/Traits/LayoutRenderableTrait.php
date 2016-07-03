@@ -11,7 +11,7 @@ namespace Windwalker\Core\View\Traits;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Filesystem\Path;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
@@ -109,7 +109,7 @@ trait LayoutRenderableTrait
 
 		/**
 		 * @var PriorityQueue $paths
-		 * @var Registry      $config
+		 * @var Structure     $config
 		 */
 		$paths   = $this->getRenderer()->getPaths();
 		$config  = $this->getPackage()->getContainer()->get('config');

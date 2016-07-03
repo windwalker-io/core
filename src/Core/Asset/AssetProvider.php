@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Asset;
 
-use Windwalker\Core\Registry\ConfigRegistry;
+use Windwalker\Core\Registry\ConfigStructure;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Uri\UriData;
@@ -32,8 +32,8 @@ class AssetProvider implements ServiceProviderInterface
 		$closure = function(Container $container)
 		{
 			/**
-			 * @var UriData $uri
-			 * @var ConfigRegistry $config
+			 * @var UriData         $uri
+			 * @var ConfigStructure $config
 			 */
 			$uri = $container->get('uri');
 			$config = $container->get('config');

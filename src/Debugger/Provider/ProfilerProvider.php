@@ -18,7 +18,7 @@ use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Profiler\Point\Point;
 use Windwalker\Profiler\Profiler;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The ProfilerProvider class.
@@ -66,7 +66,7 @@ class ProfilerProvider implements ServiceProviderInterface
 
 			if ($config->get('system.debug'))
 			{
-				return new Registry;
+				return new Structure;
 			}
 			else
 			{
@@ -89,11 +89,11 @@ class ProfilerProvider implements ServiceProviderInterface
 	 * registerProfilers
 	 *
 	 * @param Container $container
-	 * @param Registry  $config
+	 * @param Structure $config
 	 *
 	 * @return  void
 	 */
-	protected function registerDatabaseProfiler(Container $container, Registry $config)
+	protected function registerDatabaseProfiler(Container $container, Structure $config)
 	{
 		if (!$container->exists('database'))
 		{
@@ -155,11 +155,11 @@ class ProfilerProvider implements ServiceProviderInterface
 	 * registerProfilerListener
 	 *
 	 * @param Container $container
-	 * @param Registry  $config
+	 * @param Structure $config
 	 *
 	 * @return  void
 	 */
-	protected function registerProfilerListener(Container $container, Registry $config)
+	protected function registerProfilerListener(Container $container, Structure $config)
 	{
 		$dispatcher = $container->get('dispatcher');
 
@@ -172,11 +172,11 @@ class ProfilerProvider implements ServiceProviderInterface
 	 * registerEmailProfiler
 	 *
 	 * @param Container $container
-	 * @param Registry  $config
+	 * @param Structure $config
 	 *
 	 * @return  void
 	 */
-	protected function registerEmailProfiler(Container $container, Registry $config)
+	protected function registerEmailProfiler(Container $container, Structure $config)
 	{
 		// Not implemented yet
 	}
@@ -185,11 +185,11 @@ class ProfilerProvider implements ServiceProviderInterface
 	 * registerLogsProfiler
 	 *
 	 * @param Container $container
-	 * @param Registry  $config
+	 * @param Structure $config
 	 *
 	 * @return  void
 	 */
-	protected function registerLogsProfiler(Container $container, Registry $config)
+	protected function registerLogsProfiler(Container $container, Structure $config)
 	{
 		// Not implemented yet
 	}

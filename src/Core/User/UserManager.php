@@ -19,7 +19,7 @@ use Windwalker\Authorisation\PolicyProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\EventTriggerableInterface;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 
 /**
  * The UserManager class.
@@ -121,7 +121,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 			$user = new Credential($user);
 		}
 
-		$options = $options instanceof Registry ? $options : new Registry($options);
+		$options = $options instanceof Structure ? $options : new Structure($options);
 
 		$options['remember'] = $remember;
 
@@ -201,7 +201,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 */
 	public function logout($conditions = [], $options = [])
 	{
-		$options = $options instanceof Registry ? $options : new Registry($options);
+		$options = $options instanceof Structure ? $options : new Structure($options);
 
 		$user = $this->getUser($conditions);
 
@@ -283,7 +283,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 			$user = new UserData($user);
 		}
 
-		$options = ($options instanceof Registry) ? $options : new Registry($options);
+		$options = ($options instanceof Structure) ? $options : new Structure($options);
 
 		$this->triggerEvent('onUserBeforeSave', array('user' => $user, 'options' => &$options));
 
@@ -313,7 +313,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 */
 	public function delete($conditions = null, $options = [])
 	{
-		$options = ($options instanceof Registry) ? $options : new Registry($options);
+		$options = ($options instanceof Structure) ? $options : new Structure($options);
 
 		$this->triggerEvent('onUserBeforeDelete', array('conditions' => &$conditions, 'options' => &$options));
 

@@ -10,7 +10,7 @@ use Windwalker\Application\AbstractCliApplication;
 use Windwalker\Console\Prompter\ValidatePrompter;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Filesystem\Path;
-use Windwalker\Registry\Registry;
+use Windwalker\Structure\Structure;
 use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
 
@@ -66,7 +66,7 @@ class GenTest extends AbstractCliApplication
 			exit();
 		}
 
-		$replace = new Registry;
+		$replace = new Structure;
 
 		$ref = new \ReflectionClass($class);
 
@@ -117,11 +117,11 @@ class GenTest extends AbstractCliApplication
 	/**
 	 * genClass
 	 *
-	 * @param Registry $replace
+	 * @param Structure $replace
 	 *
 	 * @return  void
 	 */
-	protected function genClass(Registry $replace)
+	protected function genClass(Structure $replace)
 	{
 		$tmpl = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testClass.tpl');
 
