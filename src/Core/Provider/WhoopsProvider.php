@@ -40,6 +40,7 @@ class WhoopsProvider implements ServiceProviderInterface
 		{
 			/** @var Whoops $whoops */
 			$whoops = $container->get('whoops');
+			$whoops->allowQuit(false);
 			echo $whoops->handleException($e);
 		};
 
