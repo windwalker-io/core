@@ -19,15 +19,14 @@ $this->extend('_global.html');
 
 <?php $this->block('content') ?>
 
-<h2>Event Executed</h2>
+<h2>Event Triggered</h2>
 
 <?php echo $this->load('events', array('events' => $executed)); ?>
 
 	<br /><br />
 
-<h2>Event No Executed</h2>
+<h2>Event Not Triggered (But listeners registered)</h2>
 
 <?php echo $this->load('events', array('events' => $noExecuted)); ?>
-
 
 <?php $this->endblock() ?>

@@ -153,6 +153,19 @@ class Pagination
 	];
 
 	/**
+	 * simple
+	 *
+	 * @param int $current
+	 * @param int $limit
+	 *
+	 * @return  static
+	 */
+	public static function simple($current, $limit = 10)
+	{
+		return (new Pagination($current, $limit, -1, 1))->template('windwalker.pagination.simple');
+	}
+
+	/**
 	 * Create instance
 	 *
 	 * @param int $current    Number of the current page
@@ -215,8 +228,17 @@ class Pagination
 
 		// Lower
 		$offset = $this->current - 1;
-		$neighbours  = $this->current - $this->neighbours;
-		$neighbours  = $neighbours < static::BASE_PAGE ? static::BASE_PAGE : $neighbours;
+
+		// -1 is simple pagination
+		if ($this->total == -1)
+		{
+			$neighbours = 1;
+		}
+		else
+		{
+			$neighbours  = $this->current - $this->neighbours;
+			$neighbours  = $neighbours < static::BASE_PAGE ? static::BASE_PAGE : $neighbours;
+		}
 
 		for ($i = $offset; $i >= $neighbours; $i--)
 		{

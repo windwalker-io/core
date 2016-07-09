@@ -74,12 +74,27 @@ class MailerManager
 	/**
 	 * send
 	 *
-	 * @param MailMessage $message
+	 * @param MailMessage|callable $message
 	 *
 	 * @return  boolean
 	 */
-	public function send(MailMessage $message)
+	public function send($message)
 	{
+		if (is_callable($message))
+		{
+			$message = $message($this->createMessage(), $this);
+
+			if (!$message instanceof MailMessage)
+			{
+				throw new \UnexpectedValueException(sprintf('Please return %s from your callback. ', MailMessage::class));
+			}
+		}
+
+		if (!$message instanceof MailMessage)
+		{
+			throw new \InvalidArgumentException(sprintf('Mail Message should instance of %s', MailMessage::class));
+		}
+
 		$this->triggerEvent('onMailerBeforeSend', [
 			'message' => $message,
 			'manager' => $this

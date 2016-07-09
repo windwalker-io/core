@@ -20,16 +20,16 @@ class BootstrapKeyValueGrid extends KeyValueGrid
 	/**
 	 * Class init.
 	 *
-	 * @param array $options
+	 * @param array $attribs
 	 */
-	public function __construct($options = array())
+	public function __construct($attribs = array())
 	{
-		if (!isset($options['class']))
+		if (!isset($attribs['class']))
 		{
-			$options['class'] = 'table table-bordered';
+			$attribs['class'] = 'table table-bordered';
 		}
 
-		parent::__construct($options);
+		parent::__construct($attribs);
 	}
 
 	/**
@@ -37,35 +37,35 @@ class BootstrapKeyValueGrid extends KeyValueGrid
 	 *
 	 * @param string $keyTitle
 	 * @param string $valueTitle
-	 * @param array  $options
+	 * @param array  $attribs
 	 *
 	 * @return  static
 	 */
-	public function addHeader($keyTitle = 'Key', $valueTitle = 'Value', $options = array())
+	public function addHeader($keyTitle = 'Key', $valueTitle = 'Value', $attribs = array())
 	{
-		if (!isset($options[static::COL_KEY]['width']))
+		if (!isset($attribs[static::COL_KEY]['width']))
 		{
-			$options[static::COL_KEY]['width'] = '30%';
+			$attribs[static::COL_KEY]['width'] = '30%';
 		}
 
-		return parent::addHeader($keyTitle, $valueTitle, $options);
+		return parent::addHeader($keyTitle, $valueTitle, $attribs);
 	}
 
 	/**
 	 * addTitle
 	 *
 	 * @param string $name
-	 * @param array  $options
+	 * @param array  $attribs
 	 *
 	 * @return  static
 	 */
-	public function addTitle($name, $options = array())
+	public function addTitle($name, $attribs = array())
 	{
-		if (!isset($options[static::ROW]['class']))
+		if (!isset($attribs[static::ROW]['class']))
 		{
-			$options[static::ROW]['class'] = 'active';
+			$attribs[static::ROW]['class'] = 'active';
 		}
 
-		return parent::addTitle($name, $options);
+		return parent::addTitle($name, $attribs);
 	}
 }
