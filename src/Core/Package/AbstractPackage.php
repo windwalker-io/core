@@ -241,6 +241,19 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
+	 * run
+	 *
+	 * @param string|AbstractController  $task
+	 * @param array|Input                $input
+	 *
+	 * @return  Response
+	 */
+	public function executeTask($task, $input = null)
+	{
+		return $this->execute($this->getController($task, $input), $this->app->request, new \Windwalker\Http\Response\Response);
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void

@@ -42,6 +42,20 @@ class RendererProvider implements ServiceProviderInterface
 	public $rendererManager;
 
 	/**
+	 * boot
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	public function boot(Container $container)
+	{
+		$this->prepareBlade($container);
+		$this->prepareEdge($container);
+		$this->prepareTwig($container);
+	}
+
+	/**
 	 * Registers the service provider with a DI container.
 	 *
 	 * @param   Container $container The DI container.
@@ -52,7 +66,7 @@ class RendererProvider implements ServiceProviderInterface
 	{
 		$this->prepareManager($container);
 
-		$this->getWidgetManager($container);
+		$this->prepareWidgetManager($container);
 	}
 
 	/**
@@ -64,18 +78,10 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareManager(Container $container)
 	{
-		$closure = function(Container $container)
-		{
-			$manager = new RendererManager($container);
-
-			return $manager;
-		};
-
-		$container->share('raw.renderer.manager', $closure);
-
 		$closure = function (Container $container)
 		{
-			$manager = $container->get('raw.renderer.manager');
+			$manager = new RendererManager($container);
+			$this->rendererManager = $manager;
 
 			// Prepare Globals
 			$this->prepareGlobals($container, $manager);
@@ -94,18 +100,35 @@ class RendererProvider implements ServiceProviderInterface
 	}
 
 	/**
+	 * getRendererManager
+	 *
+	 * @param Container $container
+	 *
+	 * @return  RendererManager
+	 */
+	public function getRendererManager(Container $container)
+	{
+		if ($this->rendererManager)
+		{
+			return $this->rendererManager;
+		}
+
+		return $container->get('renderer.manager');
+	}
+
+	/**
 	 * prepareWidget
 	 *
-	 * @param Container       $container
+	 * @param Container  $container
 	 *
 	 * @return WidgetManager
 	 */
-	public function getWidgetManager(Container $container)
+	public function prepareWidgetManager(Container $container)
 	{
 		$closure = function (Container $container)
 		{
 			/** @var RendererManager $rendererManager */
-			$rendererManager = $container->get('raw.renderer.manager');
+			$rendererManager = $this->getRendererManager($container);
 
 			return new WidgetManager($rendererManager);
 		};
@@ -114,17 +137,76 @@ class RendererProvider implements ServiceProviderInterface
 	}
 
 	/**
-	 * boot
+	 * prepareGlobals
+	 *
+	 * @param Container       $container
+	 * @param RendererManager $manager
+	 *
+	 * @return  RendererManager
+	 */
+	protected function prepareGlobals(Container $container, RendererManager $manager)
+	{
+		if (static::$messages === null && $container->exists('session'))
+		{
+			/** @var Session $session */
+			$session = $container->get('session');
+
+			$session->start();
+
+			static::$messages = $session->getFlashBag()->takeAll();
+		}
+
+		$globals = array(
+			'uri'        => $container->get('uri'),
+			'app'        => $container->get('application'),
+			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
+			'messages'   => static::$messages,
+			'translator' => $container->exists('language') ? $container->get('language') : null,
+			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
+			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
+		);
+
+		$manager->setGlobals($globals);
+
+		/** @var EventDispatcher $dispatcher */
+		if ($container->exists('dispatcher'))
+		{
+			$dispatcher = $container->get('dispatcher');
+
+			$dispatcher->triggerEvent('onRendererPrepareGlobals', [
+				'manager' => $manager
+			]);
+		}
+
+		return $manager;
+	}
+
+	/**
+	 * prepareEdge
 	 *
 	 * @param Container $container
 	 *
 	 * @return  void
 	 */
-	public function boot(Container $container)
+	protected function prepareEdge(Container $container)
 	{
-		$this->prepareBlade($container);
-		$this->prepareEdge($container);
-		$this->prepareTwig($container);
+		Renderer\Edge\GlobalContainer::addExtension(new \Windwalker\Core\Renderer\Edge\WindwalkerExtension);
+	}
+
+	/**
+	 * prepareTwig
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	protected function prepareTwig(Container $container)
+	{
+		// Twig
+		if (class_exists('Twig_Extension'))
+		{
+			Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
+		}
 	}
 
 	/**
@@ -187,78 +269,5 @@ class RendererProvider implements ServiceProviderInterface
 		});
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
-	}
-
-	/**
-	 * prepareEdge
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	protected function prepareEdge(Container $container)
-	{
-		Renderer\Edge\GlobalContainer::addExtension(new \Windwalker\Core\Renderer\Edge\WindwalkerExtension);
-	}
-
-	/**
-	 * prepareTwig
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	protected function prepareTwig(Container $container)
-	{
-		// Twig
-		if (class_exists('Twig_Extension'))
-		{
-			Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
-		}
-	}
-
-	/**
-	 * prepareGlobals
-	 *
-	 * @param Container       $container
-	 * @param RendererManager $manager
-	 *
-	 * @return  RendererManager
-	 */
-	protected function prepareGlobals(Container $container, RendererManager $manager)
-	{
-		if (static::$messages === null && $container->exists('session'))
-		{
-			/** @var Session $session */
-			$session = $container->get('session');
-
-			$session->start();
-
-			static::$messages = $session->getFlashBag()->takeAll();
-		}
-
-		$globals = array(
-			'uri'        => $container->get('uri'),
-			'app'        => $container->get('application'),
-			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
-			'messages'   => static::$messages,
-			'translator' => $container->exists('language') ? $container->get('language') : null,
-			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
-			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
-		);
-
-		$manager->setGlobals($globals);
-
-		/** @var EventDispatcher $dispatcher */
-		if ($container->exists('dispatcher'))
-		{
-			$dispatcher = $container->get('dispatcher');
-
-			$dispatcher->triggerEvent('onRendererPrepareGlobals', [
-				'manager' => $manager
-			]);
-		}
-
-		return $manager;
 	}
 }

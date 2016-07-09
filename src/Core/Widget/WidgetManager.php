@@ -10,6 +10,7 @@ namespace Windwalker\Core\Widget;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Renderer\RendererInterface;
 
@@ -76,6 +77,7 @@ class WidgetManager
 	 */
 	public function createWidget($layout, $engine = null, $package = null)
 	{
+		RendererHelper::boot();
 		$engine = $this->rendererManager->getRenderer($engine ? : static::PHP);
 
 		// Prepare package
