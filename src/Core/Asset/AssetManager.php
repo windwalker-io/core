@@ -685,12 +685,12 @@ class AssetManager implements DispatcherAwareInterface
 	/**
 	 * Internal method to get a JavaScript object notation string from an array
 	 *
-	 * @param mixed $data
-	 * @param bool  $quoteKey
+	 * @param mixed $data      The data to convert to JavaScript object notation
+	 * @param bool  $quoteKey  Quote json key or not.
 	 *
 	 * @return string JavaScript object notation representation of the array
 	 */
-	public static function getJSObject($data, $quoteKey = true)
+	public static function getJSObject($data, $quoteKey = false)
 	{
 		if ($data === null)
 		{

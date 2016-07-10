@@ -329,14 +329,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		catch (\Exception $e)
 		{
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
-			$this->processFailure($e->getMessage(), Bootstrap::MSG_DANGER);
+			$this->processFailure($e);
 
 			throw $e;
 		}
 		catch (\Throwable $e)
 		{
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
-			$this->processFailure();
+			$this->processFailure(new \ErrorException($e->getMessage(), $e->getCode(), $e));
 
 			throw $e;
 		}
@@ -349,7 +349,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		else
 		{
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
-			$this->processFailure();
+			$this->processFailure(new \Exception);
 		}
 
 		// Now we return result to package that it will handle response.
@@ -430,12 +430,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Process success.
 	 *
-	 * @param string $message Success message.
-	 * @param string $type    The message type.
-	 *
 	 * @return bool
 	 */
-	public function processSuccess($message = null, $type = 'info')
+	public function processSuccess()
 	{
 		return true;
 	}
@@ -443,12 +440,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Process failure.
 	 *
-	 * @param string $message Failure message.
-	 * @param string $type    The message type.
+	 * @param \Exception $e
 	 *
 	 * @return bool
 	 */
-	public function processFailure($message = null, $type = 'warning')
+	public function processFailure(\Exception $e = null)
 	{
 		return false;
 	}

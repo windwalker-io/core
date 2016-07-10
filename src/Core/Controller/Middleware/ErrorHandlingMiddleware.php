@@ -63,7 +63,7 @@ class ErrorHandlingMiddleware extends AbstractControllerMiddleware
 				throw $e;
 			}
 
-			$this->controller->processFailure($e->getMessage(), Bootstrap::MSG_WARNING);
+			$this->controller->processFailure($e);
 
 			return false;
 		}
