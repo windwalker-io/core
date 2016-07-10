@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
+use Windwalker\Core\Controller\Middleware\ControllerData;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Mvc\ModelResolver;
@@ -275,21 +276,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			'controller' => $this
 		));
 
-		// Prepare controller data for middlewares.
-		$data = new Data([
-			'input'    => $this->input,
-			'mute'     => $this->mute,
-			'hmvc'     => $this->hmvc,
-			'app'      => $this->app,
-			'request'  => $this->request,
-			'response' => $this->response,
-			'router'    => $this->router,
-			'container' => $this->container,
-			'package'  => $this->getPackage()
-		]);
-
-		$data->bind(get_object_vars($this));
-
 		// Prepare the last middleware, the last middleware is the real logic of this controller self.
 		$chain = $this->getMiddlewareChain()->setEndMiddleware(function ()
 		{
@@ -297,7 +283,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		});
 
 		// Do execute, run middlewares.
-		$result = $chain->execute($data);
+		$result = $chain->execute(new ControllerData(get_object_vars($this)));
 
 		// @ post hook
 		$result = $this->postExecute($result);
@@ -341,19 +327,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			throw $e;
 		}
 
-		if ($result !== false)
-		{
-			// If result not FALSE, run processSuccess() to do some extra logic.
-			$this->processSuccess();
-		}
-		else
+		if ($result === false)
 		{
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
-			$this->processFailure(new \Exception);
+			return $this->processFailure(new \Exception);
 		}
 
 		// Now we return result to package that it will handle response.
-		return $result;
+		return $this->processSuccess();
 	}
 
 	/**

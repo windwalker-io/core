@@ -46,10 +46,6 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 			{
 				$result = $result->getHandledData();
 			}
-			elseif ($this->controller instanceof AbstractPostController)
-			{
-				$result = $data->record->dump(true);
-			}
 
 			$message = $this->getMessage();
 
@@ -57,26 +53,42 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 		}
 		catch (\Exception $e)
 		{
-			$data = [];
-
-			if ($this->controller->app->get('system.debug'))
-			{
-				$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
-			}
-
-			$code = $e->getCode();
-
-			if (!ResponseHelper::validateStatus($code))
-			{
-				$code = 500;
-			}
-
-			$this->controller->setResponse(
-				$this->controller->getResponse()->withStatus($code)
-			);
-
-			return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
+			return $this->handleException($e);
 		}
+		catch (\Throwable $e)
+		{
+			return $this->handleException(new \ErrorException($e->getMessage(), $e->getCode(), $e));
+		}
+	}
+
+	/**
+	 * handleException
+	 *
+	 * @param \Exception $e
+	 *
+	 * @return  JsonBuffer
+	 */
+	protected function handleException(\Exception $e)
+	{
+		$data = [];
+
+		if ($this->controller->app->get('system.debug'))
+		{
+			$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
+		}
+
+		$code = $e->getCode();
+
+		if (!ResponseHelper::validateStatus($code))
+		{
+			$code = 500;
+		}
+
+		$this->controller->setResponse(
+			$this->controller->getResponse()->withStatus($code)
+		);
+
+		return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
 	}
 
 	/**
