@@ -36,20 +36,27 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 
 		foreach ((array) $data->eventExecuted as $event)
 		{
+			$eventName = $event['event'];
+
+			if (!isset($events[$eventName]))
+			{
+				$events[$eventName] = [];
+			}
+			
 			foreach ($event['listeners'] as $listener)
 			{
-				$id = $event['event'] . '.' . implode('::', (array) $listener);
+				$id = implode('::', (array) $listener);
 
 				if (!isset($events[$id]))
 				{
-					$events[$id] = array(
-						'name'     => $event['event'],
+					$events[$eventName][$id] = array(
+						'name'     => $eventName,
 						'times'    => 0,
 						'listener' => implode('::', (array) $listener)
 					);
 				}
 
-				$events[$id]['times']++;
+				$events[$eventName][$id]['times']++;
 			}
 		}
 
@@ -58,19 +65,22 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 		// Event No executed
 		$events = array();
 
-		foreach ((array) $data->eventListeners as $name => $listeners)
+		foreach ((array) $data->eventListeners as $eventName => $listeners)
 		{
 			foreach ($listeners as $listener)
 			{
-				$id = $name . '.' . implode('::', (array) $listener);
-
-				if (array_key_exists($id, $data->executed))
+				if (!empty($data->executed[$eventName]))
 				{
 					continue;
 				}
 
-				$events[$id] = array(
-					'name'     => $name,
+				if (!isset($events[$eventName]))
+				{
+					$events[$eventName] = [];
+				}
+
+				$events[$eventName][] = array(
+					'name'     => $eventName,
 					'times'    => 0,
 					'listener' => implode('::', (array) $listener)
 				);

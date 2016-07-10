@@ -20,6 +20,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @method  static  AbstractRenderer|CoreRendererInterface  getRenderer($type = RendererManager::ENGINE_PHP, $config = array())
  * @method  static  PhpRenderer      getPhpRenderer($config = array())
  * @method  static  BladeRenderer    getBladeRenderer($config = array())
+ * @method  static  EdgeRenderer     getEdgeRenderer($config = array())
  * @method  static  TwigRenderer     getTwigRenderer($config = array())
  * @method  static  PriorityQueue    getGlobalPaths()
  * @method  static  RendererManager  addGlobalPath($path, $priority = PriorityQueue::LOW)
@@ -39,4 +40,14 @@ abstract class RendererHelper extends AbstractProxyFacade
 	const MUSTACHE = 'mustache';
 
 	protected static $_key = 'renderer.manager';
+
+	/**
+	 * Boot RendererManager.
+	 *
+	 * @return  void
+	 */
+	public static function boot()
+	{
+		static::getInstance();
+	}
 }

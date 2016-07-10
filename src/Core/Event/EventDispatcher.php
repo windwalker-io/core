@@ -102,7 +102,9 @@ class EventDispatcher extends Dispatcher
 			{
 				if ($listener instanceof \Closure)
 				{
-					$listener = array('Closure');
+					$ref = new \ReflectionFunction($listener);
+
+					$listener = array('{Closure}: ' . $ref->getFileName() . ' - Line: ' . $ref->getStartLine());
 				}
 
 				if (is_object($listener[0]))

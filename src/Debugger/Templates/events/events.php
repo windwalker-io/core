@@ -16,18 +16,38 @@
 	</tr>
 	</thead>
 	<tbody>
-	<?php foreach ($events as $event): ?>
-		<tr>
-			<td>
-				<?php echo $event['name']; ?>
-			</td>
-			<td>
-				<?php echo $event['times']; ?>
-			</td>
-			<td>
-				<code><?php echo $event['listener']; ?></code>
-			</td>
-		</tr>
+	<?php foreach ($events as $name => $listeners): ?>
+        <?php if (count($listeners)): ?>
+            <?php $i = 0; ?>
+            <?php foreach ($listeners as $event): ?>
+                <tr>
+                    <?php if ($i == 0): ?>
+                        <td rowspan="<?php echo count($listeners); ?>">
+                            <?php echo $name; ?>
+                        </td>
+                    <?php endif; ?>
+                    <td>
+                        <?php echo $event['times']; ?>
+                    </td>
+                    <td>
+                        <code><?php echo $event['listener']; ?></code>
+                    </td>
+                </tr>
+                <?php $i++; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td>
+                    <?php echo $name; ?>
+                </td>
+                <td>
+                    -
+                </td>
+                <td>
+                    -
+                </td>
+            </tr>
+        <?php endif; ?>
 	<?php endforeach; ?>
 	</tbody>
 </table>

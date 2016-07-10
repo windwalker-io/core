@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Provider;
 
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Run as Whoops;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -18,6 +20,33 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class WhoopsProvider implements ServiceProviderInterface
 {
+	/**
+	 * boot
+	 *
+	 * @param Container $container
+	 *
+	 * @return  void
+	 */
+	public function boot(Container $container)
+	{
+		$error = $container->get('error.handler');
+
+		/**
+		 * @param \Exception|\Throwable $e
+		 *
+		 * @return  void
+		 */
+		$handler = function ($e) use ($container)
+		{
+			/** @var Whoops $whoops */
+			$whoops = $container->get('whoops');
+			$whoops->allowQuit(false);
+			echo $whoops->handleException($e);
+		};
+
+		$error->addHandler($handler, 'default');
+	}
+
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -33,9 +62,9 @@ class WhoopsProvider implements ServiceProviderInterface
 
 		if ($config->get('system.debug'))
 		{
-			$whoops = new \Whoops\Run;
+			$whoops = new Whoops;
 
-			$handler = new \Whoops\Handler\PrettyPageHandler;
+			$handler = new PrettyPageHandler;
 
 			$whoops->pushHandler($handler);
 
@@ -61,12 +90,11 @@ class WhoopsProvider implements ServiceProviderInterface
 				http_response_code($exception->getCode());
 			});
 
-			$whoops->register();
+			$container->share(Whoops::class, $whoops)
+				->alias('whoops', Whoops::class);
 
-			$container->share('debugger', $whoops)
-				->alias('whoops', 'debugger');
-
-			$container->share('whoops.handler', $handler);
+			$container->share(PrettyPageHandler::class, $handler)
+				->alias('whoops.handler', PrettyPageHandler::class);
 		}
 	}
 }

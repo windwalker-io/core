@@ -241,6 +241,19 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
+	 * run
+	 *
+	 * @param string|AbstractController  $task
+	 * @param array|Input                $input
+	 *
+	 * @return  Response
+	 */
+	public function executeTask($task, $input = null)
+	{
+		return $this->execute($this->getController($task, $input), $this->app->request, new \Windwalker\Http\Response\Response);
+	}
+
+	/**
 	 * prepareExecute
 	 *
 	 * @return  void
@@ -479,7 +492,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		}
 
 		// Override
-		$file = $this->container->get('config')->get('path.etc') . '/package/' . $this->name . '.php';
+		$file = $this->getContainer()->get('config')->get('path.etc') . '/package/' . $this->name . '.php';
 
 		if (is_file($file))
 		{
@@ -552,7 +565,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function getMvcResolver()
 	{
-		return $this->container->get('mvc.resolver');
+		return $this->getContainer()->get('mvc.resolver');
 	}
 
 	/**

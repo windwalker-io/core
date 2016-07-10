@@ -243,7 +243,7 @@ class AssetManager implements DispatcherAwareInterface
 	{
 		$html = array();
 
-		$this->triggerEvent('onPhoenixRenderScripts', array(
+		$this->triggerEvent('onAssetRenderScripts', array(
 			'asset' => $this,
 			'withInternal' => &$withInternal,
 			'html' => &$html

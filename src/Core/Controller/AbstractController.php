@@ -458,9 +458,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param bool   $forceNew The Force create new instance.
 	 *
 	 * @return AbstractView|HtmlView
-	 * @throws \UnexpectedValueException
-	 *
-	 * @throws \DomainException
+	 * @throws \Exception
 	 */
 	public function getView($name = null, $format = 'html', $engine = null, $forceNew = false)
 	{
@@ -492,8 +490,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			{
 				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, [], $config, $engine);
 			}
-			catch (\DomainException $e)
+			catch (\Exception $e)
 			{
+				if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+				{
+					throw $e;
+				}
+
 				// If format is html or NULL, we return HtmlView as default.
 				if ($format === 'html' || !$format)
 				{
@@ -523,8 +526,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param bool   $forceNew
 	 *
 	 * @return ModelRepository
-	 * @throws \UnexpectedValueException
-	 * @throws \DomainException
+	 * @throws \Exception
 	 */
 	public function getModel($name = null, $source = null, $forceNew = false)
 	{
@@ -563,8 +565,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				// Use resolver to find model class and create it.
 				$model = $package->getMvcResolver()->getModelResolver()->create($modelName, $config, null, $source);
 			}
-			catch (\DomainException $e)
+			catch (\Exception $e)
 			{
+				if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+				{
+					throw $e;
+				}
+
 				$model = new ModelRepository($config);
 			}
 

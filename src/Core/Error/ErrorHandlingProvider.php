@@ -66,7 +66,24 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	{
 		$closure = function (Container $container)
 		{
-		    return $container->createSharedObject(ErrorManager::class);
+			/** @var ErrorManager $error */
+			$error = $container->createSharedObject(ErrorManager::class);
+
+			$config = $container->get('config');
+
+			$handlers = (array) $config->get('error.handlers', []);
+
+			foreach ($handlers as $key => $handler)
+			{
+				if (is_string($handler) && class_exists($handler))
+				{
+					$handler = new $handler($this->app);
+				}
+
+				$error->addHandler($handler, is_numeric($key) ? $key : null);
+			}
+
+			return $error;
 		};
 
 		$container->share(ErrorManager::class, $closure);

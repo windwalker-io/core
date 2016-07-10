@@ -26,7 +26,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  void    restore()
  * @method  static  callable[]    getHandlers()
  * @method  static  ErrorManager  setHandlers()
- * @method  static  ErrorManager  addHandler(callable $handler)
+ * @method  static  ErrorManager  addHandler(callable $handler, $name = null)
  * @method  static  ErrorManager  removeHandler($name)
  *
  * @since  3.0
