@@ -34,7 +34,7 @@ abstract class AbstractScript
 	 *
 	 * @return bool
 	 */
-	public static function inited($name, ...$data)
+	protected static function inited($name, ...$data)
 	{
 		return static::getInstance()->inited($name, ...$data);
 	}
@@ -46,7 +46,7 @@ abstract class AbstractScript
 	 *
 	 * @return  string
 	 */
-	public static function getInitedId(...$data)
+	protected static function getInitedId(...$data)
 	{
 		return static::getInstance()->getInitedId(...$data);
 	}
@@ -56,7 +56,7 @@ abstract class AbstractScript
 	 *
 	 * @return  AssetManager
 	 */
-	public static function getAsset()
+	protected static function getAsset()
 	{
 		return static::getInstance()->getAsset();
 	}
@@ -70,7 +70,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	public static function addCSS($url, $version = null, $attribs = array())
+	protected static function addCSS($url, $version = null, $attribs = array())
 	{
 		return static::getAsset()->addCSS($url, $version, $attribs);
 	}
@@ -84,7 +84,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	public static function addJS($url, $version = null, $attribs = array())
+	protected static function addJS($url, $version = null, $attribs = array())
 	{
 		return static::getAsset()->addJS($url, $version, $attribs);
 	}
@@ -96,7 +96,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	public static function internalCSS($content)
+	protected static function internalCSS($content)
 	{
 		return static::getAsset()->internalCSS($content);
 	}
@@ -108,7 +108,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	public static function internalJS($content)
+	protected static function internalJS($content)
 	{
 		return static::getAsset()->internalJS($content);
 	}
@@ -121,7 +121,7 @@ abstract class AbstractScript
 	 *
 	 * @return  string
 	 */
-	public function getJSObject(...$data)
+	public static function getJSObject(...$data)
 	{
 		$quote = array_pop($data);
 
@@ -149,7 +149,7 @@ abstract class AbstractScript
 	 *
 	 * @return  array
 	 */
-	public function mergeOptions($options1, $options2, $recursive = true)
+	public static function mergeOptions($options1, $options2, $recursive = true)
 	{
 		return ArrayHelper::merge($options1, $options2, $recursive);
 	}

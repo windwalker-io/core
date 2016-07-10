@@ -5,6 +5,7 @@ namespace Windwalker\SystemPackage\Command;
 use Windwalker\Console\Command\Command;
 use Windwalker\SystemPackage\Command\System\DownCommand;
 use Windwalker\SystemPackage\Command\System\GenerateCommand;
+use Windwalker\SystemPackage\Command\System\ModeCommand;
 use Windwalker\SystemPackage\Command\System\UpCommand;
 
 /**
@@ -45,6 +46,7 @@ class SystemCommand extends Command
 		$this->addCommand(GenerateCommand::class);
 		$this->addCommand(UpCommand::class);
 		$this->addCommand(DownCommand::class);
+		$this->addCommand(ModeCommand::class);
 
   		parent::init();
 	}
