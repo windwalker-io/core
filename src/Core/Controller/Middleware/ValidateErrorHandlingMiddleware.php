@@ -13,11 +13,11 @@ use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Form\Validate\ValidateResult;
 
 /**
- * The ErrorHandlingMiddleware class.
+ * The ValidateErrorHandlingMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class ErrorHandlingMiddleware extends AbstractControllerMiddleware
+class ValidateErrorHandlingMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
@@ -58,7 +58,7 @@ class ErrorHandlingMiddleware extends AbstractControllerMiddleware
 		}
 		catch (\Exception $e)
 		{
-			if (WINDWALKER_DEBUG)
+			if ($this->app->get('system.debug'))
 			{
 				throw $e;
 			}
