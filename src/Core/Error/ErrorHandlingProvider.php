@@ -48,7 +48,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 		error_reporting($this->app->get('system.error_reporting', 0));
 
 		/** @var ErrorManager $handler */
-		$handler = $container->get('error.handler');
+		$handler = $container->get(ErrorManager::class);
 		
 		$handler->setErrorTemplate($this->app->get('error.template', 'windwalker.error.default'));
 		

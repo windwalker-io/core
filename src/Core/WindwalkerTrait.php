@@ -193,6 +193,7 @@ trait WindwalkerTrait
 		$container->registerServiceProvider(new SystemProvider($this));
 
 		$providers = (array) $this->config->get('providers');
+		$bootQueue = [];
 
 		foreach ($providers as $provider)
 		{
@@ -210,8 +211,13 @@ trait WindwalkerTrait
 
 			if (is_callable([$provider, 'boot']))
 			{
-				$provider->boot($container);
+				$bootQueue[] = $provider;
 			}
+		}
+
+		foreach ($bootQueue as $provider)
+		{
+			$provider->boot($container);
 		}
 	}
 
