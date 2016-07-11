@@ -112,7 +112,7 @@ class ErrorManager
 
 		$content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
-		$exception = new \ErrorException($content, $code, 1, $file, $line);
+		$exception = new \ErrorException($content, $code, E_ERROR, $file, $line);
 
 		$this->exception($exception);
 	}

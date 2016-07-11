@@ -55,9 +55,9 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 		{
 			return $this->handleException($e);
 		}
-		catch (\Throwable $e)
+		catch (\Throwable $t)
 		{
-			return $this->handleException(new \ErrorException($e->getMessage(), $e->getCode(), $e));
+			return $this->handleException(new \ErrorException($t->getMessage(), $t->getCode(), E_ERROR, $t->getFile(), $t->getLine(), $t));
 		}
 	}
 
