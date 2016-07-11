@@ -30,25 +30,12 @@ class AssetProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function(Container $container)
-		{
-			return $container->createSharedObject(AssetManager::class);
-		};
-
-		$container->share(AssetManager::class, $closure);
-		
-		// Script
-		$closure = function (Container $container)
-		{
-			return new ScriptManager($container->get('asset'));
-		};
-
-		$container->share(ScriptManager::class, $closure)
-			->alias('script.manager', ScriptManager::class);
+		$container->prepareSharedObject(AssetManager::class);
+		$container->prepareSharedObject(ScriptManager::class);
 
 		AbstractScript::$instance = function () use ($container)
 		{
-		    return $container->get('script.manager');
+		    return $container->get(ScriptManager::class);
 		};
 	}
 }

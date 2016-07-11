@@ -46,10 +46,8 @@ class WebProvider implements ServiceProviderInterface
 
 		// Environment
 		$container->share(WebEnvironment::class, $app->getEnvironment());
-
-		$container->share(Browser::class, $app->getEnvironment()->getBrowser());
-
-		$container->share(Platform::class, $app->getEnvironment()->getPlatform());
+		$container->share(Browser::class,        $app->getEnvironment()->getBrowser());
+		$container->share(Platform::class,       $app->getEnvironment()->getPlatform());
 
 		// Uri
 		$container->share(UriData::class, function (Container $container) use ($app)

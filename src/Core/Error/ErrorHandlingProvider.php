@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Error;
 
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Config\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -20,20 +21,20 @@ use Windwalker\DI\ServiceProviderInterface;
 class ErrorHandlingProvider implements ServiceProviderInterface
 {
 	/**
-	 * Property app.
+	 * Property config.
 	 *
-	 * @var  WebApplication
+	 * @var  Config
 	 */
-	protected $app;
+	protected $config;
 
 	/**
 	 * ErrorHandlingProvider constructor.
 	 *
-	 * @param WebApplication $app
+	 * @param Config $config
 	 */
-	public function __construct(WebApplication $app)
+	public function __construct(Config $config)
 	{
-		$this->app = $app;
+		$this->config = $config;
 	}
 
 	/**
@@ -45,12 +46,12 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 */
 	public function boot(Container $container)
 	{
-		error_reporting($this->app->get('system.error_reporting', 0));
+		error_reporting($this->config->get('system.error_reporting', 0));
 
 		/** @var ErrorManager $handler */
 		$handler = $container->get(ErrorManager::class);
 		
-		$handler->setErrorTemplate($this->app->get('error.template', 'windwalker.error.default'));
+		$handler->setErrorTemplate($this->config->get('error.template', 'windwalker.error.default'));
 		
 		$handler->register(true, null, true);
 	}
@@ -64,20 +65,13 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function (Container $container)
+		$closure = function (Container $container, ErrorManager $error)
 		{
-			/** @var ErrorManager $error */
-			$error = $container->createSharedObject(ErrorManager::class);
-
-			$config = $container->get('config');
-
-			$handlers = (array) $config->get('error.handlers', []);
-
-			foreach ($handlers as $key => $handler)
+			foreach ((array) $this->config->get('error.handlers', []) as $key => $handler)
 			{
-				if (is_string($handler) && class_exists($handler))
+				if (is_string($handler))
 				{
-					$handler = new $handler($this->app);
+					$handler = $container->newInstance($handler);
 				}
 
 				$error->addHandler($handler, is_numeric($key) ? $key : null);
@@ -86,6 +80,6 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 			return $error;
 		};
 
-		$container->share(ErrorManager::class, $closure);
+		$container->prepareSharedObject(ErrorManager::class, $closure);
 	}
 }

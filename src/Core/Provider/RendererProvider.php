@@ -49,7 +49,7 @@ class RendererProvider implements ServiceProviderInterface
 	 *
 	 * @return  void
 	 */
-	public function boot(Container $container)
+	public function bootDeferred(Container $container)
 	{
 		$this->prepareBlade($container);
 		$this->prepareEdge($container);
@@ -65,37 +65,42 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$this->prepareManager($container);
-
-		$this->prepareWidgetManager($container);
+		$container->prepareSharedObject(RendererManager::class, [$this, 'manager']);
+		$container->prepareSharedObject(PackageFinder::class);
+		$container->share(WidgetManager::class, [$this, 'widget']);
 	}
 
 	/**
 	 * prepareFactory
 	 *
-	 * @param Container $container
+	 * @param Container       $container
+	 * @param RendererManager $manager
 	 *
-	 * @return  void
+	 * @return RendererManager
 	 */
-	protected function prepareManager(Container $container)
+	public function manager(Container $container, RendererManager $manager)
 	{
-		$container->share(RendererManager::class, function (Container $container)
-		{
-			/** @var RendererManager $manager */
-			$manager = $container->createSharedObject(RendererManager::class);
+		$this->rendererManager = $manager;
 
-			$this->rendererManager = $manager;
+		// Prepare Globals
+		$this->prepareGlobals($container, $manager);
 
-			// Prepare Globals
-			$this->prepareGlobals($container, $manager);
+		return $manager;
+	}
 
-			return $manager;
-		});
+	/**
+	 * prepareWidget
+	 *
+	 * @param Container  $container
+	 *
+	 * @return WidgetManager
+	 */
+	public function widget(Container $container)
+	{
+		/** @var RendererManager $rendererManager */
+		$rendererManager = $this->getRendererManager($container);
 
-		$container->share(PackageFinder::class, function(Container $container)
-		{
-			return $container->createSharedObject(PackageFinder::class);
-		});
+		return new WidgetManager($rendererManager);
 	}
 
 	/**
@@ -113,26 +118,6 @@ class RendererProvider implements ServiceProviderInterface
 		}
 
 		return $container->get(RendererManager::class);
-	}
-
-	/**
-	 * prepareWidget
-	 *
-	 * @param Container  $container
-	 *
-	 * @return WidgetManager
-	 */
-	public function prepareWidgetManager(Container $container)
-	{
-		$closure = function (Container $container)
-		{
-			/** @var RendererManager $rendererManager */
-			$rendererManager = $this->getRendererManager($container);
-
-			return new WidgetManager($rendererManager);
-		};
-
-		$container->share(WidgetManager::class, $closure);
 	}
 
 	/**

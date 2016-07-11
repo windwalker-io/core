@@ -28,12 +28,7 @@ class SecurityProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function(Container $container)
-		{
-			return new CsrfGuard($container);
-		};
-
-		$container->share(CsrfGuard::class, $closure)
+		$container->prepareSharedObject(CsrfGuard::class)
 			->alias('security.csrf', CsrfGuard::class);
 	}
 }

@@ -193,16 +193,15 @@ trait WindwalkerTrait
 		$container->registerServiceProvider(new SystemProvider($this, $this->config));
 
 		$providers = (array) $this->config->get('providers');
-		$bootQueue = [];
 
-		foreach ($providers as $provider)
+		foreach ($providers as &$provider)
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = $container->createSharedObject($provider);
+				$provider = $container->newInstance($provider);
 			}
 
-			if (!$provider)
+			if ($provider === false)
 			{
 				continue;
 			}
@@ -211,13 +210,16 @@ trait WindwalkerTrait
 
 			if (is_callable([$provider, 'boot']))
 			{
-				$bootQueue[] = $provider;
+				$provider->boot($container);
 			}
 		}
 
-		foreach ($bootQueue as $provider)
+		foreach ($providers as $provider)
 		{
-			$provider->boot($container);
+			if (is_callable([$provider, 'bootDeferred']))
+			{
+				$provider->bootDeferred($container);
+			}
 		}
 	}
 
@@ -274,7 +276,7 @@ trait WindwalkerTrait
 			}
 			else
 			{
-				$dispatcher->addListener($this->container->createSharedObject($listener['class']), $listener['priority']);
+				$dispatcher->addListener($this->container->newInstance($listener['class']), $listener['priority']);
 			}
 		}
 	}

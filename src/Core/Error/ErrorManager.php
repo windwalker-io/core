@@ -244,9 +244,9 @@ class ErrorManager
 	 *
 	 * @param bool $restore
 	 * @param int  $type
-	 * @param bool $shotdown
+	 * @param bool $shutdown
 	 */
-	public function register($restore = true, $type = null, $shotdown = false)
+	public function register($restore = true, $type = E_ALL | E_STRICT, $shutdown = false)
 	{
 		if ($type === null)
 		{
@@ -261,7 +261,7 @@ class ErrorManager
 		set_error_handler([$this, 'error'], $type);
 		set_exception_handler([$this, 'exception']);
 
-		if ($shotdown)
+		if ($shutdown)
 		{
 			register_shutdown_function([$this, 'down']);
 		}

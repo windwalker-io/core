@@ -32,10 +32,7 @@ class CacheProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		// Get cache factory object.
-		$container->share(CacheManager::class, function(Container $container)
-		{
-			return $container->createSharedObject(CacheManager::class);
-		});
+		$container->prepareSharedObject(CacheManager::class);
 
 		// Get global cache object.
 		$container->share(Cache::class, function(Container $container)
@@ -46,7 +43,7 @@ class CacheProvider implements ServiceProviderInterface
 			$storage = $config->get('cache.storage', 'file');
 			$handler = $config->get('cache.serializer', 'php');
 
-			return $container->get('cache.manager')->create('windwalker', $storage, $handler);
+			return $container->get(CacheManager::class)->create('windwalker', $storage, $handler);
 		});
 	}
 }
