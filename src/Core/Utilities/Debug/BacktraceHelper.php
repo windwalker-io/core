@@ -39,7 +39,7 @@ class BacktraceHelper
 	 *
 	 * @return  array
 	 */
-	public static function normalizeBacktrace($trace)
+	public static function normalizeBacktrace(array $trace)
 	{
 		$trace = new Data($trace);
 
@@ -57,8 +57,20 @@ class BacktraceHelper
 			}
 			elseif (is_string($arg))
 			{
-				$arg = Utf8String::substr($arg, 0, 10);
+				if (Utf8String::strlen($arg) > 10)
+				{
+					$arg = Utf8String::substr($arg, 0, 10) . '...';
+				}
+
 				$arg = StringHelper::quote($arg);
+			}
+			elseif (is_null($arg))
+			{
+				$arg = 'NULL';
+			}
+			elseif (is_bool($arg))
+			{
+				$arg = $arg ? 'TRUE' : 'FALSE';
 			}
 
 			$args[] = $arg;
@@ -78,7 +90,7 @@ class BacktraceHelper
 	 *
 	 * @return  array
 	 */
-	public static function normalizeBacktraces($traces)
+	public static function normalizeBacktraces(array $traces)
 	{
 		$return = [];
 
