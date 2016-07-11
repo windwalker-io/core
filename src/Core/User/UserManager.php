@@ -16,6 +16,7 @@ use Windwalker\Authorisation\Authorisation;
 use Windwalker\Authorisation\AuthorisationInterface;
 use Windwalker\Authorisation\PolicyInterface;
 use Windwalker\Authorisation\PolicyProviderInterface;
+use Windwalker\Core\User\Exception\AuthenticateFailException;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\EventTriggerableInterface;
@@ -108,6 +109,8 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 * @param array        $options
 	 *
 	 * @return  boolean
+	 *
+	 * @throws  AuthenticateFailException
 	 */
 	public function login($user, $remember = false, $options = array())
 	{
@@ -129,37 +132,48 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 		$this->triggerEvent('onUserBeforeLogin', ['user' => &$user, 'options' => &$options]);
 
 		// Do login
-		if ($result = $this->authentication->authenticate($user))
+		try
 		{
-			$user = $this->authentication->getCredential();
+			if ($result = $this->authentication->authenticate($user))
+			{
+				$user = $this->authentication->getCredential();
 
-			// Authorise event
-			$this->triggerEvent('onUserAuthorisation', [
-				'user'    => &$user,
-				'authorisation' => $this->getAuthorisation(),
-				'options' => &$options,
+				// Authorise event
+				$this->triggerEvent('onUserAuthorisation', [
+					'user'    => &$user,
+					'authorisation' => $this->getAuthorisation(),
+					'options' => &$options,
+					'result'  => &$result
+				]);
+
+				if ($result)
+				{
+					$result = $this->makeUserLoggedIn($user);
+				}
+			}
+
+			// After login event
+			$this->triggerEvent('onUserAfterLogin', [
+				'user'    => $user,
+				'options' => $options,
 				'result'  => &$result
 			]);
 
-			if ($result)
+			if (!$result)
 			{
-				$result = $this->makeUserLogin($user);
+				throw new AuthenticateFailException($this->authentication->getResults());
 			}
 		}
-
-		// After login event
-		$this->triggerEvent('onUserAfterLogin', [
-			'user'    => $user,
-			'options' => $options,
-			'result'  => &$result
-		]);
-
-		// Fail event
-		if (!$result)
+		catch (AuthenticateFailException $e)
 		{
-			$this->triggerEvent('onUserLoginFailure', ['user' => $user, 'options' => $options, 'results' => $this->authentication->getResults()]);
+			$this->triggerEvent('onUserLoginFailure', [
+				'user' => $user,
+				'options' => $options,
+				'results' => $this->authentication->getResults(),
+				'exception' => $e
+			]);
 
-			return false;
+			throw $e;
 		}
 
 		return true;
@@ -172,7 +186,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 *
 	 * @return  boolean
 	 */
-	public function makeUserLogin($user)
+	public function makeUserLoggedIn($user)
 	{
 		if (!is_array($user) && !is_object($user))
 		{
@@ -278,7 +292,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 			throw new \InvalidArgumentException('User data should be array or object.');
 		}
 
-		if (!$user instanceof UserData)
+		if (!$user instanceof UserDataInterface)
 		{
 			$user = new UserData($user);
 		}

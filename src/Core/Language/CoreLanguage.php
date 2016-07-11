@@ -8,8 +8,9 @@
 
 namespace Windwalker\Core\Language;
 
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\DI\Container;
+use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Language\Language;
 use Windwalker\Language\LanguageNormalize;
 use Windwalker\Structure\Structure;
@@ -27,28 +28,34 @@ class CoreLanguage extends Language
 	 * @var  Structure
 	 */
 	protected $config;
+
 	/**
-	 * Property container.
+	 * Property packageResolver.
 	 *
-	 * @var  Container
+	 * @var  PackageResolver
 	 */
-	protected $container;
+	protected $packageResolver;
 
 	/**
 	 * CoreLanguage constructor.
 	 *
-	 * @param Structure $config
-	 * @param Container $container
+	 * @param Config          $config
+	 * @param PackageResolver $packageResolver
 	 */
-	public function __construct(Structure $config, Container $container)
+	public function __construct(Config $config, PackageResolver $packageResolver)
 	{
 		$this->config = $config;
-		$this->container = $container;
+		$this->packageResolver = $packageResolver;
 
 		parent::__construct(
 			$config->get('language.locale', 'en-GB'),
 			$config->get('language.default', 'en-GB')
 		);
+
+		$debug     = $config['system.debug'] ? : false;
+		$langDebug = $config['language.debug'] ? : false;
+		
+		$this->setDebug(($debug && $langDebug));
 	}
 
 	/**
@@ -77,7 +84,7 @@ class CoreLanguage extends Language
 		// If package name exists, we load package language first, that global can override it.
 		if (is_string($package))
 		{
-			$package = $this->container->get('package.resolver')->getPackage($package);
+			$package = $this->packageResolver->getPackage($package);
 		}
 
 		if ($package instanceof AbstractPackage)

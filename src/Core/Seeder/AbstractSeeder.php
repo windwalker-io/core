@@ -122,9 +122,7 @@ abstract class AbstractSeeder
 	 *
 	 * @return  void
 	 */
-	public function doClear()
-	{
-	}
+	abstract public function doClear();
 
 	/**
 	 * Get DB table.

@@ -8,7 +8,9 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Cache\Cache;
 use Windwalker\Core\Cache\CacheFactory;
+use Windwalker\Core\Cache\CacheManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Structure\Structure;
@@ -30,15 +32,13 @@ class CacheProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		// Get cache factory object.
-		$closure = function(Container $container)
+		$container->share(CacheManager::class, function(Container $container)
 		{
-			return CacheFactory::getInstance($container);
-		};
-
-		$container->share(CacheFactory::class, $closure);
+			return $container->createSharedObject(CacheManager::class);
+		});
 
 		// Get global cache object.
-		$container->share('cache', function(Container $container)
+		$container->share(Cache::class, function(Container $container)
 		{
 			/** @var Structure $config */
 			$config = $container->get('config');
@@ -46,7 +46,7 @@ class CacheProvider implements ServiceProviderInterface
 			$storage = $config->get('cache.storage', 'file');
 			$handler = $config->get('cache.serializer', 'php');
 
-			return $container->get('cache.factory')->create('windwalker', $storage, $handler);
+			return $container->get('cache.manager')->create('windwalker', $storage, $handler);
 		});
 	}
 }

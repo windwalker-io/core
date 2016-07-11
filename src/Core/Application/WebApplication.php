@@ -14,6 +14,7 @@ use Windwalker\Application\AbstractWebApplication;
 use Windwalker\Core;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Config\Config;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
@@ -88,16 +89,16 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * Class constructor.
 	 *
 	 * @param   Request        $request       An optional argument to provide dependency injection for the Http request object.
-	 * @param   Structure      $config        An optional argument to provide dependency injection for the application's
+	 * @param   Config         $config        An optional argument to provide dependency injection for the application's
 	 *                                        config object.
 	 * @param   WebEnvironment $environment   An optional argument to provide dependency injection for the application's
 	 *                                        environment object.
 	 *
 	 * @since   2.0
 	 */
-	public function __construct(Request $request = null, Structure $config = null, WebEnvironment $environment = null)
+	public function __construct(Request $request = null, Config $config = null, WebEnvironment $environment = null)
 	{
-		$this->config   = $config instanceof Structure ? $config : new Structure($config);
+		$this->config   = $config instanceof Config ? $config : new Config;
 		$this->name     = $this->config->get('name', $this->name);
 		$this->rootPath = $this->config->get('path.root', $this->rootPath);
 
@@ -105,7 +106,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		$this->container = Core\Ioc::factory();
 
-		parent::__construct($request, $config, $environment);
+		parent::__construct($request, $this->config, $environment);
 
 		$this->set('execution.start', microtime(true));
 		$this->set('execution.memory', memory_get_usage());

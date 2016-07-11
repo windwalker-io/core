@@ -14,6 +14,7 @@ use Windwalker\Console\IO\IOInterface;
 use Windwalker\Console\IO\NullInput;
 use Windwalker\Core;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Debugger\Helper\ComposerInformation;
@@ -94,11 +95,11 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 * Class init.
 	 *
 	 * @param   IOInterface $io     The Input and output handler.
-	 * @param   Structure   $config Application's config object.
+	 * @param   Config      $config Application's config object.
 	 */
-	public function __construct(IOInterface $io = null, $config = null)
+	public function __construct(IOInterface $io = null, Config $config = null)
 	{
-		$this->config = $config instanceof Structure ? $config : new Structure($config);
+		$this->config = $config instanceof Config ? $config : new Config;
 		$this->name   = $this->config->get('name', $this->name);
 
 		Core\Ioc::setProfile($this->name);

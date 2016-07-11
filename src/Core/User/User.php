@@ -8,9 +8,11 @@
 
 namespace Windwalker\Core\User;
 
+use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\AuthenticationInterface;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\MethodInterface;
+use Windwalker\Authorisation\Authorisation;
 use Windwalker\Authorisation\AuthorisationInterface;
 use Windwalker\Authorisation\PolicyProviderInterface;
 use Windwalker\Core\Facade\AbstractProxyFacade;
@@ -18,7 +20,9 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The User class.
  *
- * @see \Windwalker\Core\Authentication\UserManager
+ * @see UserManager
+ * @see Authentication
+ * @see Authorisation
  *
  * @method static boolean          authenticate(Credential $credential)
  * @method static integer[]        getAuthResults()

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Mailer;
 
+use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Core\Mailer\Adapter\SwiftMailerAdapter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -29,33 +30,35 @@ class SwiftMailerProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share(\Swift_Mailer::class, function (Container $container)
-		{
-			/** @var Structure $config */
-			$config = $container->get('config');
-
-			$transport = SwiftMailerAdapter::createTransport($config->get('mail.transport'), (array) $config->get('mail'));
-
-			return \Swift_Mailer::newInstance($transport);
-		})->alias('swiftmailer', \Swift_Mailer::class);
+		$container->share(\Swift_Mailer::class, [$this, 'swiftmailer'])
+			->alias('swiftmailer', \Swift_Mailer::class);
 
 		$container->share(SwiftMailerAdapter::class, function (Container $container)
 		{
 		    return $container->createSharedObject(SwiftMailerAdapter::class);
-		})->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class);
+		})->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class)
+			->alias(MailerAdapterInterface::class, SwiftMailerAdapter::class);
+	}
 
-		$closure = function(MailerManager $mailer, Container $container)
+	/**
+	 * swiftmailer
+	 *
+	 * @param Container $container
+	 *
+	 * @return  \Swift_Mailer
+	 */
+	public function swiftmailer(Container $container)
+	{
+		if (!class_exists('Swift_Mailer'))
 		{
-			if (!class_exists('Swift_Mailer'))
-			{
-				throw new \LogicException('Please install swiftmailer/swiftmailer 5.* first.');
-			}
+			throw new \LogicException('Please install swiftmailer/swiftmailer 5.* first.');
+		}
+		
+		/** @var Structure $config */
+		$config = $container->get('config');
 
-			$mailer->setAdapter($container->get('mailer.adapter.swiftmailer'));
+		$transport = SwiftMailerAdapter::createTransport($config->get('mail.transport'), (array) $config->get('mail'));
 
-			return $mailer;
-		};
-
-		$container->extend(MailerManager::class, $closure);
+		return \Swift_Mailer::newInstance($transport);
 	}
 }

@@ -28,19 +28,9 @@ class LanguageProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function(Container $container)
+		$container->share(CoreLanguage::class, function(Container $container)
 		{
-			/** @var \Windwalker\Structure\Structure $config */
-			$config = $container->get('config');
-
-			$debug     = $config['system.debug'] ? : false;
-			$langDebug = $config['language.debug'] ? : false;
-
-			$language = new CoreLanguage($config, $container);
-
-			return $language->setDebug(($debug && $langDebug));
-		};
-
-		$container->share(CoreLanguage::class, $closure);
+			return $container->createSharedObject(CoreLanguage::class);
+		});
 	}
 }

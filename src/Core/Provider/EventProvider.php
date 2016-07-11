@@ -11,6 +11,8 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Event\Dispatcher;
+use Windwalker\Event\DispatcherInterface;
 
 /**
  * The EventProvider class.
@@ -37,7 +39,8 @@ class EventProvider implements ServiceProviderInterface
 			return $dispatcher;
 		};
 
-		$container->share(EventDispatcher::class, $closure);
+		$container->share(EventDispatcher::class, $closure)
+			->alias(Dispatcher::class, EventDispatcher::class)
+			->alias(DispatcherInterface::class, EventDispatcher::class);
 	}
 }
- 

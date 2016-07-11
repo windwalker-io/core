@@ -43,9 +43,17 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'messages'  => [$this, 'messages'],
 			'widget'    => [$this, 'widget'],
 			'route'     => [$this, 'route'],
+			'formToken' => [$this, 'formToken'],
+
+			// Authorisation
+			'auth'      => [$this, 'auth'],
+			'can'       => [$this, 'auth'],
+			'endcan'    => [$this, 'endauth'],
+			'endauth'   => [$this, 'endauth'],
+
+			// Asset
 			'assetTemplate' => [$this, 'assetTemplate'],
-			'endTemplate'   => [$this, 'endTemplate'],
-			'formToken' => [$this, 'formToken']
+			'endTemplate'   => [$this, 'endTemplate']
 		];
 	}
 
@@ -138,7 +146,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function route($expression)
 	{
-		return "<?php echo \$route->encode{$expression} ?>";
+		return "<?php echo htmlspecialchars(\$router->route{$expression}) ?>";
 	}
 
 	/**
@@ -163,6 +171,30 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function endTemplate($expression)
 	{
 		return "<?php \$asset->getTemplate()->endTemplate{$expression} ?>";
+	}
+
+	/**
+	 * auth
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function auth($expression)
+	{
+		return "<?php if (\\Windwalker\\Core\\User\\User::authorise{$expression}): ?>";
+	}
+
+	/**
+	 * endauth
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function endauth($expression)
+	{
+		return "<?php endif; ?>";
 	}
 
 	/**

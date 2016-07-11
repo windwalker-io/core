@@ -2,13 +2,14 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
+ * @copyright  Copyright (C) {YEAR} {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later;
  */
 
 use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Database\Schema\Column;
 use Windwalker\Database\Schema\DataType;
+use Windwalker\Database\Schema\Schema;
 
 /**
  * Migration class, version: {{version}}

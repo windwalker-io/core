@@ -30,7 +30,7 @@ class LoggerProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			return new LoggerManager($container);
+			return new LoggerManager($container->get('config')->get('path.logs'));
 		};
 
 		$container->share(LoggerManager::class, $closure);

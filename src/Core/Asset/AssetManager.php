@@ -8,13 +8,17 @@
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Core\Config\Config;
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Filesystem\File;
 use Windwalker\Ioc;
 use Windwalker\String\StringHelper;
+use Windwalker\Uri\UriData;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -30,7 +34,6 @@ use Windwalker\Utilities\ArrayHelper;
 class AssetManager implements DispatcherAwareInterface
 {
 	use DispatcherAwareTrait;
-	use OptionAccessTrait;
 
 	/**
 	 * Property styles.
@@ -96,16 +99,25 @@ class AssetManager implements DispatcherAwareInterface
 	public $root;
 
 	/**
+	 * Property config.
+	 *
+	 * @var  Config
+	 */
+	protected $config;
+
+	/**
 	 * AssetManager constructor.
 	 *
-	 * @param array $options
+	 * @param Config              $config
+	 * @param UriData             $uri
+	 * @param DispatcherInterface $dispatcher
 	 */
-	public function __construct($options = [])
+	public function __construct(Config $config, UriData $uri, DispatcherInterface $dispatcher)
 	{
-		$this->options = $options;
-		
-		$this->path = $this->getOption('uri_path') ? : Ioc::getUriData()->path . '/asset';
-		$this->root = $this->getOption('uri_root') ? : Ioc::getUriData()->root . '/asset';
+		$this->path = $uri->path . '/asset';
+		$this->root = $uri->root . '/asset';
+		$this->config = $config;
+		$this->dispatcher = $dispatcher;
 	}
 
 	/**
@@ -305,11 +317,11 @@ class AssetManager implements DispatcherAwareInterface
 			return $this->version;
 		}
 
-		$sumFile = $this->getOption('cache_path') . '/asset/MD5SUM';
+		$sumFile = $this->config->get('path.cache') . '/asset/MD5SUM';
 
 		if (!is_file($sumFile))
 		{
-			if ($this->getOption('debug'))
+			if ($this->config->get('system.debug'))
 			{
 				return $this->version = md5(uniqid());
 			}
@@ -340,7 +352,7 @@ class AssetManager implements DispatcherAwareInterface
 
 		if (strpos($assetUri, 'http') === 0 | strpos($assetUri, '//') === 0)
 		{
-			return $version = md5($assetUri . $this->getOption('secret', 'Windwalker-Asset'));
+			return $version = md5($assetUri . $this->config->get('system.secret', 'Windwalker-Asset'));
 		}
 		else
 		{
@@ -361,7 +373,7 @@ class AssetManager implements DispatcherAwareInterface
 			$time .= $file->getMTime();
 		}
 
-		return $version = md5($this->getOption('secret', 'Windwalker-Asset') . $time);
+		return $version = md5($this->config->get('system.secret', 'Windwalker-Asset') . $time);
 	}
 
 	/**
@@ -374,7 +386,7 @@ class AssetManager implements DispatcherAwareInterface
 	protected function addSysPath($assetUri)
 	{
 		$assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-		$base = rtrim($this->getOption('public_sys_path'), '/\\');
+		$base = rtrim($this->config->get('path.public'), '/\\');
 
 		if (!$base)
 		{
@@ -572,7 +584,7 @@ class AssetManager implements DispatcherAwareInterface
 		}
 
 		// Use uncompressed file first
-		if ($this->getOption('debug'))
+		if ($this->config->get('system.debug'))
 		{
 			if (is_file($root . '/' . $assetFile))
 			{

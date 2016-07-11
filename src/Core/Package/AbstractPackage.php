@@ -283,13 +283,10 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function registerProviders(Container $container)
 	{
-		/** @var Container $container */
-		$container = $this->getContainer();
-
 		$sysProvider = new PackageProvider($this);
-		$sysProvider->boot();
-
 		$container->registerServiceProvider($sysProvider);
+
+		$sysProvider->boot();
 
 		$providers = (array) $this->get('providers');
 
@@ -297,7 +294,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = new $provider($this);
+				$provider = $container->createSharedObject($provider);
 			}
 
 			if (!$provider)
@@ -305,12 +302,12 @@ class AbstractPackage implements DispatcherAwareInterface
 				continue;
 			}
 
+			$container->registerServiceProvider($provider);
+
 			if (is_callable($provider, 'boot'))
 			{
 				$provider->boot($container);
 			}
-
-			$container->registerServiceProvider($provider);
 		}
 	}
 
@@ -351,7 +348,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			}
 			elseif (class_exists($listener['class']))
 			{
-				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
+				$dispatcher->addListener($this->container->createSharedObject($listener['class']), $listener['priority']);
 			}
 		}
 	}
@@ -422,7 +419,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
 			{
-				$middleware = new Psr7Middleware(new $middleware($this->app, $this));
+				$middleware = new Psr7Middleware($this->container->createSharedObject($middleware));
 			}
 			elseif ($middleware instanceof \Closure)
 			{

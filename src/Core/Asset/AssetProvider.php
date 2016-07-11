@@ -8,7 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
-use Windwalker\Core\Registry\ConfigStructure;
+use Windwalker\Core\Config\Config;
+use Windwalker\Core\Config\ConfigStructure;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Uri\UriData;
@@ -31,24 +32,7 @@ class AssetProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			/**
-			 * @var UriData         $uri
-			 * @var ConfigStructure $config
-			 */
-			$uri = $container->get('uri');
-			$config = $container->get('config');
-
-			$asset = new AssetManager([
-				'uri_path' => rtrim($uri->path, '/') . '/' . $config->get('asset.uri', 'asset'),
-				'uri_root' => rtrim($uri->root, '/') . '/' . $config->get('asset.uri', 'asset'),
-				'public_sys_path' => $config->get('path.public'),
-				'cache_path' => $config->get('path.cache', sys_get_temp_dir()),
-				'debug' => $config->get('system.debug')
-			]);
-			
-			$asset->setDispatcher($container->get('dispatcher'));
-
-			return $asset;
+			return $container->createSharedObject(AssetManager::class);
 		};
 
 		$container->share(AssetManager::class, $closure);

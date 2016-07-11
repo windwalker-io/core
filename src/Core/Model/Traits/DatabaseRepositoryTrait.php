@@ -25,28 +25,16 @@ trait DatabaseRepositoryTrait
 	use DatabaseModelTrait;
 
 	/**
-	 * Default Record name
-	 *
-	 * @var  string
-	 */
-	protected $record;
-
-	/**
-	 * Default DataMapper name.
-	 *
-	 * @var  string
-	 */
-	protected $dataMapper;
-
-	/**
 	 * bootModelRepositoryTrait
 	 *
 	 * @return  void
 	 */
 	public function bootModelRepositoryTrait()
 	{
-		$this->table = property_exists($this, 'table') ? $this->table : null;
-		$this->keys = property_exists($this, 'keys') ? $this->keys : 'id';
+		$this->table  = property_exists($this, 'table')  ? $this->table  : null;
+		$this->keys   = property_exists($this, 'keys')   ? $this->keys   : 'id';
+		$this->record = property_exists($this, 'record') ? $this->record : null;
+		$this->dataMapper = property_exists($this, 'dataMapper') ? $this->dataMapper : null;
 	}
 	
 	/**
@@ -58,11 +46,10 @@ trait DatabaseRepositoryTrait
 	 */
 	public function getRecord($name = null)
 	{
-		$name = $name ? : $this->record;
-		$name = $name ? : $this->getName();
+		$recordName = $name ? : $this->record;
+		$recordName = $recordName ? : $this->getName();
 
 		$mapper = $this->getDataMapper();
-		$errors = [];
 
 		if ($mapper instanceof CoreDataMapper)
 		{
@@ -70,17 +57,15 @@ trait DatabaseRepositoryTrait
 		}
 
 		// (1): Find object from registered namespaces
-		$record = RecordResolver::create($name, $this->table, $this->keys, $mapper);
-
-		if ($record)
+		if ($record = RecordResolver::create($recordName, $this->table, $this->keys, $mapper))
 		{
 			return $record;
 		}
 
-		$errors[] = sprintf('Record: "%s" not found from namespaces: (%s)', $name, implode(" |\n ", RecordResolver::dumpNamespaces()));
+		$errors[] = sprintf('Record: "%s" not found from namespaces: (%s)', $recordName, implode(" |\n ", RecordResolver::dumpNamespaces()));
 
 		// (2): Find from package directory.
-		$class = sprintf('%s\Record\%sRecord', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($name));
+		$class = sprintf('%s\Record\%sRecord', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($recordName));
 
 		if (class_exists($class))
 		{
@@ -89,12 +74,15 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if ($name)
+		if ($recordName)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
 
-		if (!$this->table)
+		// If name not NULL, set it as table name, otherwise use pre-set table property.
+		$table = $name ? : $this->table;
+
+		if (!$table)
 		{
 			throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ", $errors));
 		}
@@ -112,22 +100,19 @@ trait DatabaseRepositoryTrait
 	 */
 	public function getDataMapper($name = null)
 	{
-		$name = $name ? : $this->dataMapper;
-		$name = $name ? : $this->getName();
+		$mapperName = $name ? : $this->dataMapper;
+		$mapperName = $mapperName ? : $this->getName();
 
 		// (1): Find object from registered namespaces
-		$mapper = DataMapperResolver::create($name, $this->table, $this->keys, $this->db);
-		$errors = [];
-
-		if ($mapper)
+		if ($mapper = DataMapperResolver::create($mapperName, $this->table, $this->keys, $this->db))
 		{
 			return $mapper;
 		}
 
-		$errors[] = sprintf('DataMapper: "%s" not found from namespaces: (%s)', $name, implode(" |\n ", DataMapperResolver::dumpNamespaces()));
+		$errors[] = sprintf('DataMapper: "%s" not found from namespaces: (%s)', $mapperName, implode(" |\n ", DataMapperResolver::dumpNamespaces()));
 
 		// (2): Find from package directory.
-		$class = sprintf('%s\DataMapper\%sMapper', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($name));
+		$class = sprintf('%s\DataMapper\%sMapper', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($mapperName));
 
 		if (class_exists($class))
 		{
@@ -136,17 +121,20 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if ($name)
+		if (!$mapperName)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
 
-		if (!$this->table)
+		// If name not NULL, set it as table name, otherwise use pre-set table property.
+		$table = $name ? : $this->table;
+
+		if (!$table)
 		{
 			throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ", $errors));
 		}
 
 		// (3): If name is null, we get default object with table name provided.
-		return new DataMapper($this->table, $this->keys, $this->db);
+		return new DataMapper($table, $this->keys, $this->db);
 	}
 }

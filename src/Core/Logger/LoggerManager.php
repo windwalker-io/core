@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Logger\Monolog\GlobalContainer;
+use Windwalker\Core\Config\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
 
@@ -23,7 +24,7 @@ use Windwalker\DI\ContainerAwareInterface;
  *
  * @since  2.1.1
  */
-class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, ContainerAwareInterface
+class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 {
 	/**
 	 * Property loggers.
@@ -40,20 +41,20 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, Con
 	protected $nullLogger;
 
 	/**
-	 * Property container.
+	 * Property logPath.
 	 *
-	 * @var  Container
+	 * @var
 	 */
-	protected $container;
+	protected $logPath;
 
 	/**
 	 * LoggerPool constructor.
 	 *
-	 * @param Container $container
+	 * @param  string  $logPath
 	 */
-	public function __construct(Container $container)
+	public function __construct($logPath)
 	{
-		$this->container = $container;
+		$this->logPath = $logPath;
 	}
 
 	/**
@@ -260,7 +261,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, Con
 			{
 				$logger = new Monolog($category);
 
-				$handler = new StreamHandler($this->container->get('config')->get('path.logs') . '/' . $category . '.log', $level);
+				$handler = new StreamHandler($this->logPath . '/' . $category . '.log', $level);
 				$logger->pushProcessor(new PsrLogMessageProcessor);
 
 				// Basic string handler
@@ -435,25 +436,25 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate, Con
 	}
 
 	/**
-	 * Get the DI container.
-	 *
-	 * @return  Container
-	 */
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	/**
-	 * Set the DI container.
-	 *
-	 * @param   Container $container The DI container.
+	 * Method to get property LogPath
 	 *
 	 * @return  mixed
 	 */
-	public function setContainer(Container $container)
+	public function getLogPath()
 	{
-		$this->container = $container;
+		return $this->logPath;
+	}
+
+	/**
+	 * Method to set property logPath
+	 *
+	 * @param   mixed $logPath
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setLogPath($logPath)
+	{
+		$this->logPath = $logPath;
 
 		return $this;
 	}

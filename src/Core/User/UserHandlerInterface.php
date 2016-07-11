@@ -20,7 +20,7 @@ interface UserHandlerInterface
 	 *
 	 * @param array $conditions
 	 *
-	 * @return  mixed|false
+	 * @return  UserDataInterface|false
 	 */
 	public function load($conditions);
 

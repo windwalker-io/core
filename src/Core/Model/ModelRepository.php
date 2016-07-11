@@ -12,6 +12,7 @@ use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
+use Windwalker\Core\Utilities\Classes\SingletonTrait;
 use Windwalker\Structure\Structure;
 
 /**
@@ -24,6 +25,7 @@ use Windwalker\Structure\Structure;
 class ModelRepository implements \ArrayAccess
 {
 	use BootableTrait;
+	use SingletonTrait;
 
 	/**
 	 * Make sure state at the first to easily debug.

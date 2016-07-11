@@ -8,9 +8,10 @@
 
 namespace Windwalker\Core\Renderer;
 
+use Windwalker\Core\Config\Config;
+use Windwalker\Core\Renderer\Finder\PackageFinder;
 use Windwalker\Core\Renderer\Traits\GlobalVarsTrait;
 use Windwalker\Core\View\Helper\AbstractHelper;
-use Windwalker\DI\Container;
 use Windwalker\Renderer\AbstractRenderer;
 use Windwalker\Renderer\MustacheRenderer;
 use Windwalker\Renderer\BladeRenderer;
@@ -48,23 +49,32 @@ class RendererManager
 	 * @var  AbstractHelper[]
 	 */
 	protected $helpers = [];
-
+	
 	/**
-	 * Property container.
+	 * Property config.
 	 *
-	 * @var  Container
+	 * @var  Config
 	 */
-	protected $container;
+	protected $config;
+	
+	/**
+	 * Property finder.
+	 *
+	 * @var  PackageFinder
+	 */
+	protected $finder;
 
 	/**
 	 * RendererFactory constructor.
 	 *
-	 * @param PriorityQueue|array $paths
-	 * @param Container           $container
+	 * @param Config        $config
+	 * @param PackageFinder $finder
+	 * @param array         $paths
 	 */
-	public function __construct(Container $container, $paths = array())
+	public function __construct(Config $config, PackageFinder $finder, $paths = array())
 	{
-		$this->container = $container;
+		$this->config = $config;
+		$this->finder = $finder;
 
 		if ($paths)
 		{
@@ -101,9 +111,7 @@ class RendererManager
 		{
 			if (empty($config['cache_path']))
 			{
-				$config = $this->container->get('config');
-
-				$config['cache_path'] = $config->get('path.cache') . '/renderer';
+				$config['cache_path'] = $this->config->get('path.cache') . '/renderer';
 			}
 		}
 
@@ -111,9 +119,7 @@ class RendererManager
 		{
 			if (empty($config['cache_path']) && !isset($config['cache']))
 			{
-				$config = $this->container->get('config');
-
-				$config['cache_path'] = $config->get('path.cache') . '/renderer';
+				$config['cache_path'] = $this->config->get('path.cache') . '/renderer';
 			}
 		}
 
@@ -128,7 +134,7 @@ class RendererManager
 		/** @var AbstractRenderer|CoreRendererInterface|GlobalVarsTrait $renderer */
 		$renderer = new $class(static::getGlobalPaths(), $config);
 
-		$renderer->setPackageFinder($this->container->get('package.finder'));
+		$renderer->setPackageFinder($this->finder);
 		$renderer->setGlobals($this->getGlobals());
 
 		return $renderer;
@@ -278,7 +284,7 @@ class RendererManager
 	 */
 	protected function registerPaths()
 	{
-		$config = $this->container->get('config');
+		$config = $this->config;
 
 		// Priority (1)
 		$this->addPath(

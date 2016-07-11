@@ -334,7 +334,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		}
 
 		// Now we return result to package that it will handle response.
-		return $this->processSuccess();
+		return $this->processSuccess($result);
 	}
 
 	/**
@@ -411,11 +411,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	/**
 	 * Process success.
 	 *
-	 * @return bool
+	 * @param  mixed  $result
+	 *
+	 * @return mixed
 	 */
-	public function processSuccess()
+	public function processSuccess($result)
 	{
-		return true;
+		return $result;
 	}
 
 	/**

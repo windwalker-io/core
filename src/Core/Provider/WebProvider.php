@@ -39,9 +39,9 @@ class WebProvider implements ServiceProviderInterface
 		$container->share(WebApplication::class, $app);
 
 		// Input
-		$container->share(Input::class, function (Container $container)
+		$container->share(Input::class, function (Container $container) use ($app)
 		{
-		    return PsrInput::create($container->get('application')->getRequest());
+		    return PsrInput::create($app->getRequest());
 		})->alias(PsrInput::class, Input::class);
 
 		// Environment
@@ -49,14 +49,12 @@ class WebProvider implements ServiceProviderInterface
 
 		$container->share(Browser::class, $app->getEnvironment()->getBrowser());
 
-		$container
-			->share(Platform::class, $app->getEnvironment()->getPlatform());
+		$container->share(Platform::class, $app->getEnvironment()->getPlatform());
 
 		// Uri
 		$container->share(UriData::class, function (Container $container) use ($app)
 		{
-			return $container->get('application')->getServer()->getUriData();
+			return $app->getServer()->getUriData();
 		});
 	}
 }
- 

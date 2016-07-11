@@ -190,7 +190,7 @@ trait WindwalkerTrait
 			$container->alias($alias, $target);
 		}
 
-		$container->registerServiceProvider(new SystemProvider($this));
+		$container->registerServiceProvider(new SystemProvider($this, $this->config));
 
 		$providers = (array) $this->config->get('providers');
 		$bootQueue = [];
@@ -199,9 +199,9 @@ trait WindwalkerTrait
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = new $provider($this);
+				$provider = $container->createSharedObject($provider);
 			}
-			
+
 			if (!$provider)
 			{
 				continue;
@@ -274,7 +274,7 @@ trait WindwalkerTrait
 			}
 			else
 			{
-				$dispatcher->addListener(new $listener['class']($this), $listener['priority']);
+				$dispatcher->addListener($this->container->createSharedObject($listener['class']), $listener['priority']);
 			}
 		}
 	}

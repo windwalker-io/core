@@ -89,7 +89,7 @@ class PackageResolver implements ContainerAwareInterface
 			}
 
 			/** @var \Windwalker\Core\Package\AbstractPackage $package */
-			$package = new $package;
+			$package = $this->container->createSharedObject($package);
 		}
 
 		if (!$package)

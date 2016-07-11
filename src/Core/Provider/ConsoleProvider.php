@@ -48,6 +48,8 @@ class ConsoleProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
+		$container->share(CoreConsole::class, $this->app);
+
 		// Input
 		$container->share(IOInterface::class, $this->app->io)
 			->alias('io', IOInterface::class);

@@ -11,6 +11,7 @@ namespace Windwalker\Core\Provider;
 use Illuminate\View\Compilers\BladeCompiler;
 use Windwalker\Core\DateTime\DateTime;
 use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Core\Renderer\Edge\WindwalkerExtension as EdgeExtension;
 use Windwalker\Core\Renderer\Finder\PackageFinder;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Core\Renderer\Twig\WindwalkerExtension;
@@ -78,25 +79,23 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareManager(Container $container)
 	{
-		$closure = function (Container $container)
+		$container->share(RendererManager::class, function (Container $container)
 		{
-			$manager = new RendererManager($container);
+			/** @var RendererManager $manager */
+			$manager = $container->createSharedObject(RendererManager::class);
+
 			$this->rendererManager = $manager;
 
 			// Prepare Globals
 			$this->prepareGlobals($container, $manager);
 
 			return $manager;
-		};
+		});
 
-		$container->share(RendererManager::class, $closure);
-
-		$closure = function(Container $container)
+		$container->share(PackageFinder::class, function(Container $container)
 		{
-			return new PackageFinder($container->get('package.resolver'));
-		};
-
-		$container->share(PackageFinder::class, $closure);
+			return $container->createSharedObject(PackageFinder::class);
+		});
 	}
 
 	/**
@@ -113,7 +112,7 @@ class RendererProvider implements ServiceProviderInterface
 			return $this->rendererManager;
 		}
 
-		return $container->get('renderer.manager');
+		return $container->get(RendererManager::class);
 	}
 
 	/**
@@ -190,7 +189,7 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareEdge(Container $container)
 	{
-		Renderer\Edge\GlobalContainer::addExtension(new \Windwalker\Core\Renderer\Edge\WindwalkerExtension);
+		Renderer\Edge\GlobalContainer::addExtension(new EdgeExtension);
 	}
 
 	/**
@@ -223,50 +222,30 @@ class RendererProvider implements ServiceProviderInterface
 			return;
 		}
 
-		Renderer\Blade\GlobalContainer::addCompiler('translate', function($expression)
-		{
-			return "<?php echo \$translator->translate{$expression} ?>";
-		});
+		$extension = new EdgeExtension;
 
-		Renderer\Blade\GlobalContainer::addCompiler('sprintf', function($expression)
-		{
-			return "<?php echo \$translator->sprintf{$expression} ?>";
-		});
+		$directives = [
+			'translate' => [$extension, 'translate'],
+			'sprintf'   => [$extension, 'translate'],
+			'plural'    => [$extension, 'plural'],
+			'messages'  => [$extension, 'messages'],
+			'widget'    => [$extension, 'widget'],
+			'route'     => [$extension, 'route'],
+			'formToken' => [$extension, 'formToken'],
 
-		Renderer\Blade\GlobalContainer::addCompiler('plural', function($expression)
-		{
-			return "<?php echo \$translator->plural{$expression} ?>";
-		});
+			// Authorisation
+			'auth'      => [$extension, 'auth'],
+			'endauth'   => [$extension, 'endauth'],
 
-		Renderer\Blade\GlobalContainer::addCompiler('widget', function($expression)
-		{
-			return "<?php echo \$widget->render{$expression} ?>";
-		});
+			// Asset
+			'assetTemplate' => [$extension, 'assetTemplate'],
+			'endTemplate'   => [$extension, 'endTemplate']
+		];
 
-		Renderer\Blade\GlobalContainer::addCompiler('messages', function($expression)
+		foreach ($directives as $name => $callback)
 		{
-			return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), 'php', \$package) ?>";
-		});
-
-		Renderer\Blade\GlobalContainer::addCompiler('route', function($expression)
-		{
-			return "<?php echo \$route->encode{$expression} ?>";
-		});
-
-		Renderer\Blade\GlobalContainer::addCompiler('assetTemplate', function($expression)
-		{
-			return "<?php \$asset->getTemplate->startTemplate{$expression} ?>";
-		});
-
-		Renderer\Blade\GlobalContainer::addCompiler('endTemplate', function($expression)
-		{
-			return "<?php \$asset->getTemplate->endTemplate{$expression} ?>";
-		});
-
-		Renderer\Blade\GlobalContainer::addCompiler('formToken', function($expression)
-		{
-			return "<?php echo \\Windwalker\\Core\\Security\\CsrfProtection::input{$expression} ?>";
-		});
+			Renderer\Blade\GlobalContainer::addCompiler($name, $callback);
+		}
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
 	}
