@@ -30,37 +30,24 @@ class RouterProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$self = $this;
+		$container->share(MatcherInterface::class, [$this, 'matcher']);
 
-		$closure = function(Container $container) use ($self)
-		{
-			/** @var \Windwalker\Structure\Structure $config */
-			$config = $container->get('config');
-
-			$matcher = $config->get('routing.matcher', 'default');
-
-			$matcher = strtolower($matcher) == 'default' ? 'sequential' : $matcher;
-
-			$router = new CoreRouter(array(), $self->getMatcher($matcher));
-
-			$router->setUri($container->get('uri'))
-				->setDispatcher($container->get('dispatcher'));
-
-			return $router;
-		};
-
-		$container->share(CoreRouter::class, $closure);
+		$container->prepareSharedObject(CoreRouter::class);
 	}
 
 	/**
-	 * getMatcher
+	 * matcher
 	 *
-	 * @param   string  $matcher
+	 * @param Container $container
 	 *
 	 * @return  MatcherInterface
 	 */
-	public function getMatcher($matcher)
+	public function matcher(Container $container)
 	{
+		$matcher = $container->get('config')->get('routing.matcher', 'default');
+
+		$matcher = strtolower($matcher) == 'default' ? 'sequential' : $matcher;
+
 		$class = sprintf('Windwalker\Router\Matcher\%sMatcher', ucfirst($matcher));
 
 		if (!class_exists($class))
@@ -68,7 +55,6 @@ class RouterProvider implements ServiceProviderInterface
 			throw new \DomainException(sprintf('Router Matcher: %s not supported.', ucfirst($matcher)));
 		}
 
-		return new $class;
+		return $container->newInstance($class);
 	}
 }
- 

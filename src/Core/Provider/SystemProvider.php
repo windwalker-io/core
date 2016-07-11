@@ -57,17 +57,14 @@ class SystemProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share(Container::class, $this);
+		$container->share(Container::class, $container);
 
 		$container->share(get_class($this->app), $this->app)
 			->alias(WindwalkerApplicationInterface::class, get_class($this->app));
 
 		$container->share(Config::class, $this->config);
 
-		$container->share(PackageResolver::class, function(Container $container)
-		{
-			return new PackageResolver($container);
-		});
+		$container->prepareSharedObject(PackageResolver::class);
 	}
 }
  

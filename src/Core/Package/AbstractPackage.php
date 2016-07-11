@@ -294,7 +294,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
-				$provider = $container->createSharedObject($provider);
+				$provider = $container->newInstance($provider);
 			}
 
 			if (!$provider)
@@ -348,7 +348,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			}
 			elseif (class_exists($listener['class']))
 			{
-				$dispatcher->addListener($this->container->createSharedObject($listener['class']), $listener['priority']);
+				$dispatcher->addListener($this->container->newInstance($listener['class']), $listener['priority']);
 			}
 		}
 	}
@@ -419,7 +419,7 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
 			{
-				$middleware = new Psr7Middleware($this->container->createSharedObject($middleware));
+				$middleware = new Psr7Middleware($this->container->newInstance($middleware));
 			}
 			elseif ($middleware instanceof \Closure)
 			{

@@ -11,6 +11,8 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Language\CoreLanguage;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Language\Language;
+use Windwalker\Language\LanguageInterface;
 
 /**
  * The LanguageProvider class.
@@ -28,9 +30,8 @@ class LanguageProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share(CoreLanguage::class, function(Container $container)
-		{
-			return $container->createSharedObject(CoreLanguage::class);
-		});
+		$container->prepareSharedObject(CoreLanguage::class)
+			->alias(Language::class, CoreLanguage::class)
+			->alias(LanguageInterface::class, CoreLanguage::class);
 	}
 }

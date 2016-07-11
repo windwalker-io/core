@@ -22,6 +22,7 @@ use Windwalker\Core\User\UserManager;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Event\DispatcherInterface;
 
 /**
  * The AuthenticateProvider class.
@@ -30,6 +31,23 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class UserProvider implements ServiceProviderInterface
 {
+	/**
+	 * Property dispatcher.
+	 *
+	 * @var  DispatcherInterface
+	 */
+	protected $dispatcher;
+
+	/**
+	 * UserProvider constructor.
+	 *
+	 * @param DispatcherInterface $dispatcher
+	 */
+	public function __construct(DispatcherInterface $dispatcher)
+	{
+		$this->dispatcher = $dispatcher;
+	}
+
 	/**
 	 * Registers the service provider with a DI container.
 	 *
@@ -48,10 +66,10 @@ class UserProvider implements ServiceProviderInterface
 			->alias(AuthorisationInterface::class, Authorisation::class);
 
 		// User Handler
-		$container->share(UserHandlerInterface::class, [$this, 'handler']);
+		$this->prepareHandler($container);
 
 		// User Manager
-		$container->share(UserManager::class, [$this, 'handler']);
+		$container->prepareSharedObject(UserManager::class);
 	}
 
 	/**
@@ -63,22 +81,18 @@ class UserProvider implements ServiceProviderInterface
 	 */
 	public function authentication(Container $container)
 	{
-		$auth = $container->createSharedObject(Authentication::class);
+		$auth = $container->newInstance(Authentication::class);
 
 		foreach ((array) $container->get('config')->get('user.methods') as $name => $method)
 		{
-			if (is_string($method) && class_exists($method))
+			if ($method !== false)
 			{
-				$method = $container->createSharedObject($method);
+				$auth->addMethod($container->newInstance($method), $method);
 			}
-
-			$auth->addMethod($name, $method);
 		}
 
 		/** @var EventDispatcher $dispatcher */
-		$dispatcher = $container->get('dispatcher');
-
-		$dispatcher->triggerEvent('onLoadAuthenticationMethods', array('auth' => $auth));
+		$this->dispatcher->triggerEvent('onLoadAuthenticationMethods', array('auth' => $auth));
 
 		return $auth;
 	}
@@ -97,18 +111,13 @@ class UserProvider implements ServiceProviderInterface
 
 		foreach ((array) $config->get('user.policies') as $name => $policy)
 		{
-			if (is_string($policy) && class_exists($policy))
-			{
-				$policy = $container->createSharedObject($policy);
-			}
-
 			if ($policy instanceof PolicyInterface)
 			{
-				$auth->addPolicy($name, $policy);
+				$auth->addPolicy($name, $container->newInstance($policy));
 			}
 			elseif ($policy instanceof PolicyProviderInterface)
 			{
-				$auth->registerPolicyProvider($policy);
+				$auth->registerPolicyProvider($container->newInstance($policy));
 			}
 			elseif ($policy === false)
 			{
@@ -125,9 +134,7 @@ class UserProvider implements ServiceProviderInterface
 		}
 
 		/** @var EventDispatcher $dispatcher */
-		$dispatcher = $container->get('dispatcher');
-
-		$dispatcher->triggerEvent('onLoadAuthorisationPolicies', array('auth' => $auth));
+		$this->dispatcher->triggerEvent('onLoadAuthorisationPolicies', array('auth' => $auth));
 
 		return $auth;
 	}
@@ -139,37 +146,10 @@ class UserProvider implements ServiceProviderInterface
 	 *
 	 * @return  UserHandlerInterface
 	 */
-	public function handler(Container $container)
+	public function prepareHandler(Container $container)
 	{
-		$handler = $container->get('config')->get('user.handler');
+		$handler = $container->get('config')->get('user.handler') ? : NullUserHandler::class;
 
-		if (is_string($handler) && class_exists($handler))
-		{
-			$handler = $container->createSharedObject($handler);
-		}
-
-		if ($handler instanceof UserHandlerInterface)
-		{
-			return $handler;
-		}
-
-		return new NullUserHandler;
-	}
-
-	/**
-	 * manager
-	 *
-	 * @param Container $container
-	 *
-	 * @return  UserManager
-	 */
-	public function manager(Container $container)
-	{
-		/** @var UserManager $manager */
-		$manager = $container->createSharedObject(UserManager::class);
-
-		$manager->setDispatcher($container->get('dispatcher'));
-
-		return $manager;
+		$container->bindShared(UserHandlerInterface::class, $handler);
 	}
 }

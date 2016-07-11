@@ -10,7 +10,15 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Session\Bag\FlashBag;
+use Windwalker\Session\Bag\FlashBagInterface;
+use Windwalker\Session\Bag\SessionBag;
+use Windwalker\Session\Bag\SessionBagInterface;
+use Windwalker\Session\Bridge\NativeBridge;
+use Windwalker\Session\Bridge\SessionBridgeInterface;
+use Windwalker\Session\Database\AbstractDatabaseAdapter;
 use Windwalker\Session\Database\WindwalkerAdapter;
+use Windwalker\Session\Handler\HandlerInterface;
 use Windwalker\Session\Session;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -30,20 +38,24 @@ class SessionProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
+		$container->share(HandlerInterface::class, [$this, 'handler']);
+		$container->share(AbstractDatabaseAdapter::class, [$this, 'dbAdapter']);
+
+		$container->bind(SessionBagInterface::class,    SessionBag::class);
+		$container->bind(FlashBagInterface::class,      FlashBag::class);
+		$container->bind(SessionBridgeInterface::class, NativeBridge::class);
+
 		$closure = function(Container $container)
 		{
 			/** @var \Windwalker\Structure\Structure $config */
 			$config = $container->get('config');
 			$uri = $container->get('uri');
 
-			$handler  = $config->get('session.handler', 'native');
 			$options  = (array) $config->get('session', array());
 
 			$options['cookie_path'] = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->root;
 
-			$sesion = new Session($this->getHandler($handler, $container, $options), null, null, null, $options);
-
-			return $sesion;
+			return $container->newInstance(Session::class, ['options' => $options]);
 		};
 
 		$container->share(Session::class, $closure);
@@ -51,28 +63,30 @@ class SessionProvider implements ServiceProviderInterface
 
 	/**
 	 * getHandler
-	 *
-	 * @param string    $handler
 	 * @param Container $container
 	 *
 	 * @return \Windwalker\Session\Handler\HandlerInterface
 	 */
-	public function getHandler($handler, Container $container, $options)
+	public function handler(Container $container)
 	{
-		$class = sprintf('Windwalker\Session\Handler\%sHandler', ucfirst($handler));
+		$config = $container->get('config');
+		$handler = $config->get('session.handler', 'native');
 
-		if (!class_exists($class))
-		{
-			throw new \DomainException(sprintf('Session handler: %s not supported', $class));
-		}
+		return $container->newInstance(sprintf('Windwalker\Session\Handler\%sHandler', ucfirst($handler)));
+	}
 
-		if ($handler == 'database')
-		{
-			$adapter = new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', array()));
+	/**
+	 * dbAdapter
+	 *
+	 * @param Container $container
+	 *
+	 * @return  WindwalkerAdapter
+	 */
+	public function dbAdapter(Container $container)
+	{
+		$config = $container->get('config');
+		$options = $config->get('session', []);
 
-			return new $class($adapter);
-		}
-
-		return new $class;
+		return new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', array()));
 	}
 }

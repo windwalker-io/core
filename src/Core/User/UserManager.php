@@ -16,9 +16,11 @@ use Windwalker\Authorisation\Authorisation;
 use Windwalker\Authorisation\AuthorisationInterface;
 use Windwalker\Authorisation\PolicyInterface;
 use Windwalker\Authorisation\PolicyProviderInterface;
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\User\Exception\AuthenticateFailException;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\Structure\Structure;
 
@@ -56,13 +58,15 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 * @param UserHandlerInterface    $handler
 	 * @param AuthenticationInterface $authentication
 	 * @param AuthorisationInterface  $authorisation
+	 * @param DispatcherInterface     $dispatcher
 	 */
 	public function __construct(UserHandlerInterface $handler = null, AuthenticationInterface $authentication = null,
-		AuthorisationInterface $authorisation = null)
+		AuthorisationInterface $authorisation = null, DispatcherInterface $dispatcher = null)
 	{
 		$this->handler = $handler ? : new NullUserHandler;
 		$this->authentication = $authentication ? : new Authentication;
 		$this->authorisation = $authorisation ? : new Authorisation;
+		$this->dispatcher = $dispatcher ? : new EventDispatcher;
 	}
 
 	/**
