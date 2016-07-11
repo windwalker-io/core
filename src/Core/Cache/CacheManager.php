@@ -165,7 +165,6 @@ class CacheManager
 		switch (strtolower($storage))
 		{
 			case 'file':
-			case 'raw_file':
 			case 'php_file':
 				$path = $options['cache_dir'];
 				$denyAccess = $options['deny_access'];

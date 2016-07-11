@@ -71,6 +71,11 @@ class DocblockHelper
 				$return = $method->getDeclaringClass()->getName();
 			}
 
+			if (class_exists($return))
+			{
+				$return = '\\' . $return;
+			}
+
 			$source = file($method->getFileName());
 			$body = implode("", array_slice($source, $method->getStartLine() - 1, 1));
 

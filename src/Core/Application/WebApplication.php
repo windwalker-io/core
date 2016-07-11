@@ -11,6 +11,7 @@ namespace Windwalker\Core\Application;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Application\AbstractWebApplication;
+use Windwalker\Cache\Cache;
 use Windwalker\Core;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Package\AbstractPackage;
@@ -44,9 +45,12 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\Router\CoreRouter        router
  * @property-read  Language                      language
  * @property-read  Core\Renderer\RendererManager renderer
- * @property-read  Core\Cache\CacheFactory       cache
+ * @property-read  Core\Cache\cacheManager       cacheManager
+ * @property-read  Cache                         cache
  * @property-read  Session                       session
  * @property-read  Core\Mailer\MailerManager     mailer
+ * @property-read  Core\Asset\AssetManager       asset
+ * @property-read  Core\User\UserManager         user
  *
  * @since  2.0
  */
@@ -63,6 +67,13 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 * @var  string
 	 */
 	protected $name = 'web';
+
+	/**
+	 * Property mode.
+	 *
+	 * @var  string
+	 */
+	protected $mode;
 
 	/**
 	 * Property configPath.
@@ -360,10 +371,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function addMessage($messages, $type = 'info')
 	{
-		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('session');
-
-		$session->getFlashBag()->add($messages, $type);
+		$this->session->getFlashBag()->add($messages, $type);
 
 		return $this;
 	}
@@ -375,10 +383,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function clearMessages()
 	{
-		/** @var \Windwalker\Session\Session $session */
-		$session = $this->container->get('session');
-
-		$session->getFlashBag()->clear();
+		$this->session->getFlashBag()->clear();
 
 		return $this;
 	}
@@ -439,7 +444,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function setMode($mode)
 	{
-		$this->set('system.mode', (string) $mode);
+		$this->mode = $mode;
 
 		return $this;
 	}
@@ -461,8 +466,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'language'   => 'language',
 			'renderer'   => 'renderer',
 			'cache'      => 'cache',
+			'cacheManager' => 'cache.manager',
 			'session'    => 'session',
 			'mailer'     => 'mailer',
+			'asset'      => 'asset',
+			'user'       => 'user.manager',
 		];
 
 		if (isset($diMapping[$name]))
