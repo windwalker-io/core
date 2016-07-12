@@ -21,6 +21,7 @@ use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\DI\Container;
@@ -44,6 +45,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  WebApplication|CoreConsole $app
  * @property-read  string                     $name
  * @property-read  Container                  $container
+ * @property-read  CsrfGuard                  $csrf
  *
  * @since  2.0
  */
@@ -527,35 +529,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	}
 
 	/**
-	 * getRouter
-	 *
-	 * @return  PackageRouter
-	 */
-	public function getRouter()
-	{
-		if (!$this->router)
-		{
-			$this->router = new PackageRouter($this->getContainer()->get('router'), $this);
-		}
-
-		return $this->router;
-	}
-
-	/**
-	 * Method to set property router
-	 *
-	 * @param   PackageRouter $router
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRouter($router)
-	{
-		$this->router = $router;
-
-		return $this;
-	}
-
-	/**
 	 * getMvcResolver
 	 *
 	 * @return  MvcResolver
@@ -782,7 +755,9 @@ class AbstractPackage implements DispatcherAwareInterface
 		$diMapping = [
 			'app'        => 'application',
 			'input'      => 'input',
-			'dispatcher' => 'dispatcher'
+			'dispatcher' => 'dispatcher',
+			'csrf'       => 'security.csrf',
+			'router'     => 'package.router'
 		];
 
 		if (isset($diMapping[$name]))
@@ -798,11 +773,6 @@ class AbstractPackage implements DispatcherAwareInterface
 		if ($name == 'config')
 		{
 			return $this->getConfig();
-		}
-
-		if ($name == 'router')
-		{
-			return $this->getRouter();
 		}
 
 		if ($name == 'name')

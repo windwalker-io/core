@@ -14,6 +14,8 @@ use Windwalker\Core\Package\AbstractPackage;
  * Class ViewHelper
  *
  * @since 1.0
+ *
+ * @deprecated
  */
 class ViewHelper extends AbstractHelper
 {

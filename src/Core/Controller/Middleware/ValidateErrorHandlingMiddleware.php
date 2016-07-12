@@ -58,7 +58,7 @@ class ValidateErrorHandlingMiddleware extends AbstractControllerMiddleware
 		}
 		catch (\Exception $e)
 		{
-			if ($this->app->get('system.debug'))
+			if ($this->controller->app->get('system.debug'))
 			{
 				throw $e;
 			}

@@ -51,6 +51,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\Mailer\MailerManager     mailer
  * @property-read  Core\Asset\AssetManager       asset
  * @property-read  Core\User\UserManager         user
+ * @property-read  Core\Security\CsrfGuard       csrf
  *
  * @since  2.0
  */
@@ -471,6 +472,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'mailer'     => 'mailer',
 			'asset'      => 'asset',
 			'user'       => 'user.manager',
+			'csrf'       => 'security.csrf',
 		];
 
 		if (isset($diMapping[$name]))

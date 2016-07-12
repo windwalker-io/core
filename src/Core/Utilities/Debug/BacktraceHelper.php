@@ -57,9 +57,9 @@ class BacktraceHelper
 			}
 			elseif (is_string($arg))
 			{
-				if (Utf8String::strlen($arg) > 10)
+				if (Utf8String::strlen($arg) > 20)
 				{
-					$arg = Utf8String::substr($arg, 0, 10) . '...';
+					$arg = Utf8String::substr($arg, 0, 20) . '...';
 				}
 
 				$arg = StringHelper::quote($arg);
@@ -96,7 +96,7 @@ class BacktraceHelper
 
 		foreach ($traces as $trace)
 		{
-			$return[] = static::normalizeBacktrace($trace);
+			$return[] = $trace ? static::normalizeBacktrace($trace) : null;
 		}
 
 		return $return;

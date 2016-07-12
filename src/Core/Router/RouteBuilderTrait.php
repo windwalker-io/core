@@ -9,16 +9,12 @@
 namespace Windwalker\Core\Router;
 
 /**
- * Interface RouteBuilderInterface
+ * The RouteBuilderTrait class.
  *
  * @since  {DEPLOY_VERSION}
  */
-interface RouteBuilderInterface
+trait RouteBuilderTrait
 {
-	const TYPE_RAW = 'raw';
-	const TYPE_PATH = 'path';
-	const TYPE_FULL = 'full';
-	
 	/**
 	 * build
 	 *
@@ -27,8 +23,12 @@ interface RouteBuilderInterface
 	 * @param string $type
 	 *
 	 * @return string
+	 * @throws \OutOfRangeException
 	 */
-	public function route($route, $queries = array(), $type = CoreRouter::TYPE_PATH);
+	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
+	{
+		return $this->build($route, $queries, $type);
+	}
 
 	/**
 	 * fullRoute
@@ -38,7 +38,10 @@ interface RouteBuilderInterface
 	 *
 	 * @return  string
 	 */
-	public function fullRoute($route, $queries = []);
+	public function fullRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_FULL);
+	}
 
 	/**
 	 * rawRoute
@@ -48,7 +51,10 @@ interface RouteBuilderInterface
 	 *
 	 * @return  string
 	 */
-	public function rawRoute($route, $queries = []);
+	public function rawRoute($route, $queries = [])
+	{
+		return $this->route($route, $queries, static::TYPE_RAW);
+	}
 
 	/**
 	 * escape
@@ -57,5 +63,8 @@ interface RouteBuilderInterface
 	 *
 	 * @return  string
 	 */
-	public function escape($text);
+	public function escape($text)
+	{
+		return htmlspecialchars($text);
+	}
 }

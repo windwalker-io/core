@@ -35,10 +35,7 @@ use Windwalker\Utilities\ArrayHelper;
 class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwareInterface, DispatcherInterface
 {
 	use DispatcherAwareTrait;
-	
-	const TYPE_RAW = 'raw';
-	const TYPE_PATH = 'path';
-	const TYPE_FULL = 'full';
+	use RouteBuilderTrait;
 
 	/**
 	 * An array of HTTP Method => controller suffix pairs for routing the request.
@@ -117,6 +114,8 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			throw new \OutOfRangeException('Route: ' . $route . ' not found.');
 		}
 
+		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
+
 		// Hook
 		$extra = $this->routes[$route]->getExtraValues();
 
@@ -172,68 +171,6 @@ class CoreRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		$this->cache->set($key, $url);
 
 		return $url;
-	}
-
-	/**
-	 * build
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return string
-	 */
-	public function route($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
-		
-		return $this->build($route, $queries, $type);
-	}
-
-	/**
-	 * fullRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function fullRoute($route, $queries = [])
-	{
-		return $this->route($route, $queries, static::TYPE_FULL);
-	}
-
-	/**
-	 * rawRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function rawRoute($route, $queries = [])
-	{
-		return $this->route($route, $queries, static::TYPE_RAW);
-	}
-
-	/**
-	 * secure
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return  string
-	 */
-	public function secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
-		
-		$queries = (array) $queries;
-		$token = Ioc::get('security.csrf')->getFormToken();
-		$queries[$token] = 1;
-
-		return $this->route($route, $queries, $type);
 	}
 
 	/**

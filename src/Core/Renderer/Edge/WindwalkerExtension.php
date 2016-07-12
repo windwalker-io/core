@@ -182,7 +182,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function auth($expression)
 	{
-		return "<?php if (\\Windwalker\\Core\\User\\User::authorise{$expression}): ?>";
+		return "<?php if (\$app->user->authorise{$expression}): ?>";
 	}
 
 	/**
@@ -206,6 +206,6 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function formToken($expression)
 	{
-		return "<?php echo \\Windwalker\\Core\\Security\\CsrfProtection::input{$expression} ?>";
+		return "<?php echo \$package->csrf->input{$expression} ?>";
 	}
 }

@@ -18,9 +18,7 @@ use Windwalker\Core\Package\NullPackage;
  */
 class PackageRouter implements RouteBuilderInterface
 {
-	const TYPE_RAW = 'raw';
-	const TYPE_PATH = 'path';
-	const TYPE_FULL = 'full';
+	use RouteBuilderTrait;
 
 	/**
 	 * Property package.
@@ -42,7 +40,7 @@ class PackageRouter implements RouteBuilderInterface
 	 * @param CoreRouter      $router
 	 * @param AbstractPackage $package
 	 */
-	public function __construct(CoreRouter $router, $package = null)
+	public function __construct(CoreRouter $router, AbstractPackage $package = null)
 	{
 		$this->router = $router;
 
@@ -61,8 +59,6 @@ class PackageRouter implements RouteBuilderInterface
 	 */
 	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
 	{
-		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
-		
 		try
 		{
 			if ($this->router->hasRoute($this->package->getName() . '@' . $route))
@@ -80,69 +76,11 @@ class PackageRouter implements RouteBuilderInterface
 			}
 			elseif ($this->package->app->get('system.debug', false))
 			{
-				return sprintf('javascript:alert(\'%s\')', $e->getMessage());
+				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
 			}
 
 			return '#';
 		}
-	}
-
-	/**
-	 * fullRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function fullRoute($route, $queries = [])
-	{
-		return $this->route($route, $queries, static::TYPE_FULL);
-	}
-
-	/**
-	 * rawRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function rawRoute($route, $queries = [])
-	{
-		return $this->route($route, $queries, static::TYPE_RAW);
-	}
-
-	/**
-	 * secure
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return  string
-	 */
-	public function secure($route, $queries = array(), $type = CoreRouter::TYPE_PATH)
-	{
-		$queries = is_scalar($queries) ? ['id' => $queries] : $queries;
-		
-		$queries = (array) $queries;
-		$token = $this->package->container->get('security.csrf')->getFormToken();
-		$queries[$token] = 1;
-
-		return $this->route($route, $queries, $type);
-	}
-
-	/**
-	 * escape
-	 *
-	 * @param   string  $text
-	 *
-	 * @return  string
-	 */
-	public function escape($text)
-	{
-		return htmlspecialchars($text);
 	}
 
 	/**
