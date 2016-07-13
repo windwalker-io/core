@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of Windwalker project.
+ * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -9,24 +9,33 @@
 namespace Windwalker\Core\Controller\Middleware;
 
 /**
- * The TestMiddleware class.
+ * The TranslationMiddleware class.
  *
  * @since  {DEPLOY_VERSION}
  */
-class TestMiddleware extends AbstractControllerMiddleware
+class TransactionMiddleware extends AbstractControllerMiddleware
 {
 	/**
 	 * Call next middleware.
 	 *
 	 * @param   ControllerData $data
 	 *
-	 * @return  string
+	 * @return  mixed
 	 */
 	public function execute($data = null)
 	{
-		$result = $this->next->execute($data);
+		$data->model->transactionStart(true);
 
-		$result .= 'test';
+		try
+		{
+			$result = $this->next->execute($data);
+		}
+		finally
+		{
+			$data->model->transactionRollback(true);
+		}
+
+		$data->model->transactionCommmit(true);
 
 		return $result;
 	}

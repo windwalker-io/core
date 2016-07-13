@@ -106,7 +106,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
 		$this->container = Core\Ioc::factory();
 
-		parent::__construct($io, $config);
+		parent::__construct($io, $this->config);
 	}
 
 	/**

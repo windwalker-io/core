@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Console\IO\IOInterface;
+use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -23,23 +24,6 @@ use Windwalker\Environment\Platform;
 class ConsoleProvider implements ServiceProviderInterface
 {
 	/**
-	 * Property app.
-	 *
-	 * @var CoreConsole
-	 */
-	protected $app;
-
-	/**
-	 * Class init.
-	 *
-	 * @param CoreConsole $app
-	 */
-	public function __construct(CoreConsole $app)
-	{
-		$this->app = $app;
-	}
-
-	/**
 	 * Registers the service provider with a DI container.
 	 *
 	 * @param   Container $container The DI container.
@@ -48,19 +32,18 @@ class ConsoleProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->share(CoreConsole::class, $this->app);
+		$app = $container->get('application');
+
+		$container->share(get_class($app), $app)
+			->alias(CoreConsole::class, get_class($app))
+			->alias(WindwalkerApplicationInterface::class, CoreConsole::class);
 
 		// Input
-		$container->share(IOInterface::class, $this->app->io)
+		$container->share(IOInterface::class, $app->io)
 			->alias('io', IOInterface::class);
 
-		$closure = function(Container $container)
-		{
-			return new Environment;
-		};
-
 		// Environment
-		$container->share(Environment::class, $closure)
+		$container->prepareSharedObject(Environment::class)
 			->alias('environment', Environment::class);
 
 		$closure = function(Container $container)

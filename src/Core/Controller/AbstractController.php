@@ -14,6 +14,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Controller\Middleware\ControllerData;
 use Windwalker\Core\Frontend\Bootstrap;
+use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\ViewResolver;
@@ -31,11 +32,13 @@ use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Middleware\Chain\ChainBuilder;
 use Windwalker\Structure\Structure;
+use Windwalker\Utilities\ArrayHelper;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -94,17 +97,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @var  Structure
 	 */
 	protected $config;
-
-	/**
-	 * The redirect url.
-	 *
-	 * @var  array
-	 */
-	protected $redirectUrl = array(
-		'url' => null,
-		'msg' => null,
-		'type' => null,
-	);
 
 	/**
 	 * If set to TRUE, all message will not set to session.
@@ -209,13 +201,15 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			/** @var AbstractController $controller */
 			$controller = $task->setContainer($this->container)
 				->isHmvc(true)
+				->setRequest($this->request)
+				->setResponse($this->response)
 				->setPackage($this->package)
-				->setInput($input)
-				->setApplication($this->app);
+				->setInput($input);
 
 			$result = $controller->execute();
 
-			$this->passRedirect($controller);
+			$this->response = $controller->getResponse();
+			$this->request = $controller->getRequest();
 
 			return $result;
 		}
@@ -225,7 +219,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		$response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response, true);
 
-		$this->passRedirect($package->getCurrentController());
+		$this->response = $package->getCurrentController()->getResponse();
 
 		return $response->getBody()->__toString();
 	}
@@ -268,49 +262,37 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	public function execute()
 	{
-		// @ prepare hook
-		$this->prepareExecute();
-
-		// @ before event
-		$this->triggerEvent('onControllerBeforeExecute', array(
-			'controller' => $this
-		));
-
-		// Prepare the last middleware, the last middleware is the real logic of this controller self.
-		$chain = $this->getMiddlewareChain()->setEndMiddleware(function ()
-		{
-			return $this->innerExecute();
-		});
-
-		// Do execute, run middlewares.
-		$result = $chain->execute(new ControllerData(get_object_vars($this)));
-
-		// @ post hook
-		$result = $this->postExecute($result);
-
-		// @ post event
-		$this->triggerEvent('onControllerAfterExecute', array(
-			'controller' => $this,
-			'result'     => &$result
-		));
-
-		return $result;
-	}
-
-	/**
-	 * This method will ba a middleware in the execution chain.
-	 *
-	 * @return  mixed
-	 *
-	 * @throws \Exception
-	 * @throws \Throwable
-	 */
-	protected function innerExecute()
-	{
 		try
 		{
-			// Call the doExecute() method, this method is a placeholder to write your own controller logic.
-			$result = $this->doExecute();
+			// @ prepare hook
+			$this->prepareExecute();
+
+			// @ before event
+			$this->triggerEvent('onControllerBeforeExecute', array(
+				'controller' => $this
+			));
+
+			// Prepare the last middleware, the last middleware is the real logic of this controller self.
+			$chain = $this->getMiddlewareChain()->setEndMiddleware(function ()
+			{
+				return $this->doExecute();
+			});
+
+			// Do execute, run middlewares.
+			$result = $chain->execute(new ControllerData(get_object_vars($this)));
+
+			// @ post hook
+			$result = $this->postExecute($result);
+
+			// @ post event
+			$this->triggerEvent('onControllerAfterExecute', array(
+				'controller' => $this,
+				'result'     => &$result
+			));
+		}
+		catch (ValidateFailException $e)
+		{
+			return $this->processFailure($e);
 		}
 		catch (\Exception $e)
 		{
@@ -330,7 +312,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		if ($result === false)
 		{
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
-			return $this->processFailure(new \Exception);
+			return $this->processFailure(new \Exception('Unknown Error'));
 		}
 
 		// Now we return result to package that it will handle response.
@@ -447,54 +429,55 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	{
 		$name = $name ? : $this->getName();
 
+		$format = $format ? : 'html';
+
 		$key = ViewResolver::getDIKey($name . '.' . strtolower($format));
 
 		// Let's prepare controller getter.
 		if (!$this->container->exists($key))
 		{
-			// Find if package exists
-			$package = $this->getPackage();
-
-			$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($format));
-
-			$config = clone $this->config;
-
-			/*
-			 * If the name of this view not same as this controller, we don't pass name into it,
-			 * so that the view will keep it's own name.
-			 * Otherwise we override the name in view config with ours.
-			 */
-			if ($name && strcasecmp($name, $this->getName()) !== 0)
+			$this->container->share($key, function (Container $container) use ($name, $format, $engine)
 			{
-				$config['name'] = null;
-			}
-			
-			try
-			{
-				$view = $package->getMvcResolver()->getViewResolver()->create($viewName, [], $config, $engine);
-			}
-			catch (\Exception $e)
-			{
-				if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+				// Find if package exists
+				$viewName = sprintf('%s\%s%sView', ucfirst($name), ucfirst($name), ucfirst($format));
+
+				$config = clone $this->config;
+
+				/*
+				 * If the name of this view not same as this controller, we don't pass name into it,
+				 * so that the view will keep it's own name.
+				 * Otherwise we override the name in view config with ours.
+				 */
+				if ($name && strcasecmp($name, $this->getName()) !== 0)
 				{
-					throw $e;
+					$config['name'] = null;
 				}
 
-				// If format is html or NULL, we return HtmlView as default.
-				if ($format === 'html' || !$format)
+				try
 				{
-					$view = new HtmlView([], $config, $engine);
+					$class = $this->getPackage()->getMvcResolver()->getViewResolver()->resolve($viewName);
+
+					return $container->createObject($class, ['renderer' => $engine, 'config' => $config]);
 				}
-				// Otherwise we throw exception to notice developers that they did something wrong.
-				else
+				catch (\Exception $e)
 				{
-					throw $e;
+					if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+					{
+						throw $e;
+					}
+
+					// If format is html or NULL, we return HtmlView as default.
+					if (strtolower($format) === 'html')
+					{
+						return new HtmlView([], $config, $engine);
+					}
+					// Otherwise we throw exception to notice developers that they did something wrong.
+					else
+					{
+						throw $e;
+					}
 				}
-			}
-
-			$class = get_class($view);
-
-			$this->container->share($class, $view)->alias($key, $class);
+			});
 		}
 
 		// Get view from controller.
@@ -520,47 +503,39 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		// Let's prepare controller getter.
 		if (!$this->container->exists($key))
 		{
-			// Find if package exists
-			$package = $this->getPackage();
-
-			$modelName = ucfirst($name) . 'Model';
-
-			$config = clone $this->config;
-
-			/*
-			 * If the name of this model not same as this controller, we don't pass name into it,
-			 * so that the model will keep it's own name.
-			 * Otherwise we override the name in model config with ours.
-			 */
-			if ($name && strcasecmp($name, $this->getName()) !== 0)
+			// Use resolver to find model class and create it.
+			$this->container->share($key, function (Container $container) use ($name, $source)
 			{
-				$config['name'] = null;
-			}
+				$config    = clone $this->config;
+				$modelName = ucfirst($name) . 'Model';
+				$source    = $source ? : $this->getDataSource();
 
-			try
-			{
-				if ($source === null)
+				/*
+				 * If the name of this model not same as this controller, we don't pass name into it,
+				 * so that the model will keep it's own name.
+				 * Otherwise we override the name in model config with ours.
+				 */
+				if ($name && strcasecmp($name, $this->getName()) !== 0)
 				{
-					// If DB exists, pass it into model.
-					$source = $this->container->exists('database') ? $this->container->get('database') : null;
+					$config['name'] = null;
 				}
 
-				// Use resolver to find model class and create it.
-				$model = $package->getMvcResolver()->getModelResolver()->create($modelName, $config, null, $source);
-			}
-			catch (\Exception $e)
-			{
-				if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+				try
 				{
-					throw $e;
+					$class = $this->getPackage()->getMvcResolver()->getModelResolver()->resolve($modelName);
+
+					return $container->createObject($class, array('source' => $source, 'config' => $config));
 				}
+				catch (\Exception $e)
+				{
+					if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException)
+					{
+						throw $e;
+					}
 
-				$model = new ModelRepository($config);
-			}
-
-			$class = get_class($model);
-
-			$this->container->share($class, $model)->alias($key, $class);
+					return new ModelRepository($config);
+				}
+			});
 		}
 
 		// Get model from controller.
@@ -571,44 +546,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * setRedirect
 	 *
 	 * @param string $url
-	 * @param string $msg
-	 * @param string $type
+	 * @param int    $code
+	 * @param array  $headers
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function setRedirect($url, $msg = null, $type = 'info')
+	public function setRedirect($url, $code = 303, array $headers = array())
 	{
-		$this->redirectUrl = array(
-			'url' => $url,
-			'msg' => $msg,
-			'type' => $type,
-		);
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property RedirectUrl
-	 *
-	 * @param bool $onlyValues
-	 *
-	 * @return  array
-	 */
-	public function getRedirect($onlyValues = false)
-	{
-		return $onlyValues ? array_values($this->redirectUrl) : $this->redirectUrl;
-	}
-
-	/**
-	 * passRedirect
-	 *
-	 * @param AbstractController $controller
-	 *
-	 * @return  static
-	 */
-	public function passRedirect(AbstractController $controller)
-	{
-		$this->setRedirect(...$controller->getRedirect(true));
+		$this->response = new RedirectResponse($url, $code, $headers ? : $this->response->getHeaders());
 
 		return $this;
 	}
@@ -617,12 +562,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * redirect
 	 *
 	 * @param string $url
-	 * @param string $msg
-	 * @param string $type
-	 *
-	 * @return  void
+	 * @param int    $code
 	 */
-	public function redirect($url = null, $msg = null, $type = 'info')
+	public function redirect($url = null, $code = 303)
 	{
 		if ($this->isHmvc())
 		{
@@ -636,20 +578,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		if (!$url)
 		{
-			list($url, $msg, $type) = array_values($this->redirectUrl);
-		}
-
-		if (!$url)
-		{
 			return;
 		}
 
-		if ($msg)
-		{
-			$this->addMessage($msg, $type);
-		}
-
-		$this->app->redirect($url, $this->response->getStatusCode());
+		$this->app->redirect($url, $code);
 	}
 
 	/**
@@ -1046,6 +978,23 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		$this->response = $response;
 
 		return $this;
+	}
+
+	/**
+	 * getDataSource
+	 *
+	 * @param string $key
+	 *
+	 * @return  mixed
+	 */
+	public function getDataSource($key = 'database')
+	{
+		if ($this->container->exists('database'))
+		{
+			return $this->container->get($key);
+		}
+
+		return null;
 	}
 
 	/**
