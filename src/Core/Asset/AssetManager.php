@@ -9,8 +9,6 @@
 namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Config\Config;
-use Windwalker\Core\Event\EventDispatcher;
-use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
@@ -190,7 +188,7 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function internalStyle($content)
 	{
-		$this->internalStyles[] = $content;
+		$this->internalStyles[] = (string) $content;
 
 		return $this;
 	}
@@ -204,7 +202,7 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function internalScript($content)
 	{
-		$this->internalScripts[] = $content;
+		$this->internalScripts[] = (string) $content;
 
 		return $this;
 	}

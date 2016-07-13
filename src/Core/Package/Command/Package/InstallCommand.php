@@ -93,6 +93,11 @@ class InstallCommand extends Command
 			$this->copyMigration($package);
 			$this->copySeeders($package);
 			$this->syncAssets($package);
+
+			if (is_callable([$package, 'install']))
+			{
+				$package->install($this);
+			}
 		}
 
 		return true;

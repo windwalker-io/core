@@ -2,6 +2,7 @@
 .*
 !.gitignore
 !.gitkeep
+!ide/*
 
 # Composer
 /vendor

@@ -18,12 +18,10 @@ use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
-use Windwalker\Core\Package\Middleware\AbstractPackageMiddleware;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
-use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -290,7 +288,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		$providers = (array) $this->get('providers');
 
-		foreach ($providers as $provider)
+		foreach ($providers as &$provider)
 		{
 			if (is_string($provider) && class_exists($provider))
 			{
@@ -307,6 +305,14 @@ class AbstractPackage implements DispatcherAwareInterface
 			if (is_callable($provider, 'boot'))
 			{
 				$provider->boot($container);
+			}
+		}
+
+		foreach ($providers as $provider)
+		{
+			if (is_callable([$provider, 'bootDeferred']))
+			{
+				$provider->bootDeferred($container);
 			}
 		}
 	}

@@ -64,6 +64,13 @@ class CoreDataMapper
 	protected static $table;
 
 	/**
+	 * Property keys.
+	 *
+	 * @var  string
+	 */
+	protected static $keys = 'id';
+
+	/**
 	 * Property instances.
 	 *
 	 * @var  DataMapper[]
