@@ -137,4 +137,38 @@ trait DatabaseRepositoryTrait
 		// (3): If name is null, we get default object with table name provided.
 		return new DataMapper($table, $this->keys, $this->db);
 	}
+
+	/**
+	 * getTableName
+	 *
+	 * @return  string
+	 */
+	public function getTableName()
+	{
+		return isset($this->table) ? $this->table : $this->getRecord()->getTableName();
+	}
+
+	/**
+	 * getKeyName
+	 *
+	 * @param bool $multiple
+	 *
+	 * @return  array|string
+	 */
+	public function getKeyName($multiple = false)
+	{
+		if (isset($this->keys))
+		{
+			$keys = (array) $this->keys;
+
+			if ($multiple)
+			{
+				return $keys;
+			}
+
+			return $keys[0];
+		}
+
+		return $this->getRecord()->getKeyName($multiple);
+	}
 }
