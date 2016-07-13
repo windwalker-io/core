@@ -40,14 +40,21 @@ class AssetManager implements DispatcherAwareInterface
 	 *
 	 * @var  array
 	 */
-	protected $styles = array();
+	protected $styles = [];
 
 	/**
 	 * Property scripts.
 	 *
 	 * @var  array
 	 */
-	protected $scripts = array();
+	protected $scripts = [];
+
+	/**
+	 * Property aliases.
+	 *
+	 * @var  array
+	 */
+	protected $aliases = [];
 
 	/**
 	 * Property internalStyles.
@@ -521,6 +528,42 @@ class AssetManager implements DispatcherAwareInterface
 	}
 
 	/**
+	 * alias
+	 *
+	 * @param string $target
+	 * @param string $alias
+	 *
+	 * @return  static
+	 */
+	public function alias($target, $alias)
+	{
+		$this->normalizeUri($target, $name);
+
+		$this->aliases[$name] = $alias;
+
+		return $this;
+	}
+
+	/**
+	 * resolveAlias
+	 *
+	 * @param   string  $uri
+	 *
+	 * @return  string
+	 */
+	public function resolveAlias($uri)
+	{
+		$this->normalizeUri($uri, $name);
+
+		while (isset($this->aliases[$name]))
+		{
+			$name = $this->aliases[$name];
+		}
+
+		return $name;
+	}
+
+	/**
 	 * Method to set property indents
 	 *
 	 * @param   string $indents
@@ -553,6 +596,8 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	protected function handleUri($uri)
 	{
+		$uri = $this->resolveAlias($uri);
+
 		// Check has .min
 		// $uri = Uri::addBase($uri, 'path');
 
@@ -560,8 +605,6 @@ class AssetManager implements DispatcherAwareInterface
 		{
 			return $uri;
 		}
-
-		$ext = File::getExtension($uri);
 
 		$assetUri = trim($this->path, '/');
 
@@ -572,16 +615,7 @@ class AssetManager implements DispatcherAwareInterface
 
 		$root = $this->addSysPath($assetUri);
 
-		if (StringHelper::endsWith($uri, '.min.' . $ext))
-		{
-			$assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
-			$assetMinFile = $uri;
-		}
-		else
-		{
-			$assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
-			$assetFile = $uri;
-		}
+		$this->normalizeUri($uri, $assetFile, $assetMinFile);
 
 		// Use uncompressed file first
 		if ($this->config->get('system.debug'))
@@ -613,6 +647,33 @@ class AssetManager implements DispatcherAwareInterface
 
 		// All file not found, fallback to default uri.
 		return $this->addBase($uri, 'path');
+	}
+
+	/**
+	 * normalizeUri
+	 *
+	 * @param   string  $uri
+	 * @param   string  $assetFile
+	 * @param   string  $assetMinFile
+	 *
+	 * @return  array
+	 */
+	public function normalizeUri($uri, &$assetFile = null, &$assetMinFile = null)
+	{
+		$ext = File::getExtension($uri);
+
+		if (StringHelper::endsWith($uri, '.min.' . $ext))
+		{
+			$assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
+			$assetMinFile = $uri;
+		}
+		else
+		{
+			$assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+			$assetFile = $uri;
+		}
+
+		return [$assetFile, $assetMinFile];
 	}
 
 	/**
@@ -768,20 +829,34 @@ class AssetManager implements DispatcherAwareInterface
 	/**
 	 * Method to get property Path
 	 *
-	 * @return  string
+	 * @param   string $uri
+	 *
+	 * @return string
 	 */
-	public function path()
+	public function path($uri = null)
 	{
+		if ($uri !== null)
+		{
+			return $this->path . '/' . $uri;
+		}
+
 		return $this->path;
 	}
 
 	/**
 	 * Method to get property Root
 	 *
-	 * @return  string
+	 * @param  string $uri
+	 *
+	 * @return string
 	 */
-	public function root()
+	public function root($uri = null)
 	{
+		if ($uri !== null)
+		{
+			return $this->root . '/' . $uri;
+		}
+
 		return $this->root;
 	}
 }

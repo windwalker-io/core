@@ -15,6 +15,7 @@ use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Data\DataSet;
 use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;
@@ -40,6 +41,7 @@ class ProfilerListener
 	 */
 	public function onAfterInitialise(Event $event)
 	{
+
 		/**
 		 * @var Container $container
 		 * @var Collector $collector
@@ -49,6 +51,27 @@ class ProfilerListener
 		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 		$input     = $container->get('input');
+
+		// Push exception collector
+		$container->get('error.handler')->addHandler(function($exception) use ($container)
+		{
+			if (!$container->exists('debugger.collector'))
+			{
+				return;
+			}
+
+			$collector = $container->get('debugger.collector');
+
+			/** @var \Exception $exception */
+			$collector['exception'] = array(
+				'type'    => get_class($exception),
+				'message' => $exception->getMessage(),
+				'code'    => $exception->getCode(),
+				'file'    => $exception->getFile(),
+				'line'    => $exception->getLine(),
+				'trace'   => BacktraceHelper::normalizeBacktraces($exception->getTrace())
+			);
+		});
 
 		$collector['system.name'] = $event['app']->getName();
 		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::FORMAT_YMD_HIS);

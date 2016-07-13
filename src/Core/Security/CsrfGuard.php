@@ -8,10 +8,9 @@
 
 namespace Windwalker\Core\Security;
 
-use Windwalker\Core\User\User;
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
-use Windwalker\DI\Container;
-use Windwalker\DI\ContainerAwareInterface;
+use Windwalker\Core\User\UserManager;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Filter\InputFilter;
 use Windwalker\IO\Input;
@@ -22,25 +21,48 @@ use Windwalker\Session\Session;
  *
  * @since  2.1.1
  */
-class CsrfGuard implements ContainerAwareInterface
+class CsrfGuard
 {
 	const TOKEN_KEY = 'form.token';
-
 	/**
-	 * Property container.
+	 * Property config.
 	 *
-	 * @var  Container
+	 * @var  Config
 	 */
-	protected $container;
+	private $config;
+	/**
+	 * Property input.
+	 *
+	 * @var  Input
+	 */
+	private $input;
+	/**
+	 * Property session.
+	 *
+	 * @var  Session
+	 */
+	private $session;
+	/**
+	 * Property userManager.
+	 *
+	 * @var  UserManager
+	 */
+	private $userManager;
 
 	/**
 	 * CsrfGuard constructor.
 	 *
-	 * @param Container $container
+	 * @param Config      $config
+	 * @param Input       $input
+	 * @param Session     $session
+	 * @param UserManager $userManager
 	 */
-	public function __construct(Container $container)
+	public function __construct(Config $config, Input $input, Session $session, UserManager $userManager)
 	{
-		$this->container = $container;
+		$this->config = $config;
+		$this->input = $input;
+		$this->session = $session;
+		$this->userManager = $userManager;
 	}
 
 	/**
@@ -118,7 +140,7 @@ class CsrfGuard implements ContainerAwareInterface
 	public function getToken($forceNew = false)
 	{
 		/** @var Session $session */
-		$session = $this->container->get('session');
+		$session = $this->session;
 
 		$token = $session->get(static::TOKEN_KEY);
 
@@ -145,14 +167,10 @@ class CsrfGuard implements ContainerAwareInterface
 	 */
 	public function getFormToken($userId = null, $forceNew = false)
 	{
-		if (User::hasHandler())
-		{
-			$userId = $userId ? : User::get()->id;
-		}
+		$userId = $userId ? : $this->userManager->getUser()->id;
+		$userId = $userId ? : $this->session->getId();
 
-		$userId = $userId ? : $this->container->get('session')->getId();
-
-		$config = $this->container->get('config');
+		$config = $this->config;
 
 		return md5($config['system.secret'] . $userId . $this->getToken($forceNew));
 	}
@@ -170,7 +188,7 @@ class CsrfGuard implements ContainerAwareInterface
 	public function checkToken($userId = null, $method = null)
 	{
 		/** @var Input $input */
-		$input = $this->container->get('input');
+		$input = $this->input;
 		$token = $this->getFormToken($userId);
 
 		if ($method)
@@ -183,30 +201,11 @@ class CsrfGuard implements ContainerAwareInterface
 			return true;
 		}
 
+		if ($input->header->get('X-Csrf-Token') == $token)
+		{
+			return true;
+		}
+
 		return false;
-	}
-
-	/**
-	 * Get the DI container.
-	 *
-	 * @return  Container
-	 */
-	public function getContainer()
-	{
-		return $this->container;
-	}
-
-	/**
-	 * Set the DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  mixed
-	 */
-	public function setContainer(Container $container)
-	{
-		$this->container = $container;
-
-		return $this;
 	}
 }

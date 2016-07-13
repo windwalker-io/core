@@ -13,6 +13,8 @@ use Windwalker\Dom\HtmlElement;
 
 /**
  * The CsrfProtection class.
+ * 
+ * @see  CsrfGuard
  *
  * @method  static  boolean      validate($justDie = false, $message = 'Invalid Token')  {@throws  Exception\InvalidTokenException}
  * @method  static  boolean      checkToken($userId = null, $method = null)

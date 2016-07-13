@@ -10,6 +10,7 @@ namespace Windwalker\Core\Provider;
 
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run as Whoops;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -67,28 +68,6 @@ class WhoopsProvider implements ServiceProviderInterface
 			$handler = new PrettyPageHandler;
 
 			$whoops->pushHandler($handler);
-
-			$whoops->pushHandler(function($exception, $inspector, $run) use ($container)
-			{
-				if (!$container->exists('debugger.collector'))
-				{
-					return;
-				}
-
-				$collector = $container->get('debugger.collector');
-
-				/** @var \Exception $exception */
-				$collector['exception'] = array(
-					'type'    => get_class($exception),
-					'message' => $exception->getMessage(),
-					'code'    => $exception->getCode(),
-					'file'    => $exception->getFile(),
-					'line'    => $exception->getLine(),
-					'trace'   => $exception->getTrace()
-				);
-
-				http_response_code($exception->getCode());
-			});
 
 			$container->share(Whoops::class, $whoops)
 				->alias('whoops', Whoops::class);

@@ -160,21 +160,24 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		$this->input = $input ? : $this->getInput();
 		$this->app = $this->getApplication();
 
-		// Prepare middlewares
+		// Prepare middlewares queue
 		$this->middlewares = (new PriorityQueue)->insertArray((array) $this->middlewares);
 
+		// Boot all traits used
 		$this->bootTraits($this);
 
+		// Custom initialise code
 		$this->init();
 	}
 
 	/**
-	 * initialise
+	 * Init this class.
 	 *
 	 * @return  void
 	 */
 	protected function init()
 	{
+		// Override it if you need.
 	}
 
 	/**
@@ -198,6 +201,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				$input = new Input($input);
 			}
 
+			// Let's push some important data into it.
 			/** @var AbstractController $controller */
 			$controller = $task->setContainer($this->container)
 				->isHmvc(true)
@@ -206,20 +210,22 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 				->setPackage($this->package)
 				->setInput($input);
 
+			// Do action and return executed result.
 			$result = $controller->execute();
 
-			$this->response = $controller->getResponse();
-			$this->request = $controller->getRequest();
+			// Take back the redirect information.
+			$this->passRedirect($controller);
 
 			return $result;
 		}
 
-		// If task is string, find controller from package
+		// If task is string, find controller by package
 		$package = $package ? $this->app->getPackage($package) : $this->package;
 
 		$response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response, true);
 
-		$this->response = $package->getCurrentController()->getResponse();
+		// Take back the redirect information.
+		$this->passRedirect($package->getCurrentController());
 
 		return $response->getBody()->__toString();
 	}
@@ -377,6 +383,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		$this->setConfig($this->config);
 
+		// Set data into View
 		foreach ($data as $key => $value)
 		{
 			$view[$key] = $value;
@@ -455,8 +462,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 				try
 				{
+					// Use MvcResolver to find view class.
 					$class = $this->getPackage()->getMvcResolver()->getViewResolver()->resolve($viewName);
 
+					// Create object by container, container will auto inject all necessary dependencies
 					return $container->createObject($class, ['renderer' => $engine, 'config' => $config]);
 				}
 				catch (\Exception $e)
@@ -522,8 +531,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 				try
 				{
+					// Use MvcResolver to fin Model class
 					$class = $this->getPackage()->getMvcResolver()->getModelResolver()->resolve($modelName);
 
+					// Create object by container, container will auto inject all necessary dependencies
 					return $container->createObject($class, array('source' => $source, 'config' => $config));
 				}
 				catch (\Exception $e)
@@ -564,24 +575,33 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param string $url
 	 * @param int    $code
 	 */
-	public function redirect($url = null, $code = 303)
+	public function redirect($url, $code = 303)
 	{
-		if ($this->isHmvc())
-		{
-			return;
-		}
-
-		if (!$this->app)
-		{
-			return;
-		}
-
-		if (!$url)
+		if ($this->isHmvc() || !$this->app)
 		{
 			return;
 		}
 
 		$this->app->redirect($url, $code);
+	}
+
+	/**
+	 * passRedirect
+	 *
+	 * @param AbstractController $controller
+	 *
+	 * @return  static
+	 */
+	public function passRedirect(AbstractController $controller)
+	{
+		$response = $controller->getResponse();
+
+		if ($response instanceof RedirectResponse)
+		{
+			$this->response = $response;
+		}
+
+		return $this;
 	}
 
 	/**
@@ -713,10 +733,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		foreach ($middlewares as $middleware)
 		{
+			// If is class name, just create it.
 			if (is_string($middleware) && is_subclass_of($middleware, AbstractControllerMiddleware::class))
 			{
-				$middleware = new $middleware($this);
+				$middleware = $this->container->newInstance($middleware, ['controller' => $this]);
 			}
+			// If is closure, we bind $this to current object
 			elseif ($middleware instanceof \Closure)
 			{
 				$middleware->bindTo($this);

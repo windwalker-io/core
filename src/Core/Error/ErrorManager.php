@@ -130,6 +130,8 @@ class ErrorManager
 	{
 		try
 		{
+			http_response_code($exception->getCode());
+
 			foreach ($this->handlers as $handler)
 			{
 				$handler($exception);

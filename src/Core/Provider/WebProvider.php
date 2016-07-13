@@ -8,12 +8,14 @@
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Environment\Browser\Browser;
 use Windwalker\Environment\Platform;
 use Windwalker\Environment\WebEnvironment;
+use Windwalker\Http\Request\ServerRequest;
 use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Uri\UriData;
@@ -43,6 +45,10 @@ class WebProvider implements ServiceProviderInterface
 		{
 		    return PsrInput::create($app->getRequest());
 		})->alias(PsrInput::class, Input::class);
+
+		// Request
+//		$container->share(ServerRequest::class, $app->getRequest())
+//			->alias(ServerRequestInterface::class, ServerRequest::class);
 
 		// Environment
 		$container->share(WebEnvironment::class, $app->getEnvironment());

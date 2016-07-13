@@ -116,8 +116,7 @@ abstract class AbstractScript
 	/**
 	 * getJSObject
 	 *
-	 * @param mixed   ...$data
-	 * @param boolean $quoteKey
+	 * @param mixed  ...$data
 	 *
 	 * @return  string
 	 */

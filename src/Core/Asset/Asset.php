@@ -27,14 +27,16 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string        renderScripts()           renderScripts($withInternal = false)
  * @method  static  string        renderInternalStyles()    renderInternalStyles()
  * @method  static  string        renderInternalScripts()   renderInternalScripts()
+ * @method  static  AssetManager  alias()                   alias($target, $alias)
+ * @method  static  AssetManager  resolveAlias()            resolveAlias($alias)
  * @method  static  string        getVersion()              getVersion()
  * @method  static  AssetManager  setIndents()              setIndents(string $indents)
  * @method  static  string        getIndents()              getIndents()
  * @method  static  AssetTemplate getTemplate()             getTemplate()
  * @method  static  string        setTemplate()             setTemplate(AssetTemplate $template)
  * @method  static  string        getJSObject()             getJSObject(array $array)
- * @method  static  string        path()                    path()
- * @method  static  string        root()                    root()
+ * @method  static  string        path()                    path($uri = null)
+ * @method  static  string        root()                    root($uri = null)
  *
  * @since  1.0
  */
