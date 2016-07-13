@@ -30,7 +30,13 @@ namespace PHPSTORM_META
 {
 	\$STATIC_METHOD_TYPES = [
 		\Windwalker\Application\AbstractApplication::get('') => [
-			%s
+			{config}
+		],
+		\Windwalker\Core\Config\Config::get('') => [
+			{config}
+		],
+		new \Windwalker\Core\Config\Config => [
+			{config}
 		]
 	];
 }
@@ -67,7 +73,7 @@ TMPL;
 		    return StringHelper::quote($value) . ' instanceof mixed';
 		}, array_keys($array));
 
-		$data = sprintf($this->tmpl, implode(",\n", $keys));
+		$data = str_replace('{config}', implode(",\n", $keys), $this->tmpl);
 
 		File::write(WINDWALKER_TEMP . '/ide/.phpstorm.meta.php', $data);
 	}

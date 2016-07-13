@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\User\UserManager;
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
@@ -162,16 +163,6 @@ abstract class Ioc
 	}
 
 	/**
-	 * getAuthenticate
-	 *
-	 * @return  \Windwalker\Authentication\Authentication
-	 */
-	public static function getAuthentication()
-	{
-		return static::get('authentication');
-	}
-
-	/**
 	 * getUserManager
 	 *
 	 * @return  UserManager
@@ -184,7 +175,7 @@ abstract class Ioc
 	/**
 	 * getConfig
 	 *
-	 * @return  \Windwalker\Structure\Structure
+	 * @return  Config
 	 */
 	public static function getConfig()
 	{
