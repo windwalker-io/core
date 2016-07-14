@@ -8,6 +8,7 @@
 
 namespace Windwalker\Debugger\Provider;
 
+use Windwalker\Data\Data;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\Core\Object\NullObject;
@@ -114,9 +115,9 @@ class ProfilerProvider implements ServiceProviderInterface
 
 		// Set profiler to DatabaseDriver
 		$db->addMiddleware(new DbProfilerMiddleware(
-			function (AbstractDatabaseDriver $db, $sql) use ($container, $collector, &$queryData)
+			function (AbstractDatabaseDriver $db, \stdClass $data) use ($container, $collector, &$queryData)
 			{
-				if (stripos(trim($sql), 'EXPLAIN') === 0)
+				if (stripos(trim($data->sql), 'EXPLAIN') === 0)
 				{
 					return;
 				}
@@ -129,9 +130,9 @@ class ProfilerProvider implements ServiceProviderInterface
 					'memory' => array('start' => memory_get_usage(false))
 				);
 			},
-			function (AbstractDatabaseDriver $db, $sql) use ($container, $collector, &$queryData)
+			function (AbstractDatabaseDriver $db, \stdClass $data) use ($container, $collector, &$queryData)
 			{
-				if (stripos(trim($sql), 'EXPLAIN') === 0)
+				if (stripos(trim($data->sql), 'EXPLAIN') === 0)
 				{
 					return;
 				}
@@ -140,8 +141,10 @@ class ProfilerProvider implements ServiceProviderInterface
 				$queryData['time']['duration'] = abs($queryData['time']['end'] - $queryData['time']['start']);
 				$queryData['memory']['end'] = memory_get_usage(false);
 				$queryData['memory']['duration'] = abs($queryData['memory']['end'] - $queryData['memory']['start']);
-				$queryData['query'] = $sql;
+				$queryData['query'] = $db->getLastQuery();
 				$queryData['rows'] = $db->getReader()->countAffected();
+
+				$queryData = array_merge((array) $data, $queryData);
 
 				$collector->push('database.queries', $queryData);
 

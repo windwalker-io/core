@@ -78,7 +78,7 @@ class RendererProvider implements ServiceProviderInterface
 	 *
 	 * @return RendererManager
 	 */
-	public function manager(Container $container, RendererManager $manager)
+	public function manager(RendererManager $manager, Container $container)
 	{
 		$this->rendererManager = $manager;
 

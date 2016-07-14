@@ -41,7 +41,6 @@ class ProfilerListener
 	 */
 	public function onAfterInitialise(Event $event)
 	{
-
 		/**
 		 * @var Container $container
 		 * @var Collector $collector
@@ -79,6 +78,28 @@ class ProfilerListener
 		$collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
 		$collector['system.method.http']   = $input->getMethod();
 		$collector['system.method.custom'] = strtoupper($input->get('_method'));
+
+		$profiler->mark(__FUNCTION__, array(
+			'tag' => 'system.process'
+		));
+	}
+
+	/**
+	 * onAfterRouting
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onAfterRegisterMiddlewares(Event $event)
+	{
+		/**
+		 * @var Container $container
+		 * @var Collector $collector
+		 * @var Profiler  $profiler
+		 */
+		$container = $event['app']->getContainer();
+		$profiler  = $container->get('profiler');
 
 		$profiler->mark(__FUNCTION__, array(
 			'tag' => 'system.process'
@@ -369,7 +390,19 @@ class ProfilerListener
 					continue;
 				}
 
-				$collector['database.queries.' . $k . '.explain'] = $db->setQuery('EXPLAIN ' . $data['query'])->loadAll();
+				$query = $db->getQuery(true);
+				$query->setQuery('EXPLAIN ' . $data['query']);
+
+				if (!empty($data['bounded']))
+				{
+					foreach ((array) $data['bounded'] as $key => $bind)
+					{
+						$bind = (object) $bind;
+						$query->bind($key, $bind->value, $bind->dataType, $bind->length, $bind->driverOptions);
+					}
+				}
+
+				$collector['database.queries.' . $k . '.explain'] = $db->setQuery($query)->loadAll();
 			}
 
 			// Database Information

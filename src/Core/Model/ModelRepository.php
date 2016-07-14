@@ -208,7 +208,7 @@ class ModelRepository implements \ArrayAccess
 	 */
 	public function getCacheId($id = null)
 	{
-		$id = $id . json_encode($this->state->toArray());
+		$id = $id . serialize($this->state->toArray());
 
 		return sha1($id);
 	}

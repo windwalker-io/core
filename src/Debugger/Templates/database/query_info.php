@@ -7,6 +7,16 @@
  */
 
 use Windwalker\Data\DataSet;
+
+$types = [
+    PDO::PARAM_BOOL => 'BOOL',
+    PDO::PARAM_NULL => 'NULL',
+    PDO::PARAM_INT  => 'INT',
+    PDO::PARAM_STR  => 'STR',
+    PDO::PARAM_LOB  => 'LOB',
+    PDO::PARAM_STMT  => 'STMT',
+    PDO::PARAM_INPUT_OUTPUT => 'INPUT_OUTPUT',
+];
 ?>
 
 <div class="panel panel-<?php echo $timeline['time']['style'] ?>">
@@ -22,6 +32,33 @@ use Windwalker\Data\DataSet;
 		Memory: <span class="label label-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'], 3) ?> MB</span>
 		Return Rows: <span class="label label-info"><?php echo $timeline['data']['rows'] ?></span>
 	</div>
+    <?php if (isset($timeline['data']['bounded'])): ?>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Bounded Key</th>
+                <th>Value</th>
+                <th>Data Type</th>
+                <th>Length</th>
+                <th>Driver Options</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ((array) $timeline['data']['bounded'] as $key => $item): ?>
+                <tr>
+                    <td><?php echo $key ?></td>
+                    <td><?php echo $item['value'] ?></td>
+                    <td><?php echo isset($types[$item['dataType']]) ? $types[$item['dataType']] : 'UNKNOWN' ?></td>
+                    <td><?php echo $item['length'] ?></td>
+                    <td><?php echo print_r($item['driverOptions'], true) ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <hr />
+    <?php endif; ?>
+
 	<?php if (isset($timeline['data']['explain'])): ?>
 		<table class="table table-striped">
 			<thead>
@@ -35,7 +72,7 @@ use Windwalker\Data\DataSet;
 				<th>Key Length</th>
 				<th>Reference</th>
 				<th>Rows</th>
-				<th>Extra</th>
+				<th width="10%">Extra</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -46,7 +83,7 @@ use Windwalker\Data\DataSet;
 					<td><?php echo $item->select_type ?></td>
 					<td><?php echo $item->table ?></td>
 					<td><?php echo $item->type ?></td>
-					<td><?php echo $item->possible_keys ?></td>
+					<td><?php echo str_replace(',', ', ', $item->possible_keys) ?></td>
 					<td><strong><?php echo $item->key ?></strong></td>
 					<td><?php echo $item->key_len ?></td>
 					<td><?php echo $item->ref ?></td>

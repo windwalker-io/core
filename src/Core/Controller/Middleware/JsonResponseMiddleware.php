@@ -38,8 +38,6 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 
 		$result = $this->next->execute($data);
 
-		$this->controller->setRedirect(null);
-
 		return $result;
 	}
 }

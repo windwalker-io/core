@@ -65,7 +65,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function (Container $container, ErrorManager $error)
+		$container->prepareSharedObject(ErrorManager::class, function (ErrorManager $error, Container $container)
 		{
 			foreach ((array) $this->config->get('error.handlers', []) as $key => $handler)
 			{
@@ -78,8 +78,6 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 			}
 
 			return $error;
-		};
-
-		$container->prepareSharedObject(ErrorManager::class, $closure);
+		});
 	}
 }

@@ -74,6 +74,7 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 
 		if ($this->controller->app->get('system.debug'))
 		{
+			$data['exception'] = get_class($e);
 			$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
 		}
 
