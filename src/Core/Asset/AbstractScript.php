@@ -127,6 +127,7 @@ abstract class AbstractScript
 		if (!is_bool($quote))
 		{
 			array_push($data, $quote);
+			$quote = false;
 		}
 
 		$result = [];

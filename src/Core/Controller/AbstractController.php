@@ -466,7 +466,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					$class = $this->getPackage()->getMvcResolver()->getViewResolver()->resolve($viewName);
 
 					// Create object by container, container will auto inject all necessary dependencies
-					return $container->createObject($class, ['renderer' => $engine, 'config' => $config]);
+					return $container->createSharedObject($class, ['renderer' => $engine, 'config' => $config]);
 				}
 				catch (\Exception $e)
 				{
@@ -535,7 +535,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					$class = $this->getPackage()->getMvcResolver()->getModelResolver()->resolve($modelName);
 
 					// Create object by container, container will auto inject all necessary dependencies
-					return $container->createObject($class, array('source' => $source, 'config' => $config));
+					return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
 				}
 				catch (\Exception $e)
 				{

@@ -22,10 +22,12 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The AssetManager class.
  *
- * @method  static  addCSS($url, $version = null, $attribs = array())
- * @method  static  addJS($url, $version = null, $attribs = array())
- * @method  static  internalCSS($content)
- * @method  static  internalJS($content)
+ * @property-read  UriData  $uri
+ *
+ * @method  $this  addCSS($url, $version = null, $attribs = array())
+ * @method  $this  addJS($url, $version = null, $attribs = array())
+ * @method  $this  internalCSS($content)
+ * @method  $this  internalJS($content)
  *
  * @since   3.0
  */
@@ -111,6 +113,20 @@ class AssetManager implements DispatcherAwareInterface
 	protected $config;
 
 	/**
+	 * Property assetFolder.
+	 *
+	 * @var  string
+	 */
+	protected $assetFolder = 'asset';
+
+	/**
+	 * Property uri.
+	 *
+	 * @var  UriData
+	 */
+	protected $uri;
+
+	/**
 	 * AssetManager constructor.
 	 *
 	 * @param Config              $config
@@ -119,10 +135,11 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function __construct(Config $config, UriData $uri, DispatcherInterface $dispatcher)
 	{
-		$this->path = $uri->path . '/asset';
-		$this->root = $uri->root . '/asset';
+		$this->path = $config->get('asset.uri') ? : $uri->path . '/' . $this->getAssetFolder();
+		$this->root = $config->get('asset.uri') ? : $uri->root . '/' . $this->getAssetFolder();
 		$this->config = $config;
 		$this->dispatcher = $dispatcher;
+		$this->uri = $uri;
 	}
 
 	/**
@@ -803,14 +820,14 @@ class AssetManager implements DispatcherAwareInterface
 
 				foreach ($array as $key => $value)
 				{
-					$key = json_encode($key);
+					$encodedKey = json_encode($key);
 
-					if (!$quoteKey)
+					if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', $key) == 0)
 					{
-						$key = substr(substr($key, 0, -1), 1);
+						$encodedKey = substr(substr($encodedKey, 0, -1), 1);
 					}
 
-					$row[] = $key . ':' . static::getJSObject($value, $quoteKey);
+					$row[] = $encodedKey . ':' . static::getJSObject($value, $quoteKey);
 				}
 
 				$output .= '{' . implode(',', $row) . '}';
@@ -856,5 +873,64 @@ class AssetManager implements DispatcherAwareInterface
 		}
 
 		return $this->root;
+	}
+
+	/**
+	 * Method to get property AssetFolder
+	 *
+	 * @return  string
+	 */
+	public function getAssetFolder()
+	{
+		return $this->assetFolder;
+	}
+
+	/**
+	 * Method to set property assetFolder
+	 *
+	 * @param   string $assetFolder
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setAssetFolder($assetFolder)
+	{
+		$this->assetFolder = (string) $assetFolder;
+
+		return $this;
+	}
+
+	/**
+	 * Method to set property uri
+	 *
+	 * @param   UriData $uri
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setUriData(UriData $uri)
+	{
+		$this->uri = $uri;
+
+		return $this;
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param   string  $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		$allow = [
+			'uri'
+		];
+
+		if (in_array($name, $allow))
+		{
+			return $this->$name;
+		}
+
+		throw new \OutOfRangeException(sprintf('Property %s not exists.', $name));
 	}
 }
