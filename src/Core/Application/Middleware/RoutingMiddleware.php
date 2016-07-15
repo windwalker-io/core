@@ -80,7 +80,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	 */
 	public function match(CoreRouter $router, $route = null)
 	{
-		$route = $route ? : $this->app->server->uri->route;
+		$route = $route ? : $this->app->uri->route;
 		$route = $route ? : '/';
 
 		$input = $this->app->input;
