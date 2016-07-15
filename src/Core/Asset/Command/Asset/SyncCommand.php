@@ -91,8 +91,9 @@ class SyncCommand extends Command
 			throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder so nothing synced.');
 		}
 
+		$folder = $this->console->get('asset.folder');
 		$target = $this->getArgument(1, $name);
-		$target = $this->console->get('path.public') . '/asset/' . $target;
+		$target = $this->console->get('path.public') . '/' . trim($folder, '/') . '/' . $target;
 
 		$symlink = new Symlink;
 
@@ -113,7 +114,7 @@ class SyncCommand extends Command
 
 			if (!PlatformHelper::isWindows())
 			{
-				$this->out('Link success ' . $dir . ' <====> ' . $target);
+				$this->out('Link success <info>' . $dir . '</info> <====> <info>' . $target . '</info>');
 			}
 		}
 

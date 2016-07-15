@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Asset\Command\Asset;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 
 /**
@@ -50,11 +51,9 @@ class MakesumCommand extends Command
 	{
 		$cachePath = $this->getOption('cache_path', WINDWALKER_CACHE);
 
-		Folder::create($cachePath . '/asset');
+		$sum = md5(uniqid($this->console->get('system.secret')));
 
-		$sum = md5(uniqid());
-
-		file_put_contents($cachePath . '/asset/MD5SUM', $sum);
+		File::write($cachePath . '/asset/MD5SUM', $sum);
 
 		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . $cachePath . '/asset/MD5SUM</info>');
 

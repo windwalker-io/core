@@ -113,13 +113,6 @@ class AssetManager implements DispatcherAwareInterface
 	protected $config;
 
 	/**
-	 * Property assetFolder.
-	 *
-	 * @var  string
-	 */
-	protected $assetFolder = 'asset';
-
-	/**
 	 * Property uri.
 	 *
 	 * @var  UriData
@@ -135,8 +128,8 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function __construct(Config $config, UriData $uri, DispatcherInterface $dispatcher)
 	{
-		$this->path = $config->get('asset.uri') ? : $uri->path . '/' . $this->getAssetFolder();
-		$this->root = $config->get('asset.uri') ? : $uri->root . '/' . $this->getAssetFolder();
+		$this->path = $config->get('asset.uri') ? : $uri->path . '/' . $config->get('asset.folder', 'asset');
+		$this->root = $config->get('asset.uri') ? : $uri->root . '/' . $config->get('asset.folder', 'asset');
 		$this->config = $config;
 		$this->dispatcher = $dispatcher;
 		$this->uri = $uri;
@@ -882,21 +875,7 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function getAssetFolder()
 	{
-		return $this->assetFolder;
-	}
-
-	/**
-	 * Method to set property assetFolder
-	 *
-	 * @param   string $assetFolder
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setAssetFolder($assetFolder)
-	{
-		$this->assetFolder = (string) $assetFolder;
-
-		return $this;
+		return $this->config->get('asset.folder', 'asset');
 	}
 
 	/**
