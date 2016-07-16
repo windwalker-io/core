@@ -93,8 +93,8 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 				{
 					throw new \DomainException(sprintf(
 						'Class: "%s" should be sub class of %s',
-						$this->baseClass,
-						$class
+						$class,
+						$this->baseClass
 					));
 				}
 

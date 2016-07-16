@@ -38,6 +38,12 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 
 		$result = $this->next->execute($data);
 
+		// Check is already json string.
+		if (is_array($result) || is_object($result))
+		{
+			return json_encode($result);
+		}
+
 		return $result;
 	}
 }
