@@ -134,13 +134,21 @@ class RoutingMiddleware extends AbstractWebMiddleware
 					$router->fetchControllerSuffix($method)
 				)
 			);
-			
+
 			// Find package
 			$ns = implode('\\', array_map('ucfirst', $route)) . '\\' . ucfirst(end($route)) . 'Package';
-			
+
 			$resolver = $this->getPackageResolver();
+
+			// If package not found, try create one
+			if (!$resolver->getAlias($ns))
+			{
+				$resolver->addPackage(end($route), new $ns);
+			}
+
+			// Get package, if not exists, return DefaultPackage
 			$package = $resolver->resolvePackage($resolver->getAlias($ns));
-			
+
 			$packageName = $package ? $package->getName() : implode('.', $route);
 
 			if (!class_exists($class))
@@ -156,6 +164,11 @@ class RoutingMiddleware extends AbstractWebMiddleware
 			
 			return $matched;
 		}
+	}
+
+	protected function matchSimpleRouting()
+	{
+		
 	}
 
 	/**
