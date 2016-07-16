@@ -12,7 +12,10 @@ return [
 	],
 
 	'providers' =>[
-		
+		'logger' => \Windwalker\Core\Provider\LoggerProvider::class,
+		'event'  => \Windwalker\Core\Provider\EventProvider::class,
+		'mailer' => \Windwalker\Core\Mailer\MailerProvider::class,
+		'swiftmailer' => \Windwalker\Core\Mailer\SwiftMailerProvider::class
 	],
 
 	'configs' => [
@@ -85,7 +88,10 @@ return [
 
 			// Asset
 			'asset' => \Windwalker\Core\Asset\AssetManager::class,
-			'script.manager' => \Windwalker\Core\Asset\ScriptManager::class
+			'script.manager' => \Windwalker\Core\Asset\ScriptManager::class,
+
+			// Mailer
+			'mailer' => \Windwalker\Core\Mailer\MailerManager::class
 		]
 	],
 	

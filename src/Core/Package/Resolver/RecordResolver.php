@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of Phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Package\Resolver;
 
-use Phoenix\Record\NullRecord;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Record\Record;
 

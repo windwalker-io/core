@@ -64,6 +64,13 @@ class CoreDataMapper
 	protected static $table;
 
 	/**
+	 * Property alias.
+	 *
+	 * @var  string
+	 */
+	protected static $alias;
+
+	/**
 	 * Property keys.
 	 *
 	 * @var  string

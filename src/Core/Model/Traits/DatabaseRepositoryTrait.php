@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -16,7 +16,7 @@ use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
 
 /**
- * The PhoenixModelTrait class.
+ * The DatabaseRepositoryTrait class.
  *
  * @since  {DEPLOY_VERSION}
  */
@@ -36,20 +36,21 @@ trait DatabaseRepositoryTrait
 		$this->record = property_exists($this, 'record') ? $this->record : null;
 		$this->dataMapper = property_exists($this, 'dataMapper') ? $this->dataMapper : null;
 	}
-	
+
 	/**
 	 * getRecord
 	 *
 	 * @param   string $name
 	 *
 	 * @return  Record
+	 * @throws \LogicException
 	 */
 	public function getRecord($name = null)
 	{
 		$recordName = $name ? : $this->record;
 		$recordName = $recordName ? : $this->getName();
 
-		$mapper = $this->getDataMapper();
+		$mapper = $this->getDataMapper($name);
 
 		if ($mapper instanceof CoreDataMapper)
 		{
@@ -74,7 +75,9 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if ($recordName)
+		// If name is NULL and this model prepared a default record name.
+		// We must throw exception to tell developers record not found.
+		if (!$name && $this->record)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
@@ -88,7 +91,7 @@ trait DatabaseRepositoryTrait
 		}
 
 		// (3): If name is null, we get default object with table name provided.
-		return new Record($this->table, $this->keys, $mapper);
+		return new Record($table, $this->keys, $mapper);
 	}
 
 	/**
@@ -97,6 +100,7 @@ trait DatabaseRepositoryTrait
 	 * @param string $name
 	 *
 	 * @return  DataMapper
+	 * @throws \LogicException
 	 */
 	public function getDataMapper($name = null)
 	{
@@ -121,7 +125,9 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if (!$mapperName)
+		// If name is NULL and this model prepared a default mapper name.
+		// We must throw exception to tell developers mapper not found.
+		if (!$name && $this->dataMapper)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
@@ -131,7 +137,7 @@ trait DatabaseRepositoryTrait
 
 		if (!$table)
 		{
-			throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ", $errors));
+			throw new \LogicException('Please add table property to ' . get_called_class() . " to support DataMapper object. \n" . implode("\n- ", $errors));
 		}
 
 		// (3): If name is null, we get default object with table name provided.
@@ -154,6 +160,8 @@ trait DatabaseRepositoryTrait
 	 * @param bool $multiple
 	 *
 	 * @return  array|string
+	 * 
+	 * @throws \LogicException
 	 */
 	public function getKeyName($multiple = false)
 	{
