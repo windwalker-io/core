@@ -138,14 +138,19 @@ class SwiftMailerAdapter implements MailerAdapterInterface
 
 				$instance = \Swift_SmtpTransport::newInstance(
 					$config->get('host'),
-					$config->get('port', 465),
-					$config->get('security', 'ssl')
+					$config->get('port', 2525),
+					$config->get('security', 'tls')
 				)->setUsername($config->get('username'))
 					->setPassword($config->get('password'));
 
 				if ($config->exists('local'))
 				{
 					$instance->setLocalDomain($config->get('local'));
+				}
+
+				if (!$config->get('verify', true))
+				{
+					$instance->setStreamOptions(['ssl'=> ['allow_self_signed'=> true, 'verify_peer'=> false]]);
 				}
 
 				break;
