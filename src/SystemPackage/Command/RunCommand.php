@@ -68,7 +68,7 @@ class RunCommand extends Command
 	{
 		$resolver = ConsoleHelper::getAllPackagesResolver();
 
-		$scripts = (array) $this->console->get('console.script');
+		$scripts = (array) $this->console->get('console.scripts');
 
 		foreach ((array) ConsoleHelper::loadPackages() as $name => $package)
 		{
