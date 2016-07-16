@@ -78,6 +78,7 @@ class UserProvider implements ServiceProviderInterface
 	 * @param Container $container
 	 *
 	 * @return  AuthenticationInterface
+	 * @throws \Windwalker\DI\Exception\DependencyResolutionException
 	 */
 	public function authentication(Container $container)
 	{
@@ -103,6 +104,7 @@ class UserProvider implements ServiceProviderInterface
 	 * @param Container $container
 	 *
 	 * @return  AuthorisationInterface
+	 * @throws \InvalidArgumentException
 	 */
 	public function authorisation(Container $container)
 	{
@@ -111,11 +113,11 @@ class UserProvider implements ServiceProviderInterface
 
 		foreach ((array) $config->get('user.policies') as $name => $policy)
 		{
-			if ($policy instanceof PolicyInterface)
+			if (is_subclass_of($policy, PolicyInterface::class))
 			{
 				$auth->addPolicy($name, $container->newInstance($policy));
 			}
-			elseif ($policy instanceof PolicyProviderInterface)
+			elseif (is_subclass_of($policy, PolicyProviderInterface::class))
 			{
 				$auth->registerPolicyProvider($container->newInstance($policy));
 			}
@@ -145,6 +147,7 @@ class UserProvider implements ServiceProviderInterface
 	 * @param Container $container
 	 *
 	 * @return  UserHandlerInterface
+	 * @throws \UnexpectedValueException
 	 */
 	public function prepareHandler(Container $container)
 	{
