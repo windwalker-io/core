@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
@@ -176,7 +177,15 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
 
 		$globals  = $this->getRendererManager()->getGlobals();
 		$globals['package'] = $this->getPackage();
-		$globals['router'] = $this->getPackage()->router;
+
+		if ($this->getPackage() instanceof NullPackage)
+		{
+			$globals['router'] = $this->getPackage()->app->router;
+		}
+		else
+		{
+			$globals['router'] = $this->getPackage()->router;
+		}
 
 		$data->bind($globals);
 	}

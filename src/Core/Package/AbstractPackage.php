@@ -101,6 +101,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected $router;
 
 	/**
+	 * Property booted.
+	 *
+	 * @var  boolean
+	 */
+	protected $booted = false;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -108,6 +115,11 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function boot()
 	{
+		if ($this->booted)
+		{
+			return;
+		}
+
 		if (!$this->name)
 		{
 			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
@@ -120,6 +132,8 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->registerListeners($this->getDispatcher());
 
 		$this->registerMiddlewares();
+
+		$this->booted = true;
 	}
 
 	/**

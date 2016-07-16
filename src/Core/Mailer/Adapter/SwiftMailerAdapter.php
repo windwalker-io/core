@@ -157,7 +157,7 @@ class SwiftMailerAdapter implements MailerAdapterInterface
 
 			case 'sendmail':
 
-				$instance = \Swift_SendmailTransport::newInstance($config->get('command'));
+				$instance = \Swift_SendmailTransport::newInstance($config->get('sendmail'));
 
 				break;
 

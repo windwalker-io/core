@@ -71,7 +71,10 @@ namespace PHPSTORM_META
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager
+			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+
+			// Mailer
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
 		],
 
 		new \Windwalker\DI\Container => [
@@ -136,7 +139,10 @@ namespace PHPSTORM_META
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager
+			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+
+			// Mailer
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
 		]
 	];
 }
