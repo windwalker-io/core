@@ -11,7 +11,7 @@ namespace Windwalker\Core\Application\Middleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Windwalker\Core\Package\PackageResolver;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Middleware\MiddlewareInterface;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Route;
@@ -73,12 +73,12 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	/**
 	 * match
 	 *
-	 * @param CoreRouter $router
+	 * @param MainRouter $router
 	 * @param string     $route
 	 *
 	 * @return  Route
 	 */
-	public function match(CoreRouter $router, $route = null)
+	public function match(MainRouter $router, $route = null)
 	{
 		$route = $route ? : $this->app->uri->route;
 		$route = $route ? : '/';
@@ -161,7 +161,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	/**
 	 * getRouter
 	 *
-	 * @return  CoreRouter
+	 * @return  MainRouter
 	 */
 	protected function getRouter()
 	{

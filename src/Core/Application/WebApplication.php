@@ -42,7 +42,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  UriData                       uri
  * @property-read  Core\Event\EventDispatcher    dispatcher
  * @property-read  AbstractDatabaseDriver        database
- * @property-read  Core\Router\CoreRouter        router
+ * @property-read  Core\Router\MainRouter        router
  * @property-read  Language                      language
  * @property-read  Core\Renderer\RendererManager renderer
  * @property-read  Core\Cache\cacheManager       cacheManager
@@ -93,7 +93,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * Property router.
 	 *
-	 * @var  Core\Router\CoreRouter
+	 * @var  Core\Router\MainRouter
 	 */
 	protected $router;
 
@@ -220,13 +220,13 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @param bool $new
 	 *
-	 * @return  Core\Router\CoreRouter
+	 * @return  Core\Router\MainRouter
 	 */
 	public function getRouter($new = false)
 	{
 		if (!$this->router || $new)
 		{
-			/** @var Core\Router\CoreRouter $router */
+			/** @var Core\Router\MainRouter $router */
 			$router = $this->container->get('router');
 
 			$routes = $router::loadRoutingFiles((array) $this->get('routing.files'));

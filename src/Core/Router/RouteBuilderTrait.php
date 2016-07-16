@@ -25,7 +25,7 @@ trait RouteBuilderTrait
 	 * @return string
 	 * @throws \OutOfRangeException
 	 */
-	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
+	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type);
 	}

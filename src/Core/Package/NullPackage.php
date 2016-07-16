@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Console\Console;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Object\SilencerObjectInterface;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Structure\Structure;
@@ -213,12 +213,12 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
 	/**
 	 * loadRouting
 	 *
-	 * @param CoreRouter $router
+	 * @param MainRouter $router
 	 * @param string     $group
 	 *
-	 * @return CoreRouter
+	 * @return MainRouter
 	 */
-	public function loadRouting(CoreRouter $router, $group = null)
+	public function loadRouting(MainRouter $router, $group = null)
 	{
 		return $router;
 	}

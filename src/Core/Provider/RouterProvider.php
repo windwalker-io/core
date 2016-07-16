@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Router\Matcher\MatcherInterface;
@@ -32,7 +32,7 @@ class RouterProvider implements ServiceProviderInterface
 	{
 		$container->share(MatcherInterface::class, [$this, 'matcher']);
 
-		$container->prepareSharedObject(CoreRouter::class);
+		$container->prepareSharedObject(MainRouter::class);
 	}
 
 	/**

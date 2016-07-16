@@ -53,7 +53,7 @@ return [
 			'sql.exporter' => \Windwalker\Core\Database\Exporter\AbstractExporter::class,
 
 			// Router
-			'router' => \Windwalker\Core\Router\CoreRouter::class,
+			'router' => \Windwalker\Core\Router\MainRouter::class,
 
 			// Language
 			'language' => \Windwalker\Core\Language\CoreLanguage::class,
@@ -76,8 +76,9 @@ return [
 			'authorisation'  => \Windwalker\Authorisation\AuthorisationInterface::class,
 			'user.manager'   => \Windwalker\Core\User\UserManager::class,
 
-			// CSRF
+			// Security
 			'security.csrf' => \Windwalker\Core\Security\CsrfGuard::class,
+			'crypt' => \Windwalker\Crypt\CryptInterface::class,
 
 			// DateTime
 			'datetime' => \Windwalker\Core\DateTime\DateTime::class,

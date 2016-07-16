@@ -13,7 +13,7 @@ use Windwalker\Session\Bag\FlashBagInterface;
 use Windwalker\Session\Bag\SessionBagInterface;
 use Windwalker\Session\Bridge\SessionBridgeInterface;
 use Windwalker\Session\Handler\HandlerInterface;
-use Windwalker\Session\Session as WiSession;
+use Windwalker\Session\Session;
 
 /**
  * The Session class.
@@ -24,44 +24,44 @@ use Windwalker\Session\Session as WiSession;
  * @method  static  boolean    destroy()
  * @method  static  boolean    restart()
  * @method  static  boolean    fork()
- * @method  static  WiSession  close()
- * @method  static  WiSession  regenerate($destroy = false)
+ * @method  static  Session  close()
+ * @method  static  Session  regenerate($destroy = false)
  * @method  static  mixed      get($name, $default = null, $namespace = 'default')
  * @method  static  array      getAll($namespace = 'default')
  * @method  static  array      takeAll($namespace = 'default')
- * @method  static  WiSession  clean($namespace = 'default')
- * @method  static  WiSession  set($name, $value = null, $namespace = 'default')
+ * @method  static  Session  clean($namespace = 'default')
+ * @method  static  Session  set($name, $value = null, $namespace = 'default')
  * @method  static  boolean    exists($name, $namespace = 'default')
  * @method  static  mixed      remove($name, $namespace = 'default')
- * @method  static  WiSession  addFlash($msg, $type = 'info')
+ * @method  static  Session  addFlash($msg, $type = 'info')
  * @method  static  array      getFlashes()
  * @method  static  SessionBridgeInterface  getBridge()
- * @method  static  WiSession  setBridge($bridge)
+ * @method  static  Session  setBridge($bridge)
  * @method  static  HandlerInterface  getHandler()
- * @method  static  WiSession  setHandler($handler)
+ * @method  static  Session  setHandler($handler)
  * @method  static  string     getName()
  * @method  static  string     getId()
  * @method  static  boolean    isActive()
  * @method  static  boolean    isNew()
  * @method  static  string     getState()
- * @method  static  WiSession  setState($state)
+ * @method  static  Session  setState($state)
  * @method  static  array      getCookie()
  * @method  static  Session    setCookie($cookie)
  * @method  static  mixed      getOption($name, $default = null)
- * @method  static  WiSession  setOption($name, $value)
+ * @method  static  Session  setOption($name, $value)
  * @method  static  array      getOptions()
- * @method  static  WiSession  setOptions($options)
+ * @method  static  Session  setOptions($options)
  * @method  static  array      getBags()
  * @method  static  Session    setBags(array $bags)
  * @method  static  SessionBagInterface  getBag($name)
- * @method  static  WiSession  setBag($name, SessionBagInterface $bag)
+ * @method  static  Session  setBag($name, SessionBagInterface $bag)
  * @method  static  FlashBagInterface  getFlashBag()
- * @method  static  WiSession  setFlashBag(FlashBagInterface $bag)
- * @method  static  WiSession  setDebug($debug)
+ * @method  static  Session  setFlashBag(FlashBagInterface $bag)
+ * @method  static  Session  setDebug($debug)
  *
  * @since  {DEPLOY_VERSION}
  */
-class Session extends AbstractProxyFacade
+class CoreSession extends AbstractProxyFacade
 {
 	/**
 	 * Property _key.

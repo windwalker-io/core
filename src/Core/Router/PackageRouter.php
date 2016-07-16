@@ -30,17 +30,17 @@ class PackageRouter implements RouteBuilderInterface
 	/**
 	 * Property router.
 	 *
-	 * @var CoreRouter
+	 * @var MainRouter
 	 */
 	protected $router;
 
 	/**
 	 * Class init.
 	 *
-	 * @param CoreRouter      $router
+	 * @param MainRouter      $router
 	 * @param AbstractPackage $package
 	 */
-	public function __construct(CoreRouter $router, AbstractPackage $package = null)
+	public function __construct(MainRouter $router, AbstractPackage $package = null)
 	{
 		$this->router = $router;
 
@@ -57,7 +57,7 @@ class PackageRouter implements RouteBuilderInterface
 	 * @return string
 	 * @throws \OutOfRangeException
 	 */
-	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
+	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
 	{
 		try
 		{
@@ -86,7 +86,7 @@ class PackageRouter implements RouteBuilderInterface
 	/**
 	 * Method to get property Router
 	 *
-	 * @return  CoreRouter
+	 * @return  MainRouter
 	 */
 	public function getRouter()
 	{
@@ -96,11 +96,11 @@ class PackageRouter implements RouteBuilderInterface
 	/**
 	 * Method to set property router
 	 *
-	 * @param   CoreRouter $router
+	 * @param   MainRouter $router
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setRouter(CoreRouter $router)
+	public function setRouter(MainRouter $router)
 	{
 		$this->router = $router;
 
