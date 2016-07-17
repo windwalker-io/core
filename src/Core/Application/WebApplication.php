@@ -311,6 +311,10 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			{
 				$middleware->bindTo($this);
 			}
+			elseif ($middleware === false)
+			{
+				continue;
+			}
 
 			$chain->add($middleware);
 		}
