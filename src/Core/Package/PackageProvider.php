@@ -96,7 +96,7 @@ class PackageProvider implements ServiceProviderInterface
 		if ($this->package->app->isWeb())
 		{
 			// Router
-			$container->prepareSharedObject(PackageRouter::class)->alias('package.router', PackageRouter::class);
+			$container->prepareSharedObject(PackageRouter::class)->alias('router', PackageRouter::class);
 		}
 	}
 }

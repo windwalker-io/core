@@ -760,7 +760,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		return $this->currentController;
 	}
-
 	/**
 	 * __get
 	 *
@@ -775,7 +774,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			'input'      => 'input',
 			'dispatcher' => 'dispatcher',
 			'csrf'       => 'security.csrf',
-			'router'     => 'package.router'
+			'router'     => 'router'
 		];
 
 		if (isset($diMapping[$name]))

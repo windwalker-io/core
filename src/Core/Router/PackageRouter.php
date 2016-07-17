@@ -84,6 +84,19 @@ class PackageRouter implements RouteBuilderInterface
 	}
 
 	/**
+	 * __call
+	 *
+	 * @param string $name
+	 * @param array  $args
+	 *
+	 * @return  mixed
+	 */
+	public function __call($name, $args)
+	{
+		return $this->getRouter()->$name(...$args);
+	}
+
+	/**
 	 * Method to get property Router
 	 *
 	 * @return  MainRouter

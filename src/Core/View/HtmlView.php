@@ -177,15 +177,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
 
 		$globals  = $this->getRendererManager()->getGlobals();
 		$globals['package'] = $this->getPackage();
-
-		if ($this->getPackage() instanceof NullPackage)
-		{
-			$globals['router'] = $this->getPackage()->app->router;
-		}
-		else
-		{
-			$globals['router'] = $this->getPackage()->router;
-		}
+		$globals['router'] = $this->getPackage()->router;
 
 		$data->bind($globals);
 	}
