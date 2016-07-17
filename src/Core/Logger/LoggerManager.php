@@ -15,9 +15,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Logger\Monolog\GlobalContainer;
-use Windwalker\Core\Config\Config;
-use Windwalker\DI\Container;
-use Windwalker\DI\ContainerAwareInterface;
 
 /**
  * The LoggerFactory class.
