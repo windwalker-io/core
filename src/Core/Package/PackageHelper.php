@@ -28,7 +28,7 @@ use Windwalker\Structure\Structure;
  * @method  static  AbstractPackage         getPackage($name = null)
  * @method  static  AbstractPackage         getCurrentPackage()
  * @method  static  PackageResolver         setCurrentPackage(AbstractPackage $package)
- * @method  static  string|AbstractPackage  getAlias($package)
+ * @method  static  string                  getAlias($package)
  * @method  static  AbstractPackage         resolvePackage($name)
  * @method  static  PackageResolver         removePackage($name)
  * @method  static  AbstractPackage[]       getPackages()

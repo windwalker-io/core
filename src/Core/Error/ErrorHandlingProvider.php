@@ -83,7 +83,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 
 		if (!$container->get('config')->get('error.log', false))
 		{
-			$container->extend('logger', function (LoggerManager $logger, Container $container)
+			$container->extend(LoggerManager::class, function (LoggerManager $logger, Container $container)
 			{
 			    $logger->addLogger('error', new NullLogger);
 
