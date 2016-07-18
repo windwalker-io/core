@@ -11,7 +11,7 @@ namespace Windwalker\Core\Router;
 /**
  * The RouteBuilderTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait RouteBuilderTrait
 {

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Mvc;
 /**
  * Interface ClassResolverInterface
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface ClassResolverInterface
 {

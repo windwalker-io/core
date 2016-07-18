@@ -14,7 +14,7 @@ use Illuminate\View\FileViewFinder;
 /**
  * The BladeFinder class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class BladeFinder extends FileViewFinder
 {

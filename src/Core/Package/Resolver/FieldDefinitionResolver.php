@@ -13,7 +13,7 @@ use Windwalker\Form\FieldDefinitionInterface;
 /**
  * The FormDefinitionResolver class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class FieldDefinitionResolver extends AbstractPackageObjectResolver
 {

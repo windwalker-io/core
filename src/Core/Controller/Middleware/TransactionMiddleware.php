@@ -11,7 +11,7 @@ namespace Windwalker\Core\Controller\Middleware;
 /**
  * The TranslationMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class TransactionMiddleware extends AbstractControllerMiddleware
 {

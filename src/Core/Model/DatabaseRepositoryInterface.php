@@ -15,7 +15,7 @@ use Windwalker\Record\Record;
 /**
  * The DatabaseRepositoryInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface DatabaseRepositoryInterface
 {

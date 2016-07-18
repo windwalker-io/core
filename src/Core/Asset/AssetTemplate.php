@@ -14,7 +14,7 @@ use Windwalker\String\SimpleTemplate;
 /**
  * The AssetTemplate class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class AssetTemplate
 {

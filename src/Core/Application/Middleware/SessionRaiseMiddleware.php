@@ -15,7 +15,7 @@ use Windwalker\Middleware\MiddlewareInterface;
 /**
  * The SessionRaiseMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SessionRaiseMiddleware extends AbstractWebMiddleware
 {

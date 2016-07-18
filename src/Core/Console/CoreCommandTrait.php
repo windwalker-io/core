@@ -11,7 +11,7 @@ namespace Windwalker\Core\Console;
 /**
  * The CoreCommandTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait CoreCommandTrait
 {

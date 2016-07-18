@@ -14,7 +14,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The MailerProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class MailerProvider implements ServiceProviderInterface
 {

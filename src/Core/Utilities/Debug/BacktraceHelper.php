@@ -16,7 +16,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The DebugHelper class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class BacktraceHelper
 {

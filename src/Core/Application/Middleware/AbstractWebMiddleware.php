@@ -15,7 +15,7 @@ use Windwalker\Middleware\Psr7InvokableInterface;
 /**
  * The AbstractApplicationMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 abstract class AbstractWebMiddleware implements Psr7InvokableInterface
 {

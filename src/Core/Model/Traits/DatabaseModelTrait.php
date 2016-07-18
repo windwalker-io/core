@@ -15,7 +15,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 /**
  * The DatabaseModelTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait DatabaseModelTrait
 {

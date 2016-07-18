@@ -13,7 +13,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The DocblockHelper class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class DocblockHelper
 {

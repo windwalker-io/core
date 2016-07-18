@@ -14,7 +14,7 @@ use Windwalker\Structure\Structure;
 /**
  * The SwiftMailerAdapter class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SwiftMailerAdapter implements MailerAdapterInterface
 {

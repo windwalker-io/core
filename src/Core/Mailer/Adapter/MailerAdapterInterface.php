@@ -13,7 +13,7 @@ use Windwalker\Core\Mailer\MailMessage;
 /**
  * The MailerAdapterInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface MailerAdapterInterface
 {

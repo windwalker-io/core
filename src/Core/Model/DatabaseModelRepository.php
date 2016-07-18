@@ -13,7 +13,7 @@ use Windwalker\Core\Model\Traits\DatabaseRepositoryTrait;
 /**
  * The ModelRepository class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class DatabaseModelRepository extends ModelRepository implements DatabaseRepositoryInterface
 {

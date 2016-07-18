@@ -18,7 +18,7 @@ use Windwalker\Record\Record;
 /**
  * The DatabaseRepositoryTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait DatabaseRepositoryTrait
 {

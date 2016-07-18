@@ -15,7 +15,7 @@ use Windwalker\Structure\Structure;
 /**
  * The UpCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class DownCommand extends CoreCommand
 {

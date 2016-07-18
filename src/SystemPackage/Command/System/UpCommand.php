@@ -11,7 +11,7 @@ namespace Windwalker\SystemPackage\Command\System;
 /**
  * The UpCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class UpCommand extends DownCommand
 {

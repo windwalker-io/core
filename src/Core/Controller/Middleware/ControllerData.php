@@ -30,7 +30,7 @@ use Windwalker\IO\Input;
  * @property Container              container
  * @property AbstractPackage        package
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ControllerData extends Data
 {

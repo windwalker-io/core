@@ -30,7 +30,7 @@ use Windwalker\Http\Transport\TransportInterface;
  * @method  static  ResponseInterface  trace($url, $headers = array())
  * @method  static  ResponseInterface  patch($url, $data, $headers = array())
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class HttpRetriever
 {

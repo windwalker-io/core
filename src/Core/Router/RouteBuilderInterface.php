@@ -11,7 +11,7 @@ namespace Windwalker\Core\Router;
 /**
  * Interface RouteBuilderInterface
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface RouteBuilderInterface
 {

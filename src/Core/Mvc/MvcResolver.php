@@ -15,7 +15,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The MvcResolver class. This is a composite class to wrap Controller, Model, View resolvers.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class MvcResolver
 {

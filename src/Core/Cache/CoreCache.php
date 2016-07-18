@@ -32,7 +32,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  Cache  setStorage($storage)
  * @method  static  CacheItemPoolInterface  getStorage()
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CoreCache extends AbstractProxyFacade
 {

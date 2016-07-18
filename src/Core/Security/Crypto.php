@@ -26,7 +26,7 @@ use Windwalker\Crypt\CryptInterface;
  * @method  static  Crypt    getIV($key)
  * @method  static  string   setIV($iv)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class Crypto extends AbstractProxyFacade
 {

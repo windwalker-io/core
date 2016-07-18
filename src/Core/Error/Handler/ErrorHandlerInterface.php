@@ -11,7 +11,7 @@ namespace Windwalker\Core\Error\Handler;
 /**
  * The ErrorHandlerInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface ErrorHandlerInterface
 {

@@ -17,7 +17,7 @@ use Windwalker\Uri\UriData;
 /**
  * The AssetProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class AssetProvider implements ServiceProviderInterface
 {

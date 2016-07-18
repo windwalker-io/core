@@ -11,7 +11,7 @@ namespace Windwalker\Core\Utilities\Exception;
 /**
  * The MultiMessagesExceptionTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait MultiMessagesExceptionTrait
 {

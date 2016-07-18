@@ -17,7 +17,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The DeployCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class RunCommand extends Command
 {

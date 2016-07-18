@@ -23,7 +23,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The RoutingMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class RoutingMiddleware extends AbstractWebMiddleware
 {

@@ -18,7 +18,7 @@ use Windwalker\Structure\Structure;
 /**
  * The CoreLanguage class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CoreLanguage extends Language
 {

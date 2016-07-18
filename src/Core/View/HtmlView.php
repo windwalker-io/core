@@ -20,7 +20,7 @@ use Windwalker\Renderer\AbstractRenderer;
 /**
  * The AbstractHtmlView class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class HtmlView extends AbstractView implements LayoutRenderableInterface
 {

@@ -15,7 +15,7 @@ use Windwalker\Filesystem\File;
 /**
  * The ModeCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ModeCommand extends CoreCommand
 {

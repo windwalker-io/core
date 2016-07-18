@@ -25,7 +25,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The PackageProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class PackageProvider implements ServiceProviderInterface
 {

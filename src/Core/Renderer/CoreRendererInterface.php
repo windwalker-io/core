@@ -13,7 +13,7 @@ use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
 /**
  * The CoreRendererInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface CoreRendererInterface
 {

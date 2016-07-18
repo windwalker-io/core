@@ -11,7 +11,7 @@ namespace Windwalker\Core\Renderer\Traits;
 /**
  * The GlobalVarsTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait GlobalVarsTrait
 {

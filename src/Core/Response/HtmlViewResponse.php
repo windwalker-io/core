@@ -15,7 +15,7 @@ use Windwalker\Http\Response\HtmlResponse;
 /**
  * The HtmlViewResponse class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class HtmlViewResponse extends HtmlResponse
 {

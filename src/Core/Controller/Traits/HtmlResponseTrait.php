@@ -14,7 +14,7 @@ use Windwalker\Core\Controller\Middleware\HtmlResponseMiddleware;
 /**
  * The HtmlResponseTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait HtmlResponseTrait
 {

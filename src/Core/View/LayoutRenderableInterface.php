@@ -13,7 +13,7 @@ use Windwalker\Renderer\AbstractRenderer;
 /**
  * Interface LayoutRenderableInterface
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface LayoutRenderableInterface
 {

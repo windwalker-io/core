@@ -13,7 +13,7 @@ use Windwalker\Core\Controller\Middleware\TransactionMiddleware;
 /**
  * The TransactionalTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait TransactionalTrait
 {

@@ -18,7 +18,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The RenderViewMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class JsonApiMiddleware extends AbstractControllerMiddleware
 {

@@ -27,7 +27,7 @@ use Windwalker\Structure\Structure;
 /**
  * The UserManager class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 {

@@ -59,7 +59,7 @@ use Windwalker\Session\Session;
  * @method  static  Session  setFlashBag(FlashBagInterface $bag)
  * @method  static  Session  setDebug($debug)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CoreSession extends AbstractProxyFacade
 {

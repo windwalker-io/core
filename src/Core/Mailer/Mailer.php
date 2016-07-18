@@ -24,7 +24,7 @@ use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
  * @method  static  MailerAdapterInterface  getAdapter()
  * @method  static  MailerManager           setAdapter(MailerAdapterInterface $adapter)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class Mailer extends AbstractProxyFacade
 {

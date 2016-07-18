@@ -14,7 +14,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The CsrfProtectionTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait CsrfProtectionTrait
 {

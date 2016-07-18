@@ -18,7 +18,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * LayoutRenderableTrait
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait LayoutRenderableTrait
 {

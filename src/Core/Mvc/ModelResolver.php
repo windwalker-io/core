@@ -14,7 +14,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The ModelResolver class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ModelResolver extends AbstractClassResolver
 {

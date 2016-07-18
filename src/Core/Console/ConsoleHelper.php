@@ -21,7 +21,7 @@ use Windwalker\Structure\Structure;
 /**
  * The ConsoleHelper class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ConsoleHelper
 {
