@@ -14,6 +14,7 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\ArrayAccessTrait;
+use Windwalker\Data\DataInterface;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Data\Data;
 use Windwalker\Renderer\PhpRenderer;
@@ -151,11 +152,11 @@ class Widget implements \ArrayAccess
 	/**
 	 * prepareData
 	 *
-	 * @param  \Windwalker\Data\Data  $data
+	 * @param  DataInterface  $data
 	 *
 	 * @return  void
 	 */
-	protected function prepareData($data)
+	protected function prepareData(DataInterface $data)
 	{
 	}
 
@@ -210,11 +211,11 @@ class Widget implements \ArrayAccess
 	/**
 	 * prepareGlobals
 	 *
-	 * @param Data $data
+	 * @param DataInterface $data
 	 *
 	 * @return  static
 	 */
-	protected function prepareGlobals(Data $data)
+	protected function prepareGlobals(DataInterface $data)
 	{
 		$data->layout = $this->layout;
 		$data->renderer = get_class($this->renderer);
