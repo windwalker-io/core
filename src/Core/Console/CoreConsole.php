@@ -168,12 +168,12 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
 		$this->prepareExecute();
 
-		$this->triggerEvent('onBeforeExecute');
+		$this->triggerEvent('onBeforeExecute', ['app' => $this]);
 
 		// Perform application routines.
 		$exitCode = $this->doExecute();
 
-		$this->triggerEvent('onAfterExecute');
+		$this->triggerEvent('onAfterExecute', ['app' => $this]);
 
 		return $this->postExecute($exitCode);
 	}
@@ -226,9 +226,9 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('dispatcher');
 
-		$dispatcher->triggerEvent($event);
+		$dispatcher->triggerEvent($event, $args);
 
-		return $this;
+		return $event;
 	}
 
 	/**
