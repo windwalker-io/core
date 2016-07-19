@@ -11,7 +11,7 @@ namespace Windwalker\Core\Renderer\Finder;
 /**
  * The TwigFilesystemLoader class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class TwigFilesystemLoader extends \Windwalker\Renderer\Twig\TwigFilesystemLoader
 {

@@ -16,7 +16,7 @@ use Windwalker\Event\DispatcherAwareTrait;
 /**
  * The Mailer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class MailerManager
 {
@@ -82,11 +82,13 @@ class MailerManager
 	{
 		if (is_callable($message))
 		{
-			$message = $message($this->createMessage(), $this);
+			$msgObject = $this->createMessage();
+
+			$message = $message($msgObject, $this);
 
 			if (!$message instanceof MailMessage)
 			{
-				throw new \UnexpectedValueException(sprintf('Please return %s from your callback. ', MailMessage::class));
+				$message = $msgObject;
 			}
 		}
 

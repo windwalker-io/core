@@ -77,11 +77,12 @@ class WidgetManager
 	 */
 	public function createWidget($layout, $engine = null, $package = null)
 	{
-		RendererHelper::boot();
+		// TODO: If we don't need boot() anymore, remove RendererHelper::boot()
+//		RendererHelper::boot();
 		$engine = $this->rendererManager->getRenderer($engine ? : static::PHP);
 
 		// Prepare package
-		$package = $package ? : Ioc::get('current.package');
+		$package = $package ? : Ioc::get('package.resolver')->getPackage();
 
 		if (class_exists($layout) && is_subclass_of($layout, WidgetComponent::class))
 		{

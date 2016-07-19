@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Model\Traits;
 
+use Windwalker\Core\Database\NullDataMapper;
+use Windwalker\Core\Database\NullRecord;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
 use Windwalker\Core\DataMapper\CoreDataMapper;
@@ -16,9 +18,9 @@ use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
 
 /**
- * The PhoenixModelTrait class.
+ * The DatabaseRepositoryTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait DatabaseRepositoryTrait
 {
@@ -36,27 +38,40 @@ trait DatabaseRepositoryTrait
 		$this->record = property_exists($this, 'record') ? $this->record : null;
 		$this->dataMapper = property_exists($this, 'dataMapper') ? $this->dataMapper : null;
 	}
-	
+
 	/**
 	 * getRecord
 	 *
 	 * @param   string $name
 	 *
 	 * @return  Record
+	 * @throws \LogicException
 	 */
 	public function getRecord($name = null)
 	{
 		$recordName = $name ? : $this->record;
+
+		if ($recordName === false)
+		{
+			return new NullRecord;
+		}
+
 		$recordName = $recordName ? : $this->getName();
 
-		$mapper = $this->getDataMapper();
+		$mapper = $this->getDataMapper($name);
 
 		if ($mapper instanceof CoreDataMapper)
 		{
 			$mapper = $mapper->getInstance();
 		}
 
-		// (1): Find object from registered namespaces
+		// (1) If name is class, just new it.
+		if (class_exists($recordName))
+		{
+			return new $recordName($this->table, $this->keys, $mapper);
+		}
+
+		// (2): Find object from registered namespaces
 		if ($record = RecordResolver::create($recordName, $this->table, $this->keys, $mapper))
 		{
 			return $record;
@@ -64,17 +79,19 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('Record: "%s" not found from namespaces: (%s)', $recordName, implode(" |\n ", RecordResolver::dumpNamespaces()));
 
-		// (2): Find from package directory.
+		// (3): Find from package directory.
 		$class = sprintf('%s\Record\%sRecord', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($recordName));
 
 		if (class_exists($class))
 		{
-			return new $class;
+			return new $class($this->table, $this->keys, $mapper);
 		}
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if ($recordName)
+		// If name is NULL and this model prepared a default record name.
+		// We must throw exception to tell developers record not found.
+		if (!$name && $this->record)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
@@ -87,8 +104,8 @@ trait DatabaseRepositoryTrait
 			throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ", $errors));
 		}
 
-		// (3): If name is null, we get default object with table name provided.
-		return new Record($this->table, $this->keys, $mapper);
+		// (4): If name is null, we get default object with table name provided.
+		return new Record($table, $this->keys, $mapper);
 	}
 
 	/**
@@ -97,13 +114,26 @@ trait DatabaseRepositoryTrait
 	 * @param string $name
 	 *
 	 * @return  DataMapper
+	 * @throws \LogicException
 	 */
 	public function getDataMapper($name = null)
 	{
 		$mapperName = $name ? : $this->dataMapper;
+
+		if ($mapperName === false)
+		{
+			return new NullDataMapper;
+		}
+
 		$mapperName = $mapperName ? : $this->getName();
 
-		// (1): Find object from registered namespaces
+		// (1) If name is class, just new it.
+		if (class_exists($mapperName))
+		{
+			return new $mapperName($this->table, $this->keys, $this->db);
+		}
+
+		// (2): Find object from registered namespaces
 		if ($mapper = DataMapperResolver::create($mapperName, $this->table, $this->keys, $this->db))
 		{
 			return $mapper;
@@ -111,17 +141,19 @@ trait DatabaseRepositoryTrait
 
 		$errors[] = sprintf('DataMapper: "%s" not found from namespaces: (%s)', $mapperName, implode(" |\n ", DataMapperResolver::dumpNamespaces()));
 
-		// (2): Find from package directory.
+		// (3): Find from package directory.
 		$class = sprintf('%s\DataMapper\%sMapper', MvcHelper::getPackageNamespace(get_called_class(), 2), ucfirst($mapperName));
 
 		if (class_exists($class))
 		{
-			return new $class($this->db);
+			return new $class($this->table, $this->keys, $this->db);
 		}
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
 
-		if (!$mapperName)
+		// If name is NULL and this model prepared a default mapper name.
+		// We must throw exception to tell developers mapper not found.
+		if (!$name && $this->dataMapper)
 		{
 			throw new \LogicException(implode("\n- ", $errors));
 		}
@@ -131,10 +163,10 @@ trait DatabaseRepositoryTrait
 
 		if (!$table)
 		{
-			throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ", $errors));
+			throw new \LogicException('Please add table property to ' . get_called_class() . " to support DataMapper object. \n" . implode("\n- ", $errors));
 		}
 
-		// (3): If name is null, we get default object with table name provided.
+		// (4): If name is null, we get default object with table name provided.
 		return new DataMapper($table, $this->keys, $this->db);
 	}
 
@@ -154,6 +186,8 @@ trait DatabaseRepositoryTrait
 	 * @param bool $multiple
 	 *
 	 * @return  array|string
+	 * 
+	 * @throws \LogicException
 	 */
 	public function getKeyName($multiple = false)
 	{

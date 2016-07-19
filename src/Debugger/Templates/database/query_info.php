@@ -32,7 +32,7 @@ $types = [
 		Memory: <span class="label label-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'], 3) ?> MB</span>
 		Return Rows: <span class="label label-info"><?php echo $timeline['data']['rows'] ?></span>
 	</div>
-    <?php if (isset($timeline['data']['bounded'])): ?>
+    <?php if (!empty($timeline['data']['bounded'])): ?>
         <table class="table table-striped">
             <thead>
             <tr>

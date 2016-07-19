@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -11,7 +11,7 @@ namespace Windwalker\Core\Router;
 /**
  * The RouteBuilderTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait RouteBuilderTrait
 {
@@ -25,7 +25,7 @@ trait RouteBuilderTrait
 	 * @return string
 	 * @throws \OutOfRangeException
 	 */
-	public function route($route, $queries = [], $type = CoreRouter::TYPE_PATH)
+	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
 	{
 		return $this->build($route, $queries, $type);
 	}

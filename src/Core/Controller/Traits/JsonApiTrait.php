@@ -15,7 +15,7 @@ use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
 /**
  * The HtmlResponseTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait JsonApiTrait
 {

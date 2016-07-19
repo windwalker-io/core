@@ -15,7 +15,7 @@ use Windwalker\Core\Package\Command\Package\InstallCommand;
 /**
  * The PackageCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class PackageCommand extends Command
 {

@@ -14,7 +14,7 @@ use Psr\Log\NullLogger;
 /**
  * The LoggerAwareTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait LoggerAwareTrait
 {

@@ -14,7 +14,7 @@ use Windwalker\Structure\Structure;
 /**
  * The SwiftMailerAdapter class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SwiftMailerAdapter implements MailerAdapterInterface
 {
@@ -137,22 +137,27 @@ class SwiftMailerAdapter implements MailerAdapterInterface
 			case 'smtp':
 
 				$instance = \Swift_SmtpTransport::newInstance(
-					$config->get('host'),
-					$config->get('port', 465),
-					$config->get('security', 'ssl')
-				)->setUsername($config->get('username'))
-					->setPassword($config->get('password'));
+					$config->get('smtp.host'),
+					$config->get('smtp.port', 2525),
+					$config->get('smtp.security', 'tls')
+				)->setUsername($config->get('smtp.username'))
+					->setPassword($config->get('smtp.password'));
 
-				if ($config->exists('local'))
+				if ($config->exists('smtp.local'))
 				{
 					$instance->setLocalDomain($config->get('local'));
+				}
+
+				if (!$config->get('smtp.verify', true))
+				{
+					$instance->setStreamOptions(['ssl'=> ['allow_self_signed'=> true, 'verify_peer'=> false]]);
 				}
 
 				break;
 
 			case 'sendmail':
 
-				$instance = \Swift_SendmailTransport::newInstance($config->get('command'));
+				$instance = \Swift_SendmailTransport::newInstance($config->get('sendmail'));
 
 				break;
 

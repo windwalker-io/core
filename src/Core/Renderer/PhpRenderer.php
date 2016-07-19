@@ -15,7 +15,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The PhpRenderer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRendererInterface
 {

@@ -14,7 +14,7 @@ use Windwalker\Middleware\AbstractMiddleware;
 /**
  * The AbstractControllerMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 abstract class AbstractControllerMiddleware extends AbstractMiddleware
 {

@@ -8,15 +8,16 @@
 
 namespace Windwalker\Core\Error;
 
-use Windwalker\Core\Application\WebApplication;
+use Psr\Log\NullLogger;
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Logger\LoggerManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
 /**
  * The ErrorHandlingProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ErrorHandlingProvider implements ServiceProviderInterface
 {
@@ -79,5 +80,15 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 
 			return $error;
 		});
+
+		if (!$container->get('config')->get('error.log', false))
+		{
+			$container->extend(LoggerManager::class, function (LoggerManager $logger, Container $container)
+			{
+			    $logger->addLogger('error', new NullLogger);
+
+				return $logger;
+			});
+		}
 	}
 }

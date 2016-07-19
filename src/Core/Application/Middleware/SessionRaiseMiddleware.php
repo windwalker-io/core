@@ -15,7 +15,7 @@ use Windwalker\Middleware\MiddlewareInterface;
 /**
  * The SessionRaiseMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SessionRaiseMiddleware extends AbstractWebMiddleware
 {
@@ -30,7 +30,9 @@ class SessionRaiseMiddleware extends AbstractWebMiddleware
 	 */
 	public function __invoke(Request $request, Response $response, $next = null)
 	{
-		$this->app->container->get('session')->start();
+		$session = $this->app->container->get('session');
+
+		$session->start();
 
 		return $next($request, $response);
 	}

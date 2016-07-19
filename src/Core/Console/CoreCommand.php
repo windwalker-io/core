@@ -13,7 +13,7 @@ use Windwalker\Console\Command\Command;
 /**
  * The CoreCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CoreCommand extends Command
 {

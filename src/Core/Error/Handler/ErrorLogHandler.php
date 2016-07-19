@@ -13,7 +13,7 @@ use Windwalker\Core\Logger\Logger;
 /**
  * The ErrorLogHandler class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ErrorLogHandler implements ErrorHandlerInterface
 {

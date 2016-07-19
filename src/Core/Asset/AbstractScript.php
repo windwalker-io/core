@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -25,6 +26,13 @@ abstract class AbstractScript
 	 * @var  callable|ScriptManager
 	 */
 	public static $instance;
+
+	/**
+	 * Property packageClass.
+	 *
+	 * @var  string
+	 */
+	protected static $packageClass;
 
 	/**
 	 * inited
@@ -59,6 +67,20 @@ abstract class AbstractScript
 	protected static function getAsset()
 	{
 		return static::getInstance()->getAsset();
+	}
+
+	/**
+	 * packageName
+	 *
+	 * @param null $class
+	 *
+	 * @return  string|\Windwalker\Core\Package\AbstractPackage
+	 */
+	protected static function packageName($class = null)
+	{
+		$class = $class ? : static::$packageClass;
+
+		return PackageHelper::getAlias($class);
 	}
 
 	/**

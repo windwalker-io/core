@@ -13,7 +13,7 @@ use Windwalker\Structure\Structure;
 /**
  * The ConfigRegistry class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class Config extends Structure
 {

@@ -14,7 +14,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The BootableTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait BootableTrait
 {

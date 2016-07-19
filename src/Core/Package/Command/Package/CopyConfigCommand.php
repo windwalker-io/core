@@ -16,7 +16,7 @@ use Windwalker\Filesystem\File;
 /**
  * The InstallCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CopyConfigCommand extends Command
 {

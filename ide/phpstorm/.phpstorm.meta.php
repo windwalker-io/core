@@ -38,7 +38,7 @@ namespace PHPSTORM_META
 			'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
 
 			// Router
-			'router' instanceof \Windwalker\Core\Router\CoreRouter,
+			'router' instanceof \Windwalker\Core\Router\MainRouter,
 
 			// Language
 			'language' instanceof \Windwalker\Core\Language\CoreLanguage,
@@ -62,15 +62,19 @@ namespace PHPSTORM_META
 			'user.manager' instanceof \Windwalker\Core\User\UserManager,
 			'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
 
-			// CSRF
+			// Security
 			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
+			'crypt' instanceof \Windwalker\Crypt\Crypt,
 
 			// DateTime
 			'datetime' instanceof \Windwalker\Core\DateTime\DateTime,
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager
+			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+
+			// Mailer
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
 		],
 
 		new \Windwalker\DI\Container => [
@@ -102,7 +106,7 @@ namespace PHPSTORM_META
 			'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
 
 			// Router
-			'router' instanceof \Windwalker\Core\Router\CoreRouter,
+			'router' instanceof \Windwalker\Core\Router\MainRouter,
 
 			// Language
 			'language' instanceof \Windwalker\Core\Language\CoreLanguage,
@@ -126,15 +130,19 @@ namespace PHPSTORM_META
 			'user.manager' instanceof \Windwalker\Core\User\UserManager,
 			'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
 
-			// CSRF
+			// Security
 			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
+			'crypt' instanceof \Windwalker\Crypt\Crypt,
 
 			// DateTime
 			'datetime' instanceof \Windwalker\Core\DateTime\DateTime,
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager
+			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+
+			// Mailer
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
 		]
 	];
 }

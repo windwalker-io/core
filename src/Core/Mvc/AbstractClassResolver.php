@@ -19,7 +19,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The AbstractResolver class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 abstract class AbstractClassResolver implements ClassResolverInterface, ContainerAwareInterface
 {
@@ -93,8 +93,8 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 				{
 					throw new \DomainException(sprintf(
 						'Class: "%s" should be sub class of %s',
-						$this->baseClass,
-						$class
+						$class,
+						$this->baseClass
 					));
 				}
 

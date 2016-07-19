@@ -8,11 +8,9 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Phoenix\Controller\AbstractPostController;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Core\View\AbstractView;
-use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Utilities\ArrayHelper;
@@ -20,7 +18,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The RenderViewMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class JsonApiMiddleware extends AbstractControllerMiddleware
 {
@@ -99,14 +97,8 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 	 */
 	protected function getMessage()
 	{
-		list($url, $msg, $type) = $this->controller->getRedirect(true);
-
-		if (!$msg)
-		{
-			$msg = $this->controller->app->session->getFlashBag()->takeAll();
-
-			$msg = implode("\n", ArrayHelper::flatten($msg));
-		}
+		$msg = $this->controller->app->session->getFlashBag()->takeAll();
+		$msg = implode("\n", ArrayHelper::flatten($msg));
 
 		return $msg;
 	}

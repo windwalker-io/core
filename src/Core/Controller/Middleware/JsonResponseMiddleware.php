@@ -14,7 +14,7 @@ use Windwalker\Http\Response\JsonResponse;
 /**
  * The RenderViewMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class JsonResponseMiddleware extends AbstractControllerMiddleware
 {
@@ -37,6 +37,12 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 		$this->controller->setResponse(new JsonResponse(null, $response->getStatusCode(), $response->getHeaders()));
 
 		$result = $this->next->execute($data);
+
+		// Check is already json string.
+		if (is_array($result) || is_object($result))
+		{
+			return json_encode($result);
+		}
 
 		return $result;
 	}

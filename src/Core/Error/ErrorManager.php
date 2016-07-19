@@ -14,7 +14,7 @@ use Windwalker\Http\Response\HtmlResponse;
 /**
  * The ErrorManager class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ErrorManager
 {

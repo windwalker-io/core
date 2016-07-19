@@ -13,7 +13,7 @@ use Windwalker\Edge\Loader\EdgeFileLoader;
 /**
  * The EdgeLoader class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class EdgeLoader extends EdgeFileLoader
 {

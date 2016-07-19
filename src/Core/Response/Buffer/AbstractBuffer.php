@@ -11,7 +11,7 @@ namespace Windwalker\Core\Response\Buffer;
 /**
  * The AbstractBuffer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 abstract class AbstractBuffer
 {

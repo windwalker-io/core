@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -18,7 +18,7 @@ use Windwalker\Structure\Structure;
 /**
  * The CoreLanguage class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class CoreLanguage extends Language
 {

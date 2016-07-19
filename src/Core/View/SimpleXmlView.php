@@ -13,7 +13,7 @@ use Windwalker\Structure\Format\XmlFormat;
 /**
  * The PhpXmlView class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SimpleXmlView extends AbstractView
 {

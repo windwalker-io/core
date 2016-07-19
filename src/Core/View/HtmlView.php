@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
@@ -19,7 +20,7 @@ use Windwalker\Renderer\AbstractRenderer;
 /**
  * The AbstractHtmlView class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class HtmlView extends AbstractView implements LayoutRenderableInterface
 {

@@ -13,7 +13,7 @@ use Windwalker\Http\Response\HtmlResponse;
 /**
  * The HtmlResponseMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class HtmlResponseMiddleware extends AbstractControllerMiddleware
 {

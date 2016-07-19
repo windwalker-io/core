@@ -28,6 +28,7 @@ use Windwalker\Language\Language;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Middleware\Psr7InvokableInterface;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Structure\Structure;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
@@ -42,7 +43,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  UriData                       uri
  * @property-read  Core\Event\EventDispatcher    dispatcher
  * @property-read  AbstractDatabaseDriver        database
- * @property-read  Core\Router\CoreRouter        router
+ * @property-read  Core\Router\MainRouter        router
  * @property-read  Language                      language
  * @property-read  Core\Renderer\RendererManager renderer
  * @property-read  Core\Cache\cacheManager       cacheManager
@@ -52,6 +53,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\Asset\AssetManager       asset
  * @property-read  Core\User\UserManager         user
  * @property-read  Core\Security\CsrfGuard       csrf
+ * @property-read  Core\Package\PackageResolver  packageResolver
  *
  * @since  2.0
  */
@@ -93,7 +95,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	/**
 	 * Property router.
 	 *
-	 * @var  Core\Router\CoreRouter
+	 * @var  Core\Router\MainRouter
 	 */
 	protected $router;
 
@@ -212,6 +214,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		/** @var AbstractPackage $package */
 		$package = $this->getPackage();
 
+		if (!$package)
+		{
+			throw new RouteNotFoundException('Can not find package to execute.', 404);
+		}
+
 		return $package->execute($request->getAttribute('_controller'), $request, $response);
 	}
 
@@ -220,13 +227,13 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 *
 	 * @param bool $new
 	 *
-	 * @return  Core\Router\CoreRouter
+	 * @return  Core\Router\MainRouter
 	 */
 	public function getRouter($new = false)
 	{
 		if (!$this->router || $new)
 		{
-			/** @var Core\Router\CoreRouter $router */
+			/** @var Core\Router\MainRouter $router */
 			$router = $this->container->get('router');
 
 			$routes = $router::loadRoutingFiles((array) $this->get('routing.files'));
@@ -264,11 +271,32 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	{
 		if (!$package instanceof AbstractPackage)
 		{
-			$package = $this->container->get('package.resolver')->getPackage($package);
+			$package = $this->packageResolver->getPackage($package);
 		}
 
-		$this->container->share('current.package', $package);
+		$this->packageResolver->setCurrentPackage($package);
 		
+		return $this;
+	}
+
+	/**
+	 * setTask
+	 *
+	 * @param   string|AbstractPackage                    $package
+	 * @param   string|Core\Controller\AbstractController $controller
+	 *
+	 * @return  static
+	 */
+	public function setTask($package, $controller)
+	{
+		if (!$package instanceof AbstractPackage)
+		{
+			$package = $this->getPackage($package);
+		}
+
+		$this->setCurrentPackage($package);
+		$this->server->setRequest($this->request->withAttribute('_controller', $controller));
+
 		return $this;
 	}
 
@@ -305,11 +333,15 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		{
 			if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))
 			{
-				$middleware = new Psr7Middleware(new $middleware($this));
+				$middleware = new Psr7Middleware($this->container->newInstance($middleware));
 			}
 			elseif ($middleware instanceof \Closure)
 			{
 				$middleware->bindTo($this);
+			}
+			elseif ($middleware === false)
+			{
+				continue;
 			}
 
 			$chain->add($middleware);
@@ -473,6 +505,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'asset'      => 'asset',
 			'user'       => 'user.manager',
 			'csrf'       => 'security.csrf',
+			'packageResolver' => 'package.resolver',
 		];
 
 		if (isset($diMapping[$name]))

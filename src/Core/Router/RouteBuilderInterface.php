@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
  * @license    GNU General Public License version 2 or later.
@@ -11,7 +11,7 @@ namespace Windwalker\Core\Router;
 /**
  * Interface RouteBuilderInterface
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface RouteBuilderInterface
 {
@@ -28,7 +28,7 @@ interface RouteBuilderInterface
 	 *
 	 * @return string
 	 */
-	public function route($route, $queries = array(), $type = CoreRouter::TYPE_PATH);
+	public function route($route, $queries = array(), $type = MainRouter::TYPE_PATH);
 
 	/**
 	 * fullRoute

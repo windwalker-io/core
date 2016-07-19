@@ -11,7 +11,7 @@ namespace Windwalker\Core\Renderer\Finder;
 /**
  * The RendererFinderInterface class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 interface PackageFinderInterface
 {

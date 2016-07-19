@@ -17,7 +17,7 @@ use Windwalker\Structure\Structure;
 /**
  * The MailerProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class SwiftMailerProvider implements ServiceProviderInterface
 {

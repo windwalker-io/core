@@ -16,7 +16,7 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
 /**
  * The BladeRenderer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class BladeRenderer extends \Windwalker\Renderer\BladeRenderer implements CoreRendererInterface
 {

@@ -25,7 +25,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The PackageProvider class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class PackageProvider implements ServiceProviderInterface
 {
@@ -96,7 +96,7 @@ class PackageProvider implements ServiceProviderInterface
 		if ($this->package->app->isWeb())
 		{
 			// Router
-			$container->prepareSharedObject(PackageRouter::class)->alias('package.router', PackageRouter::class);
+			$container->prepareSharedObject(PackageRouter::class)->alias('router', PackageRouter::class);
 		}
 	}
 }

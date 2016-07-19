@@ -12,7 +12,10 @@ return [
 	],
 
 	'providers' =>[
-		
+		'logger' => \Windwalker\Core\Provider\LoggerProvider::class,
+		'event'  => \Windwalker\Core\Provider\EventProvider::class,
+		'mailer' => \Windwalker\Core\Mailer\MailerProvider::class,
+		'mailer_adapter' => \Windwalker\Core\Mailer\SwiftMailerProvider::class
 	],
 
 	'configs' => [
@@ -53,7 +56,7 @@ return [
 			'sql.exporter' => \Windwalker\Core\Database\Exporter\AbstractExporter::class,
 
 			// Router
-			'router' => \Windwalker\Core\Router\CoreRouter::class,
+			'router' => \Windwalker\Core\Router\MainRouter::class,
 
 			// Language
 			'language' => \Windwalker\Core\Language\CoreLanguage::class,
@@ -76,15 +79,19 @@ return [
 			'authorisation'  => \Windwalker\Authorisation\AuthorisationInterface::class,
 			'user.manager'   => \Windwalker\Core\User\UserManager::class,
 
-			// CSRF
+			// Security
 			'security.csrf' => \Windwalker\Core\Security\CsrfGuard::class,
+			'crypt' => \Windwalker\Crypt\CryptInterface::class,
 
 			// DateTime
 			'datetime' => \Windwalker\Core\DateTime\DateTime::class,
 
 			// Asset
 			'asset' => \Windwalker\Core\Asset\AssetManager::class,
-			'script.manager' => \Windwalker\Core\Asset\ScriptManager::class
+			'script.manager' => \Windwalker\Core\Asset\ScriptManager::class,
+
+			// Mailer
+			'mailer' => \Windwalker\Core\Mailer\MailerManager::class
 		]
 	],
 	

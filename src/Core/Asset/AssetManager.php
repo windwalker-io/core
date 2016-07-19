@@ -1,6 +1,6 @@
 <?php
 /**
- * Part of Phoenix project.
+ * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later;
@@ -369,13 +369,9 @@ class AssetManager implements DispatcherAwareInterface
 		{
 			return $version = md5($assetUri . $this->config->get('system.secret', 'Windwalker-Asset'));
 		}
-		else
-		{
-			$path = $this->addSysPath($assetUri);
-		}
 
 		$time = '';
-		$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::FOLLOW_SYMLINKS));
+		$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->addSysPath($assetUri), \FilesystemIterator::FOLLOW_SYMLINKS));
 
 		/** @var \SplFileInfo $file */
 		foreach ($files as $file)
@@ -422,7 +418,7 @@ class AssetManager implements DispatcherAwareInterface
 			}
 		}
 
-		return $base . substr($assetUri, strlen($match));
+		return $base . DIRECTORY_SEPARATOR . ltrim(substr($assetUri, strlen($match)), '/\\');
 	}
 
 	/**

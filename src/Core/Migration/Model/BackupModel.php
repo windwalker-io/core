@@ -39,28 +39,6 @@ class BackupModel extends ModelRepository
 	public $lastBackup;
 
 	/**
-	 * Property instance.
-	 *
-	 * @var  static
-	 */
-	protected static $instance;
-
-	/**
-	 * getInstance
-	 *
-	 * @return static
-	 */
-	public static function getInstance()
-	{
-		if (!static::$instance)
-		{
-			static::$instance = new static;
-		}
-
-		return static::$instance;
-	}
-
-	/**
 	 * backup
 	 *
 	 * @return  boolean

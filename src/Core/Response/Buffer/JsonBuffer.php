@@ -11,7 +11,7 @@ namespace Windwalker\Core\Response\Buffer;
 /**
  * The JsonBuffer class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class JsonBuffer extends AbstractBuffer
 {

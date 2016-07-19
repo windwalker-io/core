@@ -133,18 +133,12 @@ class StructureView extends AbstractView implements \JsonSerializable
 	/**
 	 * Return data which should be serialized by json_encode().
 	 *
-	 * @return  string
+	 * @return  mixed
 	 *
 	 * @throws \RuntimeException
 	 */
 	public function jsonSerialize()
 	{
-		$format = $this->format;
-
-		$result = $this->setFormat(static::FORMAT_JSON)->render();
-
-		$this->format = $format;
-
-		return $result;
+		return $result = $this->getHandledData();
 	}
 }

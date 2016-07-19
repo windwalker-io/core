@@ -10,7 +10,7 @@ namespace Windwalker\Core\Pagination;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RouteBuilderInterface;
 use Windwalker\Core\Widget\WidgetHelper;
@@ -149,7 +149,7 @@ class Pagination
 	protected $route = [
 		'route' => null,
 		'query' => [],
-		'type' => CoreRouter::TYPE_PATH
+		'type' => MainRouter::TYPE_PATH
 	];
 
 	/**
@@ -486,7 +486,7 @@ class Pagination
 	 *
 	 * @return  static
 	 */
-	public function route($route, $query = [], $type = CoreRouter::TYPE_PATH)
+	public function route($route, $query = [], $type = MainRouter::TYPE_PATH)
 	{
 		$this->route = [
 			'route' => $route,

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Application\Middleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Windwalker\Core\Package\PackageResolver;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Middleware\MiddlewareInterface;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Route;
@@ -23,7 +23,7 @@ use Windwalker\Utilities\ArrayHelper;
 /**
  * The RoutingMiddleware class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class RoutingMiddleware extends AbstractWebMiddleware
 {
@@ -73,14 +73,14 @@ class RoutingMiddleware extends AbstractWebMiddleware
 	/**
 	 * match
 	 *
-	 * @param CoreRouter $router
+	 * @param MainRouter $router
 	 * @param string     $route
 	 *
 	 * @return  Route
 	 */
-	public function match(CoreRouter $router, $route = null)
+	public function match(MainRouter $router, $route = null)
 	{
-		$route = $route ? : $this->app->server->uri->route;
+		$route = $route ? : $this->app->uri->route;
 		$route = $route ? : '/';
 
 		$input = $this->app->input;
@@ -134,13 +134,21 @@ class RoutingMiddleware extends AbstractWebMiddleware
 					$router->fetchControllerSuffix($method)
 				)
 			);
-			
+
 			// Find package
 			$ns = implode('\\', array_map('ucfirst', $route)) . '\\' . ucfirst(end($route)) . 'Package';
-			
+
 			$resolver = $this->getPackageResolver();
+
+			// If package not found, try create one
+			if (!$resolver->getAlias($ns))
+			{
+				$resolver->addPackage(end($route), new $ns);
+			}
+
+			// Get package, if not exists, return DefaultPackage
 			$package = $resolver->resolvePackage($resolver->getAlias($ns));
-			
+
 			$packageName = $package ? $package->getName() : implode('.', $route);
 
 			if (!class_exists($class))
@@ -158,10 +166,15 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		}
 	}
 
+	protected function matchSimpleRouting()
+	{
+		
+	}
+
 	/**
 	 * getRouter
 	 *
-	 * @return  CoreRouter
+	 * @return  MainRouter
 	 */
 	protected function getRouter()
 	{

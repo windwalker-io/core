@@ -13,7 +13,7 @@ use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
 /**
  * The AccessDenyException class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class AccessDeniedException extends \RuntimeException
 {

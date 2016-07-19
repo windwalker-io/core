@@ -15,7 +15,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The WidgetComponent class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class WidgetComponent extends Widget
 {

@@ -19,12 +19,12 @@ use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
  * @see  MailAttachment
  *
  * @method  static  MailMessage             createMessage($subject = null, $content = null, $html = true)
- * @method  static  boolean                 send(MailMessage $message)
+ * @method  static  boolean|callable        send($message)
  * @method  static  MailerManager           setMessageClass($messageClass)
  * @method  static  MailerAdapterInterface  getAdapter()
  * @method  static  MailerManager           setAdapter(MailerAdapterInterface $adapter)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class Mailer extends AbstractProxyFacade
 {

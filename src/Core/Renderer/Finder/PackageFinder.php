@@ -14,7 +14,7 @@ use Windwalker\String\StringHelper;
 /**
  * The RendererFinder class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class PackageFinder implements PackageFinderInterface
 {

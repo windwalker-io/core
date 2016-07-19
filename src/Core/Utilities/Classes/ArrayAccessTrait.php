@@ -11,7 +11,7 @@ namespace Windwalker\Core\Utilities\Classes;
 /**
  * The ArrayAccessTrait class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait ArrayAccessTrait
 {

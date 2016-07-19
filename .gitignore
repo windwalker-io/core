@@ -3,6 +3,7 @@
 !.gitignore
 !.gitkeep
 !ide/*
+!.phpstorm.meta.php
 
 # Composer
 /vendor

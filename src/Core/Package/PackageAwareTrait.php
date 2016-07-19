@@ -11,7 +11,7 @@ namespace Windwalker\Core\Package;
 /**
  * PackageAeareTrait
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 trait PackageAwareTrait
 {

@@ -21,7 +21,7 @@ use Windwalker\Filesystem\Folder;
 /**
  * The InstallCommand class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class InstallCommand extends Command
 {

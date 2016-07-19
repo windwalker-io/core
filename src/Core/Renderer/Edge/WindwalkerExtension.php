@@ -13,7 +13,7 @@ use Windwalker\Edge\Extension\EdgeExtensionInterface;
 /**
  * The WindwalkerExtension class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class WindwalkerExtension implements EdgeExtensionInterface
 {

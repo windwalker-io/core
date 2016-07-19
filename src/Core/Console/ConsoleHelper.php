@@ -11,6 +11,7 @@ namespace Windwalker\Core\Console;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Http\Output\NoHeaderOutput;
@@ -20,7 +21,7 @@ use Windwalker\Structure\Structure;
 /**
  * The ConsoleHelper class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0
  */
 class ConsoleHelper
 {
@@ -54,7 +55,10 @@ class ConsoleHelper
 	{
 		$console = $console ? : Ioc::getApplication();
 
-		$resolver = new PackageResolver($console->container);
+		$container = clone $console->container;
+		$container->share(EventDispatcher::class, $container->newInstance(EventDispatcher::class));
+
+		$resolver = new PackageResolver($container);
 
 		foreach (static::loadPackages($env, $console) as $name => $package)
 		{

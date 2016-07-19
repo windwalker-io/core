@@ -19,7 +19,7 @@ use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\Container;
@@ -101,6 +101,13 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected $router;
 
 	/**
+	 * Property booted.
+	 *
+	 * @var  boolean
+	 */
+	protected $booted = false;
+
+	/**
 	 * initialise
 	 *
 	 * @throws  \LogicException
@@ -108,6 +115,11 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function boot()
 	{
+		if ($this->booted)
+		{
+			return;
+		}
+
 		if (!$this->name)
 		{
 			throw new \LogicException('Package: ' . get_class($this) . ' name property should not be empty.');
@@ -120,6 +132,8 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->registerListeners($this->getDispatcher());
 
 		$this->registerMiddlewares();
+
+		$this->booted = true;
 	}
 
 	/**
@@ -510,16 +524,16 @@ class AbstractPackage implements DispatcherAwareInterface
 	/**
 	 * loadRouting
 	 *
-	 * @param CoreRouter $router
+	 * @param MainRouter $router
 	 * @param string     $group
 	 *
-	 * @return CoreRouter
+	 * @return MainRouter
 	 */
-	public function loadRouting(CoreRouter $router, $group = null)
+	public function loadRouting(MainRouter $router, $group = null)
 	{
 		$routing = (array) $this->get('routing.files');
 
-		$router->group($group, function (CoreRouter $router) use ($routing)
+		$router->group($group, function (MainRouter $router) use ($routing)
 		{
 			$router->addRouteFromFiles($routing, $this);
 
@@ -746,7 +760,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	{
 		return $this->currentController;
 	}
-
 	/**
 	 * __get
 	 *
@@ -761,7 +774,7 @@ class AbstractPackage implements DispatcherAwareInterface
 			'input'      => 'input',
 			'dispatcher' => 'dispatcher',
 			'csrf'       => 'security.csrf',
-			'router'     => 'package.router'
+			'router'     => 'router'
 		];
 
 		if (isset($diMapping[$name]))
