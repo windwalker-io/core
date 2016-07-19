@@ -57,6 +57,11 @@ trait DatabaseRepositoryTrait
 			$mapper = $mapper->getInstance();
 		}
 
+		if (class_exists($recordName))
+		{
+			return new $recordName($this->table, $this->keys, $mapper);
+		}
+
 		// (1): Find object from registered namespaces
 		if ($record = RecordResolver::create($recordName, $this->table, $this->keys, $mapper))
 		{
@@ -70,7 +75,7 @@ trait DatabaseRepositoryTrait
 
 		if (class_exists($class))
 		{
-			return new $class;
+			return new $class($this->table, $this->keys, $mapper);
 		}
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
@@ -107,6 +112,11 @@ trait DatabaseRepositoryTrait
 		$mapperName = $name ? : $this->dataMapper;
 		$mapperName = $mapperName ? : $this->getName();
 
+		if (class_exists($mapperName))
+		{
+			return new $mapperName($this->table, $this->keys, $this->db);
+		}
+
 		// (1): Find object from registered namespaces
 		if ($mapper = DataMapperResolver::create($mapperName, $this->table, $this->keys, $this->db))
 		{
@@ -120,7 +130,7 @@ trait DatabaseRepositoryTrait
 
 		if (class_exists($class))
 		{
-			return new $class($this->db);
+			return new $class($this->table, $this->keys, $this->db);
 		}
 
 		$errors[] = sprintf('Class: %s not exists.', $class);
