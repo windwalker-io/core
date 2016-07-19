@@ -112,7 +112,16 @@ class ErrorManager
 
 		$content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
-		$exception = new \ErrorException($content, $code, E_ERROR, $file, $line);
+		if (version_compare(PHP_VERSION, 7, '>='))
+		{
+			$e = new \Error;
+		}
+		else
+		{
+			$e = new \Exception;
+		}
+
+		$exception = new \ErrorException($content, $code, E_ERROR, $file, $line, $e);
 
 		$this->exception($exception);
 	}
