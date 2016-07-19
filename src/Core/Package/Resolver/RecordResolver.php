@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Package\Resolver;
 
+use Windwalker\Core\Database\NullRecord;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Record\Record;
 
@@ -46,7 +47,7 @@ class RecordResolver extends AbstractPackageObjectResolver
 		{
 			if ($e instanceof \InvalidArgumentException || $e->getPrevious() instanceof \PDOException)
 			{
-				return new NullObject;
+				return new NullRecord;
 			}
 
 			throw $e;
