@@ -482,6 +482,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 						throw $e;
 					}
 
+					// Guess the view position
+					$class = MvcHelper::getPackageNamespace($this) . '\View\\' . ucfirst($viewName);
+
+					if (class_exists($class))
+					{
+						return $container->createSharedObject($class, ['renderer' => $engine, 'config' => $config]);
+					}
+
 					// If format is html or NULL, we return HtmlView as default.
 					if (strtolower($format) === 'html')
 					{
@@ -551,6 +559,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 						throw $e;
 					}
 
+					// Guess the model position
+					$class = MvcHelper::getPackageNamespace($this) . '\Model\\' . ucfirst($modelName);
+					
+					if (class_exists($class))
+					{
+						return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
+					}
+					
 					return new ModelRepository($config);
 				}
 			});
