@@ -131,7 +131,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 				<hr />
 
 				<footer>
-					&copy; Windwalker <?php echo $datetime->format('Y'); ?> - Theme by <a target="_blank" href="https://bootswatch.com/sandstone/">Bootswatch</a>
+					&copy; Windwalker <?php echo $datetime->format('Y'); ?>
 				</footer>
 			</div>
 		</div>

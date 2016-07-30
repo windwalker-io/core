@@ -26,7 +26,7 @@ $types = [
 		</h3>
 	</div>
 	<div class="panel-body">
-		<pre><?php echo $timeline['data']['query']; ?></pre>
+		<pre><?php echo $view->highlightQuery($timeline['data']['query']); ?></pre>
 		<hr />
 		Query Time: <span class="label label-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'], 2) ?> ms</span>
 		Memory: <span class="label label-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'], 3) ?> MB</span>

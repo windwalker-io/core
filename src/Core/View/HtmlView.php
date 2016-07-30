@@ -163,11 +163,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
 	 */
 	protected function prepareGlobals($data)
 	{
-		$data->view = new Data;
-
-		$data->view->name = $this->getName();
-		$data->view->layout = $this->getLayout();
-
+		$data->view   = $this;
 		$data->helper = $this->getHelperSet();
 
 		foreach ($this->getRendererManager()->getHelpers() as $name => $helper)

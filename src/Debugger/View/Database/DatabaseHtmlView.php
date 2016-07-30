@@ -39,4 +39,35 @@ class DatabaseHtmlView extends AbstractDebuggerHtmlView
 
 		$data->queryProcess = TimelineHelper::prepareQueryTimeline($queries);
 	}
+
+	/**
+	 * Simple highlight for SQL queries.
+	 *
+	 * @param   string  $query  The query to highlight.
+	 *
+	 * @return  string  Highlighted query string.
+	 */
+	public function highlightQuery($query)
+	{
+		$newlineKeywords = '#\b(FROM|LEFT|INNER|OUTER|WHERE|SET|VALUES|ORDER|GROUP|HAVING|LIMIT|ON|AND|CASE)\b#i';
+
+		$query = htmlspecialchars($query, ENT_QUOTES);
+
+		$query = preg_replace($newlineKeywords, '<br />&#160;&#160;\\0', $query);
+
+		$regex = array(
+			'/(=)/'
+			=> '<strong class="text-error">$1</strong>',
+
+			// All uppercase words have a special meaning.
+			'/(?<!\w|>)([A-Z_]{2,})(?!\w)/x'
+			=> '<span class="text-info">$1</span>'
+		);
+
+		$query = preg_replace(array_keys($regex), array_values($regex), $query);
+
+		$query = str_replace('*', '<strong style="color: red;">*</strong>', $query);
+
+		return $query;
+	}
 }
