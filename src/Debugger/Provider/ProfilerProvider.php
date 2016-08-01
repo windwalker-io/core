@@ -8,11 +8,10 @@
 
 namespace Windwalker\Debugger\Provider;
 
-use Windwalker\Data\Data;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\Core\Object\NullObject;
-use Windwalker\Core\Profiler\NullProfiler;
+use Windwalker\Profiler\NullProfiler;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

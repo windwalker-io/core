@@ -30,6 +30,13 @@ class WhoopsProvider implements ServiceProviderInterface
 	 */
 	public function boot(Container $container)
 	{
+		$config = $container->get('config');
+
+		if (!$config->get('system.debug'))
+		{
+			return;
+		}
+
 		$error = $container->get('error.handler');
 
 		/**
@@ -42,7 +49,7 @@ class WhoopsProvider implements ServiceProviderInterface
 			/** @var Whoops $whoops */
 			$whoops = $container->get('whoops');
 			$whoops->allowQuit(false);
-			echo $whoops->handleException($e);
+			$whoops->handleException($e);
 		};
 
 		$error->addHandler($handler, 'default');
