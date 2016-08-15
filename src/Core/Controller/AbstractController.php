@@ -496,6 +496,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					// If format is html or NULL, we return HtmlView as default.
 					if (strtolower($format) === 'html')
 					{
+						$config['name'] = $name;
+
 						return new HtmlView([], $config, $engine);
 					}
 					// Otherwise we throw exception to notice developers that they did something wrong.
@@ -569,6 +571,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					{
 						return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
 					}
+
+					$config['name'] = $name;
 					
 					return new ModelRepository($config);
 				}
