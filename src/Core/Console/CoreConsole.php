@@ -147,6 +147,11 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
 		foreach ($commands as $command)
 		{
+			if ($command === false)
+			{
+				continue;
+			}
+
 			$this->addCommand($command);
 		}
 	}
