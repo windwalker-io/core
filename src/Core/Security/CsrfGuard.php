@@ -122,7 +122,7 @@ class CsrfGuard
 
 		for ($i = 0; $i < $length; ++$i)
 		{
-			$token .= $chars[(rand(0, $max))];
+			$token .= $chars[(mt_rand(0, $max))];
 		}
 
 		return md5($token . $name);
