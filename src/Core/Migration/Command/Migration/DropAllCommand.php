@@ -21,8 +21,6 @@ use Windwalker\Core\Migration\Model\BackupModel;
  */
 class DropAllCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-	
 	/**
 	 * Console(Argument) name.
 	 *
