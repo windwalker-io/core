@@ -46,12 +46,7 @@ class ConsoleProvider implements ServiceProviderInterface
 		$container->prepareSharedObject(Environment::class)
 			->alias('environment', Environment::class);
 
-		$closure = function(Container $container)
-		{
-			return $container->get('environment')->platform;
-		};
-
-		$container->share(Platform::class, $closure)
+		$container->prepareSharedObject(Platform::class)
 			->alias('platform', Platform::class);
 	}
 }

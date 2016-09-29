@@ -19,6 +19,7 @@ use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;
+use Windwalker\Environment\Environment;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
@@ -39,7 +40,8 @@ use Windwalker\Session\Session;
  * @property-read  Core\Renderer\RendererManager renderer
  * @property-read  Core\Cache\CacheFactory       cache
  * @property-read  Session                       session
- * 
+ * @property-read  Environment                   environment
+ *
  * @since  2.0
  */
 class CoreConsole extends Console implements Core\Application\WindwalkerApplicationInterface, DispatcherAwareInterface
@@ -313,7 +315,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	public function setDispatcher(DispatcherInterface $dispatcher)
 	{
-		$this->container->share('system.dispatcher', $dispatcher);
+		$this->container->share('dispatcher', $dispatcher);
 
 		return $this;
 	}
@@ -387,11 +389,12 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	public function __get($name)
 	{
 		$diMapping = [
-			'io'         => 'system.io',
-			'dispatcher' => 'system.dispatcher',
-			'database'   => 'system.database',
-			'language'   => 'system.language',
-			'cache'      => 'system.cache',
+			'io'         => 'io',
+			'dispatcher' => 'dispatcher',
+			'database'   => 'database',
+			'language'   => 'language',
+			'cache'      => 'cache',
+			'environment' => 'environment'
 		];
 
 		if (isset($diMapping[$name]))
