@@ -54,7 +54,7 @@ class PackageProvider implements ServiceProviderInterface
 		DataMapperResolver::addNamespace($ns . '\DataMapper');
 		FieldHelper::addNamespace($ns . '\Field');
 		ValidatorHelper::addNamespace($ns . 'Validator');
-		FieldDefinitionResolver::addNamespace($ns . '\Form');
+		// FieldDefinitionResolver::addNamespace($ns . '\Form');
 	}
 
 	/**

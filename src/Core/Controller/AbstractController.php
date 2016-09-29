@@ -302,13 +302,13 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		}
 		catch (\Exception $e)
 		{
+			$this->app->logger->error('error', $e->getMessage(), ['code' => $e->getCode()]);
+
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
 			$result = $this->processFailure($e);
 
 			if (!$this->app->get('system.debug'))
 			{
-				$this->app->logger->error('error', $e->getMessage(), ['code' => $e->getCode()]);
-
 				return $result;
 			}
 
@@ -422,9 +422,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @param \Exception $e
 	 *
 	 * @return bool
+	 * @throws \Exception
 	 */
 	public function processFailure(\Exception $e = null)
 	{
+		throw $e;
+
 		return false;
 	}
 
@@ -482,9 +485,19 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 						throw $e;
 					}
 
+					// Guess the view position
+					$class = MvcHelper::getPackageNamespace($this) . '\View\\' . ucfirst($viewName);
+
+					if (class_exists($class))
+					{
+						return $container->createSharedObject($class, ['renderer' => $engine, 'config' => $config]);
+					}
+
 					// If format is html or NULL, we return HtmlView as default.
 					if (strtolower($format) === 'html')
 					{
+						$config['name'] = $name;
+
 						return new HtmlView([], $config, $engine);
 					}
 					// Otherwise we throw exception to notice developers that they did something wrong.
@@ -551,6 +564,16 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 						throw $e;
 					}
 
+					// Guess the model position
+					$class = MvcHelper::getPackageNamespace($this) . '\Model\\' . ucfirst($modelName);
+					
+					if (class_exists($class))
+					{
+						return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
+					}
+
+					$config['name'] = $name;
+					
 					return new ModelRepository($config);
 				}
 			});

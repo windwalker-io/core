@@ -26,7 +26,7 @@ return ArrayHelper::merge(
 		],
 
 		'console' => [
-			'commends' => [
+			'commands' => [
 				'asset'     => \Windwalker\Core\Asset\Command\AssetCommand::class,
 				'migration' => \Windwalker\Core\Migration\Command\MigrationCommand::class,
 				'seed'      => \Windwalker\Core\Seeder\Command\SeedCommand::class,

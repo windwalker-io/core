@@ -118,57 +118,74 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		}
 		catch (RouteNotFoundException $e)
 		{
+			// If simple_route is disabled, just continue throw the exception.
 			if (!$this->app->get('routing.simple_route', false))
 			{
 				throw $e;
 			}
 
 			// Simple routing
-			$route = explode('/', $route);
-			$controller = array_pop($route);
-			$class = StringNormalise::toClassNamespace(
-				sprintf(
-					'%s\Controller\%s\%s',
-					implode($route, '\\'),
-					ucfirst($controller),
-					$router->fetchControllerSuffix($method)
-				)
-			);
+			$matched = $this->matchSimpleRouting($route, $method, $router);
 
-			// Find package
-			$ns = implode('\\', array_map('ucfirst', $route)) . '\\' . ucfirst(end($route)) . 'Package';
-
-			$resolver = $this->getPackageResolver();
-
-			// If package not found, try create one
-			if (!$resolver->getAlias($ns))
-			{
-				$resolver->addPackage(end($route), new $ns);
-			}
-
-			// Get package, if not exists, return DefaultPackage
-			$package = $resolver->resolvePackage($resolver->getAlias($ns));
-
-			$packageName = $package ? $package->getName() : implode('.', $route);
-
-			if (!class_exists($class))
+			if ($matched === false)
 			{
 				throw new RouteNotFoundException($e->getMessage(), $e->getCode(), $e);
 			}
 
-			$matched = new Route($packageName . '@' . $controller, implode($route, '/'));
-
-			$matched->setExtraValues(array(
-				'controller' => $class
-			));
-			
 			return $matched;
 		}
 	}
 
-	protected function matchSimpleRouting()
+	/**
+	 * matchSimpleRouting
+	 *
+	 * @param string     $route
+	 * @param string     $method
+	 * @param MainRouter $router
+	 *
+	 * @return  bool|Route
+	 */
+	protected function matchSimpleRouting($route, $method, MainRouter $router)
 	{
-		
+		$route = explode('/', $route);
+		$controller = array_pop($route);
+		$class = StringNormalise::toClassNamespace(
+			sprintf(
+				'%s\Controller\%s\%s',
+				implode($route, '\\'),
+				ucfirst($controller),
+				$router->fetchControllerSuffix($method)
+			)
+		);
+
+		// Find package
+		$ns = implode('\\', array_map('ucfirst', $route)) . '\\' . ucfirst(end($route)) . 'Package';
+
+		$resolver = $this->getPackageResolver();
+
+		// If package not found but class exists, try create one
+		if (!$resolver->getAlias($ns) && class_exists($ns))
+		{
+			$resolver->addPackage(end($route), new $ns);
+		}
+
+		// Get package, if not exists, return DefaultPackage
+		$package = $resolver->resolvePackage($resolver->getAlias($ns));
+
+		$packageName = $package ? $package->getName() : implode('.', $route);
+
+		if (!class_exists($class))
+		{
+			return false;
+		}
+
+		$matched = new Route($packageName . '@' . $controller, implode($route, '/'));
+
+		$matched->setExtraValues(array(
+			'controller' => $class
+		));
+
+		return $matched;
 	}
 
 	/**

@@ -11,6 +11,7 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
@@ -170,6 +171,39 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		$this->cache->set($key, $url);
 
 		return $url;
+	}
+
+	/**
+	 * build
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 * @param string $type
+	 *
+	 * @return string
+	 * @throws \OutOfRangeException
+	 */
+	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
+	{
+		try
+		{
+			return $this->build($route, $queries, $type);
+		}
+		catch (\OutOfRangeException $e)
+		{
+			$config = Ioc::getConfig();
+
+			if ($config->get('routing.debug', false))
+			{
+				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
+			}
+			elseif ($config->get('system.debug', false))
+			{
+				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+			}
+
+			return '#';
+		}
 	}
 
 	/**
