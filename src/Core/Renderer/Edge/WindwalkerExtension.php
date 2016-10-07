@@ -170,7 +170,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function endTemplate($expression)
 	{
-		return "<?php \$asset->getTemplate()->endTemplate{$expression} ?>";
+		return "<?php \$asset->getTemplate()->endTemplate() ?>";
 	}
 
 	/**
