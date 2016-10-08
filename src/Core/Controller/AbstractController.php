@@ -32,6 +32,7 @@ use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
+use Windwalker\Http\Helper\HeaderHelper;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 use Windwalker\IO\Input;
@@ -629,6 +630,34 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		if ($response instanceof RedirectResponse)
 		{
 			$this->response = $response;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * header
+	 *
+	 * @param string       $name   Header name.
+	 * @param string|array $value  Header value.
+	 * @param bool         $emit   Emit header immediately
+	 *
+	 * @return  static
+	 */
+	public function header($name, $value, $emit = false)
+	{
+		if ($emit)
+		{
+			$name = HeaderHelper::normalizeHeaderName($name);
+
+			foreach ((array) $value as $v)
+			{
+				header("$name: $v", false);
+			}
+		}
+		else
+		{
+			$this->response = $this->response->withAddedHeader($name, $value);
 		}
 
 		return $this;
