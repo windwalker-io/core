@@ -76,6 +76,11 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 			$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
 		}
 
+		if (class_exists(DebuggerHelper::class))
+		{
+			$data['debug_messages'] = (array) DebuggerHelper::getInstance()->get('debug.messages');
+		}
+
 		$code = $e->getCode();
 
 		if (!ResponseHelper::validateStatus($code))

@@ -67,6 +67,49 @@ abstract class DebuggerHelper extends AbstractFacade
 	}
 
 	/**
+	 * addMessage
+	 *
+	 * @param string|array $message
+	 * @param string       $type
+	 */
+	public static function addMessage($message, $type = 'default')
+	{
+		if (is_array($message))
+		{
+			foreach ($message as $msg)
+			{
+				static::addMessage($msg);
+			}
+
+			return;
+		}
+
+		try
+		{
+			$collector = static::getInstance();
+		}
+		catch (\UnexpectedValueException $e)
+		{
+			return;
+		}
+
+		$data = $collector['debug.messages'];
+
+		if ($data === null)
+		{
+			$data = array();
+		}
+
+		$data[] = [
+			'message' => $message,
+			'type' => $type,
+			'timestamp' => microtime(true)
+		];
+
+		$collector['debug.messages'] = $data;
+	}
+
+	/**
 	 * getQueries
 	 *
 	 * @return  array

@@ -137,4 +137,47 @@
 			</div>
 		</a>
 	</div>
+
+    <!-- MESSAGES -->
+    <div class="windwalker-debugger-block">
+        <a class="windwalker-debugger-link" href="<?php echo $router->route('system', array('id' => $collector['id'])); ?>">
+            <div class="windwalker-debugger-block-inner">
+                Messages
+                <span class="windwalker-debugger-badge">
+					<?php echo $this->escape((int) array_sum($messagesCount)); ?>
+				</span>
+            </div>
+
+            <!-- Drop MENU -->
+            <div class="windwalker-debugger-drop-menu" style="max-height: 400px; overflow-y: scroll;">
+                <h3>Messages in Queue</h3>
+                <?php if ($messagesCount['messages']): ?>
+                    <ul class="windwalker-debugger-messages">
+                        <?php foreach ($messages as $type => $msgs): ?>
+                            <?php foreach ($msgs as $msg): ?>
+                                <li style="padding-left: 7px" class="windwalker-debugger-message-item windwalker-debugger-text-<?php echo $type; ?>">
+                                    <?php echo $msg; ?>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <span style="padding-left: 7px">None</span>
+                <?php endif; ?>
+
+                <h3>Debug Messages</h3>
+                <?php if ($messagesCount['debug']): ?>
+                    <ul class="windwalker-debugger-messages">
+                        <?php foreach ($debugMessages as $msg): ?>
+                        <li style="padding-left: 7px" class="windwalker-debugger-message-item windwalker-debugger-text-<?php echo $msg['type']; ?>">
+                            <?php echo $msg['message']; ?>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <span style="padding-left: 7px">None</span>
+                <?php endif; ?>
+            </div>
+        </a>
+    </div>
 </div>

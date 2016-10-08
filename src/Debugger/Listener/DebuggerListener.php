@@ -23,6 +23,7 @@ use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Structure\Structure;
+use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The DebuggerListener class.
@@ -267,11 +268,23 @@ class DebuggerListener
 		$data = new Data;
 		$data->collector = $collector;
 		$data->style = file_get_contents($style);
+
+		// Execute Time
 		$data->time = $time * 1000;
 		$data->memory = $memory / 1048576;
+
+		// Queries
 		$data->queryTimes = $collector['database.query.times'];
 		$data->queryTotalTime = $collector['database.query.total.time'] * 1000;
 		$data->queryTotalMemory = $collector['database.query.total.memory'] / 1048576;
+
+		// Messages
+		$data->messages = (array) $collector['request.session._flash'];
+		$data->debugMessages = (array) $collector['debug.messages'];
+		$data->messagesCount = [
+			'messages' => count(ArrayHelper::flatten($data->messages)),
+			'debug' => count($data->debugMessages)
+		];
 
 		$data->timeStyle = TimelineHelper::getStateColor($data->time, 250);
 		$data->memoryStyle = TimelineHelper::getStateColor($data->memory, 5);

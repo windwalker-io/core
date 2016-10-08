@@ -69,6 +69,23 @@ echo BootstrapKeyValueGrid::create()
 
 <br /><br />
 
+<h2>Debug Messages</h2>
+
+<?php
+echo BootstrapKeyValueGrid::create()
+    ->addHeader('Type', 'Message')
+    ->configure((array) $collector['debug.messages'], function (BootstrapKeyValueGrid $grid, $key, $item)
+    {
+        $grid->addItem(
+            $item['type'],
+            $item['message'],
+            [BootstrapKeyValueGrid::ROW => ['class' => $item['type']]]
+        );
+    });
+?>
+
+<br /><br />
+
 <h2>Config</h2>
 
 <?php

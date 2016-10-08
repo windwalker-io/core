@@ -234,4 +234,14 @@ class RendererProvider implements ServiceProviderInterface
 
 		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
 	}
+
+	/**
+	 * Method to get property Messages
+	 *
+	 * @return  array
+	 */
+	public static function getMessages()
+	{
+		return static::$messages;
+	}
 }
