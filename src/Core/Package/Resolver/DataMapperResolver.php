@@ -10,6 +10,7 @@ namespace Windwalker\Core\Package\Resolver;
 
 use Windwalker\Core\Package\Resolver\AbstractPackageObjectResolver;
 use Windwalker\Core\DataMapper\CoreDataMapper;
+use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 
 /**
@@ -33,7 +34,7 @@ abstract class DataMapperResolver extends AbstractPackageObjectResolver
 	 */
 	protected static function createObject($class, ...$args)
 	{
-		if (!is_subclass_of($class, DataMapper::class) && !is_subclass_of($class, CoreDataMapper::class))
+		if (!is_subclass_of($class, DataMapper::class) && !is_subclass_of($class, AbstractDatabaseMapperProxy::class))
 		{
 			throw new \InvalidArgumentException(sprintf('Class: %s is not sub class of ' . DataMapper::class, $class));
 		}

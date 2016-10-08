@@ -12,8 +12,8 @@ use Windwalker\Core\Database\NullDataMapper;
 use Windwalker\Core\Database\NullRecord;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
-use Windwalker\Core\DataMapper\CoreDataMapper;
 use Windwalker\Core\Mvc\MvcHelper;
+use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;
 
@@ -60,7 +60,7 @@ trait DatabaseRepositoryTrait
 
 		$mapper = $this->getDataMapper($name);
 
-		if ($mapper instanceof CoreDataMapper)
+		if ($mapper instanceof AbstractDatabaseMapperProxy)
 		{
 			$mapper = $mapper->getInstance();
 		}
