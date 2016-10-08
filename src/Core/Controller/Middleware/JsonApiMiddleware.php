@@ -74,11 +74,18 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 		{
 			$data['exception'] = get_class($e);
 			$data['backtrace'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
-		}
 
-		if (class_exists(DebuggerHelper::class))
-		{
-			$data['debug_messages'] = (array) DebuggerHelper::getInstance()->get('debug.messages');
+			if (class_exists(DebuggerHelper::class))
+			{
+				try
+				{
+					$data['debug_messages'] = (array) DebuggerHelper::getInstance()->get('debug.messages');
+				}
+				catch (\Exception $exception)
+				{
+					// None
+				}
+			}
 		}
 
 		$code = $e->getCode();

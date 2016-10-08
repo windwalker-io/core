@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response\JsonResponse;
 
@@ -31,6 +32,21 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 		{
 			DebuggerHelper::disableConsole();
 		}
+
+		// Simple Json Error Handler
+		$this->controller->getContainer()
+			->get('error.handler')
+			->addHandler(function ($exception)
+			{
+				$this->controller->app
+					->getServer()
+					->getOutput()
+					->respond(
+						new JsonResponse(['error' => $exception->getMessage()])
+					);
+
+				die;
+			}, 'default');
 
 		$response = $data->response;
 
