@@ -33,6 +33,7 @@ use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Structure\Structure;
 use Windwalker\Utilities\Queue\PriorityQueue;
+use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The AbstractPackage class.
@@ -628,6 +629,18 @@ class AbstractPackage implements DispatcherAwareInterface
 	public function getDir()
 	{
 		return dirname($this->getFile());
+	}
+
+	/**
+	 * getNamespace
+	 *
+	 * @return  string
+	 *
+	 * @since  3.0.1
+	 */
+	public function getNamespace()
+	{
+		return ReflectionHelper::getNamespaceName($this);
 	}
 
 	/**
