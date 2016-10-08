@@ -205,6 +205,16 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 */
 	public function log($category, $level, $message, array $context = array())
 	{
+		if (is_array($message))
+		{
+			foreach ($message as $msg)
+			{
+				$this->log($category, $level, $msg, $context);
+			}
+
+			return $this;
+		}
+
 		$this->getLogger($category)->log($level, $message, $context);
 
 		return $this;

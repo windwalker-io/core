@@ -14,7 +14,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The Logger class.
  *
- * @see LoggerPool
+ * @see LoggerManager
  *
  * @method  static  LoggerManager  emergency($category, $message, array $context = array())
  * @method  static  LoggerManager  alert($category, $message, array $context = array())
