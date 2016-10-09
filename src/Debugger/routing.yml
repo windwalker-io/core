@@ -34,3 +34,7 @@ exception:
 asset:
     pattern: /asset/(type)
     controller: Asset
+
+mail:
+    pattern: /mail
+    controller: Mail

@@ -43,3 +43,11 @@ footer {
 pre {
     white-space: pre-wrap;
 }
+
+#mail-tester-body {
+	background-color: #eee;
+}
+
+#mail-tester-wrapper {
+	background-color: #fff;
+}

@@ -45,7 +45,7 @@ class MailerManager
 	public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
 	{
 		$this->adapter = $adapter;
-		$this->dispatcher = $dispatcher;
+		$this->dispatcher = $dispatcher ? : new EventDispatcher;
 	}
 
 	/**
@@ -160,6 +160,30 @@ class MailerManager
 	public function setAdapter(MailerAdapterInterface $adapter)
 	{
 		$this->adapter = $adapter;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Messages
+	 *
+	 * @return  \callable[]
+	 */
+	public function getMessages()
+	{
+		return $this->messages;
+	}
+
+	/**
+	 * Method to set property messages
+	 *
+	 * @param   \callable[] $messages
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMessages($messages)
+	{
+		$this->messages=$messages;
 
 		return $this;
 	}
