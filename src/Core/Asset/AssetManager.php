@@ -338,7 +338,7 @@ class AssetManager implements DispatcherAwareInterface
 		{
 			if ($this->config->get('system.debug'))
 			{
-				return $this->version = md5(uniqid());
+				return $this->version = md5(uniqid('Windwalker-Asset-Version', true));
 			}
 			else
 			{
@@ -365,7 +365,7 @@ class AssetManager implements DispatcherAwareInterface
 
 		$assetUri = $this->path;
 
-		if (strpos($assetUri, 'http') === 0 | strpos($assetUri, '//') === 0)
+		if (strpos($assetUri, 'http') === 0 || strpos($assetUri, '//') === 0)
 		{
 			return $version = md5($assetUri . $this->config->get('system.secret', 'Windwalker-Asset'));
 		}
@@ -394,7 +394,7 @@ class AssetManager implements DispatcherAwareInterface
 	 *
 	 * @return  string
 	 */
-	protected function addSysPath($assetUri)
+	public function addSysPath($assetUri)
 	{
 		$assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
 		$base = rtrim($this->config->get('path.public'), '/\\');
@@ -412,7 +412,7 @@ class AssetManager implements DispatcherAwareInterface
 			$chunk = substr($base, $i);
 			$len = strlen($chunk);
 			
-			if (substr($assetUri, 0, $len) == $chunk && $len > strlen($match)) 
+			if (substr($assetUri, 0, $len) == $chunk && $len > strlen($match))
 			{
 				$match = $chunk;
 			}
@@ -610,11 +610,11 @@ class AssetManager implements DispatcherAwareInterface
 			return $uri;
 		}
 
-		$assetUri = trim($this->path, '/');
+		$assetUri = $this->path;
 
 		if (strpos($assetUri, 'http') === 0 || strpos($assetUri, '//') === 0)
 		{
-			return $assetUri . '/' . ltrim($uri, '/');
+			return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
 		}
 
 		$root = $this->addSysPath($assetUri);

@@ -77,6 +77,8 @@ class MailerManager
 	 * @param MailMessage|callable $message
 	 *
 	 * @return  boolean
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function send($message)
 	{
@@ -113,7 +115,15 @@ class MailerManager
 			}
 		}
 
-		return $this->getAdapter()->send($message);
+		$result = $this->getAdapter()->send($message);
+
+		$this->triggerEvent('onMailerAfterSend', [
+			'message' => $message,
+			'manager' => $this,
+			'result'  => &$result
+		]);
+
+		return $result;
 	}
 
 	/**
