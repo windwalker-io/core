@@ -73,7 +73,7 @@ class ViewModel implements \ArrayAccess
 	 */
 	public function setModel(ModelRepository $model, $default = null, $customName = null)
 	{
-		if ($default === true || ($default === null && !$this->model))
+		if ($default === true)
 		{
 			$this->model = $model;
 		}
