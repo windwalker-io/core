@@ -365,7 +365,7 @@ class AssetManager implements DispatcherAwareInterface
 
 		$assetUri = $this->path;
 
-		if (strpos($assetUri, 'http') === 0 || strpos($assetUri, '//') === 0)
+		if (static::isAbsoluteUrl($assetUri))
 		{
 			return $version = md5($assetUri . $this->config->get('system.secret', 'Windwalker-Asset'));
 		}
@@ -396,6 +396,11 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function addSysPath($assetUri)
 	{
+		if (static::isAbsoluteUrl($assetUri))
+		{
+			return $assetUri;
+		}
+
 		$assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
 		$base = rtrim($this->config->get('path.public'), '/\\');
 
@@ -419,6 +424,18 @@ class AssetManager implements DispatcherAwareInterface
 		}
 
 		return $base . DIRECTORY_SEPARATOR . ltrim(substr($assetUri, strlen($match)), '/\\');
+	}
+
+	/**
+	 * isAbsoluteUrl
+	 *
+	 * @param   string  $uri
+	 *
+	 * @return  boolean
+	 */
+	public static function isAbsoluteUrl($uri)
+	{
+		return stripos($uri, 'http') === 0 || strpos($uri, '//') === 0;
 	}
 
 	/**
@@ -605,14 +622,14 @@ class AssetManager implements DispatcherAwareInterface
 		// Check has .min
 		// $uri = Uri::addBase($uri, 'path');
 
-		if (strpos($uri, 'http') === 0 || strpos($uri, '//') === 0)
+		if (static::isAbsoluteUrl($uri))
 		{
 			return $uri;
 		}
 
 		$assetUri = $this->path;
 
-		if (strpos($assetUri, 'http') === 0 || strpos($assetUri, '//') === 0)
+		if (static::isAbsoluteUrl($assetUri))
 		{
 			return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
 		}
@@ -690,7 +707,7 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function addBase($uri, $path = 'path')
 	{
-		if (strpos($uri, 'http') !== 0 && strpos($uri, '//') !== 0)
+		if (!static::isAbsoluteUrl($uri))
 		{
 			$uri = $this->$path . '/' . $uri;
 		}
