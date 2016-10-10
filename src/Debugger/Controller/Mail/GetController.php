@@ -44,6 +44,17 @@ class GetController extends AbstractController
 			$message = Mailer::send($class::create());
 
 			$view['message'] = $message;
+
+			// Set default sender
+			if (!$message->getFrom())
+			{
+				$config = $this->app->config;
+
+				if ($config->exists('mail.from.email'))
+				{
+					$message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
+				}
+			}
 		}
 
 		$view['class'] = $class;
