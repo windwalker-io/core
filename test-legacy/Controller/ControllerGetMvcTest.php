@@ -19,7 +19,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * Test class of Controller
  *
- * @since {DEPLOY_VERSION}
+ * @since 3.0.1
  */
 class ControllerGetMvcTest extends \PHPUnit_Framework_TestCase
 {

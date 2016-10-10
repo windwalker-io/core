@@ -2,7 +2,7 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -16,7 +16,7 @@ use Windwalker\Http\Helper\HeaderHelper;
  *
  * @see  https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0.1
  */
 class CorsHandler
 {
