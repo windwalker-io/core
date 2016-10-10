@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Mailer;
 
-use Windwalker\Core\Utilities\Classes\OptionAccessTrait;
+use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 /**
  * The MailAttachment class.
