@@ -2,7 +2,7 @@
 /**
  * Part of windwalker  project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -25,7 +25,7 @@ use Windwalker\Uri\UriData;
  * @method static string path($uri = null)
  * @method static string scheme()
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0.1
  */
 class CoreUriData extends AbstractProxyFacade
 {

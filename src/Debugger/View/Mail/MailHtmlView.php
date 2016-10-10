@@ -2,7 +2,7 @@
 /**
  * Part of earth project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -14,7 +14,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 /**
  * The MailHtmlView class.
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.0.1
  */
 class MailHtmlView extends AbstractDebuggerHtmlView
 {

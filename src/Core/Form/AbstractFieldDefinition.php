@@ -2,7 +2,7 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -19,10 +19,19 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * The AbstractFieldDefinition class.
  *
  * @method  Field\TextField      text($name = null, $label = null)
+ * @method  Field\NumberField    number($name = null, $label = null)
+ * @method  Field\RangeField     range($name = null, $label = null)
+ * @method  Field\DatetimeLocalField  datetimeLocal($name = null, $label = null)
+ * @method  Field\MonthField     month($name = null, $label = null)
+ * @method  Field\TelField       tel($name = null, $label = null)
+ * @method  Field\TimeField      time($name = null, $label = null)
+ * @method  Field\UrlField       url($name = null, $label = null)
+ * @method  Field\WeekField      week($name = null, $label = null)
  * @method  Field\ButtonField    button($name = null, $label = null)
  * @method  Field\CheckboxField  checkbox($name = null, $label = null)
  * @method  Field\CheckboxesField  checkboxes($name = null, $label = null)
  * @method  Field\CustomHtmlField  customHtml($name = null, $label = null)
+ * @method  Field\ColorField     color($name = null, $label = null)
  * @method  Field\EmailField     email($name = null, $label = null)
  * @method  Field\HiddenField    hidden($name = null, $label = null)
  * @method  Field\ListField      list($name = null, $label = null)

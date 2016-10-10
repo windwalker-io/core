@@ -13,7 +13,7 @@ use Windwalker\Core\View\SimpleXmlView;
 /**
  * Test class of PhpXmlView
  *
- * @since {DEPLOY_VERSION}
+ * @since 3.0.1
  */
 class PhpXmlViewTest extends \PHPUnit_Framework_TestCase
 {

@@ -13,7 +13,7 @@ use Windwalker\Core\View\StructureView;
 /**
  * Test class of PhpJsonView
  *
- * @since {DEPLOY_VERSION}
+ * @since 3.0.1
  */
 class PhpJsonViewTest extends \PHPUnit_Framework_TestCase
 {
