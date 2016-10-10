@@ -13,7 +13,7 @@ namespace Windwalker\Core\Mailer;
  *
  * @since  {DEPLOY_VERSION}
  */
-interface MailMessageProviderInterface
+interface MessageProviderInterface
 {
 	/**
 	 * render

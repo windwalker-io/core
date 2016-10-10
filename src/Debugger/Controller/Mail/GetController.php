@@ -12,9 +12,8 @@ use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mailer\Adapter\DebugMailerAdapter;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Core\Mailer\Mailer;
-use Windwalker\Core\Mailer\MailerManager;
 use Windwalker\Core\Mailer\MailMessage;
-use Windwalker\Core\Mailer\MailMessageProviderInterface;
+use Windwalker\Core\Mailer\MessageProviderInterface;
 
 /**
  * The GetController class.
@@ -34,7 +33,7 @@ class GetController extends AbstractController
 
 		$view = $this->getView();
 
-		if ($class && is_subclass_of($class, MailMessageProviderInterface::class))
+		if ($class && is_subclass_of($class, MessageProviderInterface::class))
 		{
 			Mailer::getContainer()
 				->prepareSharedObject(DebugMailerAdapter::class)

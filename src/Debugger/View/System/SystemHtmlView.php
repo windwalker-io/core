@@ -9,6 +9,7 @@
 namespace Windwalker\Debugger\View\System;
 
 use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
+use Windwalker\Dom\HtmlElement;
 
 /**
  * The SystemHtmlView class.
@@ -27,5 +28,19 @@ class SystemHtmlView extends AbstractDebuggerHtmlView
 	protected function prepareData($data)
 	{
 		$data->collector = $data->item['collector'];
+
+		$customData = [];
+
+		foreach ($data->collector['custom.data'] as $key => $item)
+		{
+			if (is_array($item))
+			{
+				$item = (string) new HtmlElement('pre', print_r($item, 1));
+			}
+
+			$customData[$key] = $item;
+		}
+
+		$data->collector['custom.data'] = $customData;
 	}
 }
