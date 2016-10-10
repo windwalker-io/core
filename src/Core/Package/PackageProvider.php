@@ -13,14 +13,12 @@ use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
-use Windwalker\Core\Package\Resolver\FieldDefinitionResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Form\FieldHelper;
 use Windwalker\Form\ValidatorHelper;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**
  * The PackageProvider class.

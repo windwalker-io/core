@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
-use Windwalker\Core\Application\WebApplication;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response\JsonResponse;
 

@@ -8,11 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
-use Windwalker\Core\Config\Config;
-use Windwalker\Core\Config\ConfigStructure;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Uri\UriData;
 
 /**
  * The AssetProvider class.

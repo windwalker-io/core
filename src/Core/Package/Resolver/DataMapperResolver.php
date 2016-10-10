@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Package\Resolver;
 
-use Windwalker\Core\Package\Resolver\AbstractPackageObjectResolver;
-use Windwalker\Core\DataMapper\CoreDataMapper;
 use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 

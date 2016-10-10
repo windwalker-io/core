@@ -10,7 +10,6 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Model\BackupModel;
 

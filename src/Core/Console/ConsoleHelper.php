@@ -15,7 +15,6 @@ use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Http\Output\NoHeaderOutput;
-use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Structure\Structure;
 
 /**

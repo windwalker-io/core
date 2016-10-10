@@ -8,13 +8,7 @@
 
 namespace Windwalker\Core\DataMapper;
 
-use Windwalker\Data\Data;
-use Windwalker\Data\DataSet;
 use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
-use Windwalker\DataMapper\AbstractDataMapper;
-use Windwalker\DataMapper\DataMapper;
-use Windwalker\Event\DispatcherInterface;
-use Windwalker\Event\Event;
 
 /**
  * The AbstractDataMapperFacade class.

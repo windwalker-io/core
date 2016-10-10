@@ -10,7 +10,6 @@ namespace Windwalker\Debugger\Listener\Ide;
 
 use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path\PathCollection;
 use Windwalker\Filesystem\Path\PathLocator;
 use Windwalker\Structure\Structure;

@@ -9,14 +9,8 @@
 namespace Windwalker\Core\Test;
 
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Error\ErrorHandler;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Provider;
-use Windwalker\Core\Test\Mock\MockSessionProvider;
-use Windwalker\Core\Test\TestWindwalker as Windwalker;
 use Windwalker\Database\Test\TestDsnResolver;
-use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Structure\Structure;
 
 /**
  * The TestApplication class.

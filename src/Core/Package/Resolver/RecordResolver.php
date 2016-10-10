@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Package\Resolver;
 
 use Windwalker\Core\Database\NullRecord;
-use Windwalker\Core\Object\NullObject;
 use Windwalker\Record\Record;
 
 /**

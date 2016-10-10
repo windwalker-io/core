@@ -10,7 +10,6 @@ namespace Windwalker\Core\Asset\Command\Asset;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Folder;
 
 /**
  * The SyncCommand class.

@@ -12,7 +12,6 @@ use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\Model\MigrationsModel;
 use Windwalker\Filesystem\File;
 use Windwalker\String\SimpleTemplate;
-use Windwalker\String\StringHelper;
 
 /**
  * The CreateCommand class.

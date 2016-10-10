@@ -10,7 +10,6 @@ namespace Windwalker\Core\Widget;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Renderer\RendererInterface;
 

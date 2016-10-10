@@ -15,7 +15,6 @@ use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
 
 /**

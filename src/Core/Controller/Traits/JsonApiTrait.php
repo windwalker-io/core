@@ -10,7 +10,6 @@ namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
-use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
 
 /**
  * The HtmlResponseTrait class.
