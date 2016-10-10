@@ -230,7 +230,7 @@ class Pagination
 		$offset = $this->current - 1;
 
 		// -1 is simple pagination
-		if ($this->total == -1)
+		if ($this->total === -1)
 		{
 			$neighbours = 1;
 		}
@@ -273,7 +273,11 @@ class Pagination
 			$this->result->setMore($neighbours + 1);
 		}
 
-		$this->result->setNext($this->current + 1);
+		// Show next button if not last page or for simple pagination
+		if ($this->total === -1 || $this->current !== $this->pages)
+		{
+			$this->result->setNext($this->current + 1);
+		}
 
 		// Last
 		if ($this->current + $this->neighbours < $this->pages)
