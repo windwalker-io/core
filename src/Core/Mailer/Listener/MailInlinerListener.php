@@ -43,12 +43,13 @@ class MailInlinerListener
 
 		$body = $message->getBody();
 		
-		preg_match_all('/<style[^>]*>([\w\W\d\s]*)<\/style>/', $body, $matches);
-		$body = preg_replace('/<link[^>]*>/', '', $body);
+		preg_match_all('/<style.*?>(.*?)<\/style>/s', $body, $matches, PREG_SET_ORDER);
+//		preg_match_all('/<link.*?href="(.*?)"/s', $body, $linkMatches, PREG_SET_ORDER);
 
 		// Remove script & style
 		$body = OutputFilter::stripScript($body);
 		$body = OutputFilter::stripStyle($body);
+		$body = OutputFilter::stripLinks($body);
 
 		/** @var AssetManager $asset */
 		$asset= Asset::getInstance();
@@ -66,12 +67,12 @@ class MailInlinerListener
 		// Loop internal styles
 		foreach ($matches as $match)
 		{
-			if (!isset($match[0]))
+			if (!isset($match[1]))
 			{
 				continue;
 			}
 
-			$css .= $match[0] . "\n";
+			$css .= $match[1] . "\n";
 		}
 
 		$message->body((new CssToInlineStyles)->convert($body, $css));

@@ -52,6 +52,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'endauth'   => [$this, 'endauth'],
 
 			// Asset
+			'css' => [$this, 'css'],
+			'js'  => [$this, 'js'],
 			'assetTemplate' => [$this, 'assetTemplate'],
 			'endTemplate'   => [$this, 'endTemplate']
 		];
@@ -147,6 +149,30 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function route($expression)
 	{
 		return "<?php echo htmlspecialchars(\$router->route{$expression}) ?>";
+	}
+
+	/**
+	 * css
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function css($expression)
+	{
+		return "<?php \$asset->addCSS{$expression} ?>";
+	}
+
+	/**
+	 * js
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function js($expression)
+	{
+		return "<?php \$asset->addJS{$expression} ?>";
 	}
 
 	/**
