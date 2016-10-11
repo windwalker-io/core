@@ -27,6 +27,7 @@ $this->extend('_global.html');
 <?php $this->block('content') ?>
 <div id="mail-tester-body" class="container">
 	<div class="row">
+        <?php if (isset($message)): ?>
 		<div class="col-md-4">
 			<h3>Mail Information</h3>
 
@@ -97,6 +98,8 @@ $this->extend('_global.html');
 				</tr>
 			</table>
 		</div>
+        <?php endif; ?>
+
 		<div id="mail-tester-wrapper" class="col-md-8" style="margin-top: 30px; margin-bottom: 30px; padding: 0">
 			<?php if (isset($message)): ?>
 				<iframe id="mail-tester-frame" frameborder="0" style="width: 100%; height: 550px;"></iframe>
