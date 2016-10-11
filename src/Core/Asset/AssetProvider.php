@@ -2,17 +2,14 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
 namespace Windwalker\Core\Asset;
 
-use Windwalker\Core\Config\Config;
-use Windwalker\Core\Config\ConfigStructure;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Uri\UriData;
 
 /**
  * The AssetProvider class.

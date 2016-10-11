@@ -29,7 +29,6 @@ use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Middleware\Psr7InvokableInterface;
 use Windwalker\Router\Exception\RouteNotFoundException;
-use Windwalker\Structure\Structure;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Queue\PriorityQueue;

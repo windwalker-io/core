@@ -66,6 +66,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 
 				<li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a href="<?php echo $router->route('database', $item->id); ?>">Database</a></li>
 				<li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a href="<?php echo $router->route('exception', $item->id); ?>">Exception</a></li>
+				<li class="<?php echo $helper->view->isActiveRoute('mail') ?>"><a href="<?php echo $router->route('mail'); ?>">Mail</a></li>
 				<?php $this->endblock(); ?>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
@@ -93,6 +94,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 <?php echo $this->load('windwalker.message.default'); ?>
 <?php $this->endblock(); ?>
 
+<?php $this->block('banner') ?>
 <div class="header-title jumbotron">
 	<div class="container">
 		<h1><?php $this->block('page_title'); ?><?php $this->endblock(); ?></h1>
@@ -115,6 +117,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 		</p>
 	</div>
 </div>
+<?php $this->endblock() ?>
 
 <div class="main-body container">
 	<?php $this->block('content') ?>

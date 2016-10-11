@@ -92,11 +92,16 @@ class DebuggerListener
 		}
 
 		$controller = $event['controller'];
-		$input   = $controller->getInput();
-		$app     = Ioc::getApplication();
-		$uri     = Ioc::getUriData();
+		$input = $controller->getInput();
+		$app   = Ioc::getApplication();
+		$uri   = Ioc::getUriData();
 
-		if ($app->get('route.matched') == $package->name . '@asset')
+		$noRedirect = [
+			'asset',
+			'mail'
+		];
+		
+		if (in_array($app->get('route.short_name'), $noRedirect))
 		{
 			return;
 		}

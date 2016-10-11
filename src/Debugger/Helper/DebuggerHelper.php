@@ -61,7 +61,15 @@ abstract class DebuggerHelper extends AbstractFacade
 			$value = new HtmlElement('pre', ArrayHelper::dump($value, $depth));
 		}
 
-		$data[$key] = (string) $value;
+		if (isset($data[$key]) && is_string($data[$key]))
+		{
+			$data[$key] = [$data[$key]];
+			$data[$key][] = (string) $value;
+		}
+		else
+		{
+			$data[$key] = (string) $value;
+		}
 
 		$collector['custom.data'] = $data;
 	}

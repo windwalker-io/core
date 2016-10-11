@@ -16,7 +16,8 @@
         "illuminate/view": "~5.0"
     },
     "suggest": {
-        "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts."
+        "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts.",
+        "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
     "autoload" : {
         "psr-4" : {

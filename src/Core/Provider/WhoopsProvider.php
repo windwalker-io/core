@@ -10,7 +10,6 @@ namespace Windwalker\Core\Provider;
 
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run as Whoops;
-use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 

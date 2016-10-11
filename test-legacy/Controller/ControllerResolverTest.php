@@ -18,7 +18,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * Test class of ControllerResolver
  *
- * @since {DEPLOY_VERSION}
+ * @since 3.0.1
  */
 class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 {

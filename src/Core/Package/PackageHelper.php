@@ -8,13 +8,7 @@
 
 namespace Windwalker\Core\Package;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Facade\AbstractProxyFacade;
-use Windwalker\Http\Response\Response;
-use Windwalker\IO\Input;
-use Windwalker\Ioc;
 use Windwalker\Structure\Structure;
 
 /**

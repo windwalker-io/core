@@ -9,7 +9,6 @@
 namespace Windwalker\Debugger\Profiler;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
-use Windwalker\Profiler\ProfilerInterface;
 
 /**
  * The Profiler class.

@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Cache\Cache;
-use Windwalker\Core\Cache\CacheFactory;
 use Windwalker\Core\Cache\CacheManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

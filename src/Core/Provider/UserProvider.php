@@ -15,8 +15,6 @@ use Windwalker\Authorisation\AuthorisationInterface;
 use Windwalker\Authorisation\PolicyInterface;
 use Windwalker\Authorisation\PolicyProviderInterface;
 use Windwalker\Core\User\NullUserHandler;
-use Windwalker\Core\User\UserData;
-use Windwalker\Core\User\UserDataInterface;
 use Windwalker\Core\User\UserHandlerInterface;
 use Windwalker\Core\User\UserManager;
 use Windwalker\Core\Event\EventDispatcher;

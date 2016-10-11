@@ -28,7 +28,6 @@ use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\LayoutRenderableInterface;
-use Windwalker\Data\Data;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
@@ -39,7 +38,6 @@ use Windwalker\IO\Input;
 use Windwalker\Core\Ioc;
 use Windwalker\Middleware\Chain\ChainBuilder;
 use Windwalker\Structure\Structure;
-use Windwalker\Utilities\ArrayHelper;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 

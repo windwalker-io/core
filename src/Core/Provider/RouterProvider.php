@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

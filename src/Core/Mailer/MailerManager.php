@@ -2,7 +2,7 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -45,7 +45,7 @@ class MailerManager
 	public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
 	{
 		$this->adapter = $adapter;
-		$this->dispatcher = $dispatcher;
+		$this->dispatcher = $dispatcher ? : new EventDispatcher;
 	}
 
 	/**
@@ -77,6 +77,8 @@ class MailerManager
 	 * @param MailMessage|callable $message
 	 *
 	 * @return  boolean
+	 *
+	 * @throws \InvalidArgumentException
 	 */
 	public function send($message)
 	{
@@ -113,7 +115,15 @@ class MailerManager
 			}
 		}
 
-		return $this->getAdapter()->send($message);
+		$result = $this->getAdapter()->send($message);
+
+		$this->triggerEvent('onMailerAfterSend', [
+			'message' => $message,
+			'manager' => $this,
+			'result'  => &$result
+		]);
+
+		return $result;
 	}
 
 	/**
@@ -150,6 +160,30 @@ class MailerManager
 	public function setAdapter(MailerAdapterInterface $adapter)
 	{
 		$this->adapter = $adapter;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Messages
+	 *
+	 * @return  \callable[]
+	 */
+	public function getMessages()
+	{
+		return $this->messages;
+	}
+
+	/**
+	 * Method to set property messages
+	 *
+	 * @param   \callable[] $messages
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setMessages($messages)
+	{
+		$this->messages=$messages;
 
 		return $this;
 	}

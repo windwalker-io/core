@@ -2,7 +2,7 @@
 /**
  * Part of starter project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
@@ -15,7 +15,6 @@ use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Filesystem\File;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
 
 /**

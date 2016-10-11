@@ -2,19 +2,13 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2016 {ORGANIZATION}. All rights reserved.
+ * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
 
 namespace Windwalker\Core\DataMapper;
 
-use Windwalker\Data\Data;
-use Windwalker\Data\DataSet;
 use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
-use Windwalker\DataMapper\AbstractDataMapper;
-use Windwalker\DataMapper\DataMapper;
-use Windwalker\Event\DispatcherInterface;
-use Windwalker\Event\Event;
 
 /**
  * The AbstractDataMapperFacade class.
