@@ -13,7 +13,7 @@ use Windwalker\Core\Mailer\MailMessage;
 /**
  * The DebugMailerAdapter class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class DebugMailerAdapter implements MailerAdapterInterface
 {

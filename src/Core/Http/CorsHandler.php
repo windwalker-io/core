@@ -16,7 +16,7 @@ use Windwalker\Http\Helper\HeaderHelper;
  *
  * @see  https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class CorsHandler
 {

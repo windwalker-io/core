@@ -17,7 +17,7 @@ use Windwalker\Core\Mailer\MailMessage;
 /**
  * The GetController class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class GetController extends AbstractController
 {

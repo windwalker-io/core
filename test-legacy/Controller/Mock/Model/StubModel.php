@@ -13,7 +13,7 @@ use Windwalker\Core\Model\ModelRepository;
 /**
  * The StubModel class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class StubModel extends ModelRepository
 {

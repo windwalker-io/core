@@ -25,7 +25,7 @@ use Windwalker\Uri\UriData;
  * @method static string path($uri = null)
  * @method static string scheme()
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class CoreUriData extends AbstractProxyFacade
 {

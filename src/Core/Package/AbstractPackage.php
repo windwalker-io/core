@@ -636,7 +636,7 @@ class AbstractPackage implements DispatcherAwareInterface
 	 *
 	 * @return  string
 	 *
-	 * @since  3.0.1
+	 * @since  3.1
 	 */
 	public function getNamespace()
 	{
