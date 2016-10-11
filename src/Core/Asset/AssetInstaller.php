@@ -237,7 +237,7 @@ class AssetInstaller extends AbstractCommand
 			return $this;
 		}
 
-		$dest = dirname($file) . '/' . File::getFilename($file) . '.min.' . $type;
+		$dest = dirname($file) . '/' . File::stripExtension(File::getFilename($file)) . '.min.' . $type;
 
 		file_put_contents($dest, $content);
 
