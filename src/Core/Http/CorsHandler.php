@@ -53,14 +53,22 @@ class CorsHandler
 	 * allowOrigin
 	 *
 	 * @param string|array $domain
+	 * @param bool         $replace
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function allowOrigin($domain = '*')
+	public function allowOrigin($domain = '*', $replace = false)
 	{
 		$domain = implode(' ', (array) $domain);
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
+		if ($replace)
+		{
+			$this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
+		}
+		else
+		{
+			$this->response = $this->response->withAddedHeader('Access-Control-Allow-Origin', $domain);
+		}
 
 		return $this;
 	}
