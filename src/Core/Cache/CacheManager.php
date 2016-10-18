@@ -162,6 +162,9 @@ class CacheManager
 		$options['cache_dir']   = isset($options['cache_dir'])   ? $options['cache_dir']   : $config->get('path.cache');
 		$options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
 
+		// Convert seconds to minutes
+		$options['cache_time'] *= 60;
+
 		switch (strtolower($storage))
 		{
 			case 'file':
