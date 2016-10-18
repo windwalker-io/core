@@ -27,7 +27,80 @@ $this->extend('_global.html');
 <?php $this->block('content') ?>
 <div id="mail-tester-body" class="container">
 	<div class="row">
-		<div id="mail-tester-wrapper" class="col-md-8 col-md-offset-2" style="margin-top: 30px; margin-bottom: 30px; padding: 0">
+        <?php if (isset($message)): ?>
+		<div class="col-md-4">
+			<h3>Mail Information</h3>
+
+			<table class="table">
+				<tr>
+					<td>From</td>
+					<td>
+						<ul>
+							<?php foreach ($message->getFrom() as $mail => $name): ?>
+								<li>
+									<?php echo $mail; ?>
+
+									<?php if ($name): ?>
+										&lt;<?php echo $name; ?>&gt;
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>To</td>
+					<td>
+						<ul>
+							<?php foreach ($message->getTo() as $mail => $name): ?>
+								<li>
+									<?php echo $mail; ?>
+
+									<?php if ($name): ?>
+										&lt;<?php echo $name; ?>&gt;
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>CC</td>
+					<td>
+						<ul>
+							<?php foreach ($message->getCc() as $mail => $name): ?>
+								<li>
+									<?php echo $mail; ?>
+
+									<?php if ($name): ?>
+										&lt;<?php echo $name; ?>&gt;
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>BCC</td>
+					<td>
+						<ul>
+							<?php foreach ($message->getBcc() as $mail => $name): ?>
+								<li>
+									<?php echo $mail; ?>
+
+									<?php if ($name): ?>
+										&lt;<?php echo $name; ?>&gt;
+									<?php endif; ?>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</td>
+				</tr>
+			</table>
+		</div>
+        <?php endif; ?>
+
+		<div id="mail-tester-wrapper" class="col-md-8" style="margin-top: 30px; margin-bottom: 30px; padding: 0">
 			<?php if (isset($message)): ?>
 				<iframe id="mail-tester-frame" frameborder="0" style="width: 100%; height: 550px;"></iframe>
 			<?php else: ?>

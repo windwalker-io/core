@@ -18,7 +18,7 @@ use Windwalker\Filter\OutputFilter;
 /**
  * The MailInlinerListener class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class MailInlinerListener
 {

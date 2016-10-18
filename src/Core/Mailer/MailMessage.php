@@ -76,6 +76,16 @@ class MailMessage
 	protected $files = [];
 
 	/**
+	 * create
+	 *
+	 * @return  MailMessage
+	 */
+	public static function create()
+	{
+		return new static;
+	}
+
+	/**
 	 * MailMessage constructor.
 	 *
 	 * @param string $subject

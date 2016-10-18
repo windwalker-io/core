@@ -16,7 +16,7 @@ use Windwalker\Filesystem\Folder;
 /**
  * The AssetInstaller class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class AssetInstaller extends AbstractCommand
 {
@@ -237,7 +237,7 @@ class AssetInstaller extends AbstractCommand
 			return $this;
 		}
 
-		$dest = dirname($file) . '/' . File::getFilename($file) . '.min.' . $type;
+		$dest = dirname($file) . '/' . File::stripExtension(File::getFilename($file)) . '.min.' . $type;
 
 		file_put_contents($dest, $content);
 

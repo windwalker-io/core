@@ -13,7 +13,7 @@ use Windwalker\Core\View\PhpHtmlView;
 /**
  * The StubHtmlView class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class StubHtmlView extends PhpHtmlView
 {

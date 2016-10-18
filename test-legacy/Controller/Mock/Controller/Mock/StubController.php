@@ -13,7 +13,7 @@ use Windwalker\Core\Controller\AbstractController;
 /**
  * The MockController class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class StubController extends AbstractController
 {

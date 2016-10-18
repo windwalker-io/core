@@ -16,7 +16,7 @@ use Windwalker\Http\Helper\HeaderHelper;
  *
  * @see  https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class CorsHandler
 {
@@ -53,14 +53,22 @@ class CorsHandler
 	 * allowOrigin
 	 *
 	 * @param string|array $domain
+	 * @param bool         $replace
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function allowOrigin($domain = '*')
+	public function allowOrigin($domain = '*', $replace = false)
 	{
 		$domain = implode(' ', (array) $domain);
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
+		if ($replace)
+		{
+			$this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
+		}
+		else
+		{
+			$this->response = $this->response->withAddedHeader('Access-Control-Allow-Origin', $domain);
+		}
 
 		return $this;
 	}

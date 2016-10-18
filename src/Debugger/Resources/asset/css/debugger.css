@@ -45,9 +45,9 @@ pre {
 }
 
 #mail-tester-body {
-	background-color: #eee;
+
 }
 
 #mail-tester-wrapper {
-	background-color: #fff;
+	border: 1px solid #eee;
 }

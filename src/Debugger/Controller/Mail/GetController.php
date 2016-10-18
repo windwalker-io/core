@@ -13,12 +13,11 @@ use Windwalker\Core\Mailer\Adapter\DebugMailerAdapter;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailMessage;
-use Windwalker\Core\Mailer\MessageProviderInterface;
 
 /**
  * The GetController class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class GetController extends AbstractController
 {
@@ -26,6 +25,8 @@ class GetController extends AbstractController
 	 * Do execute action.
 	 *
 	 * @return  mixed
+	 *
+	 * @throws \Exception
 	 */
 	protected function doExecute()
 	{
@@ -33,16 +34,27 @@ class GetController extends AbstractController
 
 		$view = $this->getView();
 
-		if ($class && is_subclass_of($class, MessageProviderInterface::class))
+		if ($class && is_subclass_of($class, MailMessage::class))
 		{
 			Mailer::getContainer()
 				->prepareSharedObject(DebugMailerAdapter::class)
 				->alias(MailerAdapterInterface::class, DebugMailerAdapter::class);
 
 			/** @var MailMessage $message */
-			$message = Mailer::send($class::render());
+			$message = Mailer::send($class::create());
 
 			$view['message'] = $message;
+
+			// Set default sender
+			if (!$message->getFrom())
+			{
+				$config = $this->app->config;
+
+				if ($config->exists('mail.from.email'))
+				{
+					$message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
+				}
+			}
 		}
 
 		$view['class'] = $class;

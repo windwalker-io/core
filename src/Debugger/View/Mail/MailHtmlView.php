@@ -14,7 +14,7 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 /**
  * The MailHtmlView class.
  *
- * @since  3.0.1
+ * @since  3.1
  */
 class MailHtmlView extends AbstractDebuggerHtmlView
 {
