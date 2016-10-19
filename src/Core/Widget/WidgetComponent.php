@@ -47,7 +47,7 @@ class WidgetComponent extends Widget
 			$layout = $this->name ? : 'default';
 		}
 
-		parent::__construct($layout);
+		parent::__construct($layout, null, $package);
 	}
 
 	/**

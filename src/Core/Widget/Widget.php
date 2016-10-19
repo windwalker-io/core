@@ -380,7 +380,14 @@ class Widget implements \ArrayAccess
 	 */
 	public function setPackage($package)
 	{
-		$this->package = PackageHelper::getPackage($package);
+		if ($package instanceof AbstractPackage)
+		{
+			$this->package = $package;
+		}
+		else
+		{
+			$this->package = PackageHelper::getPackage($package);
+		}
 
 		return $this;
 	}
