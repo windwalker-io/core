@@ -148,7 +148,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function route($expression)
 	{
-		return "<?php echo htmlspecialchars(\$router->route{$expression}) ?>";
+		return "<?php echo htmlspecialchars(\$router->generate{$expression}) ?>";
 	}
 
 	/**

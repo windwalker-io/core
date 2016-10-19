@@ -174,39 +174,6 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	}
 
 	/**
-	 * build
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return string
-	 * @throws \OutOfRangeException
-	 */
-	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
-	{
-		try
-		{
-			return $this->build($route, $queries, $type);
-		}
-		catch (\OutOfRangeException $e)
-		{
-			$config = Ioc::getConfig();
-
-			if ($config->get('routing.debug', false))
-			{
-				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
-			}
-			elseif ($config->get('system.debug', false))
-			{
-				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
-			}
-
-			return '#';
-		}
-	}
-
-	/**
 	 * match
 	 *
 	 * @param string $rawRoute

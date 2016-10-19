@@ -70,11 +70,33 @@ class PackageRouter implements RouteBuilderInterface
 		}
 		catch (\OutOfRangeException $e)
 		{
-			if ($this->package->app->get('routing.debug', false))
+			if ($this->package->app->get('routing.debug', true))
 			{
 				throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);
 			}
-			elseif ($this->package->app->get('system.debug', false))
+
+			return '#';
+		}
+	}
+
+	/**
+	 * generate
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH)
+	{
+		try
+		{
+			return $this->route($route, $queries, $type);
+		}
+		catch (\OutOfRangeException $e)
+		{
+			if ($this->package->app->get('system.debug', false))
 			{
 				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
 			}
