@@ -114,28 +114,29 @@ trait LayoutRenderableTrait
 		$paths   = $this->getRenderer()->getPaths();
 		$config  = $this->getPackage()->getContainer()->get('config');
 		$ref     = new \ReflectionClass($this);
+		$viewName = strtolower($this->getName());
 		$package = $this->getPackage();
 
 		if ($this->config['package.path'])
 		{
-			$this->config['tmpl_path.view'] = Path::normalize($this->config['package.path'] . '/Templates/' . $this->getName());
+			$this->config['tmpl_path.view'] = Path::normalize($this->config['package.path'] . '/Templates/' . $viewName);
 			$this->config['tmpl_path.package'] = Path::normalize($this->config['package.path'] . '/Templates');
 		}
 		elseif (!$package instanceof NullPackage)
 		{
-			$this->config['tmpl_path.view'] = Path::normalize($package->getDir() . '/Templates/' . $this->getName());
+			$this->config['tmpl_path.view'] = Path::normalize($package->getDir() . '/Templates/' . $viewName);
 			$this->config['tmpl_path.package'] = Path::normalize($package->getDir() . '/Templates');
 		}
 		else
 		{
-			$this->config['tmpl_path.view'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates/' . $this->getName());
+			$this->config['tmpl_path.view'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates/' . $viewName);
 			$this->config['tmpl_path.package'] = Path::normalize(dirname($ref->getFileName()) . '/../../Templates');
 		}
 
 		$paths->insert($this->config['tmpl_path.view'], PriorityQueue::LOW);
 		$paths->insert($this->config['tmpl_path.package'], PriorityQueue::LOW);
 
-		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $this->getName()), PriorityQueue::LOW - 10);
+		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $viewName), PriorityQueue::LOW - 10);
 		$paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()), PriorityQueue::LOW - 10);
 
 		$this->renderer->setPaths($paths);
@@ -143,7 +144,7 @@ trait LayoutRenderableTrait
 		$this->config['path.registered'] = true;
 
 		$this->registerMultilingualPaths();
-		
+
 		return $this;
 	}
 
