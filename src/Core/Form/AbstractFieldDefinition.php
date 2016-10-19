@@ -40,6 +40,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @method  Field\SpacerField    spacer($name = null, $label = null)
  * @method  Field\TextareaField  textarea($name = null, $label = null)
  * @method  Field\TimezoneField  timezone($name = null, $label = null)
+ * @method  Field\FileField      file($name = null, $label = null)
  *
  * @since  3.0
  */
