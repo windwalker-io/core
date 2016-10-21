@@ -346,7 +346,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 			return false;
 		}
 
-		$this->triggerEvent('onUseAfterDelete', array('conditions' => $conditions, 'options' => $options));
+		$this->triggerEvent('onUserAfterDelete', array('conditions' => $conditions, 'options' => $options));
 
 		return true;
 	}
