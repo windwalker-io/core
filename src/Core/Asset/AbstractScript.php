@@ -138,7 +138,8 @@ abstract class AbstractScript
 	/**
 	 * getJSObject
 	 *
-	 * @param mixed  ...$data
+	 * @param mixed  ...$data  The data to merge.
+	 * @param bool   $quote    Quote object key or not, default is false.
 	 *
 	 * @return  string
 	 */
