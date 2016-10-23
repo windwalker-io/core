@@ -70,7 +70,7 @@ class ImportCommand extends CoreCommand
 			throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
 		}
 
-		if (!$this->io->getOption('no-backup'))
+		if (!$this->getOption('no-backup'))
 		{
 			// backup
 			BackupModel::getInstance()->setCommand($this)->backup();

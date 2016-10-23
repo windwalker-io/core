@@ -68,7 +68,10 @@ class ClearCommand extends CoreCommand
 		}
 
 		// backup
-		BackupModel::getInstance()->setCommand($this)->backup();
+		if (!$this->getOption('no-backup'))
+		{
+			BackupModel::getInstance()->setCommand($this)->backup();
+		}
 
 		$class = $this->console->get('seed.class');
 

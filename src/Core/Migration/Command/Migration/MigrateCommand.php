@@ -79,7 +79,7 @@ class MigrateCommand extends CoreCommand
 		$migration = new MigrationsModel;
 		$migration->setIo($this->io);
 
-		if (!$this->io->getOption('no-backup'))
+		if (!$this->getOption('no-backup'))
 		{
 			// backup
 			BackupModel::getInstance()->setCommand($this)->backup();
@@ -99,11 +99,6 @@ class MigrateCommand extends CoreCommand
 
 				$io->setArguments(array('seed', 'import'));
 				$io->setOption('no-backup', true);
-
-	//			foreach ($this->io->getOptions() as $k => $v)
-	//			{
-	//				$io->setOption($k, $v);
-	//			}
 
 				$this->console->getRootCommand()->setIO($io)->execute();
 			}
