@@ -34,6 +34,7 @@ echo BootstrapKeyValueGrid::create()
 
 	<br /><br />
 
+<div id="queries" style="position: relative; top: -50px;"></div>
 <h2>Queries</h2>
 
 <?php foreach ((array) $queryProcess as $name => $timeline): ?>

@@ -112,7 +112,7 @@
 
 	<!-- DATABASE -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>#queries">
 			<div class="windwalker-debugger-block-inner">
 				Queries
 				<span class="windwalker-debugger-badge">
