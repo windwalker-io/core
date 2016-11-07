@@ -40,9 +40,14 @@ echo BootstrapKeyValueGrid::create()
 <?php foreach ((array) $queryProcess as $name => $timeline): ?>
 
 	<br />
-	<?php echo $this->load('query_info', array('timeline' => $timeline)) ?>
+	<?php echo $this->load('query_info', array('name' => $name, 'timeline' => $timeline)) ?>
 	<br />
 
 <?php endforeach; ?>
+
+<script src="<?php echo $router->route('asset', array('type' => 'tooltip-js')); ?>"></script>
+<script>
+    $('.hasTooltip').tooltip();
+</script>
 
 <?php $this->endblock() ?>

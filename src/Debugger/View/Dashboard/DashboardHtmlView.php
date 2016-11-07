@@ -27,7 +27,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 	 */
 	protected function prepareData($data)
 	{
-		$route = $this->getPackage()->router;
+		$router = $this->getPackage()->router;
 
 		$data->items = $this->model->getItems();
 

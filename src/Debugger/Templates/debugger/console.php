@@ -110,34 +110,6 @@
 		</a>
 	</div>
 
-	<!-- DATABASE -->
-	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>#queries">
-			<div class="windwalker-debugger-block-inner">
-				Queries
-				<span class="windwalker-debugger-badge">
-					<?php echo $this->escape((int) $queryTimes); ?>
-				</span>
-			</div>
-
-			<!-- Drop MENU -->
-			<div class="windwalker-debugger-drop-menu">
-				<dl>
-					<dt>DB Queries</dt>
-					<dd>
-						<?php echo $this->escape((int) $queryTimes); ?>
-					</dd>
-
-					<dt>Total Time</dt>
-					<dd><?php echo $this->escape(round($queryTotalTime, 2)); ?> ms</dd>
-
-					<dt>Total Memory</dt>
-					<dd><?php echo $this->escape(round($queryTotalMemory, 3)); ?> MB</dd>
-				</dl>
-			</div>
-		</a>
-	</div>
-
     <!-- MESSAGES -->
     <div class="windwalker-debugger-block">
         <a class="windwalker-debugger-link" href="<?php echo $router->route('system', array('id' => $collector['id'])); ?>">
@@ -169,9 +141,9 @@
                 <?php if ($messagesCount['debug']): ?>
                     <ul class="windwalker-debugger-messages">
                         <?php foreach ($debugMessages as $msg): ?>
-                        <li style="padding-left: 7px" class="windwalker-debugger-message-item windwalker-debugger-text-<?php echo $msg['type']; ?>">
-                            <?php echo $msg['message']; ?>
-                        </li>
+                            <li style="padding-left: 7px" class="windwalker-debugger-message-item windwalker-debugger-text-<?php echo $msg['type']; ?>">
+                                <?php echo $msg['message']; ?>
+                            </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php else: ?>
@@ -180,4 +152,32 @@
             </div>
         </a>
     </div>
+
+	<!-- DATABASE -->
+	<div class="windwalker-debugger-block">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>#queries">
+			<div class="windwalker-debugger-block-inner">
+				Queries
+				<span class="windwalker-debugger-badge">
+					<?php echo $this->escape((int) $queryTimes); ?>
+				</span>
+			</div>
+
+			<!-- Drop MENU -->
+			<div class="windwalker-debugger-drop-menu">
+				<dl>
+					<dt>DB Queries</dt>
+					<dd>
+						<?php echo $this->escape((int) $queryTimes); ?>
+					</dd>
+
+					<dt>Total Time</dt>
+					<dd><?php echo $this->escape(round($queryTotalTime, 2)); ?> ms</dd>
+
+					<dt>Total Memory</dt>
+					<dd><?php echo $this->escape(round($queryTotalMemory, 3)); ?> MB</dd>
+				</dl>
+			</div>
+		</a>
+	</div>
 </div>

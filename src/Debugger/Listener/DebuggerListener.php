@@ -111,6 +111,8 @@ class DebuggerListener
 
 		if ($input->get('refresh'))
 		{
+			$hash = $input->getString('hash');
+			$hash = $hash ? '#' . $hash : '';
 
 			$input->set('id', null);
 
@@ -124,7 +126,7 @@ class DebuggerListener
 
 			if ($item)
 			{
-				$app->redirect($package->router->route($app->get('route.matched'), array('id' => $item['id'])));
+				$app->redirect($package->router->route($app->get('route.matched'), array('id' => $item['id'])) . $hash);
 
 				return;
 			}

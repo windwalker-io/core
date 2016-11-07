@@ -21,6 +21,18 @@ $types = [
 
 <div class="panel panel-<?php echo $timeline['time']['style'] ?>">
 	<div class="panel-heading">
+        <div id="query-<?php echo $name; ?>" style="position: relative; top: -70px;"></div>
+        <div class="pull-right">
+            <a href="#query-<?php echo $name; ?>">
+                <span class="glyphicon glyphicon-link"></span>
+            </a>
+            &nbsp;
+            &nbsp;
+            <a href="<?php echo $router->route('database', ['id' => $item->id, 'refresh' => 1, 'hash' => 'query-' . $name]); ?>"
+                class="hasTooltip" title="Refresh and back to this query.">
+                <span class="glyphicon glyphicon-refresh"></span>
+            </a>
+        </div>
 		<h3 class="panel-title">
 			Query: <?php echo $timeline['data']['serial'] ?>
 		</h3>
