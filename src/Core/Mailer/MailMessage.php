@@ -252,7 +252,7 @@ class MailMessage
 	public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
 	{
 		$widget = WidgetHelper::createWidget($layout, $engine, $package);
-		$widget->setPathPrefix($prefix);
+		$widget->setPathPrefix($prefix)->registerPaths(true);
 
 		$this->body($widget->render($data), true);
 
