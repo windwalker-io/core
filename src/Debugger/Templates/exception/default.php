@@ -45,24 +45,16 @@ $this->extend('_global.html');
 			$trace = new Data($trace);
 
 			$args = array();
-
-			foreach ($trace['args'] as $name => $value)
-			{
-				$value = is_array($value) ? 'Array(...)' : $value;
-				$value = is_object($value) ? ReflectionHelper::getShortName($value) : $value;
-
-				$args[$name] = Utf8String::substr($value, 0, 10);
-			}
 			?>
 			<tr>
 				<td>
 					<?php echo $i + 1; ?>
 				</td>
 				<td>
-					<?php echo $trace['file']; ?> (<?php echo $trace['line']; ?>)
+					<?php echo $trace['file']; ?>
 				</td>
 				<td>
-					<?php echo $trace['class']; ?><?php echo $trace['type']; ?><?php echo $trace['function']; ?>(<?php echo implode(', ', $args); ?>)
+					<?php echo $trace['class']; ?><?php echo $trace['type']; ?><?php echo $trace['function']; ?>
 				</td>
 			</tr>
 		<?php endforeach; ?>
