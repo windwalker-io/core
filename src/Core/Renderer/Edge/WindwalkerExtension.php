@@ -48,7 +48,9 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			// Authorisation
 			'auth'      => [$this, 'auth'],
 			'can'       => [$this, 'auth'],
+			'cannot'    => [$this, 'cannot'],
 			'endcan'    => [$this, 'endauth'],
+			'endcannot' => [$this, 'endauth'],
 			'endauth'   => [$this, 'endauth'],
 
 			// Asset
@@ -209,6 +211,18 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function auth($expression)
 	{
 		return "<?php if (\$app->user->authorise{$expression}): ?>";
+	}
+
+	/**
+	 * cannot
+	 *
+	 * @param   string  $expression
+	 *
+	 * @return  string
+	 */
+	public function cannot($expression)
+	{
+		return "<?php if (!\$app->user->authorise{$expression}): ?>";
 	}
 
 	/**
