@@ -72,7 +72,12 @@ class RunCommand extends Command
 
 		foreach ((array) ConsoleHelper::loadPackages() as $name => $package)
 		{
-			$scripts = array_merge($scripts, (array) $resolver->getPackage($name)->get('console.script'));
+			if (!$package = $resolver->getPackage($name))
+			{
+				continue;
+			}
+
+			$scripts = array_merge($scripts, (array) $package->get('console.scripts'));
 		}
 
 		if ($this->getOption('l'))
