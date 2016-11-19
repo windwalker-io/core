@@ -20,7 +20,10 @@ class TransactionMiddleware extends AbstractControllerMiddleware
 	 *
 	 * @param   ControllerData $data
 	 *
-	 * @return  mixed
+	 * @return mixed
+	 *
+	 * @throws \Exception
+	 * @throws \Throwable
 	 */
 	public function execute($data = null)
 	{
@@ -30,12 +33,20 @@ class TransactionMiddleware extends AbstractControllerMiddleware
 		{
 			$result = $this->next->execute($data);
 		}
-		finally
+		catch (\Exception $e)
 		{
 			$data->model->transactionRollback(true);
+
+			throw $e;
+		}
+		catch (\Throwable $e)
+		{
+			$data->model->transactionRollback(true);
+
+			throw $e;
 		}
 
-		$data->model->transactionCommmit(true);
+		$data->model->transactionCommit(true);
 
 		return $result;
 	}

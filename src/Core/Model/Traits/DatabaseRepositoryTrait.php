@@ -31,7 +31,7 @@ trait DatabaseRepositoryTrait
 	 *
 	 * @return  void
 	 */
-	public function bootModelRepositoryTrait()
+	public function bootDatabaseRepositoryTrait()
 	{
 		$this->table  = property_exists($this, 'table')  ? $this->table  : null;
 		$this->keys   = property_exists($this, 'keys')   ? $this->keys   : 'id';
