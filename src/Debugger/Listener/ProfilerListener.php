@@ -265,7 +265,9 @@ class ProfilerListener
 			'variables'  => $event['variables'],
 		));
 
-		$profiler->mark(__FUNCTION__, array(
+		$name = $package->getName();
+
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
 			'tag' => 'package.process'
 		));
 	}
