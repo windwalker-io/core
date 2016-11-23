@@ -32,7 +32,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method static UserManager      registerPolicyProvider(PolicyProviderInterface $provider)
  * @method static UserManager      setHandler(UserHandlerInterface $handler)
  * @method static boolean          hasHandler()
- * @method static UserHandlerInterface  getHandler(Credential $credential)
+ * @method static UserHandlerInterface  getHandler()
  * @method static boolean          login($user, $remember = false, $options = array())
  * @method static boolean          makeUserLoggedIn($user)
  * @method static boolean          logout($conditions = [], $options = [])
