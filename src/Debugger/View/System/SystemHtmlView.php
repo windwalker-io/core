@@ -31,7 +31,7 @@ class SystemHtmlView extends AbstractDebuggerHtmlView
 
 		$customData = [];
 
-		foreach ($data->collector['custom.data'] as $key => $item)
+		foreach ((array) $data->collector['custom.data'] as $key => $item)
 		{
 			if (is_array($item))
 			{
