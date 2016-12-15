@@ -367,6 +367,8 @@ class MailMessage
 
 				$this->$field($mail, $name);
 			}
+			
+			return;
 		}
 
 		$this->{$field}[$email] = $name;
