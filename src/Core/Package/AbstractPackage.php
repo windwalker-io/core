@@ -95,13 +95,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	protected $middlewares;
 
 	/**
-	 * Property router.
-	 *
-	 * @var  PackageRouter
-	 */
-	protected $router;
-
-	/**
 	 * Property booted.
 	 *
 	 * @var  boolean
