@@ -360,6 +360,11 @@ class MailMessage
 					$name = null;
 				}
 
+				if ($mail === null)
+				{
+					continue;
+				}
+
 				$this->$field($mail, $name);
 			}
 		}
