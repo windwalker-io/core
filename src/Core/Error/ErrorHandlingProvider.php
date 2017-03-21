@@ -44,6 +44,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 * @param Container $container
 	 *
 	 * @return  void
+	 * @throws \UnexpectedValueException
 	 */
 	public function boot(Container $container)
 	{
@@ -63,6 +64,8 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 * @param   Container $container The DI container.
 	 *
 	 * @return  void
+	 * @throws \UnexpectedValueException
+	 * @throws \InvalidArgumentException
 	 */
 	public function register(Container $container)
 	{
@@ -75,7 +78,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 					$handler = $container->newInstance($handler);
 				}
 
-				$error->addHandler($handler, is_numeric($key) ? $key : null);
+				$error->addHandler($handler, is_numeric($key) ? null : $key);
 			}
 
 			return $error;
