@@ -80,12 +80,15 @@ class MysqlExporter extends AbstractExporter
 	 * @param $table
 	 *
 	 * @return mixed|null|string
+	 *
+	 * @throws \InvalidArgumentException
+	 * @throws \RuntimeException
 	 */
 	protected function getInserts($table)
 	{
-		$db      = $this->db;
-		$query   = $db->getQuery(true);
-		$iterator   = $db->getReader($query->select('*')->from($table))->getIterator();
+		$db = $this->db;
+		$query = $db->getQuery(true);
+		$iterator = $db->getReader($query->select('*')->from($table))->getIterator();
 
 		if (!count($iterator))
 		{
@@ -101,7 +104,7 @@ class MysqlExporter extends AbstractExporter
 			$data = array_map(
 				function($d) use ($query)
 				{
-					return $query->q($d);
+					return $query->q($d) ? : 'NULL';
 				},
 				$data
 			);
