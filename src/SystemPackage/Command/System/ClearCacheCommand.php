@@ -65,7 +65,7 @@ class ClearCacheCommand extends CoreCommand
 			}
 		}
 
-		$this->out()->out('Cache cleared.');
+		$this->out('Cache cleared.');
 	}
 
 	protected function clearCacheRoot()
