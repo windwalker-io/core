@@ -486,17 +486,6 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function loadConfig(Structure $config)
 	{
-		$cache = CacheFactory::create('config', 'php_file', 'php_file', ['group' => 'config']);
-
-		$cacheKey = 'config.package.' . $this->name;
-
-		if ($this->app->getMode() != 'dev' && $this->app->getName() != 'dev' && $cache->exists($cacheKey))
-		{
-			$config->load($cache->get($cacheKey));
-
-			return $this;
-		}
-
 		$file = $this->getDir() . '/Resources/config/config.dist.php';
 
 		if (is_file($file))
@@ -511,8 +500,6 @@ class AbstractPackage implements DispatcherAwareInterface
 		{
 			$config->loadFile($file, 'php', ['load_raw' => true]);
 		}
-
-		$cache->set($cacheKey, $config->toArray());
 
 		return $this;
 	}
