@@ -8,7 +8,9 @@
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Log\LogLevel;
 use Windwalker\Core\Logger\LoggerManager;
+use Windwalker\Core\Logger\Monolog\MessageHandler;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -30,7 +32,18 @@ class LoggerProvider implements ServiceProviderInterface
 	{
 		$closure = function(Container $container)
 		{
-			return new LoggerManager($container->get('config')->get('path.logs'));
+			$manager = new LoggerManager($container->get('config')->get('path.logs'));
+
+			$manager->addLogger(
+				'message',
+				$manager->createLogger(
+					'message',
+					LogLevel::DEBUG,
+					$container->createSharedObject(MessageHandler::class)
+				)
+			);
+
+			return $manager;
 		};
 
 		$container->share(LoggerManager::class, $closure);

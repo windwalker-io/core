@@ -59,9 +59,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * System is unusable.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -78,9 +78,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Example: Entire website down, database unavailable, etc. This should
 	 * trigger the SMS alerts and wake you up.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -96,9 +96,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * Example: Application component unavailable, unexpected exception.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -113,9 +113,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Runtime errors that do not require immediate action but should typically
 	 * be logged and monitored.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -132,9 +132,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Example: Use of deprecated APIs, poor use of an API, undesirable things
 	 * that are not necessarily wrong.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -148,9 +148,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Normal but significant events.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -166,9 +166,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * Example: User logs in, SQL logs.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -182,9 +182,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Detailed debug information.
 	 *
-	 * @param string $category
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array  $category
+	 * @param string|array  $message
+	 * @param array         $context
 	 *
 	 * @return static
 	 */
@@ -198,15 +198,25 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Logs with an arbitrary level.
 	 *
-	 * @param string $category
-	 * @param mixed  $level
-	 * @param string $message
-	 * @param array  $context
+	 * @param string|array $category
+	 * @param string|int   $level
+	 * @param string|array $message
+	 * @param array        $context
 	 *
 	 * @return static
 	 */
 	public function log($category, $level, $message, array $context = [])
 	{
+		if (is_array($category))
+		{
+			foreach ($category as $cat)
+			{
+				$this->log($cat, $level, $message, $context);
+			}
+
+			return $this;
+		}
+
 		if (is_array($message))
 		{
 			foreach ($message as $msg)
