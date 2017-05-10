@@ -113,9 +113,10 @@ class RunCommand extends Command
 	/**
 	 * executeScriptProfile
 	 *
-	 * @param   array  $scripts
+	 * @param   array $scripts
 	 *
 	 * @return  void
+	 * @throws \RuntimeException
 	 */
 	protected function executeScriptProfile($scripts)
 	{
@@ -136,9 +137,9 @@ class RunCommand extends Command
 			$command = ArrayHelper::getValue($script, 'cmd');
 			$input   = ArrayHelper::getValue($script, 'in');
 
-			if ($this->executeScript($command, $input) !== 0)
+			if ($this->executeScript($command, $input) === 64)
 			{
-				throw new \RuntimeException('Running script fail...');
+				throw new \RuntimeException('Script stopped...');
 			}
 		}
 	}
@@ -146,10 +147,13 @@ class RunCommand extends Command
 	/**
 	 * executeScript
 	 *
-	 * @param   string  $script
-	 * @param   string  $input
+	 * @param   string $script
+	 * @param   string $input
 	 *
 	 * @return int
+	 *
+	 * @throws \Symfony\Component\Process\Exception\RuntimeException
+	 * @throws \Symfony\Component\Process\Exception\LogicException
 	 */
 	protected function executeScript($script, $input = null)
 	{
@@ -165,7 +169,7 @@ class RunCommand extends Command
 				$process->setInput($input);
 			}
 
-			$process->run(function ($type, $buffer)
+			return $process->run(function ($type, $buffer)
 			{
 				if (Process::ERR === $type)
 				{
@@ -177,12 +181,10 @@ class RunCommand extends Command
 				}
 			});
 		}
-		else
-		{
-			system($script);
-		}
 
-		return 0;
+		system($script, $return);
+
+		return $return;
 	}
 
 	/**
