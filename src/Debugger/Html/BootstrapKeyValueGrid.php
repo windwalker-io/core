@@ -22,7 +22,7 @@ class BootstrapKeyValueGrid extends KeyValueGrid
 	 *
 	 * @param array $attribs
 	 */
-	public function __construct($attribs = [])
+	public function __construct($attribs = array())
 	{
 		if (!isset($attribs['class']))
 		{
@@ -41,7 +41,7 @@ class BootstrapKeyValueGrid extends KeyValueGrid
 	 *
 	 * @return  static
 	 */
-	public function addHeader($keyTitle = 'Key', $valueTitle = 'Value', $attribs = [])
+	public function addHeader($keyTitle = 'Key', $valueTitle = 'Value', $attribs = array())
 	{
 		if (!isset($attribs[static::COL_KEY]['width']))
 		{
@@ -59,7 +59,7 @@ class BootstrapKeyValueGrid extends KeyValueGrid
 	 *
 	 * @return  static
 	 */
-	public function addTitle($name, $attribs = [])
+	public function addTitle($name, $attribs = array())
 	{
 		if (!isset($attribs[static::ROW]['class']))
 		{

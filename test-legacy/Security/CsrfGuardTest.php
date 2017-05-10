@@ -78,7 +78,7 @@ class CsrfGuardTest extends \PHPUnit_Framework_TestCase
 
 		$html = sprintf('<input class="test" type="hidden" name="%s" value="1" />', $token);
 
-		$this->assertEquals($html, (string) $this->instance->input(123, ['class' => 'test']));
+		$this->assertEquals($html, (string) $this->instance->input(123, array('class' => 'test')));
 	}
 
 	/**

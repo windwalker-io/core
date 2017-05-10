@@ -136,10 +136,10 @@ class Pagination
 	 *
 	 * @var  array
 	 */
-	protected $template = [
+	protected $template = array(
 		'layout' => 'windwalker.pagination.default',
 		'engine' => 'php'
-	];
+	);
 
 	/**
 	 * Property route.
@@ -454,7 +454,7 @@ class Pagination
 			};
 		}
 
-		return $widget->render(['pagination' => $result, 'route' => $route]);
+		return $widget->render(array('pagination' => $result, 'route' => $route));
 	}
 
 	/**

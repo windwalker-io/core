@@ -28,7 +28,7 @@ class CacheManager
 	 *
 	 * @var  Cache[]
 	 */
-	protected static $caches = [];
+	protected static $caches = array();
 
 	/**
 	 * Property ignoreGlobal.
@@ -74,7 +74,7 @@ class CacheManager
 	 * @return  CacheInterface
 	 * @throws \UnexpectedValueException
 	 */
-	public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
+	public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
 		$config = $this->config;
 
@@ -100,7 +100,7 @@ class CacheManager
 	 *
 	 * @return  CacheInterface
 	 */
-	public function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
+	public function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
 	{
 		$storage    = $storage ? : 'array';
 		$serializer = $serializer ? : 'php';
@@ -147,7 +147,7 @@ class CacheManager
 	 * @throws \UnexpectedValueException
 	 * @throws \DomainException
 	 */
-	public function getStorage($storage, $options = [], $name = 'windwalker')
+	public function getStorage($storage, $options = array(), $name = 'windwalker')
 	{
 		$class = sprintf('Windwalker\Cache\Storage\%sStorage', StringNormalise::toCamelCase($storage));
 

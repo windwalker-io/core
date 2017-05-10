@@ -64,7 +64,7 @@ class MultiActionControllerTest extends AbstractBaseTestCase
 	 */
 	public function testExistsAction()
 	{
-		$this->instance->setActionName('flyAction')->setArguments([1000, 450]);
+		$this->instance->setActionName('flyAction')->setArguments(array(1000, 450));
 
 		$this->assertEquals('Flying on 1000 km and speed: 450', $this->instance->execute());
 	}

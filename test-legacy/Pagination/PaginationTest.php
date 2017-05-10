@@ -27,26 +27,26 @@ class PaginationTest extends AbstractBaseTestCase
 	 */
 	public function pageProvider()
 	{
-		return [
-			[
+		return array(
+			array(
 				500,
 				1,
 				10,
 				2,
-				[
+				array(
 					1 => 'current',
 					2 => 'higher',
 					3 => 'higher',
 					4 => 'more',
 					50 => 'last',
-				]
-			],
-			[
+				)
+			),
+			array(
 				500,
 				3,
 				10,
 				2,
-				[
+				array(
 					1 => 'lower',
 					2 => 'lower',
 					3 => 'current',
@@ -54,14 +54,14 @@ class PaginationTest extends AbstractBaseTestCase
 					5 => 'higher',
 					6 => 'more',
 					50 => 'last',
-				]
-			],
-			[
+				)
+			),
+			array(
 				500,
 				10,
 				10,
 				2,
-				[
+				array(
 					1 => 'first',
 					7 => 'less',
 					8 => 'lower',
@@ -71,14 +71,14 @@ class PaginationTest extends AbstractBaseTestCase
 					12 => 'higher',
 					13 => 'more',
 					50 => 'last',
-				]
-			],
-			[
+				)
+			),
+			array(
 				500,
 				48,
 				10,
 				2,
-				[
+				array(
 					1 => 'first',
 					45 => 'less',
 					46 => 'lower',
@@ -86,9 +86,9 @@ class PaginationTest extends AbstractBaseTestCase
 					48 => 'current',
 					49 => 'higher',
 					50 => 'higher',
-				]
-			],
-		];
+				)
+			),
+		);
 	}
 
 	/**
@@ -141,7 +141,7 @@ HTML;
 
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
-		$html = $renderer->render('windwalker.pagination.test', ['pagination' => $pagination->getResult()]);
+		$html = $renderer->render('windwalker.pagination.test', array('pagination' => $pagination->getResult()));
 
 		$this->assertStringDataEquals($compare, $html);
 

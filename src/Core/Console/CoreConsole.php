@@ -228,7 +228,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 *
 	 * @since   2.0
 	 */
-	public function triggerEvent($event, $args = [])
+	public function triggerEvent($event, $args = array())
 	{
 		/** @var \Windwalker\Event\Dispatcher $dispatcher */
 		$dispatcher = $this->container->get('dispatcher');
@@ -402,10 +402,10 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 			return $this->container->get($diMapping[$name]);
 		}
 
-		$allowNames = [
+		$allowNames = array(
 			'container',
 			'config'
-		];
+		);
 
 		if (in_array($name, $allowNames))
 		{

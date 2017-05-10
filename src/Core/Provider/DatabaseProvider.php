@@ -37,14 +37,14 @@ class DatabaseProvider implements ServiceProviderInterface
 			/** @var Structure $config */
 			$config = $container->get('config');
 
-			$option = [
+			$option = array(
 				'driver'   => $config->get('database.driver', 'mysql'),
 				'host'     => $config->get('database.host', 'localhost'),
 				'user'     => $config->get('database.user', 'root'),
 				'password' => $config->get('database.password', ''),
 				'database' => $config->get('database.name'),
 				'prefix'   => $config->get('database.prefix', 'wind_'),
-			];
+			);
 
 			return DatabaseFactory::getDbo($option['driver'], $option);
 		};

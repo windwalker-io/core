@@ -131,17 +131,17 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function splitPackageProvider()
 	{
-		return [
-			[
+		return array(
+			array(
 				'sakura', null, 'sakura'
-			],
-			[
+			),
+			array(
 				'flower@sakura', 'flower', 'sakura'
-			],
-			[
+			),
+			array(
 				'flower@', 'flower', null
-			],
-		];
+			),
+		);
 	}
 
 	/**
@@ -171,11 +171,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 		$this->instance->addNamespace('flower\rose', Priority::HIGH);
 		$this->instance->addNamespace('flower\lily', Priority::NORMAL);
 
-		$expected = [
+		$expected = array(
 			'Flower\Rose',
 			'Flower\Lily',
 			'Flower\Sakura',
-		];
+		);
 
 		$this->assertEquals($expected, $this->instance->dumpNamespaces());
 	}
@@ -196,11 +196,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertSame($queue, $this->instance->getNamespaces());
 
-		$this->instance->setNamespaces(['foo', 'bar']);
+		$this->instance->setNamespaces(array('foo', 'bar'));
 
 		$this->assertTrue($this->instance->getNamespaces() instanceof PriorityQueue);
 
-		$this->assertEquals(['foo', 'bar'], $this->instance->dumpNamespaces());
+		$this->assertEquals(array('foo', 'bar'), $this->instance->dumpNamespaces());
 	}
 
 	/**
@@ -224,11 +224,11 @@ class ControllerResolverTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function normaliseProvider()
 	{
-		return [
-			['Flower\Sakura/GetController'],
-			['flower/sakura/getController'],
-			['flower.sakura.GetController']
-		];
+		return array(
+			array('Flower\Sakura/GetController'),
+			array('flower/sakura/getController'),
+			array('flower.sakura.GetController')
+		);
 	}
 
 	/**

@@ -18,7 +18,7 @@ use Windwalker\Dom\HtmlElement;
  *
  * @method  static  boolean      validate($justDie = false, $message = 'Invalid Token')  {@throws  Exception\InvalidTokenException}
  * @method  static  boolean      checkToken($userId = null, $method = null)
- * @method  static  HtmlElement  input($userId = null, $attribs = [])
+ * @method  static  HtmlElement  input($userId = null, $attribs = array())
  * @method  static  string       createToken($length = 12)
  * @method  static  string       getToken($forceNew = false)
  * @method  static  string       getFormToken($userId = null, $forceNew = false)

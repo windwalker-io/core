@@ -28,7 +28,7 @@ class MysqlExporter extends AbstractExporter
 	{
 		$tables = $this->db->getDatabase()->getTables(true);
 
-		$sql = [];
+		$sql = array();
 
 		foreach ($tables as $table)
 		{
@@ -95,7 +95,7 @@ class MysqlExporter extends AbstractExporter
 			return null;
 		}
 
-		$sql = [];
+		$sql = array();
 
 		foreach ($iterator as $data)
 		{

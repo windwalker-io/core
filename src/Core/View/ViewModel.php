@@ -106,7 +106,7 @@ class ViewModel implements \ArrayAccess
 
 		$method = 'get' . ucfirst($name);
 
-		if (!is_callable([$model, $method]))
+		if (!is_callable(array($model, $method)))
 		{
 			return null;
 		}
@@ -134,7 +134,7 @@ class ViewModel implements \ArrayAccess
 
 		$method = 'load' . ucfirst($name);
 
-		if (!is_callable([$model, $method]))
+		if (!is_callable(array($model, $method)))
 		{
 			return null;
 		}

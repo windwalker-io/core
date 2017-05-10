@@ -45,16 +45,14 @@ class ValidateFailExceptionTest extends AbstractBaseTestCase
 
 		$this->assertEquals('foo', $e->getMessage());
 
-		$e = new ValidateFailException(['a', 'b']);
+		$e = new ValidateFailException(array('a', 'b'));
 
 		$this->assertStringSafeEquals("a\nb", $e->getMessage());
 
-		$e = new ValidateFailException(
-			[
-			['a', 'b'],
-			['c', 'd']
-			]
-		);
+		$e = new ValidateFailException(array(
+			array('a', 'b'),
+			array('c', 'd')
+		));
 
 		$this->assertStringSafeEquals("a\nb\nc\nd", $e->getMessage());
 	}

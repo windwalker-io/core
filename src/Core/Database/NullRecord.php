@@ -32,7 +32,7 @@ class NullRecord extends Record
 	 *
 	 * @var  array
 	 */
-	protected $fields = [];
+	protected $fields = array();
 
 	/**
 	 * Object constructor to set table and key fields.  In most cases this will

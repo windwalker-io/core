@@ -17,11 +17,11 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  *
  * @see  RendererManager
  *
- * @method  static  AbstractRenderer|CoreRendererInterface  getRenderer($type = RendererManager::ENGINE_PHP, $config = [])
- * @method  static  PhpRenderer      getPhpRenderer($config = [])
- * @method  static  BladeRenderer    getBladeRenderer($config = [])
- * @method  static  EdgeRenderer     getEdgeRenderer($config = [])
- * @method  static  TwigRenderer     getTwigRenderer($config = [])
+ * @method  static  AbstractRenderer|CoreRendererInterface  getRenderer($type = RendererManager::ENGINE_PHP, $config = array())
+ * @method  static  PhpRenderer      getPhpRenderer($config = array())
+ * @method  static  BladeRenderer    getBladeRenderer($config = array())
+ * @method  static  EdgeRenderer     getEdgeRenderer($config = array())
+ * @method  static  TwigRenderer     getTwigRenderer($config = array())
  * @method  static  PriorityQueue    getGlobalPaths()
  * @method  static  RendererManager  addGlobalPath($path, $priority = PriorityQueue::LOW)
  * @method  static  RendererManager  addPath($path, $priority = PriorityQueue::LOW)

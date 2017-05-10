@@ -18,10 +18,10 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * 
  * @see  CacheManager
  * 
- * @method  static  CacheInterface  getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
- * @method  static  CacheInterface  create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
+ * @method  static  CacheInterface  getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
+ * @method  static  CacheInterface  create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = array())
  * @method  static  CacheInterface  getGlobal($forceNew = false)
- * @method  static  CacheItemPoolInterface  getStorage($storage, $options = [], $name = 'windwalker')
+ * @method  static  CacheItemPoolInterface  getStorage($storage, $options = array(), $name = 'windwalker')
  * @method  static  SerializerInterface     getSerializer($serializer)
  * @method  static  boolean       ignoreGlobal($bool = null)
  * @method  static  string        getCacheClass()

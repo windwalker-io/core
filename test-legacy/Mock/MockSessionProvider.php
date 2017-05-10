@@ -34,7 +34,7 @@ class MockSessionProvider implements ServiceProviderInterface
 
 		$closure = function(Container $container) use ($self)
 		{
-			$sesion = new Session(new NativeHandler, null, null, new MockArrayBridge, []);
+			$sesion = new Session(new NativeHandler, null, null, new MockArrayBridge, array());
 
 			return $sesion;
 		};

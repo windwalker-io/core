@@ -409,6 +409,23 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	}
 
 	/**
+	 * getMessages
+	 *
+	 * @param bool $clear
+	 *
+	 * @return  array
+	 */
+	public function getMessages($clear = false)
+	{
+		if ($clear)
+		{
+			return $this->session->getFlashBag()->takeAll();
+		}
+
+		return $this->session->getFlashBag()->all();
+	}
+
+	/**
 	 * clearMessage
 	 *
 	 * @return  static
@@ -448,12 +465,11 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function redirect($url, $code = 303)
 	{
-		$this->triggerEvent('onBeforeRedirect', [
+		$this->triggerEvent('onBeforeRedirect', array(
 			'app'  => $this,
 			'url'  => &$url,
 			'code' => &$code
-		]
-		);
+		));
 
 		parent::redirect($url, $code);
 	}
@@ -513,9 +529,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			return $this->container->get($diMapping[$name]);
 		}
 
-		$allowNames = [
+		$allowNames = array(
 			'container',
-		];
+		);
 
 		if (in_array($name, $allowNames))
 		{

@@ -53,7 +53,7 @@ abstract class DebuggerHelper extends AbstractFacade
 
 		if ($data === null)
 		{
-			$data = [];
+			$data = array();
 		}
 
 		if (is_array($value) || is_object($value))
@@ -105,7 +105,7 @@ abstract class DebuggerHelper extends AbstractFacade
 
 		if ($data === null)
 		{
-			$data = [];
+			$data = array();
 		}
 
 		$data[] = [

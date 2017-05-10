@@ -15,7 +15,7 @@ use Windwalker\Record\Record;
  * The RecordResolver class.
  *
  * @method  static  Record  create($name, ...$args)
- * @method  static  Record  getInstance($name, $args = [], $forceNew = false)
+ * @method  static  Record  getInstance($name, $args = array(), $forceNew = false)
  *
  * @since  1.0
  */

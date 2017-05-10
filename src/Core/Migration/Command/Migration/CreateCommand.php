@@ -93,7 +93,7 @@ class CreateCommand extends AbstractCommand
 		// Get template
 		$tmpl = file_get_contents(__DIR__ . '/../../../Resources/Templates/migration/migration.php.dist');
 
-		$tmpl = SimpleTemplate::render($tmpl, ['version' => $date, 'className' => ucfirst($name)]);
+		$tmpl = SimpleTemplate::render($tmpl, array('version' => $date, 'className' => ucfirst($name)));
 
 		// Get file path
 		$filePath = $this->console->get('migration.dir') . '/' . $file;

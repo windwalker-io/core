@@ -116,7 +116,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 *
 	 * @throws  AuthenticateFailException
 	 */
-	public function login($user, $remember = false, $options = [])
+	public function login($user, $remember = false, $options = array())
 	{
 		if (!is_array($user) && !is_object($user))
 		{
@@ -256,7 +256,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 * @return  UserDataInterface
 	 * @throws \LogicException
 	 */
-	public function getUser($conditions = [])
+	public function getUser($conditions = array())
 	{
 		$user = $this->getHandler()->load($conditions);
 
@@ -275,7 +275,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 *
 	 * @return  UserDataInterface
 	 */
-	public function get($conditions = [])
+	public function get($conditions = array())
 	{
 		return $this->getUser($conditions);
 	}
@@ -289,7 +289,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	 * @throws \Exception
 	 * @return  UserDataInterface
 	 */
-	public function save($user = [], $options = [])
+	public function save($user = array(), $options = array())
 	{
 		if (!is_array($user) && !is_object($user))
 		{
@@ -303,7 +303,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 
 		$options = ($options instanceof Structure) ? $options : new Structure($options);
 
-		$this->triggerEvent('onUserBeforeSave', ['user' => $user, 'options' => &$options]);
+		$this->triggerEvent('onUserBeforeSave', array('user' => $user, 'options' => &$options));
 
 		try
 		{
@@ -311,12 +311,12 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 		}
 		catch (\Exception $e)
 		{
-			$this->triggerEvent('onUserSaveFailure', ['user' => $user, 'exception' => $e, 'options' => $options]);
+			$this->triggerEvent('onUserSaveFailure', array('user' => $user, 'exception' => $e, 'options' => $options));
 
 			throw $e;
 		}
 
-		$this->triggerEvent('onUserAfterSave', ['user' => $user, 'options' => $options]);
+		$this->triggerEvent('onUserAfterSave', array('user' => $user, 'options' => $options));
 
 		return $user;
 	}
@@ -333,7 +333,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 	{
 		$options = ($options instanceof Structure) ? $options : new Structure($options);
 
-		$this->triggerEvent('onUserBeforeDelete', ['conditions' => &$conditions, 'options' => &$options]);
+		$this->triggerEvent('onUserBeforeDelete', array('conditions' => &$conditions, 'options' => &$options));
 
 		try
 		{
@@ -341,12 +341,12 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 		}
 		catch (\Exception $e)
 		{
-			$this->triggerEvent('onUserDeleteFailure', ['conditions' => $conditions, 'exception' => $e, 'options' => $options]);
+			$this->triggerEvent('onUserDeleteFailure', array('conditions' => $conditions, 'exception' => $e, 'options' => $options));
 
 			return false;
 		}
 
-		$this->triggerEvent('onUserAfterDelete', ['conditions' => $conditions, 'options' => $options]);
+		$this->triggerEvent('onUserAfterDelete', array('conditions' => $conditions, 'options' => $options));
 
 		return true;
 	}

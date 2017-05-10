@@ -55,14 +55,14 @@ class DatabaseHtmlView extends AbstractDebuggerHtmlView
 
 		$query = preg_replace($newlineKeywords, '<br />&#160;&#160;\\0', $query);
 
-		$regex = [
+		$regex = array(
 			'/(=)/'
 			=> '<strong class="text-error">$1</strong>',
 
 			// All uppercase words have a special meaning.
 			'/(?<!\w|>)([A-Z_]{2,})(?!\w)/x'
 			=> '<span class="text-info">$1</span>'
-		];
+		);
 
 		$query = preg_replace(array_keys($regex), array_values($regex), $query);
 

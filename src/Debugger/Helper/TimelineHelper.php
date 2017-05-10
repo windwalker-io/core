@@ -58,7 +58,7 @@ class TimelineHelper
 	 */
 	public static function getPoints(array $points, $tag = null)
 	{
-		$set = [];
+		$set = array();
 
 		foreach ($points as $point)
 		{
@@ -95,7 +95,7 @@ class TimelineHelper
 		$profiler = new Profiler('system', null, $set);
 
 		// Prepare timeline data
-		$timeline = [];
+		$timeline = array();
 
 		$lastName = 'start';
 
@@ -113,13 +113,13 @@ class TimelineHelper
 
 			$memory['value'] = $profiler->getMemoryBetween($lastName, $name) / 1048576;
 
-			$timeline[$name] = [
+			$timeline[$name] = array(
 				'total_time'   => $totalTime,
 				'time'         => $time,
 				'total_memory' => $totalMemory,
 				'memory'       => $memory,
 				'data'         => $point->getData()
-			];
+			);
 
 			$lastName = $name;
 			$fullTime = $totalTime['value'];
@@ -134,14 +134,14 @@ class TimelineHelper
 			$item['memory']['style']       = TimelineHelper::getStateColor($item['memory']['value'], $fullMemory / count($set));
 		}
 
-		return [
+		return array(
 			'tag'         => $tag,
 			'timeline'    => $timeline,
 			'full_time'   => $fullTime,
 			'avg_time'    => $fullTime / count($set),
 			'full_memory' => $fullMemory,
 			'avg_memory'  => $fullMemory / count($set)
-		];
+		);
 	}
 
 	/**
@@ -159,7 +159,7 @@ class TimelineHelper
 		}
 
 		// Prepare timeline data
-		$timeline = [];
+		$timeline = array();
 
 		foreach ($queries as $i => $data)
 		{
@@ -169,11 +169,11 @@ class TimelineHelper
 			$memory['value'] = abs($data['memory']['start'] - $data['memory']['end']) / 1048576;
 			$memory['style'] = static::getStateColor($memory['value'], 0.01);
 
-			$timeline[$data['serial']] = [
+			$timeline[$data['serial']] = array(
 				'time'   => $time,
 				'memory' => $memory,
 				'data'   => $data
-			];
+			);
 		}
 
 		return $timeline;

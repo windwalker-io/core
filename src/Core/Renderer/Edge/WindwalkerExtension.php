@@ -138,7 +138,11 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	 */
 	public function messages($expression)
 	{
-		return "<?php echo \$widget->render('windwalker.message.default', array('messages' => \$messages), 'php', \$package) ?>";
+		$expression = trim(static::stripParentheses($expression));
+
+		$expression = $expression ? ', ' . $expression : '';
+
+		return "<?php echo \\Windwalker\\Core\\Message\\MessageHelper::render(\$widget{$expression}) ?>";
 	}
 
 	/**
@@ -247,5 +251,22 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function formToken($expression)
 	{
 		return "<?php echo \$package->csrf->input{$expression} ?>";
+	}
+
+	/**
+	 * Strip the parentheses from the given expression.
+	 *
+	 * @param  string $expression
+	 *
+	 * @return string
+	 */
+	public static function stripParentheses($expression)
+	{
+		if (strpos($expression, '(') === 0)
+		{
+			$expression = substr($expression, 1, -1);
+		}
+
+		return $expression;
 	}
 }

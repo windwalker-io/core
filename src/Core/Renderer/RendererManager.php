@@ -71,7 +71,7 @@ class RendererManager
 	 * @param PackageFinder $finder
 	 * @param array         $paths
 	 */
-	public function __construct(Config $config, PackageFinder $finder, $paths = [])
+	public function __construct(Config $config, PackageFinder $finder, $paths = array())
 	{
 		$this->config = $config;
 		$this->finder = $finder;
@@ -91,7 +91,7 @@ class RendererManager
 	 * @return  AbstractRenderer|CoreRendererInterface
 	 * @since   2.0
 	 */
-	public function getRenderer($type = self::PHP, $config = [])
+	public function getRenderer($type = self::PHP, $config = array())
 	{
 		$type = strtolower($type);
 
@@ -149,7 +149,7 @@ class RendererManager
 	 *
 	 * @since   2.0
 	 */
-	public function getPhpRenderer($config = [])
+	public function getPhpRenderer($config = array())
 	{
 		return $this->getRenderer(static::PHP, $config);
 	}
@@ -163,7 +163,7 @@ class RendererManager
 	 *
 	 * @since   2.0
 	 */
-	public function getBladeRenderer($config = [])
+	public function getBladeRenderer($config = array())
 	{
 		return $this->getRenderer(static::BLADE, $config);
 	}
@@ -177,7 +177,7 @@ class RendererManager
 	 *
 	 * @since   3.0
 	 */
-	public function getEdgeRenderer($config = [])
+	public function getEdgeRenderer($config = array())
 	{
 		return $this->getRenderer(static::EDGE, $config);
 	}
@@ -191,7 +191,7 @@ class RendererManager
 	 *
 	 * @since   2.0
 	 */
-	public function getTwigRenderer($config = [])
+	public function getTwigRenderer($config = array())
 	{
 		return $this->getRenderer(static::TWIG, $config);
 	}
@@ -205,7 +205,7 @@ class RendererManager
 	 *
 	 * @since   2.0
 	 */
-	public function getMustacheRenderer($config = [])
+	public function getMustacheRenderer($config = array())
 	{
 		return $this->getRenderer(static::MUSTACHE, $config);
 	}

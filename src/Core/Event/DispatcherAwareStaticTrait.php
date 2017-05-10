@@ -33,7 +33,7 @@ trait DispatcherAwareStaticTrait
 	 *
 	 * @return  mixed
 	 */
-	public static function triggerEvent($event, $args = [])
+	public static function triggerEvent($event, $args = array())
 	{
 		static::getDispatcher()->triggerEvent($event, $args);
 	}

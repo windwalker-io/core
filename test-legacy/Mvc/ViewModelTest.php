@@ -72,7 +72,7 @@ class ViewModelTest extends AbstractBaseTestCase
 		$view = new PhpHtmlView;
 
 		$model = new StubModel;
-		$model->setConfig(new Structure(['name' => 'foo']));
+		$model->setConfig(new Structure(array('name' => 'foo')));
 		$view->setModel($model);
 
 		$this->assertTrue($view->getModel() instanceof StubModel);
@@ -105,7 +105,7 @@ class ViewModelTest extends AbstractBaseTestCase
 
 		$this->assertEquals('Item', $this->view->model->getItem());
 		$this->assertEquals('Item', $this->view->model->get('Item'));
-		$this->assertEquals([1,2,3,4], $this->view->model->getList());
+		$this->assertEquals(array(1,2,3,4), $this->view->model->getList());
 		$this->assertEquals(null, $this->view->model->getData());
 		$this->assertEquals(null, $this->view->model->loadData());
 		$this->assertEquals(null, $this->view->model->load('Data'));

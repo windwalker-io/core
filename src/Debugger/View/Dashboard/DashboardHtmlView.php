@@ -37,7 +37,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 			$collector = $item['collector'];
 
 			$item->url  = $collector['system.uri.full'];
-			$item->link = $router->route('system', ['id' => $item->id]);
+			$item->link = $router->route('system', array('id' => $item->id));
 			$item->method = $collector['system.method.custom'] ? : $collector['system.method.http'];
 			$item->ip   = $collector['system.ip'];
 			$item->time = $collector['system.time'];
@@ -48,7 +48,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
 			{
 				$item->status_style = 'label label-success';
 			}
-			elseif (in_array($item->status, [301, 302, 303]))
+			elseif (in_array($item->status, array(301, 302, 303)))
 			{
 				$item->status_style = 'label label-warning';
 			}

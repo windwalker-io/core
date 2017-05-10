@@ -23,7 +23,7 @@
 
 	<!-- VERSION -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('system', ['id' => $collector['id']]); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('system', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
 					V <?php echo $this->escape($collector['windwalker.version.framework']); ?>
@@ -34,7 +34,7 @@
 
 	<!-- METHOD -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('request', ['id' => $collector['id']]); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('request', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge">
 					<?php echo $this->escape($collector['system.method.custom'] ? : $collector['system.method.http']); ?>
@@ -56,7 +56,7 @@
 
 	<!-- ROUTING -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('routing', ['id' => $collector['id']]); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('routing', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
 					<?php echo $this->escape($collector['system.http.status']); ?>
@@ -90,7 +90,7 @@
 
 	<!-- TIME -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', ['id' => $collector['id']]); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $timeStyle; ?>">
 					Time: <?php echo $this->escape(round($time, 2)); ?> ms
@@ -101,7 +101,7 @@
 
 	<!-- MEMORY -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', ['id' => $collector['id']]); ?>">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('timeline', array('id' => $collector['id'])); ?>">
 			<div class="windwalker-debugger-block-inner">
 				<span class="windwalker-debugger-badge windwalker-debugger-color-<?php echo $memoryStyle; ?>">
 					Memory: <?php echo $this->escape(round($memory, 2)); ?> MB
@@ -112,7 +112,7 @@
 
     <!-- MESSAGES -->
     <div class="windwalker-debugger-block">
-        <a class="windwalker-debugger-link" href="<?php echo $router->route('system', ['id' => $collector['id']]); ?>">
+        <a class="windwalker-debugger-link" href="<?php echo $router->route('system', array('id' => $collector['id'])); ?>">
             <div class="windwalker-debugger-block-inner">
                 Messages
                 <span class="windwalker-debugger-badge">
@@ -155,7 +155,7 @@
 
 	<!-- DATABASE -->
 	<div class="windwalker-debugger-block">
-		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', ['id' => $collector['id']]); ?>#queries">
+		<a class="windwalker-debugger-link" href="<?php echo $router->route('database', array('id' => $collector['id'])); ?>#queries">
 			<div class="windwalker-debugger-block-inner">
 				Queries
 				<span class="windwalker-debugger-badge">

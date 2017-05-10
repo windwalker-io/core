@@ -76,7 +76,7 @@ class ConsoleHelper
 	 *
 	 * @return  Response
 	 */
-	public static function executeWeb(Request $request, $config = [], $appClass = 'Windwalker\Web\Application')
+	public static function executeWeb(Request $request, $config = array(), $appClass = 'Windwalker\Web\Application')
 	{
 		$profile = Ioc::getProfile();
 
@@ -119,7 +119,7 @@ class ConsoleHelper
 	 *
 	 * @return Response
 	 */
-	public static function executePackage($package, $task, Request $request, $config = [], $appClass = 'Windwalker\Web\Application')
+	public static function executePackage($package, $task, Request $request, $config = array(), $appClass = 'Windwalker\Web\Application')
 	{
 		$profile = Ioc::getProfile();
 

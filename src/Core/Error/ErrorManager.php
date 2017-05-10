@@ -44,7 +44,7 @@ class ErrorManager
 	 *
 	 * @var  array
 	 */
-	protected $constants = [
+	protected $constants = array(
 		E_ERROR           => 'E_ERROR',
 		E_WARNING         => 'E_WARNING',
 		E_PARSE           => 'E_PARSE',
@@ -60,7 +60,7 @@ class ErrorManager
 		E_DEPRECATED      => 'E_DEPRECATED',
 		E_USER_DEPRECATED => 'E_USER_DEPRECATED',
 		E_ALL             => 'E_ALL'
-	];
+	);
 
 	/**
 	 * ErrorManager constructor.
@@ -185,7 +185,7 @@ class ErrorManager
 	{
 		$renderer = $this->app->renderer->getPhpRenderer();
 
-		$body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'), ['exception' => $exception]);
+		$body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'), array('exception' => $exception));
 
 		$this->app->server->getOutput()->respond(new HtmlResponse($body, $exception->getCode() ? : 500));
 	}

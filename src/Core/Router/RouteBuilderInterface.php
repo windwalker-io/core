@@ -28,7 +28,7 @@ interface RouteBuilderInterface
 	 *
 	 * @return string
 	 */
-	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH);
+	public function route($route, $queries = array(), $type = MainRouter::TYPE_PATH);
 
 	/**
 	 * fullRoute

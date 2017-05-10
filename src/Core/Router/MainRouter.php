@@ -42,7 +42,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 *
 	 * @var  array
 	 */
-	protected $suffixMap = [
+	protected $suffixMap = array(
 		'GET'     => 'GetController',
 		'POST'    => 'SaveController',
 		'PUT'     => 'SaveController',
@@ -50,7 +50,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		'DELETE'  => 'DeleteController',
 		'HEAD'    => 'HeadController',
 		'OPTIONS' => 'OptionsController'
-	];
+	);
 
 	/**
 	 * Property controller.
@@ -107,7 +107,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 * @return  string
 	 * @throws \LogicException
 	 */
-	public function build($route, $queries = [], $type = MainRouter::TYPE_RAW)
+	public function build($route, $queries = array(), $type = MainRouter::TYPE_RAW)
 	{
 		if (!$this->hasRoute($route))
 		{
@@ -129,15 +129,14 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			call_user_func($extra['hook']['build'], $this, $route, $queries, $type);
 		}
 
-		$this->triggerEvent('onRouterBeforeRouteBuild', [
+		$this->triggerEvent('onRouterBeforeRouteBuild', array(
 			'route'   => &$route,
 			'queries' => &$queries,
 			'type'    => &$type,
 			'router'  => $this
-		]
-		);
+		));
 
-		$key = $this->getCacheKey([$route, $queries, $type]);
+		$key = $this->getCacheKey(array($route, $queries, $type));
 
 		if ($this->cache->exists($key))
 		{
@@ -147,14 +146,13 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		// Build
 		$url = parent::build($route, $queries);
 
-		$this->triggerEvent('onRouterAfterRouteBuild', [
+		$this->triggerEvent('onRouterAfterRouteBuild', array(
 			'url'     => &$url,
 			'route'   => &$route,
 			'queries' => &$queries,
 			'type'    => &$type,
 			'router'  => $this
-		]
-		);
+		));
 
 		$uri = $this->getUri();
 
@@ -187,26 +185,24 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 * @throws \Windwalker\Router\Exception\RouteNotFoundException
 	 * @throws \LogicException
 	 */
-	public function match($rawRoute, $method = 'GET', $options = [])
+	public function match($rawRoute, $method = 'GET', $options = array())
 	{
-		$this->triggerEvent('onRouterBeforeRouteMatch', [
+		$this->triggerEvent('onRouterBeforeRouteMatch', array(
 			'route'   => &$rawRoute,
 			'method'  => &$method,
 			'options' => &$options,
 			'router'  => $this
-		]
-		);
+		));
 
 		$route = parent::match($rawRoute, $method, $options);
 
-		$this->triggerEvent('onRouterAfterRouteMatch', [
+		$this->triggerEvent('onRouterAfterRouteMatch', array(
 			'route'   => &$rawRoute,
 			'matched' => $route,
 			'method'  => &$method,
 			'options' => &$options,
 			'router'  => $this
-		]
-		);
+		));
 
 		$extra = $route->getExtraValues();
 
@@ -218,7 +214,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		}
 
 		// Suffix
-		$suffix = $this->fetchControllerSuffix($method, ArrayHelper::getValue($extra, 'action', []));
+		$suffix = $this->fetchControllerSuffix($method, ArrayHelper::getValue($extra, 'action', array()));
 
 		$suffix = '\\' . $suffix;
 
@@ -273,7 +269,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 *
 	 * @since   2.0
 	 */
-	public function fetchControllerSuffix($method = 'GET', $customSuffix = [])
+	public function fetchControllerSuffix($method = 'GET', $customSuffix = array())
 	{
 		$method = strtoupper($method);
 
@@ -349,8 +345,8 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		}
 
 		$pattern = ArrayHelper::getValue($route, 'pattern');
-		$variables = ArrayHelper::getValue($route, 'variables', []);
-		$allowMethods = ArrayHelper::getValue($route, 'method', []);
+		$variables = ArrayHelper::getValue($route, 'variables', array());
+		$allowMethods = ArrayHelper::getValue($route, 'method', array());
 
 		if (isset($route['controller']))
 		{
@@ -631,7 +627,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 *
 	 * @since   2.0
 	 */
-	public function addListener($listener, $priorities = [])
+	public function addListener($listener, $priorities = array())
 	{
 		$this->getDispatcher()->addListener($listener, $priorities);
 
@@ -649,7 +645,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	 */
 	public function listen($event, $callable, $priority = ListenerPriority::NORMAL)
 	{
-		$this->addListener($callable, [$event => $priority]);
+		$this->addListener($callable, array($event => $priority));
 
 		return $this;
 	}

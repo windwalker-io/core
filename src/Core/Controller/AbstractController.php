@@ -273,10 +273,9 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			$this->prepareExecute();
 
 			// @ before event
-			$this->triggerEvent('onControllerBeforeExecute', [
+			$this->triggerEvent('onControllerBeforeExecute', array(
 				'controller' => $this
-			]
-			);
+			));
 
 			// Prepare the last middleware, the last middleware is the real logic of this controller self.
 			$chain = $this->getMiddlewareChain()->setEndMiddleware(function ()
@@ -291,11 +290,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			$result = $this->postExecute($result);
 
 			// @ post event
-			$this->triggerEvent('onControllerAfterExecute', [
+			$this->triggerEvent('onControllerAfterExecute', array(
 				'controller' => $this,
 				'result'     => &$result
-			]
-			);
+			));
 		}
 		catch (ValidateFailException $e)
 		{
@@ -353,7 +351,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 */
 	protected function delegate($task, ...$args)
 	{
-		if (is_callable([$this, $task]))
+		if (is_callable(array($this, $task)))
 		{
 			return $this->$task(...$args);
 		}
@@ -377,7 +375,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 * @return string
 	 * @throws \LogicException
 	 */
-	public function renderView($view, $layout = 'default', $engine = 'php', array $data = [])
+	public function renderView($view, $layout = 'default', $engine = 'php', array $data = array())
 	{
 		if (is_string($view))
 		{
@@ -556,7 +554,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					$class = $this->getPackage()->getMvcResolver()->getModelResolver()->resolve($modelName);
 
 					// Create object by container, container will auto inject all necessary dependencies
-					return $container->createSharedObject($class, ['source' => $source, 'config' => $config]);
+					return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
 				}
 				catch (\Exception $e)
 				{
@@ -570,7 +568,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 					
 					if (class_exists($class))
 					{
-						return $container->createSharedObject($class, ['source' => $source, 'config' => $config]);
+						return $container->createSharedObject($class, array('source' => $source, 'config' => $config));
 					}
 
 					$config['name'] = $name;
@@ -593,7 +591,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @return static
 	 */
-	public function setRedirect($url, $code = 303, array $headers = [])
+	public function setRedirect($url, $code = 303, array $headers = array())
 	{
 		$this->response = new RedirectResponse($url, $code, $headers ? : $this->response->getHeaders());
 
@@ -980,7 +978,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @since   2.0
 	 */
-	public function triggerEvent($event, $args = [])
+	public function triggerEvent($event, $args = array())
 	{
 		$container = $this->getContainer();
 

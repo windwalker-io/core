@@ -76,7 +76,7 @@ class WidgetTest extends AbstractBaseTestCase
 
 		$widget = new Widget('widget.test');
 
-		$this->assertEquals('Flower: Sakura', trim($widget->render(['flower' => 'Sakura'])));
+		$this->assertEquals('Flower: Sakura', trim($widget->render(array('flower' => 'Sakura'))));
 	}
 
 	/**

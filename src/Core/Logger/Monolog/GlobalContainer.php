@@ -22,14 +22,14 @@ abstract class GlobalContainer
 	 *
 	 * @var  HandlerInterface[]
 	 */
-	protected static $handlers = [];
+	protected static $handlers = array();
 
 	/**
 	 * Property processors.
 	 *
 	 * @var  object[]
 	 */
-	protected static $processors = [];
+	protected static $processors = array();
 
 	/**
 	 * addHandler

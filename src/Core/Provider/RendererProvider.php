@@ -130,25 +130,15 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareGlobals(Container $container, RendererManager $manager)
 	{
-		if (static::$messages === null && $container->exists('session'))
-		{
-			/** @var Session $session */
-			$session = $container->get('session');
-
-			$session->start();
-
-			static::$messages = $session->getFlashBag()->takeAll();
-		}
-
-		$globals = [
+		$globals = array(
 			'uri'        => $container->get('uri'),
 			'app'        => $container->get('application'),
 			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
-			'messages'   => static::$messages,
+			'messages'   => [], // Deprecated this variable after 4.0
 			'translator' => $container->exists('language') ? $container->get('language') : null,
 			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
 			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
-		];
+		);
 
 		$manager->setGlobals($globals);
 

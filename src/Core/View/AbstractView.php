@@ -154,11 +154,10 @@ abstract class AbstractView implements \ArrayAccess
 
 		$dispatcher = $this->getPackage()->getDispatcher();
 
-		$dispatcher->triggerEvent('onViewAfterHandleData', [
+		$dispatcher->triggerEvent('onViewAfterHandleData', array(
 			'data' => &$data,
 			'view' => $this
-		]
-		);
+		));
 
 		return $this;
 	}
@@ -245,22 +244,20 @@ abstract class AbstractView implements \ArrayAccess
 
 		$dispatcher = $this->getPackage()->getDispatcher();
 
-		$dispatcher->triggerEvent('onViewBeforeRender', [
+		$dispatcher->triggerEvent('onViewBeforeRender', array(
 			'data' => $this->data,
 			'view' => $this
-		]
-		);
+		));
 
 		$output = $this->doRender($data);
 
 		$output = $this->postRender($output);
 
-		$dispatcher->triggerEvent('onViewAfterRender', [
+		$dispatcher->triggerEvent('onViewAfterRender', array(
 			'data'   => $this->data,
 			'view'   => $this,
 			'output' => &$output
-		]
-		);
+		));
 
 		return $output;
 	}
@@ -612,7 +609,7 @@ abstract class AbstractView implements \ArrayAccess
 
 		$name = StringNormalise::toCamelCase($name);
 
-		if (is_callable([$this, $name]))
+		if (is_callable(array($this, $name)))
 		{
 			return $this->$name(...$args);
 		}

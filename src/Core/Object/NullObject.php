@@ -114,7 +114,7 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
 	 */
 	public function getIterator()
 	{
-		return new \ArrayIterator([]);
+		return new \ArrayIterator(array());
 	}
 
 	/**

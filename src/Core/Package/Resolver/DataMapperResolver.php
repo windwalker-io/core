@@ -15,7 +15,7 @@ use Windwalker\DataMapper\DataMapper;
  * The DataMapperResolver class.
  *
  * @method  static  DataMapper  create($name, ...$args)
- * @method  static  DataMapper  getInstance($name, $args = [], $forceNew = false)
+ * @method  static  DataMapper  getInstance($name, $args = array(), $forceNew = false)
  *
  * @since  1.0
  */

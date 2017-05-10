@@ -251,11 +251,11 @@ LOG;
 
 		$end = time();
 
-		$this['log.' . $migrationItem['id']] = [
+		$this['log.' . $migrationItem['id']] = array(
 			'id' => $migrationItem['id'],
 			'direction' => $direction,
 			'name' => $migrationItem['name']
-		];
+		);
 
 		$this->storeVersion($migrationItem, $direction, $start, $end);
 	}

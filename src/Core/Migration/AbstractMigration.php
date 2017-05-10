@@ -92,7 +92,7 @@ abstract class AbstractMigration
 	 *
 	 * @return AbstractTable
 	 */
-	public function createTable($name, callable $callback, $ifNotExists = true, $options = [])
+	public function createTable($name, callable $callback, $ifNotExists = true, $options = array())
 	{
 		return $this->getTable($name)->create($callback, $ifNotExists, $options);
 	}
@@ -120,7 +120,7 @@ abstract class AbstractMigration
 	 *
 	 * @return AbstractTable
 	 */
-	public function saveTable($name, callable $callback, $ifNotExists = true, $options = [])
+	public function saveTable($name, callable $callback, $ifNotExists = true, $options = array())
 	{
 		return $this->getTable($name)->save($callback, $ifNotExists, $options);
 	}

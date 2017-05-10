@@ -91,7 +91,7 @@ class UserProvider implements ServiceProviderInterface
 		}
 
 		/** @var EventDispatcher $dispatcher */
-		$this->dispatcher->triggerEvent('onLoadAuthenticationMethods', ['auth' => $auth]);
+		$this->dispatcher->triggerEvent('onLoadAuthenticationMethods', array('auth' => $auth));
 
 		return $auth;
 	}
@@ -134,7 +134,7 @@ class UserProvider implements ServiceProviderInterface
 		}
 
 		/** @var EventDispatcher $dispatcher */
-		$this->dispatcher->triggerEvent('onLoadAuthorisationPolicies', ['auth' => $auth]);
+		$this->dispatcher->triggerEvent('onLoadAuthorisationPolicies', array('auth' => $auth));
 
 		return $auth;
 	}

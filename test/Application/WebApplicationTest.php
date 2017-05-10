@@ -62,7 +62,7 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
 			'/flower/index.php'
 		));
 
-		$uriExpected = [
+		$uriExpected = array(
 			'full'    => 'http://windwalker.io/flower/sakura/new',
 			'current' => 'http://windwalker.io/flower/sakura/new',
 			'script'  => 'index.php',
@@ -70,7 +70,7 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
 			'route'   => 'sakura/new',
 			'host'    => 'http://windwalker.io',
 			'path'    => '/flower',
-		];
+		);
 
 		$app->boot();
 

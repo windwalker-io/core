@@ -47,7 +47,7 @@ class ProfilerProvider implements ServiceProviderInterface
 			{
 				$profiler = new Profiler('windwalker');
 
-				$profiler->setPoint(new Point('start', $config['execution.start'] ? : microtime(true), $config['execution.memory'] ? : memory_get_usage(true), ['tag' => 'system.process']));
+				$profiler->setPoint(new Point('start', $config['execution.start'] ? : microtime(true), $config['execution.memory'] ? : memory_get_usage(true), array('tag' => 'system.process')));
 
 				return $profiler;
 			}
@@ -100,14 +100,14 @@ class ProfilerProvider implements ServiceProviderInterface
 			return;
 		}
 
-		static $queryData = [];
+		static $queryData = array();
 
 		$collector = $container->get('debugger.collector');
 
 		$collector['database.query.times'] = 0;
 		$collector['database.query.total.time'] = 0;
 		$collector['database.query.total.memory'] = 0;
-		$collector['database.queries'] = [];
+		$collector['database.queries'] = array();
 
 		/** @var AbstractDatabaseDriver $db */
 		$db = $container->get('database');
@@ -123,11 +123,11 @@ class ProfilerProvider implements ServiceProviderInterface
 
 				$collector['database.query.times'] = $collector['database.query.times'] + 1;
 
-				$queryData = [
+				$queryData = array(
 					'serial' => $collector['database.query.times'],
-					'time'   => ['start' => microtime(true)],
-					'memory' => ['start' => memory_get_usage(false)]
-				];
+					'time'   => array('start' => microtime(true)),
+					'memory' => array('start' => memory_get_usage(false))
+				);
 			},
 			function (AbstractDatabaseDriver $db, \stdClass $data) use ($container, $collector, &$queryData)
 			{
