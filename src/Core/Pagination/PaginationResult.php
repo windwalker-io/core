@@ -41,7 +41,7 @@ class PaginationResult
 	 *
 	 * @var  array
 	 */
-	protected $lowers = array();
+	protected $lowers = [];
 
 	/**
 	 * Property current.
@@ -55,7 +55,7 @@ class PaginationResult
 	 *
 	 * @var  array
 	 */
-	protected $highers = array();
+	protected $highers = [];
 
 	/**
 	 * Property next.
@@ -329,7 +329,7 @@ class PaginationResult
 	 */
 	public function getPages()
 	{
-		$pages = array();
+		$pages = [];
 
 		foreach ($this->getLowers() as $lower)
 		{
@@ -358,7 +358,7 @@ class PaginationResult
 	 */
 	public function getAll()
 	{
-		$all = array();
+		$all = [];
 		$pages = $this->getPages();
 
 		if ($this->getFirst() !== null)

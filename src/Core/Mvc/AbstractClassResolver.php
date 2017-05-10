@@ -31,14 +31,14 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 *
 	 * @var  PriorityQueue
 	 */
-	protected $namespaces = array();
+	protected $namespaces = [];
 
 	/**
 	 * Property aliases.
 	 *
 	 * @var  array
 	 */
-	protected $classAliases = array();
+	protected $classAliases = [];
 
 	/**
 	 * Property baseClass.
@@ -54,7 +54,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 * @param Container       $container
 	 * @param array           $namespaces
 	 */
-	public function __construct(AbstractPackage $package, Container $container = null, $namespaces = array())
+	public function __construct(AbstractPackage $package, Container $container = null, $namespaces = [])
 	{
 		$this->container = $container;
 		$this->package   = $package;
@@ -157,7 +157,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
 	 */
 	public static function getDIKey($name)
 	{
-		$name = str_replace(array('/', '\\'), '.', $name);
+		$name = str_replace(['/', '\\'], '.', $name);
 
 		$name = StringNormalise::toDotSeparated($name);
 

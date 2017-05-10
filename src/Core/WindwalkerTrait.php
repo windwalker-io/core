@@ -109,7 +109,7 @@ trait WindwalkerTrait
 
 		$this->registerPackages();
 
-		$this->triggerEvent('onAfterInitialise', array('app' => $this));
+		$this->triggerEvent('onAfterInitialise', ['app' => $this]);
 
 		$this->booted = true;
 	}
@@ -234,17 +234,17 @@ trait WindwalkerTrait
 		$listeners = (array) $this->get('listeners');
 		$dispatcher = $this->getDispatcher();
 
-		$defaultOptions = array(
+		$defaultOptions = [
 			'class'    => '',
 			'priority' => ListenerPriority::NORMAL,
 			'enabled'  => true
-		);
+		];
 
 		foreach ($listeners as $name => $listener)
 		{
 			if (is_string($listener) || is_callable($listener))
 			{
-				$listener = array('class' => $listener);
+				$listener = ['class' => $listener];
 			}
 
 			$listener = array_merge($defaultOptions, (array) $listener);

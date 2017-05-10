@@ -86,7 +86,7 @@ class GenTest extends AbstractCliApplication
 
 		$methods = $ref->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC);
 		$methodTmpl = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testMethod.tpl');
-		$methodCodes = array();
+		$methodCodes = [];
 
 		foreach ($methods as $method)
 		{

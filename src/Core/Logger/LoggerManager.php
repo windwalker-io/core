@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Logger;
 
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monolog;
 use Monolog\Processor\PsrLogMessageProcessor;
@@ -28,7 +29,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @var  LoggerInterface[]
 	 */
-	protected $loggers = array();
+	protected $loggers = [];
 
 	/**
 	 * Property nullLogger.
@@ -63,7 +64,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function emergency($category, $message, array $context = array())
+	public function emergency($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::EMERGENCY, $message, $context);
 
@@ -82,7 +83,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function alert($category, $message, array $context = array())
+	public function alert($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::ALERT, $message, $context);
 
@@ -100,7 +101,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function critical($category, $message, array $context = array())
+	public function critical($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::CRITICAL, $message, $context);
 
@@ -117,7 +118,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function error($category, $message, array $context = array())
+	public function error($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::ERROR, $message, $context);
 
@@ -136,7 +137,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function warning($category, $message, array $context = array())
+	public function warning($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::WARNING, $message, $context);
 
@@ -152,7 +153,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function notice($category, $message, array $context = array())
+	public function notice($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::NOTICE, $message, $context);
 
@@ -170,7 +171,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function info($category, $message, array $context = array())
+	public function info($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::INFO, $message, $context);
 
@@ -186,7 +187,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function debug($category, $message, array $context = array())
+	public function debug($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::DEBUG, $message, $context);
 
@@ -203,7 +204,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function log($category, $level, $message, array $context = array())
+	public function log($category, $level, $message, array $context = [])
 	{
 		if (is_array($message))
 		{
@@ -257,6 +258,8 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * @param   int    $level
 	 *
 	 * @return LoggerInterface
+	 *
+	 * @throws \Exception
 	 */
 	public function getLogger($category, $level = Logger::DEBUG)
 	{
@@ -264,11 +267,11 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 
 		if (!isset($this->loggers[$category]))
 		{
-			if (class_exists('Monolog\Logger'))
+			if (class_exists(\Monolog\Logger::class))
 			{
 				$logger = new Monolog($category);
 
-				$handler = new StreamHandler($this->logPath . '/' . $category . '.log', $level);
+				$handler = new RotatingFileHandler($this->logPath . '/' . $category . '.log', $level);
 				$logger->pushProcessor(new PsrLogMessageProcessor);
 
 				// Basic string handler

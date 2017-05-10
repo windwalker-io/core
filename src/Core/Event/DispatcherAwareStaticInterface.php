@@ -25,5 +25,5 @@ interface DispatcherAwareStaticInterface
 	 *
 	 * @return  mixed
 	 */
-	public static function triggerEvent($event, $args = array());
+	public static function triggerEvent($event, $args = []);
 }

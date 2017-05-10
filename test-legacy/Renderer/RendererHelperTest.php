@@ -101,10 +101,10 @@ class RendererHelperTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertTrue($paths instanceof PriorityQueue);
 
-		$array = array(
+		$array = [
 			Path::clean(WINDWALKER_TEMPLATES),
 			realpath(WINDWALKER_SOURCE . '/../src/Core/Resources/Templates')
-		);
+		];
 
 		$this->assertEquals($array, $paths->toArray());
 	}

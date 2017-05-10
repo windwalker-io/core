@@ -32,7 +32,7 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 		$data->eventListeners = $data->collector['event.listeners'];
 
 		// Executed Events
-		$events = array();
+		$events = [];
 
 		foreach ((array) $data->eventExecuted as $event)
 		{
@@ -49,11 +49,11 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 
 				if (!isset($events[$id]))
 				{
-					$events[$eventName][$id] = array(
+					$events[$eventName][$id] = [
 						'name'     => $eventName,
 						'times'    => 0,
 						'listener' => implode('::', (array) $listener)
-					);
+					];
 				}
 
 				$events[$eventName][$id]['times']++;
@@ -63,7 +63,7 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 		$data->executed = $events;
 
 		// Event No executed
-		$events = array();
+		$events = [];
 
 		foreach ((array) $data->eventListeners as $eventName => $listeners)
 		{
@@ -79,11 +79,11 @@ class EventsHtmlView extends AbstractDebuggerHtmlView
 					$events[$eventName] = [];
 				}
 
-				$events[$eventName][] = array(
+				$events[$eventName][] = [
 					'name'     => $eventName,
 					'times'    => 0,
 					'listener' => implode('::', (array) $listener)
-				);
+				];
 			}
 		}
 

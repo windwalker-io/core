@@ -44,7 +44,7 @@ $this->extend('_global.html');
 			<?php
 			$trace = new Data($trace);
 
-			$args = array();
+			$args = [];
 			?>
 			<tr>
 				<td>

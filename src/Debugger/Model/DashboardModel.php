@@ -33,11 +33,11 @@ class DashboardModel extends ModelRepository
 
 			if (!$files)
 			{
-				return array();
+				return [];
 			}
 
 			$limit = $state->get('list.limit', 100);
-			$items = array();
+			$items = [];
 
 			/** @var \SplFileInfo $file */
 			foreach ($files as $file)
@@ -68,7 +68,7 @@ class DashboardModel extends ModelRepository
 
 		if (!is_dir($dir))
 		{
-			return array();
+			return [];
 		}
 
 		return new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS));

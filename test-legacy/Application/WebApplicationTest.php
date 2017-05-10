@@ -38,7 +38,7 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
 		$_SERVER['PHP_SELF'] = '/foo/bar';
 		$_SERVER['SCRIPT_NAME'] = '/foo/bar';
 
-		$this->instance = new WebApplication(null, null, array('name' => 'test'));
+		$this->instance = new WebApplication(null, null, ['name' => 'test']);
 	}
 
 	/**

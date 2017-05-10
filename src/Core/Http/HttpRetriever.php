@@ -18,17 +18,17 @@ use Windwalker\Http\Transport\TransportInterface;
 /**
  * The HttpRetriever class.
  *
- * @method  static  ResponseInterface  request($method, $url, $data = null, $headers = array())
- * @method  static  ResponseInterface  download($url, $dest, $data = null, $headers = array())
+ * @method  static  ResponseInterface  request($method, $url, $data = null, $headers = [])
+ * @method  static  ResponseInterface  download($url, $dest, $data = null, $headers = [])
  * @method  static  ResponseInterface  send(RequestInterface $request)
- * @method  static  ResponseInterface  options($url, $headers = array())
- * @method  static  ResponseInterface  head($url, $headers = array())
- * @method  static  ResponseInterface  get($url, $data = null, $headers = array())
- * @method  static  ResponseInterface  post($url, $data, $headers = array())
- * @method  static  ResponseInterface  put($url, $data, $headers = array())
- * @method  static  ResponseInterface  delete($url, $data = null, $headers = array())
- * @method  static  ResponseInterface  trace($url, $headers = array())
- * @method  static  ResponseInterface  patch($url, $data, $headers = array())
+ * @method  static  ResponseInterface  options($url, $headers = [])
+ * @method  static  ResponseInterface  head($url, $headers = [])
+ * @method  static  ResponseInterface  get($url, $data = null, $headers = [])
+ * @method  static  ResponseInterface  post($url, $data, $headers = [])
+ * @method  static  ResponseInterface  put($url, $data, $headers = [])
+ * @method  static  ResponseInterface  delete($url, $data = null, $headers = [])
+ * @method  static  ResponseInterface  trace($url, $headers = [])
+ * @method  static  ResponseInterface  patch($url, $data, $headers = [])
  *
  * @since  3.0
  */

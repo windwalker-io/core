@@ -38,7 +38,7 @@ abstract class StubErrorHandler extends ErrorHandler
 	{
 		$renderer = new PhpRenderer(RendererHelper::getGlobalPaths());
 
-		$body = $renderer->render(static::$errorTemplate, array('exception' => $exception));
+		$body = $renderer->render(static::$errorTemplate, ['exception' => $exception]);
 
 		$response = new Response;
 

@@ -33,14 +33,14 @@ class PackageResolver implements ContainerAwareInterface
 	 *
 	 * @var  AbstractPackage[]
 	 */
-	protected $packages = array();
+	protected $packages = [];
 
 	/**
 	 * Property aliases.
 	 *
 	 * @var  array
 	 */
-	protected $aliases = array();
+	protected $aliases = [];
 
 	/**
 	 * PackageResolver constructor.

@@ -34,7 +34,7 @@ abstract class Ioc
 	 *
 	 * @var  Container[]
 	 */
-	protected static $instances = array();
+	protected static $instances = [];
 
 	/**
 	 * getInstance

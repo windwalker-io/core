@@ -29,7 +29,7 @@ class EventDispatcher extends Dispatcher
 	 *
 	 * @var  array
 	 */
-	protected $collector = array();
+	protected $collector = [];
 
 	/**
 	 * Trigger an event.
@@ -39,7 +39,7 @@ class EventDispatcher extends Dispatcher
 	 *
 	 * @return  Event  The event after being passed through all listeners.
 	 */
-	public function triggerEvent($event, $args = array())
+	public function triggerEvent($event, $args = [])
 	{
 		if (!is_string($event) && !$event instanceof Event)
 		{
@@ -64,7 +64,7 @@ class EventDispatcher extends Dispatcher
 
 		$event->mergeArguments($args);
 
-		$listeners = array();
+		$listeners = [];
 
 		if (isset($this->listeners[$event->getName()]))
 		{
@@ -77,7 +77,7 @@ class EventDispatcher extends Dispatcher
 
 				if (!is_callable($listener))
 				{
-					$listener = array($listener, $event->getName());
+					$listener = [$listener, $event->getName()];
 				}
 
 				if (!is_callable($listener))
@@ -96,7 +96,7 @@ class EventDispatcher extends Dispatcher
 
 		if ($this->debug)
 		{
-			$executedListeners = array();
+			$executedListeners = [];
 
 			foreach ($listeners as $listener)
 			{
@@ -104,7 +104,7 @@ class EventDispatcher extends Dispatcher
 				{
 					$ref = new \ReflectionFunction($listener);
 
-					$listener = array('{Closure}: ' . $ref->getFileName() . ' - Line: ' . $ref->getStartLine());
+					$listener = ['{Closure}: ' . $ref->getFileName() . ' - Line: ' . $ref->getStartLine()];
 				}
 
 				if (is_object($listener[0]))
@@ -115,10 +115,10 @@ class EventDispatcher extends Dispatcher
 				$executedListeners[] = $listener;
 			}
 
-			$this->collector[] = array(
+			$this->collector[] = [
 				'event' => $event->getName(),
 				'listeners' => $executedListeners
-			);
+			];
 		}
 
 		return $event;
@@ -137,7 +137,7 @@ class EventDispatcher extends Dispatcher
 	 *
 	 * @throws  \InvalidArgumentException
 	 */
-	public function addListener($listener, $priorities = array())
+	public function addListener($listener, $priorities = [])
 	{
 		parent::addListener($listener, $priorities);
 

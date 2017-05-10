@@ -22,7 +22,7 @@ class ScriptManager
 	 *
 	 * @var  array
 	 */
-	protected static $inited = array();
+	protected static $inited = [];
 
 	/**
 	 * ScriptManager constructor.

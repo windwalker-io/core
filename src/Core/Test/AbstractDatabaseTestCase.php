@@ -45,7 +45,7 @@ class AbstractDatabaseTestCase extends AbstractBaseTestCase
 	 *
 	 * @var  array
 	 */
-	protected static $quote = array('"', '"');
+	protected static $quote = ['"', '"'];
 
 	/**
 	 * Property dbname.
@@ -59,7 +59,7 @@ class AbstractDatabaseTestCase extends AbstractBaseTestCase
 	 *
 	 * @var array
 	 */
-	protected static $dsn = array();
+	protected static $dsn = [];
 
 	/**
 	 * setUpBeforeClass

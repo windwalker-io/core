@@ -24,7 +24,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @var  array
 	 */
-	protected $helpers = array();
+	protected $helpers = [];
 
 	/**
 	 * Property view.
@@ -38,7 +38,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @var  array
 	 */
-	protected static $namespaces = array();
+	protected static $namespaces = [];
 
 	/**
 	 * HelperSet constructor.

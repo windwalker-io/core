@@ -48,7 +48,7 @@ class NullDataMapper extends DataMapper
 	 * @return  mixed|DataSet Found rows data set.
 	 * @since   2.0
 	 */
-	public function find($conditions = array(), $order = null, $start = null, $limit = null)
+	public function find($conditions = [], $order = null, $start = null, $limit = null)
 	{
 		$class = $this->getDatasetClass();
 
@@ -93,7 +93,7 @@ class NullDataMapper extends DataMapper
 	 *
 	 * @return mixed|Data Found row data.
 	 */
-	public function findOne($conditions = array(), $order = null)
+	public function findOne($conditions = [], $order = null)
 	{
 		$class = $this->getDataClass();
 
@@ -120,7 +120,7 @@ class NullDataMapper extends DataMapper
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function findColumn($column, $conditions = array(), $order = null, $start = null, $limit = null)
+	public function findColumn($column, $conditions = [], $order = null, $start = null, $limit = null)
 	{
 		return [];
 	}
@@ -206,7 +206,7 @@ class NullDataMapper extends DataMapper
 	 * @throws \InvalidArgumentException
 	 * @return  boolean
 	 */
-	public function updateBatch($data, $conditions = array())
+	public function updateBatch($data, $conditions = [])
 	{
 		return true;
 	}
@@ -223,7 +223,7 @@ class NullDataMapper extends DataMapper
 	 *
 	 * @return  mixed|DataSet Updated data set.
 	 */
-	public function flush($dataset, $conditions = array())
+	public function flush($dataset, $conditions = [])
 	{
 		$class = $this->getDatasetClass();
 
@@ -261,20 +261,22 @@ class NullDataMapper extends DataMapper
 	public function saveOne($data, $condFields = null, $updateNulls = false)
 	{
 		// Event
-		$this->triggerEvent('onBefore' . ucfirst(__FUNCTION__), array(
+		$this->triggerEvent('onBefore' . ucfirst(__FUNCTION__), [
 			'data'        => &$data,
 			'condFields'  => &$condFields,
 			'updateNulls' => &$updateNulls
-		));
+		]
+		);
 
-		$dataset = $this->save($this->bindDataset(array($data)), $condFields, $updateNulls);
+		$dataset = $this->save($this->bindDataset([$data]), $condFields, $updateNulls);
 
 		$result = $dataset[0];
 
 		// Event
-		$this->triggerEvent('onAfter' . ucfirst(__FUNCTION__), array(
+		$this->triggerEvent('onAfter' . ucfirst(__FUNCTION__), [
 			'result' => &$result,
-		));
+		]
+		);
 
 		return $result;
 	}

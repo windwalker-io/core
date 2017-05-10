@@ -69,7 +69,7 @@ class ViewModelTest extends \PHPUnit_Framework_TestCase
 		$viewModel = new ViewModel;
 
 		$model = new StubModel;
-		$model->setConfig(new Structure(array('name' => 'foo')));
+		$model->setConfig(new Structure(['name' => 'foo']));
 		$viewModel->setModel($model);
 
 		$this->assertTrue($viewModel->getModel() instanceof StubModel);
@@ -125,7 +125,7 @@ class ViewModelTest extends \PHPUnit_Framework_TestCase
 		$this->instance->setModel(new FlowerModel);
 
 		$this->assertEquals('Item', $this->instance->getItem());
-		$this->assertEquals(array(1,2,3,4), $this->instance->getList());
+		$this->assertEquals([1,2,3,4], $this->instance->getList());
 		$this->assertEquals(null, $this->instance->getData());
 		$this->assertEquals(null, $this->instance->loadData());
 

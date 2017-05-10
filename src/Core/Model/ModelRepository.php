@@ -67,10 +67,10 @@ class ModelRepository implements \ArrayAccess
 	 *
 	 * @var  array
 	 */
-	protected $magicMethodPrefix = array(
+	protected $magicMethodPrefix = [
 		'get',
 		'load'
-	);
+	];
 
 	/**
 	 * Instantiate the model.
@@ -115,7 +115,7 @@ class ModelRepository implements \ArrayAccess
 	 *
 	 * @throws \InvalidArgumentException
 	 */
-	public function __call($name, $args = array())
+	public function __call($name, $args = [])
 	{
 		$allow = false;
 

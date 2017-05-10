@@ -106,11 +106,11 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		// Prepare option data
 		$uri = $request->getUri();
 
-		$options = array(
+		$options = [
 			'scheme' => $uri->getScheme(),
 			'host'   => $uri->getHost(),
 			'port'   => $uri->getPort()
-		);
+		];
 
 		try
 		{
@@ -181,9 +181,11 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
 		$matched = new Route($packageName . '@' . $controller, implode($route, '/'));
 
-		$matched->setExtraValues(array(
+		$matched->setExtraValues(
+			[
 			'controller' => $class
-		));
+			]
+		);
 
 		return $matched;
 	}

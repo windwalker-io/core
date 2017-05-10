@@ -54,9 +54,9 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 
 	public function testConstruct()
 	{
-		$queue = new PriorityQueue(array('a', 'b', 'c', 'd', 'e'));
+		$queue = new PriorityQueue(['a', 'b', 'c', 'd', 'e']);
 
-		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $queue)));
+		$this->assertEquals(['a', 'b', 'c', 'd', 'e'], array_values(iterator_to_array(clone $queue)));
 		$this->assertEquals($this->instance, $queue);
 
 		$queue = new \SplPriorityQueue;
@@ -69,7 +69,7 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 
 		$queue = new PriorityQueue($queue);
 
-		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $queue)));
+		$this->assertEquals(['a', 'b', 'c', 'd', 'e'], array_values(iterator_to_array(clone $queue)));
 		$this->assertEquals($this->instance, $queue);
 	}
 
@@ -82,7 +82,7 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testInsert()
 	{
-		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $this->instance)));
+		$this->assertEquals(['a', 'b', 'c', 'd', 'e'], array_values(iterator_to_array(clone $this->instance)));
 	}
 
 	/**
@@ -104,9 +104,9 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testBind()
 	{
-		$queue = new PriorityQueue(array('a', 'b', 'c', 'd', 'e'));
+		$queue = new PriorityQueue(['a', 'b', 'c', 'd', 'e']);
 
-		$this->assertEquals(array('a', 'b', 'c', 'd', 'e'), array_values(iterator_to_array(clone $queue)));
+		$this->assertEquals(['a', 'b', 'c', 'd', 'e'], array_values(iterator_to_array(clone $queue)));
 		$this->assertEquals($this->instance, $queue);
 	}
 
@@ -147,7 +147,7 @@ class PriorityQueueTest extends \PHPUnit_Framework_TestCase
 		$this->instance->merge($queue);
 
 		$this->assertEquals(
-			array('A', 'B', 'C', 'D', 'E', 'a', 'b', 'c', 'd', 'e'),
+			['A', 'B', 'C', 'D', 'E', 'a', 'b', 'c', 'd', 'e'],
 			$this->instance->toArray()
 		);
 	}

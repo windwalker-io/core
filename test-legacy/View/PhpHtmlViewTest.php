@@ -103,12 +103,12 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 		Ioc::get('package.resolver')->addPackage('mvc', new MvcPackage);
 
 		$config = new Structure(
-			array(
+			[
 				'name' => 'stub',
-				'package' => array(
+				'package' => [
 					'name' => 'mvc'
-				)
-			)
+				]
+			]
 		);
 
 		$this->instance->setConfig($config);
@@ -128,9 +128,9 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('default', $this->instance->getName());
 
 		$config = new Structure(
-			array(
+			[
 				'name' => 'foo'
-			)
+			]
 		);
 
 		$this->instance->setConfig($config);
@@ -171,13 +171,13 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 	public function testGetAndSetConfig()
 	{
 		$config = new Structure(
-			array(
+			[
 				'name' => 'sakura',
-				'package' => array(
+				'package' => [
 					'name' => 'flower',
 					'path' => 'foo/bar/baz'
-				)
-			)
+				]
+			]
 		);
 
 		$this->instance->setConfig($config);
@@ -268,21 +268,21 @@ class PhpHtmlViewTest extends \PHPUnit_Framework_TestCase
 		/** @var MainRouter $router */
 		$router = Ioc::getRouter();
 
-		$router->addRoute(new Route('mvc@flower', '/flower/(id)', array('foo' => 'bar'), null, array('extra' => array('controller' => 'Bar'))));
-		$router->addRoute(new Route('mvc@sakura', '/sakura/(id)', array('foo' => 'baz'), null, array('extra' => array('controller' => 'Baz'))));
+		$router->addRoute(new Route('mvc@flower', '/flower/(id)', ['foo' => 'bar'], null, ['extra' => ['controller' => 'Bar']]));
+		$router->addRoute(new Route('mvc@sakura', '/sakura/(id)', ['foo' => 'baz'], null, ['extra' => ['controller' => 'Baz']]));
 
 		// $this->assertEquals('flower/12', $router->build('mvc:flower', array('id' => 12)));
 
 		$package->router->setRouter($router);
 
-		$this->assertEquals('flower/12', $package->router->route('flower', array('id' => 12), MainRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $package->router->route('flower', ['id' => 12], MainRouter::TYPE_RAW));
 
 		// Test global variables
 		TestHelper::invoke($this->instance, 'prepareGlobals', $this->instance->getData());
 
 		$data = $this->instance->getData();
 
-		$this->assertEquals('flower/12', $data->router->route('flower', array('id' => 12), MainRouter::TYPE_RAW));
-		$this->assertEquals('flower/12', $data->package->route->route('flower', array('id' => 12), MainRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->router->route('flower', ['id' => 12], MainRouter::TYPE_RAW));
+		$this->assertEquals('flower/12', $data->package->route->route('flower', ['id' => 12], MainRouter::TYPE_RAW));
 	}
 }

@@ -82,11 +82,11 @@ class CacheFactoryTest extends \PHPUnit_Framework_TestCase
 		$this->assertTrue($this->instance->getCache('windwalker', null, 'string')->getSerializer() instanceof StringHandler);
 
 		// Test storage
-		$this->assertTrue($this->instance->getCache('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE))->getStorage() instanceof FileStorage);
+		$this->assertTrue($this->instance->getCache('windwalker', 'file', 'string', ['cache_dir' => WINDWALKER_CACHE])->getStorage() instanceof FileStorage);
 
 		// Test FileStorage Denycode
 		$config->set('cache.denyAccess', true);
-		$fileStorage = $this->instance->getCache('windwalker', 'file', 'string', array('cache_dir' => WINDWALKER_CACHE, 'deny_code' => 'FOO'))->getStorage();
+		$fileStorage = $this->instance->getCache('windwalker', 'file', 'string', ['cache_dir' => WINDWALKER_CACHE, 'deny_code' => 'FOO'])->getStorage();
 
 		$optinos = $fileStorage->getOptions();
 

@@ -96,7 +96,7 @@ class CsrfGuard
 	 *
 	 * @return  HtmlElement
 	 */
-	public function input($userId = null, $attribs = array())
+	public function input($userId = null, $attribs = [])
 	{
 		$attribs['type']  = 'hidden';
 		$attribs['name']  = static::getFormToken($userId);

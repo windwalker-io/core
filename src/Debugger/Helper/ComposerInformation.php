@@ -90,7 +90,7 @@ class ComposerInformation
 	{
 		$composer = ComposerInformation::getLock();
 
-		$data = ArrayHelper::query($composer['packages'], array('name' => $package));
+		$data = ArrayHelper::query($composer['packages'], ['name' => $package]);
 
 		if (isset($data[0]['version']))
 		{

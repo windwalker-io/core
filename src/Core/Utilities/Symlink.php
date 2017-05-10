@@ -30,8 +30,8 @@ class Symlink
 	{
 		$windows = PlatformHelper::isWindows();
 
-		$src    = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $src);
-		$dest = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $dest);
+		$src    = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $src);
+		$dest = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dest);
 
 		if ($windows)
 		{

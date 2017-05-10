@@ -52,12 +52,14 @@ class PhpXmlViewTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testRender()
 	{
-		$view = new SimpleXmlView(array(
+		$view = new SimpleXmlView(
+			[
 			'foo' => 'bar',
-			'flower' => array(
+			'flower' => [
 				'sakura' => 'beautiful'
-			)
-		));
+			]
+			]
+		);
 
 		$xml = <<<XML
 <?xml version="1.0"?>

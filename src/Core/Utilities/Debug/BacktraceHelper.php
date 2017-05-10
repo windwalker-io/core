@@ -76,11 +76,11 @@ class BacktraceHelper
 			$args[] = $arg;
 		}
 
-		return array(
+		return [
 			'file' => $trace['file'] ? $trace['file'] . ' (' . $trace['line'] . ')' : null,
 			'function' => ($trace['class'] ? $trace['class'] . $trace['type'] : null) . $trace['function'] .
 				sprintf('(%s)', implode(', ', $args))
-		);
+		];
 	}
 
 	/**

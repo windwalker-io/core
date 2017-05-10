@@ -24,8 +24,8 @@ use Windwalker\Utilities\ArrayHelper;
  *
  * @property-read  UriData  $uri
  *
- * @method  $this  addCSS($url, $version = null, $attribs = array())
- * @method  $this  addJS($url, $version = null, $attribs = array())
+ * @method  $this  addCSS($url, $version = null, $attribs = [])
+ * @method  $this  addJS($url, $version = null, $attribs = [])
  * @method  $this  internalCSS($content)
  * @method  $this  internalJS($content)
  *
@@ -61,14 +61,14 @@ class AssetManager implements DispatcherAwareInterface
 	 *
 	 * @var  array
 	 */
-	protected $internalStyles = array();
+	protected $internalStyles = [];
 
 	/**
 	 * Property internalScripts.
 	 *
 	 * @var  array
 	 */
-	protected $internalScripts = array();
+	protected $internalScripts = [];
 
 	/**
 	 * Property version.
@@ -144,18 +144,18 @@ class AssetManager implements DispatcherAwareInterface
 	 *
 	 * @return  static
 	 */
-	public function addStyle($url, $version = null, $attribs = array())
+	public function addStyle($url, $version = null, $attribs = [])
 	{
 		if (!$version && $version !== false)
 		{
 			$version = $this->getVersion();
 		}
 
-		$file = array(
+		$file = [
 			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
 			'version' => $version
-		);
+		];
 
 		$this->styles[$url] = $file;
 
@@ -171,18 +171,18 @@ class AssetManager implements DispatcherAwareInterface
 	 *
 	 * @return  static
 	 */
-	public function addScript($url, $version = null, $attribs = array())
+	public function addScript($url, $version = null, $attribs = [])
 	{
 		if (!$version && $version !== false)
 		{
 			$version = $this->getVersion();
 		}
 
-		$file = array(
+		$file = [
 			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
 			'version' => $version
-		);
+		];
 
 		$this->scripts[$url] = $file;
 
@@ -226,20 +226,21 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function renderStyles($withInternal = false)
 	{
-		$html = array();
+		$html = [];
 
-		Ioc::getApplication()->triggerEvent('onAssetRenderStyles', array(
+		Ioc::getApplication()->triggerEvent('onAssetRenderStyles', [
 			'asset' => $this,
 			'withInternal' => &$withInternal,
 			'html' => &$html
-		));
+		]
+		);
 
 		foreach ($this->styles as $url => $style)
 		{
-			$defaultAttribs = array(
+			$defaultAttribs = [
 				'rel' => 'stylesheet',
 				'href' => $style['url']
-			);
+			];
 
 			$attribs = array_merge($defaultAttribs, $style['attribs']);
 
@@ -268,19 +269,20 @@ class AssetManager implements DispatcherAwareInterface
 	 */
 	public function renderScripts($withInternal = false)
 	{
-		$html = array();
+		$html = [];
 
-		$this->triggerEvent('onAssetRenderScripts', array(
+		$this->triggerEvent('onAssetRenderScripts', [
 			'asset' => $this,
 			'withInternal' => &$withInternal,
 			'html' => &$html
-		));
+		]
+		);
 
 		foreach ($this->scripts as $url => $script)
 		{
-			$defaultAttribs = array(
+			$defaultAttribs = [
 				'src' => $script['url']
-			);
+			];
 
 			$attribs = array_merge($defaultAttribs, $script['attribs']);
 
@@ -808,7 +810,7 @@ class AssetManager implements DispatcherAwareInterface
 			case 'array':
 				if (!ArrayHelper::isAssociative($data))
 				{
-					$child = array();
+					$child = [];
 
 					foreach ($data as $value)
 					{
@@ -822,7 +824,7 @@ class AssetManager implements DispatcherAwareInterface
 			case 'object':
 				$array = is_object($data) ? get_object_vars($data) : $data;
 
-				$row = array();
+				$row = [];
 
 				foreach ($array as $key => $value)
 				{

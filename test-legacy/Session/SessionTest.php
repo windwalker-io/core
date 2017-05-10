@@ -42,12 +42,12 @@ class SessionTest extends AbstractBaseTestCase
 		$config = $container->get('config');
 
 		$config['session.handler'] = 'database';
-		$config['session.database'] = array(
+		$config['session.database'] = [
 			'table'    => 'flower',
 			'id_col'   => 'sakura_id',
 			'data_col' => 'sakura_data',
 			'time_col' => 'sakura_time'
-		);
+		];
 
 		$container->registerServiceProvider(new SessionProvider);
 

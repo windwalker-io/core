@@ -24,7 +24,7 @@ class ViewHelper extends AbstractHelper
 	 *
 	 * @var  array
 	 */
-	protected static $messages = array();
+	protected static $messages = [];
 
 	/**
 	 * getGlobalVariables
@@ -45,7 +45,7 @@ class ViewHelper extends AbstractHelper
 
 		$container = $package->getContainer();
 
-		return array(
+		return [
 			'uri'        => $container->get('uri'),
 			'app'        => $container->get('application'),
 			'package'    => $package,
@@ -54,7 +54,7 @@ class ViewHelper extends AbstractHelper
 			'messages'   => static::$messages,
 			'translator' => $container->get('language'),
 			'datetime'   => new \DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
-		);
+		];
 	}
 
 	/**

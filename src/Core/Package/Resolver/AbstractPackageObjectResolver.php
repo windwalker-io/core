@@ -24,14 +24,14 @@ abstract class AbstractPackageObjectResolver
 	 *
 	 * @var  PriorityQueue[]
 	 */
-	protected static $namespaces = array();
+	protected static $namespaces = [];
 
 	/**
 	 * Property instances.
 	 *
 	 * @var  array
 	 */
-	protected static $instances = array();
+	protected static $instances = [];
 
 	/**
 	 * create
@@ -101,7 +101,7 @@ abstract class AbstractPackageObjectResolver
 	 *
 	 * @return object
 	 */
-	public static function getInstance($name, $args = array(), $forceNew = false)
+	public static function getInstance($name, $args = [], $forceNew = false)
 	{
 		$key = strtolower($name);
 
@@ -230,7 +230,7 @@ abstract class AbstractPackageObjectResolver
 	 */
 	public static function dumpAll()
 	{
-		$array = array();
+		$array = [];
 
 		foreach (static::$namespaces as $class => $namespaces)
 		{

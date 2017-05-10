@@ -28,11 +28,11 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 	<?php $this->endblock(); ?>
 
 	<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,300,700' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="<?php echo $router->route('asset', array('type' => 'css')); ?>" />
+	<link rel="stylesheet" href="<?php echo $router->route('asset', ['type' => 'css']); ?>" />
 	<style>
 		@font-face {
 			font-family: 'Glyphicons Halflings';
-			src: url('<?php echo $router->route('asset', array('type' => 'fonts')); ?>');
+			src: url('<?php echo $router->route('asset', ['type' => 'fonts']); ?>');
 		}
 	</style>
 	<?php $this->block('style'); ?>
@@ -71,7 +71,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li>
-					<a class="" href="<?php echo $router->route($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
+					<a class="" href="<?php echo $router->route($app->get('route.matched'), ['refresh' => 1, 'id' => $item['id']]); ?>"
 						data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
 						<span class="glyphicon glyphicon-refresh"></span>
 						Refresh
@@ -103,7 +103,7 @@ use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 				data-toggle="tooltip" data-placement="top" title="Choose other URLs">
 				<span class="glyphicon glyphicon-list"></span>
 			</a>
-			<a class="btn btn-sm btn-success" href="<?php echo $router->route($app->get('route.matched'), array('refresh' => 1, 'id' => $item['id'])); ?>"
+			<a class="btn btn-sm btn-success" href="<?php echo $router->route($app->get('route.matched'), ['refresh' => 1, 'id' => $item['id']]); ?>"
 				data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
 				<span class="glyphicon glyphicon-refresh"></span>
 			</a>

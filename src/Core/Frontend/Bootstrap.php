@@ -34,10 +34,11 @@ class Bootstrap
 	 */
 	public static function renderFields(array $fields, $labelCols = 'col-md-3', $inputCols = 'col-md-9', $tmpl = 'bootstrap.form.fields')
 	{
-		return WidgetManager::render($tmpl, array(
+		return WidgetManager::render($tmpl, [
 			'fields' => $fields,
 			'label_cols' => $labelCols,
 			'input_cols' => $inputCols
-		));
+		]
+		);
 	}
 }

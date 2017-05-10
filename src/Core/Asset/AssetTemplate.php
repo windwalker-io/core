@@ -25,7 +25,7 @@ class AssetTemplate
 	 *
 	 * @var  array
 	 */
-	protected $templates = array();
+	protected $templates = [];
 
 	/**
 	 * Property currentName.
@@ -53,7 +53,7 @@ class AssetTemplate
 	 *
 	 * @return  static
 	 */
-	public function addTemplate($name, $string, $data = array())
+	public function addTemplate($name, $string, $data = [])
 	{
 		$this->templates[$name] = SimpleTemplate::render($string, $data);
 
@@ -84,7 +84,7 @@ class AssetTemplate
 	 */
 	public function resetTemplates()
 	{
-		$this->templates = array();
+		$this->templates = [];
 
 		return $this;
 	}
@@ -124,7 +124,7 @@ class AssetTemplate
 	 *
 	 * @return  $this
 	 */
-	public function startTemplate($__assetTemplateName, $__assetTemplateData = array())
+	public function startTemplate($__assetTemplateName, $__assetTemplateData = [])
 	{
 		if ($this->currentName)
 		{

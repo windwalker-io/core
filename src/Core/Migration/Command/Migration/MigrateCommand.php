@@ -97,7 +97,7 @@ class MigrateCommand extends CoreCommand
 			{
 				$io = clone $this->io;
 
-				$io->setArguments(array('seed', 'import'));
+				$io->setArguments(['seed', 'import']);
 				$io->setOption('no-backup', true);
 
 				$this->console->getRootCommand()->setIO($io)->execute();

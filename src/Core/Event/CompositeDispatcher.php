@@ -30,7 +30,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 *
 	 * @var  Dispatcher[]
 	 */
-	protected $dispatchers = array();
+	protected $dispatchers = [];
 
 	/**
 	 * Property log.
@@ -57,7 +57,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 *
 	 * @return  EventInterface  The event after being passed through all listeners.
 	 */
-	public function triggerEvent($event, $args = array())
+	public function triggerEvent($event, $args = [])
 	{
 		foreach ($this->dispatchers as $dispatcher)
 		{
@@ -96,7 +96,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 *
 	 * @since   2.0
 	 */
-	public function addListener($listener, $priorities = array())
+	public function addListener($listener, $priorities = [])
 	{
 		foreach ($this->dispatchers as $dispatcher)
 		{
@@ -115,7 +115,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 *
 	 * @return  EventInterface
 	 */
-	public function triggerSubEvent($name, $event, $args = array())
+	public function triggerSubEvent($name, $event, $args = [])
 	{
 		return $this->getDispatcher($name)->triggerEvent($event, $args);
 	}
@@ -145,7 +145,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
 	 *
 	 * @return  $this
 	 */
-	public function addSubListener($name, $listener, $priorities = array())
+	public function addSubListener($name, $listener, $priorities = [])
 	{
 		$this->getDispatcher($name)->addListener($listener, $priorities);
 
