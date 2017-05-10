@@ -21,12 +21,12 @@ $this->extend('_global.html');
 
 <h2>Event Triggered</h2>
 
-<?php echo $this->load('events', array('events' => $executed)); ?>
+<?php echo $this->load('events', ['events' => $executed]); ?>
 
 	<br /><br />
 
 <h2>Event Not Triggered (But listeners registered)</h2>
 
-<?php echo $this->load('events', array('events' => $noExecuted)); ?>
+<?php echo $this->load('events', ['events' => $noExecuted]); ?>
 
 <?php $this->endblock() ?>

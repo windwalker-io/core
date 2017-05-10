@@ -211,22 +211,24 @@ class AbstractPackage implements DispatcherAwareInterface
 		$this->prepareExecute();
 
 		// @event: onPackageBeforeExecute
-		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', array(
+		$this->getDispatcher()->triggerEvent('onPackageBeforeExecute', [
 			'package'    => $this,
 			'controller' => &$controller,
 			'task'       => $controller,
-		));
+		]
+		);
 
 		$result = $controller->execute();
 
 		$result = $this->postExecute($result);
 
 		// @event: onPackageAfterExecute
-		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', array(
+		$this->getDispatcher()->triggerEvent('onPackageAfterExecute', [
 			'package'    => $this,
 			'controller' => $controller,
 			'result'     => &$result
-		));
+		]
+		);
 
 		$response = $controller->getResponse();
 
@@ -334,19 +336,19 @@ class AbstractPackage implements DispatcherAwareInterface
 	 */
 	public function registerListeners(DispatcherInterface $dispatcher)
 	{
-		$listeners = (array) $this->get('listeners', array());
+		$listeners = (array) $this->get('listeners', []);
 
-		$defaultOptions = array(
+		$defaultOptions = [
 			'class'    => '',
 			'priority' => ListenerPriority::NORMAL,
 			'enabled'  => true
-		);
+		];
 
 		foreach ($listeners as $name => $listener)
 		{
 			if (is_string($listener))
 			{
-				$listener = array('class' => $listener);
+				$listener = ['class' => $listener];
 			}
 
 			$listener = array_merge($defaultOptions, (array) $listener);

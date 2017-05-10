@@ -130,7 +130,7 @@ class RendererProvider implements ServiceProviderInterface
 	 */
 	protected function prepareGlobals(Container $container, RendererManager $manager)
 	{
-		$globals = array(
+		$globals = [
 			'uri'        => $container->get('uri'),
 			'app'        => $container->get('application'),
 			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
@@ -138,7 +138,7 @@ class RendererProvider implements ServiceProviderInterface
 			'translator' => $container->exists('language') ? $container->get('language') : null,
 			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
 			'datetime'   => new DateTime('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
-		);
+		];
 
 		$manager->setGlobals($globals);
 

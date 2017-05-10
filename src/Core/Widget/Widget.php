@@ -131,7 +131,7 @@ class Widget implements \ArrayAccess
 	 *
 	 * @return string
 	 */
-	public function render($data = array())
+	public function render($data = [])
 	{
 		$this->registerPaths();
 

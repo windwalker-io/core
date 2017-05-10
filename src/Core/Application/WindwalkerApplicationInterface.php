@@ -49,7 +49,7 @@ interface WindwalkerApplicationInterface
 	 *
 	 * @since   2.0
 	 */
-	public function triggerEvent($event, $args = array());
+	public function triggerEvent($event, $args = []);
 
 	/**
 	 * Method to get property Container

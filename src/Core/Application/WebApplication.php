@@ -465,11 +465,12 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 	 */
 	public function redirect($url, $code = 303)
 	{
-		$this->triggerEvent('onBeforeRedirect', array(
+		$this->triggerEvent('onBeforeRedirect', [
 			'app'  => $this,
 			'url'  => &$url,
 			'code' => &$code
-		));
+		]
+		);
 
 		parent::redirect($url, $code);
 	}
@@ -529,9 +530,9 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			return $this->container->get($diMapping[$name]);
 		}
 
-		$allowNames = array(
+		$allowNames = [
 			'container',
-		);
+		];
 
 		if (in_array($name, $allowNames))
 		{

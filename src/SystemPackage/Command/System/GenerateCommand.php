@@ -129,7 +129,7 @@ TMPL;
 	public function init()
 	{
 		$this->addOption(
-			array('d', 'description'),
+			['d', 'description'],
 			null,
 			'Command description'
 		);
@@ -154,7 +154,7 @@ TMPL;
 		}
 
 		// Regularize Namespace
-		$namespace = str_replace(array('/', '\\'), ' ', $namespace);
+		$namespace = str_replace(['/', '\\'], ' ', $namespace);
 
 		$namespace = ucwords($namespace);
 
@@ -173,12 +173,12 @@ TMPL;
 
 		$namespace = implode('\\', $namespace);
 
-		$replace = array(
+		$replace = [
 			'{{NAME}}'      => $name,
 			'{{NAMESPACE}}' => $namespace,
 			'{{CLASS}}'     => $class,
 			'{{DESCRIPTION}}' => $description
-		);
+		];
 
 		$content = strtr($this->template, $replace);
 
@@ -186,7 +186,7 @@ TMPL;
 
 		$file = $config->get('path.root') . '/src/' . $namespace . '/' . $class . 'Command.php';
 
-		$file = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $file);
+		$file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
 
 		if (!File::write($file, $content))
 		{

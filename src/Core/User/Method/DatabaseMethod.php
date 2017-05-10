@@ -39,7 +39,7 @@ class DatabaseMethod extends AbstractMethod
 
 		$datamapper = new DataMapper('users');
 
-		$user = $datamapper->findOne(array('username' => $credential->username));
+		$user = $datamapper->findOne(['username' => $credential->username]);
 
 		if ($user->isNull())
 		{

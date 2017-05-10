@@ -62,14 +62,14 @@ class ProfilerListener
 			$collector = $container->get('debugger.collector');
 
 			/** @var \Exception $exception */
-			$collector['exception'] = array(
+			$collector['exception'] = [
 				'type'    => get_class($exception),
 				'message' => $exception->getMessage(),
 				'code'    => $exception->getCode(),
 				'file'    => $exception->getFile(),
 				'line'    => $exception->getLine(),
 				'trace'   => BacktraceHelper::normalizeBacktraces($exception->getTrace())
-			);
+			];
 		});
 
 		$collector['system.name'] = $event['app']->getName();
@@ -79,9 +79,10 @@ class ProfilerListener
 		$collector['system.method.http']   = $input->getMethod();
 		$collector['system.method.custom'] = strtoupper($input->get('_method'));
 
-		$profiler->mark(__FUNCTION__, array(
+		$profiler->mark(__FUNCTION__, [
 			'tag' => 'system.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -101,9 +102,10 @@ class ProfilerListener
 		$container = $event['app']->getContainer();
 		$profiler  = $container->get('profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$profiler->mark(__FUNCTION__, [
 			'tag' => 'system.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -134,9 +136,10 @@ class ProfilerListener
 		$collector['routing.matched'] = iterator_to_array($container->get('current.route'));
 		$collector['routing.routes']  = StructureHelper::dumpObjectValues($router->getRoutes());
 
-		$profiler->mark(__FUNCTION__, array(
+		$profiler->mark(__FUNCTION__, [
 			'tag' => 'system.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -157,9 +160,10 @@ class ProfilerListener
 
 		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
-		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
 			'tag' => 'package.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -180,9 +184,10 @@ class ProfilerListener
 
 		$name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
-		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
 			'tag' => 'package.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -203,9 +208,10 @@ class ProfilerListener
 
 		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
-		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
 			'tag' => 'package.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -226,9 +232,10 @@ class ProfilerListener
 
 		$name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
-		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
 			'tag' => 'package.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -258,18 +265,20 @@ class ProfilerListener
 
 		$collector['controller.main'] = get_class($controller);
 
-		$collector->push('controller.executed', array(
+		$collector->push('controller.executed', [
 			'controller' => get_class($controller),
 			'task'       => $event['task'],
 			'input'      => $controller->getInput()->toArray(),
 			'variables'  => $event['variables'],
-		));
+		]
+		);
 
 		$name = $package->getName();
 
-		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', array(
+		$profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
 			'tag' => 'package.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -290,9 +299,10 @@ class ProfilerListener
 		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$profiler->mark(__FUNCTION__, [
 			'tag' => 'system.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -313,10 +323,10 @@ class ProfilerListener
 		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
-		$collector['redirect'] = array(
+		$collector['redirect'] = [
 			'url'   => $event['url'],
 			'moved' => $event['moved']
-		);
+		];
 	}
 
 	/**
@@ -337,9 +347,10 @@ class ProfilerListener
 		$collector = $container->get('debugger.collector');
 		$profiler  = $container->get('profiler');
 
-		$profiler->mark(__FUNCTION__, array(
+		$profiler->mark(__FUNCTION__, [
 			'tag' => 'system.process'
-		));
+		]
+		);
 	}
 
 	/**
@@ -360,7 +371,7 @@ class ProfilerListener
 
 		// Packages
 		$packages = PackageHelper::getPackages();
-		$pkgs = array();
+		$pkgs = [];
 
 		foreach ($packages as $package)
 		{
@@ -424,11 +435,11 @@ class ProfilerListener
 
 		$collector['event.executed'] = $dispatcher->getCollector();
 
-		$listenersMapping = array();
+		$listenersMapping = [];
 
 		foreach ($dispatcher->getListeners() as $eventName => $listeners)
 		{
-			$listenersMapping[$eventName] = array();
+			$listenersMapping[$eventName] = [];
 
 			foreach ($listeners as $listener)
 			{
@@ -439,7 +450,7 @@ class ProfilerListener
 
 				if (is_object($listener))
 				{
-					$listener = array(get_class($listener), $eventName);
+					$listener = [get_class($listener), $eventName];
 				}
 
 				$listenersMapping[$eventName][] = $listener;

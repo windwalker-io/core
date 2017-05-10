@@ -51,7 +51,7 @@ class SessionProvider implements ServiceProviderInterface
 			$config = $container->get('config');
 			$uri = $container->get('uri');
 
-			$options  = (array) $config->get('session', array());
+			$options  = (array) $config->get('session', []);
 
 			$options['cookie_path'] = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->path;
 			$options['cookie_domain'] = parse_url($uri->host, PHP_URL_HOST);
@@ -88,6 +88,6 @@ class SessionProvider implements ServiceProviderInterface
 		$config = $container->get('config');
 		$options = $config->get('session', []);
 
-		return new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', array()));
+		return new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', []));
 	}
 }

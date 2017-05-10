@@ -126,7 +126,7 @@ class DebuggerListener
 
 			if ($item)
 			{
-				$app->redirect($package->router->route($app->get('route.matched'), array('id' => $item['id'])) . $hash);
+				$app->redirect($package->router->route($app->get('route.matched'), ['id' => $item['id']]) . $hash);
 
 				return;
 			}
@@ -158,7 +158,7 @@ class DebuggerListener
 			// set id to session and redirect
 			$session->set('debugger.current.id', $id);
 
-			$app->redirect($package->router->route($app->get('route.matched'), array('id' => $id)));
+			$app->redirect($package->router->route($app->get('route.matched'), ['id' => $id]));
 
 			return;
 		}
@@ -237,10 +237,10 @@ class DebuggerListener
 
 		$this->deleteOldFiles();
 
-		$data = array(
+		$data = [
 			'profiler'  => $profiler,
 			'collector' => $collector
-		);
+		];
 
 		$data = serialize($data);
 
@@ -311,7 +311,7 @@ class DebuggerListener
 		$model = new DashboardModel;
 
 		$files = $model->getFiles();
-		$items = array();
+		$items = [];
 
 		/** @var \SplFileInfo $file */
 		foreach ($files as $file)

@@ -92,7 +92,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	protected static function addCSS($url, $version = null, $attribs = array())
+	protected static function addCSS($url, $version = null, $attribs = [])
 	{
 		return static::getAsset()->addCSS($url, $version, $attribs);
 	}
@@ -106,7 +106,7 @@ abstract class AbstractScript
 	 *
 	 * @return  static
 	 */
-	protected static function addJS($url, $version = null, $attribs = array())
+	protected static function addJS($url, $version = null, $attribs = [])
 	{
 		return static::getAsset()->addJS($url, $version, $attribs);
 	}

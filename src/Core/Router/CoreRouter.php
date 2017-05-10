@@ -16,14 +16,14 @@ use Windwalker\Router\Route;
  * 
  * @since  2.0.
  *
- * @method  static  string  build($route, $queries = array(), $type = MainRouter::TYPE_RAW)
- * @method  static  string  route($route, $queries = array(), $type = MainRouter::TYPE_RAW)
- * @method  static  string  fullRoute($route, $queries = array())
- * @method  static  string  rawRoute($route, $queries = array())
- * @method  static  Route   match($rawRoute, $method = 'GET', $options = array())
+ * @method  static  string  build($route, $queries = [], $type = MainRouter::TYPE_RAW)
+ * @method  static  string  route($route, $queries = [], $type = MainRouter::TYPE_RAW)
+ * @method  static  string  fullRoute($route, $queries = [])
+ * @method  static  string  rawRoute($route, $queries = [])
+ * @method  static  Route   match($rawRoute, $method = 'GET', $options = [])
  * @method  static  Route   addRouteByConfig($name, $route, $package = null)
  * @method  static  MainRouter  addRouteByConfigs($routes, $package = null)
- * @method  static  MainRouter  addRoute($name, $pattern = null, $variables = array(), $method = array(), $options = array())
+ * @method  static  MainRouter  addRoute($name, $pattern = null, $variables = [], $method = [], $options = [])
  * @method  static  MainRouter  addRoutes(array $routes)
  * @method  static  Route       getRoute($name)
  *

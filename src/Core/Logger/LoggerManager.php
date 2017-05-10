@@ -28,7 +28,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @var  LoggerInterface[]
 	 */
-	protected $loggers = array();
+	protected $loggers = [];
 
 	/**
 	 * Property nullLogger.
@@ -63,7 +63,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function emergency($category, $message, array $context = array())
+	public function emergency($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::EMERGENCY, $message, $context);
 
@@ -82,7 +82,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function alert($category, $message, array $context = array())
+	public function alert($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::ALERT, $message, $context);
 
@@ -100,7 +100,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function critical($category, $message, array $context = array())
+	public function critical($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::CRITICAL, $message, $context);
 
@@ -117,7 +117,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function error($category, $message, array $context = array())
+	public function error($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::ERROR, $message, $context);
 
@@ -136,7 +136,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function warning($category, $message, array $context = array())
+	public function warning($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::WARNING, $message, $context);
 
@@ -152,7 +152,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function notice($category, $message, array $context = array())
+	public function notice($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::NOTICE, $message, $context);
 
@@ -170,7 +170,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function info($category, $message, array $context = array())
+	public function info($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::INFO, $message, $context);
 
@@ -186,7 +186,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function debug($category, $message, array $context = array())
+	public function debug($category, $message, array $context = [])
 	{
 		$this->log($category, LogLevel::DEBUG, $message, $context);
 
@@ -203,7 +203,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * @return static
 	 */
-	public function log($category, $level, $message, array $context = array())
+	public function log($category, $level, $message, array $context = [])
 	{
 		if (is_array($message))
 		{

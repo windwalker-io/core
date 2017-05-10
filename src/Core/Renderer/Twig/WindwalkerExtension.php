@@ -51,7 +51,7 @@ class WindwalkerExtension extends \Twig_Extension
 	 */
 	public function getGlobals()
 	{
-		return array();
+		return [];
 	}
 
 	/**
@@ -61,9 +61,9 @@ class WindwalkerExtension extends \Twig_Extension
 	 */
 	public function getFunctions()
 	{
-		return array(
+		return [
 			new \Twig_SimpleFunction('show', 'show')
-		);
+		];
 	}
 
 	/**
@@ -75,11 +75,11 @@ class WindwalkerExtension extends \Twig_Extension
 	{
 		$language = $this->container->get('language');
 
-		return array(
-			new \Twig_SimpleFilter('trans', array($language, 'translate')),
-			new \Twig_SimpleFilter('lang', array($language, 'translate')),
-			new \Twig_SimpleFilter('translate', array($language, 'translate')),
-			new \Twig_SimpleFilter('_', array($language, 'translate')),
+		return [
+			new \Twig_SimpleFilter('trans', [$language, 'translate']),
+			new \Twig_SimpleFilter('lang', [$language, 'translate']),
+			new \Twig_SimpleFilter('translate', [$language, 'translate']),
+			new \Twig_SimpleFilter('_', [$language, 'translate']),
 			new \Twig_SimpleFilter('sprintf', function (...$args) use ($language)
 			{
 				return $language->sprintf(...$args);
@@ -88,7 +88,7 @@ class WindwalkerExtension extends \Twig_Extension
 			{
 				return $language->plural(...$args);
 			})
-		);
+		];
 	}
 
 	/**

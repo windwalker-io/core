@@ -37,7 +37,7 @@ use Windwalker\Dom\HtmlElement;
 			else
 			{
                 $gridObject->addRow()
-					->setRowCell('key', 'No Data', array('colspan' => 3));
+					->setRowCell('key', 'No Data', ['colspan' => 3]);
 			}
 		}
 		else

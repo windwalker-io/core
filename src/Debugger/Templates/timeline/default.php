@@ -20,11 +20,11 @@ $this->extend('_global.html');
 <?php $this->block('content') ?>
 <h2>System Process</h2>
 
-<?php echo $this->load('timeline', array('timeline' => $systemProcess)) ?>
+<?php echo $this->load('timeline', ['timeline' => $systemProcess]) ?>
 
 	<br /><br />
 
 <h2>All Process</h2>
 
-<?php echo $this->load('timeline', array('timeline' => $allProcess)) ?>
+<?php echo $this->load('timeline', ['timeline' => $allProcess]) ?>
 <?php $this->endblock() ?>

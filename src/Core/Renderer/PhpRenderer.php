@@ -46,7 +46,7 @@ class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRender
 	 */
 	public function findFile($file, $ext = 'php')
 	{
-		static $paths = array();
+		static $paths = [];
 
 		$path = $this->packageFinder->find($file, $ext);
 
