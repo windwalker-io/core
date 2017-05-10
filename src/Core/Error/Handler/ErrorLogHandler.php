@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Error\Handler;
 
-use Windwalker\Core\Logger\Logger;
+use Windwalker\Core\Logger\LoggerManager;
 
 /**
  * The ErrorLogHandler class.
@@ -18,6 +18,23 @@ use Windwalker\Core\Logger\Logger;
 class ErrorLogHandler implements ErrorHandlerInterface
 {
 	/**
+	 * Property manager.
+	 *
+	 * @var  LoggerManager
+	 */
+	protected $manager;
+
+	/**
+	 * ErrorLogHandler constructor.
+	 *
+	 * @param LoggerManager $manager
+	 */
+	public function __construct(LoggerManager $manager)
+	{
+		$this->manager = $manager;
+	}
+
+	/**
 	 * __invoke
 	 *
 	 * @param  \Exception|\Throwable $e
@@ -26,6 +43,6 @@ class ErrorLogHandler implements ErrorHandlerInterface
 	 */
 	public function __invoke($e)
 	{
-		Logger::error('error', $e->getMessage(), ['code' => $e->getCode()]);
+		$this->manager->error('error', $e->getMessage(), ['code' => $e->getCode()]);
 	}
 }

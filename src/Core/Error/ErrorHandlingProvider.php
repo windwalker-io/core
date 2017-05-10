@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Error;
 
+use Monolog\Handler\RotatingFileHandler;
+use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Logger\LoggerManager;
@@ -84,14 +86,20 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 			return $error;
 		});
 
-		if (!$container->get('config')->get('error.log', false))
+		$container->extend(LoggerManager::class, function (LoggerManager $manager, Container $container)
 		{
-			$container->extend(LoggerManager::class, function (LoggerManager $logger, Container $container)
+			if ($container->get('config')->get('error.log', false))
 			{
-			    $logger->addLogger('error', new NullLogger);
+				$logger = $manager->createLogger('error', LogLevel::ERROR, new RotatingFileHandler($manager->getLogFile('error'), LogLevel::ERROR));
+			}
+			else
+			{
+				$logger = new NullLogger;
+			}
 
-				return $logger;
-			});
-		}
+			$manager->addLogger('error', $logger);
+
+			return $manager;
+		});
 	}
 }

@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Logger;
 
+use Monolog\Handler\HandlerInterface;
+use Monolog\Logger as Monolog;
 use Psr\Log\LoggerInterface;
 use Windwalker\Core\Facade\AbstractProxyFacade;
 
@@ -26,7 +28,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  LoggerManager  debug($category, $message, array $context = [])
  * @method  static  LoggerManager  log($category, $level, $message, array $context = [])
  * @method  static  LoggerManager  addLogger($category, LoggerInterface $logger)
- * @method  static  boolean     hasLogger($category)
+ * @method  static  Monolog        createLogger($categoey, $level = Logger::DEBUG, HandlerInterface $handler = null)
+ * @method  static  boolean        hasLogger($category)
  * @method  static  LoggerManager  removeLogger($category)
  * @method  static  LoggerManager  setLoggers(array $loggers)
  * @method  static  LoggerInterface    getLogger($category, $level = Logger::DEBUG)
@@ -40,19 +43,19 @@ class Logger extends AbstractProxyFacade
 	/**
 	 * Detailed debug information
 	 */
-	const DEBUG = 100;
+	const DEBUG = 'debug';
 
 	/**
 	 * Interesting events
 	 *
 	 * Examples: User logs in, SQL logs.
 	 */
-	const INFO = 200;
+	const INFO = 'info';
 
 	/**
 	 * Uncommon events
 	 */
-	const NOTICE = 250;
+	const NOTICE = 'notice';
 
 	/**
 	 * Exceptional occurrences that are not errors
@@ -60,19 +63,19 @@ class Logger extends AbstractProxyFacade
 	 * Examples: Use of deprecated APIs, poor use of an API,
 	 * undesirable things that are not necessarily wrong.
 	 */
-	const WARNING = 300;
+	const WARNING = 'warning';
 
 	/**
 	 * Runtime errors
 	 */
-	const ERROR = 400;
+	const ERROR = 'error';
 
 	/**
 	 * Critical conditions
 	 *
 	 * Example: Application component unavailable, unexpected exception.
 	 */
-	const CRITICAL = 500;
+	const CRITICAL = 'critical';
 
 	/**
 	 * Action must be taken immediately
@@ -80,12 +83,12 @@ class Logger extends AbstractProxyFacade
 	 * Example: Entire website down, database unavailable, etc.
 	 * This should trigger the SMS alerts and wake you up.
 	 */
-	const ALERT = 550;
+	const ALERT = 'alert';
 
 	/**
 	 * Urgent alert.
 	 */
-	const EMERGENCY = 600;
+	const EMERGENCY = 'emergency';
 
 	/**
 	 * Property _key.

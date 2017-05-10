@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Logger;
 
+use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monolog;
 use Monolog\Processor\PsrLogMessageProcessor;
@@ -241,7 +243,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * createCategory
 	 *
 	 * @param string  $category
-	 * @param int     $level
+	 * @param string  $level
 	 *
 	 * @return  LoggerInterface
 	 */
@@ -254,7 +256,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * getLogger
 	 *
 	 * @param   string $category
-	 * @param   int    $level
+	 * @param   string $level
 	 *
 	 * @return LoggerInterface
 	 */
@@ -264,37 +266,61 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 
 		if (!isset($this->loggers[$category]))
 		{
-			if (class_exists('Monolog\Logger'))
+			if (class_exists(Monolog::class))
 			{
-				$logger = new Monolog($category);
+				$this->loggers[$category] = $this->createLogger($category, $level);
 
-				$handler = new StreamHandler($this->logPath . '/' . $category . '.log', $level);
-				$logger->pushProcessor(new PsrLogMessageProcessor);
-
-				// Basic string handler
-				$logger->pushHandler($handler);
-
-				foreach (GlobalContainer::getHandlers() as $handler)
-				{
-					$logger->pushHandler(clone $handler);
-				}
-
-				foreach (GlobalContainer::getProcessors() as $processor)
-				{
-					$logger->pushProcessor(clone $processor);
-				}
-
-				$this->loggers[$category] = $logger;
-
-				return $logger;
+				return $this->loggers[$category];
 			}
-			else
-			{
-				return $this->getNullLogger();
-			}
+
+			return $this->getNullLogger();
 		}
 
 		return $this->loggers[$category];
+	}
+
+	/**
+	 * createLogger
+	 *
+	 * @param string                $categoey
+	 * @param int                   $level
+	 * @param HandlerInterface|null $handler
+	 *
+	 * @return  Monolog
+	 */
+	public function createLogger($categoey, $level = Logger::DEBUG, HandlerInterface $handler = null)
+	{
+		$logger = new Monolog($categoey);
+
+		$handler = $handler ? : new StreamHandler($this->logPath . '/' . $categoey . '.log', $level);
+		$logger->pushProcessor(new PsrLogMessageProcessor);
+
+		// Basic string handler
+		$logger->pushHandler($handler);
+
+		foreach (GlobalContainer::getHandlers() as $handler)
+		{
+			$logger->pushHandler(clone $handler);
+		}
+
+		foreach (GlobalContainer::getProcessors() as $processor)
+		{
+			$logger->pushProcessor(clone $processor);
+		}
+
+		return $logger;
+	}
+
+	/**
+	 * getLogFile
+	 *
+	 * @param string $categoey
+	 *
+	 * @return  string
+	 */
+	public function getLogFile($categoey)
+	{
+		return $this->logPath . '/' . $categoey . '.log';
 	}
 
 	/**

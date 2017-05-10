@@ -303,8 +303,6 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 		}
 		catch (\Exception $e)
 		{
-			$this->app->logger->error('error', $e->getMessage(), ['code' => $e->getCode()]);
-
 			// You can do some error handling in processFailure(), for example: rollback the transaction.
 			$result = $this->processFailure($e);
 
