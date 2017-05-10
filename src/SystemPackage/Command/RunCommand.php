@@ -139,7 +139,7 @@ class RunCommand extends Command
 
 			if ($this->executeScript($command, $input) === 64)
 			{
-				throw new \RuntimeException('Script stopped...');
+				throw new \RuntimeException('Previous command return code 64, script stopped...');
 			}
 		}
 	}

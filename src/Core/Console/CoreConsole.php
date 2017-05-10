@@ -182,7 +182,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
 		$this->triggerEvent('onAfterExecute', ['app' => $this]);
 
-		return $this->postExecute($exitCode);
+		exit($this->postExecute($exitCode));
 	}
 
 	/**
