@@ -58,7 +58,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 		
 		$handler->setErrorTemplate(
 			$this->config->get('error.template', 'windwalker.error.default'),
-			$this->config->get('error.engine')
+			$this->config->get('error.engine', 'php')
 		);
 		
 		$handler->register(true, null, true);
