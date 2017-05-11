@@ -75,6 +75,8 @@ class MailAttachment
 		    return file_get_contents($file);
 		};
 
+		$this->setFilename(pathinfo($file, PATHINFO_BASENAME));
+
 		return $this;
 	}
 
