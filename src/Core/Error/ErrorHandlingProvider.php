@@ -46,6 +46,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 	 * @param Container $container
 	 *
 	 * @return  void
+	 * @throws \InvalidArgumentException
 	 * @throws \UnexpectedValueException
 	 */
 	public function boot(Container $container)
@@ -55,7 +56,10 @@ class ErrorHandlingProvider implements ServiceProviderInterface
 		/** @var ErrorManager $handler */
 		$handler = $container->get(ErrorManager::class);
 		
-		$handler->setErrorTemplate($this->config->get('error.template', 'windwalker.error.default'));
+		$handler->setErrorTemplate(
+			$this->config->get('error.template', 'windwalker.error.default'),
+			$this->config->get('error.engine')
+		);
 		
 		$handler->register(true, null, true);
 	}

@@ -40,6 +40,13 @@ class ErrorManager
 	protected $handlers;
 
 	/**
+	 * Property engine.
+	 *
+	 * @var  string
+	 */
+	protected $engine = 'php';
+
+	/**
 	 * Property constants.
 	 *
 	 * @var  array
@@ -183,7 +190,7 @@ class ErrorManager
 	 */
 	protected function respond($exception)
 	{
-		$renderer = $this->app->renderer->getPhpRenderer();
+		$renderer = $this->app->renderer->getRenderer($this->engine);
 
 		$body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'), ['exception' => $exception]);
 
@@ -204,10 +211,12 @@ class ErrorManager
 	 * Method to set property errorTemplate
 	 *
 	 * @param   string $errorTemplate
+	 * @param   string $engine
 	 *
-	 * @return  void
+	 * @return void
+	 * @throws \InvalidArgumentException
 	 */
-	public function setErrorTemplate($errorTemplate)
+	public function setErrorTemplate($errorTemplate, $engine = null)
 	{
 		if (!is_string($errorTemplate))
 		{
@@ -215,6 +224,11 @@ class ErrorManager
 		}
 
 		$this->errorTemplate = $errorTemplate;
+
+		if ($engine)
+		{
+			$this->setEngine($engine);
+		}
 	}
 
 	/**
@@ -319,7 +333,7 @@ class ErrorManager
 	public function removeHandler($name)
 	{
 		unset($this->handlers[$name]);
-		
+
 		return $this;
 	}
 
@@ -343,6 +357,30 @@ class ErrorManager
 	public function setHandlers($handlers)
 	{
 		$this->handlers = $handlers;
+
+		return $this;
+	}
+
+	/**
+	 * Method to get property Engine
+	 *
+	 * @return  string
+	 */
+	public function getEngine()
+	{
+		return $this->engine;
+	}
+
+	/**
+	 * Method to set property engine
+	 *
+	 * @param   string $engine
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setEngine($engine)
+	{
+		$this->engine = $engine;
 
 		return $this;
 	}
