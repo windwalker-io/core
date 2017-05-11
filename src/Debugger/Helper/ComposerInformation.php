@@ -8,6 +8,7 @@
 
 namespace Windwalker\Debugger\Helper;
 
+use Windwalker\Core\Ioc;
 use Windwalker\Structure\Structure;
 use Windwalker\Utilities\ArrayHelper;
 
@@ -41,7 +42,8 @@ class ComposerInformation
 	{
 		if (!static::$lock)
 		{
-			$file = WINDWALKER_ROOT . '/composer.lock';
+			$root = Ioc::getConfig()->get('path.root');
+			$file = $root . '/composer.lock';
 
 			// Ignore unknown PHP7 version caused net::ERR_INCOMPLETE_CHUNKED_ENCODING in debug mode.
 //			if (version_compare(PHP_VERSION, 7, '<='))
@@ -71,7 +73,8 @@ class ComposerInformation
 	{
 		if (!static::$json)
 		{
-			$file = WINDWALKER_ROOT . '/composer.json';
+			$root = Ioc::getConfig()->get('path.root');
+			$file = $root . '/composer.json';
 
 			static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
 		}
