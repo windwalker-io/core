@@ -31,6 +31,27 @@ interface RouteBuilderInterface
 	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH);
 
 	/**
+	 * to
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  RouteString
+	 */
+	public function to($route, $queries = []);
+
+	/**
+	 * generate
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH);
+
+	/**
 	 * fullRoute
 	 *
 	 * @param string $route

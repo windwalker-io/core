@@ -31,6 +31,45 @@ trait RouteBuilderTrait
 	}
 
 	/**
+	 * to
+	 *
+	 * @param string $route
+	 * @param array  $queries
+	 *
+	 * @return  RouteString
+	 */
+	public function to($route, $queries = [])
+	{
+		return new RouteString($this, $route, $queries);
+	}
+
+	/**
+	 * generate
+	 *
+	 * @param string  $route
+	 * @param array   $queries
+	 * @param string  $type
+	 *
+	 * @return  string
+	 */
+	public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH)
+	{
+		try
+		{
+			return $this->route($route, $queries, $type);
+		}
+		catch (\OutOfRangeException $e)
+		{
+			if ($this->package->app->get('system.debug', false))
+			{
+				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+			}
+
+			return '#';
+		}
+	}
+
+	/**
 	 * fullRoute
 	 *
 	 * @param string $route

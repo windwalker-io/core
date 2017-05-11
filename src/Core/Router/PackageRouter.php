@@ -80,32 +80,6 @@ class PackageRouter implements RouteBuilderInterface
 	}
 
 	/**
-	 * generate
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH)
-	{
-		try
-		{
-			return $this->route($route, $queries, $type);
-		}
-		catch (\OutOfRangeException $e)
-		{
-			if ($this->package->app->get('system.debug', false))
-			{
-				return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
-			}
-
-			return '#';
-		}
-	}
-
-	/**
 	 * __call
 	 *
 	 * @param string $name

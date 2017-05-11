@@ -134,8 +134,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			'queries' => &$queries,
 			'type'    => &$type,
 			'router'  => $this
-		]
-		);
+		]);
 
 		$key = $this->getCacheKey([$route, $queries, $type]);
 
@@ -153,19 +152,18 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			'queries' => &$queries,
 			'type'    => &$type,
 			'router'  => $this
-		]
-		);
+		]);
 
 		$uri = $this->getUri();
 
 		$script = $uri->script;
 		$script = $script ? $script . '/' : null;
 
-		if ($type == static::TYPE_PATH)
+		if ($type === static::TYPE_PATH)
 		{
 			$url = $uri->path . '/' . $script . ltrim($url, '/');
 		}
-		elseif ($type == static::TYPE_FULL)
+		elseif ($type === static::TYPE_FULL)
 		{
 			$url = $uri->root . '/' . $script . $url;
 		}

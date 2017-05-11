@@ -18,6 +18,7 @@ use Windwalker\Router\Route;
  *
  * @method  static  string  build($route, $queries = [], $type = MainRouter::TYPE_RAW)
  * @method  static  string  route($route, $queries = [], $type = MainRouter::TYPE_RAW)
+ * @method  static  string  to($route, $queries = [])
  * @method  static  string  fullRoute($route, $queries = [])
  * @method  static  string  rawRoute($route, $queries = [])
  * @method  static  Route   match($rawRoute, $method = 'GET', $options = [])
