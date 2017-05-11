@@ -12,6 +12,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Environment\PlatformHelper;
+use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Core\Utilities\Symlink;
 
@@ -51,6 +52,11 @@ class SyncCommand extends Command
 		$this->addOption('hard')
 			->defaultValue(false)
 			->description('Hard copy assets to media folders');
+
+		$this->addOption('force')
+			->alias('f')
+			->defaultValue(false)
+			->description('Force replace exists link or folder.');
 	}
 
 	/**
@@ -96,10 +102,18 @@ class SyncCommand extends Command
 		$target = $this->console->get('path.public') . '/' . trim($folder, '/') . '/' . $target;
 
 		$symlink = new Symlink;
+		$force = $this->getOption('force');
 
 		if (is_link($target))
 		{
-			throw new \RuntimeException('Link ' . $target . ' already created.');
+			if (!$force)
+			{
+				throw new \RuntimeException('Link ' . $target . ' already created.');
+			}
+
+			$this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
+
+			File::delete($target);
 		}
 
 		if ($hard)
