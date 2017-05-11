@@ -9,7 +9,7 @@
 namespace Windwalker\Debugger\Listener;
 
 use Windwalker\Core\Controller\AbstractController;
-use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
@@ -73,7 +73,7 @@ class ProfilerListener
 		});
 
 		$collector['system.name'] = $event['app']->getName();
-		$collector['system.time'] = DateTime::create('now', DateTime::TZ_LOCALE)->format(DateTime::FORMAT_YMD_HIS);
+		$collector['system.time'] = Chronos::create('now', Chronos::TZ_LOCALE)->format(Chronos::FORMAT_YMD_HIS);
 		$collector['system.uri']  = get_object_vars($container->get('uri'));
 		$collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
 		$collector['system.method.http']   = $input->getMethod();

@@ -84,7 +84,7 @@ return [
 			'crypt' => \Windwalker\Crypt\CryptInterface::class,
 
 			// DateTime
-			'datetime' => \Windwalker\Core\DateTime\DateTime::class,
+			'datetime' => \Windwalker\Core\DateTime\Chronos::class,
 
 			// Asset
 			'asset' => \Windwalker\Core\Asset\AssetManager::class,

@@ -67,7 +67,7 @@ namespace PHPSTORM_META
 			'crypt' instanceof \Windwalker\Crypt\Crypt,
 
 			// DateTime
-			'datetime' instanceof \Windwalker\Core\DateTime\DateTime,
+			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
@@ -135,7 +135,7 @@ namespace PHPSTORM_META
 			'crypt' instanceof \Windwalker\Crypt\Crypt,
 
 			// DateTime
-			'datetime' instanceof \Windwalker\Core\DateTime\DateTime,
+			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
 
 			// Asset
 			'asset' instanceof \Windwalker\Core\Asset\AssetManager,

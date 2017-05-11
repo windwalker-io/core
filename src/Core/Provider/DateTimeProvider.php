@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\DateTime\DateTime;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -42,9 +42,9 @@ class DateTimeProvider implements ServiceProviderInterface
 		{
 			$tz = $container->get('config')->get('system.timezone', 'UTC');
 
-			return new DateTime('now', new \DateTimeZone($tz));
+			return new Chronos('now', new \DateTimeZone($tz));
 		};
 
-		$container->set(DateTime::class, $closure);
+		$container->set(Chronos::class, $closure);
 	}
 }
