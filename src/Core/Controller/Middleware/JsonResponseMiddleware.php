@@ -41,7 +41,7 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 					->getServer()
 					->getOutput()
 					->respond(
-						new JsonResponse(['error' => $exception->getMessage()])
+						new JsonResponse(['error' => $exception->getMessage()], $exception->getCode())
 					);
 
 				die;
