@@ -42,21 +42,11 @@ class ComposerInformation
 	{
 		if (!static::$lock)
 		{
-			$root = Ioc::getConfig()->get('path.root');
-			$file = $root . '/composer.lock';
+			$root = __DIR__ . '/../../../../../..';
+			$file = realpath($root . '/composer.lock');
 
-			// Ignore unknown PHP7 version caused net::ERR_INCOMPLETE_CHUNKED_ENCODING in debug mode.
-//			if (version_compare(PHP_VERSION, 7, '<='))
-			if (true)
-			{
-				$data = file_get_contents($file);
-
-				$data = json_decode($data);
-			}
-			else
-			{
-				$data = '{}';
-			}
+			$data = file_get_contents($file);
+			$data = json_decode($data);
 
 			static::$lock = new Structure($data);
 		}
@@ -73,8 +63,8 @@ class ComposerInformation
 	{
 		if (!static::$json)
 		{
-			$root = Ioc::getConfig()->get('path.root');
-			$file = $root . '/composer.json';
+			$root = __DIR__ . '/../../../../../..';
+			$file = realpath($root . '/composer.json');
 
 			static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
 		}
