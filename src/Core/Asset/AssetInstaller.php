@@ -83,17 +83,9 @@ class AssetInstaller extends AbstractCommand
 	public function doExecute()
 	{
 		$vendors = (array) $this->assets;
-		$installs = $this->io->getArguments();
 
-		foreach ($installs as $vendor)
+		foreach ($vendors as $vendor => $files)
 		{
-			if (!isset($vendors[$vendor]))
-			{
-				continue;
-			}
-
-			$files = $vendors[$vendor];
-
 			if (!is_dir($this->vendorPath . '/' . $vendor))
 			{
 				continue;

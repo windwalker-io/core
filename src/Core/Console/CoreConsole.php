@@ -118,10 +118,6 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	protected function init()
 	{
-		if (class_exists(ComposerInformation::class))
-		{
-			$this->version = ComposerInformation::getInstalledVersion('windwalker/core');
-		}
 	}
 
 	/**
@@ -212,6 +208,11 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 	 */
 	protected function prepareExecute()
 	{
+		if (class_exists(ComposerInformation::class))
+		{
+			$this->version = ComposerInformation::getInstalledVersion('windwalker/core');
+		}
+
 		if ($this->getRootCommand()->getOption('n'))
 		{
 			IOFactory::getIO()->setInput(new NullInput);

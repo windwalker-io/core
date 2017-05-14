@@ -42,7 +42,7 @@ class ComposerInformation
 	{
 		if (!static::$lock)
 		{
-			$root = __DIR__ . '/../../../../../..';
+			$root = Ioc::getConfig()->get('path.root');
 			$file = realpath($root . '/composer.lock');
 
 			$data = file_get_contents($file);
@@ -63,7 +63,7 @@ class ComposerInformation
 	{
 		if (!static::$json)
 		{
-			$root = __DIR__ . '/../../../../../..';
+			$root = Ioc::getConfig()->get('path.root');
 			$file = realpath($root . '/composer.json');
 
 			static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
