@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Seeder;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Core\Database\Traits\DateFormatTrait;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Environment\PlatformHelper;
@@ -20,6 +21,8 @@ use Windwalker\Environment\PlatformHelper;
  */
 abstract class AbstractSeeder
 {
+	use DateFormatTrait;
+
 	/**
 	 * Property db.
 	 *

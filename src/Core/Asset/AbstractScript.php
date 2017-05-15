@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Package\PackageHelper;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The ScriptManager class.
@@ -90,7 +90,7 @@ abstract class AbstractScript
 	 * @param string $version
 	 * @param array  $attribs
 	 *
-	 * @return  static
+	 * @return  AssetManager
 	 */
 	protected static function addCSS($url, $version = null, $attribs = [])
 	{
@@ -104,7 +104,7 @@ abstract class AbstractScript
 	 * @param string $version
 	 * @param array  $attribs
 	 *
-	 * @return  static
+	 * @return  AssetManager
 	 */
 	protected static function addJS($url, $version = null, $attribs = [])
 	{
@@ -116,7 +116,7 @@ abstract class AbstractScript
 	 *
 	 * @param string $content
 	 *
-	 * @return  static
+	 * @return  AssetManager
 	 */
 	protected static function internalCSS($content)
 	{
@@ -128,7 +128,7 @@ abstract class AbstractScript
 	 *
 	 * @param string $content
 	 *
-	 * @return  static
+	 * @return  AssetManager
 	 */
 	protected static function internalJS($content)
 	{
@@ -174,7 +174,12 @@ abstract class AbstractScript
 	 */
 	public static function mergeOptions($options1, $options2, $recursive = true)
 	{
-		return ArrayHelper::merge($options1, $options2, $recursive);
+		if (!$recursive)
+		{
+			return array_merge($options1, $options2);
+		}
+
+		return Arr::mergeRecursive($options1, $options2);
 	}
 
 	/**

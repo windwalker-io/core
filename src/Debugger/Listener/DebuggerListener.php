@@ -23,7 +23,7 @@ use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
 use Windwalker\Profiler\Profiler;
 use Windwalker\Structure\Structure;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The DebuggerListener class.
@@ -289,7 +289,7 @@ class DebuggerListener
 		$data->messages = (array) $collector['request.session._flash'];
 		$data->debugMessages = (array) $collector['debug.messages'];
 		$data->messagesCount = [
-			'messages' => count(ArrayHelper::flatten($data->messages)),
+			'messages' => count(Arr::flatten($data->messages)),
 			'debug' => count($data->debugMessages)
 		];
 

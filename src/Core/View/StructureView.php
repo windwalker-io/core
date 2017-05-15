@@ -9,7 +9,7 @@
 namespace Windwalker\Core\View;
 
 use Windwalker\Structure\Structure;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The StructureView class.
@@ -77,7 +77,7 @@ class StructureView extends AbstractView implements \JsonSerializable
 			return $data->toString($this->format, (array) $this->config->get('options', []));
 		}
 
-		return ArrayHelper::dump($data, $this->config->get('options.level', 5));
+		return Arr::dump($data, $this->config->get('options.level', 5));
 	}
 
 	/**

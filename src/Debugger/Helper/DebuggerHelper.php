@@ -13,6 +13,7 @@ use Windwalker\Debugger\DebuggerPackage;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Ioc;
 use Windwalker\Profiler\Point\Collector;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\ArrayHelper;
 
 /**
@@ -58,7 +59,7 @@ abstract class DebuggerHelper extends AbstractFacade
 
 		if (is_array($value) || is_object($value))
 		{
-			$value = new HtmlElement('pre', ArrayHelper::dump($value, $depth));
+			$value = new HtmlElement('pre', Arr::dump($value, $depth));
 		}
 
 		if (isset($data[$key]) && is_string($data[$key]))

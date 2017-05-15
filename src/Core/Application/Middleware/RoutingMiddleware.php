@@ -18,7 +18,7 @@ use Windwalker\Router\Route;
 use Windwalker\String\StringHelper;
 use Windwalker\String\StringNormalise;
 use Windwalker\Uri\UriHelper;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The RoutingMiddleware class.
@@ -254,6 +254,6 @@ class RoutingMiddleware extends AbstractWebMiddleware
 		$this->app->container->share('current.package', $package);
 		$this->app->container->share('current.route', $route);
 
-		return $request->withAttribute('_controller', ArrayHelper::getValue($extra, 'controller'));
+		return $request->withAttribute('_controller', Arr::get($extra, 'controller'));
 	}
 }

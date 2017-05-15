@@ -17,7 +17,7 @@ use Windwalker\Filesystem\File;
 use Windwalker\Ioc;
 use Windwalker\String\StringHelper;
 use Windwalker\Uri\UriData;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The AssetManager class.
@@ -808,7 +808,7 @@ class AssetManager implements DispatcherAwareInterface
 				break;
 
 			case 'array':
-				if (!ArrayHelper::isAssociative($data))
+				if (!Arr::isAssociative($data))
 				{
 					$child = [];
 

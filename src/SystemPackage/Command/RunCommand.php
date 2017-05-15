@@ -12,7 +12,7 @@ use Symfony\Component\Process\Process;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommandTrait;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The DeployCommand class.
@@ -120,7 +120,7 @@ class RunCommand extends Command
 	 */
 	protected function executeScriptProfile($scripts)
 	{
-		if (ArrayHelper::getColumn($scripts, 'in'))
+		if (array_column($scripts, 'in'))
 		{
 			$msg = "We noticed you entered input data for auto answer the prompt. \nPlease install symfony/process ~3.0 to support auto answer by custom input.";
 
@@ -134,8 +134,8 @@ class RunCommand extends Command
 				$script = ['cmd' => $script, 'in' => null];
 			}
 
-			$command = ArrayHelper::getValue($script, 'cmd');
-			$input   = ArrayHelper::getValue($script, 'in');
+			$command = Arr::get($script, 'cmd');
+			$input   = Arr::get($script, 'in');
 
 			if ($this->executeScript($command, $input) === 64)
 			{
@@ -217,8 +217,8 @@ class RunCommand extends Command
 					$cmd = ['cmd' => $cmd, 'in' => null];
 				}
 
-				$input = ArrayHelper::getValue($cmd, 'in');
-				$cmd   = ArrayHelper::getValue($cmd, 'cmd');
+				$input = Arr::get($cmd, 'in');
+				$cmd   = Arr::get($cmd, 'cmd');
 
 				$this->out('    <comment>$</comment> ' . $cmd, false);
 

@@ -11,7 +11,6 @@ namespace Windwalker\Core\Router;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
@@ -25,7 +24,7 @@ use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Uri\UriData;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The Router class.
@@ -208,7 +207,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
 		$extra = $route->getExtraValues();
 
-		$controller = ArrayHelper::getValue($extra, 'controller');
+		$controller = Arr::get($extra, 'controller');
 
 		if (!$controller)
 		{
@@ -216,7 +215,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 		}
 
 		// Suffix
-		$suffix = $this->fetchControllerSuffix($method, ArrayHelper::getValue($extra, 'action', []));
+		$suffix = $this->fetchControllerSuffix($method, Arr::get($extra, 'action', []));
 
 		$suffix = '\\' . $suffix;
 
@@ -335,7 +334,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 				$package = PackageHelper::getPackage($package);
 			}
 
-			$pattern = ArrayHelper::getValue($route, 'pattern');
+			$pattern = Arr::get($route, 'pattern');
 
 			$route['pattern'] = rtrim($prefix, '/ ') . $pattern;
 
@@ -346,9 +345,9 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 			$name = $package->getName() . '@' . $name;
 		}
 
-		$pattern = ArrayHelper::getValue($route, 'pattern');
-		$variables = ArrayHelper::getValue($route, 'variables', []);
-		$allowMethods = ArrayHelper::getValue($route, 'method', []);
+		$pattern = Arr::get($route, 'pattern');
+		$variables = Arr::get($route, 'variables', []);
+		$allowMethods = Arr::get($route, 'method', []);
 
 		if (isset($route['controller']))
 		{

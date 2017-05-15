@@ -6,9 +6,9 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
-return ArrayHelper::merge(
+return Arr::mergeRecursive(
 	include __DIR__ . '/windwalker.php',
 	[
 		'packages' => [

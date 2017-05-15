@@ -13,7 +13,7 @@ use Windwalker\Core\User\UserManager;
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
 use Windwalker\Uri\UriData;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The Factory class.
@@ -373,6 +373,6 @@ abstract class Ioc
 	 */
 	public static function dump($level = 10, $name = null, $profile = null)
 	{
-		return ArrayHelper::dump(static::factory($name, $profile), $level);
+		return Arr::dump(static::factory($name, $profile), $level);
 	}
 }

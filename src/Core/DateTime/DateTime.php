@@ -13,7 +13,7 @@ namespace Windwalker\Core\DateTime;
  *
  * @since  2.1.1
  *
- * @deprecated  Use Chronos instead.
+ * @deprecated  Use \Windwalker\Core\DateTime\Chronos instead.
  */
 class DateTime extends Chronos
 {

@@ -13,7 +13,7 @@ use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Helper\ResponseHelper;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The RenderViewMiddleware class.
@@ -110,7 +110,7 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 	protected function getMessage()
 	{
 		$msg = $this->controller->app->session->getFlashBag()->takeAll();
-		$msg = implode("\n", ArrayHelper::flatten($msg));
+		$msg = implode("\n", Arr::flatten($msg));
 
 		return $msg;
 	}

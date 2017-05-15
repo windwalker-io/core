@@ -20,7 +20,7 @@ use Windwalker\Session\Database\AbstractDatabaseAdapter;
 use Windwalker\Session\Database\WindwalkerAdapter;
 use Windwalker\Session\Handler\HandlerInterface;
 use Windwalker\Session\Session;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The SessionProvider class.
@@ -88,6 +88,6 @@ class SessionProvider implements ServiceProviderInterface
 		$config = $container->get('config');
 		$options = $config->get('session', []);
 
-		return new WindwalkerAdapter($container->get('database'), ArrayHelper::getValue($options, 'database', []));
+		return new WindwalkerAdapter($container->get('database'), Arr::get($options, 'database', []));
 	}
 }

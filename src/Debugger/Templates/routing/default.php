@@ -9,7 +9,7 @@
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Profiler\Point\Collector;
-use Windwalker\Utilities\ArrayHelper;
+use Windwalker\Utilities\Arr;
 
 $this->extend('_global.html');
 
@@ -48,7 +48,7 @@ if ($collector['system.uri'])
 	echo BootstrapKeyValueGrid::create()
 		->addHeader()
 		->configure(
-			ArrayHelper::flatten($collector['system.uri']),
+			Arr::flatten($collector['system.uri']),
 			function (BootstrapKeyValueGrid $grid, $key, $value)
 			{
 				$grid->addItem(new HtmlElement('code', $key), $this->escape($value));

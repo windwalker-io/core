@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Database\Traits\DateFormatTrait;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
@@ -19,6 +20,8 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
  */
 abstract class AbstractMigration
 {
+	use DateFormatTrait;
+
 	const UP = 'up';
 	const DOWN = 'down';
 
