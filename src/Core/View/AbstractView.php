@@ -503,7 +503,7 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param string $name
 	 *
-	 * @return  Structure
+	 * @return  mixed
 	 */
 	public function __get($name)
 	{

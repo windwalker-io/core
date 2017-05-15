@@ -8,17 +8,18 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Package\NullPackage;
+use Phoenix\Html\HtmlHeaderManager;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\View\Helper\AbstractHelper;
 use Windwalker\Core\View\Helper\Set\HelperSet;
 use Windwalker\Core\View\Traits\LayoutRenderableTrait;
 use Windwalker\Data\Data;
-use Windwalker\Filesystem\Path;
 use Windwalker\Renderer\AbstractRenderer;
 
 /**
  * The AbstractHtmlView class.
+ *
+ * @property-read  HtmlHeaderManager  head
  *
  * @since  3.0
  */
@@ -176,5 +177,22 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
 		$globals['router'] = $this->getPackage()->router;
 
 		$data->bind($globals);
+	}
+
+	/**
+	 * __get
+	 *
+	 * @param string $name
+	 *
+	 * @return  mixed
+	 */
+	public function __get($name)
+	{
+		if ($name === 'head')
+		{
+			return $this->package->container->get('html.header');
+		}
+
+		return parent::__get($name);
 	}
 }
