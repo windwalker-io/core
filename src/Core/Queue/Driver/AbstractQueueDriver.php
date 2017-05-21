@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Queue\Driver;
 
+use Windwalker\Core\Queue\QueueMessage;
+
 /**
  * The AbstractQueueDriver class.
  *
@@ -15,5 +17,4 @@ namespace Windwalker\Core\Queue\Driver;
  */
 class AbstractQueueDriver
 {
-
 }

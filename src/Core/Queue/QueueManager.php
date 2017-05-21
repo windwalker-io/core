@@ -35,9 +35,13 @@ class QueueManager
 		$this->driver = $driver;
 	}
 
-	public function push()
+	public function push($job)
 	{
+		$message = $this->getMessage($job);
 
+		$message = json_encode($message);
+
+		$this->driver->push($message);
 	}
 
 	public function pop()
@@ -48,5 +52,21 @@ class QueueManager
 	public function delete()
 	{
 
+	}
+
+	public function getMessage($job)
+	{
+		$message = new QueueMessage;
+
+		if ($job instanceof AbstractJob)
+		{
+			$message->name = $job->getName();
+			$message->job = serialize($job);
+			$message->data = [
+				'class' => get_class($job)
+			];
+		}
+
+		return $message;
 	}
 }
