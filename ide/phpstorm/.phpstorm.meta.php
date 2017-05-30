@@ -74,7 +74,10 @@ namespace PHPSTORM_META
 			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
 
 			// Mailer
-			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
+
+			// Queue
+			'queue' instanceof \Windwalker\Core\Queue\QueueManager
 		],
 
 		new \Windwalker\DI\Container => [
@@ -142,7 +145,10 @@ namespace PHPSTORM_META
 			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
 
 			// Mailer
-			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager
+			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
+
+			// Queue
+			'queue' instanceof \Windwalker\Core\Queue\QueueManager
 		]
 	];
 }

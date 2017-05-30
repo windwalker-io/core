@@ -41,6 +41,7 @@ use Windwalker\Session\Session;
  * @property-read  Core\Cache\CacheFactory       cache
  * @property-read  Session                       session
  * @property-read  Environment                   environment
+ * @property-read  Core\Queue\QueueManager       queue
  *
  * @since  2.0
  */
@@ -395,7 +396,8 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 			'database'   => 'database',
 			'language'   => 'language',
 			'cache'      => 'cache',
-			'environment' => 'environment'
+			'environment' => 'environment',
+			'queue'      => 'queue',
 		];
 
 		if (isset($diMapping[$name]))

@@ -21,7 +21,7 @@ class QueueManager
 	/**
 	 * Property driver.
 	 *
-	 * @var AbstractQueueDriver
+	 * @var SqsQueueDriver
 	 */
 	protected $driver;
 
@@ -41,12 +41,12 @@ class QueueManager
 
 		$message = json_encode($message);
 
-		$this->driver->push($message);
+		return $this->driver->push($message);
 	}
 
 	public function pop()
 	{
-
+		return $this->driver->pop();
 	}
 
 	public function delete()

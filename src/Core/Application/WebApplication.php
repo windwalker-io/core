@@ -53,6 +53,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\User\UserManager         user
  * @property-read  Core\Security\CsrfGuard       csrf
  * @property-read  Core\Package\PackageResolver  packageResolver
+ * @property-read  Core\Queue\QueueManager       queue
  *
  * @since  2.0
  */
