@@ -302,18 +302,6 @@ class QueueMessage implements \JsonSerializable
 	}
 
 	/**
-	 * jsonSerialize
-	 *
-	 * @return  array
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function jsonSerialize()
-	{
-		return $this->body;
-	}
-
-	/**
 	 * Method to get property Delay
 	 *
 	 * @return  int
@@ -335,5 +323,17 @@ class QueueMessage implements \JsonSerializable
 		$this->delay = (int) $delay;
 
 		return $this;
+	}
+
+	/**
+	 * jsonSerialize
+	 *
+	 * @return  array
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	public function jsonSerialize()
+	{
+		return $this->body;
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Queue;
 
+use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -27,7 +28,16 @@ class QueueProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->prepareSharedObject(QueueManager::class)
-			->alias(QueueManager::class, 'queue');
+		$container->prepareSharedObject(QueueFactory::class)
+			->alias('queue.factory', QueueFactory::class);
+
+		$container->share(QueueDriverInterface::class, function (Container $container)
+		{
+			$factory = $container->get('queue.factory');
+
+			return $factory->getDriver();
+		})->alias('queue.driver', QueueDriverInterface::class);
+
+		$container->prepareSharedObject(QueueManager::class);
 	}
 }

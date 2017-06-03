@@ -470,8 +470,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'app'  => $this,
 			'url'  => &$url,
 			'code' => &$code
-		]
-		);
+		]);
 
 		parent::redirect($url, $code);
 	}
@@ -524,6 +523,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			'user'       => 'user.manager',
 			'csrf'       => 'security.csrf',
 			'packageResolver' => 'package.resolver',
+			'queue'      => 'queue'
 		];
 
 		if (isset($diMapping[$name]))
@@ -540,12 +540,12 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 			return $this->$name;
 		}
 
-		if ($name == 'router')
+		if ($name === 'router')
 		{
 			return $this->getRouter();
 		}
 
-		if ($name == 'logger')
+		if ($name === 'logger')
 		{
 			return $this->getLogger();
 		}

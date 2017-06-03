@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Queue;
 
-use Windwalker\Core\Queue\Driver\AbstractQueueDriver;
+use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
 use Windwalker\Core\Queue\Job\CallableJob;
 use Windwalker\Core\Queue\Job\JobInterface;
@@ -42,18 +42,32 @@ class QueueManager implements ContainerAwareInterface
 	/**
 	 * QueueManager constructor.
 	 *
-	 * @param AbstractQueueDriver $driver
-	 * @param Container           $container
+	 * @param QueueDriverInterface $driver
+	 * @param Container            $container
 	 */
-	public function __construct(AbstractQueueDriver $driver, Container $container)
+	public function __construct(QueueDriverInterface $driver, Container $container)
 	{
 		$this->driver = $driver;
 		$this->container = $container;
 	}
 
-	public function push($job)
+	public function push($job, $delay = 0, $queue = null, array $options = [])
 	{
 		$message = $this->getMessageByJob($job);
+		$message->setDelay($delay);
+		$message->setQueueName($queue);
+		$message->setOptions($options);
+
+		return $this->driver->push($message);
+	}
+
+	public function pushRaw($body, $delay = 0, $queue = null, array $options = [])
+	{
+		$message = new QueueMessage;
+		$message->setBody($body);
+		$message->setDelay($delay);
+		$message->setQueueName($queue);
+		$message->setOptions($options);
 
 		return $this->driver->push($message);
 	}
@@ -74,13 +88,15 @@ class QueueManager implements ContainerAwareInterface
 		$this->driver->delete($message);
 	}
 
-	public function release($message)
+	public function release($message, $delay = 0)
 	{
 		if (!$message instanceof QueueMessage)
 		{
 			$msg = new QueueMessage;
 			$msg->setId($message);
 		}
+
+		$message->setDelay($delay);
 
 		$this->driver->release($message);
 	}

@@ -15,7 +15,7 @@ use Windwalker\Core\Queue\QueueMessage;
  *
  * @since  __DEPLOY_VERSION__
  */
-abstract class AbstractQueueDriver
+interface QueueDriverInterface
 {
 	/**
 	 * push
@@ -23,13 +23,8 @@ abstract class AbstractQueueDriver
 	 * @param QueueMessage $message
 	 *
 	 * @return int|string
-	 * @internal param array $options
-	 *
-	 * @internal param string $queue
-	 * @internal param string $body
-	 * @internal param int $delay
 	 */
-	abstract public function push(QueueMessage $message);
+	public function push(QueueMessage $message);
 
 	/**
 	 * pop
@@ -38,7 +33,7 @@ abstract class AbstractQueueDriver
 	 *
 	 * @return QueueMessage
 	 */
-	abstract public function pop($queue = null);
+	public function pop($queue = null);
 
 	/**
 	 * delete
@@ -46,10 +41,8 @@ abstract class AbstractQueueDriver
 	 * @param QueueMessage|string $message
 	 *
 	 * @return static
-	 * @internal param null $queue
-	 *
 	 */
-	abstract public function delete(QueueMessage $message);
+	public function delete(QueueMessage $message);
 
 	/**
 	 * release
@@ -57,9 +50,6 @@ abstract class AbstractQueueDriver
 	 * @param QueueMessage|string $message
 	 *
 	 * @return static
-	 * @internal param string $queue
-	 *
-	 * @internal param int $delay
 	 */
-	abstract public function release(QueueMessage $message);
+	public function release(QueueMessage $message);
 }

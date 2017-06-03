@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Queue\Driver;
 
 use Aws\Sqs\SqsClient;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Queue\QueueMessage;
 
 /**
@@ -17,7 +16,7 @@ use Windwalker\Core\Queue\QueueMessage;
  *
  * @since  __DEPLOY_VERSION__
  */
-class SqsQueueDriver extends AbstractQueueDriver
+class SqsQueueDriver implements QueueDriverInterface
 {
 	/**
 	 * Property client.
@@ -36,19 +35,25 @@ class SqsQueueDriver extends AbstractQueueDriver
 	/**
 	 * SqsQueueDriver constructor.
 	 *
+	 * @param string $key
+	 * @param string $secret
 	 * @param string $default
+	 * @param array  $options
 	 */
-	public function __construct($default)
+	public function __construct($key, $secret, $default = 'default', array $options = [])
 	{
-		$config = Ioc::getConfig();
-		$this->client = new SqsClient([
+		$defaultOptions = [
 			'region' => 'ap-northeast-1',
 			'version' => 'latest',
 			'credentials' => [
-				'key'    => $config->get('queue.sqs.key'),
-				'secret' => $config->get('queue.sqs.secret'),
+				'key'    => $key,
+				'secret' => $secret,
 			]
-		]);
+		];
+
+		$options = array_merge($defaultOptions, $options);
+
+		$this->client = new SqsClient($options);
 
 		$this->default = $default;
 	}

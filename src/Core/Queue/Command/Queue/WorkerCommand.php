@@ -49,7 +49,7 @@ class WorkerCommand extends Command
 		/** @var CoreConsole $app */
 		$app = $this->getApplication();
 
-		$queue = new QueueManager(new SqsQueueDriver('test'), $app->container);
+		$queue = $app->queue;
 
 		do
 		{
