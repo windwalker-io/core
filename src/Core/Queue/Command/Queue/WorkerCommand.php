@@ -49,11 +49,22 @@ class WorkerCommand extends Command
 		/** @var CoreConsole $app */
 		$app = $this->getApplication();
 
-		$queue = $queue = new QueueManager(new SqsQueueDriver('test'));
+		$queue = new QueueManager(new SqsQueueDriver('test'), $app->container);
 
-		$result = $queue->pop();
+		do
+		{
+			$message = $queue->pop();
 
-		show($result->attempts, 7);
+			if ($message !== false)
+			{
+				$job = $message->getJob();
+
+				$queue->runJob($job);
+
+				$queue->release($message);
+			}
+		}
+		while ($message !== false);
 
 		return true;
 	}

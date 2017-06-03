@@ -10,7 +10,7 @@ namespace Windwalker\Core\Queue\Driver;
 
 use Aws\Sqs\SqsClient;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Queue\MessageResponse;
+use Windwalker\Core\Queue\QueueMessage;
 
 /**
  * The SqsQueueDriver class.
@@ -56,28 +56,27 @@ class SqsQueueDriver extends AbstractQueueDriver
 	/**
 	 * push
 	 *
-	 * @param string $body
-	 * @param string $queue
-	 * @param int    $delay
-	 * @param array  $options
+	 * @param QueueMessage $message
 	 *
-	 * @return string|int
+	 * @return int|string
 	 */
-	public function push($body, $queue = null, $delay = 0, array $options = [])
+	public function push(QueueMessage $message)
 	{
-		$message = [
-			'QueueUrl' => $this->getQueueUrl($queue),
-			'MessageBody' => $body
+		$request = [
+			'QueueUrl' => $this->getQueueUrl($message->getQueueName()),
+			'MessageBody' => json_encode($message)
 		];
 
-		if (is_int($delay) && $delay > 0)
+		if ($message->getDelay() > 0)
 		{
-			$message['DelaySeconds'] = $delay;
+			$message['DelaySeconds'] = $message->getDelay();
 		}
 
-		$message = array_merge($message, $options);
+		$options = $message->getOptions();
 
-		return $this->client->sendMessage($message)->get('MessageId');
+		$request = array_merge($request, $options);
+
+		return $this->client->sendMessage($request)->get('MessageId');
 	}
 
 	/**
@@ -85,7 +84,7 @@ class SqsQueueDriver extends AbstractQueueDriver
 	 *
 	 * @param string $queue
 	 *
-	 * @return MessageResponse|bool
+	 * @return QueueMessage|bool
 	 */
 	public function pop($queue = null)
 	{
@@ -101,13 +100,14 @@ class SqsQueueDriver extends AbstractQueueDriver
 
 		$data = $result['Messages'][0];
 
-		$res = new MessageResponse($result['Messages'][0]);
+		$res = new QueueMessage;
 
 		$res->setId($data['MessageId']);
 		$res->setAttempts($data['Attributes']['ApproximateReceiveCount']);
-		$res->setBody(json_decode($data['Body']));
-		$res->setRawData($data['Body']);
-		$res->setQueue($queue ? : $this->default);
+		$res->setBody(json_decode($data['Body'], true));
+		$res->setRawBody($data['Body']);
+		$res->setQueueName($queue ? : $this->default);
+		$res->set('ReceiptHandle', $data['ReceiptHandle']);
 
 		return $res;
 	}
@@ -115,22 +115,17 @@ class SqsQueueDriver extends AbstractQueueDriver
 	/**
 	 * delete
 	 *
-	 * @param MessageResponse|string $message
-	 * @param null                   $queue
+	 * @param QueueMessage|string $message
 	 *
 	 * @return static
+	 * @internal param null $queue
+	 *
 	 */
-	public function delete($message, $queue = null)
+	public function delete(QueueMessage $message)
 	{
-		if ($message instanceof MessageResponse)
-		{
-			$queue = $message->getQueue();
-			$message = $message->get('ReceiptHandle');
-		}
-
 		$this->client->deleteMessage([
-			'QueueUrl' => $this->getQueueUrl($queue),
-			'ReceiptHandle' => $message
+			'QueueUrl' => $this->getQueueUrl($message->getQueueName()),
+			'ReceiptHandle' => $this->getReceiptHandle($message),
 		]);
 
 		return $this;
@@ -139,24 +134,16 @@ class SqsQueueDriver extends AbstractQueueDriver
 	/**
 	 * release
 	 *
-	 * @param MessageResponse|string $message
-	 * @param int                    $delay
-	 * @param string                 $queue
+	 * @param QueueMessage|string $message
 	 *
-	 * @return  static
+	 * @return static
 	 */
-	public function release($message, $delay = 0, $queue = null)
+	public function release(QueueMessage $message)
 	{
-		if ($message instanceof MessageResponse)
-		{
-			$queue = $message->getQueue();
-			$message = $message->get('ReceiptHandle');
-		}
-
 		$this->client->changeMessageVisibility([
-			'QueueUrl' => $this->getQueueUrl($queue),
-			'ReceiptHandle' => $message,
-			'VisibilityTimeout' => $delay
+			'QueueUrl' => $this->getQueueUrl($message->getQueueName()),
+			'ReceiptHandle' => $this->getReceiptHandle($message),
+			'VisibilityTimeout' => $message->getDelay()
 		]);
 
 		return $this;
@@ -179,5 +166,17 @@ class SqsQueueDriver extends AbstractQueueDriver
 		}
 
 		return $this->client->getQueueUrl(array('QueueName' => $queue))->get('QueueUrl');
+	}
+
+	/**
+	 * getReceiptHandle
+	 *
+	 * @param QueueMessage $message
+	 *
+	 * @return  string
+	 */
+	public function getReceiptHandle(QueueMessage $message)
+	{
+		return $message->get('ReceiptHandle', $message->getId());
 	}
 }

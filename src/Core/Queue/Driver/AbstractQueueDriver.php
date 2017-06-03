@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Queue\Driver;
 
-use Windwalker\Core\Queue\MessageResponse;
+use Windwalker\Core\Queue\QueueMessage;
 
 /**
  * The AbstractQueueDriver class.
@@ -20,42 +20,46 @@ abstract class AbstractQueueDriver
 	/**
 	 * push
 	 *
-	 * @param string $body
-	 * @param string $queue
-	 * @param int    $delay
-	 * @param array  $options
+	 * @param QueueMessage $message
 	 *
-	 * @return string|int
+	 * @return int|string
+	 * @internal param array $options
+	 *
+	 * @internal param string $queue
+	 * @internal param string $body
+	 * @internal param int $delay
 	 */
-	abstract public function push($body, $queue = null, $delay = 0, array $options = []);
+	abstract public function push(QueueMessage $message);
 
 	/**
 	 * pop
 	 *
 	 * @param string $queue
 	 *
-	 * @return MessageResponse
+	 * @return QueueMessage
 	 */
 	abstract public function pop($queue = null);
 
 	/**
 	 * delete
 	 *
-	 * @param MessageResponse|string $message
-	 * @param null                   $queue
+	 * @param QueueMessage|string $message
 	 *
 	 * @return static
+	 * @internal param null $queue
+	 *
 	 */
-	abstract public function delete($message, $queue = null);
+	abstract public function delete(QueueMessage $message);
 
 	/**
 	 * release
 	 *
-	 * @param MessageResponse|string $message
-	 * @param int                    $delay
-	 * @param string                 $queue
+	 * @param QueueMessage|string $message
 	 *
-	 * @return  static
+	 * @return static
+	 * @internal param string $queue
+	 *
+	 * @internal param int $delay
 	 */
-	abstract public function release($message, $delay = 0, $queue = null);
+	abstract public function release(QueueMessage $message);
 }

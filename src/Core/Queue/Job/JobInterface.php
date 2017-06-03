@@ -6,21 +6,21 @@
  * @license    __LICENSE__
  */
 
-namespace Windwalker\Core\Queue;
+namespace Windwalker\Core\Queue\Job;
 
 /**
  * The AbstractJob class.
  *
  * @since  __DEPLOY_VERSION__
  */
-abstract class AbstractJob
+interface JobInterface
 {
 	/**
 	 * getName
 	 *
 	 * @return  string
 	 */
-	abstract public function getName();
+	public function getName();
 
-	abstract public function handle();
+	public function execute();
 }
