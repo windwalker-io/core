@@ -15,7 +15,7 @@ return Arr::mergeRecursive(
 
 		],
 
-		'providers' =>[
+		'providers' => [
 			'console'  => \Windwalker\Core\Provider\ConsoleProvider::class,
 			'datetime' => \Windwalker\Core\Provider\DateTimeProvider::class,
 			'logger'   => \Windwalker\Core\Provider\LoggerProvider::class,

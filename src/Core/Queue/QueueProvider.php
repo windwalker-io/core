@@ -39,5 +39,7 @@ class QueueProvider implements ServiceProviderInterface
 		})->alias('queue.driver', QueueDriverInterface::class);
 
 		$container->prepareSharedObject(QueueManager::class);
+
+		$container->prepareSharedObject(Worker::class)->alias('queue.worker', Worker::class);
 	}
 }

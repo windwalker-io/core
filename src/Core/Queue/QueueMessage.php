@@ -57,6 +57,13 @@ class QueueMessage implements \JsonSerializable
 	protected $delay = 0;
 
 	/**
+	 * Property deleted.
+	 *
+	 * @var  bool
+	 */
+	protected $deleted = false;
+
+	/**
 	 * QueueMessage constructor.
 	 *
 	 * @param JobInterface $job
@@ -321,6 +328,25 @@ class QueueMessage implements \JsonSerializable
 	public function setDelay($delay)
 	{
 		$this->delay = (int) $delay;
+
+		return $this;
+	}
+
+	/**
+	 * isDeleted
+	 *
+	 * @param bool $bool
+	 *
+	 * @return  static|bool
+	 */
+	public function isDeleted($bool = null)
+	{
+		if ($bool === null)
+		{
+			return $this->deleted;
+		}
+
+		$this->deleted = (bool) $bool;
 
 		return $this;
 	}

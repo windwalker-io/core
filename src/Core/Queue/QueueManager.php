@@ -28,7 +28,7 @@ class QueueManager implements ContainerAwareInterface
 	/**
 	 * Property driver.
 	 *
-	 * @var SqsQueueDriver
+	 * @var QueueDriverInterface
 	 */
 	protected $driver;
 
@@ -72,9 +72,9 @@ class QueueManager implements ContainerAwareInterface
 		return $this->driver->push($message);
 	}
 
-	public function pop()
+	public function pop($queue = null)
 	{
-		return $this->driver->pop();
+		return $this->driver->pop($queue);
 	}
 
 	public function delete($message)
@@ -86,6 +86,8 @@ class QueueManager implements ContainerAwareInterface
 		}
 
 		$this->driver->delete($message);
+
+		$message->isDeleted(true);
 	}
 
 	public function release($message, $delay = 0)
@@ -188,5 +190,29 @@ class QueueManager implements ContainerAwareInterface
 		}
 
 		return $job;
+	}
+
+	/**
+	 * Method to get property Driver
+	 *
+	 * @return  QueueDriverInterface
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+
+	/**
+	 * Method to set property driver
+	 *
+	 * @param   QueueDriverInterface $driver
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDriver(QueueDriverInterface $driver)
+	{
+		$this->driver = $driver;
+
+		return $this;
 	}
 }

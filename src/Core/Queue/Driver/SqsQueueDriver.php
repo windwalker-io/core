@@ -89,7 +89,7 @@ class SqsQueueDriver implements QueueDriverInterface
 	 *
 	 * @param string $queue
 	 *
-	 * @return QueueMessage|bool
+	 * @return QueueMessage|null
 	 */
 	public function pop($queue = null)
 	{
@@ -100,7 +100,7 @@ class SqsQueueDriver implements QueueDriverInterface
 
 		if ($result['Messages'] === null)
 		{
-			return false;
+			return null;
 		}
 
 		$data = $result['Messages'][0];
