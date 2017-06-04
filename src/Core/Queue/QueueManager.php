@@ -10,7 +10,10 @@ namespace Windwalker\Core\Queue;
 
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
+use Windwalker\Core\Queue\Driver\IronmqQueueDriver;
+use Windwalker\Core\Queue\Driver\NullQueueDriver;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
+use Windwalker\Core\Queue\Driver\RabbitmqQueueDriver;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
 use Windwalker\Core\Queue\Driver\SyncQueueDriver;
 use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
@@ -154,6 +157,7 @@ class QueueManager
 			throw new \LogicException('No queue config for ' . $driver);
 		}
 
+		// TODO: All driver should have DI pattern.
 		switch ($driver)
 		{
 			case 'sqs':
@@ -169,14 +173,32 @@ class QueueManager
 
 			case 'sync':
 				return new SyncQueueDriver($this->container);
+
 			case 'database':
 				return new DatabaseQueueDriver(
 					$this->container->get('db'),
 					$queueConfig->get('queue', 'default'),
 					$queueConfig->get('table', 'queue_jobs')
 				);
+
 			case 'ironmq':
-			case 'redis':
+				return new IronmqQueueDriver(
+					$queueConfig->get('project_id'),
+					$queueConfig->get('token'),
+					$queueConfig->get('queue', 'default'),
+					[
+						'host' => $queueConfig->get('region', 'mq-aws-us-east-1-1') . '.iron.io'
+					]
+				);
+
+			case 'rabbitmq':
+				return new RabbitmqQueueDriver(
+					$queueConfig->get('queue', 'default'),
+					(array) $queueConfig->get('options', [])
+				);
+
+			default:
+				return new NullQueueDriver;
 		}
 	}
 

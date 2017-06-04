@@ -72,10 +72,7 @@ class SqsQueueDriver implements QueueDriverInterface
 			'MessageBody' => json_encode($message)
 		];
 
-		if ($message->getDelay() > 0)
-		{
-			$message['DelaySeconds'] = $message->getDelay();
-		}
+		$message['DelaySeconds'] = $message->getDelay();
 
 		$options = $message->getOptions();
 

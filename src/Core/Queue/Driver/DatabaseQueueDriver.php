@@ -11,6 +11,7 @@ namespace Windwalker\Core\Queue\Driver;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Query\Query;
 
 /**
  * The DatabaseQueueDriver class.
@@ -32,12 +33,20 @@ class DatabaseQueueDriver implements QueueDriverInterface
 	 * @var
 	 */
 	protected $table;
+
 	/**
 	 * Property queue.
 	 *
 	 * @var  string
 	 */
-	private $queue;
+	protected $queue;
+
+	/**
+	 * Property timeout.
+	 *
+	 * @var  int
+	 */
+	protected $timeout;
 
 	/**
 	 * DatabaseQueueDriver constructor.
@@ -45,12 +54,14 @@ class DatabaseQueueDriver implements QueueDriverInterface
 	 * @param AbstractDatabaseDriver $db
 	 * @param string                 $queue
 	 * @param string                 $table
+	 * @param int                    $timeout
 	 */
-	public function __construct(AbstractDatabaseDriver $db, $queue = 'default', $table = 'queue_jobs')
+	public function __construct(AbstractDatabaseDriver $db, $queue = 'default', $table = 'queue_jobs', $timeout = 60)
 	{
 		$this->db = $db;
 		$this->table = $table;
 		$this->queue = $queue;
+		$this->timeout = $timeout;
 	}
 
 	/**
@@ -97,12 +108,15 @@ class DatabaseQueueDriver implements QueueDriverInterface
 			->from($this->table)
 			->where('queue = :queue')
 			->where('visibility <= :now')
-			->where('reserved IS NULL')
+			->orWhere(function (Query $query)
+			{
+			    $query->where('reserved IS NULL')
+				    ->where('reserved < :timeout');
+			})
 			->bind('queue', $queue)
 			->bind('now', $now->toSql())
-			->bind($now->toSql());
+			->bind('timeout', Chronos::create('now -' . $this->timeout . 'seconds')->toSql());
 
-		$this->db->setDebug(true);
 		$data = $this->db->setQuery($query)->loadOne('assoc');
 
 		if (!$data)

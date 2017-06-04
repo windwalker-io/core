@@ -79,6 +79,13 @@ class Worker implements DispatcherAwareInterface
 	protected $lastRestart;
 
 	/**
+	 * Property pid.
+	 *
+	 * @var  int
+	 */
+	protected $pid;
+
+	/**
 	 * Worker constructor.
 	 *
 	 * @param Queue               $manager
@@ -106,6 +113,11 @@ class Worker implements DispatcherAwareInterface
 
 		// Last Restart
 		$this->lastRestart = Chronos::create('now')->toUnix();
+
+		// Log PID
+		$this->pid = getmypid();
+
+		$this->logger->info('A worker start running... PID: ' . $this->pid);
 
 		$this->setState(static::STATE_ACTIVE);
 
@@ -262,7 +274,7 @@ class Worker implements DispatcherAwareInterface
 		{
 			pcntl_signal(SIGALRM, function () use ($timeout)
 			{
-				$this->stop('A job process over the max timeout: ' . $timeout);
+				$this->stop('A job process over the max timeout: ' . $timeout . ' PID: ' . $this->pid);
 			});
 
 			pcntl_alarm($timeout + $options->get('sleep'));
@@ -453,18 +465,18 @@ class Worker implements DispatcherAwareInterface
 
 			if ($this->lastRestart < $signal)
 			{
-				$this->stop('Receive restart signal.');
+				$this->stop('Receive restart signal. PID: ' . $this->pid);
 			}
 		}
 
 		if ((memory_get_usage() / 1024 / 1024) >= (int) $options->get('memory_limit', 128))
 		{
-			$this->stop('Memory usage exceeded.');
+			$this->stop('Memory usage exceeded. PID: ' . $this->pid);
 		}
 
 		if ($this->getState() === static::STATE_EXITING)
 		{
-			$this->stop('Shotdown by signal.');
+			$this->stop('Shutdown by signal. PID: ' . $this->pid);
 		}
 	}
 }
