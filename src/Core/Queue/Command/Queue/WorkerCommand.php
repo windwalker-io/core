@@ -146,7 +146,7 @@ class WorkerCommand extends Command
 	protected function listenToWorker(Worker $worker)
 	{
 		$worker->getDispatcher()
-			->listen('onWorkBeforeJobRun', function (Event $event)
+			->listen('onWorkerBeforeJobRun', function (Event $event)
 			{
 				/**
 				 * @var JobInterface $job
@@ -161,7 +161,7 @@ class WorkerCommand extends Command
 				    $message->getId()
 			    ));
 			})
-			->listen('onWorkJobFailure', function (Event $event)
+			->listen('onWorkerJobFailure', function (Event $event)
 			{
 				/**
 				 * @var JobInterface $job
@@ -190,7 +190,7 @@ class WorkerCommand extends Command
 					);
 				}
 			})
-			->listen('onWorkLoopCycleStart', function (Event $event)
+			->listen('onWorkerLoopCycleStart', function (Event $event)
 			{
 				/** @var Worker $worker */
 				$worker = $event['worker'];

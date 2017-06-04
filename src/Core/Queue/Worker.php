@@ -114,7 +114,7 @@ class Worker implements DispatcherAwareInterface
 			$this->gc();
 
 			// @loop start
-			$this->dispatcher->triggerEvent('onWorkLoopCycleStart', [
+			$this->dispatcher->triggerEvent('onWorkerLoopCycleStart', [
 				'worker' => $this,
 				'manager' => $this->manager
 			]);
@@ -130,7 +130,7 @@ class Worker implements DispatcherAwareInterface
 			$this->stopIfNecessary($options);
 
 			// @loop end
-			$this->dispatcher->triggerEvent('onWorkLoopCycleEnd', [
+			$this->dispatcher->triggerEvent('onWorkerLoopCycleEnd', [
 				'worker' => $this,
 				'manager' => $this->manager
 			]);
@@ -156,6 +156,19 @@ class Worker implements DispatcherAwareInterface
 			return;
 		}
 
+		$this->process($message, $options);
+	}
+
+	/**
+	 * process
+	 *
+	 * @param QueueMessage $message
+	 * @param Structure    $options
+	 *
+	 * @return  void
+	 */
+	public function process(QueueMessage $message, Structure $options)
+	{
 		$maxTries = (int) $options->get('tries', 5);
 
 		$job = $message->getJob();
@@ -165,7 +178,7 @@ class Worker implements DispatcherAwareInterface
 		try
 		{
 			// @before event
-			$this->dispatcher->triggerEvent('onWorkBeforeJobRun', [
+			$this->dispatcher->triggerEvent('onWorkerBeforeJobRun', [
 				'worker' => $this,
 				'message' => $message,
 				'job' => $job,
@@ -184,7 +197,7 @@ class Worker implements DispatcherAwareInterface
 			$job->execute();
 
 			// @after event
-			$this->dispatcher->triggerEvent('onWorkAfterJobRun', [
+			$this->dispatcher->triggerEvent('onWorkerAfterJobRun', [
 				'worker' => $this,
 				'message' => $message,
 				'job' => $job,
@@ -281,7 +294,7 @@ class Worker implements DispatcherAwareInterface
 	{
 		$this->logger->info('Worker stop: ' . $reason);
 
-		$this->triggerEvent('onWorkerStop', [
+		$this->triggerEvent('onWorkererStop', [
 			'worker' => $this
 		]);
 
@@ -334,7 +347,7 @@ class Worker implements DispatcherAwareInterface
 			));
 		}
 
-		$this->dispatcher->triggerEvent('onWorkJobFailure', [
+		$this->dispatcher->triggerEvent('onWorkerJobFailure', [
 			'worker' => $this,
 			'exception' => $e,
 			'job' => $job,

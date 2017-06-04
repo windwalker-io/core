@@ -95,13 +95,14 @@ class DatabaseQueueDriver implements QueueDriverInterface
 
 		$query->select('*')
 			->from($this->table)
-			->where('queue = %q', $queue)
-			->where('visibility <= %q', $now->toSql())
+			->where('queue = :queue')
+			->where('visibility <= :now')
 			->where('reserved IS NULL')
-//			->bind('queue', $queue)
-//			->bind('now', $now->toSql())
+			->bind('queue', $queue)
+			->bind('now', $now->toSql())
 			->bind($now->toSql());
 
+		$this->db->setDebug(true);
 		$data = $this->db->setQuery($query)->loadOne('assoc');
 
 		if (!$data)

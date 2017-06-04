@@ -12,6 +12,7 @@ use Windwalker\Core\Config\Config;
 use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
+use Windwalker\Core\Queue\Driver\SyncQueueDriver;
 use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
 use Windwalker\Core\Queue\Failer\NullQueueFailer;
 use Windwalker\Core\Queue\Failer\QueueFailerInterface;
@@ -167,6 +168,7 @@ class QueueManager
 				);
 
 			case 'sync':
+				return new SyncQueueDriver($this->container);
 			case 'database':
 				return new DatabaseQueueDriver(
 					$this->container->get('db'),
