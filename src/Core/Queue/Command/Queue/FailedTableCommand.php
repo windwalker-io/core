@@ -17,7 +17,7 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
  *
  * @since  __DEPLOY_VERSION__
  */
-class TableCommand extends Command
+class FailedTableCommand extends Command
 {
 	use CoreCommandTrait;
 	use MigrationCommandTrait;
@@ -27,14 +27,14 @@ class TableCommand extends Command
 	 *
 	 * @var  string
 	 */
-	protected $name = 'table';
+	protected $name = 'failed-table';
 
 	/**
 	 * Property description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Create jobs migraiton file.';
+	protected $description = 'Create failed_jobs migraiton file.';
 
 	/**
 	 * Property usage.
@@ -62,8 +62,8 @@ class TableCommand extends Command
 		$repository = $this->getRepository();
 
 		$repository->copyMigration(
-			$this->getArgument(0, 'QueueJobInit'),
-			__DIR__ . '/../../../Resources/Templates/migration/queue_jobs.tpl'
+			$this->getArgument(0, 'QueueFailedJobInit'),
+			__DIR__ . '/../../../Resources/Templates/migration/queue_failed_jobs.tpl'
 		);
 
 		return true;

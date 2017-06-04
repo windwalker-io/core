@@ -10,6 +10,7 @@ namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Queue\Job\JobInterface;
 use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Core\Queue\Worker;
@@ -40,12 +41,24 @@ class WorkerCommand extends Command
 	protected $description = 'Start a queue worker.';
 
 	/**
+	 * Property usage.
+	 *
+	 * @var  string
+	 */
+	protected $usage = '%s <cmd><queues...></cmd> <option>[option]</option>';
+
+	/**
 	 * init
 	 *
 	 * @return  void
 	 */
 	protected function init()
 	{
+		$this->addOption('c')
+			->alias('connection')
+			->defaultValue(null)
+			->description('The connection of queue.');
+
 		$this->addOption('o')
 			->alias('once')
 			->defaultValue(false)
@@ -90,6 +103,13 @@ class WorkerCommand extends Command
 	{
 		$queues  = $this->io->getArguments();
 		$options = $this->getWorkOptions();
+		$connection = $this->getOption('connection', null) ? : $this->console->get('queue.connection');
+
+		// Set connection as default
+		if ($connection !== null)
+		{
+			$this->console->set('queue.connection', $connection);
+		}
 
 		/** @var Worker $worker */
 		$worker = $this->console->container->get('queue.worker');
@@ -97,8 +117,9 @@ class WorkerCommand extends Command
 		// Default Queues
 		if (!count($queues))
 		{
-			$driver = $this->console->get('queue.driver', 'sync');
-			$queues = $this->console->get('queue.' . $driver . '.default');
+			$queues = $this->console->container->get('queue.factory')
+				->getConnectionConfig($connection)
+				->get('queue');
 		}
 
 		$this->listenToWorker($worker);
@@ -157,6 +178,17 @@ class WorkerCommand extends Command
 					$e->getMessage(),
 					$message->getId()
 				), 'error');
+
+				// If be deleted, send to failed table
+				if ($message->isDeleted())
+				{
+					$this->console->container->get('queue.failer')->add(
+						$this->console->get('queue.connection', 'sync'),
+						$message->getQueueName(),
+						json_encode($message),
+						(string) $e
+					);
+				}
 			})
 			->listen('onWorkLoopCycleStart', function (Event $event)
 			{
@@ -189,7 +221,8 @@ class WorkerCommand extends Command
 				'memory'  => $this->getOption('memory'),
 				'sleep'   => $this->getOption('sleep'),
 				'tries'   => $this->getOption('tries'),
-				'timeout' => $this->getOption('timeout')
+				'timeout' => $this->getOption('timeout'),
+				'restart_signal' => $file = $this->console->get('path.temp') . '/queue/restart'
 			]
 		);
 	}

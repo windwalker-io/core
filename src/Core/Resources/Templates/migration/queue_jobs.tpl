@@ -29,7 +29,7 @@ class {{className}} extends AbstractMigration
 			$schema->tinyint('attempts')->unsigned();
 			$schema->datetime('created');
 			$schema->datetime('visibility');
-			$schema->primary('released')->allowNull();
+			$schema->datetime('released')->allowNull();
 
 			$schema->addIndex('queue');
 		});

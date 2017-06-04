@@ -78,7 +78,11 @@ class QueueMessage implements \JsonSerializable
 			$this->setJob($job);
 		}
 
-		$this->setData($data);
+		if ($data)
+		{
+			$this->setData($data);
+		}
+
 		$this->setDelay($delay);
 		$this->setOptions($options);
 	}
@@ -255,7 +259,7 @@ class QueueMessage implements \JsonSerializable
 	 */
 	public function setBody($body)
 	{
-		$this->body = $body;
+		$this->body = (array) $body;
 
 		return $this;
 	}

@@ -21,10 +21,10 @@ class {{className}} extends AbstractMigration
 	 */
 	public function up()
 	{
-		$this->createTable('queue_fail_jobs', function (Schema $schema)
+		$this->createTable('queue_failed_jobs', function (Schema $schema)
 		{
 			$schema->primary('id');
-			$schema->varchar('driver');
+			$schema->varchar('connection');
 			$schema->varchar('queue');
 			$schema->longtext('body');
 			$schema->longtext('exception');

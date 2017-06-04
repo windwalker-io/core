@@ -11,6 +11,11 @@ namespace Windwalker\Core\Queue;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
+use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
+use Windwalker\Core\Queue\Failer\NullQueueFailer;
+use Windwalker\Core\Queue\Failer\QueueFailerInterface;
+use Windwalker\DI\Container;
+use Windwalker\Structure\Structure;
 
 /**
  * The QueueDriverFactory class.
@@ -27,6 +32,13 @@ class QueueFactory
 	protected $config;
 
 	/**
+	 * Property managers.
+	 *
+	 * @var  QueueManager[]
+	 */
+	protected $managers = [];
+
+	/**
 	 * Property drivers.
 	 *
 	 * @var  QueueDriverInterface[]
@@ -34,46 +46,87 @@ class QueueFactory
 	protected $drivers = [];
 
 	/**
+	 * Property container.
+	 *
+	 * @var  Container
+	 */
+	protected $container;
+
+	/**
 	 * QueueDriverFactory constructor.
 	 *
 	 * @param Config $config
 	 */
-	public function __construct(Config $config)
+	public function __construct(Config $config, Container $container)
 	{
 		$this->config = $config;
+		$this->container = $container;
 	}
 
 	/**
 	 * create
 	 *
-	 * @param string $driver
+	 * @param $connection $driver
 	 *
 	 * @return  QueueManager
 	 */
-	public function create($driver = 'sync')
+	public function create($connection = null)
 	{
-		return new QueueManager($this->getDriver($driver));
+		$driver = $this->createDriverByConnection($connection);
+
+		return new QueueManager($driver);
+	}
+
+	/**
+	 * getManager
+	 *
+	 * @param string $connection
+	 *
+	 * @return  QueueManager
+	 */
+	public function getManager($connection = null)
+	{
+		$connection = strtolower($connection);
+
+		if (!isset($this->managers[$connection]))
+		{
+			$this->managers[$connection] = $this->create($connection);
+		}
+
+		return $this->managers[$connection];
+	}
+
+	/**
+	 * createDriverByConnection
+	 *
+	 * @param string $connection
+	 *
+	 * @return  QueueDriverInterface
+	 */
+	public function createDriverByConnection($connection = null)
+	{
+		$connection = $connection ? : $this->getConnectionName();
+
+		$config = $this->getConnectionConfig($connection);
+
+		return $this->createDriver($config->get('driver', 'sync'), $config->toArray());
 	}
 
 	/**
 	 * getDriver
 	 *
 	 * @param string $driver
+	 * @param array  $config
 	 *
-	 * @return  QueueDriverInterface
+	 * @return QueueDriverInterface
 	 */
-	public function getDriver($driver = null)
+	public function getDriver($driver = null, array $config = [])
 	{
-		if ($driver === null)
-		{
-			$driver = $this->config->get('queue.driver');
-		}
-
 		$driver = strtolower($driver);
 
 		if (!isset($this->drivers[$driver]))
 		{
-			$this->drivers[$driver] = $this->createDriver($driver);
+			$this->drivers[$driver] = $this->createDriver($driver, $config);
 		}
 
 		return $this->drivers[$driver];
@@ -83,19 +136,15 @@ class QueueFactory
 	 * create
 	 *
 	 * @param string $driver
+	 * @param array  $config
 	 *
-	 * @return  QueueDriverInterface
+	 * @return QueueDriverInterface
 	 */
-	public function createDriver($driver = null)
+	public function createDriver($driver, array $config = [])
 	{
-		if ($driver === null)
-		{
-			$driver = $this->config->get('queue.driver');
-		}
-
 		$driver = strtolower($driver);
 
-		$queueConfig = $this->config->extract('queue.' . $driver);
+		$queueConfig = new Structure($config);
 
 		if (!$queueConfig->toArray())
 		{
@@ -108,7 +157,7 @@ class QueueFactory
 				return new SqsQueueDriver(
 					$queueConfig->get('key'),
 					$queueConfig->get('secret'),
-					$queueConfig->get('default', 'default'),
+					$queueConfig->get('queue', 'default'),
 					[
 						'region' => $queueConfig->get('region', 'us-west-2'),
 						'version' => $queueConfig->get('version', 'latest')
@@ -120,5 +169,71 @@ class QueueFactory
 			case 'ironmq':
 			case 'redis':
 		}
+	}
+
+	/**
+	 * createFailer
+	 *
+	 * @param string $driver
+	 *
+	 * @return  QueueFailerInterface
+	 * @throws \UnexpectedValueException
+	 */
+	public function createFailer($driver = null)
+	{
+		$driver = $driver ? : $this->config->get('queue.failer.driver', 'database');
+
+		switch ($driver)
+		{
+			case 'database':
+				$failer = new DatabaseQueueFailer(
+					$this->container->get('db'),
+					$this->config->get('queue.failer.table')
+				);
+
+				if ($failer->isSupported())
+				{
+					return $failer;
+				}
+			case 'null':
+			default:
+				return new NullQueueFailer;
+		}
+	}
+
+	/**
+	 * getConnectionName
+	 *
+	 * @return  string
+	 */
+	public function getConnectionName()
+	{
+		return $this->config->get('queue.connection', 'sync');
+	}
+
+	/**
+	 * getDriverName
+	 *
+	 * @return  string
+	 */
+	public function getDriverName($conn = null)
+	{
+		$conn = $conn ? : $this->getConnectionName();
+
+		return $this->config->get('queue.' . $conn . '.driver', 'sync');
+	}
+
+	/**
+	 * getConnectionConfig
+	 *
+	 * @param   string $conn
+	 *
+	 * @return  Structure
+	 */
+	public function getConnectionConfig($conn = null)
+	{
+		$conn = $conn ? : $this->getConnectionName();
+
+		return $this->config->extract('queue.' . $conn);
 	}
 }

@@ -41,6 +41,9 @@ class QueueCommand extends Command
 	{
 		$this->addCommand(Queue\WorkerCommand::class);
 		$this->addCommand(Queue\TableCommand::class);
-		$this->addCommand(Queue\FailTableCommand::class);
+		$this->addCommand(Queue\FailedTableCommand::class);
+		$this->addCommand(Queue\RetryCommand::class);
+		$this->addCommand(Queue\RestartCommand::class);
+		$this->addCommand(Queue\RemoveFailedCommand::class);
 	}
 }

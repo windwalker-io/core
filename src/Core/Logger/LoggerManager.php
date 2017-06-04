@@ -265,8 +265,8 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * getLogger
 	 *
-	 * @param   string $category
-	 * @param   string $level
+	 * @param string  $category
+	 * @param string  $level
 	 *
 	 * @return LoggerInterface
 	 */
@@ -302,7 +302,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	{
 		$logger = new Monolog($categoey);
 
-		$handler = $handler ? : new StreamHandler($this->logPath . '/' . $categoey . '.log', $level);
+		$handler = $handler ? : new StreamHandler($this->getLogFile($categoey), $level);
 		$logger->pushProcessor(new PsrLogMessageProcessor);
 
 		// Basic string handler
@@ -319,6 +319,20 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 		}
 
 		return $logger;
+	}
+
+	/**
+	 * getRotatingLogger
+	 *
+	 * @param string $category
+	 * @param string $level
+	 * @param int    $maxFiles
+	 *
+	 * @return  LoggerInterface
+	 */
+	public function createRotatingLogger($category, $level = Logger::DEBUG, $maxFiles = 7)
+	{
+		return $this->createLogger($category, $level, new RotatingFileHandler($this->getLogFile($category), $maxFiles, $level));
 	}
 
 	/**

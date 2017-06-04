@@ -10,9 +10,11 @@ namespace Windwalker\Core\Queue;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Queue\Exception\MaxAttemptsExceededException;
 use Windwalker\Core\Queue\Job\JobInterface;
+use Windwalker\Core\Queue\Job\NullJob;
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
@@ -70,6 +72,13 @@ class Worker implements DispatcherAwareInterface
 	protected $exiting = false;
 
 	/**
+	 * Property lastRestart.
+	 *
+	 * @var  int
+	 */
+	protected $lastRestart;
+
+	/**
 	 * Worker constructor.
 	 *
 	 * @param QueueManager        $manager
@@ -96,6 +105,7 @@ class Worker implements DispatcherAwareInterface
 		gc_enable();
 
 		// Last Restart
+		$this->lastRestart = Chronos::create('now')->toUnix();
 
 		$this->setState(static::STATE_ACTIVE);
 
@@ -116,16 +126,8 @@ class Worker implements DispatcherAwareInterface
 			{
 				$this->runNextJob($queue, $options);
 			}
-show(memory_get_usage() / 1024 / 1024);
-			if ((memory_get_usage() / 1024 / 1024) >= (int) $options->get('memory_limit', 128))
-			{
-				$this->stop('Memory usage exceeded.');
-			}
 
-			if ($this->getState() === static::STATE_EXITING)
-			{
-				$this->stop('Shotdown by signal.');
-			}
+			$this->stopIfNecessary($options);
 
 			// @loop end
 			$this->dispatcher->triggerEvent('onWorkLoopCycleEnd', [
@@ -193,26 +195,14 @@ show(memory_get_usage() / 1024 / 1024);
 		}
 		catch (\Exception $e)
 		{
-			$this->handleJobException($job, $message, $e);
+			$this->handleJobException($job, $message, $options, $e);
 		}
 		catch (\Throwable $t)
 		{
-			$this->handleJobException($job, $message, $t);
+			$this->handleJobException($job, $message, $options, $t);
 		}
 		finally
 		{
-			// Delete and log error if reach max attempts.
-			if ($maxTries !== 0 && $maxTries <= $message->getAttempts())
-			{
-				$this->manager->delete($message);
-				$this->logger->error(sprintf(
-					'Max attempts exceeded. Job: %s (%s) - Class: %s',
-					$job->getName(),
-					$message->getId(),
-					get_class($job)
-				));
-			}
-
 			if (!$message->isDeleted())
 			{
 				$this->manager->release($message, (int) $options->get('delay', 0));
@@ -305,12 +295,18 @@ show(memory_get_usage() / 1024 / 1024);
 	 *
 	 * @param JobInterface          $job
 	 * @param QueueMessage          $message
+	 * @param Structure             $options
 	 * @param \Exception|\Throwable $e
 	 *
 	 * @return void
 	 */
-	protected function handleJobException(JobInterface $job, QueueMessage $message, $e)
+	protected function handleJobException($job, QueueMessage $message, Structure $options, $e)
 	{
+		if (!$job instanceof JobInterface)
+		{
+			$job = new NullJob;
+		}
+
 		$this->logger->error(sprintf(
 			'Job [%s] (%s) failed: %s - Class: %s',
 			$job->getName(),
@@ -322,6 +318,20 @@ show(memory_get_usage() / 1024 / 1024);
 		if (method_exists($job, 'failed'))
 		{
 			$job->failed($e);
+		}
+
+		$maxTries = (int) $options->get('tries', 5);
+
+		// Delete and log error if reach max attempts.
+		if ($maxTries !== 0 && $maxTries <= $message->getAttempts())
+		{
+			$this->manager->delete($message);
+			$this->logger->error(sprintf(
+				'Max attempts exceeded. Job: %s (%s) - Class: %s',
+				$job->getName(),
+				$message->getId(),
+				get_class($job)
+			));
 		}
 
 		$this->dispatcher->triggerEvent('onWorkJobFailure', [
@@ -411,5 +421,37 @@ show(memory_get_usage() / 1024 / 1024);
 	public function setState($state)
 	{
 		$this->state = $state;
+	}
+
+	/**
+	 * stopIfNecessary
+	 *
+	 * @param Structure $options
+	 *
+	 * @return  void
+	 */
+	public function stopIfNecessary(Structure $options)
+	{
+		$restartSignal = $options->get('restart_signal');
+
+		if (is_file($restartSignal))
+		{
+			$signal = file_get_contents($restartSignal);
+
+			if ($this->lastRestart < $signal)
+			{
+				$this->stop('Receive restart signal.');
+			}
+		}
+
+		if ((memory_get_usage() / 1024 / 1024) >= (int) $options->get('memory_limit', 128))
+		{
+			$this->stop('Memory usage exceeded.');
+		}
+
+		if ($this->getState() === static::STATE_EXITING)
+		{
+			$this->stop('Shotdown by signal.');
+		}
 	}
 }

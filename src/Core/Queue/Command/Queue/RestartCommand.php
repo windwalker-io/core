@@ -10,36 +10,32 @@ namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\CoreCommandTrait;
-use Windwalker\Core\Migration\Command\MigrationCommandTrait;
-use Windwalker\Core\Queue\Job\JobInterface;
-use Windwalker\Core\Queue\QueueMessage;
-use Windwalker\Core\Queue\Worker;
-use Windwalker\Event\Event;
-use Windwalker\Structure\Structure;
+use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Filesystem\File;
+use Windwalker\Utilities\Arr;
 
 /**
  * The WorkerCommand class.
  *
  * @since  __DEPLOY_VERSION__
  */
-class FailTableCommand extends Command
+class RestartCommand extends Command
 {
 	use CoreCommandTrait;
-	use MigrationCommandTrait;
 
 	/**
 	 * Property name.
 	 *
 	 * @var  string
 	 */
-	protected $name = 'fail-table';
+	protected $name = 'restart';
 
 	/**
 	 * Property description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Create fail-jobs migraiton file.';
+	protected $description = 'Send restart signal to all workers.';
 
 	/**
 	 * init
@@ -48,6 +44,10 @@ class FailTableCommand extends Command
 	 */
 	protected function init()
 	{
+		$this->addOption('t')
+			->alias('time')
+			->defaultValue('now')
+			->description('The time to restart all workers.');
 	}
 
 	/**
@@ -57,12 +57,11 @@ class FailTableCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$repository = $this->getRepository();
+		$file = $this->console->get('path.temp') . '/queue/restart';
 
-		$repository->copyMigration(
-			$this->getArgument(0, 'QueueFailJobInit'),
-			__DIR__ . '/../../../Resources/Templates/migration/queue_fail_jobs.tpl'
-		);
+		File::write($file, Chronos::create($this->getOption('time'))->toUnix());
+
+		$this->out('Sent restart signal to all workers.');
 
 		return true;
 	}

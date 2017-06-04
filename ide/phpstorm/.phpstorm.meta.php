@@ -77,7 +77,9 @@ namespace PHPSTORM_META
 			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
 
 			// Queue
-			'queue' instanceof \Windwalker\Core\Queue\QueueManager
+			'queue' instanceof \Windwalker\Core\Queue\QueueManager,
+			'queue.factory' instanceof \Windwalker\Core\Queue\QueueFactory,
+			'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
 		],
 
 		new \Windwalker\DI\Container => [
@@ -148,7 +150,9 @@ namespace PHPSTORM_META
 			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
 
 			// Queue
-			'queue' instanceof \Windwalker\Core\Queue\QueueManager
+			'queue' instanceof \Windwalker\Core\Queue\QueueManager,
+			'queue.factory' instanceof \Windwalker\Core\Queue\QueueFactory,
+			'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
 		]
 	];
 }
