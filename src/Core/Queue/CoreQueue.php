@@ -11,16 +11,16 @@ namespace Windwalker\Core\Queue;
 use Windwalker\Core\Facade\AbstractProxyFacade;
 
 /**
- * The QueueFactory class.
+ * The CoreQueue class.
  *
  * @since  __DEPLOY_VERSION__
  */
-class QueueFactory extends AbstractProxyFacade
+class CoreQueue extends AbstractProxyFacade
 {
 	/**
 	 * Property _key.
 	 *
 	 * @var  string
 	 */
-	protected static $_key = 'queue.manager';
+	protected static $_key = 'queue';
 }

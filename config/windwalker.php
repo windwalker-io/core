@@ -95,7 +95,8 @@ return [
 			'mailer' => \Windwalker\Core\Mailer\MailerManager::class,
 
 			// Queue
-			'queue' => \Windwalker\Core\Queue\QueueManager::class
+			'queue' => \Windwalker\Core\Queue\Queue::class,
+			'queue.manager' => \Windwalker\Core\Queue\QueueManager::class,
 		]
 	],
 	

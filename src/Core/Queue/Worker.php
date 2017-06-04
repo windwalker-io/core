@@ -46,7 +46,7 @@ class Worker implements DispatcherAwareInterface
 	/**
 	 * Property queue.
 	 *
-	 * @var  QueueManager
+	 * @var  Queue
 	 */
 	protected $manager;
 
@@ -81,11 +81,11 @@ class Worker implements DispatcherAwareInterface
 	/**
 	 * Worker constructor.
 	 *
-	 * @param QueueManager        $manager
+	 * @param Queue               $manager
 	 * @param DispatcherInterface $dispatcher
 	 * @param LoggerInterface     $logger
 	 */
-	public function __construct(QueueManager $manager, DispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+	public function __construct(Queue $manager, DispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
 	{
 		$this->manager = $manager;
 		$this->dispatcher = $dispatcher ? : new Dispatcher;
@@ -394,7 +394,7 @@ class Worker implements DispatcherAwareInterface
 	/**
 	 * Method to get property Manager
 	 *
-	 * @return  QueueManager
+	 * @return  Queue
 	 */
 	public function getManager()
 	{

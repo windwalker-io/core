@@ -41,7 +41,7 @@ use Windwalker\Session\Session;
  * @property-read  Core\Cache\CacheFactory       cache
  * @property-read  Session                       session
  * @property-read  Environment                   environment
- * @property-read  Core\Queue\QueueManager       queue
+ * @property-read  Core\Queue\Queue              queue
  *
  * @since  2.0
  */

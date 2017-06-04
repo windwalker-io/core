@@ -68,7 +68,7 @@ class RetryCommand extends Command
 	 */
 	protected function doExecute()
 	{
-		$factory = $this->console->container->get('queue.factory');
+		$factory = $this->console->container->get('queue.manager');
 		$failer = $this->console->container->get('queue.failer');
 
 		$all = $this->getOption('all');

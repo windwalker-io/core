@@ -8,196 +8,233 @@
 
 namespace Windwalker\Core\Queue;
 
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
-use Windwalker\Core\Queue\Job\CallableJob;
-use Windwalker\Core\Queue\Job\JobInterface;
+use Windwalker\Core\Queue\Driver\SqsQueueDriver;
+use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
+use Windwalker\Core\Queue\Failer\NullQueueFailer;
+use Windwalker\Core\Queue\Failer\QueueFailerInterface;
+use Windwalker\DI\Container;
+use Windwalker\Structure\Structure;
 
 /**
- * The QueueManager class.
+ * The QueueDriverFactory class.
  *
  * @since  __DEPLOY_VERSION__
  */
 class QueueManager
 {
 	/**
-	 * Property driver.
+	 * Property config.
 	 *
-	 * @var QueueDriverInterface
+	 * @var  Config
 	 */
-	protected $driver;
+	protected $config;
 
 	/**
-	 * QueueManager constructor.
+	 * Property managers.
 	 *
-	 * @param QueueDriverInterface $driver
+	 * @var  Queue[]
 	 */
-	public function __construct(QueueDriverInterface $driver)
+	protected $managers = [];
+
+	/**
+	 * Property drivers.
+	 *
+	 * @var  QueueDriverInterface[]
+	 */
+	protected $drivers = [];
+
+	/**
+	 * Property container.
+	 *
+	 * @var  Container
+	 */
+	protected $container;
+
+	/**
+	 * QueueDriverFactory constructor.
+	 *
+	 * @param Config    $config
+	 * @param Container $container
+	 */
+	public function __construct(Config $config, Container $container)
 	{
-		$this->driver = $driver;
-	}
-
-	public function push($job, $delay = 0, $queue = null, array $options = [])
-	{
-		$message = $this->getMessageByJob($job);
-		$message->setDelay($delay);
-		$message->setQueueName($queue);
-		$message->setOptions($options);
-
-		return $this->driver->push($message);
-	}
-
-	public function pushRaw($body, $delay = 0, $queue = null, array $options = [])
-	{
-		$message = new QueueMessage;
-		$message->setBody($body);
-		$message->setDelay($delay);
-		$message->setQueueName($queue);
-		$message->setOptions($options);
-
-		return $this->driver->push($message);
-	}
-
-	public function pop($queue = null)
-	{
-		return $this->driver->pop($queue);
-	}
-
-	public function delete($message)
-	{
-		if (!$message instanceof QueueMessage)
-		{
-			$msg = new QueueMessage;
-			$msg->setId($message);
-		}
-
-		$this->driver->delete($message);
-
-		$message->isDeleted(true);
-	}
-
-	public function release($message, $delay = 0)
-	{
-		if (!$message instanceof QueueMessage)
-		{
-			$msg = new QueueMessage;
-			$msg->setId($message);
-		}
-
-		$message->setDelay($delay);
-
-		$this->driver->release($message);
+		$this->config = $config;
+		$this->container = $container;
 	}
 
 	/**
-	 * runJob
+	 * create
 	 *
-	 * @param string $job
+	 * @param $connection $driver
 	 *
-	 * @return  void
+	 * @return  Queue
 	 */
-	public function runJob($job)
+	public function create($connection = null)
 	{
-		$job = unserialize($job);
+		$driver = $this->createDriverByConnection($connection);
 
-		if (!$job instanceof JobInterface)
-		{
-			throw new \InvalidArgumentException('Job is not s JobInterface.');
-		}
-
-		$job->execute();
+		return new Queue($driver, $this->container);
 	}
 
 	/**
-	 * getMessage
+	 * getManager
 	 *
-	 * @param mixed $job
-	 * @param array $data
+	 * @param string $connection
 	 *
-	 * @return QueueMessage
-	 * @throws \InvalidArgumentException
+	 * @return  Queue
 	 */
-	public function getMessageByJob($job, array $data = [])
+	public function getManager($connection = null)
 	{
-		$message = new QueueMessage;
+		$connection = strtolower($connection);
 
-		$job = $this->createJobInstance($job);
+		if (!isset($this->managers[$connection]))
+		{
+			$this->managers[$connection] = $this->create($connection);
+		}
 
-		$data['class'] = get_class($job);
-
-		$message->setName($job->getName());
-		$message->setJob(serialize($job));
-		$message->setData($data);
-
-		return $message;
+		return $this->managers[$connection];
 	}
 
 	/**
-	 * createJobInstance
+	 * createDriverByConnection
 	 *
-	 * @param mixed $job
-	 *
-	 * @return  JobInterface
-	 */
-	protected function createJobInstance($job)
-	{
-		if ($job instanceof JobInterface)
-		{
-			return $job;
-		}
-
-		// Create callable
-		if (is_callable($job))
-		{
-			$job = new CallableJob($job, md5(uniqid('', true)));
-		}
-
-		// Create by class name.
-		if (is_string($job))
-		{
-			if (!class_exists($job) || is_subclass_of($job, JobInterface::class))
-			{
-				throw new \InvalidArgumentException(
-					sprintf('Job should be a class which implements JobInterface, %s given', $job)
-				);
-			}
-
-			$job = new $job;
-
-			if (!$job instanceof JobInterface)
-			{
-				throw new \UnexpectedValueException('Job instance is not a JobInterface.');
-			}
-		}
-
-		if (is_array($job))
-		{
-			throw new \InvalidArgumentException('Job should not be array.');
-		}
-
-		return $job;
-	}
-
-	/**
-	 * Method to get property Driver
+	 * @param string $connection
 	 *
 	 * @return  QueueDriverInterface
 	 */
-	public function getDriver()
+	public function createDriverByConnection($connection = null)
 	{
-		return $this->driver;
+		$connection = $connection ? : $this->getConnectionName();
+
+		$config = $this->getConnectionConfig($connection);
+
+		return $this->createDriver($config->get('driver', 'sync'), $config->toArray());
 	}
 
 	/**
-	 * Method to set property driver
+	 * getDriver
 	 *
-	 * @param   QueueDriverInterface $driver
+	 * @param string $driver
+	 * @param array  $config
 	 *
-	 * @return  static  Return self to support chaining.
+	 * @return QueueDriverInterface
 	 */
-	public function setDriver(QueueDriverInterface $driver)
+	public function getDriver($driver = null, array $config = [])
 	{
-		$this->driver = $driver;
+		$driver = strtolower($driver);
 
-		return $this;
+		if (!isset($this->drivers[$driver]))
+		{
+			$this->drivers[$driver] = $this->createDriver($driver, $config);
+		}
+
+		return $this->drivers[$driver];
+	}
+
+	/**
+	 * create
+	 *
+	 * @param string $driver
+	 * @param array  $config
+	 *
+	 * @return QueueDriverInterface
+	 */
+	public function createDriver($driver, array $config = [])
+	{
+		$driver = strtolower($driver);
+
+		$queueConfig = new Structure($config);
+
+		if (!$queueConfig->toArray())
+		{
+			throw new \LogicException('No queue config for ' . $driver);
+		}
+
+		switch ($driver)
+		{
+			case 'sqs':
+				return new SqsQueueDriver(
+					$queueConfig->get('key'),
+					$queueConfig->get('secret'),
+					$queueConfig->get('queue', 'default'),
+					[
+						'region' => $queueConfig->get('region', 'us-west-2'),
+						'version' => $queueConfig->get('version', 'latest')
+					]
+				);
+
+			case 'sync':
+			case 'database':
+			case 'ironmq':
+			case 'redis':
+		}
+	}
+
+	/**
+	 * createFailer
+	 *
+	 * @param string $driver
+	 *
+	 * @return  QueueFailerInterface
+	 * @throws \UnexpectedValueException
+	 */
+	public function createFailer($driver = null)
+	{
+		$driver = $driver ? : $this->config->get('queue.failer.driver', 'database');
+
+		switch ($driver)
+		{
+			case 'database':
+				$failer = new DatabaseQueueFailer(
+					$this->container->get('db'),
+					$this->config->get('queue.failer.table')
+				);
+
+				if ($failer->isSupported())
+				{
+					return $failer;
+				}
+			case 'null':
+			default:
+				return new NullQueueFailer;
+		}
+	}
+
+	/**
+	 * getConnectionName
+	 *
+	 * @return  string
+	 */
+	public function getConnectionName()
+	{
+		return $this->config->get('queue.connection', 'sync');
+	}
+
+	/**
+	 * getDriverName
+	 *
+	 * @return  string
+	 */
+	public function getDriverName($conn = null)
+	{
+		$conn = $conn ? : $this->getConnectionName();
+
+		return $this->config->get('queue.' . $conn . '.driver', 'sync');
+	}
+
+	/**
+	 * getConnectionConfig
+	 *
+	 * @param   string $conn
+	 *
+	 * @return  Structure
+	 */
+	public function getConnectionConfig($conn = null)
+	{
+		$conn = $conn ? : $this->getConnectionName();
+
+		return $this->config->extract('queue.' . $conn);
 	}
 }

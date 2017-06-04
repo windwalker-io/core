@@ -117,7 +117,7 @@ class WorkerCommand extends Command
 		// Default Queues
 		if (!count($queues))
 		{
-			$queues = $this->console->container->get('queue.factory')
+			$queues = $this->console->container->get('queue.manager')
 				->getConnectionConfig($connection)
 				->get('queue');
 		}

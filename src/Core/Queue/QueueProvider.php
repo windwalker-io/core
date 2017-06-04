@@ -31,12 +31,11 @@ class QueueProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$container->prepareSharedObject(QueueFactory::class)
-			->alias('queue.factory', QueueFactory::class);
+		$container->prepareSharedObject(QueueManager::class);
 
-		$container->share(QueueManager::class, function (Container $container)
+		$container->share(Queue::class, function (Container $container)
 		{
-			return $container->get('queue.factory')->getManager();
+			return $container->get('queue.manager')->getManager();
 		});
 
 		// Worker
@@ -51,7 +50,7 @@ class QueueProvider implements ServiceProviderInterface
 		// Failer
 		$container->share(QueueFailerInterface::class, function (Container $container)
 		{
-			return $container->get('queue.factory')->createFailer();
+			return $container->get('queue.manager')->createFailer();
 		})->alias('queue.failer', QueueFailerInterface::class);
 	}
 }
