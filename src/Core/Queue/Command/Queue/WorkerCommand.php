@@ -10,10 +10,9 @@ namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\CoreCommandTrait;
-use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Queue\Job\JobInterface;
+use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Core\Queue\Worker;
-use Windwalker\Dom\DomElement;
 use Windwalker\Event\Event;
 use Windwalker\Structure\Structure;
 
@@ -47,39 +46,39 @@ class WorkerCommand extends Command
 	 */
 	protected function init()
 	{
-		$this->addOption('once')
-			->alias('o')
+		$this->addOption('o')
+			->alias('once')
 			->defaultValue(false)
 			->description('Only run next job.');
 
-		$this->addOption('delay')
-			->alias('d')
+		$this->addOption('d')
+			->alias('delay')
 			->defaultValue(0)
 			->description('Delay time for failed job to wait next run.');
 
-		$this->addOption('force')
-			->alias('f')
+		$this->addOption('f')
+			->alias('force')
 			->defaultValue(false)
 			->description('Force run worker if in pause mode.');
 
-		$this->addOption('memory')
-			->alias('m')
+		$this->addOption('m')
+			->alias('memory')
 			->defaultValue(128)
 			->description('The memory limit in megabytes.');
 
-		$this->addOption('sleep')
-			->alias('s')
-			->defaultValue(3)
+		$this->addOption('s')
+			->alias('sleep')
+			->defaultValue(1)
 			->description('Number of seconds to sleep after job run complete.');
+
+		$this->addOption('t')
+			->alias('tries')
+			->defaultValue(5)
+			->description('Number of times to attempt a job if it failed.');
 
 		$this->addOption('timeout')
 			->defaultValue(60)
 			->description('Number of seconds that a job can run.');
-
-		$this->addOption('tries')
-			->alias('t')
-			->defaultValue(5)
-			->description('Number of times to attempt a job if it failed.');
 	}
 
 	/**
@@ -90,7 +89,7 @@ class WorkerCommand extends Command
 	protected function doExecute()
 	{
 		$queues  = $this->io->getArguments();
-		$options = new Structure($this->io->getOptions());
+		$options = $this->getWorkOptions();
 
 		/** @var Worker $worker */
 		$worker = $this->console->container->get('queue.worker');
@@ -128,25 +127,70 @@ class WorkerCommand extends Command
 		$worker->getDispatcher()
 			->listen('onWorkBeforeJobRun', function (Event $event)
 			{
-				/** @var JobInterface $job */
+				/**
+				 * @var JobInterface $job
+				 * @var QueueMessage $message
+				 */
 				$job = $event['job'];
+				$message = $event['message'];
 
-			    $this->console->addMessage('Run Job: ' . new DomElement('info', $job->getName()));
+			    $this->console->addMessage(sprintf(
+			    	'Run Job: <info>%s</info> - Message ID: <info>%s</info>',
+				    $job->getName(),
+				    $message->getId()
+			    ));
 			})
 			->listen('onWorkJobFailure', function (Event $event)
 			{
 				/**
 				 * @var JobInterface $job
 				 * @var \Exception   $e
+				 * @var QueueMessage $message
 				 */
 				$job = $event['job'];
 				$e = $event['exception'];
+				$message = $event['message'];
 
 				$this->console->addMessage(sprintf(
-					'Job %s failed: %s',
+					'Job %s failed: %s (%s)',
 					$job->getName(),
-					$e->getMessage()
+					$e->getMessage(),
+					$message->getId()
 				), 'error');
+			})
+			->listen('onWorkLoopCycleStart', function (Event $event)
+			{
+				/** @var Worker $worker */
+				$worker = $event['worker'];
+
+				if ($this->console->isOffline())
+				{
+					$worker->setState($worker::STATE_PAUSE);
+				}
+				else
+				{
+					$worker->setState($worker::STATE_ACTIVE);
+				}
 			});
+	}
+
+	/**
+	 * getWorkOptions
+	 *
+	 * @return  Structure
+	 */
+	protected function getWorkOptions()
+	{
+		return new Structure(
+			[
+				'once'    => $this->getOption('once'),
+				'delay'   => $this->getOption('delay'),
+				'force'   => $this->getOption('force'),
+				'memory'  => $this->getOption('memory'),
+				'sleep'   => $this->getOption('sleep'),
+				'tries'   => $this->getOption('tries'),
+				'timeout' => $this->getOption('timeout')
+			]
+		);
 	}
 }

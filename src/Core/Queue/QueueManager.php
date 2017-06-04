@@ -9,22 +9,16 @@
 namespace Windwalker\Core\Queue;
 
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
-use Windwalker\Core\Queue\Driver\SqsQueueDriver;
 use Windwalker\Core\Queue\Job\CallableJob;
 use Windwalker\Core\Queue\Job\JobInterface;
-use Windwalker\DI\Container;
-use Windwalker\DI\ContainerAwareInterface;
-use Windwalker\DI\ContainerAwareTrait;
 
 /**
  * The QueueManager class.
  *
  * @since  __DEPLOY_VERSION__
  */
-class QueueManager implements ContainerAwareInterface
+class QueueManager
 {
-	use ContainerAwareTrait;
-
 	/**
 	 * Property driver.
 	 *
@@ -33,22 +27,13 @@ class QueueManager implements ContainerAwareInterface
 	protected $driver;
 
 	/**
-	 * Property container.
-	 *
-	 * @var  Container
-	 */
-	protected $container;
-
-	/**
 	 * QueueManager constructor.
 	 *
 	 * @param QueueDriverInterface $driver
-	 * @param Container            $container
 	 */
-	public function __construct(QueueDriverInterface $driver, Container $container)
+	public function __construct(QueueDriverInterface $driver)
 	{
 		$this->driver = $driver;
-		$this->container = $container;
 	}
 
 	public function push($job, $delay = 0, $queue = null, array $options = [])
@@ -176,7 +161,7 @@ class QueueManager implements ContainerAwareInterface
 				);
 			}
 
-			$job = $this->container->createSharedObject($job);
+			$job = new $job;
 
 			if (!$job instanceof JobInterface)
 			{

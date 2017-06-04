@@ -56,19 +56,15 @@ class DownCommand extends CoreCommand
 	 */
 	protected function doExecute()
 	{
-		$file = WINDWALKER_ETC . '/secret.yml';
+		$tmpFile = WINDWALKER_TEMP . '/offline';
 
-		if (!is_file($file))
+		if ($this->offline)
 		{
-			throw new \RuntimeException('File: etc/secret.yml not exists.');
+			File::write($tmpFile, 'off');
 		}
-
-		$registry = (new Structure)->loadFile($file, 'yaml');
-		$registry->set('system.offline', $this->offline);
-
-		if (!File::write($file, $registry->toString('yaml', ['inline' => 4])))
+		elseif (is_file($tmpFile))
 		{
-			throw new \RuntimeException('Writing etc/secret.yml file fail.');
+			File::delete($tmpFile);
 		}
 
 		$this->out()->out($this->description);

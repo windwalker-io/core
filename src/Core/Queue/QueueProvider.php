@@ -40,6 +40,12 @@ class QueueProvider implements ServiceProviderInterface
 
 		$container->prepareSharedObject(QueueManager::class);
 
+		$container->whenCreating(Worker::class)
+			->setArgument('logger', function (Container $container)
+			{
+			    return $container->get('logger')->getLogger('queue');
+			});
+
 		$container->prepareSharedObject(Worker::class)->alias('queue.worker', Worker::class);
 	}
 }

@@ -337,7 +337,7 @@ class QueueMessage implements \JsonSerializable
 	 *
 	 * @param bool $bool
 	 *
-	 * @return  static|bool
+	 * @return  bool|static
 	 */
 	public function isDeleted($bool = null)
 	{

@@ -95,4 +95,11 @@ interface WindwalkerApplicationInterface
 	 * @return  boolean
 	 */
 	public function isWeb();
+
+	/**
+	 * isOffline
+	 *
+	 * @return  bool
+	 */
+	public function isOffline();
 }

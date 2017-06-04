@@ -342,4 +342,16 @@ trait WindwalkerTrait
 
 		return $mode;
 	}
+
+	/**
+	 * isOffline
+	 *
+	 * @return  bool
+	 */
+	public function isOffline()
+	{
+		$file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
+
+		return is_file($file);
+	}
 }

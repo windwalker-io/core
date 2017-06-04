@@ -8,12 +8,15 @@
 
 namespace Windwalker\Core\Queue;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Windwalker\Core\Event\EventDispatcher;
-use Windwalker\Core\Logger\LoggerManager;
 use Windwalker\Core\Queue\Exception\MaxAttemptsExceededException;
 use Windwalker\Core\Queue\Job\JobInterface;
+use Windwalker\Event\Dispatcher;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
+use Windwalker\Event\DispatcherInterface;
 use Windwalker\Structure\Structure;
 
 /**
@@ -24,6 +27,12 @@ use Windwalker\Structure\Structure;
 class Worker implements DispatcherAwareInterface
 {
 	use DispatcherAwareTrait;
+
+	const STATE_INACTIVE = 'inactive';
+	const STATE_ACTIVE  = 'active';
+	const STATE_EXITING = 'exiting';
+	const STATE_PAUSE   = 'pause';
+	const STATE_STOP    = 'stop';
 
 	/**
 	 * Property dispatcher.
@@ -42,9 +51,16 @@ class Worker implements DispatcherAwareInterface
 	/**
 	 * Property logger.
 	 *
-	 * @var  LoggerManager
+	 * @var LoggerInterface
 	 */
 	protected $logger;
+
+	/**
+	 * Property state.
+	 *
+	 * @var  string
+	 */
+	protected $state = self::STATE_INACTIVE;
 
 	/**
 	 * Property exiting.
@@ -56,15 +72,15 @@ class Worker implements DispatcherAwareInterface
 	/**
 	 * Worker constructor.
 	 *
-	 * @param QueueManager    $manager
-	 * @param EventDispatcher $dispatcher
-	 * @param LoggerManager   $logger
+	 * @param QueueManager        $manager
+	 * @param DispatcherInterface $dispatcher
+	 * @param LoggerInterface     $logger
 	 */
-	public function __construct(QueueManager $manager, EventDispatcher $dispatcher, LoggerManager $logger)
+	public function __construct(QueueManager $manager, DispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
 	{
-		$this->dispatcher = $dispatcher;
 		$this->manager = $manager;
-		$this->logger = $logger;
+		$this->dispatcher = $dispatcher ? : new Dispatcher;
+		$this->logger = $logger ? : new NullLogger;
 	}
 
 	/**
@@ -81,29 +97,43 @@ class Worker implements DispatcherAwareInterface
 
 		// Last Restart
 
+		$this->setState(static::STATE_ACTIVE);
+
 		while (true)
 		{
 			$this->gc();
 
+			// @loop start
+			$this->dispatcher->triggerEvent('onWorkLoopCycleStart', [
+				'worker' => $this,
+				'manager' => $this->manager
+			]);
+
 			// Timeout handler
 			$this->registerSignals($options);
 
-			// if ($this->canLoop() || $options->get('force'))
+			if ($this->canLoop() || $options->get('force'))
 			{
 				$this->runNextJob($queue, $options);
 			}
-
+show(memory_get_usage() / 1024 / 1024);
 			if ((memory_get_usage() / 1024 / 1024) >= (int) $options->get('memory_limit', 128))
 			{
 				$this->stop('Memory usage exceeded.');
 			}
 
-			if ($this->exiting)
+			if ($this->getState() === static::STATE_EXITING)
 			{
 				$this->stop('Shotdown by signal.');
 			}
 
-			$this->sleep((int) $options->get('sleep'));
+			// @loop end
+			$this->dispatcher->triggerEvent('onWorkLoopCycleEnd', [
+				'worker' => $this,
+				'manager' => $this->manager
+			]);
+
+			$this->sleep((int) $options->get('sleep', 1));
 		}
 	}
 
@@ -135,6 +165,7 @@ class Worker implements DispatcherAwareInterface
 			// @before event
 			$this->dispatcher->triggerEvent('onWorkBeforeJobRun', [
 				'worker' => $this,
+				'message' => $message,
 				'job' => $job,
 				'manager' => $this->manager
 			]);
@@ -148,11 +179,12 @@ class Worker implements DispatcherAwareInterface
 			}
 
 			// run
-			$this->manager->getContainer()->execute([$job, 'execute']);
+			$job->execute();
 
 			// @after event
 			$this->dispatcher->triggerEvent('onWorkAfterJobRun', [
 				'worker' => $this,
+				'message' => $message,
 				'job' => $job,
 				'manager' => $this->manager
 			]);
@@ -161,17 +193,24 @@ class Worker implements DispatcherAwareInterface
 		}
 		catch (\Exception $e)
 		{
-			$this->handleJobException($job, $e);
+			$this->handleJobException($job, $message, $e);
 		}
 		catch (\Throwable $t)
 		{
-			$this->handleJobException($job, $t);
+			$this->handleJobException($job, $message, $t);
 		}
 		finally
 		{
+			// Delete and log error if reach max attempts.
 			if ($maxTries !== 0 && $maxTries <= $message->getAttempts())
 			{
 				$this->manager->delete($message);
+				$this->logger->error(sprintf(
+					'Max attempts exceeded. Job: %s (%s) - Class: %s',
+					$job->getName(),
+					$message->getId(),
+					get_class($job)
+				));
 			}
 
 			if (!$message->isDeleted())
@@ -179,6 +218,16 @@ class Worker implements DispatcherAwareInterface
 				$this->manager->release($message, (int) $options->get('delay', 0));
 			}
 		}
+	}
+
+	/**
+	 * canLoop
+	 *
+	 * @return  bool
+	 */
+	protected function canLoop()
+	{
+		return $this->getState() === static::STATE_ACTIVE;
 	}
 
 	/**
@@ -228,7 +277,7 @@ class Worker implements DispatcherAwareInterface
 	 */
 	public function shoutdown()
 	{
-		$this->exiting = true;
+		$this->setState(static::STATE_EXITING);
 	}
 
 	/**
@@ -240,11 +289,13 @@ class Worker implements DispatcherAwareInterface
 	 */
 	public function stop($reason = 'Unkonwn reason')
 	{
-		$this->logger->info('queue', 'Worker stop: ' . $reason);
+		$this->logger->info('Worker stop: ' . $reason);
 
 		$this->triggerEvent('onWorkerStop', [
 			'worker' => $this
 		]);
+
+		$this->setState(static::STATE_STOP);
 
 		exit();
 	}
@@ -253,16 +304,19 @@ class Worker implements DispatcherAwareInterface
 	 * handleException
 	 *
 	 * @param JobInterface          $job
+	 * @param QueueMessage          $message
 	 * @param \Exception|\Throwable $e
 	 *
 	 * @return void
 	 */
-	protected function handleJobException(JobInterface $job, $e)
+	protected function handleJobException(JobInterface $job, QueueMessage $message, $e)
 	{
-		$this->logger->error('queue', sprintf(
-			'%s : %s',
-			get_class($e),
-			$e->getMessage()
+		$this->logger->error(sprintf(
+			'Job [%s] (%s) failed: %s - Class: %s',
+			$job->getName(),
+			$message->getId(),
+			$e->getMessage(),
+			get_class($job)
 		));
 
 		if (method_exists($job, 'failed'))
@@ -273,7 +327,8 @@ class Worker implements DispatcherAwareInterface
 		$this->dispatcher->triggerEvent('onWorkJobFailure', [
 			'worker' => $this,
 			'exception' => $e,
-			'job' => $job
+			'job' => $job,
+			'message' => $message
 		]);
 	}
 
@@ -334,5 +389,27 @@ class Worker implements DispatcherAwareInterface
 	public function getManager()
 	{
 		return $this->manager;
+	}
+
+	/**
+	 * Method to get property State
+	 *
+	 * @return  string
+	 */
+	public function getState()
+	{
+		return $this->state;
+	}
+
+	/**
+	 * setState
+	 *
+	 * @param string $state
+	 *
+	 * @return  void
+	 */
+	public function setState($state)
+	{
+		$this->state = $state;
 	}
 }
