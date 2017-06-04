@@ -32,7 +32,7 @@ trait CliOutputModelTrait
 	 *
 	 * @return  static
 	 */
-	public function out($text, $nl = true)
+	public function out($text = '', $nl = true)
 	{
 		$this->io->out($text, $nl);
 

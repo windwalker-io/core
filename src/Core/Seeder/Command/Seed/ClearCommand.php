@@ -10,7 +10,7 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Migration\Model\BackupModel;
+use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
  * Class Seed
@@ -70,7 +70,7 @@ class ClearCommand extends CoreCommand
 		// backup
 		if (!$this->getOption('no-backup'))
 		{
-			BackupModel::getInstance()->setCommand($this)->backup();
+			BackupRepository::getInstance()->setCommand($this)->backup();
 		}
 
 		$class = $this->console->get('seed.class');

@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Core\Migration\Model\MigrationsModel;
+use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
+use Windwalker\Core\Migration\Repository\MigrationsRepository;
 
 /**
  * The StatusCommand class.
@@ -18,6 +20,9 @@ use Windwalker\Core\Migration\Model\MigrationsModel;
  */
 class StatusCommand extends AbstractCommand
 {
+	use CoreCommandTrait;
+	use MigrationCommandTrait;
+
 	/**
 	 * An enabled flag.
 	 *
@@ -62,11 +67,11 @@ class StatusCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
-		$migration = new MigrationsModel;
+		$repository = $this->getRepository();
 
-		$migration['path'] = $this->console->get('migration.dir');
+		$repository['path'] = $this->console->get('migration.dir');
 
-		$migrations = $migration->getMigrations();
+		$migrations = $repository->getMigrations();
 
 		if (!count($migrations))
 		{
@@ -77,25 +82,25 @@ class StatusCommand extends AbstractCommand
 		$this->out(' Status  Version         Migration Name ');
 		$this->out('-----------------------------------------');
 
-		$versions = $migration->getVersions();
+		$versions = $repository->getVersions();
 
 		$migrations->ksort();
 
-		foreach ($migrations as $migItem)
+		foreach ($migrations as $migration)
 		{
-			$status = (in_array($migItem['id'], $versions)) ? '    <info>up</info>' : '  <error>down</error>';
+			$status = (in_array($migration['id'], $versions)) ? '    <info>up</info>' : '  <error>down</error>';
 
 			$info = sprintf(
 				'%s   %14.0f  %s',
 				$status,
-				$migItem['id'],
-				'<comment>' . $migItem['name'] . '</comment>'
+				$migration['id'],
+				'<comment>' . $migration['name'] . '</comment>'
 			);
 
 			$this->out($info);
 
 			// Remove printed versions
-			$index = array_search($migItem['id'], $versions);
+			$index = array_search($migration['id'], $versions);
 
 			unset($versions[$index]);
 		}
@@ -117,4 +122,3 @@ class StatusCommand extends AbstractCommand
 		return true;
 	}
 }
- 

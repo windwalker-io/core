@@ -9,7 +9,8 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Migration\Model\BackupModel;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
+use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
  * The CreateCommand class.
@@ -18,6 +19,8 @@ use Windwalker\Core\Migration\Model\BackupModel;
  */
 class ResetCommand extends CoreCommand
 {
+	use MigrationCommandTrait;
+
 	/**
 	 * An enabled flag.
 	 *
@@ -68,7 +71,7 @@ class ResetCommand extends CoreCommand
 	 */
 	protected function doExecute()
 	{
-		if ($this->console->getMode() != 'dev')
+		if ($this->console->getMode() !== 'dev')
 		{
 			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
 		}
@@ -76,7 +79,7 @@ class ResetCommand extends CoreCommand
 		// backup
 		if (!$this->getOption('no-backup'))
 		{
-			BackupModel::getInstance()->setCommand($this)->backup();
+			$this->backup();
 		}
 
 		$this->out('<cmd>Rollback to 0 version...</cmd>');

@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Migration\Model;
+namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\AbstractMigration;
@@ -18,6 +18,7 @@ use Windwalker\Data\DataSet;
 use Windwalker\Database\Schema\Schema;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -25,7 +26,7 @@ use Windwalker\String\StringNormalise;
  * 
  * @since  2.0
  */
-class MigrationsModel extends ModelRepository
+class MigrationsRepository extends ModelRepository
 {
 	use DatabaseModelTrait;
 	use CliOutputModelTrait;
@@ -61,7 +62,7 @@ class MigrationsModel extends ModelRepository
 		{
 			$ext = File::getExtension($file->getBasename());
 
-			if ($ext != 'php')
+			if ($ext !== 'php')
 			{
 				continue;
 			}
@@ -338,5 +339,49 @@ LOG;
 		$this->command = $command;
 
 		return $this;
+	}
+
+	/**
+	 * copyMigration
+	 *
+	 * @param string $name
+	 * @param string $template
+	 *
+	 * @return  void
+	 */
+	public function copyMigration($name, $template)
+	{
+		$migrations = $this->getMigrations();
+
+		// Check name not exists
+		foreach ($migrations as $migration)
+		{
+			if (strtolower($name) == strtolower($migration['name']))
+			{
+				throw new \RuntimeException('Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" . $migration['path'] . '</info>');
+			}
+		}
+
+		$date = gmdate('YmdHis');
+
+		$file = $date . '_' . ucfirst($name) . '.php';
+
+		$tmpl = file_get_contents($template);
+
+		$tmpl = SimpleTemplate::render($tmpl, ['version' => $date, 'className' => ucfirst($name)]);
+
+		// Get file path
+		$filePath = $this->get('path') . '/' . $file;
+
+		if (is_file($filePath))
+		{
+			throw new \RuntimeException(sprintf('File already exists: %s', $filePath));
+		}
+
+		// Write it
+		File::write($filePath, $tmpl);
+
+		$this->out()->out('Migration version: <info>' . $file . '</info> created.');
+		$this->out('File path: <info>' . realpath($filePath). '</info>');
 	}
 }

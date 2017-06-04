@@ -10,8 +10,9 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Migration\Model\BackupModel;
-use Windwalker\Core\Migration\Model\MigrationsModel;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
+use Windwalker\Core\Migration\Repository\BackupRepository;
+use Windwalker\Core\Migration\Repository\MigrationsRepository;
 
 /**
  * The MigrateCommand class.
@@ -20,6 +21,8 @@ use Windwalker\Core\Migration\Model\MigrationsModel;
  */
 class MigrateCommand extends CoreCommand
 {
+	use MigrationCommandTrait;
+
 	/**
 	 * An enabled flag.
 	 *
@@ -71,27 +74,24 @@ class MigrateCommand extends CoreCommand
 	 */
 	protected function doExecute()
 	{
-		if ($this->console->getMode() != 'dev')
+		if ($this->console->getMode() !== 'dev')
 		{
 			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
 		}
 
-		$migration = new MigrationsModel;
-		$migration->setIo($this->io);
+		$repository = $this->getRepository();
 
 		if (!$this->getOption('no-backup'))
 		{
 			// backup
-			BackupModel::getInstance()->setCommand($this)->backup();
+			$this->backup();
 		}
 
-		$migration->setCommand($this);
-
-		$migration['path'] = $this->console->get('migration.dir');
+		$repository['path'] = $this->console->get('migration.dir');
 
 		try
 		{
-			$migration->migrate($this->getArgument(0, null));
+			$repository->migrate($this->getArgument(0, null));
 
 			if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0')
 			{
@@ -111,7 +111,7 @@ class MigrateCommand extends CoreCommand
 
 			if ($prompter->ask('Do you want to restore to last backup? [Y/n] (Y): ', true))
 			{
-				BackupModel::getInstance()->restoreLatest();
+				$this->getBackupRepository()->restoreLatest();
 			}
 
 			throw $e;
@@ -120,4 +120,3 @@ class MigrateCommand extends CoreCommand
 		return true;
 	}
 }
- 

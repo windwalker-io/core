@@ -83,7 +83,7 @@ class DatabaseProvider implements ServiceProviderInterface
 		/** @var Structure $config */
 		$config = $container->get('config');
 
-		if ($config->get('database.driver') == 'mysql')
+		if ($config->get('database.driver') === 'mysql')
 		{
 			if ($mode)
 			{

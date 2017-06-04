@@ -11,8 +11,6 @@ namespace Windwalker\Core\Migration\Command;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Provider\DatabaseProvider;
-use Windwalker\Core\Ioc;
 
 /**
  * The MigrationCommand class.
@@ -78,22 +76,20 @@ class MigrationCommand extends CoreCommand
 	 */
 	protected function prepareExecute()
 	{
-		$config = Ioc::getConfig();
+		$config = $this->console->config;
 
 		// Auto create database
 		$name = $config['database.name'];
 
 		$config['database.name'] = null;
 
-		$db = Ioc::getDatabase();
+		$db = $this->console->database;
 
 		$db->getDatabase($name)->create(true);
 
 		$db->select($name);
 
 		$config['database.name'] = $name;
-
-		DatabaseProvider::strictMode(Ioc::factory());
 
 		// Prepare migration path
 		$packageName = $this->getOption('p');

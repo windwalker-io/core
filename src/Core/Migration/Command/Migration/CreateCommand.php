@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Core\Migration\Model\MigrationsModel;
+use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
+use Windwalker\Core\Migration\Repository\MigrationsRepository;
 use Windwalker\Filesystem\File;
 use Windwalker\String\SimpleTemplate;
 
@@ -20,6 +22,9 @@ use Windwalker\String\SimpleTemplate;
  */
 class CreateCommand extends AbstractCommand
 {
+	use CoreCommandTrait;
+	use MigrationCommandTrait;
+
 	/**
 	 * An enabled flag.
 	 *
@@ -64,11 +69,7 @@ class CreateCommand extends AbstractCommand
 	 */
 	protected function doExecute()
 	{
-		$migration = new MigrationsModel;
-
-		$migration['path'] = $this->console->get('migration.dir');
-
-		$migrations = $migration->getMigrations();
+		$repository = $this->getRepository();
 
 		$name = $this->getArgument(0);
 
@@ -77,37 +78,11 @@ class CreateCommand extends AbstractCommand
 			throw new \InvalidArgumentException('Missing first argument "name"');
 		}
 
-		// Check name not exists
-		foreach ($migrations as $migItem)
-		{
-			if (strtolower($name) == strtolower($migItem['name']))
-			{
-				throw new \RuntimeException('Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" . $migItem['path'] . '</info>');
-			}
-		}
-
-		$date = gmdate('YmdHis');
-
-		$file = $date . '_' . ucfirst($name) . '.php';
-
 		// Get template
-		$tmpl = file_get_contents(__DIR__ . '/../../../Resources/Templates/migration/migration.php.dist');
-
-		$tmpl = SimpleTemplate::render($tmpl, ['version' => $date, 'className' => ucfirst($name)]);
-
-		// Get file path
-		$filePath = $this->console->get('migration.dir') . '/' . $file;
-
-		if (is_file($filePath))
-		{
-			throw new \RuntimeException(sprintf('File already exists: %s', $filePath));
-		}
-
-		// Write it
-		File::write($filePath, $tmpl);
-
-		$this->out()->out('Migration version: <info>' . $file . '</info> created.');
-		$this->out('File path: <info>' . realpath($filePath). '</info>');
+		$repository->copyMigration(
+			$name,
+			__DIR__ . '/../../../Resources/Templates/migration/migration.tpl'
+		);
 
 		return true;
 	}

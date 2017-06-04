@@ -9,7 +9,7 @@
 namespace Windwalker\Core\Queue\Command;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\Core\Queue\Command\Queue\WorkerCommand;
+use Windwalker\Core\Queue\Command\Queue;
 
 /**
  * The QueueCommand class.
@@ -39,6 +39,8 @@ class QueueCommand extends Command
 	 */
 	protected function init()
 	{
-		$this->addCommand(WorkerCommand::class);
+		$this->addCommand(Queue\WorkerCommand::class);
+		$this->addCommand(Queue\TableCommand::class);
+		$this->addCommand(Queue\FailTableCommand::class);
 	}
 }

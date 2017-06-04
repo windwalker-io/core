@@ -11,7 +11,8 @@ namespace Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Migration\Model\BackupModel;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
+use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
  * The DropAllCommand class.
@@ -20,6 +21,8 @@ use Windwalker\Core\Migration\Model\BackupModel;
  */
 class DropAllCommand extends CoreCommand
 {
+	use MigrationCommandTrait;
+
 	/**
 	 * Console(Argument) name.
 	 *
@@ -57,7 +60,7 @@ class DropAllCommand extends CoreCommand
 	 */
 	protected function doExecute()
 	{
-		if ($this->console->getMode() != 'dev')
+		if ($this->console->getMode() !== 'dev')
 		{
 			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
 		}
@@ -72,10 +75,10 @@ class DropAllCommand extends CoreCommand
 		if (!$this->io->getOption('no-backup'))
 		{
 			// backup
-			BackupModel::getInstance()->setCommand($this)->backup();
+			$this->backup();
 		}
 
-		$db = Ioc::getDatabase();
+		$db = $this->console->database;
 
 		$tables = $db->getDatabase()->getTables(true);
 

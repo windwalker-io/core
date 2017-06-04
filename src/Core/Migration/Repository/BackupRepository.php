@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
-namespace Windwalker\Core\Migration\Model;
+namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Ioc;
@@ -20,7 +20,7 @@ use Windwalker\Filesystem\Folder;
  * 
  * @since  2.1.1
  */
-class BackupModel extends ModelRepository
+class BackupRepository extends ModelRepository
 {
 	use DatabaseModelTrait;
 
