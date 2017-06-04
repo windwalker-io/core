@@ -30,17 +30,17 @@ class SqsQueueDriver implements QueueDriverInterface
 	 *
 	 * @var string
 	 */
-	protected $default;
+	protected $queue;
 
 	/**
 	 * SqsQueueDriver constructor.
 	 *
 	 * @param string $key
 	 * @param string $secret
-	 * @param string $default
+	 * @param string $queue
 	 * @param array  $options
 	 */
-	public function __construct($key, $secret, $default = 'default', array $options = [])
+	public function __construct($key, $secret, $queue = 'default', array $options = [])
 	{
 		$defaultOptions = [
 			'region' => 'ap-northeast-1',
@@ -55,7 +55,7 @@ class SqsQueueDriver implements QueueDriverInterface
 
 		$this->client = new SqsClient($options);
 
-		$this->default = $default;
+		$this->queue = $queue;
 	}
 
 	/**
@@ -111,7 +111,7 @@ class SqsQueueDriver implements QueueDriverInterface
 		$res->setAttempts($data['Attributes']['ApproximateReceiveCount']);
 		$res->setBody(json_decode($data['Body'], true));
 		$res->setRawBody($data['Body']);
-		$res->setQueueName($queue ? : $this->default);
+		$res->setQueueName($queue ? : $this->queue);
 		$res->set('ReceiptHandle', $data['ReceiptHandle']);
 
 		return $res;
@@ -163,7 +163,7 @@ class SqsQueueDriver implements QueueDriverInterface
 	 */
 	public function getQueueUrl($queue = null)
 	{
-		$queue = $queue ? : $this->default;
+		$queue = $queue ? : $this->queue;
 
 		if (filter_var($queue, FILTER_VALIDATE_URL) !== false)
 		{

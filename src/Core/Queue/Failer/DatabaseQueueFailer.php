@@ -70,7 +70,7 @@ class DatabaseQueueFailer implements QueueFailerInterface
 
 		$data['created'] = Chronos::create('now')->toSql();
 
-		$this->db->getWriter()->insertOne($this->table, $data);
+		$this->db->getWriter()->insertOne($this->table, $data, 'id');
 
 		return $data['id'];
 	}

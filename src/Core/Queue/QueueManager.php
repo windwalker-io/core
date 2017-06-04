@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Queue;
 
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
 use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
@@ -167,6 +168,11 @@ class QueueManager
 
 			case 'sync':
 			case 'database':
+				return new DatabaseQueueDriver(
+					$this->container->get('db'),
+					$queueConfig->get('queue', 'default'),
+					$queueConfig->get('table', 'queue_jobs')
+				);
 			case 'ironmq':
 			case 'redis':
 		}
