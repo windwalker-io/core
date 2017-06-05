@@ -8,7 +8,9 @@
 
 namespace Windwalker\Core\Queue;
 
+use Pheanstalk\Pheanstalk;
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Queue\Driver\BeanstalkdQueueDriver;
 use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Core\Queue\Driver\IronmqQueueDriver;
 use Windwalker\Core\Queue\Driver\NullQueueDriver;
@@ -195,6 +197,13 @@ class QueueManager
 				return new RabbitmqQueueDriver(
 					$queueConfig->get('queue', 'default'),
 					(array) $queueConfig->get('options', [])
+				);
+
+			case 'beanstalkd':
+				return new BeanstalkdQueueDriver(
+					$queueConfig->get('host', '127.0.0.1'),
+					$queueConfig->get('queue', 'default'),
+					$queueConfig->get('timeout', 60)
 				);
 
 			default:

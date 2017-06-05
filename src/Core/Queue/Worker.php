@@ -136,7 +136,22 @@ class Worker implements DispatcherAwareInterface
 
 			if ($this->canLoop() || $options->get('force'))
 			{
-				$this->runNextJob($queue, $options);
+				try
+				{
+					$this->runNextJob($queue, $options);
+				}
+				catch (\Exception $e)
+				{
+					$msg = sprintf('Worker failure in a loop cycle: %s', $e->getMessage());
+
+					$this->logger->error($msg);
+
+					$this->dispatcher->triggerEvent('onWorkerLoopCycleFailure', [
+						'worker' => $this,
+						'exception' => $e,
+						'message' => $msg
+					]);
+				}
 			}
 
 			$this->stopIfNecessary($options);
@@ -281,8 +296,8 @@ class Worker implements DispatcherAwareInterface
 		}
 
 		// Wait job complete then stop
-		pcntl_signal(SIGINT, [$this, 'showdown']);
-		pcntl_signal(SIGTERM, [$this, 'showdown']);
+		pcntl_signal(SIGINT, [$this, 'shutdown']);
+		pcntl_signal(SIGTERM, [$this, 'shutdown']);
 	}
 
 	/**
@@ -290,7 +305,7 @@ class Worker implements DispatcherAwareInterface
 	 *
 	 * @return  void
 	 */
-	public function shoutdown()
+	public function shutdown()
 	{
 		$this->setState(static::STATE_EXITING);
 	}
@@ -306,7 +321,7 @@ class Worker implements DispatcherAwareInterface
 	{
 		$this->logger->info('Worker stop: ' . $reason);
 
-		$this->triggerEvent('onWorkererStop', [
+		$this->triggerEvent('onWorkerStop', [
 			'worker' => $this
 		]);
 
