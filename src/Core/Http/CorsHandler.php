@@ -34,7 +34,7 @@ class CorsHandler
 	 *
 	 * @return  static
 	 */
-	public static function create(ResponseInterface $response)
+	public static function create(ResponseInterface $response = null)
 	{
 		return new static($response);
 	}
@@ -44,7 +44,7 @@ class CorsHandler
 	 *
 	 * @param ResponseInterface $response
 	 */
-	public function __construct(ResponseInterface $response)
+	public function __construct(ResponseInterface $response = null)
 	{
 		$this->response = $response;
 	}
