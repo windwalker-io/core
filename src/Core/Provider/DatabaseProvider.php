@@ -71,28 +71,4 @@ class DatabaseProvider implements ServiceProviderInterface
 
 		$container->share(AbstractExporter::class, $closure);
 	}
-
-	/**
-	 * strictMode
-	 *
-	 * @param Container $container
-	 * @param boolean   $mode
-	 */
-	public static function strictMode(Container $container, $mode = null)
-	{
-		/** @var Structure $config */
-		$config = $container->get('config');
-
-		if ($config->get('database.driver') === 'mysql')
-		{
-			if ($mode)
-			{
-				$container->get('database')->setQuery("SET sql_mode = 'NO_ENGINE_SUBSTITUTION,STRICT_ALL_TABLES'")->execute();
-			}
-			else
-			{
-				$container->get('database')->setQuery("SET sql_mode = ''")->execute();
-			}
-		}
-	}
 }

@@ -57,11 +57,11 @@ class UserProvider implements ServiceProviderInterface
 	{
 		// Authentication
 		$container->share(Authentication::class, [$this, 'authentication'])
-			->alias(AuthenticationInterface::class, Authentication::class);
+			->bindShared(AuthenticationInterface::class, Authentication::class);
 
 		// Authorisation
 		$container->share(Authorisation::class, [$this, 'authorisation'])
-			->alias(AuthorisationInterface::class, Authorisation::class);
+			->bindShared(AuthorisationInterface::class, Authorisation::class);
 
 		// User Handler
 		$this->prepareHandler($container);

@@ -31,7 +31,7 @@ class LanguageProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		$container->prepareSharedObject(CoreLanguage::class)
-			->alias(Language::class, CoreLanguage::class)
-			->alias(LanguageInterface::class, CoreLanguage::class);
+			->bindShared(Language::class, CoreLanguage::class)
+			->bindShared(LanguageInterface::class, CoreLanguage::class);
 	}
 }

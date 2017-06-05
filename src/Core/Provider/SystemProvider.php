@@ -60,11 +60,10 @@ class SystemProvider implements ServiceProviderInterface
 		$container->share(Container::class, $container);
 
 		$container->share(get_class($this->app), $this->app)
-			->alias(WindwalkerApplicationInterface::class, get_class($this->app));
+			->bindShared(WindwalkerApplicationInterface::class, get_class($this->app));
 
 		$container->share(Config::class, $this->config);
 
 		$container->prepareSharedObject(PackageResolver::class);
 	}
 }
- 

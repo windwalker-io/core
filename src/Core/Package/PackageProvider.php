@@ -65,7 +65,7 @@ class PackageProvider implements ServiceProviderInterface
 	public function register(Container $container)
 	{
 		$container->share(get_class($this->package), $this->package)
-			->alias(AbstractPackage::class, get_class($this->package));
+			->bindShared(AbstractPackage::class, get_class($this->package));
 		
 		$container->share('controller.resolver', function(Container $container)
 		{

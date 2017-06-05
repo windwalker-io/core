@@ -27,12 +27,6 @@ class MailerProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function (Container $container)
-		{
-		    return $container->newInstance(MailerManager::class);
-		};
-
-		$container->share(MailerManager::class, $closure)
-			->alias('mailer', MailerManager::class);
+		$container->prepareSharedObject(MailerManager::class);
 	}
 }

@@ -38,12 +38,13 @@ class SecurityProvider implements ServiceProviderInterface
 		$container->prepareSharedObject(CsrfGuard::class)
 			->alias('security.csrf', CsrfGuard::class);
 
+		// Always new instance in every usage
 		$container->bind(CipherInterface::class, function (Container $container)
 		{
 			$config = $container->get('config');
 			$class = $this->getCipher($config->get('crypt.cipher', 'blowfish'));
 
-			return $container->alias($class, CipherInterface::class)->newInstance($class);
+			return $container->newInstance($class);
 		});
 
 		$container->share(Crypt::class, function (Container $container)
@@ -52,7 +53,7 @@ class SecurityProvider implements ServiceProviderInterface
 			$key = md5('Windwalker-Crypt::' . $config->get('system.secret'));
 
 			return $container->newInstance(Crypt::class, ['key' => $key]);
-		})->alias(CryptInterface::class, Crypt::class);
+		})->bindShared(CryptInterface::class, Crypt::class);
 	}
 
 	/**

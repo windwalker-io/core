@@ -30,17 +30,11 @@ class EventProvider implements ServiceProviderInterface
 	 */
 	public function register(Container $container)
 	{
-		$closure = function(Container $container)
+		$container->prepareSharedObject(EventDispatcher::class, function (EventDispatcher $dispatcher, Container $container)
 		{
-			$dispatcher = new EventDispatcher;
-
-			$dispatcher->setDebug($container->get('config')->get('system.debug'));
-
-			return $dispatcher;
-		};
-
-		$container->share(EventDispatcher::class, $closure)
-			->alias(Dispatcher::class, EventDispatcher::class)
-			->alias(DispatcherInterface::class, EventDispatcher::class);
+			$dispatcher->foo = 'bar';
+			return $dispatcher->setDebug($container->get('config')->get('system.debug'));
+		})->bindShared(Dispatcher::class, EventDispatcher::class)
+			->bindShared(DispatcherInterface::class, EventDispatcher::class);
 	}
 }

@@ -38,7 +38,7 @@ class GetController extends AbstractController
 		{
 			Mailer::getContainer()
 				->prepareSharedObject(DebugMailerAdapter::class)
-				->alias(MailerAdapterInterface::class, DebugMailerAdapter::class);
+				->bindShared(MailerAdapterInterface::class, DebugMailerAdapter::class);
 
 			/** @var MailMessage $message */
 			$message = Mailer::send($class::create());

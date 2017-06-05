@@ -35,8 +35,8 @@ class ConsoleProvider implements ServiceProviderInterface
 		$app = $container->get('application');
 
 		$container->share(get_class($app), $app)
-			->alias(CoreConsole::class, get_class($app))
-			->alias(WindwalkerApplicationInterface::class, CoreConsole::class);
+			->bindShared(CoreConsole::class, get_class($app))
+			->bindShared(WindwalkerApplicationInterface::class, CoreConsole::class);
 
 		// Input
 		$container->share(IOInterface::class, $app->io)
@@ -50,4 +50,3 @@ class ConsoleProvider implements ServiceProviderInterface
 			->alias('platform', Platform::class);
 	}
 }
- 

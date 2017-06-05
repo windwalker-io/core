@@ -42,7 +42,7 @@ class WebProvider implements ServiceProviderInterface
 		$container->share(Input::class, function (Container $container) use ($app)
 		{
 		    return PsrInput::create($app->getRequest());
-		})->alias(PsrInput::class, Input::class);
+		})->bindShared(PsrInput::class, Input::class);
 
 		// Request
 //		$container->share(ServerRequest::class, $app->getRequest())
