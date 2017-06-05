@@ -146,25 +146,6 @@ class Queue
 	}
 
 	/**
-	 * runJob
-	 *
-	 * @param string $job
-	 *
-	 * @return  void
-	 */
-	public function runJob($job)
-	{
-		$job = unserialize($job);
-
-		if (!$job instanceof JobInterface)
-		{
-			throw new \InvalidArgumentException('Job is not s JobInterface.');
-		}
-
-		$job->execute();
-	}
-
-	/**
 	 * getMessage
 	 *
 	 * @param mixed $job
