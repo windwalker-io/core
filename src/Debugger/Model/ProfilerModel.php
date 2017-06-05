@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Model;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\PageRecordHelper;

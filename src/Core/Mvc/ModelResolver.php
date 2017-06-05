@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Mvc;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 /**

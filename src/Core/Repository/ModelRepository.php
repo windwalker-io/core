@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
-namespace Windwalker\Core\Model;
+namespace Windwalker\Core\Repository;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;

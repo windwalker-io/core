@@ -27,11 +27,11 @@ class MvcResolver
 	protected $controllerResolver;
 
 	/**
-	 * Property modelResolver.
+	 * Property RepositoryResolver.
 	 *
-	 * @var  ModelResolver
+	 * @var  RepositoryResolver
 	 */
-	protected $modelResolver;
+	protected $repositoryResolver;
 
 	/**
 	 * Property viewResolver.
@@ -51,7 +51,7 @@ class MvcResolver
 	{
 		return new static(
 			new ControllerResolver($package, $package->getContainer()),
-			new ModelResolver($package, $package->getContainer()),
+			new RepositoryResolver($package, $package->getContainer()),
 			new ViewResolver($package, $package->getContainer())
 		);
 	}
@@ -60,13 +60,13 @@ class MvcResolver
 	 * MvcResolver constructor.
 	 *
 	 * @param ControllerResolver $controllerResolver
-	 * @param ModelResolver      $modelResolver
+	 * @param RepositoryResolver $repositoryResolver
 	 * @param ViewResolver       $viewResolver
 	 */
-	public function __construct(ControllerResolver $controllerResolver, ModelResolver $modelResolver, ViewResolver $viewResolver)
+	public function __construct(ControllerResolver $controllerResolver, RepositoryResolver $repositoryResolver, ViewResolver $viewResolver)
 	{
 		$this->controllerResolver = $controllerResolver;
-		$this->modelResolver      = $modelResolver;
+		$this->repositoryResolver = $repositoryResolver;
 		$this->viewResolver       = $viewResolver;
 	}
 
@@ -78,9 +78,9 @@ class MvcResolver
 	 *
 	 * @return  string|false
 	 */
-	public function resolveModel($package, $name)
+	public function resolveRepository($package, $name)
 	{
-		return $this->modelResolver->resolve($name);
+		return $this->repositoryResolver->resolve($name);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class MvcResolver
 	public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
 	{
 		$this->controllerResolver->addNamespace($namespace . '\Controller', $priority);
-		$this->modelResolver->addNamespace($namespace . '\Model', $priority);
+		$this->repositoryResolver->addNamespace($namespace . '\Model', $priority);
 		$this->viewResolver->addNamespace($namespace . '\View', $priority);
 
 		return $this;
@@ -134,7 +134,7 @@ class MvcResolver
 	public function reset()
 	{
 		$this->controllerResolver->reset();
-		$this->modelResolver->reset();
+		$this->repositoryResolver->reset();
 		$this->viewResolver->reset();
 
 		return $this;
@@ -167,23 +167,23 @@ class MvcResolver
 	/**
 	 * Method to get property ModelResolver
 	 *
-	 * @return  ModelResolver
+	 * @return  RepositoryResolver
 	 */
-	public function getModelResolver()
+	public function getRepositoryResolver()
 	{
-		return $this->modelResolver;
+		return $this->repositoryResolver;
 	}
 
 	/**
 	 * Method to set property modelResolver
 	 *
-	 * @param   ModelResolver $modelResolver
+	 * @param   RepositoryResolver $repositoryResolver
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
-	public function setModelResolver($modelResolver)
+	public function setRepositoryResolver($repositoryResolver)
 	{
-		$this->modelResolver = $modelResolver;
+		$this->repositoryResolver = $repositoryResolver;
 
 		return $this;
 	}

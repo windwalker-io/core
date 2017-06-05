@@ -14,8 +14,8 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Controller\Middleware\ControllerData;
 use Windwalker\Core\Frontend\Bootstrap;
-use Windwalker\Core\Model\Exception\ValidateFailException;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Exception\ValidateFailException;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\AbstractPackage;
@@ -513,7 +513,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	}
 
 	/**
-	 * getModel
+	 * getRepository
 	 *
 	 * @param string $name
 	 * @param mixed  $source
@@ -521,8 +521,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	 *
 	 * @return ModelRepository
 	 * @throws \Exception
+	 *
+	 * @since  3.2
 	 */
-	public function getModel($name = null, $source = null, $forceNew = false)
+	public function getRepository($name = null, $source = null, $forceNew = false)
 	{
 		$name = $name ? : $this->getName();
 
@@ -536,6 +538,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			{
 				$config    = clone $this->config;
 				$modelName = ucfirst($name) . 'Model';
+				$repoName  = ucfirst($name) . 'Repository';
 				$source    = $source ? : $this->getDataSource();
 
 				/*
@@ -550,8 +553,19 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 				try
 				{
-					// Use MvcResolver to fin Model class
-					$class = $this->getPackage()->getMvcResolver()->getModelResolver()->resolve($modelName);
+					$repoResolver = $this->getPackage()->getMvcResolver()->getRepositoryResolver();
+
+					// Use RepositoryResolver to fin Repository class
+					try
+					{
+						$class = $repoResolver->resolve($repoName);
+					}
+					catch (\DomainException $e)
+					{
+						// Use ModelResolver to get legacy Model classes
+						// @deprecated
+						$repoResolver->getModelResolver()->resolve($modelName);
+					}
 
 					// Create object by container, container will auto inject all necessary dependencies
 					return $container->createSharedObject($class, ['source' => $source, 'config' => $config]);
@@ -563,7 +577,16 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 						throw $e;
 					}
 
+					// Guess the repository position
+					$class = MvcHelper::getPackageNamespace($this) . '\Repository\\' . ucfirst($repoName);
+
+					if (class_exists($class))
+					{
+						return $container->createSharedObject($class, ['source' => $source, 'config' => $config]);
+					}
+
 					// Guess the model position
+					// @deprecated
 					$class = MvcHelper::getPackageNamespace($this) . '\Model\\' . ucfirst($modelName);
 					
 					if (class_exists($class))
@@ -580,6 +603,23 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
 		// Get model from controller.
 		return $this->container->get($key, $forceNew);
+	}
+
+	/**
+	 * getRepository
+	 *
+	 * @param string $name
+	 * @param mixed  $source
+	 * @param bool   $forceNew
+	 *
+	 * @return ModelRepository
+	 * @throws \Exception
+	 *
+	 * @deprecated Use getRepository() instead.
+	 */
+	public function getModel($name = null, $source = null, $forceNew = false)
+	{
+		return $this->getRepository($name, $source, $forceNew);
 	}
 
 	/**

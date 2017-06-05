@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Model\Traits;
+namespace Windwalker\Core\Repository\Traits;
 
 use Windwalker\Core\Database\NullDataMapper;
 use Windwalker\Core\Database\NullRecord;

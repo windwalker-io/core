@@ -10,9 +10,9 @@ namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Migration\AbstractMigration;
-use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Core\Model\Traits\CliOutputModelTrait;
-use Windwalker\Core\Model\Traits\DatabaseModelTrait;
+use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Traits\CliOutputModelTrait;
+use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Schema\Schema;

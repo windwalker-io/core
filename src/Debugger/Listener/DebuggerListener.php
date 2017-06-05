@@ -10,7 +10,7 @@ namespace Windwalker\Debugger\Listener;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Data\Data;

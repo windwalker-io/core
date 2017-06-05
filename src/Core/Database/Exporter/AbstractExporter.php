@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Database\Exporter;
 
-use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Core\Model\Traits\DatabaseModelTrait;
+use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
 
 /**
  * The AbstractExporter class.

@@ -11,6 +11,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Repository;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Structure\Structure;
@@ -65,5 +66,24 @@ class SystemProvider implements ServiceProviderInterface
 		$container->share(Config::class, $this->config);
 
 		$container->prepareSharedObject(PackageResolver::class);
+
+		$this->registerClassAlias();
+	}
+
+	/**
+	 * registerClassAlias
+	 *
+	 * @return  void
+	 */
+	protected function registerClassAlias()
+	{
+		// Model to Repository
+		class_alias(Repository\Exception\ValidateFailException::class, 'Windwalker\Core\Model\Exception\ValidateException');
+		class_alias(Repository\Traits\CliOutputModelTrait::class, 'Windwalker\Core\Model\Traits\CliOutputModelTrait');
+		class_alias(Repository\Traits\DatabaseModelTrait::class, 'Windwalker\Core\Model\Traits\DatabaseModelTrait');
+		class_alias(Repository\Traits\DatabaseRepositoryTrait::class, 'Windwalker\Core\Model\Traits\DatabaseRepositoryTrait');
+		class_alias(Repository\DatabaseModelRepository::class, 'Windwalker\Core\Model\DatabaseModelRepository');
+		class_alias(Repository\DatabaseRepositoryInterface::class, 'Windwalker\Core\Model\DatabaseRepositoryInterface');
+		class_alias(Repository\ModelRepository::class, 'Windwalker\Core\Model\ModelRepository');
 	}
 }

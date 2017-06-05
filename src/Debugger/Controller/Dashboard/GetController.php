@@ -26,9 +26,9 @@ class GetController extends AbstractController
 	{
 		$view = $this->getView();
 
-		$view->setModel($model = $this->getModel(), true);
+		$view->setRepository($model = $this->getRepository(), true);
 
-		$view['item'] = $this->getModel('Profiler')->getItem($this->input->get('id'));
+		$view['item'] = $this->getRepository('Profiler')->getItem($this->input->get('id'));
 
 		return $view->render();
 	}

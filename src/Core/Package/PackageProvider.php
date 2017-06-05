@@ -11,6 +11,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Core\Mvc\ControllerResolver;
 use Windwalker\Core\Mvc\ModelResolver;
 use Windwalker\Core\Mvc\MvcResolver;
+use Windwalker\Core\Mvc\RepositoryResolver;
 use Windwalker\Core\Mvc\ViewResolver;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
@@ -72,10 +73,10 @@ class PackageProvider implements ServiceProviderInterface
 			return new ControllerResolver($this->package, $container);
 		});
 
-		$container->share('model.resolver', function(Container $container)
+		$container->share('repository.resolver', function(Container $container)
 		{
-			return new ModelResolver($this->package, $container);
-		});
+			return new RepositoryResolver($this->package, $container);
+		})->alias('model.resolver', 'repository.resolver');
 
 		$container->share('view.resolver', function(Container $container)
 		{
@@ -86,7 +87,7 @@ class PackageProvider implements ServiceProviderInterface
 		{
 			return new MvcResolver(
 				$container->get('controller.resolver'),
-				$container->get('model.resolver'),
+				$container->get('repository.resolver'),
 				$container->get('view.resolver')
 			);
 		});

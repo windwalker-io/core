@@ -25,7 +25,7 @@ class GetController extends AbstractController
 	protected function doExecute()
 	{
 		$view = $this->getView();
-		$model = $this->getModel('Profiler');
+		$model = $this->getRepository('Profiler');
 
 		$view['item'] = $model->getItem($this->input->get('id'));
 

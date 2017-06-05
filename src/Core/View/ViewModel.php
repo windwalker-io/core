@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\ModelRepository;
 
 /**
  * The ViewModel class.
