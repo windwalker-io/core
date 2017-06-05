@@ -24,7 +24,7 @@ use Windwalker\Structure\Structure;
 /**
  * The Worker class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class Worker implements DispatcherAwareInterface
 {

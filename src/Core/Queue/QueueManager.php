@@ -27,7 +27,7 @@ use Windwalker\Structure\Structure;
 /**
  * The QueueDriverFactory class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class QueueManager
 {

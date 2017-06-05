@@ -13,7 +13,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The QueueFactory class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class QueueFactory extends AbstractProxyFacade
 {

@@ -11,7 +11,7 @@ namespace Windwalker\Core\Queue\Job;
 /**
  * The AbstractJob class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 interface JobInterface
 {

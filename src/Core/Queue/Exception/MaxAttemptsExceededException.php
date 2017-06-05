@@ -11,7 +11,7 @@ namespace Windwalker\Core\Queue\Exception;
 /**
  * The MaxAttemptsExceededException class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class MaxAttemptsExceededException extends \RuntimeException
 {

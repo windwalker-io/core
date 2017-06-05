@@ -16,7 +16,7 @@ use Windwalker\Query\Query;
 /**
  * The DatabaseQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class DatabaseQueueDriver implements QueueDriverInterface
 {

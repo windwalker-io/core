@@ -16,7 +16,7 @@ use Windwalker\Core\Queue\QueueMessage;
 /**
  * The BeanstalkdQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class BeanstalkdQueueDriver implements QueueDriverInterface
 {

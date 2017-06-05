@@ -16,7 +16,7 @@ use Windwalker\Core\Widget\WidgetManager;
 /**
  * The MessageHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class MessageHelper
 {

@@ -17,7 +17,7 @@ use Windwalker\Core\Frontend\Bootstrap;
 /**
  * The MessageHandler class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class MessageHandler extends AbstractHandler
 {

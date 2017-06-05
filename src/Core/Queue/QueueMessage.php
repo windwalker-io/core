@@ -15,7 +15,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
 /**
  * The QueueMessage class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class QueueMessage implements \JsonSerializable
 {

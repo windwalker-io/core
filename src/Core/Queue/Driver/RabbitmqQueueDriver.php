@@ -17,7 +17,7 @@ use Windwalker\Core\Queue\QueueMessage;
 /**
  * The RabbitmqQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class RabbitmqQueueDriver implements QueueDriverInterface
 {

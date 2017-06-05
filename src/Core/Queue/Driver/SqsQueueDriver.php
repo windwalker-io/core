@@ -14,7 +14,7 @@ use Windwalker\Core\Queue\QueueMessage;
 /**
  * The SqsQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class SqsQueueDriver implements QueueDriverInterface
 {

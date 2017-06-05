@@ -16,7 +16,7 @@ use Windwalker\DI\Container;
 /**
  * The Queue class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class Queue
 {

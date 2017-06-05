@@ -11,7 +11,7 @@ namespace Windwalker\Core\Database\Traits;
 /**
  * The DateFormatTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 trait DateFormatTrait
 {

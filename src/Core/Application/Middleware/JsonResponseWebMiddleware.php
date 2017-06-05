@@ -17,7 +17,7 @@ use Windwalker\Middleware\MiddlewareInterface;
 /**
  * The JsonErrorMiddleware class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class JsonResponseWebMiddleware extends AbstractWebMiddleware
 {

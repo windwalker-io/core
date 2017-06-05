@@ -14,7 +14,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 /**
  * The DatabaseQueueFailer class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class DatabaseQueueFailer implements QueueFailerInterface
 {

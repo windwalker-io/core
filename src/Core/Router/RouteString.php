@@ -14,7 +14,7 @@ use Windwalker\Utilities\Classes\StringableInterface;
 /**
  * The RouteString class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class RouteString implements StringableInterface
 {

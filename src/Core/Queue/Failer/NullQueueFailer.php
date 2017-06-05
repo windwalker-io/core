@@ -11,7 +11,7 @@ namespace Windwalker\Core\Queue\Failer;
 /**
  * The NullQueueFailer class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class NullQueueFailer implements QueueFailerInterface
 {

@@ -17,7 +17,7 @@ use Windwalker\Structure\Structure;
 /**
  * The SyncQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class SyncQueueDriver implements QueueDriverInterface
 {

@@ -13,7 +13,7 @@ use Windwalker\Core\Http\CorsHandler;
 /**
  * The CorsTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 trait CorsTrait
 {

@@ -17,7 +17,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The QueueProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class QueueProvider implements ServiceProviderInterface
 {

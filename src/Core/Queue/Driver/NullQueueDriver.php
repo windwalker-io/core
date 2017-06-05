@@ -13,7 +13,7 @@ use Windwalker\Core\Queue\QueueMessage;
 /**
  * The NullQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class NullQueueDriver implements QueueDriverInterface
 {

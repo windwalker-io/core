@@ -15,7 +15,7 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 /**
  * The WorkerCommand class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class FailedTableCommand extends Command
 {

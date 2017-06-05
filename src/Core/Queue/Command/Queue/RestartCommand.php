@@ -17,7 +17,7 @@ use Windwalker\Utilities\Arr;
 /**
  * The WorkerCommand class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class RestartCommand extends Command
 {

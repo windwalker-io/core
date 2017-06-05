@@ -15,7 +15,7 @@ use Windwalker\Structure\Structure;
 /**
  * The MigrationCommandTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 trait MigrationCommandTrait
 {

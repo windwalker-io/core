@@ -11,7 +11,7 @@ namespace Windwalker\Core\Queue\Failer;
 /**
  * The QueueFailerInterface class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 interface QueueFailerInterface
 {
