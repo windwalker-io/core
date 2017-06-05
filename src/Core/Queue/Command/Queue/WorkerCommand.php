@@ -195,13 +195,21 @@ class WorkerCommand extends Command
 				/** @var Worker $worker */
 				$worker = $event['worker'];
 
-				if ($worker->getState() === $worker::STATE_ACTIVE && $this->console->isOffline())
+				switch ($worker->getState())
 				{
-					$worker->setState($worker::STATE_PAUSE);
-				}
-				elseif ($worker->getState() === $worker::STATE_PAUSE && !$this->console->isOffline())
-				{
-					$worker->setState($worker::STATE_ACTIVE);
+					case $worker::STATE_ACTIVE:
+						if ($this->console->isOffline())
+						{
+							$worker->setState($worker::STATE_PAUSE);
+						}
+						break;
+
+					case $worker::STATE_PAUSE:
+						if ($this->console->isOffline())
+						{
+							$worker->setState($worker::STATE_ACTIVE);
+						}
+						break;
 				}
 			})
 			->listen('onWorkerLoopCycleFailure', function (Event $event)

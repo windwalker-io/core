@@ -126,7 +126,7 @@ class Worker implements DispatcherAwareInterface
 			$this->gc();
 
 			// @loop start
-			$this->dispatcher->triggerEvent('onWorkerLoopCycleStart', [
+			$this->triggerEvent('onWorkerLoopCycleStart', [
 				'worker' => $this,
 				'manager' => $this->manager
 			]);
@@ -146,7 +146,7 @@ class Worker implements DispatcherAwareInterface
 
 					$this->logger->error($msg);
 
-					$this->dispatcher->triggerEvent('onWorkerLoopCycleFailure', [
+					$this->triggerEvent('onWorkerLoopCycleFailure', [
 						'worker' => $this,
 						'exception' => $e,
 						'message' => $msg
@@ -157,7 +157,7 @@ class Worker implements DispatcherAwareInterface
 			$this->stopIfNecessary($options);
 
 			// @loop end
-			$this->dispatcher->triggerEvent('onWorkerLoopCycleEnd', [
+			$this->triggerEvent('onWorkerLoopCycleEnd', [
 				'worker' => $this,
 				'manager' => $this->manager
 			]);
@@ -205,7 +205,7 @@ class Worker implements DispatcherAwareInterface
 		try
 		{
 			// @before event
-			$this->dispatcher->triggerEvent('onWorkerBeforeJobRun', [
+			$this->triggerEvent('onWorkerBeforeJobRun', [
 				'worker' => $this,
 				'message' => $message,
 				'job' => $job,
@@ -224,7 +224,7 @@ class Worker implements DispatcherAwareInterface
 			$job->execute();
 
 			// @after event
-			$this->dispatcher->triggerEvent('onWorkerAfterJobRun', [
+			$this->triggerEvent('onWorkerAfterJobRun', [
 				'worker' => $this,
 				'message' => $message,
 				'job' => $job,
@@ -322,7 +322,8 @@ class Worker implements DispatcherAwareInterface
 		$this->logger->info('Worker stop: ' . $reason);
 
 		$this->triggerEvent('onWorkerStop', [
-			'worker' => $this
+			'worker' => $this,
+			'reason' => $reason
 		]);
 
 		$this->setState(static::STATE_STOP);
