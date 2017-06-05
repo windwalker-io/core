@@ -50,21 +50,7 @@ class RabbitmqQueueDriver implements QueueDriverInterface
 	 */
 	public function __construct($queue, array $options = [])
 	{
-		$defaultOptions = [
-			'host' => 'localhost',
-			'port' => 5672,
-			'user' => 'guest',
-			'password' => 'guest'
-		];
-
-		$options = array_merge($defaultOptions, $options);
-
-		$this->client = new AMQPStreamConnection(
-			$options['host'],
-			$options['port'],
-			$options['user'],
-			$options['password']
-		);
+		$this->client = $this->getAMQPConnection($options);
 
 		$this->queue = $queue;
 		$this->channel = $this->client->channel();
@@ -183,5 +169,37 @@ class RabbitmqQueueDriver implements QueueDriverInterface
 	protected function queueDeclare($queue)
 	{
 		$this->channel->queue_declare($queue, false, true, false, false);
+	}
+
+	/**
+	 * getAMQPConnection
+	 *
+	 * @param array $options
+	 *
+	 * @return  AMQPStreamConnection
+	 * @throws \DomainException
+	 */
+	public function getAMQPConnection(array $options)
+	{
+		if (!class_exists(AMQPStreamConnection::class))
+		{
+			throw new \DomainException('Please install php-amqplib/php-amqplib first.');
+		}
+
+		$defaultOptions = [
+			'host'     => 'localhost',
+			'port'     => 5672,
+			'user'     => 'guest',
+			'password' => 'guest'
+		];
+
+		$options = array_merge($defaultOptions, $options);
+
+		return new AMQPStreamConnection(
+			$options['host'],
+			$options['port'],
+			$options['user'],
+			$options['password']
+		);
 	}
 }

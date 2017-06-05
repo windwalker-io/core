@@ -42,18 +42,7 @@ class SqsQueueDriver implements QueueDriverInterface
 	 */
 	public function __construct($key, $secret, $queue = 'default', array $options = [])
 	{
-		$defaultOptions = [
-			'region' => 'ap-northeast-1',
-			'version' => 'latest',
-			'credentials' => [
-				'key'    => $key,
-				'secret' => $secret,
-			]
-		];
-
-		$options = array_merge($defaultOptions, $options);
-
-		$this->client = new SqsClient($options);
+		$this->client = $this->getSqsClient($key, $secret, $options);
 
 		$this->queue = $queue;
 	}
@@ -180,5 +169,36 @@ class SqsQueueDriver implements QueueDriverInterface
 	public function getReceiptHandle(QueueMessage $message)
 	{
 		return $message->get('ReceiptHandle', $message->getId());
+	}
+
+	/**
+	 * getSqsClient
+	 *
+	 * @param string $key
+	 * @param string $secret
+	 * @param array  $options
+	 *
+	 * @return  SqsClient
+	 * @throws \DomainException
+	 */
+	public function getSqsClient($key, $secret, array $options = [])
+	{
+		if (!class_exists(SqsClient::class))
+		{
+			throw new \DomainException('Please install aws/aws-sdk-php first.');
+		}
+
+		$defaultOptions = [
+			'region'      => 'ap-northeast-1',
+			'version'     => 'latest',
+			'credentials' => [
+				'key'    => $key,
+				'secret' => $secret,
+			]
+		];
+
+		$options = array_merge($defaultOptions, $options);
+
+		return new SqsClient($options);
 	}
 }

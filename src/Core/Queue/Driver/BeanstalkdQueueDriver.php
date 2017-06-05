@@ -144,9 +144,15 @@ class BeanstalkdQueueDriver implements QueueDriverInterface
 	 * @param string $host
 	 *
 	 * @return  Pheanstalk
+	 * @throws \DomainException
 	 */
 	public function getPheanstalk($host = null)
 	{
+		if (!class_exists(Pheanstalk::class))
+		{
+			throw new \DomainException('Please install pda/pheanstalk first.');
+		}
+
 		return new Pheanstalk($host);
 	}
 }

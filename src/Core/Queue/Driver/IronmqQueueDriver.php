@@ -42,14 +42,7 @@ class IronmqQueueDriver implements QueueDriverInterface
 	 */
 	public function __construct($projectId, $token, $queue, array $options = [])
 	{
-		$defaultOptions = [
-			'project_id' => $projectId,
-			'token'      => $token,
-		];
-
-		$options = array_merge($defaultOptions, $options);
-
-		$this->client = new IronMQ($options);
+		$this->client = $this->getIronMQ($projectId, $token, $options);
 
 		$this->queue  = $queue;
 	}
@@ -137,5 +130,31 @@ class IronmqQueueDriver implements QueueDriverInterface
 		);
 
 		return $this;
+	}
+
+	/**
+	 * getIronMQ
+	 *
+	 * @param       $projectId
+	 * @param       $token
+	 * @param array $options
+	 *
+	 * @return  IronMQ
+	 */
+	public function getIronMQ($projectId, $token, array $options)
+	{
+		if (!class_exists(IronMQ::class))
+		{
+			throw new \DomainException('Please install iron-io/iron_mq first.');
+		}
+
+		$defaultOptions = [
+			'project_id' => $projectId,
+			'token'      => $token,
+		];
+
+		$options = array_merge($defaultOptions, $options);
+
+		return new IronMQ($options);
 	}
 }
