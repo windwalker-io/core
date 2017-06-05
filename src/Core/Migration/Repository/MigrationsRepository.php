@@ -219,19 +219,14 @@ class MigrationsRepository extends ModelRepository
 
 		$start = time();
 
+		// Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite does.
 		$tran = $this->db->getTransaction()->start();
 
 		try
 		{
-			// Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite does.
-			$migration->$direction();
-
 			$tmpl = <<<LOG
 
-	Migrate <cmd>%s</cmd> the version: <info>%s_%s</info>
-	------------------------------------------------------------
-	<option>Success</option>
-
+    Migrate <cmd>%s</cmd> the version: <info>%s_%s</info>
 LOG;
 
 			$this->out(sprintf(
@@ -240,6 +235,15 @@ LOG;
 				$migrationItem['id'],
 				$migrationItem['name']
 			));
+
+			$migration->$direction();
+
+			$tmpl = <<<LOG
+    ------------------------------------------------------------
+    <option>Success</option>
+LOG;
+
+			$this->out($tmpl);
 		}
 		catch (\Exception $e)
 		{
