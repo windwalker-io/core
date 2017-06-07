@@ -14,6 +14,7 @@ use Windwalker\Crypt\Cipher\BlowfishCipher;
 use Windwalker\Crypt\Cipher\CipherInterface;
 use Windwalker\Crypt\Cipher\Des3Cipher;
 use Windwalker\Crypt\Cipher\PhpAesCipher;
+use Windwalker\Crypt\Cipher\SodiumCipher;
 use Windwalker\Crypt\Crypt;
 use Windwalker\Crypt\CryptInterface;
 use Windwalker\DI\Container;
@@ -76,6 +77,9 @@ class SecurityProvider implements ServiceProviderInterface
 			case 'aes-256':
 			case 'aes':
 				return Aes256Cipher::class;
+
+			case 'sodium':
+				return SodiumCipher::class;
 		}
 
 		return PhpAesCipher::class;
