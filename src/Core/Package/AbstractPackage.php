@@ -241,6 +241,10 @@ class AbstractPackage implements DispatcherAwareInterface
 			{
 				$result = $result->render();
 			}
+			elseif (is_array($result))
+			{
+				$result = json_encode($result);
+			}
 
 			$response->getBody()->write((string) $result);
 		}
