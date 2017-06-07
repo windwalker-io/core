@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
@@ -22,7 +22,6 @@ use Windwalker\String\StringNormalise;
 /**
  * The AbstractView class.
  *
- * @property-read  ViewModel|mixed $repository   The ViewModel object.
  * @property-read  ViewModel|mixed $model   The ViewModel object.
  * @property-read  Structure       $config  Config object.
  * @property-read  PackageRouter   $router  Router object.
@@ -71,7 +70,7 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @var ViewModel
 	 */
-	protected $repository;
+	protected $model;
 
 	/**
 	 * Property booted.
@@ -89,7 +88,7 @@ abstract class AbstractView implements \ArrayAccess
 	public function __construct($data = null, $config = null)
 	{
 		$this->config = $config instanceof Structure ? $config : new Structure($config);
-		$this->repository = new ViewModel;
+		$this->model  = new ViewModel;
 
 		$this->setData($data);
 
@@ -158,7 +157,8 @@ abstract class AbstractView implements \ArrayAccess
 		$dispatcher->triggerEvent('onViewAfterHandleData', [
 			'data' => &$data,
 			'view' => $this
-		]);
+		]
+		);
 
 		return $this;
 	}
@@ -248,7 +248,8 @@ abstract class AbstractView implements \ArrayAccess
 		$dispatcher->triggerEvent('onViewBeforeRender', [
 			'data' => $this->data,
 			'view' => $this
-		]);
+		]
+		);
 
 		$output = $this->doRender($data);
 
@@ -258,7 +259,8 @@ abstract class AbstractView implements \ArrayAccess
 			'data'   => $this->data,
 			'view'   => $this,
 			'output' => &$output
-		]);
+		]
+		);
 
 		return $output;
 	}
@@ -297,11 +299,11 @@ abstract class AbstractView implements \ArrayAccess
 		}
 		catch (\Exception $e)
 		{
-			trigger_error($e->getMessage(), E_USER_ERROR);
+			trigger_error($e->getMessage(), E_ERROR);
 		}
 		catch (\Throwable $e)
 		{
-			trigger_error($e->getMessage(), E_USER_ERROR);
+			trigger_error($e->getMessage(), E_ERROR);
 		}
 	}
 
@@ -510,9 +512,9 @@ abstract class AbstractView implements \ArrayAccess
 			return $this->config;
 		}
 
-		if ($name === 'model' || $name === 'repository')
+		if ($name === 'model')
 		{
-			return $this->repository;
+			return $this->model;
 		}
 
 		if ($name === 'router')
@@ -521,6 +523,64 @@ abstract class AbstractView implements \ArrayAccess
 		}
 
 		return null;
+	}
+
+	/**
+	 * Method to get property Model
+	 *
+	 * @param  string $name
+	 *
+	 * @return ModelRepository
+	 */
+	public function getModel($name = null)
+	{
+		return $this->model->getModel($name);
+	}
+
+	/**
+	 * Method to set property model
+	 *
+	 * @param   ModelRepository $model
+	 * @param   bool            $default
+	 * @param   string          $customName
+	 *
+	 * @return static Return self to support chaining.
+	 */
+	public function setModel(ModelRepository $model, $default = null, $customName = null)
+	{
+		$this->model->setModel($model, $default, $customName);
+
+		return $this;
+	}
+
+	/**
+	 * Method to add model with name.
+	 *
+	 * @param string          $name
+	 * @param ModelRepository $model
+	 * @param string          $default
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function addModel($name, ModelRepository $model, $default = null)
+	{
+		$this->model->setModel($model, $default, $name);
+
+		return $this;
+	}
+
+	/**
+	 * removeModel
+	 *
+	 * @param string $name
+	 *
+	 * @return  static
+	 */
+	public function removeModel($name)
+	{
+		$this->model->removeModel($name);
+
+		return $this;
 	}
 
 	/**
@@ -558,129 +618,5 @@ abstract class AbstractView implements \ArrayAccess
 		}
 
 		return null;
-	}
-
-	/**
-	 * Method to get property Model
-	 *
-	 * @param  string $name
-	 *
-	 * @return ModelRepository
-	 */
-	public function getRepository($name = null)
-	{
-		return $this->repository->getModel($name);
-	}
-
-	/**
-	 * Method to set property model
-	 *
-	 * @param   ModelRepository $model
-	 * @param   bool            $default
-	 * @param   string          $customName
-	 *
-	 * @return static Return self to support chaining.
-	 */
-	public function setRepository(ModelRepository $model, $default = null, $customName = null)
-	{
-		$this->repository->setModel($model, $default, $customName);
-
-		return $this;
-	}
-
-	/**
-	 * Method to add model with name.
-	 *
-	 * @param string          $name
-	 * @param ModelRepository $model
-	 * @param string          $default
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function addRepository($name, ModelRepository $model, $default = null)
-	{
-		$this->repository->setModel($model, $default, $name);
-
-		return $this;
-	}
-
-	/**
-	 * removeModel
-	 *
-	 * @param string $name
-	 *
-	 * @return  static
-	 */
-	public function removeRepository($name)
-	{
-		$this->repository->removeModel($name);
-
-		return $this;
-	}
-
-	/**
-	 * Method to get property Model
-	 *
-	 * @param  string $name
-	 *
-	 * @return ModelRepository
-	 *
-	 * @deprecated use repository instead.
-	 */
-	public function getModel($name = null)
-	{
-		return $this->getRepository($name);
-	}
-
-	/**
-	 * Method to set property model
-	 *
-	 * @param   ModelRepository $model
-	 * @param   bool            $default
-	 * @param   string          $customName
-	 *
-	 * @return static Return self to support chaining.
-	 *
-	 * @deprecated use repository instead.
-	 */
-	public function setModel(ModelRepository $model, $default = null, $customName = null)
-	{
-		$this->setRepository($model, $default, $customName);
-
-		return $this;
-	}
-
-	/**
-	 * Method to add model with name.
-	 *
-	 * @param string          $name
-	 * @param ModelRepository $model
-	 * @param string          $default
-	 *
-	 * @return  static  Return self to support chaining.
-	 *
-	 * @deprecated use repository instead.
-	 */
-	public function addModel($name, ModelRepository $model, $default = null)
-	{
-		$this->addRepository($name, $model, $default);
-
-		return $this;
-	}
-
-	/**
-	 * removeModel
-	 *
-	 * @param string $name
-	 *
-	 * @return  static
-	 *
-	 * @deprecated use repository instead.
-	 */
-	public function removeModel($name)
-	{
-		$this->removeRepository($name);
-
-		return $this;
 	}
 }

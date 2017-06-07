@@ -6,10 +6,10 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Repository\Traits;
+namespace Windwalker\Core\Model\Traits;
 
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**

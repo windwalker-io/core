@@ -6,9 +6,9 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Repository;
+namespace Windwalker\Core\Model;
 
-use Windwalker\Core\Repository\Traits\DatabaseRepositoryTrait;
+use Windwalker\Core\Model\Traits\DatabaseRepositoryTrait;
 
 /**
  * The ModelRepository class.

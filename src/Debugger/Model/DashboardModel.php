@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Model;
 
-use Windwalker\Core\Repository\ModelRepository;
+use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
 
 /**

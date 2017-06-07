@@ -10,9 +10,9 @@ namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Repository\DatabaseModel;
-use Windwalker\Core\Repository\ModelRepository;
-use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
+use Windwalker\Core\Model\DatabaseModel;
+use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Model\Traits\DatabaseModelTrait;
 use Windwalker\Filesystem\Folder;
 
 /**

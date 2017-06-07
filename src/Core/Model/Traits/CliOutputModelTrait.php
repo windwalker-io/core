@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Repository\Traits;
+namespace Windwalker\Core\Model\Traits;
 
 use Windwalker\Console\IO\IOInterface;
 
