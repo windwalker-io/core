@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
+use Asika\Minifier\CssMinifier;
+use Asika\Minifier\JsMinifier;
 use Minify_CSS_Compressor;
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Filesystem\File;
@@ -216,13 +218,13 @@ class AssetInstaller extends AbstractCommand
 
 		$type = strtolower($type);
 
-		if ($type == 'css')
+		if ($type === 'css')
 		{
-			$content = Minify_CSS_Compressor::process(file_get_contents($file));
+			$content = CssMinifier::process(file_get_contents($file));
 		}
-		elseif ($type == 'js')
+		elseif ($type === 'js')
 		{
-			$content = \JSMinPlus::minify(file_get_contents($file));
+			$content = JsMinifier::process(file_get_contents($file));
 		}
 		else
 		{
