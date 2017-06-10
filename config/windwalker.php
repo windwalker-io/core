@@ -83,6 +83,7 @@ return [
 			// Security
 			'security.csrf' => \Windwalker\Core\Security\CsrfGuard::class,
 			'crypt' => \Windwalker\Crypt\CryptInterface::class,
+			'hasher' => \Windwalker\Crypt\HasherInterface::class,
 
 			// DateTime
 			'datetime' => \Windwalker\Core\DateTime\Chronos::class,
