@@ -18,23 +18,23 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * @see LoggerManager
  *
- * @method  static  LoggerManager  emergency($category, $message, array $context = [])
- * @method  static  LoggerManager  alert($category, $message, array $context = [])
- * @method  static  LoggerManager  critical($category, $message, array $context = [])
- * @method  static  LoggerManager  error($category, $message, array $context = [])
- * @method  static  LoggerManager  warning($category, $message, array $context = [])
- * @method  static  LoggerManager  notice($category, $message, array $context = [])
- * @method  static  LoggerManager  info($category, $message, array $context = [])
- * @method  static  LoggerManager  debug($category, $message, array $context = [])
- * @method  static  LoggerManager  log($category, $level, $message, array $context = [])
- * @method  static  LoggerManager  addLogger($category, LoggerInterface $logger)
- * @method  static  Monolog        createLogger($categoey, $level = Logger::DEBUG, HandlerInterface $handler = null)
- * @method  static  boolean        hasLogger($category)
- * @method  static  LoggerManager  removeLogger($category)
+ * @method  static  LoggerManager  emergency($channel, $message, array $context = [])
+ * @method  static  LoggerManager  alert($channel, $message, array $context = [])
+ * @method  static  LoggerManager  critical($channel, $message, array $context = [])
+ * @method  static  LoggerManager  error($channel, $message, array $context = [])
+ * @method  static  LoggerManager  warning($channel, $message, array $context = [])
+ * @method  static  LoggerManager  notice($channel, $message, array $context = [])
+ * @method  static  LoggerManager  info($channel, $message, array $context = [])
+ * @method  static  LoggerManager  debug($channel, $message, array $context = [])
+ * @method  static  LoggerManager  log($channel, $level, $message, array $context = [])
+ * @method  static  LoggerManager  addLogger($channel, LoggerInterface $logger)
+ * @method  static  Monolog        createLogger($channel, $level = Logger::DEBUG, HandlerInterface $handler = null)
+ * @method  static  boolean        hasLogger($channel)
+ * @method  static  LoggerManager  removeLogger($channel)
  * @method  static  LoggerManager  setLoggers(array $loggers)
- * @method  static  LoggerInterface    getLogger($category, $level = Logger::DEBUG)
+ * @method  static  LoggerInterface    getLogger($channel, $level = Logger::DEBUG)
  * @method  static  LoggerInterface[]  getLoggers()
- * @method  static  LoggerInterface    createCategory($category, $level = Logger::DEBUG)
+ * @method  static  LoggerInterface    createChannel($channel, $level = Logger::DEBUG)
  *
  * @since  2.1.1
  */

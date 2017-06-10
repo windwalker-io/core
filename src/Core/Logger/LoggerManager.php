@@ -59,15 +59,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * System is unusable.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function emergency($category, $message, array $context = [])
+	public function emergency($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::EMERGENCY, $message, $context);
+		$this->log($channel, LogLevel::EMERGENCY, $message, $context);
 
 		return $this;
 	}
@@ -78,15 +78,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Example: Entire website down, database unavailable, etc. This should
 	 * trigger the SMS alerts and wake you up.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function alert($category, $message, array $context = [])
+	public function alert($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::ALERT, $message, $context);
+		$this->log($channel, LogLevel::ALERT, $message, $context);
 
 		return $this;
 	}
@@ -96,15 +96,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * Example: Application component unavailable, unexpected exception.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function critical($category, $message, array $context = [])
+	public function critical($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::CRITICAL, $message, $context);
+		$this->log($channel, LogLevel::CRITICAL, $message, $context);
 
 		return $this;
 	}
@@ -113,15 +113,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Runtime errors that do not require immediate action but should typically
 	 * be logged and monitored.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function error($category, $message, array $context = [])
+	public function error($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::ERROR, $message, $context);
+		$this->log($channel, LogLevel::ERROR, $message, $context);
 
 		return $this;
 	}
@@ -132,15 +132,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 * Example: Use of deprecated APIs, poor use of an API, undesirable things
 	 * that are not necessarily wrong.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function warning($category, $message, array $context = [])
+	public function warning($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::WARNING, $message, $context);
+		$this->log($channel, LogLevel::WARNING, $message, $context);
 
 		return $this;
 	}
@@ -148,15 +148,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Normal but significant events.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function notice($category, $message, array $context = [])
+	public function notice($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::NOTICE, $message, $context);
+		$this->log($channel, LogLevel::NOTICE, $message, $context);
 
 		return $this;
 	}
@@ -166,15 +166,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 *
 	 * Example: User logs in, SQL logs.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function info($category, $message, array $context = [])
+	public function info($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::INFO, $message, $context);
+		$this->log($channel, LogLevel::INFO, $message, $context);
 
 		return $this;
 	}
@@ -182,15 +182,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Detailed debug information.
 	 *
-	 * @param string|array  $category
+	 * @param string|array  $channel
 	 * @param string|array  $message
 	 * @param array         $context
 	 *
 	 * @return static
 	 */
-	public function debug($category, $message, array $context = [])
+	public function debug($channel, $message, array $context = [])
 	{
-		$this->log($category, LogLevel::DEBUG, $message, $context);
+		$this->log($channel, LogLevel::DEBUG, $message, $context);
 
 		return $this;
 	}
@@ -198,18 +198,18 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * Logs with an arbitrary level.
 	 *
-	 * @param string|array $category
+	 * @param string|array $channel
 	 * @param string|int   $level
 	 * @param string|array $message
 	 * @param array        $context
 	 *
 	 * @return static
 	 */
-	public function log($category, $level, $message, array $context = [])
+	public function log($channel, $level, $message, array $context = [])
 	{
-		if (is_array($category))
+		if (is_array($channel))
 		{
-			foreach ($category as $cat)
+			foreach ($channel as $cat)
 			{
 				$this->log($cat, $level, $message, $context);
 			}
@@ -221,13 +221,13 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 		{
 			foreach ($message as $msg)
 			{
-				$this->log($category, $level, $msg, $context);
+				$this->log($channel, $level, $msg, $context);
 			}
 
 			return $this;
 		}
 
-		$this->getLogger($category)->log($level, $message, $context);
+		$this->getLogger($channel)->log($level, $message, $context);
 
 		return $this;
 	}
@@ -235,16 +235,16 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * addLogger
 	 *
-	 * @param string          $category
+	 * @param string          $channel
 	 * @param LoggerInterface $logger
 	 *
 	 * @return  static
 	 */
-	public function addLogger($category, LoggerInterface $logger)
+	public function addLogger($channel, LoggerInterface $logger)
 	{
-		$category = strtolower($category);
+		$channel = strtolower($channel);
 
-		$this->loggers[$category] = $logger;
+		$this->loggers[$channel] = $logger;
 
 		return $this;
 	}
@@ -252,41 +252,56 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * createCategory
 	 *
-	 * @param string  $category
+	 * @param string  $channel
 	 * @param string  $level
 	 *
 	 * @return  LoggerInterface
+	 *
+	 * @deprecated  Use createChannel() instead.
 	 */
-	public function createCategory($category, $level = Logger::DEBUG)
+	public function createCategory($channel, $level = Logger::DEBUG)
 	{
-		return $this->getLogger($category, $level);
+		return $this->createChannel($channel, $level);
+	}
+
+	/**
+	 * createChannel
+	 *
+	 * @param string  $channel
+	 * @param string $level
+	 *
+	 * @return  LoggerInterface
+	 */
+	public function createChannel($channel, $level = Logger::DEBUG)
+	{
+		return $this->getLogger($channel, $level);
 	}
 
 	/**
 	 * getLogger
 	 *
-	 * @param string  $category
+	 * @param string  $channel
 	 * @param string  $level
 	 *
 	 * @return LoggerInterface
 	 */
-	public function getLogger($category, $level = Logger::DEBUG)
+	public function getLogger($channel, $level = Logger::DEBUG)
 	{
-		$category = strtolower($category);
+		$channel = strtolower($channel);
 
-		if (!isset($this->loggers[$category]))
+		if (!isset($this->loggers[$channel]))
 		{
 			if (class_exists(Monolog::class))
 			{
-				$this->loggers[$category] = $this->createLogger($category, $level);
+				$this->loggers[$channel] = $this->createLogger($channel, $level);
 
-				return $this->loggers[$category];
+				return $this->loggers[$channel];
 			}
 
 			return $this->getNullLogger();
 		}
 
-		return $this->loggers[$category];
+		return $this->loggers[$channel];
 	}
 
 	/**
@@ -324,15 +339,15 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * getRotatingLogger
 	 *
-	 * @param string $category
+	 * @param string $channel
 	 * @param string $level
 	 * @param int    $maxFiles
 	 *
 	 * @return  LoggerInterface
 	 */
-	public function createRotatingLogger($category, $level = Logger::DEBUG, $maxFiles = 7)
+	public function createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7)
 	{
-		return $this->createLogger($category, $level, new RotatingFileHandler($this->getLogFile($category), $maxFiles, $level));
+		return $this->createLogger($channel, $level, new RotatingFileHandler($this->getLogFile($channel), $maxFiles, $level));
 	}
 
 	/**
@@ -350,29 +365,29 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	/**
 	 * hasLogger
 	 *
-	 * @param   string  $category
+	 * @param   string  $channel
 	 *
 	 * @return  boolean
 	 */
-	public function hasLogger($category)
+	public function hasLogger($channel)
 	{
-		$category = strtolower($category);
+		$channel = strtolower($channel);
 
-		return isset($this->loggers[$category]);
+		return isset($this->loggers[$channel]);
 	}
 
 	/**
 	 * removeLogger
 	 *
-	 * @param   string  $category
+	 * @param   string  $channel
 	 *
 	 * @return  static
 	 */
-	public function removeLogger($category)
+	public function removeLogger($channel)
 	{
-		if (isset($this->loggers[$category]))
+		if (isset($this->loggers[$channel]))
 		{
-			unset($this->loggers[$category]);
+			unset($this->loggers[$channel]);
 		}
 
 		return $this;
@@ -397,9 +412,9 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 	 */
 	public function setLoggers(array $loggers)
 	{
-		foreach ($loggers as $category => $logger)
+		foreach ($loggers as $channel => $logger)
 		{
-			$this->addLogger($category, $logger);
+			$this->addLogger($channel, $logger);
 		}
 
 		return $this;
