@@ -87,24 +87,7 @@ class Chronos extends \DateTime
 	{
 		static::backupTimezone();
 
-		// If the time zone object is not set, attempt to build it.
-		if (!($tz instanceof \DateTimeZone))
-		{
-			if ($tz === null)
-			{
-				$tz = static::useServerDefaultTimezone() ? self::$stz : self::$gmt;
-			}
-			elseif (is_string($tz))
-			{
-				$tz = new \DateTimeZone($tz);
-			}
-			elseif ($tz === static::TZ_LOCALE)
-			{
-				$config = Ioc::getConfig();
-				$tz = $config->get('system.timezone');
-				$tz = new \DateTimeZone($tz);
-			}
-		}
+		$tz = static::getTimezoneObject($tz);
 
 		// If the date is numeric assume a unix timestamp and convert it.
 		date_default_timezone_set('UTC');
@@ -265,6 +248,27 @@ class Chronos extends \DateTime
 	public static function create($date = 'now', $tz = null)
 	{
 		return new static($date, $tz);
+	}
+
+	/**
+	 * Parse a string into a new DateTime object according to the specified format
+	 *
+	 * @param string  $format   Format accepted by date().
+	 * @param string  $time     String representing the time.
+	 * @param mixed   $timezone A DateTimeZone object representing the desired time zone.
+	 *
+	 * @return static|bool
+	 */
+	public static function createFromFormat($format, $time, $timezone = null)
+	{
+		$datetime = parent::createFromFormat($format, $time, static::getTimezoneObject($timezone));
+
+		if (!$datetime)
+		{
+			return false;
+		}
+
+		return new static($datetime->getTimestamp(), $datetime->getTimezone());
 	}
 
 	/**
@@ -488,5 +492,36 @@ class Chronos extends \DateTime
 		$db = $db ? : Ioc::getDatabase();
 
 		return $db->getQuery(true)->getDateFormat();
+	}
+
+	/**
+	 * getTimezoneObject
+	 *
+	 * @param mixed $tz
+	 *
+	 * @return  DateTimeZone
+	 */
+	protected static function getTimezoneObject($tz)
+	{
+		// If the time zone object is not set, attempt to build it.
+		if (!($tz instanceof \DateTimeZone))
+		{
+			if ($tz === null)
+			{
+				$tz = static::useServerDefaultTimezone() ? self::$stz : self::$gmt;
+			}
+			elseif (is_string($tz))
+			{
+				$tz = new \DateTimeZone($tz);
+			}
+			elseif ($tz === static::TZ_LOCALE)
+			{
+				$config = Ioc::getConfig();
+				$tz = $config->get('system.timezone');
+				$tz = new \DateTimeZone($tz);
+			}
+		}
+
+		return $tz;
 	}
 }
