@@ -11,8 +11,6 @@ namespace Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
-use Windwalker\Core\Migration\Repository\BackupRepository;
-use Windwalker\Core\Migration\Repository\MigrationsRepository;
 
 /**
  * The MigrateCommand class.

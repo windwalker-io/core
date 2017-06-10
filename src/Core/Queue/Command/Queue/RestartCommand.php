@@ -12,7 +12,6 @@ use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Filesystem\File;
-use Windwalker\Utilities\Arr;
 
 /**
  * The WorkerCommand class.

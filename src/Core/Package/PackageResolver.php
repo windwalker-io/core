@@ -11,8 +11,8 @@ namespace Windwalker\Core\Package;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
-use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
+use Windwalker\Structure\Structure;
 
 /**
  * The PackageResolver class.

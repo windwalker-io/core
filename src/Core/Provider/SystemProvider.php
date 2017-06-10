@@ -9,8 +9,8 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
-use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Package\PackageResolver;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Structure\Structure;

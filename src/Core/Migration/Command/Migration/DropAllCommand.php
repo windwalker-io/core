@@ -10,9 +10,7 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
-use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
  * The DropAllCommand class.

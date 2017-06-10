@@ -8,9 +8,9 @@
 
 namespace Windwalker\Core\Asset\Command;
 
+use Windwalker\Console\Command\Command;
 use Windwalker\Core\Asset\Command\Asset\MakesumCommand;
 use Windwalker\Core\Asset\Command\Asset\SyncCommand;
-use Windwalker\Console\Command\Command;
 
 /**
  * The AssetCommand class.

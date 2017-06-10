@@ -10,7 +10,6 @@ namespace Windwalker\Core\Message;
 
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Provider\RendererProvider;
 use Windwalker\Core\Widget\WidgetManager;
 
 /**

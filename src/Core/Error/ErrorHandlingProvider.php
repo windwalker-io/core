@@ -8,7 +8,6 @@
 
 namespace Windwalker\Core\Error;
 
-use Monolog\Handler\RotatingFileHandler;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Config\Config;

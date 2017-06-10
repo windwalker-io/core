@@ -9,10 +9,10 @@
 namespace Windwalker\Core\Seeder\Command;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Seeder\Command\Seed\ClearCommand;
 use Windwalker\Core\Seeder\Command\Seed\ImportCommand;
-use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Ioc;
 use Windwalker\Loader\ClassLoader;

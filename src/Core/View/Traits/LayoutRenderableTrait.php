@@ -11,8 +11,8 @@ namespace Windwalker\Core\View\Traits;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Renderer\RendererManager;
 use Windwalker\Filesystem\Path;
-use Windwalker\Structure\Structure;
 use Windwalker\Renderer\AbstractRenderer;
+use Windwalker\Structure\Structure;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**

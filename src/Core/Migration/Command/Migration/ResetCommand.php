@@ -10,7 +10,6 @@ namespace Windwalker\Core\Migration\Command\Migration;
 
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
-use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
  * The CreateCommand class.

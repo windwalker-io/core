@@ -10,9 +10,9 @@ namespace Windwalker\Core\Model\Traits;
 
 use Windwalker\Core\Database\NullDataMapper;
 use Windwalker\Core\Database\NullRecord;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\Resolver\DataMapperResolver;
 use Windwalker\Core\Package\Resolver\RecordResolver;
-use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 use Windwalker\DataMapper\DataMapper;
 use Windwalker\Record\Record;

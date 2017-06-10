@@ -13,8 +13,8 @@ use Windwalker\Console\IO\IOFactory;
 use Windwalker\Console\IO\IOInterface;
 use Windwalker\Console\IO\NullInput;
 use Windwalker\Core;
-use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Debugger\Helper\ComposerInformation;
@@ -24,8 +24,8 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
 use Windwalker\Language\Language;
-use Windwalker\Structure\Structure;
 use Windwalker\Session\Session;
+use Windwalker\Structure\Structure;
 
 /**
  * The Console class.

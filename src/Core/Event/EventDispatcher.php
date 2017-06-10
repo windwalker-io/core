@@ -10,6 +10,7 @@ namespace Windwalker\Core\Event;
 
 use Windwalker\Event\Dispatcher;
 use Windwalker\Event\Event;
+
 /**
  * The EventDispatcher class.
  * 

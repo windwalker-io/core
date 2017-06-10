@@ -11,7 +11,6 @@ namespace Windwalker\Core\Queue\Command\Queue;
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Core\Console\CoreCommandTrait;
-use Windwalker\Utilities\Arr;
 
 /**
  * The WorkerCommand class.

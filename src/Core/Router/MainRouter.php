@@ -18,11 +18,11 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
-use Windwalker\Structure\Structure;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
+use Windwalker\Structure\Structure;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Arr;
 

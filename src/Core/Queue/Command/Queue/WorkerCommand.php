@@ -10,7 +10,6 @@ namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\CoreCommandTrait;
-use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Queue\Job\JobInterface;
 use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Core\Queue\Worker;

@@ -8,8 +8,6 @@
 
 namespace Windwalker\Core\Queue;
 
-use Windwalker\Core\Queue\Driver\QueueDriverInterface;
-use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
 use Windwalker\Core\Queue\Failer\QueueFailerInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

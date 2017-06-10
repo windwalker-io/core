@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Asset;
 
-use Windwalker\Utilities\Classes\OptionAccessTrait;
 use Windwalker\String\SimpleTemplate;
+use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 /**
  * The AssetTemplate class.

@@ -11,9 +11,6 @@ namespace Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Console\CoreCommandTrait;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
-use Windwalker\Core\Migration\Repository\MigrationsRepository;
-use Windwalker\Filesystem\File;
-use Windwalker\String\SimpleTemplate;
 
 /**
  * The CreateCommand class.

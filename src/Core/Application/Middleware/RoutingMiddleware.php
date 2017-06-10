@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Application\Middleware;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Middleware\MiddlewareInterface;

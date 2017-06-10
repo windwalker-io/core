@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Facade;
 
-use Windwalker\DI\Container;
 use Windwalker\Core\Ioc;
+use Windwalker\DI\Container;
 
 /**
  * The AbstractFacade class.

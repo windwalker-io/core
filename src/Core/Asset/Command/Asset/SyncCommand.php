@@ -11,10 +11,10 @@ namespace Windwalker\Core\Asset\Command\Asset;
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\ConsoleHelper;
+use Windwalker\Core\Utilities\Symlink;
 use Windwalker\Environment\PlatformHelper;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
-use Windwalker\Core\Utilities\Symlink;
 
 /**
  * The SyncCommand class.

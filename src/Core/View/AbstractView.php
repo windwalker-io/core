@@ -9,15 +9,15 @@
 namespace Windwalker\Core\View;
 
 use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
-use Windwalker\Structure\Structure;
 use Windwalker\String\StringNormalise;
+use Windwalker\Structure\Structure;
 
 /**
  * The AbstractView class.

@@ -19,7 +19,6 @@ use Windwalker\Core\Widget\WidgetManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Renderer;
-use Windwalker\Session\Session;
 
 /**
  * The TemplateEngineProvider class.

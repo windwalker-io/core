@@ -14,11 +14,11 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Renderer\RendererHelper;
 use Windwalker\Core\Utilities\Classes\ArrayAccessTrait;
-use Windwalker\Data\DataInterface;
-use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Data\Data;
+use Windwalker\Data\DataInterface;
 use Windwalker\Renderer\PhpRenderer;
 use Windwalker\Renderer\RendererInterface;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The Widget class.
