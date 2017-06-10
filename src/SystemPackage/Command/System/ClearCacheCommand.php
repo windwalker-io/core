@@ -8,7 +8,6 @@
 
 namespace Windwalker\SystemPackage\Command\System;
 
-use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;

@@ -9,8 +9,6 @@
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 use Windwalker\Profiler\Point\Collector;
-use Windwalker\String\Utf8String;
-use Windwalker\Utilities\Reflection\ReflectionHelper;
 
 $this->extend('_global.html');
 

@@ -14,7 +14,6 @@ use Windwalker\Dom\HtmlElement;
 use Windwalker\Ioc;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The DebuggerHelper class.

@@ -10,7 +10,6 @@ namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Filesystem\File;
-use Windwalker\Structure\Structure;
 
 /**
  * The UpCommand class.

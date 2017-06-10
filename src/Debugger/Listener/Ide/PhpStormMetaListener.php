@@ -12,8 +12,8 @@ use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Path\PathCollection;
 use Windwalker\Filesystem\Path\PathLocator;
-use Windwalker\Structure\Structure;
 use Windwalker\String\StringHelper;
+use Windwalker\Structure\Structure;
 
 /**
  * The PhpStormListener class.
