@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Security;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
+use Windwalker\Crypt\Cipher\CipherInterface;
 use Windwalker\Crypt\Crypt;
 use Windwalker\Crypt\CryptInterface;
 
@@ -20,11 +21,13 @@ use Windwalker\Crypt\CryptInterface;
  *
  * @method  static  string   encrypt($string, $key = null, $iv = null)
  * @method  static  string   decrypt($string, $key = null, $iv = null)
- * @method  static  boolean  verify($string, $hash, $key = null, $iv = null)
+ * @method  static  boolean  verify($string, $encrypted, $key = null, $iv = null)
  * @method  static  Crypt    setKey($key)
  * @method  static  string   getKey($key)
  * @method  static  Crypt    getIV($key)
  * @method  static  string   setIV($iv)
+ * @method  static  CipherInterface getCipher()
+ * @method  static  Crypt    setCipher(CipherInterface $iv)
  *
  * @since  3.0
  */
