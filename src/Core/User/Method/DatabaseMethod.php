@@ -11,7 +11,7 @@ namespace Windwalker\Core\User\Method;
 use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\Credential;
 use Windwalker\Authentication\Method\AbstractMethod;
-use Windwalker\Crypt\Password;
+use Windwalker\Core\Security\Hasher;
 use Windwalker\DataMapper\DataMapper;
 
 /**
@@ -48,9 +48,7 @@ class DatabaseMethod extends AbstractMethod
 			return false;
 		}
 
-		$password = new Password;
-
-		if (!$password->verify($credential->password, $user->password))
+		if (!Hasher::verify($credential->password, $user->password))
 		{
 			$this->status = Authentication::INVALID_CREDENTIAL;
 

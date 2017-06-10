@@ -16,17 +16,17 @@ use Windwalker\Crypt\Password;
  *
  * @see Password
  *
- * @method  string    create(string $password)
- * @method  boolean   verify(string $password, string $hash)
- * @method  string    genRandomPassword(int $length = 8)
- * @method  string    getSalt()
- * @method  Password  setSalt(string $salt)
- * @method  int       getCost()
- * @method  Password  setCost(int $cost)
- * @method  int       getType()
- * @method  Password  setType(int $type)
- * @method  bool      isSodiumAlgo(int $type)
- * @method  bool      isSodiumHash(string $hash)
+ * @method static  string    create(string $password)
+ * @method static  boolean   verify(string $password, string $hash)
+ * @method static  string    genRandomPassword(int $length = 8)
+ * @method static  string    getSalt()
+ * @method static  Password  setSalt(string $salt)
+ * @method static  int       getCost()
+ * @method static  Password  setCost(int $cost)
+ * @method static  int       getType()
+ * @method static  Password  setType(int $type)
+ * @method static  bool      isSodiumAlgo(int $type)
+ * @method static  bool      isSodiumHash(string $hash)
  *
  * @since  __DEPLOY_VERSION__
  */
