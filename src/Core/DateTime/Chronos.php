@@ -499,7 +499,7 @@ class Chronos extends \DateTime
 	 *
 	 * @param mixed $tz
 	 *
-	 * @return  DateTimeZone
+	 * @return  \DateTimeZone
 	 */
 	protected static function getTimezoneObject($tz)
 	{
