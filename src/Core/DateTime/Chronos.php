@@ -240,6 +240,34 @@ class Chronos extends \DateTime
 	}
 
 	/**
+	 * current
+	 *
+	 * @param string $format
+	 * @param bool   $local
+	 *
+	 * @return  string
+	 */
+	public static function current($format = self::FORMAT_YMD_HIS, $local = false)
+	{
+		return (new static('now', $local ? true : null))->format($format, $local);
+	}
+
+	/**
+	 * Proxy for new DateTime.
+	 *
+	 * @param   string  $date  String in a format accepted by strtotime(), defaults to "now".
+	 * @param   mixed   $tz    Time zone to be used for the date.
+	 *
+	 * @return  static
+	 *
+	 * @since   2.1
+	 */
+	public static function create($date = 'now', $tz = null)
+	{
+		return new static($date, $tz);
+	}
+
+	/**
 	 * Method to set property useServerDefaultTimezone
 	 *
 	 * @param   boolean $boolean
@@ -322,21 +350,6 @@ class Chronos extends \DateTime
 	public function __toString()
 	{
 		return (string) parent::format(static::$format);
-	}
-
-	/**
-	 * Proxy for new DateTime.
-	 *
-	 * @param   string  $date  String in a format accepted by strtotime(), defaults to "now".
-	 * @param   mixed   $tz    Time zone to be used for the date.
-	 *
-	 * @return  static
-	 *
-	 * @since   2.1
-	 */
-	public static function create($date = 'now', $tz = null)
-	{
-		return new static($date, $tz);
 	}
 
 	/**
