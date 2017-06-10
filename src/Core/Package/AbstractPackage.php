@@ -215,7 +215,8 @@ class AbstractPackage implements DispatcherAwareInterface
 			'package'    => $this,
 			'controller' => &$controller,
 			'task'       => $controller,
-		]);
+		]
+		);
 
 		$result = $controller->execute();
 
@@ -226,12 +227,25 @@ class AbstractPackage implements DispatcherAwareInterface
 			'package'    => $this,
 			'controller' => $controller,
 			'result'     => &$result
-		]);
+		]
+		);
 
 		$response = $controller->getResponse();
 
 		if ($result !== null)
 		{
+			// Render view if return value is a view object,
+			// don't use (string) keyword to make sure we can get Exception when error occurred.
+			// @see  https://bugs.php.net/bug.php?id=53648
+			if ($result instanceof AbstractView)
+			{
+				$result = $result->render();
+			}
+			elseif (is_array($result))
+			{
+				$result = json_encode($result);
+			}
+
 			$response->getBody()->write((string) $result);
 		}
 

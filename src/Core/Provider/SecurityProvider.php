@@ -14,8 +14,11 @@ use Windwalker\Crypt\Cipher\BlowfishCipher;
 use Windwalker\Crypt\Cipher\CipherInterface;
 use Windwalker\Crypt\Cipher\Des3Cipher;
 use Windwalker\Crypt\Cipher\PhpAesCipher;
+use Windwalker\Crypt\Cipher\SodiumCipher;
 use Windwalker\Crypt\Crypt;
 use Windwalker\Crypt\CryptInterface;
+use Windwalker\Crypt\HasherInterface;
+use Windwalker\Crypt\Password;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -54,6 +57,16 @@ class SecurityProvider implements ServiceProviderInterface
 
 			return $container->newInstance(Crypt::class, ['key' => $key]);
 		})->bindShared(CryptInterface::class, Crypt::class);
+
+		$container->share(Password::class, function (Container $container)
+		{
+			$config = $container->get('config');
+
+			return new Password(
+				$this->getHashingAlgorithm($config->get('crypt.hash_algo', 'blowfish')),
+				(int) $config->get('crypt.hash_cost')
+			);
+		})->bindShared(HasherInterface::class, Password::class);
 	}
 
 	/**
@@ -70,14 +83,52 @@ class SecurityProvider implements ServiceProviderInterface
 			case 'blowfish':
 			case 'bf':
 				return BlowfishCipher::class;
+
 			case 'des3':
 			case '3des':
 				return Des3Cipher::class;
+
 			case 'aes-256':
 			case 'aes':
 				return Aes256Cipher::class;
+
+			case 'sodium':
+				return SodiumCipher::class;
 		}
 
 		return PhpAesCipher::class;
+	}
+
+	/**
+	 * getPasswordAlgorithm
+	 *
+	 * @param string $type
+	 *
+	 * @return  int
+	 */
+	public function getHashingAlgorithm($type)
+	{
+		switch ($type)
+		{
+			case 'md5':
+				return Password::MD5;
+
+			case 'sha256':
+				return Password::SHA256;
+
+			case 'sha512':
+				return Password::SHA512;
+
+			case 'argon2':
+				return Password::SODIUM_ARGON2;
+
+			case 'scrypt':
+				return Password::SODIUM_SCRYPT;
+
+			case 'blowfish':
+			case 'bf':
+			default:
+				return Password::BLOWFISH;
+		}
 	}
 }

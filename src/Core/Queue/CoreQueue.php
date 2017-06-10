@@ -16,13 +16,13 @@ use Windwalker\Core\Queue\Driver\QueueDriverInterface;
  *
  * @see  Queue
  *
- * @method  int           push($job, $delay = 0, $queue = null, array $options = [])
- * @method  int           pushRaw($body, $delay = 0, $queue = null, array $options = [])
- * @method  QueueMessage  pop($queue = null)
- * @method  void          delete($message)
- * @method  void          release($message, $delay = 0)
- * @method  QueueMessage  getMessageByJob($job, array $data = [])
- * @method  QueueDriverInterface  getDriver()
+ * @method static  int           push($job, $delay = 0, $queue = null, array $options = [])
+ * @method static  int           pushRaw($body, $delay = 0, $queue = null, array $options = [])
+ * @method static  QueueMessage  pop($queue = null)
+ * @method static  void          delete($message)
+ * @method static  void          release($message, $delay = 0)
+ * @method static  QueueMessage  getMessageByJob($job, array $data = [])
+ * @method static  QueueDriverInterface  getDriver()
  *
  * @since  3.2
  */

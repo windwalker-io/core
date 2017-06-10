@@ -18,15 +18,15 @@ use Windwalker\Structure\Structure;
  *
  * @see QueueManager
  *
- * @method  Queue                 create($connection = null)
- * @method  Queue                 getManager($connection = null)
- * @method  QueueDriverInterface  createDriverByConnection($connection = null)
- * @method  QueueDriverInterface  getDriver($driver = null, array $config = [])
- * @method  QueueDriverInterface  createDriver($driver, array $config = [])
- * @method  QueueFailerInterface  createFailer($driver = null)
- * @method  string                getConnectionName()
- * @method  string                getDriverName($conn = null)
- * @method  Structure             getConnectionConfig($conn = null)
+ * @method static  Queue                 create($connection = null)
+ * @method static  Queue                 getManager($connection = null)
+ * @method static  QueueDriverInterface  createDriverByConnection($connection = null)
+ * @method static  QueueDriverInterface  getDriver($driver = null, array $config = [])
+ * @method static  QueueDriverInterface  createDriver($driver, array $config = [])
+ * @method static  QueueFailerInterface  createFailer($driver = null)
+ * @method static  string                getConnectionName()
+ * @method static  string                getDriverName($conn = null)
+ * @method static  Structure             getConnectionConfig($conn = null)
  *
  * @since  3.2
  */

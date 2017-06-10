@@ -169,6 +169,7 @@ class CacheManager
 		{
 			case 'file':
 			case 'php_file':
+			case 'forever_file':
 				$path = $options['cache_dir'];
 				$denyAccess = $options['deny_access'];
 

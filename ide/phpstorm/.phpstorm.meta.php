@@ -65,6 +65,7 @@ namespace PHPSTORM_META
 			// Security
 			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
 			'crypt' instanceof \Windwalker\Crypt\Crypt,
+			'hasher' instanceof \Windwalker\Crypt\Password,
 
 			// DateTime
 			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
@@ -138,6 +139,7 @@ namespace PHPSTORM_META
 			// Security
 			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
 			'crypt' instanceof \Windwalker\Crypt\Crypt,
+			'hasher' instanceof \Windwalker\Crypt\Password,
 
 			// DateTime
 			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
