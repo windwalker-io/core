@@ -107,7 +107,7 @@ class RendererManager
 			throw new \DomainException(sprintf('%s renderer not supported.', $type));
 		}
 
-		if ($type == 'blade')
+		if ($type === 'blade')
 		{
 			if (empty($config['cache_path']))
 			{
@@ -115,7 +115,7 @@ class RendererManager
 			}
 		}
 
-		if ($type == 'edge')
+		if ($type === 'edge')
 		{
 			if (empty($config['cache_path']) && !isset($config['cache']))
 			{
@@ -123,7 +123,7 @@ class RendererManager
 			}
 		}
 
-		if ($type == 'twig')
+		if ($type === 'twig')
 		{
 			if (empty($config['path_separator']))
 			{

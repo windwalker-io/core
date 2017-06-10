@@ -45,7 +45,7 @@ class RouterProvider implements ServiceProviderInterface
 	{
 		$matcher = $container->get('config')->get('routing.matcher', 'default');
 
-		$matcher = strtolower($matcher) == 'default' ? 'sequential' : $matcher;
+		$matcher = strtolower($matcher) === 'default' ? 'sequential' : $matcher;
 
 		$class = sprintf('Windwalker\Router\Matcher\%sMatcher', ucfirst($matcher));
 

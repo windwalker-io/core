@@ -131,7 +131,7 @@ class RendererProvider implements ServiceProviderInterface
 	protected function prepareGlobals(Container $container, RendererManager $manager)
 	{
 		$globals = [
-			'uri'        => $container->get('uri'),
+			'uri'        => $container->exists('uri') ? $container->get('uri') : null,
 			'app'        => $container->get('application'),
 			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
 			'messages'   => [], // Deprecated this variable after 4.0

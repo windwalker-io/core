@@ -398,7 +398,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 	/**
 	 * loadRoutingFromFile
 	 *
-	 * @param   array  $file
+	 * @param   string  $file
 	 *
 	 * @return  array
 	 */

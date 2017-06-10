@@ -10,12 +10,18 @@ namespace Windwalker\Core\Console;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Core\Provider\RendererProvider;
+use Windwalker\Core\Provider\RouterProvider;
 use Windwalker\Http\Output\NoHeaderOutput;
+use Windwalker\Http\Request\ServerRequestFactory;
+use Windwalker\Http\WebHttpServer;
 use Windwalker\Structure\Structure;
+use Windwalker\Uri\UriData;
 
 /**
  * The ConsoleHelper class.
@@ -152,5 +158,43 @@ class ConsoleHelper
 		Ioc::setProfile($profile);
 
 		return $response;
+	}
+
+	/**
+	 * prepareWebEnvironment
+	 *
+	 * @param string $url
+	 * @param string $script
+	 * @param array  $routeFiles
+	 *
+	 * @return  void
+	 */
+	public static function prepareWebEnvironment($env = 'web', $url = '', $script = null, $routeFiles = [])
+	{
+		$container = Ioc::factory();
+		$app = $container->get('app');
+
+		if (!$app instanceof Console)
+		{
+			return;
+		}
+
+		// Prepare server and uri object
+		$server = new WebHttpServer(null, ServerRequestFactory::createFromUri($url, $script));
+
+		$container->share(UriData::class, $server->getUriData())->alias('uri', UriData::class);
+
+		// Register providers
+		$container->registerServiceProvider($container->newInstance(RouterProvider::class))
+			->registerServiceProvider($container->newInstance(RendererProvider::class));
+
+		// Prepare routers
+		$router = $container->get('router');
+		$resolver = static::getAllPackagesResolver($env);
+
+		foreach ($routeFiles as $routeFile)
+		{
+			$router->registerRawRouting($router::loadRoutingFile($routeFile), $resolver);
+		}
 	}
 }
