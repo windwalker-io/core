@@ -16,6 +16,7 @@ use Windwalker\Core\Queue\Driver\IronmqQueueDriver;
 use Windwalker\Core\Queue\Driver\NullQueueDriver;
 use Windwalker\Core\Queue\Driver\QueueDriverInterface;
 use Windwalker\Core\Queue\Driver\RabbitmqQueueDriver;
+use Windwalker\Core\Queue\Driver\ResqueQueueDriver;
 use Windwalker\Core\Queue\Driver\SqsQueueDriver;
 use Windwalker\Core\Queue\Driver\SyncQueueDriver;
 use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
@@ -197,6 +198,13 @@ class QueueManager
 				return new RabbitmqQueueDriver(
 					$queueConfig->get('queue', 'default'),
 					(array) $queueConfig->get('options', [])
+				);
+
+			case 'resque':
+				return new ResqueQueueDriver(
+					$queueConfig->get('host', 'localhost'),
+					$queueConfig->get('port', '6379'),
+					$queueConfig->get('queue', 'default')
 				);
 
 			case 'beanstalkd':
