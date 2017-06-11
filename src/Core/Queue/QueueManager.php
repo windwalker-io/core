@@ -196,7 +196,7 @@ class QueueManager
 			case 'rabbitmq':
 				return new RabbitmqQueueDriver(
 					$queueConfig->get('queue', 'default'),
-					(array) $queueConfig->get('options', [])
+					(array) $queueConfig->toArray()
 				);
 
 			case 'beanstalkd':

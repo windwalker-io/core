@@ -9,7 +9,10 @@
 namespace Windwalker\Core;
 
 use Windwalker\Core\Config\Config;
+use Windwalker\Core\Queue\Queue;
 use Windwalker\Core\User\UserManager;
+use Windwalker\Crypt\Crypt;
+use Windwalker\Crypt\Password;
 use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
 use Windwalker\Uri\UriData;
@@ -290,6 +293,36 @@ abstract class Ioc
 	public static function getLogger()
 	{
 		return static::get('logger');
+	}
+
+	/**
+	 * getQueue
+	 *
+	 * @return  Queue
+	 */
+	public static function getQueue()
+	{
+		return static::get('queue');
+	}
+
+	/**
+	 * getCrypto
+	 *
+	 * @return  Crypt
+	 */
+	public static function getCrypto()
+	{
+		return static::get('crypt');
+	}
+
+	/**
+	 * getHasher
+	 *
+	 * @return  Password
+	 */
+	public static function getHasher()
+	{
+		return static::get('hasher');
 	}
 
 	/**
