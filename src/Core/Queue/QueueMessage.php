@@ -45,7 +45,7 @@ class QueueMessage implements \JsonSerializable
 	/**
 	 * Message body from remote server.
 	 *
-	 * @var  array
+	 * @var  string
 	 */
 	protected $rawBody = [];
 
@@ -267,7 +267,7 @@ class QueueMessage implements \JsonSerializable
 	/**
 	 * Method to get property RawData
 	 *
-	 * @return  array
+	 * @return  string
 	 */
 	public function getRawBody()
 	{
@@ -277,7 +277,7 @@ class QueueMessage implements \JsonSerializable
 	/**
 	 * Method to set property rawData
 	 *
-	 * @param   array $rawBody
+	 * @param   string $rawBody
 	 *
 	 * @return  static  Return self to support chaining.
 	 */
