@@ -145,6 +145,18 @@ class RouteString implements StringableInterface
 	}
 
 	/**
+	 * alias
+	 *
+	 * @param string $alias
+	 *
+	 * @return  RouteString
+	 */
+	public function alias($alias)
+	{
+		return $this->addVar('alias', $alias);
+	}
+
+	/**
 	 * page
 	 *
 	 * @param int $page
