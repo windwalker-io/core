@@ -592,16 +592,59 @@ abstract class AbstractView implements \ArrayAccess
 	}
 
 	/**
-	 * configureModel
+	 * Configure a model by name alias.
 	 *
-	 * @param callable $handler
-	 * @param string   $name
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
 	 *
 	 * @return  static
 	 */
-	public function configureModel(callable $handler, $name = null)
+	public function configureModel($name, $handler = null)
 	{
-		$handler($this->getModel($name), $this);
+		$this->pipe($name, $handler);
+
+		return $this;
+	}
+
+	/**
+	 * Pipe a callback to model and view then return value.
+	 *
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
+	 *
+	 * @return  mixed
+	 */
+	public function pipe($name, $handler = null)
+	{
+		if (is_callable($name))
+		{
+			$handler = $name;
+			$name = null;
+		}
+
+		return $handler($this->getModel($name), $this);
+	}
+
+	/**
+	 * Apply a callback to model and view data.
+	 *
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
+	 *
+	 * @return  $this
+	 */
+	public function applyData($name, $handler = null)
+	{
+		if (is_callable($name))
+		{
+			$handler = $name;
+			$name = null;
+		}
+
+		$handler($this->getModel($name), $this->getData());
 
 		return $this;
 	}
