@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Queue\Command\Queue;
 
-use Windwalker\Console\Command\Command;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Queue\Job\JobInterface;
 use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Core\Queue\Worker;
@@ -21,10 +20,8 @@ use Windwalker\Structure\Structure;
  *
  * @since  3.2
  */
-class WorkerCommand extends Command
+class WorkerCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *

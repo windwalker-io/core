@@ -8,19 +8,16 @@
 
 namespace Windwalker\Core\Queue\Command\Queue;
 
-use Windwalker\Console\Command\Command;
 use Windwalker\Console\Exception\WrongArgumentException;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 
 /**
  * The WorkerCommand class.
  *
  * @since  3.2
  */
-class RemoveFailedCommand extends Command
+class RemoveFailedCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *

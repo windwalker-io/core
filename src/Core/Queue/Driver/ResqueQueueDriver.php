@@ -8,8 +8,8 @@
 
 namespace Windwalker\Core\Queue\Driver;
 
-use Windwalker\Core\Queue\Resque\Resque;
 use Windwalker\Core\Queue\QueueMessage;
+use Windwalker\Core\Queue\Resque\Resque;
 
 /**
  * The ResqueQueueDriver class.

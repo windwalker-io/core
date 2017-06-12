@@ -8,11 +8,10 @@
 
 namespace Windwalker\Core\Package\Command\Package;
 
-use Windwalker\Console\Command\Command;
 use Windwalker\Console\Prompter\BooleanPrompter;
 use Windwalker\Console\Prompter\TextPrompter;
 use Windwalker\Core\Console\ConsoleHelper;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
@@ -22,10 +21,8 @@ use Windwalker\Filesystem\Folder;
  *
  * @since  3.0
  */
-class InstallCommand extends Command
+class InstallCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *
