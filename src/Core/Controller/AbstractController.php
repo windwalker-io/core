@@ -230,7 +230,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	}
 
 	/**
-	 * Prepare execute hook.
+	 * A hook before main process executing.
 	 *
 	 * @return  void
 	 */
@@ -239,14 +239,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 	}
 
 	/**
-	 * Do execute action.
+	 * The main execution process.
 	 *
 	 * @return  mixed
 	 */
 	abstract protected function doExecute();
 
 	/**
-	 * Post execute hook.
+	 * A hook after main process executing.
 	 *
 	 * @param mixed $result The result content to return, can be any value or boolean.
 	 *
