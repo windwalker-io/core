@@ -371,6 +371,8 @@ class MailMessage
 			return;
 		}
 
+		$email = Punycode::encode($email);
+
 		$this->{$field}[$email] = $name;
 	}
 }
