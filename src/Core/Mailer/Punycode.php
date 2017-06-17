@@ -62,4 +62,68 @@ class Punycode
 	{
 		return static::getInstance()->decode($punycodeString);
 	}
+
+	/**
+	 * toASCII
+	 *
+	 * @param string $string
+	 *
+	 * @return  string
+	 */
+	public static function toAscii($string)
+	{
+		$string = explode('@', $string);
+
+		// Not addressing UTF-8 user names
+		$new = $string[0];
+
+		if (!empty($string[1]))
+		{
+			$domainExploded = explode('.', $string[1]);
+			$newdomain = '';
+
+			foreach ($domainExploded as $domainex)
+			{
+				$domainex = static::encode($domainex);
+				$newdomain .= $domainex . '.';
+			}
+
+			$newdomain = substr($newdomain, 0, -1);
+			$new = $new . '@' . $newdomain;
+		}
+
+		return $new;
+	}
+
+	/**
+	 * toUtf8
+	 *
+	 * @param string $string
+	 *
+	 * @return  string
+	 */
+	public static function toUtf8($string)
+	{
+		$string = explode('@', $string);
+
+		// Not addressing UTF-8 user names
+		$new = $string[0];
+
+		if (!empty($string[1]))
+		{
+			$domainExploded = explode('.', $string[1]);
+			$newdomain = '';
+
+			foreach ($domainExploded as $domainex)
+			{
+				$domainex = static::decode($domainex);
+				$newdomain .= $domainex . '.';
+			}
+
+			$newdomain = substr($newdomain, 0, -1);
+			$new = $new . '@' . $newdomain;
+		}
+
+		return $new;
+	}
 }
