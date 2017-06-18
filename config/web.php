@@ -17,7 +17,6 @@ return Arr::mergeRecursive(
 
 		'providers' =>[
 			'web'      => \Windwalker\Core\Provider\WebProvider::class,
-			'datetime' => \Windwalker\Core\Provider\DateTimeProvider::class,
 			'error'    => \Windwalker\Core\Error\ErrorHandlingProvider::class,
 			'logger'   => \Windwalker\Core\Provider\LoggerProvider::class,
 			'event'    => \Windwalker\Core\Provider\EventProvider::class,
@@ -29,7 +28,10 @@ return Arr::mergeRecursive(
 			'session'  => \Windwalker\Core\Provider\SessionProvider::class,
 			'auth'     => \Windwalker\Core\Provider\UserProvider::class,
 			'security' => \Windwalker\Core\Provider\SecurityProvider::class,
-			'asset'    => \Windwalker\Core\Asset\AssetProvider::class
+			'asset'    => \Windwalker\Core\Asset\AssetProvider::class,
+			'mailer'   => \Windwalker\Core\Mailer\MailerProvider::class,
+			'mailer_adapter' => \Windwalker\Core\Mailer\SwiftMailerProvider::class,
+			'queue'    => \Windwalker\Core\Queue\QueueProvider::class
 		],
 
 		'routing' => [
