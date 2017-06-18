@@ -10,9 +10,9 @@ use Windwalker\Application\AbstractCliApplication;
 use Windwalker\Console\Prompter\ValidatePrompter;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Filesystem\Path;
-use Windwalker\Structure\Structure;
 use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
+use Windwalker\Structure\Structure;
 
 date_default_timezone_set('UTC');
 

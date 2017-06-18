@@ -10,7 +10,6 @@ namespace Windwalker\Core\Test\Application;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Http\Request\ServerRequestFactory;
-use Windwalker\Http\WebHttpServer;
 
 /**
  * Test class of \Windwalker\Core\Application\WebApplication
