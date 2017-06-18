@@ -77,7 +77,7 @@ class ResqueQueueDriver implements QueueDriverInterface
 			Resque::push($queue, $data);
 		}
 
-		return 1;
+		return $message->getId();
 	}
 
 	/**
