@@ -13,7 +13,7 @@ use Resque as PhpResque;
 /**
  * The Resque class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class Resque extends PhpResque
 {

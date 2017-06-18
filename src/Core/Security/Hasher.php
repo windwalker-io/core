@@ -28,7 +28,7 @@ use Windwalker\Crypt\Password;
  * @method static  bool      isSodiumAlgo(int $type)
  * @method static  bool      isSodiumHash(string $hash)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class Hasher extends AbstractProxyFacade
 {

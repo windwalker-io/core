@@ -11,7 +11,7 @@ namespace Windwalker\Core\Security\Exception;
 /**
  * The UnauthorizedException class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class UnauthorizedException extends \RuntimeException
 {

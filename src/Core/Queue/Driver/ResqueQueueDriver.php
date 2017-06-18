@@ -14,7 +14,7 @@ use Windwalker\Core\Queue\Resque\Resque;
 /**
  * The ResqueQueueDriver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.2
  */
 class ResqueQueueDriver implements QueueDriverInterface
 {
