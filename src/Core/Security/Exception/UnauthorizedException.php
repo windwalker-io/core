@@ -22,7 +22,8 @@ class UnauthorizedException extends \RuntimeException
 	 * @param int                   $code     Use 401 or 403 to forbidden access.
 	 * @param \Exception|\Throwable $previous Previous exception object.
 	 */
-	public function __construct($message = "", $code = 401, $previous = null)
+	public function __construct($message = '', $code = 401, $previous = null)
 	{
+		parent::__construct($message, $code, $previous);
 	}
 }

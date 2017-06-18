@@ -56,6 +56,13 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
 	protected $namespaces = [];
 
 	/**
+	 * Property maps.
+	 *
+	 * @var  array
+	 */
+	protected $maps = [];
+
+	/**
 	 * Property form.
 	 *
 	 * @var  Form
@@ -109,7 +116,12 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
 
 		$field = FieldHelper::findFieldClass($name, clone $this->namespaces);
 
-		if ($field === false)
+		if ($field === false && isset($this->maps[$name]))
+		{
+			$field = $this->maps[$name];
+		}
+
+		if ($field === false || !class_exists($field))
 		{
 			throw new \InvalidArgumentException(sprintf('Field: %s (%s) not found. (Namespaces: %s)', $name, ucfirst($name) . 'Field', implode(" |\n ", iterator_to_array(clone $this->namespaces))));
 		}
@@ -210,5 +222,19 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
 
 		return $this;
 	}
+
+	/**
+	 * addMap
+	 *
+	 * @param string $name
+	 * @param string $class
+	 *
+	 * @return  static
+	 */
+	public function addMap($name, $class)
+	{
+		$this->maps[$name] = $class;
+
+		return $this;
+	}
 }
- 
