@@ -27,4 +27,23 @@ trait CsrfProtectionTrait
 	{
 		$this->addMiddleware(CsrfProtectionMiddleware::class, PriorityQueue::HIGH);
 	}
+
+	/**
+	 * csrfProtect
+	 *
+	 * @param bool $bool
+	 *
+	 * @return  static
+	 */
+	public function csrfProtect($bool = null)
+	{
+		if ($bool === null)
+		{
+			return $this->config->get('csrf_protect', true);
+		}
+
+		$this->config->set('csrf_protect', (bool) $bool);
+
+		return $this;
+	}
 }
