@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Migration\Command\Migration;
 
-use Windwalker\Console\Command\AbstractCommand;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 
 /**
@@ -17,9 +16,8 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
  * 
  * @since  2.0
  */
-class CreateCommand extends AbstractCommand
+class CreateCommand extends CoreCommand
 {
-	use CoreCommandTrait;
 	use MigrationCommandTrait;
 
 	/**

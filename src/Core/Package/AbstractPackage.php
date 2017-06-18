@@ -349,7 +349,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
 		foreach ($listeners as $name => $listener)
 		{
-			if (is_string($listener))
+			if (is_string($listener) || is_callable($listener))
 			{
 				$listener = ['class' => $listener];
 			}

@@ -8,9 +8,8 @@
 
 namespace Windwalker\Core\Queue\Command\Queue;
 
-use Windwalker\Console\Command\Command;
 use Windwalker\Console\Exception\WrongArgumentException;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -18,10 +17,8 @@ use Windwalker\Utilities\Arr;
  *
  * @since  3.2
  */
-class RetryCommand extends Command
+class RetryCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *

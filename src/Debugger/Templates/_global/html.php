@@ -6,9 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-use Windwalker\Core\Package\AbstractPackage;
-use Windwalker\Core\Router\PackageRouter;
-use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
+use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRouter;use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
 
 /**
  * @var Structure       $uri

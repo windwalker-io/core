@@ -9,9 +9,8 @@
 namespace Windwalker\SystemPackage\Command;
 
 use Symfony\Component\Process\Process;
-use Windwalker\Console\Command\Command;
 use Windwalker\Core\Console\ConsoleHelper;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -19,10 +18,8 @@ use Windwalker\Utilities\Arr;
  *
  * @since  3.0
  */
-class RunCommand extends Command
+class RunCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *

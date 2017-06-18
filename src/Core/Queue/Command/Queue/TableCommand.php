@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Queue\Command\Queue;
 
-use Windwalker\Console\Command\Command;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 
 /**
@@ -17,9 +16,8 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
  *
  * @since  3.2
  */
-class TableCommand extends Command
+class TableCommand extends CoreCommand
 {
-	use CoreCommandTrait;
 	use MigrationCommandTrait;
 
 	/**

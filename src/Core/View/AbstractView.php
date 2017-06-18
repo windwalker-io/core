@@ -542,12 +542,23 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param   ModelRepository $model
 	 * @param   bool            $default
+	 * @param   callable        $handler
 	 * @param   string          $customName
 	 *
 	 * @return static Return self to support chaining.
 	 */
-	public function setModel(ModelRepository $model, $default = null, $customName = null)
+	public function setModel(ModelRepository $model, $default = null, $handler = null, $customName = null)
 	{
+		// B/C
+		if (is_string($handler))
+		{
+			$customName = $handler;
+		}
+		elseif (is_callable($handler))
+		{
+			$handler($model, $this);
+		}
+
 		$this->model->setModel($model, $default, $customName);
 
 		return $this;
@@ -558,13 +569,82 @@ abstract class AbstractView implements \ArrayAccess
 	 *
 	 * @param string          $name
 	 * @param ModelRepository $model
+	 * @param callable        $handler
 	 * @param string          $default
 	 *
-	 * @return  static  Return self to support chaining.
+	 * @return static Return self to support chaining.
 	 */
-	public function addModel($name, ModelRepository $model, $default = null)
+	public function addModel($name, ModelRepository $model, $handler = null, $default = null)
 	{
-		$this->model->setModel($model, $default, $name);
+		// B/C
+		if (is_bool($handler))
+		{
+			$default = $handler;
+		}
+		elseif (is_callable($handler))
+		{
+			$handler($model, $this);
+		}
+
+		$this->setModel($model, $default, $handler, $name);
+
+		return $this;
+	}
+
+	/**
+	 * Configure a model by name alias.
+	 *
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
+	 *
+	 * @return  static
+	 */
+	public function configureModel($name, $handler = null)
+	{
+		$this->pipe($name, $handler);
+
+		return $this;
+	}
+
+	/**
+	 * Pipe a callback to model and view then return value.
+	 *
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
+	 *
+	 * @return  mixed
+	 */
+	public function pipe($name, $handler = null)
+	{
+		if (is_callable($name))
+		{
+			$handler = $name;
+			$name = null;
+		}
+
+		return $handler($this->getModel($name), $this);
+	}
+
+	/**
+	 * Apply a callback to model and view data.
+	 *
+	 * @param string|callable $name    The name alias of model, keep NULL as default model.
+	 *                                 Or just send a callable here as handler.
+	 * @param callable        $handler The callback handler.
+	 *
+	 * @return  $this
+	 */
+	public function applyData($name, $handler = null)
+	{
+		if (is_callable($name))
+		{
+			$handler = $name;
+			$name = null;
+		}
+
+		$handler($this->getModel($name), $this->getData());
 
 		return $this;
 	}

@@ -828,7 +828,7 @@ class AssetManager implements DispatcherAwareInterface
 
 				foreach ($array as $key => $value)
 				{
-					$encodedKey = json_encode($key);
+					$encodedKey = json_encode((string) $key);
 
 					if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', $key) == 0)
 					{

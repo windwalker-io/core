@@ -26,7 +26,10 @@ class CsrfProtectionMiddleware extends AbstractControllerMiddleware
 	 */
 	public function execute($data = null)
 	{
-		CsrfProtection::validate();
+		if ($this->controller->config->get('csrf_protect', true))
+		{
+			CsrfProtection::validate();
+		}
 
 		return $this->next->execute($data);
 	}

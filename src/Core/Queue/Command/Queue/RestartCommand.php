@@ -8,8 +8,7 @@
 
 namespace Windwalker\Core\Queue\Command\Queue;
 
-use Windwalker\Console\Command\Command;
-use Windwalker\Core\Console\CoreCommandTrait;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Filesystem\File;
 
@@ -18,10 +17,8 @@ use Windwalker\Filesystem\File;
  *
  * @since  3.2
  */
-class RestartCommand extends Command
+class RestartCommand extends CoreCommand
 {
-	use CoreCommandTrait;
-
 	/**
 	 * Property name.
 	 *
