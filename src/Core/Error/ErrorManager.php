@@ -187,6 +187,7 @@ class ErrorManager
 	 * @param \Throwable $exception
 	 *
 	 * @return  void
+	 * @throws \InvalidArgumentException
 	 */
 	protected function respond($exception)
 	{
@@ -194,7 +195,9 @@ class ErrorManager
 
 		$body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'), ['exception' => $exception]);
 
-		$this->app->server->getOutput()->respond(new HtmlResponse($body, $exception->getCode() ? : 500));
+		$response = (new HtmlResponse($body))->withStatus($exception->getCode(), $exception->getMessage());
+
+		$this->app->server->getOutput()->respond($response);
 	}
 
 	/**
