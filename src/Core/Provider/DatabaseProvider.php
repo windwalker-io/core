@@ -11,6 +11,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Database\Exporter\AbstractExporter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Database\Driver\Mysql\MysqlDriver;
 use Windwalker\DataMapper\DatabaseContainer;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -46,7 +47,14 @@ class DatabaseProvider implements ServiceProviderInterface
 				'prefix'   => $config->get('database.prefix', 'wind_'),
 			];
 
-			return DatabaseFactory::getDbo($option['driver'], $option);
+			$db = DatabaseFactory::getDbo($option['driver'], $option);
+
+			if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true))
+			{
+				$this->strictMode($db);
+			}
+
+			return $db;
 		};
 
 		$container->share(AbstractDatabaseDriver::class, $closure);
@@ -70,5 +78,28 @@ class DatabaseProvider implements ServiceProviderInterface
 		};
 
 		$container->share(AbstractExporter::class, $closure);
+	}
+
+	/**
+	 * strictMode
+	 *
+	 * @param MysqlDriver $db
+	 *
+	 * @return  void
+	 */
+	public function strictMode(MysqlDriver $db)
+	{
+		// Set Mysql to strict mode
+		$modes = array(
+			// 'ONLY_FULL_GROUP_BY',
+			'STRICT_TRANS_TABLES',
+			'ERROR_FOR_DIVISION_BY_ZERO',
+			'NO_AUTO_CREATE_USER',
+			'NO_ENGINE_SUBSTITUTION',
+		);
+
+		$db->connect()
+			->getConnection()
+			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
 	}
 }
