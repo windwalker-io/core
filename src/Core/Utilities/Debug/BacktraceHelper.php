@@ -76,6 +76,11 @@ class BacktraceHelper
 			$args[] = $arg;
 		}
 
+		if (!empty($trace['file']))
+		{
+			$trace['file'] = static::replaceRoot($trace['file']);
+		}
+
 		return [
 			'file' => $trace['file'] ? $trace['file'] . ' (' . $trace['line'] . ')' : null,
 			'function' => ($trace['class'] ? $trace['class'] . $trace['type'] : null) . $trace['function'] .
@@ -100,5 +105,22 @@ class BacktraceHelper
 		}
 
 		return $return;
+	}
+
+	/**
+	 * replaceRoot
+	 *
+	 * @param string $file
+	 *
+	 * @return  string
+	 */
+	public static function replaceRoot($file)
+	{
+		if (defined('WINDWALKER_ROOT'))
+		{
+			$file = 'ROOT' . substr($file, strlen(WINDWALKER_ROOT));
+		}
+
+		return $file;
 	}
 }
