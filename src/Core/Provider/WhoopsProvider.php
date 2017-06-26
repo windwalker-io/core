@@ -60,6 +60,7 @@ class WhoopsProvider implements ServiceProviderInterface
 	 * @param   Container $container The DI container.
 	 *
 	 * @return  void
+	 * @throws \InvalidArgumentException
 	 *
 	 * @since   1.0
 	 */
@@ -72,6 +73,7 @@ class WhoopsProvider implements ServiceProviderInterface
 			$whoops = new Whoops;
 
 			$handler = new PrettyPageHandler;
+			$handler->setEditor($config->get('whoops.editor', 'phpstorm'));
 
 			$whoops->pushHandler($handler);
 
@@ -83,4 +85,3 @@ class WhoopsProvider implements ServiceProviderInterface
 		}
 	}
 }
- 
