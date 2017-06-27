@@ -98,8 +98,9 @@ class DatabaseProvider implements ServiceProviderInterface
 			'NO_ENGINE_SUBSTITUTION',
 		);
 
-		$db->connect()
-			->getConnection()
-			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+		// TODO: Re-enable this after we solve issue: https://github.com/ventoviro/windwalker/issues/451
+//		$db->connect()
+//			->getConnection()
+//			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
 	}
 }
