@@ -24,6 +24,8 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 	 * @param   ControllerData $data
 	 *
 	 * @return  mixed
+	 * @throws \InvalidArgumentException
+	 * @throws \UnexpectedValueException
 	 */
 	public function execute($data = null)
 	{
@@ -37,12 +39,15 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 			->get('error.handler')
 			->addHandler(function ($exception)
 			{
-				$this->controller->app
+				/** @var $exception \Exception|\Throwable */
+				$data = ['error' => $exception->getMessage()];
+				$response = (new JsonResponse($data))->withStatus($exception->getCode(), $exception->getMessage());
+
+				$this->controller
+					->app
 					->getServer()
 					->getOutput()
-					->respond(
-						new JsonResponse(['error' => $exception->getMessage()], $exception->getCode())
-					);
+					->respond($response);
 
 				die;
 			}, 'default');

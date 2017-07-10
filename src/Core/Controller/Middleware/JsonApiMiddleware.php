@@ -65,6 +65,7 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 	 * @param \Exception $e
 	 *
 	 * @return  JsonBuffer
+	 * @throws \InvalidArgumentException
 	 */
 	protected function handleException(\Exception $e)
 	{
@@ -90,13 +91,12 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 
 		$code = $e->getCode();
 
-		if (!ResponseHelper::validateStatus($code))
-		{
-			$code = 500;
-		}
+		$code = ResponseHelper::validateStatus($code) ? $code : 500;
 
 		$this->controller->setResponse(
-			$this->controller->getResponse()->withStatus($code)
+			$this->controller
+				->getResponse()
+				->withStatus($code, $e->getMessage())
 		);
 
 		return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
