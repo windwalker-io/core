@@ -8,6 +8,7 @@
 
 namespace Windwalker\Debugger\Listener;
 
+use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Model\ModelRepository;
@@ -15,6 +16,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\DebuggerPackage;
+use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Debugger\Helper\PageRecordHelper;
 use Windwalker\Debugger\Helper\TimelineHelper;
 use Windwalker\Debugger\Model\DashboardModel;
@@ -204,6 +206,24 @@ class DebuggerListener
 //		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
 //
 //		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
+	}
+
+	/**
+	 * onAfterRespond
+	 *
+	 * @param Event $event
+	 *
+	 * @return  void
+	 */
+	public function onAfterRespond(Event $event)
+	{
+		/** @var ResponseInterface $response */
+		$response = $event['response'];
+
+		if (strpos($response->getHeaderLine('Content-Type'), 'html') === false)
+		{
+			DebuggerHelper::disableConsole();
+		}
 	}
 
 	/**

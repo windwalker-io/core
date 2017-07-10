@@ -173,7 +173,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 		// @event onBeforeRespond
 		$this->triggerEvent('onBeforeRespond', ['app' => $this, 'response' => $response]);
 
-		$response = $this->server->getOutput()->respond($response, $this->get('output.return_body', false));
+		$this->server->getOutput()->respond($response, $this->get('output.return_body', false));
 
 		// @event onAfterRespond
 		$this->triggerEvent('onAfterRespond', ['app' => $this, 'response' => $response]);
