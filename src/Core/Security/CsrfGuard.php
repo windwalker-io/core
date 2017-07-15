@@ -201,7 +201,8 @@ class CsrfGuard
 			return true;
 		}
 
-		if ($input->header->get('X-Csrf-Token') == $token)
+		// TODO: Should remove strtolower() after Framework 3.2.5
+		if ($input->header->get(strtolower('X-CSRF-Token')) === $token)
 		{
 			return true;
 		}
