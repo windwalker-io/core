@@ -114,7 +114,6 @@
   display: inline-block;
   position: relative;
   z-index: 5;
-  background-color: #eee;
 }
 #windwalker-debugger .windwalker-debugger-badge {
   background-color: #BBBBBB;
@@ -128,6 +127,7 @@
   text-decoration: none;
   display: block;
   color: #666;
+  background-color: #eee;
 }
 #windwalker-debugger a.windwalker-debugger-link:hover {
   background-color: #e8e8e8;
