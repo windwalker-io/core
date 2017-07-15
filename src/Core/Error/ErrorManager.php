@@ -195,7 +195,14 @@ class ErrorManager
 
 		$body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'), ['exception' => $exception]);
 
-		$response = (new HtmlResponse($body))->withStatus($exception->getCode(), $exception->getMessage());
+		$code = $exception->getCode();
+
+		if ($code < 400 || $code >= 500)
+		{
+			$code = 500;
+		}
+
+		$response = (new HtmlResponse($body))->withStatus($code, $exception->getMessage());
 
 		$this->app->server->getOutput()->respond($response);
 	}
