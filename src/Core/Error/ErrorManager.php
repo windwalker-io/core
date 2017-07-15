@@ -202,7 +202,7 @@ class ErrorManager
 			$code = 500;
 		}
 
-		$response = (new HtmlResponse($body))->withStatus($code, $exception->getMessage());
+		$response = (new HtmlResponse($body))->withStatus($code);
 
 		$this->app->server->getOutput()->respond($response);
 	}
