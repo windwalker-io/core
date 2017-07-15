@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller\Middleware;
 
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response\JsonResponse;
+use Windwalker\String\Mbstring;
 
 /**
  * The RenderViewMiddleware class.
@@ -40,8 +41,15 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 			->addHandler(function ($exception)
 			{
 				/** @var $exception \Exception|\Throwable */
+				$message = $exception->getMessage();
+
+				if (Mbstring::isUtf8($message))
+				{
+					$message = str_replace('%20', ' ', rawurlencode($message));
+				}
+
 				$data = ['error' => $exception->getMessage()];
-				$response = (new JsonResponse($data))->withStatus($exception->getCode(), $exception->getMessage());
+				$response = (new JsonResponse($data))->withStatus($exception->getCode(), $message);
 
 				$this->controller
 					->app
