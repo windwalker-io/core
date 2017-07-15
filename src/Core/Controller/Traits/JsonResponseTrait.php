@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Controller\Middleware\JsonResponseMiddleware;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The HtmlResponseTrait class.
@@ -27,6 +28,6 @@ trait JsonResponseTrait
 	 */
 	public function bootJsonResponseTrait(AbstractController $controller)
 	{
-		$controller->addMiddleware(JsonResponseMiddleware::class);
+		$controller->addMiddleware(JsonResponseMiddleware::class, PriorityQueue::MAX);
 	}
 }

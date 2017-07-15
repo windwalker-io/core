@@ -10,6 +10,7 @@ namespace Windwalker\Core\Controller\Traits;
 
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Controller\Middleware\JsonApiMiddleware;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The HtmlResponseTrait class.
@@ -29,6 +30,6 @@ trait JsonApiTrait
 	 */
 	public function bootJsonApiTrait(AbstractController $controller)
 	{
-		$controller->addMiddleware(JsonApiMiddleware::class);
+		$controller->addMiddleware(JsonApiMiddleware::class, PriorityQueue::MAX);
 	}
 }
