@@ -88,10 +88,6 @@ echo BootstrapKeyValueGrid::create()
 
 <h2>Config</h2>
 
-<?php
-echo BootstrapKeyValueGrid::create()
-	->addHeader()
-	->addItems(Arr::flatten($collector['windwalker.config']));
-?>
+<pre><?php echo \Symfony\Component\Yaml\Yaml::dump($collector['windwalker.config'], 5); ?></pre>
 
 <?php $this->endblock() ?>
