@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Error;
 
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\String\Mbstring;
 
 /**
  * The ErrorManager class.
@@ -393,5 +395,34 @@ class ErrorManager
 		$this->engine = $engine;
 
 		return $this;
+	}
+
+	/**
+	 * normalizeCode
+	 *
+	 * @param int $code
+	 *
+	 * @return  int
+	 */
+	public static function normalizeCode($code)
+	{
+		return ResponseHelper::validateStatus($code) ? $code : 500;
+	}
+
+	/**
+	 * normalizeMessage
+	 *
+	 * @param string $message
+	 *
+	 * @return  string
+	 */
+	public static function normalizeMessage($message)
+	{
+		if (Mbstring::isUtf8($message))
+		{
+			$message = str_replace('%20', ' ', rawurlencode($message));
+		}
+
+		return trim(explode("\n", $message)[0]);
 	}
 }

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Controller\Middleware;
 
+use Windwalker\Core\Error\ErrorManager;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Core\View\AbstractView;
@@ -90,21 +91,13 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 			}
 		}
 
-		$code = $e->getCode();
-
-		$code = ResponseHelper::validateStatus($code) ? $code : 500;
-
-		$message = $e->getMessage();
-
-		if (Mbstring::isUtf8($message))
-		{
-			$message = str_replace('%20', ' ', rawurlencode($message));
-		}
-
 		$this->controller->setResponse(
 			$this->controller
 				->getResponse()
-				->withStatus($code, $message)
+				->withStatus(
+					ErrorManager::normalizeCode($e->getCode()),
+					ErrorManager::normalizeMessage($e->getMessage())
+				)
 		);
 
 		return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
