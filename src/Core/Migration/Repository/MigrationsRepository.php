@@ -316,8 +316,8 @@ LOG;
 		$table->create(function (Schema $schema)
 		{
 			$schema->varchar('version');
-			$schema->timestamp('start_time');
-			$schema->timestamp('end_time');
+			$schema->timestamp('start_time')->allowNull(true)->defaultValue(null);
+			$schema->timestamp('end_time')->allowNull(true)->defaultValue(null);
 		});
 	}
 

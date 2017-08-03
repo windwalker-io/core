@@ -96,11 +96,12 @@ class DatabaseProvider implements ServiceProviderInterface
 			'ERROR_FOR_DIVISION_BY_ZERO',
 			'NO_AUTO_CREATE_USER',
 			'NO_ENGINE_SUBSTITUTION',
+			'NO_ZERO_DATE',
+			'NO_ZERO_IN_DATE'
 		);
 
-		// TODO: Re-enable this after we solve issue: https://github.com/ventoviro/windwalker/issues/451
-//		$db->connect()
-//			->getConnection()
-//			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+		$db->connect()
+			->getConnection()
+			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
 	}
 }
