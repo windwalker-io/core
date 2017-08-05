@@ -318,8 +318,8 @@ LOG;
 			$schema->varchar('version');
 
 			// Use exists time as timestamp before framework supports CURRENT_TIMESTAMP
-			$schema->timestamp('start_time')->defaultValue('1970-01-01 00:00:01');
-			$schema->timestamp('end_time')->defaultValue('1970-01-01 00:00:01');
+			$schema->timestamp('start_time')->defaultValue('1970-01-02 00:00:01');
+			$schema->timestamp('end_time')->defaultValue('1970-01-02 00:00:01');
 		});
 	}
 
