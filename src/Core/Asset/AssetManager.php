@@ -334,18 +334,16 @@ class AssetManager implements DispatcherAwareInterface
 			return $this->version;
 		}
 
+		if ($this->config->get('system.debug'))
+		{
+			return $this->version = md5(uniqid('Windwalker-Asset-Version', true));
+		}
+
 		$sumFile = $this->config->get('path.cache') . '/asset/MD5SUM';
 
 		if (!is_file($sumFile))
 		{
-			if ($this->config->get('system.debug'))
-			{
-				return $this->version = md5(uniqid('Windwalker-Asset-Version', true));
-			}
-			else
-			{
-				return $this->version = $this->detectVersion();
-			}
+			return $this->version = $this->detectVersion();
 		}
 
 		return $this->version = trim(file_get_contents($sumFile));
