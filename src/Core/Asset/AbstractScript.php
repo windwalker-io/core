@@ -153,11 +153,18 @@ abstract class AbstractScript
 			$quote = false;
 		}
 
-		$result = [];
-
-		foreach ($data as $array)
+		if (count($data) > 1)
 		{
-			$result = static::mergeOptions($result, $array);
+			$result = [];
+
+			foreach ($data as $array)
+			{
+				$result = static::mergeOptions($result, $array);
+			}
+		}
+		else
+		{
+			$result = $data[0];
 		}
 
 		return static::getAsset()->getJSObject($result, $quote);
