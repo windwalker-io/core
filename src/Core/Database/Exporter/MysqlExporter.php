@@ -88,7 +88,7 @@ class MysqlExporter extends AbstractExporter
 	{
 		$db = $this->db;
 		$query = $db->getQuery(true);
-		$iterator = $db->getReader($query->select('*')->from($table))->getIterator();
+		$iterator = $db->getReader($query->select('*')->from($query->quoteName($table)))->getIterator();
 
 		if (!count($iterator))
 		{
