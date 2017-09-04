@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Asset\AssetProvider;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\PackageResolver;
@@ -186,7 +187,8 @@ class ConsoleHelper
 
 		// Register providers
 		$container->registerServiceProvider($container->newInstance(RouterProvider::class))
-			->registerServiceProvider($container->newInstance(RendererProvider::class));
+			->registerServiceProvider($container->newInstance(RendererProvider::class))
+			->registerServiceProvider($container->newInstance(AssetProvider::class));
 
 		// Prepare routers
 		$router = $container->get('router');
