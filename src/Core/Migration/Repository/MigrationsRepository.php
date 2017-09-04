@@ -97,7 +97,7 @@ class MigrationsRepository extends ModelRepository
 
 		$query = $this->db->getQuery(true)
 			->select('version')
-			->from($this->logTable)
+			->from($this->db->quoteName($this->logTable))
 			->order('version ASC');
 
 		return $this->db->setQuery($query)->loadColumn();

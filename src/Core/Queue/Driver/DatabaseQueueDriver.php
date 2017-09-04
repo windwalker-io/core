@@ -105,7 +105,7 @@ class DatabaseQueueDriver implements QueueDriverInterface
 		$query = $this->db->getQuery(true);
 
 		$query->select('*')
-			->from($this->table)
+			->from($query->quoteName($this->table))
 			->where('queue = :queue')
 			->where('visibility <= :now')
 			->orWhere(function (Query $query)
@@ -154,7 +154,7 @@ class DatabaseQueueDriver implements QueueDriverInterface
 
 		$query = $this->db->getQuery(true);
 
-		$query->delete($this->table)
+		$query->delete($query->quoteName($this->table))
 			->where('id = :id')
 			->where('queue = :queue')
 			->bind('id', $message->getId())

@@ -87,7 +87,7 @@ class DatabaseQueueFailer implements QueueFailerInterface
 		$query = $this->db->getQuery(true);
 
 		$query->select('*')
-			->from($this->table);
+			->from($query->quoteName($this->table));
 
 		return $this->db->setQuery($query)->loadAll(null, 'assoc');
 	}
@@ -104,7 +104,7 @@ class DatabaseQueueFailer implements QueueFailerInterface
 		$query = $this->db->getQuery(true);
 
 		$query->select('*')
-			->from($this->table)
+			->from($query->quoteName($this->table))
 			->where('id = :id')
 			->bind('id', $conditions);
 
@@ -122,7 +122,7 @@ class DatabaseQueueFailer implements QueueFailerInterface
 	{
 		$query = $this->db->getQuery(true);
 
-		$query->delete($this->table)
+		$query->delete($query->quoteName($this->table))
 			->where('id = :id')
 			->bind('id', $conditions);
 
