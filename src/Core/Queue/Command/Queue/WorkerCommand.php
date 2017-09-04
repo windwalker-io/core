@@ -9,7 +9,9 @@
 namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Core\Queue\Job\JobInterface;
+use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Queue\QueueMessage;
 use Windwalker\Core\Queue\Worker;
 use Windwalker\Event\Event;
@@ -214,6 +216,18 @@ class WorkerCommand extends CoreCommand
 				$e = $event['exception'];
 
 				$this->console->addMessage($e->getMessage(), 'error');
+			})
+			->listen('onWorkerLoopCycleEnd', function (Event $event)
+			{
+				/** @var QueueManager $manager */
+				$manager = $event['manager'];
+
+				$driver = $manager->getDriver();
+
+				if ($driver instanceof DatabaseQueueDriver)
+				{
+					$driver->reconnect();
+				}
 			});
 	}
 

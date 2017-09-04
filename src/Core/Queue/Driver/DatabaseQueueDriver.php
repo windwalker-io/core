@@ -215,4 +215,42 @@ class DatabaseQueueDriver implements QueueDriverInterface
 
 		return $this;
 	}
+
+	/**
+	 * Method to get property Db
+	 *
+	 * @return  AbstractDatabaseDriver
+	 */
+	public function getDb()
+	{
+		return $this->db;
+	}
+
+	/**
+	 * Method to set property db
+	 *
+	 * @param   AbstractDatabaseDriver $db
+	 *
+	 * @return  static  Return self to support chaining.
+	 */
+	public function setDb($db)
+	{
+		$this->db = $db;
+
+		return $this;
+	}
+
+	/**
+	 * Reconnect database to avoid long connect issues.
+	 *
+	 * @return  static
+	 */
+	public function reconnect()
+	{
+		$this->db->disconnect();
+
+		$this->db->connect();
+
+		return $this;
+	}
 }

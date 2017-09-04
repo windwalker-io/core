@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Event\EventDispatcher;
+use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Core\Queue\Exception\MaxAttemptsExceededException;
 use Windwalker\Core\Queue\Job\JobInterface;
 use Windwalker\Core\Queue\Job\NullJob;
