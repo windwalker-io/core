@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Error\Handler;
 
 use Windwalker\Core\Logger\LoggerManager;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 
 /**
  * The ErrorLogHandler class.
@@ -43,6 +44,21 @@ class ErrorLogHandler implements ErrorHandlerInterface
 	 */
 	public function __invoke($e)
 	{
-		$this->manager->error('error', $e->getMessage(), ['code' => $e->getCode()]);
+		// Do not log 4xx errors
+		$code = $e->getCode();
+
+		if ($code < 400 || $code >= 500)
+		{
+			$message = sprintf('Code: %s - %s - File: %s (%d)', $e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+
+			$traces = '';
+
+			foreach (BacktraceHelper::normalizeBacktraces($e->getTrace()) as $i => $trace)
+			{
+				$traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
+			}
+
+			$this->manager->error('error', $message . "\n" . $traces);
+		}
 	}
 }

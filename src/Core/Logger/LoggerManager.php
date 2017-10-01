@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Logger;
 
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
@@ -318,6 +319,8 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 		$logger = new Monolog($categoey);
 
 		$handler = $handler ? : new StreamHandler($this->getLogFile($categoey), $level);
+		$handler->setFormatter(new LineFormatter(null, null, true));
+
 		$logger->pushProcessor(new PsrLogMessageProcessor);
 
 		// Basic string handler

@@ -15,6 +15,7 @@ use Windwalker\Core\Controller\Middleware\AbstractControllerMiddleware;
 use Windwalker\Core\Controller\Middleware\ControllerData;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Model\Exception\ValidateFailException;
 use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Mvc\ModelResolver;
@@ -26,6 +27,7 @@ use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
 use Windwalker\Core\View\LayoutRenderableInterface;
@@ -294,8 +296,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 			$this->triggerEvent('onControllerAfterExecute', [
 				'controller' => $this,
 				'result'     => &$result
-			]
-			);
+			]);
 		}
 		catch (ValidateFailException $e)
 		{

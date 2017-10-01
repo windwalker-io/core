@@ -130,9 +130,7 @@ class ErrorManager
 			$e = new \Exception;
 		}
 
-		$exception = new \ErrorException($content, $code, E_ERROR, $file, $line, $e);
-
-		$this->exception($exception);
+		throw new \ErrorException($content, $code, E_ERROR, $file, $line, $e);
 	}
 
 	/**
