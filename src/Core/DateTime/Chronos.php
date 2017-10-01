@@ -495,6 +495,22 @@ class Chronos extends \DateTime
 	}
 
 	/**
+	 * Get NULL date.
+	 *
+	 * @param AbstractDatabaseDriver $db
+	 *
+	 * @return  string
+	 *
+	 * @since   3.2.6.1
+	 */
+	public static function getNullDate(AbstractDatabaseDriver $db = null)
+	{
+		$db = $db ? : Ioc::getDatabase();
+
+		return $db->getQuery(true)->getNullDate();
+	}
+
+	/**
 	 * getTimezoneObject
 	 *
 	 * @param mixed $tz
