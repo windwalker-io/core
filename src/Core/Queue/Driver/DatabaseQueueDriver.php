@@ -95,6 +95,8 @@ class DatabaseQueueDriver implements QueueDriverInterface
 	 * @param string $queue
 	 *
 	 * @return QueueMessage
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
 	 */
 	public function pop($queue = null)
 	{
@@ -106,29 +108,41 @@ class DatabaseQueueDriver implements QueueDriverInterface
 
 		$query->select('*')
 			->from($query->quoteName($this->table))
-			->where('queue = :queue')
-			->where('visibility <= :now')
+			->where('queue = %q', $queue)
+			->where('visibility <= %q', $now->toSql())
 			->orWhere(function (Query $query)
 			{
-			    $query->where('reserved IS NULL')
-				    ->where('reserved < :timeout');
-			})
-			->bind('queue', $queue)
-			->bind('now', $now->toSql())
-			->bind('timeout', Chronos::create('now -' . $this->timeout . 'seconds')->toSql());
+				$query->where('reserved IS NULL')
+					->where('reserved < %q', Chronos::create('now -' . $this->timeout . 'seconds')->toSql());
+			});
 
-		$data = $this->db->setQuery($query)->loadOne('assoc');
+		$trans = $this->db->getTransaction()->start();
 
-		if (!$data)
+		try
 		{
-			return null;
+			$data = $this->db->setQuery($query . ' FOR UPDATE')->loadOne('assoc');
+
+			if (!$data)
+			{
+				return null;
+			}
+
+			$data['attempts']++;
+
+			$values = ['reserved' => $now->toSql(), 'attempts' => $data['attempts']];
+
+			$this->db->getWriter()->updateBatch($this->table, $values, ['id' => $data['id']]);
+
+			$trans->commit();
 		}
-
-		$data['attempts']++;
-
-		$values = ['reserved' => $now->toSql(), 'attempts' => $data['attempts']];
-
-		$this->db->getWriter()->updateBatch($this->table, $values, ['id' => $data['id']]);
+		catch (\Exception $e)
+		{
+			$trans->rollback();
+		}
+		catch (\Throwable $t)
+		{
+			$trans->rollback();
+		}
 
 		$message = new QueueMessage;
 
