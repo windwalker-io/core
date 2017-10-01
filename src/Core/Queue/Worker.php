@@ -415,7 +415,7 @@ class Worker implements DispatcherAwareInterface
 	 */
 	protected function sleep($seconds)
 	{
-		sleep($seconds);
+		usleep($seconds * 1000000);
 	}
 
 	/**
