@@ -14,7 +14,7 @@ use Windwalker\Structure\Structure;
 /**
  * The PackageHelper class.
  *
- * @see  Windwalker\Core\Package\PackageResolver
+ * @see  PackageResolver
  *
  * @method  static  PackageResolver         getInstance()
  * @method  static  PackageResolver         registerPackages(array $packages)

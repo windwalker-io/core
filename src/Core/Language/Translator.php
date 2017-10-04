@@ -19,11 +19,17 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static  string    _($string)
  * @method  static  string    sprintf($string, ...$more)
  * @method  static  string    plural($string, ...$number)
+ * @method  static  bool      exists(string $key, bool $normalize = true)
+ * @method  static  CoreLanguage  load(string $file, string $format = 'ini', string $loader = 'file')
+ * @method  static  CoreLanguage  addString(string $key, string $string)
+ * @method  static  CoreLanguage  addStrings(array $strings)
  * @method  static  string    getOrphans()
  * @method  static  string    setTraceLevelOffset($level)
  * @method  static  string    getTraceLevelOffset()
+ * @method  static  string    getLocale()
+ * @method  static  string    getDefaultLocale()
  * @method  static  CoreLanguage  loadFile($file, $format = 'ini', $package = null)
- * @method  static  CoreLanguage  getInstance()
+ * @method  static  CoreLanguage  getInstance($forceNew = false)
  *
  * @since  2.0
  */
