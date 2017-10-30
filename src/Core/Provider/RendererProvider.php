@@ -200,7 +200,7 @@ class RendererProvider implements ServiceProviderInterface
 
 		$directives = [
 			'translate' => [$extension, 'translate'],
-			'sprintf'   => [$extension, 'translate'],
+			'sprintf'   => [$extension, 'sprintf'],
 			'plural'    => [$extension, 'plural'],
 			'messages'  => [$extension, 'messages'],
 			'widget'    => [$extension, 'widget'],

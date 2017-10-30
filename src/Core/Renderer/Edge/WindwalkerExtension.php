@@ -37,7 +37,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
 		return [
 			'lang'      => [$this, 'translate'],
 			'translate' => [$this, 'translate'],
-			'sprintf'   => [$this, 'translate'],
+			'sprintf'   => [$this, 'sprintf'],
 			'plural'    => [$this, 'plural'],
 			'choice'    => [$this, 'plural'],
 			'messages'  => [$this, 'messages'],
