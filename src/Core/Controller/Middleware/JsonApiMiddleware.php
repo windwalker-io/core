@@ -84,7 +84,7 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 				{
 					$data['debug_messages'] = (array) DebuggerHelper::getInstance()->get('debug.messages');
 				}
-				catch (\Exception $exception)
+				catch (\Exception $e)
 				{
 					// None
 				}
@@ -100,7 +100,15 @@ class JsonApiMiddleware extends AbstractControllerMiddleware
 				)
 		);
 
-		return new JsonBuffer($e->getMessage(), $data, false, $e->getCode());
+		$message = !WINDWALKER_DEBUG ? $e->getMessage() : sprintf(
+			'#%d %s - File: %s (%d)',
+			$e->getCode(),
+			$e->getMessage(),
+			$e->getFile(),
+			$e->getLine()
+		);
+
+		return new JsonBuffer($message, $data, false, $e->getCode());
 	}
 
 	/**

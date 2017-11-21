@@ -43,14 +43,20 @@ class JsonResponseWebMiddleware extends AbstractWebMiddleware
 		$error->addHandler(function ($exception)
 			{
 				/** @var \Exception|\Throwable $exception */
+				$message = !WINDWALKER_DEBUG ? $exception->getMessage() : sprintf(
+					'#%d %s - File: %s (%d)',
+					$exception->getCode(),
+					$exception->getMessage(),
+					$exception->getFile(),
+					$exception->getLine()
+				);
+
 				$this->app
 					->getServer()
 					->getOutput()
 					->respond(
-						new JsonResponse(['error' => $exception->getMessage()], $exception->getCode())
+						new JsonResponse(['error' => $message], $exception->getCode())
 					);
-
-				die;
 			}, 'default');
 
 		/** @var Response $response */

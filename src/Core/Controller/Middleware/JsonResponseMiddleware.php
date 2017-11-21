@@ -43,7 +43,16 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 			->addHandler(function ($exception)
 			{
 				/** @var $exception \Exception|\Throwable */
-				$data = ['error' => $exception->getMessage()];
+				$data = [
+					'error' => !WINDWALKER_DEBUG ? $exception->getMessage() : sprintf(
+						'#%d %s - File: %s (%d)',
+						$exception->getCode(),
+						$exception->getMessage(),
+						$exception->getFile(),
+						$exception->getLine()
+					)
+				];
+
 				$response = (new JsonResponse($data))->withStatus(
 					ErrorManager::normalizeCode($exception->getCode()),
 					ErrorManager::normalizeMessage($exception->getMessage())
@@ -54,8 +63,6 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
 					->getServer()
 					->getOutput()
 					->respond($response);
-
-				die;
 			}, 'default');
 
 		$response = $data->response;
