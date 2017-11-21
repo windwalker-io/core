@@ -35,14 +35,9 @@ class GetController extends AbstractController
 		{
 			case 'css':
 				$content .= file_get_contents($media . '/css/bootstrap.min.css');
+				$content .= file_get_contents($media . '/css/microtip.css');
 				$content .= file_get_contents($media . '/css/debugger.css');
 				$contentType = 'text/css';
-				break;
-
-			case 'tooltip-js':
-				$content .= file_get_contents($media . '/js/jquery.min.js');
-				$content .= file_get_contents($media . '/js/bootstrap-tooltips.min.js');
-				$contentType = 'text/javascript';
 				break;
 
 			case 'fonts':

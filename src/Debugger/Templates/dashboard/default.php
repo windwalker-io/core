@@ -53,22 +53,17 @@ $this->extend('_global.html');
 				<?php echo $item->time; ?>
 			</td>
 			<td>
-				<span class="<?php echo $item->status_style ?> hasTooltip" title="Http Status: <?php echo $item->status ?>">
+				<span class="<?php echo $item->status_style ?>" aria-label="Http Status: <?php echo $item->status ?>" data-microtip-position="top" role="tooltip">
 					<?php echo $item->status; ?>
 				</span>
 				&nbsp;
 				<?php if ($item->exception->notNull()): ?>
-				    <span class="label label-danger hasTooltip" title="<?php echo $item->exception->type ?>">E</span>
+				    <span class="label label-danger" aria-label="<?php echo $item->exception->type ?>" data-microtip-position="top" role="tooltip">E</span>
 				<?php endif; ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>
 </table>
-
-<script src="<?php echo $router->route('asset', ['type' => 'tooltip-js']); ?>"></script>
-<script>
-	$('.hasTooltip').tooltip();
-</script>
 
 <?php $this->endblock(); ?>
