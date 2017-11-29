@@ -57,7 +57,12 @@ class WindwalkerExtension implements EdgeExtensionInterface
 			'css' => [$this, 'css'],
 			'js'  => [$this, 'js'],
 			'assetTemplate' => [$this, 'assetTemplate'],
-			'endTemplate'   => [$this, 'endTemplate']
+			'endTemplate'   => [$this, 'endTemplate'],
+
+            // Debug
+            'shown' => [$this, 'shown'],
+            'dd' => [$this, 'dd'],
+            'die' => [$this, 'dead'],
 		];
 	}
 
@@ -251,6 +256,42 @@ class WindwalkerExtension implements EdgeExtensionInterface
 	public function formToken($expression)
 	{
 		return "<?php echo \$package->csrf->input{$expression} ?>";
+	}
+
+    /**
+     * show
+     *
+     * @param string $expression
+     *
+     * @return  string
+     */
+    public function shown($expression)
+    {
+        return "<?php show{$expression} ?>";
+	}
+
+    /**
+     * dead
+     *
+     * @param string $expression
+     *
+     * @return  string
+     */
+    public function dd($expression)
+    {
+        return "<?php show{$expression}; die; ?>";
+	}
+
+    /**
+     * dead
+     *
+     * @param string $expression
+     *
+     * @return  string
+     */
+    public function dead($expression)
+    {
+        return "<?php die{$expression} ?>";
 	}
 
 	/**
