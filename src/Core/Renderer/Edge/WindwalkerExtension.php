@@ -64,7 +64,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
             'dd' => [$this, 'dd'],
             'die' => [$this, 'dead'],
             'debug' => [$this, 'debug'],
-            'endebug' => [$this, 'endauth'],
+            'enddebug' => [$this, 'endauth'],
 		];
 	}
 
