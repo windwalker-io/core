@@ -6,7 +6,7 @@ use Windwalker\Console\Command\Command;
 use Windwalker\SystemPackage\Command\System\ClearCacheCommand;
 use Windwalker\SystemPackage\Command\System\DownCommand;
 use Windwalker\SystemPackage\Command\System\GenerateCommand;
-use Windwalker\SystemPackage\Command\System\LangDiffCommand;
+use Windwalker\SystemPackage\Command\System\LangMergeCommand;
 use Windwalker\SystemPackage\Command\System\MailTestCommand;
 use Windwalker\SystemPackage\Command\System\ModeCommand;
 use Windwalker\SystemPackage\Command\System\UpCommand;
@@ -48,7 +48,7 @@ class SystemCommand extends Command
 	{
 		$this->addCommand(GenerateCommand::class);
 		$this->addCommand(ClearCacheCommand::class);
-		$this->addCommand(LangDiffCommand::class);
+		$this->addCommand(LangMergeCommand::class);
 		$this->addCommand(MailTestCommand::class);
 		$this->addCommand(UpCommand::class);
 		$this->addCommand(DownCommand::class);

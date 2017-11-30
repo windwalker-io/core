@@ -22,28 +22,28 @@ use Windwalker\Utilities\Arr;
  *
  * @since  3.0
  */
-class LangDiffCommand extends CoreCommand
+class LangMergeCommand extends CoreCommand
 {
 	/**
 	 * Console(Argument) name.
 	 *
 	 * @var  string
 	 */
-	protected $name = 'lang-diff';
+	protected $name = 'lang-merge';
 
 	/**
 	 * The command description.
 	 *
 	 * @var  string
 	 */
-	protected $description = 'Diff language files and save to tmp.';
+	protected $description = 'Merge different language files and save to temp ro replace original file.';
 
 	/**
 	 * The usage to tell user how to use this command.
 	 *
 	 * @var string
 	 */
-	protected $usage = '%s <file> <lang_code> <origin_lang_code> [-p=package]';
+	protected $usage = '%s <file> [<lang_code>] [<origin_lang_code>] [-p=package]';
 
 	/**
 	 * Initialise command.
@@ -85,17 +85,12 @@ class LangDiffCommand extends CoreCommand
 	protected function doExecute()
 	{
 		$file = $this->getArgument(0);
-		$to   = $this->getArgument(1, $this->console->get('language.locale'));
-		$from = $this->getArgument(2, $this->console->get('language.default'));
+		$to   = $this->getArgument(1, $this->console->get('language.locale', 'en-GB'));
+		$from = $this->getArgument(2, $this->console->get('language.default', 'en-GB'));
 
 		if (!$file)
 		{
 			throw new WrongArgumentException('Please provide file name.');
-		}
-
-		if ($to === $from)
-		{
-			throw new \RuntimeException('Language locale are same.');
 		}
 
 		$package = null;
@@ -108,7 +103,7 @@ class LangDiffCommand extends CoreCommand
 
 			if (!$package)
 			{
-				throw new \RuntimeException('Package: ' . $$name . ' not found.');
+				throw new \RuntimeException('Package: ' . $name . ' not found.');
 			}
 		}
 
@@ -152,14 +147,7 @@ class LangDiffCommand extends CoreCommand
 
 		$data = IniFormat::structToString($data);
 
-		if ($this->getOption('r'))
-		{
-			$dest = $toFile;
-		}
-		else
-		{
-			$dest = WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
-		}
+		$dest = $this->getOption('r') ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
 
 		File::write($dest, $data);
 
