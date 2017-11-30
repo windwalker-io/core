@@ -59,12 +59,26 @@ class MailTestCommand extends CoreCommand
 
 		$body = sprintf($this->getBody(), $custom);
 
-		Mailer::send(function (MailMessage $message) use ($to, $body)
+		try
 		{
-			$message->subject('Test Message from Windwalker')
-				->to($to)
-				->body($body);
-		});
+			Mailer::send(function (MailMessage $message) use ($to, $body)
+			{
+				$message->subject('Test Message from Windwalker')
+					->to($to)
+					->body($body);
+			});
+		}
+		catch (\Exception $e)
+		{
+			$this->out('<error>[ERROR] Send mail failure.</error>')
+				->out()
+				->out('<option>Error message:</option>')
+				->out($e->getMessage());
+
+			$this->console->close();
+		}
+
+		$this->out(sprintf('Test mail sent to: <info>%s</info>.', $to));
 
 		return true;
 	}
