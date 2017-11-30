@@ -63,6 +63,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
             'shown' => [$this, 'shown'],
             'dd' => [$this, 'dd'],
             'die' => [$this, 'dead'],
+            'debug' => [$this, 'debug'],
+            'endebug' => [$this, 'endauth'],
 		];
 	}
 
@@ -292,6 +294,25 @@ class WindwalkerExtension implements EdgeExtensionInterface
     public function dead($expression)
     {
         return "<?php die{$expression} ?>";
+	}
+
+    /**
+     * dead
+     *
+     * @param string $expression
+     *
+     * @return  string
+     */
+    public function debug($expression)
+    {
+        if ($expression)
+        {
+	        $expression = static::stripParentheses($expression);
+
+	        return "<?php if(\$app->get('system.debug')) { {$expression}; } ?>";
+        }
+
+        return "<?php if(\$app->get('system.debug')): ?>";
 	}
 
 	/**
