@@ -38,13 +38,6 @@ class Worker implements DispatcherAwareInterface
 	const STATE_STOP    = 'stop';
 
 	/**
-	 * Property dispatcher.
-	 *
-	 * @var  EventDispatcher
-	 */
-	protected $dispatcher;
-
-	/**
 	 * Property queue.
 	 *
 	 * @var  Queue
