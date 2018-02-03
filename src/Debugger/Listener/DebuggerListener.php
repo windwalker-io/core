@@ -301,7 +301,7 @@ class DebuggerListener
 		$data->memory = $memory / 1048576;
 
 		// Queries
-		$data->queryTimes = $collector['database.query.times'];
+		$data->queryTimes = $collector['database.query.times'] ?: 0;
 		$data->queryTotalTime = $collector['database.query.total.time'] * 1000;
 		$data->queryTotalMemory = $collector['database.query.total.memory'] / 1048576;
 
