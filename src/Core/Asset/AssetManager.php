@@ -139,22 +139,27 @@ class AssetManager implements DispatcherAwareInterface
 	 * addStyle
 	 *
 	 * @param string $url
-	 * @param string $version
+	 * @param array  $options
 	 * @param array  $attribs
 	 *
 	 * @return  static
 	 */
-	public function addStyle($url, $version = null, $attribs = [])
+	public function addStyle($url, $options = [], $attribs = [])
 	{
-		if (!$version && $version !== false)
+		// B/C
+		if (!is_array($options))
 		{
-			$version = $this->getVersion();
+			$options = ['version' => $options];
 		}
+
+		$options = array_merge([
+			'version' => null
+		], $options);
 
 		$file = [
 			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
-			'version' => $version
+			'options' => $options
 		];
 
 		$this->styles[$url] = $file;
@@ -166,22 +171,27 @@ class AssetManager implements DispatcherAwareInterface
 	 * addScript
 	 *
 	 * @param string $url
-	 * @param string $version
+	 * @param array  $options
 	 * @param array  $attribs
 	 *
 	 * @return  static
 	 */
-	public function addScript($url, $version = null, $attribs = [])
+	public function addScript($url, $options = [], $attribs = [])
 	{
-		if (!$version && $version !== false)
+		// B/C
+		if (!is_array($options))
 		{
-			$version = $this->getVersion();
+			$options = ['version' => $options];
 		}
+
+		$options = array_merge([
+			'version' => null
+		], $options);
 
 		$file = [
 			'url' => $this->handleUri($url),
 			'attribs' => $attribs,
-			'version' => $version
+			'options' => $options
 		];
 
 		$this->scripts[$url] = $file;
@@ -232,24 +242,33 @@ class AssetManager implements DispatcherAwareInterface
 			'asset' => $this,
 			'withInternal' => &$withInternal,
 			'html' => &$html
-		]
-		);
+		]);
 
 		foreach ($this->styles as $url => $style)
 		{
 			$defaultAttribs = [
+				'href' => $style['url'],
 				'rel' => 'stylesheet',
-				'href' => $style['url']
 			];
 
 			$attribs = array_merge($defaultAttribs, $style['attribs']);
 
-			if ($style['version'] !== false)
+			if ($style['options']['version'] !== false)
 			{
-				$attribs['href'] .= '?' . $style['version'];
+				$attribs['href'] .= '?' . $this->getVersion();
+			}
+
+			if (isset($style['options']['conditional']))
+			{
+				$html[] = '<!--[if ' . $style['options']['conditional'] . ']>';
 			}
 
 			$html[] = (string) new HtmlElement('link', null, $attribs);
+
+			if (isset($style['options']['conditional']))
+			{
+				$html[] = '<![endif]-->';
+			}
 		}
 
 		if ($withInternal && $this->internalStyles)
@@ -286,12 +305,22 @@ class AssetManager implements DispatcherAwareInterface
 
 			$attribs = array_merge($defaultAttribs, $script['attribs']);
 
-			if ($script['version'] !== false)
+			if ($script['options']['version'] !== false)
 			{
-				$attribs['src'] .= '?' . $script['version'];
+				$attribs['src'] .= '?' . $this->getVersion();
+			}
+
+			if (isset($script['options']['conditional']))
+			{
+				$html[] = '<!--[if ' . $script['options']['conditional'] . ']>';
 			}
 
 			$html[] = (string) new HtmlElement('script', null, $attribs);
+
+			if (isset($script['options']['conditional']))
+			{
+				$html[] = '<![endif]-->';
+			}
 		}
 
 		if ($withInternal && $this->internalScripts)
