@@ -223,6 +223,53 @@ class Chronos extends \DateTime
 	}
 
 	/**
+	 * compare
+	 *
+	 * @param string|\DateTimeInterface $date1
+	 * @param string|\DateTimeInterface $date2
+	 * @param string                    $operator
+	 *
+	 * @return  bool|int
+	 */
+	public static function compare($date1, $date2, $operator = null)
+	{
+		$date1 = $date1 instanceof \DateTimeInterface ? $date1 : new \DateTime($date1);
+		$date2 = $date2 instanceof \DateTimeInterface ? $date2 : new \DateTime($date2);
+
+		if ($operator === null)
+		{
+			if ($date1 == $date2)
+			{
+				return 0;
+			}
+
+			return (int) ($date1 < $date2);
+		}
+
+		switch ((string) $operator)
+		{
+			case '=':
+				return $date1 == $date2;
+			case '!=':
+				return $date1 != $date2;
+			case '>':
+			case 'gt':
+				return $date1 > $date2;
+			case '>=':
+			case 'gte':
+				return $date1 >= $date2;
+			case '<':
+			case 'lt':
+				return $date1 < $date2;
+			case '<=':
+			case 'lte':
+				return $date1 <= $date2;
+		}
+
+		throw new \InvalidArgumentException('Invalid operator: ' . $operator);
+	}
+
+	/**
 	 * current
 	 *
 	 * @param string $format
