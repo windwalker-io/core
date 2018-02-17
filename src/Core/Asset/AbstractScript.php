@@ -87,28 +87,28 @@ abstract class AbstractScript
 	 * addStyle
 	 *
 	 * @param string $url
-	 * @param string $version
+	 * @param array  $options
 	 * @param array  $attribs
 	 *
 	 * @return  AssetManager
 	 */
-	protected static function addCSS($url, $version = null, $attribs = [])
+	protected static function addCSS($url, $options = [], $attribs = [])
 	{
-		return static::getAsset()->addCSS($url, $version, $attribs);
+		return static::getAsset()->addCSS($url, $options, $attribs);
 	}
 
 	/**
 	 * addScript
 	 *
 	 * @param string $url
-	 * @param string $version
+	 * @param array  $options
 	 * @param array  $attribs
 	 *
 	 * @return  AssetManager
 	 */
-	protected static function addJS($url, $version = null, $attribs = [])
+	protected static function addJS($url, $options = [], $attribs = [])
 	{
-		return static::getAsset()->addJS($url, $version, $attribs);
+		return static::getAsset()->addJS($url, $options, $attribs);
 	}
 
 	/**

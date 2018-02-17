@@ -9,7 +9,8 @@
         "windwalker/framework": "~3.0",
         "symfony/yaml": "~3.0",
         "monolog/monolog": "~1.0",
-        "filp/whoops": "~2.0"
+        "filp/whoops": "~2.0",
+        "whichbrowser/parser": "^2.0"
     },
     "require-dev" : {
         "twig/twig": "~1.0",
