@@ -17,5 +17,5 @@ use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
  */
 class AccessDeniedException extends \RuntimeException
 {
-	use MultiMessagesExceptionTrait;
+    use MultiMessagesExceptionTrait;
 }

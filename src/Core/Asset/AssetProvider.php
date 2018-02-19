@@ -18,21 +18,20 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class AssetProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(AssetManager::class);
-		$container->prepareSharedObject(ScriptManager::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(AssetManager::class);
+        $container->prepareSharedObject(ScriptManager::class);
 
-		AbstractScript::$instance = function () use ($container)
-		{
-		    return $container->get(ScriptManager::class);
-		};
-	}
+        AbstractScript::$instance = function () use ($container) {
+            return $container->get(ScriptManager::class);
+        };
+    }
 }

@@ -46,195 +46,193 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 abstract class AbstractFieldDefinition implements FieldDefinitionInterface
 {
-	use BootableTrait;
+    use BootableTrait;
 
-	/**
-	 * Property namespaces.
-	 *
-	 * @var  PriorityQueue
-	 */
-	protected $namespaces = [];
+    /**
+     * Property namespaces.
+     *
+     * @var  PriorityQueue
+     */
+    protected $namespaces = [];
 
-	/**
-	 * Property maps.
-	 *
-	 * @var  array
-	 */
-	protected $maps = [];
+    /**
+     * Property maps.
+     *
+     * @var  array
+     */
+    protected $maps = [];
 
-	/**
-	 * Property form.
-	 *
-	 * @var  Form
-	 */
-	protected $form;
+    /**
+     * Property form.
+     *
+     * @var  Form
+     */
+    protected $form;
 
-	/**
-	 * Define the form fields.
-	 *
-	 * @param Form $form The Windwalker form object.
-	 *
-	 * @return  void
-	 */
-	public function define(Form $form)
-	{
-		$this->namespaces = new PriorityQueue;
-		$this->namespaces->insert('Windwalker\Form\Field', PriorityQueue::NORMAL);
+    /**
+     * Define the form fields.
+     *
+     * @param Form $form The Windwalker form object.
+     *
+     * @return  void
+     */
+    public function define(Form $form)
+    {
+        $this->namespaces = new PriorityQueue;
+        $this->namespaces->insert('Windwalker\Form\Field', PriorityQueue::NORMAL);
 
-		$this->bootTraits($this);
+        $this->bootTraits($this);
 
-		$this->form = $form;
+        $this->form = $form;
 
-		$this->doDefine($form);
-	}
+        $this->doDefine($form);
+    }
 
-	/**
-	 * Define the form fields.
-	 *
-	 * @param Form $form The Windwalker form object.
-	 *
-	 * @return  void
-	 */
-	abstract protected function doDefine(Form $form);
+    /**
+     * Define the form fields.
+     *
+     * @param Form $form The Windwalker form object.
+     *
+     * @return  void
+     */
+    abstract protected function doDefine(Form $form);
 
-	/**
-	 * __call
-	 *
-	 * @param   string $name
-	 * @param   array  $args
-	 *
-	 * @return  \Windwalker\Form\Field\AbstractField
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function __call($name, $args)
-	{
-		if (!count($args))
-		{
-			throw new \InvalidArgumentException('Please add name to field: ' . $name);
-		}
+    /**
+     * __call
+     *
+     * @param   string $name
+     * @param   array  $args
+     *
+     * @return  \Windwalker\Form\Field\AbstractField
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function __call($name, $args)
+    {
+        if (!count($args)) {
+            throw new \InvalidArgumentException('Please add name to field: ' . $name);
+        }
 
-		$field = FieldHelper::findFieldClass($name, clone $this->namespaces);
+        $field = FieldHelper::findFieldClass($name, clone $this->namespaces);
 
-		if ($field === false && isset($this->maps[$name]))
-		{
-			$field = $this->maps[$name];
-		}
+        if ($field === false && isset($this->maps[$name])) {
+            $field = $this->maps[$name];
+        }
 
-		if ($field === false || !class_exists($field))
-		{
-			throw new \InvalidArgumentException(sprintf('Field: %s (%s) not found. (Namespaces: %s)', $name, ucfirst($name) . 'Field', implode(" |\n ", iterator_to_array(clone $this->namespaces))));
-		}
+        if ($field === false || !class_exists($field)) {
+            throw new \InvalidArgumentException(sprintf('Field: %s (%s) not found. (Namespaces: %s)', $name,
+                ucfirst($name) . 'Field', implode(" |\n ", iterator_to_array(clone $this->namespaces))));
+        }
 
-		$field = new $field(...$args);
+        $field = new $field(...$args);
 
-		$this->addField($field);
+        $this->addField($field);
 
-		return $field;
-	}
+        return $field;
+    }
 
-	/**
-	 * add
-	 *
-	 * @param string                     $name
-	 * @param string|Field\AbstractField $field
-	 * @param string                     $fieldset
-	 * @param string                     $group
-	 *
-	 * @return  Field\AbstractField|Field\ListField
-	 */
-	public function add($name, $field = null, $fieldset = null, $group = null)
-	{
-		return $this->form->add($name, $field, $fieldset, $group);
-	}
+    /**
+     * add
+     *
+     * @param string                     $name
+     * @param string|Field\AbstractField $field
+     * @param string                     $fieldset
+     * @param string                     $group
+     *
+     * @return  Field\AbstractField|Field\ListField
+     */
+    public function add($name, $field = null, $fieldset = null, $group = null)
+    {
+        return $this->form->add($name, $field, $fieldset, $group);
+    }
 
-	/**
-	 * addField
-	 *
-	 * @param string|Field\AbstractField|\SimpleXMLElement  $field
-	 * @param string                                        $fieldset
-	 * @param string                                        $group
-	 *
-	 * @return  Field\AbstractField|Field\ListField
-	 */
-	public function addField($field, $fieldset = null, $group = null)
-	{
-		return $this->form->addField($field, $fieldset, $group);
-	}
+    /**
+     * addField
+     *
+     * @param string|Field\AbstractField|\SimpleXMLElement $field
+     * @param string                                       $fieldset
+     * @param string                                       $group
+     *
+     * @return  Field\AbstractField|Field\ListField
+     */
+    public function addField($field, $fieldset = null, $group = null)
+    {
+        return $this->form->addField($field, $fieldset, $group);
+    }
 
-	/**
-	 * wrap
-	 *
-	 * @param string   $fieldset
-	 * @param string   $group
-	 * @param callable $callback
-	 *
-	 * @return  static
-	 */
-	public function wrap($fieldset, $group, callable $callback)
-	{
-		$this->form->wrap($fieldset, $group, $callback);
+    /**
+     * wrap
+     *
+     * @param string   $fieldset
+     * @param string   $group
+     * @param callable $callback
+     *
+     * @return  static
+     */
+    public function wrap($fieldset, $group, callable $callback)
+    {
+        $this->form->wrap($fieldset, $group, $callback);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * fieldset
-	 *
-	 * @param string   $fieldset
-	 * @param callable $callback
-	 *
-	 * @return  static
-	 */
-	public function fieldset($fieldset, callable $callback)
-	{
-		$this->form->fieldset($fieldset, $callback);
+    /**
+     * fieldset
+     *
+     * @param string   $fieldset
+     * @param callable $callback
+     *
+     * @return  static
+     */
+    public function fieldset($fieldset, callable $callback)
+    {
+        $this->form->fieldset($fieldset, $callback);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * group
-	 *
-	 * @param string   $group
-	 * @param callable $callback
-	 *
-	 * @return  static
-	 */
-	public function group($group, callable $callback)
-	{
-		$this->form->group($group, $callback);
+    /**
+     * group
+     *
+     * @param string   $group
+     * @param callable $callback
+     *
+     * @return  static
+     */
+    public function group($group, callable $callback)
+    {
+        $this->form->group($group, $callback);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * addNamespace
-	 *
-	 * @param string $namespace
-	 * @param int    $priority
-	 *
-	 * @return  static
-	 */
-	public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
-	{
-		$this->namespaces->insert($namespace, $priority);
+    /**
+     * addNamespace
+     *
+     * @param string $namespace
+     * @param int    $priority
+     *
+     * @return  static
+     */
+    public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
+    {
+        $this->namespaces->insert($namespace, $priority);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * addMap
-	 *
-	 * @param string $name
-	 * @param string $class
-	 *
-	 * @return  static
-	 */
-	public function addMap($name, $class)
-	{
-		$this->maps[$name] = $class;
+    /**
+     * addMap
+     *
+     * @param string $name
+     * @param string $class
+     *
+     * @return  static
+     */
+    public function addMap($name, $class)
+    {
+        $this->maps[$name] = $class;
 
-		return $this;
-	}
+        return $this;
+    }
 }

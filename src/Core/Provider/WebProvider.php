@@ -20,43 +20,41 @@ use Windwalker\Uri\UriData;
 
 /**
  * The WebProvider class.
- * 
+ *
  * @since  2.0
  */
 class WebProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$app = $container->get('application');
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $app = $container->get('application');
 
-		$container->share(WebApplication::class, $app);
+        $container->share(WebApplication::class, $app);
 
-		// Input
-		$container->share(Input::class, function (Container $container) use ($app)
-		{
-		    return PsrInput::create($app->getRequest());
-		})->bindShared(PsrInput::class, Input::class);
+        // Input
+        $container->share(Input::class, function (Container $container) use ($app) {
+            return PsrInput::create($app->getRequest());
+        })->bindShared(PsrInput::class, Input::class);
 
-		// Request
+        // Request
 //		$container->share(ServerRequest::class, $app->getRequest())
 //			->alias(ServerRequestInterface::class, ServerRequest::class);
 
-		// Environment
-		$container->share(WebEnvironment::class, $app->getEnvironment());
-		$container->share(Browser::class,        $app->getEnvironment()->getBrowser());
-		$container->share(Platform::class,       $app->getEnvironment()->getPlatform());
+        // Environment
+        $container->share(WebEnvironment::class, $app->getEnvironment());
+        $container->share(Browser::class, $app->getEnvironment()->getBrowser());
+        $container->share(Platform::class, $app->getEnvironment()->getPlatform());
 
-		// Uri
-		$container->share(UriData::class, function (Container $container) use ($app)
-		{
-			return $app->getServer()->getUriData();
-		});
-	}
+        // Uri
+        $container->share(UriData::class, function (Container $container) use ($app) {
+            return $app->getServer()->getUriData();
+        });
+    }
 }

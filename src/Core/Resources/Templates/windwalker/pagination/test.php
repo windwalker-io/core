@@ -7,9 +7,9 @@
  */
 ?>
 <ul>
-	<?php foreach ($pagination->getAll() as $k => $page): ?>
-	<li>
-		Page: <?php echo $k; ?> - Type: <?php echo $page; ?>
-	</li>
-	<?php endforeach; ?>
+    <?php foreach ($pagination->getAll() as $k => $page): ?>
+        <li>
+            Page: <?php echo $k; ?> - Type: <?php echo $page; ?>
+        </li>
+    <?php endforeach; ?>
 </ul>

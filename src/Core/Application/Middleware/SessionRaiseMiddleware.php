@@ -19,21 +19,21 @@ use Windwalker\Middleware\MiddlewareInterface;
  */
 class SessionRaiseMiddleware extends AbstractWebMiddleware
 {
-	/**
-	 * Middleware logic to be invoked.
-	 *
-	 * @param   Request                      $request  The request.
-	 * @param   Response                     $response The response.
-	 * @param   callable|MiddlewareInterface $next     The next middleware.
-	 *
-	 * @return  Response
-	 */
-	public function __invoke(Request $request, Response $response, $next = null)
-	{
-		$session = $this->app->container->get('session');
+    /**
+     * Middleware logic to be invoked.
+     *
+     * @param   Request                      $request  The request.
+     * @param   Response                     $response The response.
+     * @param   callable|MiddlewareInterface $next     The next middleware.
+     *
+     * @return  Response
+     */
+    public function __invoke(Request $request, Response $response, $next = null)
+    {
+        $session = $this->app->container->get('session');
 
-		$session->start();
+        $session->start();
 
-		return $next($request, $response);
-	}
+        return $next($request, $response);
+    }
 }

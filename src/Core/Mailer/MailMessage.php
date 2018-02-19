@@ -19,360 +19,352 @@ use Windwalker\Renderer\RendererInterface;
  */
 class MailMessage
 {
-	/**
-	 * Property subject.
-	 *
-	 * @var  string
-	 */
-	protected $subject;
+    /**
+     * Property subject.
+     *
+     * @var  string
+     */
+    protected $subject;
 
-	/**
-	 * Property to.
-	 *
-	 * @var  array
-	 */
-	protected $to = [];
+    /**
+     * Property to.
+     *
+     * @var  array
+     */
+    protected $to = [];
 
-	/**
-	 * Property from.
-	 *
-	 * @var  array
-	 */
-	protected $from = [];
+    /**
+     * Property from.
+     *
+     * @var  array
+     */
+    protected $from = [];
 
-	/**
-	 * Property cc.
-	 *
-	 * @var  array
-	 */
-	protected $cc = [];
+    /**
+     * Property cc.
+     *
+     * @var  array
+     */
+    protected $cc = [];
 
-	/**
-	 * Property bcc.
-	 *
-	 * @var  array
-	 */
-	protected $bcc = [];
+    /**
+     * Property bcc.
+     *
+     * @var  array
+     */
+    protected $bcc = [];
 
-	/**
-	 * Property content.
-	 *
-	 * @var  string
-	 */
-	protected $body;
+    /**
+     * Property content.
+     *
+     * @var  string
+     */
+    protected $body;
 
-	/**
-	 * Property html.
-	 *
-	 * @var  bool
-	 */
-	protected $html = true;
+    /**
+     * Property html.
+     *
+     * @var  bool
+     */
+    protected $html = true;
 
-	/**
-	 * Property files.
-	 *
-	 * @var  MailAttachment[]
-	 */
-	protected $files = [];
+    /**
+     * Property files.
+     *
+     * @var  MailAttachment[]
+     */
+    protected $files = [];
 
-	/**
-	 * create
-	 *
-	 * @return  MailMessage
-	 */
-	public static function create()
-	{
-		return new static;
-	}
+    /**
+     * create
+     *
+     * @return  MailMessage
+     */
+    public static function create()
+    {
+        return new static;
+    }
 
-	/**
-	 * MailMessage constructor.
-	 *
-	 * @param string $subject
-	 * @param array  $content
-	 * @param bool   $html
-	 */
-	public function __construct($subject = null, $content = null, $html = true)
-	{
-		$this->subject = $subject;
-		$this->body    = $content;
-		$this->html    = $html;
-	}
+    /**
+     * MailMessage constructor.
+     *
+     * @param string $subject
+     * @param array  $content
+     * @param bool   $html
+     */
+    public function __construct($subject = null, $content = null, $html = true)
+    {
+        $this->subject = $subject;
+        $this->body    = $content;
+        $this->html    = $html;
+    }
 
-	/**
-	 * subject
-	 *
-	 * @param   string  $subject
-	 *
-	 * @return  static
-	 */
-	public function subject($subject)
-	{
-		$this->subject = $subject;
+    /**
+     * subject
+     *
+     * @param   string $subject
+     *
+     * @return  static
+     */
+    public function subject($subject)
+    {
+        $this->subject = $subject;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * to
-	 *
-	 * @param string $email
-	 * @param string $name
-	 *
-	 * @return  static
-	 */
-	public function to($email, $name = null)
-	{
-		$this->addEmail('to', $email, $name);
+    /**
+     * to
+     *
+     * @param string $email
+     * @param string $name
+     *
+     * @return  static
+     */
+    public function to($email, $name = null)
+    {
+        $this->addEmail('to', $email, $name);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * from
-	 *
-	 * @param string $email
-	 * @param string $name
-	 *
-	 * @return  static
-	 */
-	public function from($email, $name = null)
-	{
-		$this->addEmail('from', $email, $name);
+    /**
+     * from
+     *
+     * @param string $email
+     * @param string $name
+     *
+     * @return  static
+     */
+    public function from($email, $name = null)
+    {
+        $this->addEmail('from', $email, $name);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * cc
-	 *
-	 * @param string $email
-	 * @param string $name
-	 *
-	 * @return  static
-	 */
-	public function cc($email, $name = null)
-	{
-		$this->addEmail('cc', $email, $name);
+    /**
+     * cc
+     *
+     * @param string $email
+     * @param string $name
+     *
+     * @return  static
+     */
+    public function cc($email, $name = null)
+    {
+        $this->addEmail('cc', $email, $name);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * bcc
-	 *
-	 * @param string $email
-	 * @param string $name
-	 *
-	 * @return  static
-	 */
-	public function bcc($email, $name = null)
-	{
-		$this->addEmail('bcc', $email, $name);
+    /**
+     * bcc
+     *
+     * @param string $email
+     * @param string $name
+     *
+     * @return  static
+     */
+    public function bcc($email, $name = null)
+    {
+        $this->addEmail('bcc', $email, $name);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * content
-	 *
-	 * @param string $body
-	 * @param bool   $html
-	 *
-	 * @return  static
-	 */
-	public function body($body, $html = null)
-	{
-		if ($html !== null)
-		{
-			$this->html($html);
-		}
+    /**
+     * content
+     *
+     * @param string $body
+     * @param bool   $html
+     *
+     * @return  static
+     */
+    public function body($body, $html = null)
+    {
+        if ($html !== null) {
+            $this->html($html);
+        }
 
-		$this->body = $body;
-		
-		return $this;
-	}
+        $this->body = $body;
 
-	/**
-	 * html
-	 *
-	 * @param   boolean  $bool
-	 *
-	 * @return  static
-	 */
-	public function html($bool)
-	{
-		$this->html = (bool) $bool;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * html
+     *
+     * @param   boolean $bool
+     *
+     * @return  static
+     */
+    public function html($bool)
+    {
+        $this->html = (bool) $bool;
 
-	/**
-	 * from
-	 *
-	 * @param string $file
-	 * @param string $name
-	 * @param string $type
-	 *
-	 * @return static
-	 */
-	public function attach($file, $name = null, $type = null)
-	{
-		if (!$file instanceof MailAttachment)
-		{
-			$file = new MailAttachment($file);
-		}
+        return $this;
+    }
 
-		if ($name)
-		{
-			$file->setFilename($name);
-		}
+    /**
+     * from
+     *
+     * @param string $file
+     * @param string $name
+     * @param string $type
+     *
+     * @return static
+     */
+    public function attach($file, $name = null, $type = null)
+    {
+        if (!$file instanceof MailAttachment) {
+            $file = new MailAttachment($file);
+        }
 
-		if ($type)
-		{
-			$file->setContentType($type);
-		}
+        if ($name) {
+            $file->setFilename($name);
+        }
 
-		$this->files[] = $file;
+        if ($type) {
+            $file->setContentType($type);
+        }
 
-		return $this;
-	}
+        $this->files[] = $file;
 
-	/**
-	 * renderBody
-	 *
-	 * @param string                   $layout
-	 * @param array                    $data
-	 * @param string|RendererInterface $engine
-	 * @param string|AbstractPackage   $package
-	 * @param string                   $prefix
-	 *
-	 * @return static
-	 */
-	public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
-	{
-		$widget = WidgetHelper::createWidget($layout, $engine, $package);
-		$widget->setPathPrefix($prefix)->registerPaths(true);
+        return $this;
+    }
 
-		$this->body($widget->render($data), true);
+    /**
+     * renderBody
+     *
+     * @param string                   $layout
+     * @param array                    $data
+     * @param string|RendererInterface $engine
+     * @param string|AbstractPackage   $package
+     * @param string                   $prefix
+     *
+     * @return static
+     */
+    public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
+    {
+        $widget = WidgetHelper::createWidget($layout, $engine, $package);
+        $widget->setPathPrefix($prefix)->registerPaths(true);
 
-		return $this;
-	}
+        $this->body($widget->render($data), true);
 
-	/**
-	 * Method to get property Subject
-	 *
-	 * @return  string
-	 */
-	public function getSubject()
-	{
-		return $this->subject;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property To
-	 *
-	 * @return  array
-	 */
-	public function getTo()
-	{
-		return $this->to;
-	}
+    /**
+     * Method to get property Subject
+     *
+     * @return  string
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
 
-	/**
-	 * Method to get property From
-	 *
-	 * @return  array
-	 */
-	public function getFrom()
-	{
-		return $this->from;
-	}
+    /**
+     * Method to get property To
+     *
+     * @return  array
+     */
+    public function getTo()
+    {
+        return $this->to;
+    }
 
-	/**
-	 * Method to get property Cc
-	 *
-	 * @return  array
-	 */
-	public function getCc()
-	{
-		return $this->cc;
-	}
+    /**
+     * Method to get property From
+     *
+     * @return  array
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
 
-	/**
-	 * Method to get property Bcc
-	 *
-	 * @return  array
-	 */
-	public function getBcc()
-	{
-		return $this->bcc;
-	}
+    /**
+     * Method to get property Cc
+     *
+     * @return  array
+     */
+    public function getCc()
+    {
+        return $this->cc;
+    }
 
-	/**
-	 * Method to get property Content
-	 *
-	 * @return  string
-	 */
-	public function getBody()
-	{
-		return $this->body;
-	}
+    /**
+     * Method to get property Bcc
+     *
+     * @return  array
+     */
+    public function getBcc()
+    {
+        return $this->bcc;
+    }
 
-	/**
-	 * Method to get property Html
-	 *
-	 * @return  boolean
-	 */
-	public function getHtml()
-	{
-		return $this->html;
-	}
+    /**
+     * Method to get property Content
+     *
+     * @return  string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 
-	/**
-	 * Method to get property Files
-	 *
-	 * @return  MailAttachment[]
-	 */
-	public function getFiles()
-	{
-		return $this->files;
-	}
+    /**
+     * Method to get property Html
+     *
+     * @return  boolean
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
 
-	/**
-	 * add
-	 *
-	 * @param string $field
-	 * @param string $email
-	 * @param string $name
-	 *
-	 * @return  void
-	 */
-	protected function addEmail($field, $email, $name = null)
-	{
-		if (is_array($email))
-		{
-			foreach ($email as $mail => $name)
-			{
-				if (is_numeric($mail))
-				{
-					$mail = $name;
-					$name = null;
-				}
+    /**
+     * Method to get property Files
+     *
+     * @return  MailAttachment[]
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
 
-				if ($mail === null)
-				{
-					continue;
-				}
+    /**
+     * add
+     *
+     * @param string $field
+     * @param string $email
+     * @param string $name
+     *
+     * @return  void
+     */
+    protected function addEmail($field, $email, $name = null)
+    {
+        if (is_array($email)) {
+            foreach ($email as $mail => $name) {
+                if (is_numeric($mail)) {
+                    $mail = $name;
+                    $name = null;
+                }
 
-				$this->$field($mail, $name);
-			}
-			
-			return;
-		}
+                if ($mail === null) {
+                    continue;
+                }
 
-		$email = Punycode::toAscii($email);
+                $this->$field($mail, $name);
+            }
 
-		$this->{$field}[$email] = $name;
-	}
+            return;
+        }
+
+        $email = Punycode::toAscii($email);
+
+        $this->{$field}[$email] = $name;
+    }
 }

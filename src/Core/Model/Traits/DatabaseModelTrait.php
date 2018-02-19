@@ -19,104 +19,101 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
  */
 trait DatabaseModelTrait
 {
-	/**
-	 * Property db.
-	 *
-	 * @var  AbstractDatabaseDriver
-	 */
-	protected $db;
+    /**
+     * Property db.
+     *
+     * @var  AbstractDatabaseDriver
+     */
+    protected $db;
 
-	/**
-	 * bootDatabaseModelTrait
-	 *
-	 * @param ModelRepository $model
-	 *
-	 * @return  void
-	 */
-	public function bootDatabaseModelTrait(ModelRepository $model)
-	{
-		// Prepare DB
-		$this->getDb();
-	}
+    /**
+     * bootDatabaseModelTrait
+     *
+     * @param ModelRepository $model
+     *
+     * @return  void
+     */
+    public function bootDatabaseModelTrait(ModelRepository $model)
+    {
+        // Prepare DB
+        $this->getDb();
+    }
 
-	/**
-	 * getDb
-	 *
-	 * @return  AbstractDatabaseDriver
-	 */
-	public function getDb()
-	{
-		if (!$this->db)
-		{
-			$this->db = $this->source;
+    /**
+     * getDb
+     *
+     * @return  AbstractDatabaseDriver
+     */
+    public function getDb()
+    {
+        if (!$this->db) {
+            $this->db = $this->source;
 
-			if (!$this->db instanceof AbstractDatabaseDriver)
-			{
-				$this->db = Ioc::getDatabase();
-			}
-		}
+            if (!$this->db instanceof AbstractDatabaseDriver) {
+                $this->db = Ioc::getDatabase();
+            }
+        }
 
-		return $this->db;
-	}
+        return $this->db;
+    }
 
-	/**
-	 * setDb
-	 *
-	 * @param   AbstractDatabaseDriver $db
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDb($db)
-	{
-		if (!$db instanceof AbstractDatabaseDriver)
-		{
-			throw new \InvalidArgumentException('$db should be AbstractDatabaseDriver.');
-		}
+    /**
+     * setDb
+     *
+     * @param   AbstractDatabaseDriver $db
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDb($db)
+    {
+        if (!$db instanceof AbstractDatabaseDriver) {
+            throw new \InvalidArgumentException('$db should be AbstractDatabaseDriver.');
+        }
 
-		$this->db = $db;
+        $this->db = $db;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * transactionStart
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionStart($nested = true)
-	{
-		$this->getDb()->getTransaction($nested)->start();
+    /**
+     * transactionStart
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionStart($nested = true)
+    {
+        $this->getDb()->getTransaction($nested)->start();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * transactionCommit
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionCommit($nested = true)
-	{
-		$this->getDb()->getTransaction($nested)->commit();
+    /**
+     * transactionCommit
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionCommit($nested = true)
+    {
+        $this->getDb()->getTransaction($nested)->commit();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * transactionRollback
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionRollback($nested = true)
-	{
-		$this->getDb()->getTransaction($nested)->start();
+    /**
+     * transactionRollback
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionRollback($nested = true)
+    {
+        $this->getDb()->getTransaction($nested)->start();
 
-		return $this;
-	}
+        return $this;
+    }
 }

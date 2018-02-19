@@ -13,17 +13,17 @@ namespace Windwalker\Core\Object;
  */
 interface NullObjectInterface extends SilencerObjectInterface
 {
-	/**
-	 * Is this object not contain any values.
-	 *
-	 * @return boolean
-	 */
-	public function isNull();
+    /**
+     * Is this object not contain any values.
+     *
+     * @return boolean
+     */
+    public function isNull();
 
-	/**
-	 * Is this object not contain any values.
-	 *
-	 * @return  boolean
-	 */
-	public function notNull();
+    /**
+     * Is this object not contain any values.
+     *
+     * @return  boolean
+     */
+    public function notNull();
 }

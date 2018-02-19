@@ -15,18 +15,18 @@ namespace Windwalker\Core\Facade;
  */
 abstract class AbstractProxyFacade extends AbstractFacade
 {
-	/**
-	 * Handle dynamic, static calls to the object.
-	 *
-	 * @param   string  $method  The method name.
-	 * @param   array   $args    The arguments of method call.
-	 *
-	 * @return  mixed
-	 */
-	public static function __callStatic($method, $args)
-	{
-		$instance = static::getInstance();
+    /**
+     * Handle dynamic, static calls to the object.
+     *
+     * @param   string $method The method name.
+     * @param   array  $args   The arguments of method call.
+     *
+     * @return  mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        $instance = static::getInstance();
 
-		return $instance->$method(...$args);
-	}
+        return $instance->$method(...$args);
+    }
 }

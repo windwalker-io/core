@@ -19,17 +19,17 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 trait JsonApiTrait
 {
-	use JsonResponseTrait;
+    use JsonResponseTrait;
 
-	/**
-	 * bootHtmlResponseTrait
-	 *
-	 * @param AbstractController $controller
-	 *
-	 * @return  void
-	 */
-	public function bootJsonApiTrait(AbstractController $controller)
-	{
-		$controller->addMiddleware(JsonApiMiddleware::class, PriorityQueue::MAX);
-	}
+    /**
+     * bootHtmlResponseTrait
+     *
+     * @param AbstractController $controller
+     *
+     * @return  void
+     */
+    public function bootJsonApiTrait(AbstractController $controller)
+    {
+        $controller->addMiddleware(JsonApiMiddleware::class, PriorityQueue::MAX);
+    }
 }

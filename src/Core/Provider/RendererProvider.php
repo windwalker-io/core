@@ -27,210 +27,206 @@ use Windwalker\Renderer;
  */
 class RendererProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property messages.
-	 *
-	 * @var  array
-	 */
-	protected static $messages;
+    /**
+     * Property messages.
+     *
+     * @var  array
+     */
+    protected static $messages;
 
-	/**
-	 * Property rendererManager.
-	 *
-	 * @var  RendererManager
-	 */
-	public $rendererManager;
+    /**
+     * Property rendererManager.
+     *
+     * @var  RendererManager
+     */
+    public $rendererManager;
 
-	/**
-	 * boot
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	public function bootDeferred(Container $container)
-	{
-		$this->prepareBlade($container);
-		$this->prepareEdge($container);
-		$this->prepareTwig($container);
-	}
+    /**
+     * boot
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    public function bootDeferred(Container $container)
+    {
+        $this->prepareBlade($container);
+        $this->prepareEdge($container);
+        $this->prepareTwig($container);
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(RendererManager::class, [$this, 'manager']);
-		$container->prepareSharedObject(PackageFinder::class);
-		$container->share(WidgetManager::class, [$this, 'widget']);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(RendererManager::class, [$this, 'manager']);
+        $container->prepareSharedObject(PackageFinder::class);
+        $container->share(WidgetManager::class, [$this, 'widget']);
+    }
 
-	/**
-	 * prepareFactory
-	 *
-	 * @param Container       $container
-	 * @param RendererManager $manager
-	 *
-	 * @return RendererManager
-	 */
-	public function manager(RendererManager $manager, Container $container)
-	{
-		$this->rendererManager = $manager;
+    /**
+     * prepareFactory
+     *
+     * @param Container       $container
+     * @param RendererManager $manager
+     *
+     * @return RendererManager
+     */
+    public function manager(RendererManager $manager, Container $container)
+    {
+        $this->rendererManager = $manager;
 
-		// Prepare Globals
-		$this->prepareGlobals($container, $manager);
+        // Prepare Globals
+        $this->prepareGlobals($container, $manager);
 
-		return $manager;
-	}
+        return $manager;
+    }
 
-	/**
-	 * prepareWidget
-	 *
-	 * @param Container  $container
-	 *
-	 * @return WidgetManager
-	 */
-	public function widget(Container $container)
-	{
-		/** @var RendererManager $rendererManager */
-		$rendererManager = $this->getRendererManager($container);
+    /**
+     * prepareWidget
+     *
+     * @param Container $container
+     *
+     * @return WidgetManager
+     */
+    public function widget(Container $container)
+    {
+        /** @var RendererManager $rendererManager */
+        $rendererManager = $this->getRendererManager($container);
 
-		return new WidgetManager($rendererManager);
-	}
+        return new WidgetManager($rendererManager);
+    }
 
-	/**
-	 * getRendererManager
-	 *
-	 * @param Container $container
-	 *
-	 * @return  RendererManager
-	 */
-	public function getRendererManager(Container $container)
-	{
-		if ($this->rendererManager)
-		{
-			return $this->rendererManager;
-		}
+    /**
+     * getRendererManager
+     *
+     * @param Container $container
+     *
+     * @return  RendererManager
+     */
+    public function getRendererManager(Container $container)
+    {
+        if ($this->rendererManager) {
+            return $this->rendererManager;
+        }
 
-		return $container->get(RendererManager::class);
-	}
+        return $container->get(RendererManager::class);
+    }
 
-	/**
-	 * prepareGlobals
-	 *
-	 * @param Container       $container
-	 * @param RendererManager $manager
-	 *
-	 * @return  RendererManager
-	 */
-	protected function prepareGlobals(Container $container, RendererManager $manager)
-	{
-		$globals = [
-			'uri'        => $container->exists('uri') ? $container->get('uri') : null,
-			'app'        => $container->get('application'),
-			'asset'      => $container->exists('asset') ? $container->get('asset') : null,
-			'messages'   => [], // Deprecated this variable after 4.0
-			'translator' => $container->exists('language') ? $container->get('language') : null,
-			'widget'     => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
-			'datetime'   => new Chronos('now', new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC')))
-		];
+    /**
+     * prepareGlobals
+     *
+     * @param Container       $container
+     * @param RendererManager $manager
+     *
+     * @return  RendererManager
+     */
+    protected function prepareGlobals(Container $container, RendererManager $manager)
+    {
+        $globals = [
+            'uri' => $container->exists('uri') ? $container->get('uri') : null,
+            'app' => $container->get('application'),
+            'asset' => $container->exists('asset') ? $container->get('asset') : null,
+            'messages' => [], // Deprecated this variable after 4.0
+            'translator' => $container->exists('language') ? $container->get('language') : null,
+            'widget' => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
+            'datetime' => new Chronos('now',
+                new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC'))),
+        ];
 
-		$manager->setGlobals($globals);
+        $manager->setGlobals($globals);
 
-		/** @var EventDispatcher $dispatcher */
-		if ($container->exists('dispatcher'))
-		{
-			$dispatcher = $container->get('dispatcher');
+        /** @var EventDispatcher $dispatcher */
+        if ($container->exists('dispatcher')) {
+            $dispatcher = $container->get('dispatcher');
 
-			$dispatcher->triggerEvent('onRendererPrepareGlobals', [
-				'manager' => $manager
-			]);
-		}
+            $dispatcher->triggerEvent('onRendererPrepareGlobals', [
+                'manager' => $manager,
+            ]);
+        }
 
-		return $manager;
-	}
+        return $manager;
+    }
 
-	/**
-	 * prepareEdge
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	protected function prepareEdge(Container $container)
-	{
-		Renderer\Edge\GlobalContainer::addExtension(new EdgeExtension);
-	}
+    /**
+     * prepareEdge
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    protected function prepareEdge(Container $container)
+    {
+        Renderer\Edge\GlobalContainer::addExtension(new EdgeExtension);
+    }
 
-	/**
-	 * prepareTwig
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	protected function prepareTwig(Container $container)
-	{
-		// Twig
-		if (class_exists('Twig_Extension'))
-		{
-			Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
-		}
-	}
+    /**
+     * prepareTwig
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    protected function prepareTwig(Container $container)
+    {
+        // Twig
+        if (class_exists('Twig_Extension')) {
+            Renderer\Twig\GlobalContainer::addExtension('windwalker', new WindwalkerExtension($container));
+        }
+    }
 
-	/**
-	 * prepareBlade
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	protected function prepareBlade(Container $container)
-	{
-		if (!class_exists('Illuminate\View\Compilers\BladeCompiler'))
-		{
-			return;
-		}
+    /**
+     * prepareBlade
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    protected function prepareBlade(Container $container)
+    {
+        if (!class_exists('Illuminate\View\Compilers\BladeCompiler')) {
+            return;
+        }
 
-		$extension = new EdgeExtension;
+        $extension = new EdgeExtension;
 
-		$directives = [
-			'translate' => [$extension, 'translate'],
-			'sprintf'   => [$extension, 'sprintf'],
-			'plural'    => [$extension, 'plural'],
-			'messages'  => [$extension, 'messages'],
-			'widget'    => [$extension, 'widget'],
-			'route'     => [$extension, 'route'],
-			'formToken' => [$extension, 'formToken'],
+        $directives = [
+            'translate' => [$extension, 'translate'],
+            'sprintf' => [$extension, 'sprintf'],
+            'plural' => [$extension, 'plural'],
+            'messages' => [$extension, 'messages'],
+            'widget' => [$extension, 'widget'],
+            'route' => [$extension, 'route'],
+            'formToken' => [$extension, 'formToken'],
 
-			// Authorisation
-			'auth'      => [$extension, 'auth'],
-			'endauth'   => [$extension, 'endauth'],
+            // Authorisation
+            'auth' => [$extension, 'auth'],
+            'endauth' => [$extension, 'endauth'],
 
-			// Asset
-			'assetTemplate' => [$extension, 'assetTemplate'],
-			'endTemplate'   => [$extension, 'endTemplate']
-		];
+            // Asset
+            'assetTemplate' => [$extension, 'assetTemplate'],
+            'endTemplate' => [$extension, 'endTemplate'],
+        ];
 
-		foreach ($directives as $name => $callback)
-		{
-			Renderer\Blade\GlobalContainer::addCompiler($name, $callback);
-		}
+        foreach ($directives as $name => $callback) {
+            Renderer\Blade\GlobalContainer::addCompiler($name, $callback);
+        }
 
-		Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
-	}
+        Renderer\Blade\GlobalContainer::setCachePath($container->get('config')->get('path.cache') . '/view');
+    }
 
-	/**
-	 * Method to get property Messages
-	 *
-	 * @return  array
-	 */
-	public static function getMessages()
-	{
-		return static::$messages;
-	}
+    /**
+     * Method to get property Messages
+     *
+     * @return  array
+     */
+    public static function getMessages()
+    {
+        return static::$messages;
+    }
 }

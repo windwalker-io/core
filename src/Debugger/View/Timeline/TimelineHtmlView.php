@@ -13,26 +13,26 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 
 /**
  * The SystemHtmlView class.
- * 
+ *
  * @since  2.1.1
  */
 class TimelineHtmlView extends AbstractDebuggerHtmlView
 {
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		$profiler = $data->item['profiler'];
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        $profiler = $data->item['profiler'];
 
-		// Find system process points
-		$points = (array) $profiler->getPoints();
+        // Find system process points
+        $points = (array) $profiler->getPoints();
 
-		$data->systemProcess = TimelineHelper::prepareTimeline($points, 'system.process');
-		$data->allProcess = TimelineHelper::prepareTimeline($points);
-	}
+        $data->systemProcess = TimelineHelper::prepareTimeline($points, 'system.process');
+        $data->allProcess    = TimelineHelper::prepareTimeline($points);
+    }
 }

@@ -16,36 +16,35 @@ use Windwalker\DI\ServiceProviderInterface;
 
 /**
  * The LoggerProvider class.
- * 
+ *
  * @since  2.1.1
  */
 class LoggerProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$closure = function(Container $container)
-		{
-			$manager = new LoggerManager($container->get('config')->get('path.logs'));
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $closure = function (Container $container) {
+            $manager = new LoggerManager($container->get('config')->get('path.logs'));
 
-			$manager->addLogger(
-				'message',
-				$manager->createLogger(
-					'message',
-					LogLevel::DEBUG,
-					$container->createSharedObject(MessageHandler::class)
-				)
-			);
+            $manager->addLogger(
+                'message',
+                $manager->createLogger(
+                    'message',
+                    LogLevel::DEBUG,
+                    $container->createSharedObject(MessageHandler::class)
+                )
+            );
 
-			return $manager;
-		};
+            return $manager;
+        };
 
-		$container->share(LoggerManager::class, $closure);
-	}
+        $container->share(LoggerManager::class, $closure);
+    }
 }

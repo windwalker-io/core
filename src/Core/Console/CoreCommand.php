@@ -17,10 +17,10 @@ use Windwalker\Console\Command\Command;
  */
 class CoreCommand extends Command
 {
-	/**
-	 * Property console.
-	 *
-	 * @var  CoreConsole
-	 */
-	protected $console;
+    /**
+     * Property console.
+     *
+     * @var  CoreConsole
+     */
+    protected $console;
 }

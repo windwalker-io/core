@@ -13,49 +13,49 @@ use Windwalker\Filesystem\File;
 
 /**
  * The SyncCommand class.
- * 
+ *
  * @since  2.1.1
  */
 class MakesumCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'makesum';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'makesum';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Make asset sum files';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Make asset sum files';
 
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	public function init()
-	{
-	}
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    public function init()
+    {
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  int
-	 */
-	protected function doExecute()
-	{
-		$cachePath = $this->getOption('cache_path', WINDWALKER_CACHE);
+    /**
+     * doExecute
+     *
+     * @return  int
+     */
+    protected function doExecute()
+    {
+        $cachePath = $this->getOption('cache_path', WINDWALKER_CACHE);
 
-		$sum = md5(uniqid($this->console->get('system.secret')));
+        $sum = md5(uniqid($this->console->get('system.secret')));
 
-		File::write($cachePath . '/asset/MD5SUM', $sum);
+        File::write($cachePath . '/asset/MD5SUM', $sum);
 
-		$this->out('Create SUM: <info>' . $sum . '</info> at <info>' . $cachePath . '/asset/MD5SUM</info>');
+        $this->out('Create SUM: <info>' . $sum . '</info> at <info>' . $cachePath . '/asset/MD5SUM</info>');
 
-		return true;
-	}
+        return true;
+    }
 }

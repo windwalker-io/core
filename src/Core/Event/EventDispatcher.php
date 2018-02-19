@@ -13,183 +13,168 @@ use Windwalker\Event\Event;
 
 /**
  * The EventDispatcher class.
- * 
+ *
  * @since  2.1.1
  */
 class EventDispatcher extends Dispatcher
 {
-	/**
-	 * Property debug.
-	 *
-	 * @var  bool
-	 */
-	protected $debug = false;
+    /**
+     * Property debug.
+     *
+     * @var  bool
+     */
+    protected $debug = false;
 
-	/**
-	 * Property collector.
-	 *
-	 * @var  array
-	 */
-	protected $collector = [];
+    /**
+     * Property collector.
+     *
+     * @var  array
+     */
+    protected $collector = [];
 
-	/**
-	 * Trigger an event.
-	 *
-	 * @param   Event|string $event The event object or name.
-	 * @param   array                 $args  The arguments.
-	 *
-	 * @return  Event  The event after being passed through all listeners.
-	 */
-	public function triggerEvent($event, $args = [])
-	{
-		if (!is_string($event) && !$event instanceof Event)
-		{
-			throw new \InvalidArgumentException(sprintf(
-				'%s::%s only allow Event object or string.', 
-				get_called_class(), 
-				__FUNCTION__
-			));
-		}
+    /**
+     * Trigger an event.
+     *
+     * @param   Event|string $event The event object or name.
+     * @param   array        $args  The arguments.
+     *
+     * @return  Event  The event after being passed through all listeners.
+     */
+    public function triggerEvent($event, $args = [])
+    {
+        if (!is_string($event) && !$event instanceof Event) {
+            throw new \InvalidArgumentException(sprintf(
+                '%s::%s only allow Event object or string.',
+                get_called_class(),
+                __FUNCTION__
+            ));
+        }
 
-		if (!($event instanceof Event))
-		{
-			if (isset($this->events[$event]))
-			{
-				$event = $this->events[$event];
-			}
-			else
-			{
-				$event = new Event($event);
-			}
-		}
+        if (!($event instanceof Event)) {
+            if (isset($this->events[$event])) {
+                $event = $this->events[$event];
+            } else {
+                $event = new Event($event);
+            }
+        }
 
-		$event->mergeArguments($args);
+        $event->mergeArguments($args);
 
-		$listeners = [];
+        $listeners = [];
 
-		if (isset($this->listeners[$event->getName()]))
-		{
-			foreach ($this->listeners[$event->getName()] as $listener)
-			{
-				if ($event->isStopped())
-				{
-					return $event;
-				}
+        if (isset($this->listeners[$event->getName()])) {
+            foreach ($this->listeners[$event->getName()] as $listener) {
+                if ($event->isStopped()) {
+                    return $event;
+                }
 
-				if (!is_callable($listener))
-				{
-					$listener = [$listener, $event->getName()];
-				}
+                if (!is_callable($listener)) {
+                    $listener = [$listener, $event->getName()];
+                }
 
-				if (!is_callable($listener))
-				{
-					continue;
-				}
+                if (!is_callable($listener)) {
+                    continue;
+                }
 
-				$listener($event);
+                $listener($event);
 
-				if ($this->debug)
-				{
-					$listeners[] = $listener;
-				}
-			}
-		}
+                if ($this->debug) {
+                    $listeners[] = $listener;
+                }
+            }
+        }
 
-		if ($this->debug)
-		{
-			$executedListeners = [];
+        if ($this->debug) {
+            $executedListeners = [];
 
-			foreach ($listeners as $listener)
-			{
-				if ($listener instanceof \Closure)
-				{
-					$ref = new \ReflectionFunction($listener);
+            foreach ($listeners as $listener) {
+                if ($listener instanceof \Closure) {
+                    $ref = new \ReflectionFunction($listener);
 
-					$listener = ['{Closure}: ' . $ref->getFileName() . ' - Line: ' . $ref->getStartLine()];
-				}
+                    $listener = ['{Closure}: ' . $ref->getFileName() . ' - Line: ' . $ref->getStartLine()];
+                }
 
-				if (is_object($listener[0]))
-				{
-					$listener[0] = get_class($listener[0]);
-				}
+                if (is_object($listener[0])) {
+                    $listener[0] = get_class($listener[0]);
+                }
 
-				$executedListeners[] = $listener;
-			}
+                $executedListeners[] = $listener;
+            }
 
-			$this->collector[] = [
-				'event' => $event->getName(),
-				'listeners' => $executedListeners
-			];
-		}
+            $this->collector[] = [
+                'event' => $event->getName(),
+                'listeners' => $executedListeners,
+            ];
+        }
 
-		return $event;
-	}
+        return $event;
+    }
 
-	/**
-	 * Add a listener to this dispatcher, only if not already registered to these events.
-	 * If no events are specified, it will be registered to all events matching it's methods name.
-	 * In the case of a closure, you must specify at least one event name.
-	 *
-	 * @param   object|\Closure $listener     The listener
-	 * @param   array|integer   $priorities   An associative array of event names as keys
-	 *                                        and the corresponding listener priority as values.
-	 *
-	 * @return  static  This method is chainable.
-	 *
-	 * @throws  \InvalidArgumentException
-	 */
-	public function addListener($listener, $priorities = [])
-	{
-		parent::addListener($listener, $priorities);
+    /**
+     * Add a listener to this dispatcher, only if not already registered to these events.
+     * If no events are specified, it will be registered to all events matching it's methods name.
+     * In the case of a closure, you must specify at least one event name.
+     *
+     * @param   object|\Closure $listener     The listener
+     * @param   array|integer   $priorities   An associative array of event names as keys
+     *                                        and the corresponding listener priority as values.
+     *
+     * @return  static  This method is chainable.
+     *
+     * @throws  \InvalidArgumentException
+     */
+    public function addListener($listener, $priorities = [])
+    {
+        parent::addListener($listener, $priorities);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Collector
-	 *
-	 * @return  array
-	 */
-	public function getCollector()
-	{
-		return $this->collector;
-	}
+    /**
+     * Method to get property Collector
+     *
+     * @return  array
+     */
+    public function getCollector()
+    {
+        return $this->collector;
+    }
 
-	/**
-	 * Method to set property collector
-	 *
-	 * @param   array  $collector
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setCollector($collector)
-	{
-		$this->collector = $collector;
+    /**
+     * Method to set property collector
+     *
+     * @param   array $collector
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setCollector($collector)
+    {
+        $this->collector = $collector;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Debug
-	 *
-	 * @return  boolean
-	 */
-	public function getDebug()
-	{
-		return $this->debug;
-	}
+    /**
+     * Method to get property Debug
+     *
+     * @return  boolean
+     */
+    public function getDebug()
+    {
+        return $this->debug;
+    }
 
-	/**
-	 * Method to set property debug
-	 *
-	 * @param   boolean $debug
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDebug($debug)
-	{
-		$this->debug = $debug;
+    /**
+     * Method to set property debug
+     *
+     * @param   boolean $debug
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
 
-		return $this;
-	}
+        return $this;
+    }
 }

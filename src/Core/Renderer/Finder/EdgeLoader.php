@@ -17,42 +17,41 @@ use Windwalker\Edge\Loader\EdgeFileLoader;
  */
 class EdgeLoader extends EdgeFileLoader
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinderInterface
-	 */
-	private $finder;
+    /**
+     * Property finder.
+     *
+     * @var  PackageFinderInterface
+     */
+    private $finder;
 
-	/**
-	 * EdgeFileLoader constructor.
-	 *
-	 * @param PackageFinderInterface $finder
-	 * @param array                  $paths
-	 */
-	public function __construct(PackageFinderInterface $finder, array $paths)
-	{
-		$this->finder = $finder;
-		
-		parent::__construct($paths);
-	}
+    /**
+     * EdgeFileLoader constructor.
+     *
+     * @param PackageFinderInterface $finder
+     * @param array                  $paths
+     */
+    public function __construct(PackageFinderInterface $finder, array $paths)
+    {
+        $this->finder = $finder;
 
-	/**
-	 * find
-	 *
-	 * @param string $key
-	 *
-	 * @return  string
-	 */
-	public function find($key)
-	{
-		$path = $this->finder->find($name);
+        parent::__construct($paths);
+    }
 
-		if ($path && !in_array($path, $this->paths))
-		{
-			array_unshift($this->paths, $path);
-		}
+    /**
+     * find
+     *
+     * @param string $key
+     *
+     * @return  string
+     */
+    public function find($key)
+    {
+        $path = $this->finder->find($name);
 
-		return parent::find($name);
-	}
+        if ($path && !in_array($path, $this->paths)) {
+            array_unshift($this->paths, $path);
+        }
+
+        return parent::find($name);
+    }
 }

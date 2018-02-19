@@ -17,24 +17,24 @@ use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
  */
 trait PackageFinderTrait
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinderInterface
-	 */
-	protected $packageFinder;
+    /**
+     * Property finder.
+     *
+     * @var  PackageFinderInterface
+     */
+    protected $packageFinder;
 
-	/**
-	 * setRendererFinder
-	 *
-	 * @param PackageFinderInterface $finder
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackageFinder(PackageFinderInterface $finder)
-	{
-		$this->packageFinder = $finder;
+    /**
+     * setRendererFinder
+     *
+     * @param PackageFinderInterface $finder
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPackageFinder(PackageFinderInterface $finder)
+    {
+        $this->packageFinder = $finder;
 
-		return $this;
-	}
+        return $this;
+    }
 }

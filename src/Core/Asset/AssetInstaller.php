@@ -22,221 +22,205 @@ use Windwalker\Filesystem\Folder;
  */
 class AssetInstaller extends AbstractCommand
 {
-	/**
-	 * Property hooks.
-	 *
-	 * @var  array
-	 */
-	protected $hooks = [];
+    /**
+     * Property hooks.
+     *
+     * @var  array
+     */
+    protected $hooks = [];
 
-	/**
-	 * Property vendorPath.
-	 *
-	 * @var  string
-	 */
-	protected $vendorPath;
+    /**
+     * Property vendorPath.
+     *
+     * @var  string
+     */
+    protected $vendorPath;
 
-	/**
-	 * Property assetPath.
-	 *
-	 * @var  string
-	 */
-	protected $assetPath;
+    /**
+     * Property assetPath.
+     *
+     * @var  string
+     */
+    protected $assetPath;
 
-	/**
-	 * Property assets.
-	 *
-	 * @var  array
-	 */
-	protected $assets;
+    /**
+     * Property assets.
+     *
+     * @var  array
+     */
+    protected $assets;
 
-	/**
-	 * AssetInstaller constructor.
-	 *
-	 * @param string $name
-	 * @param string $vendorPath
-	 * @param string $assetPath
-	 * @param array  $assets
-	 */
-	public function __construct($name, $vendorPath, $assetPath, $assets = [])
-	{
-		$this->vendorPath = realpath($vendorPath);
-		$this->assetPath = realpath($assetPath);
-		$this->assets = $assets;
+    /**
+     * AssetInstaller constructor.
+     *
+     * @param string $name
+     * @param string $vendorPath
+     * @param string $assetPath
+     * @param array  $assets
+     */
+    public function __construct($name, $vendorPath, $assetPath, $assets = [])
+    {
+        $this->vendorPath = realpath($vendorPath);
+        $this->assetPath  = realpath($assetPath);
+        $this->assets     = $assets;
 
-		if (!$this->vendorPath)
-		{
-			throw new \RuntimeException('Vendor path: ' . $vendorPath . ' not exists.');
-		}
+        if (!$this->vendorPath) {
+            throw new \RuntimeException('Vendor path: ' . $vendorPath . ' not exists.');
+        }
 
-		if (!$this->assetPath)
-		{
-			throw new \RuntimeException('Asset path: ' . $assetPath . ' not exists.');
-		}
+        if (!$this->assetPath) {
+            throw new \RuntimeException('Asset path: ' . $assetPath . ' not exists.');
+        }
 
-		parent::__construct($name);
-	}
+        parent::__construct($name);
+    }
 
-	/**
-	 * execute
-	 *
-	 * @return  void
-	 */
-	public function doExecute()
-	{
-		$vendors = (array) $this->assets;
+    /**
+     * execute
+     *
+     * @return  void
+     */
+    public function doExecute()
+    {
+        $vendors = (array) $this->assets;
 
-		foreach ($vendors as $vendor => $files)
-		{
-			if (!is_dir($this->vendorPath . '/' . $vendor))
-			{
-				continue;
-			}
+        foreach ($vendors as $vendor => $files) {
+            if (!is_dir($this->vendorPath . '/' . $vendor)) {
+                continue;
+            }
 
-			$this->runHook('before-' . $vendor, $vendor, $files);
+            $this->runHook('before-' . $vendor, $vendor, $files);
 
-			foreach ($files as $src => $dest)
-			{
-				$message = $this->copy($this->vendorPath . '/' . $vendor . '/' . $src, $this->assetPath . '/' . $dest);
+            foreach ($files as $src => $dest) {
+                $message = $this->copy($this->vendorPath . '/' . $vendor . '/' . $src, $this->assetPath . '/' . $dest);
 
-				$this->out($message);
-			}
+                $this->out($message);
+            }
 
-			$this->runHook('after-' . $vendor, $vendor, $files);
-		}
+            $this->runHook('after-' . $vendor, $vendor, $files);
+        }
 
 //		Folder::delete($this->getVendorPath());
 
-		$this->out('Install complete');
-	}
+        $this->out('Install complete');
+    }
 
-	/**
-	 * addHook
-	 *
-	 * @param string   $name
-	 * @param callable $callable
-	 *
-	 * @return  static
-	 */
-	public function addHook($name, callable $callable)
-	{
-		$this->hooks[$name] = $callable;
+    /**
+     * addHook
+     *
+     * @param string   $name
+     * @param callable $callable
+     *
+     * @return  static
+     */
+    public function addHook($name, callable $callable)
+    {
+        $this->hooks[$name] = $callable;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * runHook
-	 *
-	 * @param   string $name
-	 * @param   string $vendor
-	 * @param   array  $assets
-	 *
-	 * @return mixed|null
-	 */
-	public function runHook($name, $vendor, array $assets = [])
-	{
-		if (!isset($this->hooks[$name]) || !is_callable($this->hooks[$name]))
-		{
-			return null;
-		}
+    /**
+     * runHook
+     *
+     * @param   string $name
+     * @param   string $vendor
+     * @param   array  $assets
+     *
+     * @return mixed|null
+     */
+    public function runHook($name, $vendor, array $assets = [])
+    {
+        if (!isset($this->hooks[$name]) || !is_callable($this->hooks[$name])) {
+            return null;
+        }
 
-		return call_user_func($this->hooks[$name], $this, $vendor, $assets);
-	}
+        return call_user_func($this->hooks[$name], $this, $vendor, $assets);
+    }
 
-	/**
-	 * copy
-	 *
-	 * @param   string  $src
-	 * @param   string  $dest
-	 *
-	 * @return  string
-	 */
-	protected function copy($src, $dest)
-	{
-		if (!is_file($src) && !is_dir($src))
-		{
-			return 'Source File or dir not found: ' . $src;
-		}
+    /**
+     * copy
+     *
+     * @param   string $src
+     * @param   string $dest
+     *
+     * @return  string
+     */
+    protected function copy($src, $dest)
+    {
+        if (!is_file($src) && !is_dir($src)) {
+            return 'Source File or dir not found: ' . $src;
+        }
 
-		if (is_file($src))
-		{
-			File::copy($src, $dest, true);
-		}
-		elseif (is_dir($src))
-		{
-			Folder::copy($src, $dest, true);
-		}
+        if (is_file($src)) {
+            File::copy($src, $dest, true);
+        } elseif (is_dir($src)) {
+            Folder::copy($src, $dest, true);
+        }
 
-		return sprintf('Copy %s ===> %s', $src, $dest);
-	}
+        return sprintf('Copy %s ===> %s', $src, $dest);
+    }
 
-	/**
-	 * Method to get property VendorPath
-	 *
-	 * @return  string
-	 */
-	public function getVendorPath()
-	{
-		return $this->vendorPath;
-	}
+    /**
+     * Method to get property VendorPath
+     *
+     * @return  string
+     */
+    public function getVendorPath()
+    {
+        return $this->vendorPath;
+    }
 
-	/**
-	 * Method to get property AssetPath
-	 *
-	 * @return  string
-	 */
-	public function getAssetPath()
-	{
-		return $this->assetPath;
-	}
+    /**
+     * Method to get property AssetPath
+     *
+     * @return  string
+     */
+    public function getAssetPath()
+    {
+        return $this->assetPath;
+    }
 
-	/**
-	 * Method to get property Assets
-	 *
-	 * @return  array
-	 */
-	public function getAssets()
-	{
-		return $this->assets;
-	}
+    /**
+     * Method to get property Assets
+     *
+     * @return  array
+     */
+    public function getAssets()
+    {
+        return $this->assets;
+    }
 
-	/**
-	 * minify
-	 *
-	 * @param string $file
-	 * @param string $type
-	 *
-	 * @return  static
-	 */
-	public function minify($file, $type = null)
-	{
-		if ($type === null)
-		{
-			$type = File::getExtension($file);
-		}
+    /**
+     * minify
+     *
+     * @param string $file
+     * @param string $type
+     *
+     * @return  static
+     */
+    public function minify($file, $type = null)
+    {
+        if ($type === null) {
+            $type = File::getExtension($file);
+        }
 
-		$type = strtolower($type);
+        $type = strtolower($type);
 
-		if ($type === 'css')
-		{
-			$content = CssMinifier::process(file_get_contents($file));
-		}
-		elseif ($type === 'js')
-		{
-			$content = JsMinifier::process(file_get_contents($file));
-		}
-		else
-		{
-			return $this;
-		}
+        if ($type === 'css') {
+            $content = CssMinifier::process(file_get_contents($file));
+        } elseif ($type === 'js') {
+            $content = JsMinifier::process(file_get_contents($file));
+        } else {
+            return $this;
+        }
 
-		$dest = dirname($file) . '/' . File::stripExtension(File::getFilename($file)) . '.min.' . $type;
+        $dest = dirname($file) . '/' . File::stripExtension(File::getFilename($file)) . '.min.' . $type;
 
-		file_put_contents($dest, $content);
+        file_put_contents($dest, $content);
 
-		$this->out('Minify file: ' . $dest);
+        $this->out('Minify file: ' . $dest);
 
-		return $this;
-	}
+        return $this;
+    }
 }

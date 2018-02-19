@@ -18,328 +18,321 @@ use Windwalker\Utilities\Classes\StringableInterface;
  */
 class RouteString implements StringableInterface
 {
-	/**
-	 * Property route.
-	 *
-	 * @var  string
-	 */
-	protected $route;
+    /**
+     * Property route.
+     *
+     * @var  string
+     */
+    protected $route;
 
-	/**
-	 * Property router.
-	 *
-	 * @var  RouteBuilderInterface
-	 */
-	protected $router;
+    /**
+     * Property router.
+     *
+     * @var  RouteBuilderInterface
+     */
+    protected $router;
 
-	/**
-	 * Property queries.
-	 *
-	 * @var  array
-	 */
-	protected $queries = [];
+    /**
+     * Property queries.
+     *
+     * @var  array
+     */
+    protected $queries = [];
 
-	/**
-	 * Property type.
-	 *
-	 * @var  string
-	 */
-	protected $type = MainRouter::TYPE_PATH;
+    /**
+     * Property type.
+     *
+     * @var  string
+     */
+    protected $type = MainRouter::TYPE_PATH;
 
-	/**
-	 * Property escape.
-	 *
-	 * @var  bool
-	 */
-	protected $escape = false;
+    /**
+     * Property escape.
+     *
+     * @var  bool
+     */
+    protected $escape = false;
 
-	/**
-	 * Property mute.
-	 *
-	 * @var  bool
-	 */
-	protected $mute = false;
+    /**
+     * Property mute.
+     *
+     * @var  bool
+     */
+    protected $mute = false;
 
-	/**
-	 * RouteString constructor.
-	 *
-	 * @param RouteBuilderInterface $router
-	 * @param string                $route
-	 * @param array                 $queries
-	 */
-	public function __construct(RouteBuilderInterface $router, $route, $queries = [])
-	{
-		$this->route  = $route;
-		$this->router = $router;
-		$this->queries = (array) $queries;
-	}
+    /**
+     * RouteString constructor.
+     *
+     * @param RouteBuilderInterface $router
+     * @param string                $route
+     * @param array                 $queries
+     */
+    public function __construct(RouteBuilderInterface $router, $route, $queries = [])
+    {
+        $this->route   = $route;
+        $this->router  = $router;
+        $this->queries = (array) $queries;
+    }
 
-	/**
-	 * type
-	 *
-	 * @param string $type
-	 *
-	 * @return  $this
-	 */
-	public function type($type)
-	{
-		$this->type = $type;
+    /**
+     * type
+     *
+     * @param string $type
+     *
+     * @return  $this
+     */
+    public function type($type)
+    {
+        $this->type = $type;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * full
-	 *
-	 * @return  static
-	 */
-	public function full()
-	{
-		return $this->type(MainRouter::TYPE_FULL);
-	}
+    /**
+     * full
+     *
+     * @return  static
+     */
+    public function full()
+    {
+        return $this->type(MainRouter::TYPE_FULL);
+    }
 
-	/**
-	 * path
-	 *
-	 * @return  static
-	 */
-	public function path()
-	{
-		return $this->type(MainRouter::TYPE_PATH);
-	}
+    /**
+     * path
+     *
+     * @return  static
+     */
+    public function path()
+    {
+        return $this->type(MainRouter::TYPE_PATH);
+    }
 
-	/**
-	 * raw
-	 *
-	 * @return  static
-	 */
-	public function raw()
-	{
-		return $this->type(MainRouter::TYPE_RAW);
-	}
+    /**
+     * raw
+     *
+     * @return  static
+     */
+    public function raw()
+    {
+        return $this->type(MainRouter::TYPE_RAW);
+    }
 
-	/**
-	 * escape
-	 *
-	 * @param bool $bool
-	 *
-	 * @return  $this
-	 */
-	public function escape($bool = true)
-	{
-		$this->escape = (bool) $bool;
+    /**
+     * escape
+     *
+     * @param bool $bool
+     *
+     * @return  $this
+     */
+    public function escape($bool = true)
+    {
+        $this->escape = (bool) $bool;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * id
-	 *
-	 * @param int $id
-	 *
-	 * @return  RouteString
-	 */
-	public function id($id)
-	{
-		return $this->addVar('id', $id);
-	}
+    /**
+     * id
+     *
+     * @param int $id
+     *
+     * @return  RouteString
+     */
+    public function id($id)
+    {
+        return $this->addVar('id', $id);
+    }
 
-	/**
-	 * alias
-	 *
-	 * @param string $alias
-	 *
-	 * @return  RouteString
-	 */
-	public function alias($alias)
-	{
-		return $this->addVar('alias', $alias);
-	}
+    /**
+     * alias
+     *
+     * @param string $alias
+     *
+     * @return  RouteString
+     */
+    public function alias($alias)
+    {
+        return $this->addVar('alias', $alias);
+    }
 
-	/**
-	 * page
-	 *
-	 * @param int $page
-	 *
-	 * @return  RouteString
-	 */
-	public function page($page)
-	{
-		return $this->addVar('page', $page);
-	}
+    /**
+     * page
+     *
+     * @param int $page
+     *
+     * @return  RouteString
+     */
+    public function page($page)
+    {
+        return $this->addVar('page', $page);
+    }
 
-	/**
-	 * addVar
-	 *
-	 * @param string $name
-	 * @param mixed  $value
-	 *
-	 * @return  $this
-	 */
-	public function addVar($name, $value)
-	{
-		$this->queries[$name] = $value;
+    /**
+     * addVar
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return  $this
+     */
+    public function addVar($name, $value)
+    {
+        $this->queries[$name] = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * getVar
-	 *
-	 * @param string $name
-	 * @param mixed  $default
-	 *
-	 * @return  mixed
-	 */
-	public function getVar($name, $default = null)
-	{
-		return Arr::get($this->queries, $name, $default);
-	}
+    /**
+     * getVar
+     *
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return  mixed
+     */
+    public function getVar($name, $default = null)
+    {
+        return Arr::get($this->queries, $name, $default);
+    }
 
-	/**
-	 * toString
-	 *
-	 * @return  string
-	 */
-	public function toString()
-	{
-		if ($this->mute)
-		{
-			$uri = $this->router->generate($this->route, $this->queries, $this->type);
-		}
-		else
-		{
-			$uri = $this->router->route($this->route, $this->queries, $this->type);
-		}
+    /**
+     * toString
+     *
+     * @return  string
+     */
+    public function toString()
+    {
+        if ($this->mute) {
+            $uri = $this->router->generate($this->route, $this->queries, $this->type);
+        } else {
+            $uri = $this->router->route($this->route, $this->queries, $this->type);
+        }
 
-		if ($this->escape)
-		{
-			$uri = $this->router->escape($uri);
-		}
+        if ($this->escape) {
+            $uri = $this->router->escape($uri);
+        }
 
-		return $uri;
-	}
+        return $uri;
+    }
 
-	/**
-	 * Magic method to convert this object to string.
-	 *
-	 * @return  string
-	 */
-	public function __toString()
-	{
-		try
-		{
-			return $this->toString();
-		}
-		catch (\Exception $e)
-		{
-			trigger_error($e->getMessage(), E_USER_ERROR);
-		}
-	}
+    /**
+     * Magic method to convert this object to string.
+     *
+     * @return  string
+     */
+    public function __toString()
+    {
+        try {
+            return $this->toString();
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_ERROR);
+        }
+    }
 
-	/**
-	 * Method to get property Queries
-	 *
-	 * @return  array
-	 */
-	public function getQueries()
-	{
-		return $this->queries;
-	}
+    /**
+     * Method to get property Queries
+     *
+     * @return  array
+     */
+    public function getQueries()
+    {
+        return $this->queries;
+    }
 
-	/**
-	 * Method to set property queries
-	 *
-	 * @param   array $queries
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setQueries($queries)
-	{
-		$this->queries = $queries;
+    /**
+     * Method to set property queries
+     *
+     * @param   array $queries
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setQueries($queries)
+    {
+        $this->queries = $queries;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Route
-	 *
-	 * @return  string
-	 */
-	public function getRoute()
-	{
-		return $this->route;
-	}
+    /**
+     * Method to get property Route
+     *
+     * @return  string
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
 
-	/**
-	 * Method to set property route
-	 *
-	 * @param   string $route
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRoute($route)
-	{
-		$this->route = $route;
+    /**
+     * Method to set property route
+     *
+     * @param   string $route
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRoute($route)
+    {
+        $this->route = $route;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Router
-	 *
-	 * @return  RouteBuilderInterface
-	 */
-	public function getRouter()
-	{
-		return $this->router;
-	}
+    /**
+     * Method to get property Router
+     *
+     * @return  RouteBuilderInterface
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
 
-	/**
-	 * Method to set property router
-	 *
-	 * @param   RouteBuilderInterface $router
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRouter($router)
-	{
-		$this->router = $router;
+    /**
+     * Method to set property router
+     *
+     * @param   RouteBuilderInterface $router
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRouter($router)
+    {
+        $this->router = $router;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Escape
-	 *
-	 * @return  bool
-	 */
-	public function getEscape()
-	{
-		return $this->escape;
-	}
+    /**
+     * Method to get property Escape
+     *
+     * @return  bool
+     */
+    public function getEscape()
+    {
+        return $this->escape;
+    }
 
-	/**
-	 * Method to get property Mute
-	 *
-	 * @return  bool
-	 */
-	public function getMute()
-	{
-		return $this->mute;
-	}
+    /**
+     * Method to get property Mute
+     *
+     * @return  bool
+     */
+    public function getMute()
+    {
+        return $this->mute;
+    }
 
-	/**
-	 * Method to set property mute
-	 *
-	 * @param   bool $mute
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function mute($mute = true)
-	{
-		$this->mute = (bool) $mute;
+    /**
+     * Method to set property mute
+     *
+     * @param   bool $mute
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function mute($mute = true)
+    {
+        $this->mute = (bool) $mute;
 
-		return $this;
-	}
+        return $this;
+    }
 }

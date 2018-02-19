@@ -18,32 +18,31 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 trait CsrfProtectionTrait
 {
-	/**
-	 * bootCsrfProtectionTrait
-	 *
-	 * @return  void
-	 */
-	public function bootCsrfProtectionTrait()
-	{
-		$this->addMiddleware(CsrfProtectionMiddleware::class, PriorityQueue::HIGH);
-	}
+    /**
+     * bootCsrfProtectionTrait
+     *
+     * @return  void
+     */
+    public function bootCsrfProtectionTrait()
+    {
+        $this->addMiddleware(CsrfProtectionMiddleware::class, PriorityQueue::HIGH);
+    }
 
-	/**
-	 * csrfProtect
-	 *
-	 * @param bool $bool
-	 *
-	 * @return  static
-	 */
-	public function csrfProtect($bool = null)
-	{
-		if ($bool === null)
-		{
-			return $this->config->get('csrf_protect', true);
-		}
+    /**
+     * csrfProtect
+     *
+     * @param bool $bool
+     *
+     * @return  static
+     */
+    public function csrfProtect($bool = null)
+    {
+        if ($bool === null) {
+            return $this->config->get('csrf_protect', true);
+        }
 
-		$this->config->set('csrf_protect', (bool) $bool);
+        $this->config->set('csrf_protect', (bool) $bool);
 
-		return $this;
-	}
+        return $this;
+    }
 }

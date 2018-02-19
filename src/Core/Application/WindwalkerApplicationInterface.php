@@ -20,86 +20,86 @@ use Windwalker\Event\EventInterface;
  */
 interface WindwalkerApplicationInterface
 {
-	/**
-	 * getPackage
-	 *
-	 * @param string $name
-	 *
-	 * @return  AbstractPackage
-	 */
-	public function getPackage($name = null);
+    /**
+     * getPackage
+     *
+     * @param string $name
+     *
+     * @return  AbstractPackage
+     */
+    public function getPackage($name = null);
 
-	/**
-	 * addPackage
-	 *
-	 * @param string          $name
-	 * @param AbstractPackage $package
-	 *
-	 * @return  static
-	 */
-	public function addPackage($name, AbstractPackage $package);
+    /**
+     * addPackage
+     *
+     * @param string          $name
+     * @param AbstractPackage $package
+     *
+     * @return  static
+     */
+    public function addPackage($name, AbstractPackage $package);
 
-	/**
-	 * Trigger an event.
-	 *
-	 * @param   EventInterface|string $event The event object or name.
-	 * @param   array                 $args  The arguments.
-	 *
-	 * @return  EventInterface  The event after being passed through all listeners.
-	 *
-	 * @since   2.0
-	 */
-	public function triggerEvent($event, $args = []);
+    /**
+     * Trigger an event.
+     *
+     * @param   EventInterface|string $event The event object or name.
+     * @param   array                 $args  The arguments.
+     *
+     * @return  EventInterface  The event after being passed through all listeners.
+     *
+     * @since   2.0
+     */
+    public function triggerEvent($event, $args = []);
 
-	/**
-	 * Method to get property Container
-	 *
-	 * @return  Container
-	 */
-	public function getContainer();
+    /**
+     * Method to get property Container
+     *
+     * @return  Container
+     */
+    public function getContainer();
 
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName();
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName();
 
-	/**
-	 * Method to get property Mode
-	 *
-	 * @return  string
-	 */
-	public function getMode();
+    /**
+     * Method to get property Mode
+     *
+     * @return  string
+     */
+    public function getMode();
 
-	/**
-	 * addMessage
-	 *
-	 * @param string|array $messages
-	 * @param string       $type
-	 *
-	 * @return  static
-	 */
-	public function addMessage($messages, $type = Bootstrap::MSG_INFO);
+    /**
+     * addMessage
+     *
+     * @param string|array $messages
+     * @param string       $type
+     *
+     * @return  static
+     */
+    public function addMessage($messages, $type = Bootstrap::MSG_INFO);
 
-	/**
-	 * isConsole
-	 *
-	 * @return  boolean
-	 */
-	public function isConsole();
+    /**
+     * isConsole
+     *
+     * @return  boolean
+     */
+    public function isConsole();
 
-	/**
-	 * isWeb
-	 *
-	 * @return  boolean
-	 */
-	public function isWeb();
+    /**
+     * isWeb
+     *
+     * @return  boolean
+     */
+    public function isWeb();
 
-	/**
-	 * isOffline
-	 *
-	 * @return  bool
-	 */
-	public function isOffline();
+    /**
+     * isOffline
+     *
+     * @return  bool
+     */
+    public function isOffline();
 }

@@ -18,52 +18,52 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
  */
 class TableCommand extends CoreCommand
 {
-	use MigrationCommandTrait;
+    use MigrationCommandTrait;
 
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'table';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'table';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Create jobs migraiton file.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Create jobs migraiton file.';
 
-	/**
-	 * Property usage.
-	 *
-	 * @var  string
-	 */
-	protected $usage = '%s <cmd><class_name></cmd> <option>[option]</option>';
+    /**
+     * Property usage.
+     *
+     * @var  string
+     */
+    protected $usage = '%s <cmd><class_name></cmd> <option>[option]</option>';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  bool
-	 */
-	protected function doExecute()
-	{
-		$repository = $this->getRepository();
+    /**
+     * doExecute
+     *
+     * @return  bool
+     */
+    protected function doExecute()
+    {
+        $repository = $this->getRepository();
 
-		$repository->copyMigration(
-			$this->getArgument(0, 'QueueJobInit'),
-			__DIR__ . '/../../../Resources/Templates/migration/queue_jobs.tpl'
-		);
+        $repository->copyMigration(
+            $this->getArgument(0, 'QueueJobInit'),
+            __DIR__ . '/../../../Resources/Templates/migration/queue_jobs.tpl'
+        );
 
-		return true;
-	}
+        return true;
+    }
 }

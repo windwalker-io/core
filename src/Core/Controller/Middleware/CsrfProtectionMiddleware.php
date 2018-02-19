@@ -17,20 +17,19 @@ use Windwalker\Core\Security\CsrfProtection;
  */
 class CsrfProtectionMiddleware extends AbstractControllerMiddleware
 {
-	/**
-	 * Call next middleware.
-	 *
-	 * @param   ControllerData $data
-	 *
-	 * @return  mixed
-	 */
-	public function execute($data = null)
-	{
-		if ($this->controller->config->get('csrf_protect', true))
-		{
-			CsrfProtection::validate();
-		}
+    /**
+     * Call next middleware.
+     *
+     * @param   ControllerData $data
+     *
+     * @return  mixed
+     */
+    public function execute($data = null)
+    {
+        if ($this->controller->config->get('csrf_protect', true)) {
+            CsrfProtection::validate();
+        }
 
-		return $this->next->execute($data);
-	}
+        return $this->next->execute($data);
+    }
 }

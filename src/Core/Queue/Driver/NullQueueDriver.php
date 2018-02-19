@@ -17,51 +17,51 @@ use Windwalker\Core\Queue\QueueMessage;
  */
 class NullQueueDriver implements QueueDriverInterface
 {
-	/**
-	 * push
-	 *
-	 * @param QueueMessage $message
-	 *
-	 * @return int|string
-	 */
-	public function push(QueueMessage $message)
-	{
-		return 0;
-	}
+    /**
+     * push
+     *
+     * @param QueueMessage $message
+     *
+     * @return int|string
+     */
+    public function push(QueueMessage $message)
+    {
+        return 0;
+    }
 
-	/**
-	 * pop
-	 *
-	 * @param string $queue
-	 *
-	 * @return QueueMessage
-	 */
-	public function pop($queue = null)
-	{
-		return new QueueMessage;
-	}
+    /**
+     * pop
+     *
+     * @param string $queue
+     *
+     * @return QueueMessage
+     */
+    public function pop($queue = null)
+    {
+        return new QueueMessage;
+    }
 
-	/**
-	 * delete
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function delete(QueueMessage $message)
-	{
-		return $this;
-	}
+    /**
+     * delete
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function delete(QueueMessage $message)
+    {
+        return $this;
+    }
 
-	/**
-	 * release
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function release(QueueMessage $message)
-	{
-		return $this;
-	}
+    /**
+     * release
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function release(QueueMessage $message)
+    {
+        return $this;
+    }
 }

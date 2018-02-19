@@ -26,367 +26,355 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 class RendererManager
 {
-	use GlobalVarsTrait;
+    use GlobalVarsTrait;
 
-	const PHP      = 'php';
-	const BLADE    = 'blade';
-	const EDGE     = 'edge';
-	const TWIG     = 'twig';
-	const MUSTACHE = 'mustache';
+    const PHP = 'php';
+    const BLADE = 'blade';
+    const EDGE = 'edge';
+    const TWIG = 'twig';
+    const MUSTACHE = 'mustache';
 
-	/**
-	 * A PriorityQueue which extends the SplPriorityQueue.
-	 *
-	 * @var  PriorityQueue.
-	 *
-	 * @since  2.0
-	 */
-	protected $paths;
+    /**
+     * A PriorityQueue which extends the SplPriorityQueue.
+     *
+     * @var  PriorityQueue.
+     *
+     * @since  2.0
+     */
+    protected $paths;
 
-	/**
-	 * Property helpers.
-	 *
-	 * @var  AbstractHelper[]
-	 */
-	protected $helpers = [];
-	
-	/**
-	 * Property config.
-	 *
-	 * @var  Config
-	 */
-	protected $config;
-	
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinder
-	 */
-	protected $finder;
+    /**
+     * Property helpers.
+     *
+     * @var  AbstractHelper[]
+     */
+    protected $helpers = [];
 
-	/**
-	 * RendererFactory constructor.
-	 *
-	 * @param Config        $config
-	 * @param PackageFinder $finder
-	 * @param array         $paths
-	 */
-	public function __construct(Config $config, PackageFinder $finder, $paths = [])
-	{
-		$this->config = $config;
-		$this->finder = $finder;
+    /**
+     * Property config.
+     *
+     * @var  Config
+     */
+    protected $config;
 
-		if ($paths)
-		{
-			$this->setPaths($paths);
-		}
-	}
+    /**
+     * Property finder.
+     *
+     * @var  PackageFinder
+     */
+    protected $finder;
 
-	/**
-	 * Create a renderer object and auto inject the global paths.
-	 *
-	 * @param   string  $type    Renderer engine name, php, blade, twig or mustache.
-	 * @param   array   $config  Renderer config array.
-	 *
-	 * @return  AbstractRenderer|CoreRendererInterface
-	 * @since   2.0
-	 */
-	public function getRenderer($type = self::PHP, $config = [])
-	{
-		$type = strtolower($type);
+    /**
+     * RendererFactory constructor.
+     *
+     * @param Config        $config
+     * @param PackageFinder $finder
+     * @param array         $paths
+     */
+    public function __construct(Config $config, PackageFinder $finder, $paths = [])
+    {
+        $this->config = $config;
+        $this->finder = $finder;
 
-		$class = sprintf('Windwalker\Core\Renderer\%sRenderer', ucfirst($type));
+        if ($paths) {
+            $this->setPaths($paths);
+        }
+    }
 
-		if (!class_exists($class))
-		{
-			$class = sprintf('Windwalker\Renderer\%sRenderer', ucfirst($type));
-		}
+    /**
+     * Create a renderer object and auto inject the global paths.
+     *
+     * @param   string $type   Renderer engine name, php, blade, twig or mustache.
+     * @param   array  $config Renderer config array.
+     *
+     * @return  AbstractRenderer|CoreRendererInterface
+     * @since   2.0
+     */
+    public function getRenderer($type = self::PHP, $config = [])
+    {
+        $type = strtolower($type);
 
-		if (!class_exists($class))
-		{
-			throw new \DomainException(sprintf('%s renderer not supported.', $type));
-		}
+        $class = sprintf('Windwalker\Core\Renderer\%sRenderer', ucfirst($type));
 
-		if ($type === 'blade')
-		{
-			if (empty($config['cache_path']))
-			{
-				$config['cache_path'] = $this->config->get('path.cache') . '/renderer';
-			}
-		}
+        if (!class_exists($class)) {
+            $class = sprintf('Windwalker\Renderer\%sRenderer', ucfirst($type));
+        }
 
-		if ($type === 'edge')
-		{
-			if (empty($config['cache_path']) && !isset($config['cache']))
-			{
-				$config['cache_path'] = $this->config->get('path.cache') . '/renderer';
-			}
-		}
+        if (!class_exists($class)) {
+            throw new \DomainException(sprintf('%s renderer not supported.', $type));
+        }
 
-		if ($type === 'twig')
-		{
-			if (empty($config['path_separator']))
-			{
-				$config['path_separator'] = '.';
-			}
-		}
+        if ($type === 'blade') {
+            if (empty($config['cache_path'])) {
+                $config['cache_path'] = $this->config->get('path.cache') . '/renderer';
+            }
+        }
 
-		/** @var AbstractRenderer|CoreRendererInterface|GlobalVarsTrait $renderer */
-		$renderer = new $class(static::getGlobalPaths(), $config);
+        if ($type === 'edge') {
+            if (empty($config['cache_path']) && !isset($config['cache'])) {
+                $config['cache_path'] = $this->config->get('path.cache') . '/renderer';
+            }
+        }
 
-		$renderer->setPackageFinder($this->finder);
-		$renderer->setGlobals($this->getGlobals());
+        if ($type === 'twig') {
+            if (empty($config['path_separator'])) {
+                $config['path_separator'] = '.';
+            }
+        }
 
-		return $renderer;
-	}
+        /** @var AbstractRenderer|CoreRendererInterface|GlobalVarsTrait $renderer */
+        $renderer = new $class(static::getGlobalPaths(), $config);
 
-	/**
-	 * Create php renderer.
-	 *
-	 * @param   array  $config  Renderer config array.
-	 *
-	 * @return  PhpRenderer
-	 *
-	 * @since   2.0
-	 */
-	public function getPhpRenderer($config = [])
-	{
-		return $this->getRenderer(static::PHP, $config);
-	}
+        $renderer->setPackageFinder($this->finder);
+        $renderer->setGlobals($this->getGlobals());
 
-	/**
-	 * Create blade renderer.
-	 *
-	 * @param   array  $config  Renderer config array.
-	 *
-	 * @return  BladeRenderer
-	 *
-	 * @since   2.0
-	 */
-	public function getBladeRenderer($config = [])
-	{
-		return $this->getRenderer(static::BLADE, $config);
-	}
+        return $renderer;
+    }
 
-	/**
-	 * getEdgeRenderer
-	 *
-	 * @param array $config
-	 *
-	 * @return  EdgeRenderer
-	 *
-	 * @since   3.0
-	 */
-	public function getEdgeRenderer($config = [])
-	{
-		return $this->getRenderer(static::EDGE, $config);
-	}
+    /**
+     * Create php renderer.
+     *
+     * @param   array $config Renderer config array.
+     *
+     * @return  PhpRenderer
+     *
+     * @since   2.0
+     */
+    public function getPhpRenderer($config = [])
+    {
+        return $this->getRenderer(static::PHP, $config);
+    }
 
-	/**
-	 * Create twig renderer.
-	 *
-	 * @param   array  $config  Renderer config array.
-	 *
-	 * @return  TwigRenderer
-	 *
-	 * @since   2.0
-	 */
-	public function getTwigRenderer($config = [])
-	{
-		return $this->getRenderer(static::TWIG, $config);
-	}
+    /**
+     * Create blade renderer.
+     *
+     * @param   array $config Renderer config array.
+     *
+     * @return  BladeRenderer
+     *
+     * @since   2.0
+     */
+    public function getBladeRenderer($config = [])
+    {
+        return $this->getRenderer(static::BLADE, $config);
+    }
 
-	/**
-	 * Create mustache renderer.
-	 *
-	 * @param   array  $config  Renderer config array.
-	 *
-	 * @return  MustacheRenderer
-	 *
-	 * @since   2.0
-	 */
-	public function getMustacheRenderer($config = [])
-	{
-		return $this->getRenderer(static::MUSTACHE, $config);
-	}
+    /**
+     * getEdgeRenderer
+     *
+     * @param array $config
+     *
+     * @return  EdgeRenderer
+     *
+     * @since   3.0
+     */
+    public function getEdgeRenderer($config = [])
+    {
+        return $this->getRenderer(static::EDGE, $config);
+    }
 
-	/**
-	 * Get a clone of global paths.
-	 *
-	 * @return  PriorityQueue
-	 *
-	 * @since   2.0
-	 */
-	public function getGlobalPaths()
-	{
-		return clone $this->getPaths();
-	}
+    /**
+     * Create twig renderer.
+     *
+     * @param   array $config Renderer config array.
+     *
+     * @return  TwigRenderer
+     *
+     * @since   2.0
+     */
+    public function getTwigRenderer($config = [])
+    {
+        return $this->getRenderer(static::TWIG, $config);
+    }
 
-	/**
-	 * Add a global path for Renderer search.
-	 *
-	 * @param   string  $path      The path you want to set.
-	 * @param   int     $priority  Priority flag to order paths.
-	 *
-	 * @return  static
-	 *
-	 * @since   2.0
-	 */
-	public function addGlobalPath($path, $priority = PriorityQueue::LOW)
-	{
-		$this->getPaths()->insert($path, $priority);
+    /**
+     * Create mustache renderer.
+     *
+     * @param   array $config Renderer config array.
+     *
+     * @return  MustacheRenderer
+     *
+     * @since   2.0
+     */
+    public function getMustacheRenderer($config = [])
+    {
+        return $this->getRenderer(static::MUSTACHE, $config);
+    }
 
-		return $this;
-	}
+    /**
+     * Get a clone of global paths.
+     *
+     * @return  PriorityQueue
+     *
+     * @since   2.0
+     */
+    public function getGlobalPaths()
+    {
+        return clone $this->getPaths();
+    }
 
-	/**
-	 * An alias of getGlobalPath()
-	 *
-	 * @param   string  $path      The path you want to set.
-	 * @param   int     $priority  Priority flag to order paths.
-	 *
-	 * @return  static
-	 *
-	 * @since   2.0
-	 */
-	public function addPath($path, $priority = PriorityQueue::LOW)
-	{
-		$this->addGlobalPath($path, $priority);
+    /**
+     * Add a global path for Renderer search.
+     *
+     * @param   string $path     The path you want to set.
+     * @param   int    $priority Priority flag to order paths.
+     *
+     * @return  static
+     *
+     * @since   2.0
+     */
+    public function addGlobalPath($path, $priority = PriorityQueue::LOW)
+    {
+        $this->getPaths()->insert($path, $priority);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Get or create paths queue.
-	 *
-	 * @return  PriorityQueue
-	 *
-	 * @since   2.0
-	 */
-	protected function getPaths()
-	{
-		if (!$this->paths)
-		{
-			$this->paths = new PriorityQueue;
+    /**
+     * An alias of getGlobalPath()
+     *
+     * @param   string $path     The path you want to set.
+     * @param   int    $priority Priority flag to order paths.
+     *
+     * @return  static
+     *
+     * @since   2.0
+     */
+    public function addPath($path, $priority = PriorityQueue::LOW)
+    {
+        $this->addGlobalPath($path, $priority);
 
-			$this->registerPaths();
-		}
+        return $this;
+    }
 
-		return $this->paths;
-	}
+    /**
+     * Get or create paths queue.
+     *
+     * @return  PriorityQueue
+     *
+     * @since   2.0
+     */
+    protected function getPaths()
+    {
+        if (!$this->paths) {
+            $this->paths = new PriorityQueue;
 
-	/**
-	 * Register default global paths.
-	 *
-	 * @return  static
-	 *
-	 * @since   2.0
-	 */
-	protected function registerPaths()
-	{
-		$config = $this->config;
+            $this->registerPaths();
+        }
 
-		// Priority (1)
-		$this->addPath(
-			realpath($config->get('path.templates')),
-			PriorityQueue::LOW - 20
-		);
+        return $this->paths;
+    }
 
-		// Priority (2)
-		$this->addPath(
-			realpath(__DIR__ . '/../Resources/Templates'),
-			PriorityQueue::LOW - 30
-		);
+    /**
+     * Register default global paths.
+     *
+     * @return  static
+     *
+     * @since   2.0
+     */
+    protected function registerPaths()
+    {
+        $config = $this->config;
 
-		return $this;
-	}
+        // Priority (1)
+        $this->addPath(
+            realpath($config->get('path.templates')),
+            PriorityQueue::LOW - 20
+        );
 
-	/**
-	 * Reset all paths.
-	 *
-	 * @return  static
-	 *
-	 * @since   2.0
-	 */
-	public function reset()
-	{
-		$this->paths = null;
+        // Priority (2)
+        $this->addPath(
+            realpath(__DIR__ . '/../Resources/Templates'),
+            PriorityQueue::LOW - 30
+        );
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to set property paths
-	 *
-	 * @param   array $paths
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPaths($paths)
-	{
-		if (!$paths instanceof PriorityQueue)
-		{
-			$paths = new PriorityQueue($paths);
-		}
+    /**
+     * Reset all paths.
+     *
+     * @return  static
+     *
+     * @since   2.0
+     */
+    public function reset()
+    {
+        $this->paths = null;
 
-		$this->paths = $paths;
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property paths
+     *
+     * @param   array $paths
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPaths($paths)
+    {
+        if (!$paths instanceof PriorityQueue) {
+            $paths = new PriorityQueue($paths);
+        }
 
-	/**
-	 * addHelper
-	 *
-	 * @param   string $name
-	 * @param   object $helper
-	 *
-	 * @return  static
-	 */
-	public function addHelper($name, $helper)
-	{
-		$this->helpers[$name] = $helper;
+        $this->paths = $paths;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * getHelper
-	 *
-	 * @param   string  $name
-	 *
-	 * @return  AbstractHelper|object
-	 */
-	public function getHelper($name)
-	{
-		if (empty($this->helpers[$name]))
-		{
-			return null;
-		}
+    /**
+     * addHelper
+     *
+     * @param   string $name
+     * @param   object $helper
+     *
+     * @return  static
+     */
+    public function addHelper($name, $helper)
+    {
+        $this->helpers[$name] = $helper;
 
-		return $this->helpers[$name];
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Helpers
-	 *
-	 * @return  \Windwalker\Core\View\Helper\AbstractHelper[]
-	 */
-	public function getHelpers()
-	{
-		return $this->helpers;
-	}
+    /**
+     * getHelper
+     *
+     * @param   string $name
+     *
+     * @return  AbstractHelper|object
+     */
+    public function getHelper($name)
+    {
+        if (empty($this->helpers[$name])) {
+            return null;
+        }
 
-	/**
-	 * Method to set property helpers
-	 *
-	 * @param   \Windwalker\Core\View\Helper\AbstractHelper[] $helpers
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setHelpers($helpers)
-	{
-		$this->helpers = $helpers;
+        return $this->helpers[$name];
+    }
 
-		return $this;
-	}
+    /**
+     * Method to get property Helpers
+     *
+     * @return  \Windwalker\Core\View\Helper\AbstractHelper[]
+     */
+    public function getHelpers()
+    {
+        return $this->helpers;
+    }
+
+    /**
+     * Method to set property helpers
+     *
+     * @param   \Windwalker\Core\View\Helper\AbstractHelper[] $helpers
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setHelpers($helpers)
+    {
+        $this->helpers = $helpers;
+
+        return $this;
+    }
 }

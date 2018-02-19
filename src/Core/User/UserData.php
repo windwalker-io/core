@@ -12,28 +12,28 @@ use Windwalker\Data\Data;
 
 /**
  * The UserData class.
- * 
+ *
  * @since  2.0
  */
 class UserData extends Data implements UserDataInterface
 {
-	/**
-	 * isLogin
-	 *
-	 * @return  boolean
-	 */
-	public function isGuest()
-	{
-		return !count($this);
-	}
+    /**
+     * isLogin
+     *
+     * @return  boolean
+     */
+    public function isGuest()
+    {
+        return !count($this);
+    }
 
-	/**
-	 * notLogin
-	 *
-	 * @return  boolean
-	 */
-	public function isMember()
-	{
-		return !$this->isGuest();
-	}
+    /**
+     * notLogin
+     *
+     * @return  boolean
+     */
+    public function isMember()
+    {
+        return !$this->isGuest();
+    }
 }

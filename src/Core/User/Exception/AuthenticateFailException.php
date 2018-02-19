@@ -12,10 +12,10 @@ use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
 
 /**
  * The UserLogoutException class.
- * 
+ *
  * @since  2.0
  */
 class AuthenticateFailException extends \RuntimeException
 {
-	use MultiMessagesExceptionTrait;
+    use MultiMessagesExceptionTrait;
 }

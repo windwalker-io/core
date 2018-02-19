@@ -7,30 +7,30 @@
  */
 
 return [
-	'providers' =>[
-	],
+    'providers' => [
+    ],
 
-	'routing' => [
-		'files' => [
-		]
-	],
+    'routing' => [
+        'files' => [
+        ],
+    ],
 
-	'middlewares' => [
+    'middlewares' => [
 
-	],
+    ],
 
-	'configs' => [
+    'configs' => [
 
-	],
+    ],
 
-	'listeners' => [
+    'listeners' => [
 
-	],
+    ],
 
-	'console' => [
-		'commands' => [
-			\Windwalker\SystemPackage\Command\SystemCommand::class,
-			\Windwalker\SystemPackage\Command\RunCommand::class
-		]
-	]
+    'console' => [
+        'commands' => [
+            \Windwalker\SystemPackage\Command\SystemCommand::class,
+            \Windwalker\SystemPackage\Command\RunCommand::class,
+        ],
+    ],
 ];

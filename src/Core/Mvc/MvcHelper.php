@@ -10,77 +10,73 @@ namespace Windwalker\Core\Mvc;
 
 /**
  * The MvcHelper class.
- * 
+ *
  * @since  2.1.5.8
  */
 abstract class MvcHelper
 {
-	/**
-	 * guessName
-	 *
-	 * @param string|object $class
-	 * @param int           $backwards
-	 * @param string        $default
-	 *
-	 * @return  string
-	 */
-	public static function guessName($class, $backwards = 2, $default = 'default')
-	{
-		if (!is_string($class))
-		{
-			$class = get_class($class);
-		}
+    /**
+     * guessName
+     *
+     * @param string|object $class
+     * @param int           $backwards
+     * @param string        $default
+     *
+     * @return  string
+     */
+    public static function guessName($class, $backwards = 2, $default = 'default')
+    {
+        if (!is_string($class)) {
+            $class = get_class($class);
+        }
 
-		$class = explode('\\', $class);
+        $class = explode('\\', $class);
 
-		$name = null;
+        $name = null;
 
-		foreach (range(1, $backwards) as $i)
-		{
-			$name = array_pop($class);
-		}
+        foreach (range(1, $backwards) as $i) {
+            $name = array_pop($class);
+        }
 
-		$name = $name ? : $default;
+        $name = $name ?: $default;
 
-		return strtolower($name);
-	}
+        return strtolower($name);
+    }
 
-	/**
-	 * guessPackage
-	 *
-	 * @param string|object $class
-	 * @param int           $backwards
-	 * @param string        $default
-	 *
-	 * @return  string
-	 */
-	public static function guessPackage($class, $backwards = 4, $default = null)
-	{
-		return static::guessName($class, $backwards, $default);
-	}
+    /**
+     * guessPackage
+     *
+     * @param string|object $class
+     * @param int           $backwards
+     * @param string        $default
+     *
+     * @return  string
+     */
+    public static function guessPackage($class, $backwards = 4, $default = null)
+    {
+        return static::guessName($class, $backwards, $default);
+    }
 
-	/**
-	 * getPackageNamespace
-	 *
-	 * @param string|object $class
-	 * @param int           $backwards
-	 *
-	 * @return  string
-	 */
-	public static function getPackageNamespace($class, $backwards = 3)
-	{
-		if (!is_string($class))
-		{
-			$class = get_class($class);
-		}
+    /**
+     * getPackageNamespace
+     *
+     * @param string|object $class
+     * @param int           $backwards
+     *
+     * @return  string
+     */
+    public static function getPackageNamespace($class, $backwards = 3)
+    {
+        if (!is_string($class)) {
+            $class = get_class($class);
+        }
 
-		$class = explode('\\', $class);
+        $class = explode('\\', $class);
 
-		foreach (range(1, $backwards) as $i)
-		{
-			array_pop($class);
-		}
+        foreach (range(1, $backwards) as $i) {
+            array_pop($class);
+        }
 
-		return implode('\\', $class);
-	}
+        return implode('\\', $class);
+    }
 }

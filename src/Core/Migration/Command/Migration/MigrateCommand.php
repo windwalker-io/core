@@ -14,107 +14,100 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 
 /**
  * The MigrateCommand class.
- * 
+ *
  * @since  2.0
  */
 class MigrateCommand extends CoreCommand
 {
-	use MigrationCommandTrait;
+    use MigrationCommandTrait;
 
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'migrate';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'migrate';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Migrate the database';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Migrate the database';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'migrate <cmd><version></cmd> <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'migrate <cmd><version></cmd> <option>[option]</option>';
 
-	/**
-	 * Configure command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-		$this->addOption('s')
-			->alias('seed')
-			->description('Also import seeds.');
+    /**
+     * Configure command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+        $this->addOption('s')
+            ->alias('seed')
+            ->description('Also import seeds.');
 
-		$this->addOption('no-backup')
-			->description('Do not backup database.');
-	}
+        $this->addOption('no-backup')
+            ->description('Do not backup database.');
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 * @throws \Exception
-	 */
-	protected function doExecute()
-	{
-		if ($this->console->getMode() !== 'dev')
-		{
-			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
-		}
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     * @throws \Exception
+     */
+    protected function doExecute()
+    {
+        if ($this->console->getMode() !== 'dev') {
+            throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+        }
 
-		$repository = $this->getRepository();
+        $repository = $this->getRepository();
 
-		if (!$this->getOption('no-backup'))
-		{
-			// backup
-			$this->backup();
-		}
+        if (!$this->getOption('no-backup')) {
+            // backup
+            $this->backup();
+        }
 
-		$repository['path'] = $this->console->get('migration.dir');
+        $repository['path'] = $this->console->get('migration.dir');
 
-		try
-		{
-			$repository->migrate($this->getArgument(0, null));
+        try {
+            $repository->migrate($this->getArgument(0, null));
 
-			if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0')
-			{
-				$io = clone $this->io;
+            if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0') {
+                $io = clone $this->io;
 
-				$io->setArguments(['seed', 'import']);
-				$io->setOption('no-backup', true);
+                $io->setArguments(['seed', 'import']);
+                $io->setOption('no-backup', true);
 
-				$this->console->getRootCommand()->setIO($io)->execute();
-			}
-		}
-		catch (\Exception $e)
-		{
-			$prompter = new BooleanPrompter;
+                $this->console->getRootCommand()->setIO($io)->execute();
+            }
+        } catch (\Exception $e) {
+            $prompter = new BooleanPrompter;
 
-			$this->out()->out('<error>An error occurred: ' . $e->getMessage() . '</error>');
+            $this->out()->out('<error>An error occurred: ' . $e->getMessage() . '</error>');
 
-			if ($prompter->ask('Do you want to restore to last backup? [Y/n] (Y): ', true))
-			{
-				$this->getBackupRepository()->restoreLatest();
-			}
+            if ($prompter->ask('Do you want to restore to last backup? [Y/n] (Y): ', true)) {
+                $this->getBackupRepository()->restoreLatest();
+            }
 
-			throw $e;
-		}
+            throw $e;
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

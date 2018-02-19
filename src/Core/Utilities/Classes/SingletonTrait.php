@@ -15,43 +15,42 @@ namespace Windwalker\Core\Utilities\Classes;
  */
 trait SingletonTrait
 {
-	/**
-	 * Property instances.
-	 *
-	 * @var  array
-	 */
-	protected static $instances = [];
+    /**
+     * Property instances.
+     *
+     * @var  array
+     */
+    protected static $instances = [];
 
-	/**
-	 * getInstance
-	 *
-	 * @param array  ...$args
-	 *
-	 * @return static
-	 */
-	public static function getInstance(...$args)
-	{
-		$class = get_called_class();
+    /**
+     * getInstance
+     *
+     * @param array ...$args
+     *
+     * @return static
+     */
+    public static function getInstance(...$args)
+    {
+        $class = get_called_class();
 
-		if (empty(static::$instances[$class]))
-		{
-			static::$instances[$class] = new $class(...$args);
-		}
+        if (empty(static::$instances[$class])) {
+            static::$instances[$class] = new $class(...$args);
+        }
 
-		return static::$instances[$class];
-	}
+        return static::$instances[$class];
+    }
 
-	/**
-	 * setInstance
-	 *
-	 * @param object $instance
-	 *
-	 * @return  mixed
-	 */
-	public static function setInstance($instance)
-	{
-		$class = get_called_class();
+    /**
+     * setInstance
+     *
+     * @param object $instance
+     *
+     * @return  mixed
+     */
+    public static function setInstance($instance)
+    {
+        $class = get_called_class();
 
-		return static::$instances[$class] = $instance;
-	}
+        return static::$instances[$class] = $instance;
+    }
 }

@@ -16,49 +16,46 @@ use Windwalker\DataMapper\DataMapper;
 
 /**
  * The DatabaseMethod class.
- * 
+ *
  * @since  2.0
  */
 class DatabaseMethod extends AbstractMethod
 {
-	/**
-	 * authenticate
-	 *
-	 * @param Credential $credential
-	 *
-	 * @return  integer
-	 */
-	public function authenticate(Credential $credential)
-	{
-		if (!$credential->username || !$credential->password)
-		{
-			$this->status = Authentication::EMPTY_CREDENTIAL;
+    /**
+     * authenticate
+     *
+     * @param Credential $credential
+     *
+     * @return  integer
+     */
+    public function authenticate(Credential $credential)
+    {
+        if (!$credential->username || !$credential->password) {
+            $this->status = Authentication::EMPTY_CREDENTIAL;
 
-			return false;
-		}
+            return false;
+        }
 
-		$datamapper = new DataMapper('users');
+        $datamapper = new DataMapper('users');
 
-		$user = $datamapper->findOne(['username' => $credential->username]);
+        $user = $datamapper->findOne(['username' => $credential->username]);
 
-		if ($user->isNull())
-		{
-			$this->status = Authentication::USER_NOT_FOUND;
+        if ($user->isNull()) {
+            $this->status = Authentication::USER_NOT_FOUND;
 
-			return false;
-		}
+            return false;
+        }
 
-		if (!Hasher::verify($credential->password, $user->password))
-		{
-			$this->status = Authentication::INVALID_CREDENTIAL;
+        if (!Hasher::verify($credential->password, $user->password)) {
+            $this->status = Authentication::INVALID_CREDENTIAL;
 
-			return false;
-		}
+            return false;
+        }
 
-		$credential->bind($user);
+        $credential->bind($user);
 
-		$this->status = Authentication::SUCCESS;
+        $this->status = Authentication::SUCCESS;
 
-		return true;
-	}
+        return true;
+    }
 }

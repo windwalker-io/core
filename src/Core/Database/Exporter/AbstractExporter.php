@@ -18,30 +18,30 @@ use Windwalker\Core\Model\Traits\DatabaseModelTrait;
  */
 abstract class AbstractExporter extends ModelRepository
 {
-	use DatabaseModelTrait;
+    use DatabaseModelTrait;
 
-	/**
-	 * export
-	 *
-	 * @return mixed|string
-	 */
-	abstract public function export();
+    /**
+     * export
+     *
+     * @return mixed|string
+     */
+    abstract public function export();
 
-	/**
-	 * getCreateTable
-	 *
-	 * @param string $table
-	 *
-	 * @return array|mixed|string
-	 */
-	abstract protected function getCreateTable($table);
+    /**
+     * getCreateTable
+     *
+     * @param string $table
+     *
+     * @return array|mixed|string
+     */
+    abstract protected function getCreateTable($table);
 
-	/**
-	 * getInserts
-	 *
-	 * @param string $table
-	 *
-	 * @return mixed|null|string
-	 */
-	abstract protected function getInserts($table);
+    /**
+     * getInserts
+     *
+     * @param string $table
+     *
+     * @return mixed|null|string
+     */
+    abstract protected function getInserts($table);
 }

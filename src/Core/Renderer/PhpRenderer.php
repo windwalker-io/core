@@ -19,44 +19,43 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 class PhpRenderer extends \Windwalker\Renderer\PhpRenderer implements CoreRendererInterface
 {
-	use PackageFinderTrait;
-	use GlobalVarsTrait;
+    use PackageFinderTrait;
+    use GlobalVarsTrait;
 
-	/**
-	 * createSelf
-	 *
-	 * @return  static
-	 */
-	protected function createSelf()
-	{
-		$renderer = parent::createSelf();
+    /**
+     * createSelf
+     *
+     * @return  static
+     */
+    protected function createSelf()
+    {
+        $renderer = parent::createSelf();
 
-		$renderer->setPackageFinder($this->packageFinder);
+        $renderer->setPackageFinder($this->packageFinder);
 
-		return $renderer;
-	}
+        return $renderer;
+    }
 
-	/**
-	 * finFile
-	 *
-	 * @param string $file
-	 * @param string $ext
-	 *
-	 * @return  string
-	 */
-	public function findFile($file, $ext = 'php')
-	{
-		static $paths = [];
+    /**
+     * finFile
+     *
+     * @param string $file
+     * @param string $ext
+     *
+     * @return  string
+     */
+    public function findFile($file, $ext = 'php')
+    {
+        static $paths = [];
 
-		$path = $this->packageFinder->find($file, $ext);
+        $path = $this->packageFinder->find($file, $ext);
 
-		if ($path && !isset($paths[$path]))
-		{
-			$this->addPath($path, PriorityQueue::MAX);
+        if ($path && !isset($paths[$path])) {
+            $this->addPath($path, PriorityQueue::MAX);
 
-			$paths[$path] = true;
-		}
+            $paths[$path] = true;
+        }
 
-		return parent::findFile($file, $ext);
-	}
+        return parent::findFile($file, $ext);
+    }
 }

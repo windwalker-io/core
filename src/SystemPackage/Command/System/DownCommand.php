@@ -18,56 +18,53 @@ use Windwalker\Filesystem\File;
  */
 class DownCommand extends CoreCommand
 {
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'down';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'down';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Make site offline.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Make site offline.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = '%s [options]';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = '%s [options]';
 
-	/**
-	 * Property offline.
-	 *
-	 * @var  boolean
-	 */
-	protected $offline = true;
+    /**
+     * Property offline.
+     *
+     * @var  boolean
+     */
+    protected $offline = true;
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int
-	 *
-	 * @since  2.0
-	 */
-	protected function doExecute()
-	{
-		$tmpFile = WINDWALKER_TEMP . '/offline';
+    /**
+     * Execute this command.
+     *
+     * @return int
+     *
+     * @since  2.0
+     */
+    protected function doExecute()
+    {
+        $tmpFile = WINDWALKER_TEMP . '/offline';
 
-		if ($this->offline)
-		{
-			File::write($tmpFile, 'off');
-		}
-		elseif (is_file($tmpFile))
-		{
-			File::delete($tmpFile);
-		}
+        if ($this->offline) {
+            File::write($tmpFile, 'off');
+        } elseif (is_file($tmpFile)) {
+            File::delete($tmpFile);
+        }
 
-		$this->out()->out($this->description);
+        $this->out()->out($this->description);
 
-		return true;
-	}
+        return true;
+    }
 }

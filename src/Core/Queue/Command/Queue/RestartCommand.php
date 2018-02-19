@@ -19,46 +19,46 @@ use Windwalker\Filesystem\File;
  */
 class RestartCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'restart';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'restart';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Send restart signal to all workers.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Send restart signal to all workers.';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addOption('t')
-			->alias('time')
-			->defaultValue('now')
-			->description('The time to restart all workers.');
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addOption('t')
+            ->alias('time')
+            ->defaultValue('now')
+            ->description('The time to restart all workers.');
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  bool
-	 */
-	protected function doExecute()
-	{
-		$file = $this->console->get('path.temp') . '/queue/restart';
+    /**
+     * doExecute
+     *
+     * @return  bool
+     */
+    protected function doExecute()
+    {
+        $file = $this->console->get('path.temp') . '/queue/restart';
 
-		File::write($file, Chronos::create($this->getOption('time'))->toUnix());
+        File::write($file, Chronos::create($this->getOption('time'))->toUnix());
 
-		$this->out('Sent restart signal to all workers.');
+        $this->out('Sent restart signal to all workers.');
 
-		return true;
-	}
+        return true;
+    }
 }

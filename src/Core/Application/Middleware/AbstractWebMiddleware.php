@@ -19,29 +19,29 @@ use Windwalker\Middleware\Psr7InvokableInterface;
  */
 abstract class AbstractWebMiddleware implements Psr7InvokableInterface
 {
-	/**
-	 * Property app.
-	 *
-	 * @var  WebApplication
-	 */
-	protected $app;
+    /**
+     * Property app.
+     *
+     * @var  WebApplication
+     */
+    protected $app;
 
-	/**
-	 * Property package.
-	 *
-	 * @var  AbstractPackage
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var  AbstractPackage
+     */
+    protected $package;
 
-	/**
-	 * AbstractApplicationMiddleware constructor.
-	 *
-	 * @param WebApplication  $app
-	 * @param AbstractPackage $package
-	 */
-	public function __construct(WebApplication $app, AbstractPackage $package = null)
-	{
-		$this->app = $app;
-		$this->package = $package;
-	}
+    /**
+     * AbstractApplicationMiddleware constructor.
+     *
+     * @param WebApplication  $app
+     * @param AbstractPackage $package
+     */
+    public function __construct(WebApplication $app, AbstractPackage $package = null)
+    {
+        $this->app     = $app;
+        $this->package = $package;
+    }
 }

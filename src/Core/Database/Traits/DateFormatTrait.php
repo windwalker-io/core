@@ -15,23 +15,23 @@ namespace Windwalker\Core\Database\Traits;
  */
 trait DateFormatTrait
 {
-	/**
-	 * getDateFormat
-	 *
-	 * @return  string
-	 */
-	public function getDateFormat()
-	{
-		return $this->db->getQuery(true)->getDateFormat();
-	}
+    /**
+     * getDateFormat
+     *
+     * @return  string
+     */
+    public function getDateFormat()
+    {
+        return $this->db->getQuery(true)->getDateFormat();
+    }
 
-	/**
-	 * getNullDate
-	 *
-	 * @return  string
-	 */
-	public function getNullDate()
-	{
-		return $this->db->getQuery(true)->getNullDate();
-	}
+    /**
+     * getNullDate
+     *
+     * @return  string
+     */
+    public function getNullDate()
+    {
+        return $this->db->getQuery(true)->getNullDate();
+    }
 }

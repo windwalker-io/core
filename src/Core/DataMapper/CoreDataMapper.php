@@ -13,7 +13,7 @@ use Windwalker\DataMapper\AbstractDatabaseMapperProxy;
 /**
  * The AbstractDataMapperFacade class.
  *
- * @since  2.1.8
+ * @since       2.1.8
  *
  * @deprecated  Use AbstractDatabaseMapperProxy instead.
  */

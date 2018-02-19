@@ -13,22 +13,22 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 
 /**
  * The SystemHtmlView class.
- * 
+ *
  * @since  2.1.1
  */
 class ExceptionHtmlView extends AbstractDebuggerHtmlView
 {
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		$data->collector = $data->item['collector'];
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        $data->collector = $data->item['collector'];
 
-		$data->exception = new Data($data->collector['exception']);
-	}
+        $data->exception = new Data($data->collector['exception']);
+    }
 }

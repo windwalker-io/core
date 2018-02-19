@@ -17,12 +17,12 @@ use Windwalker\Core\Mailer\MailMessage;
  */
 interface MailerAdapterInterface
 {
-	/**
-	 * send
-	 *
-	 * @param MailMessage $message
-	 *
-	 * @return  boolean
-	 */
-	public function send(MailMessage $message);
+    /**
+     * send
+     *
+     * @param MailMessage $message
+     *
+     * @return  boolean
+     */
+    public function send(MailMessage $message);
 }

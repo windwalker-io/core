@@ -20,21 +20,20 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
  */
 class BladeRenderer extends \Windwalker\Renderer\BladeRenderer implements CoreRendererInterface
 {
-	use PackageFinderTrait;
-	use GlobalVarsTrait;
+    use PackageFinderTrait;
+    use GlobalVarsTrait;
 
-	/**
-	 * Method to get property Finder
-	 *
-	 * @return  FileViewFinder
-	 */
-	public function getFinder()
-	{
-		if (!$this->finder)
-		{
-			$this->finder = new BladeFinder($this->packageFinder, $this->getFilesystem(), $this->dumpPaths());
-		}
+    /**
+     * Method to get property Finder
+     *
+     * @return  FileViewFinder
+     */
+    public function getFinder()
+    {
+        if (!$this->finder) {
+            $this->finder = new BladeFinder($this->packageFinder, $this->getFilesystem(), $this->dumpPaths());
+        }
 
-		return $this->finder;
-	}
+        return $this->finder;
+    }
 }

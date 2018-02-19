@@ -15,12 +15,12 @@ namespace Windwalker\Core\Renderer\Finder;
  */
 interface PackageFinderInterface
 {
-	/**
-	 * find
-	 *
-	 * @param  string  $file
-	 *
-	 * @return string
-	 */
-	public function find(&$file);
+    /**
+     * find
+     *
+     * @param  string $file
+     *
+     * @return string
+     */
+    public function find(&$file);
 }

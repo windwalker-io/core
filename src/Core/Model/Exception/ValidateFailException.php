@@ -17,5 +17,5 @@ use Windwalker\Core\Utilities\Exception\MultiMessagesExceptionTrait;
  */
 class ValidateFailException extends \RuntimeException
 {
-	use MultiMessagesExceptionTrait;
+    use MultiMessagesExceptionTrait;
 }

@@ -17,92 +17,85 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class DocblockHelper
 {
-	/**
-	 * listVarTypes
-	 *
-	 * @param array $data
-	 *
-	 * @return  string
-	 */
-	public static function listVarTypes(array $data)
-	{
-		$vars = [];
+    /**
+     * listVarTypes
+     *
+     * @param array $data
+     *
+     * @return  string
+     */
+    public static function listVarTypes(array $data)
+    {
+        $vars = [];
 
-		foreach ($data as $key => $value)
-		{
-			if (is_object($value))
-			{
-				$type = '\\' . get_class($value);
-			}
-			else
-			{
-				$type = gettype($value);
-			}
+        foreach ($data as $key => $value) {
+            if (is_object($value)) {
+                $type = '\\' . get_class($value);
+            } else {
+                $type = gettype($value);
+            }
 
-			$vars[] = sprintf(' * @var  $%s  %s', $key, $type);
-		}
+            $vars[] = sprintf(' * @var  $%s  %s', $key, $type);
+        }
 
-		return static::renderDocblock(implode("\n", $vars));
-	}
+        return static::renderDocblock(implode("\n", $vars));
+    }
 
-	/**
-	 * listMethods
-	 *
-	 * @param mixed $class
-	 * @param int   $type
-	 *
-	 * @return  string
-	 */
-	public static function listMethods($class, $type = \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC)
-	{
-		$methods = ReflectionHelper::getMethods($class, $type);
+    /**
+     * listMethods
+     *
+     * @param mixed $class
+     * @param int   $type
+     *
+     * @return  string
+     */
+    public static function listMethods($class, $type = \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC)
+    {
+        $methods = ReflectionHelper::getMethods($class, $type);
 
-		$lines = [];
+        $lines = [];
 
-		/** @var \ReflectionMethod $method */
-		foreach ($methods as $method)
-		{
-			preg_match('/\s+\*\s+@return\s+([\w]+)\s*[\w ]*/', $method->getDocComment(), $matches);
+        /** @var \ReflectionMethod $method */
+        foreach ($methods as $method) {
+            preg_match('/\s+\*\s+@return\s+([\w]+)\s*[\w ]*/', $method->getDocComment(), $matches);
 
-			$return = isset($matches[1]) ? $matches[1] : 'void';
+            $return = isset($matches[1]) ? $matches[1] : 'void';
 
-			if ($return == 'static' || $return == 'self' || $return == '$this')
-			{
-				$return = $method->getDeclaringClass()->getName();
-			}
+            if ($return == 'static' || $return == 'self' || $return == '$this') {
+                $return = $method->getDeclaringClass()->getName();
+            }
 
-			if (class_exists($return))
-			{
-				$return = '\\' . $return;
-			}
+            if (class_exists($return)) {
+                $return = '\\' . $return;
+            }
 
-			$source = file($method->getFileName());
-			$body = implode("", array_slice($source, $method->getStartLine() - 1, 1));
+            $source = file($method->getFileName());
+            $body   = implode("", array_slice($source, $method->getStartLine() - 1, 1));
 
-			preg_match('/\s+public\s+[static]*\s*function\s+(.*)/', $body, $matches);
-			$body = $matches[1];
+            preg_match('/\s+public\s+[static]*\s*function\s+(.*)/', $body, $matches);
+            $body = $matches[1];
 
-			$lines[] = sprintf(' * @method  %s  %s', $return, $body);
-		}
+            $lines[] = sprintf(' * @method  %s  %s', $return, $body);
+        }
 
-		return static::renderDocblock(implode("\n", $lines));
-	}
+        return static::renderDocblock(implode("\n", $lines));
+    }
 
-	/**
-	 * renderDocblock
-	 *
-	 * @param   string  $content
-	 *
-	 * @return  string
-	 */
-	public static function renderDocblock($content)
-	{
-		$tmpl = <<<TMPL
+    /**
+     * renderDocblock
+     *
+     * @param   string $content
+     *
+     * @return  string
+     */
+    public static function renderDocblock($content)
+    {
+        $tmpl = <<<TMPL
 /**
 %s
  */
 TMPL;
 
-		return sprintf($tmpl, $content);
-	}
+        return sprintf($tmpl, $content);
+    }
 }

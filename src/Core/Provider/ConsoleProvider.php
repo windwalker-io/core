@@ -18,35 +18,35 @@ use Windwalker\Environment\Platform;
 
 /**
  * The ConsoleProvider class.
- * 
+ *
  * @since  2.0
  */
 class ConsoleProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$app = $container->get('application');
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $app = $container->get('application');
 
-		$container->share(get_class($app), $app)
-			->bindShared(CoreConsole::class, get_class($app))
-			->bindShared(WindwalkerApplicationInterface::class, CoreConsole::class);
+        $container->share(get_class($app), $app)
+            ->bindShared(CoreConsole::class, get_class($app))
+            ->bindShared(WindwalkerApplicationInterface::class, CoreConsole::class);
 
-		// Input
-		$container->share(IOInterface::class, $app->io)
-			->alias('io', IOInterface::class);
+        // Input
+        $container->share(IOInterface::class, $app->io)
+            ->alias('io', IOInterface::class);
 
-		// Environment
-		$container->prepareSharedObject(Environment::class)
-			->alias('environment', Environment::class);
+        // Environment
+        $container->prepareSharedObject(Environment::class)
+            ->alias('environment', Environment::class);
 
-		$container->prepareSharedObject(Platform::class)
-			->alias('platform', Platform::class);
-	}
+        $container->prepareSharedObject(Platform::class)
+            ->alias('platform', Platform::class);
+    }
 }

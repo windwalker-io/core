@@ -16,22 +16,22 @@ use Windwalker\Language\LanguageInterface;
 
 /**
  * The LanguageProvider class.
- * 
+ *
  * @since  2.0
  */
 class LanguageProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(CoreLanguage::class)
-			->bindShared(Language::class, CoreLanguage::class)
-			->bindShared(LanguageInterface::class, CoreLanguage::class);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(CoreLanguage::class)
+            ->bindShared(Language::class, CoreLanguage::class)
+            ->bindShared(LanguageInterface::class, CoreLanguage::class);
+    }
 }

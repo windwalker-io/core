@@ -15,21 +15,21 @@ namespace Windwalker\Core\Mvc;
  */
 interface ClassResolverInterface
 {
-	/**
-	 * Get container key prefix.
-	 *
-	 * @return  string
-	 */
-	public static function getPrefix();
+    /**
+     * Get container key prefix.
+     *
+     * @return  string
+     */
+    public static function getPrefix();
 
-	/**
-	 * Resolve class path.
-	 *
-	 * @param   string $name
-	 *
-	 * @return false|string
-	 * @internal param string|AbstractPackage $package
-	 *
-	 */
-	public function resolve($name);
+    /**
+     * Resolve class path.
+     *
+     * @param   string $name
+     *
+     * @return false|string
+     * @internal param string|AbstractPackage $package
+     *
+     */
+    public function resolve($name);
 }

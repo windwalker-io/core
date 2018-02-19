@@ -15,34 +15,34 @@ namespace Windwalker\Core\Package;
  */
 trait PackageAwareTrait
 {
-	/**
-	 * Property package.
-	 *
-	 * @var  AbstractPackage
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var  AbstractPackage
+     */
+    protected $package;
 
-	/**
-	 * Method to get property Package
-	 *
-	 * @return  AbstractPackage
-	 */
-	public function getPackage()
-	{
-		return $this->package;
-	}
+    /**
+     * Method to get property Package
+     *
+     * @return  AbstractPackage
+     */
+    public function getPackage()
+    {
+        return $this->package;
+    }
 
-	/**
-	 * Method to set property package
-	 *
-	 * @param   AbstractPackage $package
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackage(AbstractPackage $package)
-	{
-		$this->package = $package;
+    /**
+     * Method to set property package
+     *
+     * @param   AbstractPackage $package
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPackage(AbstractPackage $package)
+    {
+        $this->package = $package;
 
-		return $this;
-	}
+        return $this;
+    }
 }

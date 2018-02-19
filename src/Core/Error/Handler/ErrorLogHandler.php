@@ -18,47 +18,46 @@ use Windwalker\Core\Utilities\Debug\BacktraceHelper;
  */
 class ErrorLogHandler implements ErrorHandlerInterface
 {
-	/**
-	 * Property manager.
-	 *
-	 * @var  LoggerManager
-	 */
-	protected $manager;
+    /**
+     * Property manager.
+     *
+     * @var  LoggerManager
+     */
+    protected $manager;
 
-	/**
-	 * ErrorLogHandler constructor.
-	 *
-	 * @param LoggerManager $manager
-	 */
-	public function __construct(LoggerManager $manager)
-	{
-		$this->manager = $manager;
-	}
+    /**
+     * ErrorLogHandler constructor.
+     *
+     * @param LoggerManager $manager
+     */
+    public function __construct(LoggerManager $manager)
+    {
+        $this->manager = $manager;
+    }
 
-	/**
-	 * __invoke
-	 *
-	 * @param  \Exception|\Throwable $e
-	 *
-	 * @return  void
-	 */
-	public function __invoke($e)
-	{
-		// Do not log 4xx errors
-		$code = $e->getCode();
+    /**
+     * __invoke
+     *
+     * @param  \Exception|\Throwable $e
+     *
+     * @return  void
+     */
+    public function __invoke($e)
+    {
+        // Do not log 4xx errors
+        $code = $e->getCode();
 
-		if ($code < 400 || $code >= 500)
-		{
-			$message = sprintf('Code: %s - %s - File: %s (%d)', $e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+        if ($code < 400 || $code >= 500) {
+            $message = sprintf('Code: %s - %s - File: %s (%d)', $e->getCode(), $e->getMessage(), $e->getFile(),
+                $e->getLine());
 
-			$traces = '';
+            $traces = '';
 
-			foreach (BacktraceHelper::normalizeBacktraces($e->getTrace()) as $i => $trace)
-			{
-				$traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
-			}
+            foreach (BacktraceHelper::normalizeBacktraces($e->getTrace()) as $i => $trace) {
+                $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
+            }
 
-			$this->manager->error('error', $message . "\n" . $traces);
-		}
-	}
+            $this->manager->error('error', $message . "\n" . $traces);
+        }
+    }
 }

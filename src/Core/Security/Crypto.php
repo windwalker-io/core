@@ -16,27 +16,27 @@ use Windwalker\Crypt\CryptInterface;
 /**
  * The Crypto class.
  *
- * @see  Crypt
- * @see  CryptInterface
+ * @see    Crypt
+ * @see    CryptInterface
  *
- * @method  static  string   encrypt($string, $key = null, $iv = null)
- * @method  static  string   decrypt($string, $key = null, $iv = null)
- * @method  static  boolean  verify($string, $encrypted, $key = null, $iv = null)
- * @method  static  Crypt    setKey($key)
- * @method  static  string   getKey($key)
- * @method  static  Crypt    getIV($key)
- * @method  static  string   setIV($iv)
- * @method  static  CipherInterface getCipher()
- * @method  static  Crypt    setCipher(CipherInterface $iv)
+ * @method  static string   encrypt($string, $key = null, $iv = null)
+ * @method  static string   decrypt($string, $key = null, $iv = null)
+ * @method  static boolean  verify($string, $encrypted, $key = null, $iv = null)
+ * @method  static Crypt    setKey($key)
+ * @method  static string   getKey($key)
+ * @method  static Crypt    getIV($key)
+ * @method  static string   setIV($iv)
+ * @method  static CipherInterface getCipher()
+ * @method  static Crypt    setCipher(CipherInterface $iv)
  *
  * @since  3.0
  */
 class Crypto extends AbstractProxyFacade
 {
-	/**
-	 * Property _key.
-	 *
-	 * @var  string
-	 */
-	protected static $_key = 'crypt';
+    /**
+     * Property _key.
+     *
+     * @var  string
+     */
+    protected static $_key = 'crypt';
 }

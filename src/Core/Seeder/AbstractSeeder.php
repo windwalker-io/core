@@ -21,209 +21,205 @@ use Windwalker\Environment\PlatformHelper;
  */
 abstract class AbstractSeeder
 {
-	use DateFormatTrait;
+    use DateFormatTrait;
 
-	/**
-	 * Property db.
-	 *
-	 * @var AbstractDatabaseDriver
-	 */
-	protected $db;
+    /**
+     * Property db.
+     *
+     * @var AbstractDatabaseDriver
+     */
+    protected $db;
 
-	/**
-	 * Property io.
-	 *
-	 * @var Command
-	 */
-	protected $command;
+    /**
+     * Property io.
+     *
+     * @var Command
+     */
+    protected $command;
 
-	/**
-	 * Property count.
-	 *
-	 * @var  int
-	 */
-	protected $count = 0;
+    /**
+     * Property count.
+     *
+     * @var  int
+     */
+    protected $count = 0;
 
-	/**
-	 * Class init.
-	 *
-	 * @param AbstractDatabaseDriver $db
-	 * @param Command                $command
-	 */
-	public function __construct(AbstractDatabaseDriver $db = null, Command $command = null)
-	{
-		$this->db = $db;
-		$this->command = $command;
-	}
+    /**
+     * Class init.
+     *
+     * @param AbstractDatabaseDriver $db
+     * @param Command                $command
+     */
+    public function __construct(AbstractDatabaseDriver $db = null, Command $command = null)
+    {
+        $this->db      = $db;
+        $this->command = $command;
+    }
 
-	/**
-	 * execute
-	 *
-	 * @param AbstractSeeder|string $seeder
-	 *
-	 * @return  static
-	 */
-	public function execute($seeder = null)
-	{
-		if (is_string($seeder))
-		{
-			$ref = new \ReflectionClass($this);
+    /**
+     * execute
+     *
+     * @param AbstractSeeder|string $seeder
+     *
+     * @return  static
+     */
+    public function execute($seeder = null)
+    {
+        if (is_string($seeder)) {
+            $ref = new \ReflectionClass($this);
 
-			include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
+            include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
-			$seeder = new $seeder;
-		}
+            $seeder = new $seeder;
+        }
 
-		$seeder->setDb($this->db)
-			->setCommand($this->command);
+        $seeder->setDb($this->db)
+            ->setCommand($this->command);
 
-		$this->command->out()->out('Import seeder <info>' . get_class($seeder) . '</info>');
+        $this->command->out()->out('Import seeder <info>' . get_class($seeder) . '</info>');
 
-		$seeder->doExecute();
+        $seeder->doExecute();
 
-		$this->command->out()->out('  <option>Import completed...</option>');
+        $this->command->out()->out('  <option>Import completed...</option>');
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  void
-	 */
-	abstract public function doExecute();
+    /**
+     * doExecute
+     *
+     * @return  void
+     */
+    abstract public function doExecute();
 
-	/**
-	 * clear
-	 *
-	 * @param AbstractSeeder|string $seeder
-	 *
-	 * @return  static
-	 */
-	public function clear($seeder = null)
-	{
-		if (is_string($seeder))
-		{
-			$ref = new \ReflectionClass($this);
+    /**
+     * clear
+     *
+     * @param AbstractSeeder|string $seeder
+     *
+     * @return  static
+     */
+    public function clear($seeder = null)
+    {
+        if (is_string($seeder)) {
+            $ref = new \ReflectionClass($this);
 
-			include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
+            include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
-			$seeder = new $seeder;
-		}
+            $seeder = new $seeder;
+        }
 
-		$seeder->setDb($this->db);
-		$seeder->setCommand($this->command);
+        $seeder->setDb($this->db);
+        $seeder->setCommand($this->command);
 
-		$this->command->out('Clear seeder <comment>' . get_class($seeder) . '</comment>');
+        $this->command->out('Clear seeder <comment>' . get_class($seeder) . '</comment>');
 
-		$seeder->doClear();
+        $seeder->doClear();
 
-		return $this;
-	}
-	/**
-	 * doClear
-	 *
-	 * @return  void
-	 */
-	abstract public function doClear();
+        return $this;
+    }
 
-	/**
-	 * Get DB table.
-	 *
-	 * @param $name
-	 *
-	 * @return  AbstractTable
-	 */
-	public function getTable($name)
-	{
-		return $this->db->getTable($name, true);
-	}
+    /**
+     * doClear
+     *
+     * @return  void
+     */
+    abstract public function doClear();
 
-	/**
-	 * truncate
-	 *
-	 * @param $name
-	 *
-	 * @return  static
-	 */
-	public function truncate($name)
-	{
-		$this->getTable($name)->truncate();
+    /**
+     * Get DB table.
+     *
+     * @param $name
+     *
+     * @return  AbstractTable
+     */
+    public function getTable($name)
+    {
+        return $this->db->getTable($name, true);
+    }
 
-		return $this;
-	}
+    /**
+     * truncate
+     *
+     * @param $name
+     *
+     * @return  static
+     */
+    public function truncate($name)
+    {
+        $this->getTable($name)->truncate();
 
-	/**
-	 * Method to get property Db
-	 *
-	 * @return  AbstractDatabaseDriver
-	 */
-	public function getDb()
-	{
-		return $this->db;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to set property db
-	 *
-	 * @param   AbstractDatabaseDriver $db
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDb(AbstractDatabaseDriver $db)
-	{
-		$this->db = $db;
+    /**
+     * Method to get property Db
+     *
+     * @return  AbstractDatabaseDriver
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property db
+     *
+     * @param   AbstractDatabaseDriver $db
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDb(AbstractDatabaseDriver $db)
+    {
+        $this->db = $db;
 
-	/**
-	 * Method to get property Command
-	 *
-	 * @return  Command
-	 */
-	public function getCommand()
-	{
-		return $this->command;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to set property command
-	 *
-	 * @param   Command $command
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setCommand(Command $command)
-	{
-		$this->command = $command;
+    /**
+     * Method to get property Command
+     *
+     * @return  Command
+     */
+    public function getCommand()
+    {
+        return $this->command;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property command
+     *
+     * @param   Command $command
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setCommand(Command $command)
+    {
+        $this->command = $command;
 
-	/**
-	 * outCounting
-	 *
-	 * @return  Command
-	 */
-	public function outCounting()
-	{
-		// @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
-		if (PlatformHelper::isWindows())
-		{
-			$loading = ['|', '/', '-', '\\'];
-		}
-		else
-		{
-			$loading = ['◐','◓','◑','◒'];
-		}
+        return $this;
+    }
 
-		$this->count++;
+    /**
+     * outCounting
+     *
+     * @return  Command
+     */
+    public function outCounting()
+    {
+        // @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
+        if (PlatformHelper::isWindows()) {
+            $loading = ['|', '/', '-', '\\'];
+        } else {
+            $loading = ['◐', '◓', '◑', '◒'];
+        }
 
-		$icon = $loading[$this->count % count($loading)];
+        $this->count++;
 
-		$this->command->out("\r  ({$this->count}) $icon ", false);
+        $icon = $loading[$this->count % count($loading)];
 
-		return $this->command;
-	}
+        $this->command->out("\r  ({$this->count}) $icon ", false);
+
+        return $this->command;
+    }
 }

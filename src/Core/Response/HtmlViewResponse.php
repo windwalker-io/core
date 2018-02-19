@@ -19,49 +19,48 @@ use Windwalker\Http\Response\HtmlResponse;
  */
 class HtmlViewResponse extends HtmlResponse
 {
-	/**
-	 * Property view.
-	 *
-	 * @var  AbstractView
-	 */
-	protected $view;
+    /**
+     * Property view.
+     *
+     * @var  AbstractView
+     */
+    protected $view;
 
-	/**
-	 * Method to get property View
-	 *
-	 * @return  AbstractView
-	 */
-	public function getView()
-	{
-		return $this->view;
-	}
+    /**
+     * Method to get property View
+     *
+     * @return  AbstractView
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
 
-	/**
-	 * Method to set property view
-	 *
-	 * @param   AbstractView $view
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function withView(AbstractView $view)
-	{
-		return new static($view, $this->getStatusCode(), $this->getHeaders());
-	}
+    /**
+     * Method to set property view
+     *
+     * @param   AbstractView $view
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function withView(AbstractView $view)
+    {
+        return new static($view, $this->getStatusCode(), $this->getHeaders());
+    }
 
-	/**
-	 * Handle body to stream object.
-	 *
-	 * @param   string $body The body data.
-	 *
-	 * @return  StreamInterface  Converted to stream object.
-	 */
-	protected function handleBody($body)
-	{
-		if ($body instanceof AbstractView)
-		{
-			$this->view = $body;
-		}
+    /**
+     * Handle body to stream object.
+     *
+     * @param   string $body The body data.
+     *
+     * @return  StreamInterface  Converted to stream object.
+     */
+    protected function handleBody($body)
+    {
+        if ($body instanceof AbstractView) {
+            $this->view = $body;
+        }
 
-		return parent::handleBody((string) $body);
-	}
+        return parent::handleBody((string) $body);
+    }
 }

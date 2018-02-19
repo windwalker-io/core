@@ -19,15 +19,15 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  */
 trait JsonResponseTrait
 {
-	/**
-	 * bootHtmlResponseTrait
-	 *
-	 * @param AbstractController $controller
-	 *
-	 * @return  void
-	 */
-	public function bootJsonResponseTrait(AbstractController $controller)
-	{
-		$controller->addMiddleware(JsonResponseMiddleware::class, PriorityQueue::MAX);
-	}
+    /**
+     * bootHtmlResponseTrait
+     *
+     * @param AbstractController $controller
+     *
+     * @return  void
+     */
+    public function bootJsonResponseTrait(AbstractController $controller)
+    {
+        $controller->addMiddleware(JsonResponseMiddleware::class, PriorityQueue::MAX);
+    }
 }

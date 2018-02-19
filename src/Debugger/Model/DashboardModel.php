@@ -13,76 +13,72 @@ use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
 
 /**
  * The DashboardModel class.
- * 
+ *
  * @since  2.1.1
  */
 class DashboardModel extends ModelRepository
 {
-	/**
-	 * getItems
-	 *
-	 * @return array
-	 */
-	public function getItems()
-	{
-		$state = $this->state;
+    /**
+     * getItems
+     *
+     * @return array
+     */
+    public function getItems()
+    {
+        $state = $this->state;
 
-		return $this->fetch('items', function() use ($state)
-		{
-			$files = $this->getFiles();
+        return $this->fetch('items', function () use ($state) {
+            $files = $this->getFiles();
 
-			if (!$files)
-			{
-				return [];
-			}
+            if (!$files) {
+                return [];
+            }
 
-			$limit = $state->get('list.limit', 100);
-			$items = [];
+            $limit = $state->get('list.limit', 100);
+            $items = [];
 
-			/** @var \SplFileInfo $file */
-			foreach ($files as $file)
-			{
-				$item = unserialize(file_get_contents($file->getPathname()));
+            /** @var \SplFileInfo $file */
+            foreach ($files as $file) {
+                $item = unserialize(file_get_contents($file->getPathname()));
 
-				$item['id'] = $file->getBasename();
+                $item['id'] = $file->getBasename();
 
-				$items[$file->getMTime()] = $item;
-			}
+                $items[$file->getMTime()] = $item;
+            }
 
-			krsort($items);
+            krsort($items);
 
-			$result = array_slice($items, 0, $limit);
+            $result = array_slice($items, 0, $limit);
 
-			return $result;
-		});
-	}
+            return $result;
+        });
+    }
 
-	/**
-	 * getFiles
-	 *
-	 * @return  \RecursiveIteratorIterator
-	 */
-	public function getFiles()
-	{
-		$dir = WINDWALKER_CACHE . '/profiler';
+    /**
+     * getFiles
+     *
+     * @return  \RecursiveIteratorIterator
+     */
+    public function getFiles()
+    {
+        $dir = WINDWALKER_CACHE . '/profiler';
 
-		if (!is_dir($dir))
-		{
-			return [];
-		}
+        if (!is_dir($dir)) {
+            return [];
+        }
 
-		return new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS));
-	}
+        return new \RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS));
+    }
 
-	/**
-	 * getLastItem
-	 *
-	 * @return  array
-	 */
-	public function getLastItem()
-	{
-		$items = $this->getItems();
+    /**
+     * getLastItem
+     *
+     * @return  array
+     */
+    public function getLastItem()
+    {
+        $items = $this->getItems();
 
-		return array_shift($items);
-	}
+        return array_shift($items);
+    }
 }

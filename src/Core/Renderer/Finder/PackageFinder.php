@@ -18,101 +18,99 @@ use Windwalker\String\StringHelper;
  */
 class PackageFinder implements PackageFinderInterface
 {
-	/**
-	 * Property separator.
-	 *
-	 * @var  string
-	 */
-	protected $separator = '@';
+    /**
+     * Property separator.
+     *
+     * @var  string
+     */
+    protected $separator = '@';
 
-	/**
-	 * Property packageResolver.
-	 *
-	 * @var  PackageResolver
-	 */
-	protected $packageResolver;
+    /**
+     * Property packageResolver.
+     *
+     * @var  PackageResolver
+     */
+    protected $packageResolver;
 
-	/**
-	 * PackageFinder constructor.
-	 *
-	 * @param PackageResolver $packageResolver
-	 */
-	public function __construct(PackageResolver $packageResolver)
-	{
-		$this->packageResolver = $packageResolver;
-	}
+    /**
+     * PackageFinder constructor.
+     *
+     * @param PackageResolver $packageResolver
+     */
+    public function __construct(PackageResolver $packageResolver)
+    {
+        $this->packageResolver = $packageResolver;
+    }
 
-	/**
-	 * find
-	 *
-	 * @param  string  $file
-	 *
-	 * @return string
-	 */
-	public function find(&$file)
-	{
-		list($package, $file) = StringHelper::explode($this->separator, $file, 2, 'array_unshift');
-		
-		if (!$package)
-		{
-			return false;
-		}
+    /**
+     * find
+     *
+     * @param  string $file
+     *
+     * @return string
+     */
+    public function find(&$file)
+    {
+        list($package, $file) = StringHelper::explode($this->separator, $file, 2, 'array_unshift');
 
-		$package = $this->packageResolver->getPackage($package);
+        if (!$package) {
+            return false;
+        }
 
-		if (!$package)
-		{
-			return false;
-		}
+        $package = $this->packageResolver->getPackage($package);
 
-		return $package->getDir() . '/Templates';
-	}
+        if (!$package) {
+            return false;
+        }
 
-	/**
-	 * Method to get property Separator
-	 *
-	 * @return  string
-	 */
-	public function getSeparator()
-	{
-		return $this->separator;
-	}
+        return $package->getDir() . '/Templates';
+    }
 
-	/**
-	 * Method to set property separator
-	 *
-	 * @param   string $separator
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setSeparator($separator)
-	{
-		$this->separator = $separator;
+    /**
+     * Method to get property Separator
+     *
+     * @return  string
+     */
+    public function getSeparator()
+    {
+        return $this->separator;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property separator
+     *
+     * @param   string $separator
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setSeparator($separator)
+    {
+        $this->separator = $separator;
 
-	/**
-	 * Method to get property PackageResolver
-	 *
-	 * @return  PackageResolver
-	 */
-	public function getPackageResolver()
-	{
-		return $this->packageResolver;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to set property packageResolver
-	 *
-	 * @param   PackageResolver $packageResolver
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackageResolver($packageResolver)
-	{
-		$this->packageResolver = $packageResolver;
+    /**
+     * Method to get property PackageResolver
+     *
+     * @return  PackageResolver
+     */
+    public function getPackageResolver()
+    {
+        return $this->packageResolver;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property packageResolver
+     *
+     * @param   PackageResolver $packageResolver
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPackageResolver($packageResolver)
+    {
+        $this->packageResolver = $packageResolver;
+
+        return $this;
+    }
 }

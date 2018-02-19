@@ -15,51 +15,51 @@ namespace Windwalker\Core\Queue\Job;
  */
 class CallableJob implements JobInterface
 {
-	/**
-	 * Property callable.
-	 *
-	 * @var  callable
-	 */
-	protected $callback;
+    /**
+     * Property callable.
+     *
+     * @var  callable
+     */
+    protected $callback;
 
-	/**
-	 * Property name.
-	 *
-	 * @var  null|string
-	 */
-	protected $name;
+    /**
+     * Property name.
+     *
+     * @var  null|string
+     */
+    protected $name;
 
-	/**
-	 * CallableJob constructor.
-	 *
-	 * @param string   $name
-	 * @param callable $callback
-	 */
-	public function __construct($name = null, callable $callback)
-	{
-		$this->callback = $callback;
-		$this->name     = $name;
-	}
+    /**
+     * CallableJob constructor.
+     *
+     * @param string   $name
+     * @param callable $callback
+     */
+    public function __construct($name = null, callable $callback)
+    {
+        $this->callback = $callback;
+        $this->name     = $name;
+    }
 
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * handle
-	 *
-	 * @return  void
-	 */
-	public function execute()
-	{
-		$callback = $this->callback;
+    /**
+     * handle
+     *
+     * @return  void
+     */
+    public function execute()
+    {
+        $callback = $this->callback;
 
-		$callback();
-	}
+        $callback();
+    }
 }

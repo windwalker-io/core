@@ -17,40 +17,40 @@ use Windwalker\Filesystem\File;
  */
 class GenerateCommand extends Command
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'gen-command';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'gen-command';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Generate a command class.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Generate a command class.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'gen-command <command name> <namespace> [-d=description]';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'gen-command <command name> <namespace> [-d=description]';
 
-	/**
-	 * Template to generate command.
-	 *
-	 * @var string
-	 */
-	protected $template = <<<TMPL
+    /**
+     * Template to generate command.
+     *
+     * @var string
+     */
+    protected $template = <<<TMPL
 <?php
 /**
  * Part of Windwalker project.
@@ -121,82 +121,79 @@ class {{CLASS}}Command extends Command
 
 TMPL;
 
-	/**
-	 * Configure command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-		$this->addOption(
-			['d', 'description'],
-			null,
-			'Command description'
-		);
+    /**
+     * Configure command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+        $this->addOption(
+            ['d', 'description'],
+            null,
+            'Command description'
+        );
 
-		parent::init();
-	}
+        parent::init();
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		$name       = $this->io->getArgument(0) ? : exit("Please enter command name");
-		$namespace  = $this->io->getArgument(1) ? : exit("Please enter command namespace");
-		$description = $this->getOption('d') ? : $name;
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        $name        = $this->io->getArgument(0) ?: exit("Please enter command name");
+        $namespace   = $this->io->getArgument(1) ?: exit("Please enter command namespace");
+        $description = $this->getOption('d') ?: $name;
 
-		if (!$name || !$namespace)
-		{
-			throw new \InvalidArgumentException('Need name & namespace.');
-		}
+        if (!$name || !$namespace) {
+            throw new \InvalidArgumentException('Need name & namespace.');
+        }
 
-		// Regularize Namespace
-		$namespace = str_replace(['/', '\\'], ' ', $namespace);
+        // Regularize Namespace
+        $namespace = str_replace(['/', '\\'], ' ', $namespace);
 
-		$namespace = ucwords($namespace);
+        $namespace = ucwords($namespace);
 
-		$namespace = str_replace(' ', '\\', $namespace);
+        $namespace = str_replace(' ', '\\', $namespace);
 
-		$namespace = explode('\\', $namespace);
+        $namespace = explode('\\', $namespace);
 
-		if ($namespace[0] == 'Command')
-		{
-			array_shift($namespace);
-		}
+        if ($namespace[0] == 'Command') {
+            array_shift($namespace);
+        }
 
-		$class = $namespace;
+        $class = $namespace;
 
-		$class = array_pop($class);
+        $class = array_pop($class);
 
-		$namespace = implode('\\', $namespace);
+        $namespace = implode('\\', $namespace);
 
-		$replace = [
-			'{{NAME}}'      => $name,
-			'{{NAMESPACE}}' => $namespace,
-			'{{CLASS}}'     => $class,
-			'{{DESCRIPTION}}' => $description
-		];
+        $replace = [
+            '{{NAME}}' => $name,
+            '{{NAMESPACE}}' => $namespace,
+            '{{CLASS}}' => $class,
+            '{{DESCRIPTION}}' => $description,
+        ];
 
-		$content = strtr($this->template, $replace);
+        $content = strtr($this->template, $replace);
 
-		$config = Ioc::getConfig();
+        $config = Ioc::getConfig();
 
-		$file = $config->get('path.root') . '/src/' . $namespace . '/' . $class . 'Command.php';
+        $file = $config->get('path.root') . '/src/' . $namespace . '/' . $class . 'Command.php';
 
-		$file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
+        $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
 
-		if (!File::write($file, $content))
-		{
-			$this->out()->out('Failure when writing file.');
+        if (!File::write($file, $content)) {
+            $this->out()->out('Failure when writing file.');
 
-			return false;
-		}
+            return false;
+        }
 
-		$this->out('File generated: ' . $file);
+        $this->out('File generated: ' . $file);
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -15,34 +15,34 @@ namespace Windwalker\Core\Utilities\Classes;
  */
 trait ConfigAccessTrait
 {
-	/**
-	 * Property options.
-	 *
-	 * @var  array
-	 */
-	protected $config = [];
+    /**
+     * Property options.
+     *
+     * @var  array
+     */
+    protected $config = [];
 
-	/**
-	 * Method to get property Options
-	 *
-	 * @return  int
-	 */
-	public function getConfig()
-	{
-		return $this->config;
-	}
+    /**
+     * Method to get property Options
+     *
+     * @return  int
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
 
-	/**
-	 * Method to set property options
-	 *
-	 * @param   int $config
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setConfig($config)
-	{
-		$this->config = $config;
+    /**
+     * Method to set property options
+     *
+     * @param   int $config
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setConfig($config)
+    {
+        $this->config = $config;
 
-		return $this;
-	}
+        return $this;
+    }
 }

@@ -17,44 +17,44 @@ use Windwalker\Core\View\Helper\Set\HelperSet;
  */
 class AbstractHelper
 {
-	/**
-	 * Property parent.
-	 *
-	 * @var  HelperSet
-	 */
-	protected $parent = null;
+    /**
+     * Property parent.
+     *
+     * @var  HelperSet
+     */
+    protected $parent = null;
 
-	/**
-	 * Class init.
-	 *
-	 * @param HelperSet $parent
-	 */
-	public function __construct(HelperSet $parent = null)
-	{
-		$this->parent = $parent;
-	}
+    /**
+     * Class init.
+     *
+     * @param HelperSet $parent
+     */
+    public function __construct(HelperSet $parent = null)
+    {
+        $this->parent = $parent;
+    }
 
-	/**
-	 * Method to get property Parent
-	 *
-	 * @return  HelperSet
-	 */
-	public function getParent()
-	{
-		return $this->parent;
-	}
+    /**
+     * Method to get property Parent
+     *
+     * @return  HelperSet
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
 
-	/**
-	 * Method to set property parent
-	 *
-	 * @param   HelperSet $parent
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setParent($parent)
-	{
-		$this->parent = $parent;
+    /**
+     * Method to set property parent
+     *
+     * @param   HelperSet $parent
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
 
-		return $this;
-	}
+        return $this;
+    }
 }

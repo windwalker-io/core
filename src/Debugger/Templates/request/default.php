@@ -11,7 +11,7 @@ use Windwalker\Profiler\Point\Collector;
 $this->extend('_global.html');
 
 /**
- * @var  Collector  $collector
+ * @var  Collector $collector
  */
 ?>
 
@@ -19,12 +19,12 @@ $this->extend('_global.html');
 
 <?php $this->block('content') ?>
 
-	<?php echo $this->load('default_request', ['type' => 'get']) ?>
-	<?php echo $this->load('default_request', ['type' => 'post']) ?>
-	<?php echo $this->load('default_request', ['type' => 'files']) ?>
-	<?php echo $this->load('session_request', ['type' => 'session']) ?>
-	<?php echo $this->load('default_request', ['type' => 'cookie']) ?>
-	<?php echo $this->load('default_request', ['type' => 'server']) ?>
-	<?php echo $this->load('default_request', ['type' => 'env']) ?>
+<?php echo $this->load('default_request', ['type' => 'get']) ?>
+<?php echo $this->load('default_request', ['type' => 'post']) ?>
+<?php echo $this->load('default_request', ['type' => 'files']) ?>
+<?php echo $this->load('session_request', ['type' => 'session']) ?>
+<?php echo $this->load('default_request', ['type' => 'cookie']) ?>
+<?php echo $this->load('default_request', ['type' => 'server']) ?>
+<?php echo $this->load('default_request', ['type' => 'env']) ?>
 
 <?php $this->endblock() ?>

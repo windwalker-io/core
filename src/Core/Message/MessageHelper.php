@@ -19,45 +19,49 @@ use Windwalker\Core\Widget\WidgetManager;
  */
 class MessageHelper
 {
-	/**
-	 * Property messages.
-	 *
-	 * @var  array
-	 */
-	protected static $messages = null;
+    /**
+     * Property messages.
+     *
+     * @var  array
+     */
+    protected static $messages = null;
 
-	/**
-	 * render
-	 *
-	 * @param WidgetManager        $widget
-	 * @param string               $template
-	 * @param array                $messages
-	 * @param string               $engine
-	 * @param AbstractPackage|null $package
-	 *
-	 * @return  string
-	 */
-	public static function render(WidgetManager $widget, $template = 'windwalker.message.default', array $messages = null, $engine = 'php', AbstractPackage $package = null)
-	{
-		$messages = $messages === null ? static::getMessages(true) : $messages;
+    /**
+     * render
+     *
+     * @param WidgetManager $widget
+     * @param string $template
+     * @param array $messages
+     * @param string $engine
+     * @param AbstractPackage|null $package
+     *
+     * @return  string
+     */
+    public static function render(
+        WidgetManager $widget,
+        $template = 'windwalker.message.default',
+        array $messages = null,
+        $engine = 'php',
+        AbstractPackage $package = null
+    ) {
+        $messages = $messages === null ? static::getMessages(true) : $messages;
 
-		return $widget->render($template, ['messages' => $messages], $engine, $package);
-	}
+        return $widget->render($template, ['messages' => $messages], $engine, $package);
+    }
 
-	/**
-	 * getMessages
-	 *
-	 * @param bool $clear
-	 *
-	 * @return array
-	 */
-	public static function getMessages($clear = true)
-	{
-		if (static::$messages === null)
-		{
-			static::$messages = Ioc::getApplication()->getMessages($clear);
-		}
+    /**
+     * getMessages
+     *
+     * @param bool $clear
+     *
+     * @return array
+     */
+    public static function getMessages($clear = true)
+    {
+        if (static::$messages === null) {
+            static::$messages = Ioc::getApplication()->getMessages($clear);
+        }
 
-		return static::$messages;
-	}
+        return static::$messages;
+    }
 }

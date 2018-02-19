@@ -15,12 +15,12 @@ namespace Windwalker\Core\Error\Handler;
  */
 interface ErrorHandlerInterface
 {
-	/**
-	 * __invoke
-	 *
-	 * @param  \Exception|\Throwable  $e
-	 *
-	 * @return  void
-	 */
-	public function __invoke($e);
+    /**
+     * __invoke
+     *
+     * @param  \Exception|\Throwable $e
+     *
+     * @return  void
+     */
+    public function __invoke($e);
 }

@@ -9,26 +9,24 @@
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 
 ?>
-<h2><?php echo strtoupper($type) ?> Variables</h2>
+    <h2><?php echo strtoupper($type) ?> Variables</h2>
 
 <?php if (!empty($collector['request'][$type])): ?>
-	<?php
+    <?php
     $gridObject = BootstrapKeyValueGrid::create()->addHeader();
 
-	foreach ($collector['request'][$type] as $key => $value)
-	{
-		if (is_array($value) || is_object($value))
-		{
-			$value = new \Windwalker\Dom\HtmlElement('pre', print_r($value, 1));
-		}
+    foreach ($collector['request'][$type] as $key => $value) {
+        if (is_array($value) || is_object($value)) {
+            $value = new \Windwalker\Dom\HtmlElement('pre', print_r($value, 1));
+        }
 
         $gridObject->addItem($key, $value);
-	}
+    }
 
-	echo $gridObject;
-	?>
-	<br /><br />
+    echo $gridObject;
+    ?>
+    <br/><br/>
 <?php else: ?>
-No data.
-	<br /><br />
+    No data.
+    <br/><br/>
 <?php endif; ?>

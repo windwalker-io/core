@@ -15,43 +15,42 @@ namespace Windwalker\Core\Renderer\Finder;
  */
 class TwigFilesystemLoader extends \Windwalker\Renderer\Twig\TwigFilesystemLoader
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinder
-	 */
-	protected $finder;
+    /**
+     * Property finder.
+     *
+     * @var  PackageFinder
+     */
+    protected $finder;
 
-	/**
-	 * TwigFilesystemLoader constructor.
-	 *
-	 * @param PackageFinder $finder
-	 * @param array|string  $paths
-	 * @param string        $separator
-	 */
-	public function __construct($finder, $paths, $separator = '.')
-	{
-		parent::__construct($paths, $separator);
+    /**
+     * TwigFilesystemLoader constructor.
+     *
+     * @param PackageFinder $finder
+     * @param array|string  $paths
+     * @param string        $separator
+     */
+    public function __construct($finder, $paths, $separator = '.')
+    {
+        parent::__construct($paths, $separator);
 
-		$this->finder = $finder;
-	}
+        $this->finder = $finder;
+    }
 
-	/**
-	 * normalizeName
-	 *
-	 * @param   string $name
-	 *
-	 * @return  string
-	 */
-	protected function normalizeName($name)
-	{
-		$path = $this->finder->find($name);
+    /**
+     * normalizeName
+     *
+     * @param   string $name
+     *
+     * @return  string
+     */
+    protected function normalizeName($name)
+    {
+        $path = $this->finder->find($name);
 
-		if ($path && in_array($path, $this->paths[static::MAIN_NAMESPACE]))
-		{
-			$this->prependPath($path);
-		}
+        if ($path && in_array($path, $this->paths[static::MAIN_NAMESPACE])) {
+            $this->prependPath($path);
+        }
 
-		return parent::normalizeName($name);
-	}
+        return parent::normalizeName($name);
+    }
 }

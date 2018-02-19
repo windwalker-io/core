@@ -17,15 +17,15 @@ use Windwalker\Core\Mailer\MailMessage;
  */
 class DebugMailerAdapter implements MailerAdapterInterface
 {
-	/**
-	 * send
-	 *
-	 * @param MailMessage $message
-	 *
-	 * @return  MailMessage
-	 */
-	public function send(MailMessage $message)
-	{
-		return $message;
-	}
+    /**
+     * send
+     *
+     * @param MailMessage $message
+     *
+     * @return  MailMessage
+     */
+    public function send(MailMessage $message)
+    {
+        return $message;
+    }
 }

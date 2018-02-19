@@ -20,222 +20,213 @@ use Windwalker\DI\Container;
  */
 class Queue
 {
-	/**
-	 * Property driver.
-	 *
-	 * @var QueueDriverInterface
-	 */
-	protected $driver;
+    /**
+     * Property driver.
+     *
+     * @var QueueDriverInterface
+     */
+    protected $driver;
 
-	/**
-	 * Property container.
-	 *
-	 * @var  Container
-	 */
-	protected $container;
+    /**
+     * Property container.
+     *
+     * @var  Container
+     */
+    protected $container;
 
-	/**
-	 * QueueManager constructor.
-	 *
-	 * @param QueueDriverInterface $driver
-	 * @param Container            $container
-	 */
-	public function __construct(QueueDriverInterface $driver, Container $container)
-	{
-		$this->driver = $driver;
-		$this->container = $container;
-	}
+    /**
+     * QueueManager constructor.
+     *
+     * @param QueueDriverInterface $driver
+     * @param Container            $container
+     */
+    public function __construct(QueueDriverInterface $driver, Container $container)
+    {
+        $this->driver    = $driver;
+        $this->container = $container;
+    }
 
-	/**
-	 * push
-	 *
-	 * @param mixed  $job
-	 * @param int    $delay
-	 * @param string $queue
-	 * @param array  $options
-	 *
-	 * @return  int|string
-	 */
-	public function push($job, $delay = 0, $queue = null, array $options = [])
-	{
-		$message = $this->getMessageByJob($job);
-		$message->setDelay($delay);
-		$message->setQueueName($queue);
-		$message->setOptions($options);
+    /**
+     * push
+     *
+     * @param mixed  $job
+     * @param int    $delay
+     * @param string $queue
+     * @param array  $options
+     *
+     * @return  int|string
+     */
+    public function push($job, $delay = 0, $queue = null, array $options = [])
+    {
+        $message = $this->getMessageByJob($job);
+        $message->setDelay($delay);
+        $message->setQueueName($queue);
+        $message->setOptions($options);
 
-		return $this->driver->push($message);
-	}
+        return $this->driver->push($message);
+    }
 
-	/**
-	 * pushRaw
-	 *
-	 * @param string|array $body
-	 * @param int          $delay
-	 * @param null         $queue
-	 * @param array        $options
-	 *
-	 * @return  int|string
-	 */
-	public function pushRaw($body, $delay = 0, $queue = null, array $options = [])
-	{
-		if (is_string($body))
-		{
-			json_decode($body, true);
-		}
+    /**
+     * pushRaw
+     *
+     * @param string|array $body
+     * @param int          $delay
+     * @param null         $queue
+     * @param array        $options
+     *
+     * @return  int|string
+     */
+    public function pushRaw($body, $delay = 0, $queue = null, array $options = [])
+    {
+        if (is_string($body)) {
+            json_decode($body, true);
+        }
 
-		$message = new QueueMessage;
-		$message->setBody($body);
-		$message->setDelay($delay);
-		$message->setQueueName($queue);
-		$message->setOptions($options);
+        $message = new QueueMessage;
+        $message->setBody($body);
+        $message->setDelay($delay);
+        $message->setQueueName($queue);
+        $message->setOptions($options);
 
-		return $this->driver->push($message);
-	}
+        return $this->driver->push($message);
+    }
 
-	/**
-	 * pop
-	 *
-	 * @param string $queue
-	 *
-	 * @return  QueueMessage
-	 */
-	public function pop($queue = null)
-	{
-		return $this->driver->pop($queue);
-	}
+    /**
+     * pop
+     *
+     * @param string $queue
+     *
+     * @return  QueueMessage
+     */
+    public function pop($queue = null)
+    {
+        return $this->driver->pop($queue);
+    }
 
-	/**
-	 * delete
-	 *
-	 * @param QueueMessage|mixed $message
-	 *
-	 * @return  void
-	 */
-	public function delete($message)
-	{
-		if (!$message instanceof QueueMessage)
-		{
-			$msg = new QueueMessage;
-			$msg->setId($message);
-		}
+    /**
+     * delete
+     *
+     * @param QueueMessage|mixed $message
+     *
+     * @return  void
+     */
+    public function delete($message)
+    {
+        if (!$message instanceof QueueMessage) {
+            $msg = new QueueMessage;
+            $msg->setId($message);
+        }
 
-		$this->driver->delete($message);
+        $this->driver->delete($message);
 
-		$message->isDeleted(true);
-	}
+        $message->isDeleted(true);
+    }
 
-	/**
-	 * release
-	 *
-	 * @param QueueMessage|mixed $message
-	 * @param int                $delay
-	 *
-	 * @return  void
-	 */
-	public function release($message, $delay = 0)
-	{
-		if (!$message instanceof QueueMessage)
-		{
-			$msg = new QueueMessage;
-			$msg->setId($message);
-		}
+    /**
+     * release
+     *
+     * @param QueueMessage|mixed $message
+     * @param int                $delay
+     *
+     * @return  void
+     */
+    public function release($message, $delay = 0)
+    {
+        if (!$message instanceof QueueMessage) {
+            $msg = new QueueMessage;
+            $msg->setId($message);
+        }
 
-		$message->setDelay($delay);
+        $message->setDelay($delay);
 
-		$this->driver->release($message);
-	}
+        $this->driver->release($message);
+    }
 
-	/**
-	 * getMessage
-	 *
-	 * @param mixed $job
-	 * @param array $data
-	 *
-	 * @return QueueMessage
-	 * @throws \InvalidArgumentException
-	 */
-	public function getMessageByJob($job, array $data = [])
-	{
-		$message = new QueueMessage;
+    /**
+     * getMessage
+     *
+     * @param mixed $job
+     * @param array $data
+     *
+     * @return QueueMessage
+     * @throws \InvalidArgumentException
+     */
+    public function getMessageByJob($job, array $data = [])
+    {
+        $message = new QueueMessage;
 
-		$job = $this->createJobInstance($job);
+        $job = $this->createJobInstance($job);
 
-		$data['class'] = get_class($job);
+        $data['class'] = get_class($job);
 
-		$message->setName($job->getName());
-		$message->setJob(serialize($job));
-		$message->setData($data);
+        $message->setName($job->getName());
+        $message->setJob(serialize($job));
+        $message->setData($data);
 
-		return $message;
-	}
+        return $message;
+    }
 
-	/**
-	 * createJobInstance
-	 *
-	 * @param mixed $job
-	 *
-	 * @return  JobInterface
-	 */
-	protected function createJobInstance($job)
-	{
-		if ($job instanceof JobInterface)
-		{
-			return $job;
-		}
+    /**
+     * createJobInstance
+     *
+     * @param mixed $job
+     *
+     * @return  JobInterface
+     */
+    protected function createJobInstance($job)
+    {
+        if ($job instanceof JobInterface) {
+            return $job;
+        }
 
-		// Create callable
-		if (is_callable($job))
-		{
-			$job = new CallableJob($job, md5(uniqid('', true)));
-		}
+        // Create callable
+        if (is_callable($job)) {
+            $job = new CallableJob($job, md5(uniqid('', true)));
+        }
 
-		// Create by class name.
-		if (is_string($job))
-		{
-			if (!class_exists($job) || is_subclass_of($job, JobInterface::class))
-			{
-				throw new \InvalidArgumentException(
-					sprintf('Job should be a class which implements JobInterface, %s given', $job)
-				);
-			}
+        // Create by class name.
+        if (is_string($job)) {
+            if (!class_exists($job) || is_subclass_of($job, JobInterface::class)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Job should be a class which implements JobInterface, %s given', $job)
+                );
+            }
 
-			$job = $this->container->newInstance($job);
+            $job = $this->container->newInstance($job);
 
-			if (!$job instanceof JobInterface)
-			{
-				throw new \UnexpectedValueException('Job instance is not a JobInterface.');
-			}
-		}
+            if (!$job instanceof JobInterface) {
+                throw new \UnexpectedValueException('Job instance is not a JobInterface.');
+            }
+        }
 
-		if (is_array($job))
-		{
-			throw new \InvalidArgumentException('Job should not be array.');
-		}
+        if (is_array($job)) {
+            throw new \InvalidArgumentException('Job should not be array.');
+        }
 
-		return $job;
-	}
+        return $job;
+    }
 
-	/**
-	 * Method to get property Driver
-	 *
-	 * @return  QueueDriverInterface
-	 */
-	public function getDriver()
-	{
-		return $this->driver;
-	}
+    /**
+     * Method to get property Driver
+     *
+     * @return  QueueDriverInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
 
-	/**
-	 * Method to set property driver
-	 *
-	 * @param   QueueDriverInterface $driver
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDriver(QueueDriverInterface $driver)
-	{
-		$this->driver = $driver;
+    /**
+     * Method to set property driver
+     *
+     * @param   QueueDriverInterface $driver
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDriver(QueueDriverInterface $driver)
+    {
+        $this->driver = $driver;
 
-		return $this;
-	}
+        return $this;
+    }
 }

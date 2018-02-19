@@ -13,36 +13,36 @@ use Windwalker\DI\ServiceProviderInterface;
 
 /**
  * The PackageProvider class.
- * 
+ *
  * @since  2.0
  */
 abstract class AbstractPackageProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property package.
-	 *
-	 * @var AbstractPackage
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var AbstractPackage
+     */
+    protected $package;
 
-	/**
-	 * Class init.
-	 *
-	 * @param AbstractPackage $package
-	 */
-	public function __construct(AbstractPackage $package)
-	{
-		$this->package = $package;
-	}
+    /**
+     * Class init.
+     *
+     * @param AbstractPackage $package
+     */
+    public function __construct(AbstractPackage $package)
+    {
+        $this->package = $package;
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+    }
 }

@@ -17,117 +17,117 @@ use Windwalker\Core\Http\CorsHandler;
  */
 trait CorsTrait
 {
-	/**
-	 * Property handler.
-	 *
-	 * @var  CorsHandler
-	 */
-	protected $corsHandler;
+    /**
+     * Property handler.
+     *
+     * @var  CorsHandler
+     */
+    protected $corsHandler;
 
-	/**
-	 * bootCorsTrait
-	 *
-	 * @return  void
-	 */
-	public function bootCorsTrait()
-	{
-		$this->corsHandler = new CorsHandler;
-	}
+    /**
+     * bootCorsTrait
+     *
+     * @return  void
+     */
+    public function bootCorsTrait()
+    {
+        $this->corsHandler = new CorsHandler;
+    }
 
-	/**
-	 * allowOrigin
-	 *
-	 * @param string|array $domain
-	 * @param bool         $replace
-	 *
-	 * @return static
-	 */
-	public function allowOrigin($domain = '*', $replace = false)
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->allowOrigin($domain, $replace)
-			->getResponse();
+    /**
+     * allowOrigin
+     *
+     * @param string|array $domain
+     * @param bool         $replace
+     *
+     * @return static
+     */
+    public function allowOrigin($domain = '*', $replace = false)
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->allowOrigin($domain, $replace)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowMethods
-	 *
-	 * @param string|array $methods
-	 *
-	 * @return  static
-	 */
-	public function allowMethods($methods = '*')
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->allowMethods($methods)
-			->getResponse();
+    /**
+     * allowMethods
+     *
+     * @param string|array $methods
+     *
+     * @return  static
+     */
+    public function allowMethods($methods = '*')
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->allowMethods($methods)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowHeaders
-	 *
-	 * @param array|string $headers
-	 *
-	 * @return  static
-	 */
-	public function allowHeaders($headers = '*')
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->allowHeaders($headers)
-			->getResponse();
+    /**
+     * allowHeaders
+     *
+     * @param array|string $headers
+     *
+     * @return  static
+     */
+    public function allowHeaders($headers = '*')
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->allowHeaders($headers)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * maxAge
-	 *
-	 * @param int $seconds
-	 *
-	 * @return  static
-	 */
-	public function maxAge($seconds)
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->maxAge($seconds)
-			->getResponse();
+    /**
+     * maxAge
+     *
+     * @param int $seconds
+     *
+     * @return  static
+     */
+    public function maxAge($seconds)
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->maxAge($seconds)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowCredentials
-	 *
-	 * @param bool $bool
-	 *
-	 * @return  static
-	 */
-	public function allowCredentials($bool = true)
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->allowCredentials($bool)
-			->getResponse();
+    /**
+     * allowCredentials
+     *
+     * @param bool $bool
+     *
+     * @return  static
+     */
+    public function allowCredentials($bool = true)
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->allowCredentials($bool)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * exposeHeaders
-	 *
-	 * @param string|array $headers
-	 *
-	 * @return  static
-	 */
-	public function exposeHeaders($headers = '*')
-	{
-		$this->response = $this->corsHandler->setResponse($this->response)
-			->exposeHeaders($headers)
-			->getResponse();
+    /**
+     * exposeHeaders
+     *
+     * @param string|array $headers
+     *
+     * @return  static
+     */
+    public function exposeHeaders($headers = '*')
+    {
+        $this->response = $this->corsHandler->setResponse($this->response)
+            ->exposeHeaders($headers)
+            ->getResponse();
 
-		return $this;
-	}
+        return $this;
+    }
 }

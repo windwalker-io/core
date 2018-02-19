@@ -20,68 +20,65 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class WhoopsProvider implements ServiceProviderInterface
 {
-	/**
-	 * boot
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 */
-	public function boot(Container $container)
-	{
-		$config = $container->get('config');
+    /**
+     * boot
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    public function boot(Container $container)
+    {
+        $config = $container->get('config');
 
-		if (!$config->get('system.debug'))
-		{
-			return;
-		}
+        if (!$config->get('system.debug')) {
+            return;
+        }
 
-		$error = $container->get('error.handler');
+        $error = $container->get('error.handler');
 
-		/**
-		 * @param \Exception|\Throwable $e
-		 *
-		 * @return  void
-		 */
-		$handler = function ($e) use ($container)
-		{
-			/** @var Whoops $whoops */
-			$whoops = $container->get('whoops');
-			$whoops->allowQuit(false);
-			$whoops->handleException($e);
-		};
+        /**
+         * @param \Exception|\Throwable $e
+         *
+         * @return  void
+         */
+        $handler = function ($e) use ($container) {
+            /** @var Whoops $whoops */
+            $whoops = $container->get('whoops');
+            $whoops->allowQuit(false);
+            $whoops->handleException($e);
+        };
 
-		$error->addHandler($handler, 'default');
-	}
+        $error->addHandler($handler, 'default');
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 * @throws \InvalidArgumentException
-	 *
-	 * @since   1.0
-	 */
-	public function register(Container $container)
-	{
-		$config = $container->get('config');
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     * @throws \InvalidArgumentException
+     *
+     * @since   1.0
+     */
+    public function register(Container $container)
+    {
+        $config = $container->get('config');
 
-		if ($config->get('system.debug'))
-		{
-			$whoops = new Whoops;
+        if ($config->get('system.debug')) {
+            $whoops = new Whoops;
 
-			$handler = new PrettyPageHandler;
-			$handler->setEditor($config->get('whoops.editor', 'phpstorm'));
+            $handler = new PrettyPageHandler;
+            $handler->setEditor($config->get('whoops.editor', 'phpstorm'));
 
-			$whoops->pushHandler($handler);
+            $whoops->pushHandler($handler);
 
-			$container->share(Whoops::class, $whoops)
-				->alias('whoops', Whoops::class);
+            $container->share(Whoops::class, $whoops)
+                ->alias('whoops', Whoops::class);
 
-			$container->share(PrettyPageHandler::class, $handler)
-				->alias('whoops.handler', PrettyPageHandler::class);
-		}
-	}
+            $container->share(PrettyPageHandler::class, $handler)
+                ->alias('whoops.handler', PrettyPageHandler::class);
+        }
+    }
 }

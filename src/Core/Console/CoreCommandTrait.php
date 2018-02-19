@@ -11,14 +11,14 @@ namespace Windwalker\Core\Console;
 /**
  * The CoreCommandTrait class.
  *
- * @since  3.0
+ * @since      3.0
  *
  * @deprecated Extend \Windwalker\Core\Console\CoreCommand instead.
  */
 trait CoreCommandTrait
 {
-	public function bootCoreCommandTrait()
-	{
-		throw new \LogicException('Please do not use this trait, extend Windwalker\Core\Console\CoreCommand instead.');
-	}
+    public function bootCoreCommandTrait()
+    {
+        throw new \LogicException('Please do not use this trait, extend Windwalker\Core\Console\CoreCommand instead.');
+    }
 }

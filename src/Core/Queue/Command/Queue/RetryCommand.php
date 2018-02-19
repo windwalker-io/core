@@ -19,103 +19,96 @@ use Windwalker\Utilities\Arr;
  */
 class RetryCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'retry';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'retry';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Retry failed jobs.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Retry failed jobs.';
 
-	/**
-	 * Property usage.
-	 *
-	 * @var  string
-	 */
-	protected $usage = '%s <cmd><ids...></cmd> <option>[option]</option>';
+    /**
+     * Property usage.
+     *
+     * @var  string
+     */
+    protected $usage = '%s <cmd><ids...></cmd> <option>[option]</option>';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addOption('d')
-			->alias('delay')
-			->defaultValue(0)
-			->description('Delay time for failed job to wait next run.');
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addOption('d')
+            ->alias('delay')
+            ->defaultValue(0)
+            ->description('Delay time for failed job to wait next run.');
 
-		$this->addOption('a')
-			->alias('all')
-			->defaultValue(false)
-			->description('Retry all failed jobs.');
-	}
+        $this->addOption('a')
+            ->alias('all')
+            ->defaultValue(false)
+            ->description('Retry all failed jobs.');
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  bool
-	 */
-	protected function doExecute()
-	{
-		$factory = $this->console->container->get('queue.manager');
-		$failer = $this->console->container->get('queue.failer');
+    /**
+     * doExecute
+     *
+     * @return  bool
+     */
+    protected function doExecute()
+    {
+        $factory = $this->console->container->get('queue.manager');
+        $failer  = $this->console->container->get('queue.failer');
 
-		$all = $this->getOption('all');
+        $all = $this->getOption('all');
 
-		if ($all)
-		{
-			$ids = array_column($failer->all(), 'id');
-		}
-		else
-		{
-			$ids = $this->io->getArguments();
+        if ($all) {
+            $ids = array_column($failer->all(), 'id');
+        } else {
+            $ids = $this->io->getArguments();
 
-			if (!count($ids))
-			{
-				throw new WrongArgumentException('No id provided');
-			}
-		}
+            if (!count($ids)) {
+                throw new WrongArgumentException('No id provided');
+            }
+        }
 
-		$delay = $this->getOption('delay');
+        $delay = $this->getOption('delay');
 
-		foreach ($ids as $id)
-		{
-			$failed = $failer->get($id);
+        foreach ($ids as $id) {
+            $failed = $failer->get($id);
 
-			$connection = Arr::get($failed, 'connection', null);
+            $connection = Arr::get($failed, 'connection', null);
 
-			$manager = $factory->getManager($connection);
+            $manager = $factory->getManager($connection);
 
-			$manager->pushRaw(json_decode($failed['body'], true), $delay, $failed['queue']);
+            $manager->pushRaw(json_decode($failed['body'], true), $delay, $failed['queue']);
 
-			if (!$all)
-			{
-				$this->out(sprintf(
-					'Resend failed-job: <info>%s</info> to connection: <option>%s</option> queue: <option>%s</option>',
-					$id,
-					$connection,
-					$failed['queue']
-				));
+            if (!$all) {
+                $this->out(sprintf(
+                    'Resend failed-job: <info>%s</info> to connection: <option>%s</option> queue: <option>%s</option>',
+                    $id,
+                    $connection,
+                    $failed['queue']
+                ));
 
-				$failer->remove($id);
-			}
-		}
+                $failer->remove($id);
+            }
+        }
 
-		if ($all)
-		{
-			$this->out('Flush all failed-jobs');
+        if ($all) {
+            $this->out('Flush all failed-jobs');
 
-			$failer->clear();
-		}
+            $failer->clear();
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

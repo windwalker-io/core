@@ -16,25 +16,25 @@ use Windwalker\Event\DispatcherInterface;
 
 /**
  * The EventProvider class.
- * 
+ *
  * @since  2.0
  */
 class EventProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(EventDispatcher::class, function (EventDispatcher $dispatcher, Container $container)
-		{
-			$dispatcher->foo = 'bar';
-			return $dispatcher->setDebug($container->get('config')->get('system.debug'));
-		})->bindShared(Dispatcher::class, EventDispatcher::class)
-			->bindShared(DispatcherInterface::class, EventDispatcher::class);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(EventDispatcher::class,
+            function (EventDispatcher $dispatcher, Container $container) {
+                $dispatcher->foo = 'bar';
+                return $dispatcher->setDebug($container->get('config')->get('system.debug'));
+            })->bindShared(Dispatcher::class, EventDispatcher::class)
+            ->bindShared(DispatcherInterface::class, EventDispatcher::class);
+    }
 }

@@ -19,21 +19,21 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
  */
 class TwigRenderer extends \Windwalker\Renderer\TwigRenderer implements CoreRendererInterface
 {
-	use PackageFinderTrait;
-	use GlobalVarsTrait;
+    use PackageFinderTrait;
+    use GlobalVarsTrait;
 
-	/**
-	 * getLoader
-	 *
-	 * @return  \Twig_LoaderInterface
-	 */
-	public function getLoader()
-	{
-		if (!$this->loader)
-		{
-			$this->loader = new TwigFilesystemLoader($this->packageFinder, $this->dumpPaths(), $this->config->get('path_separator'));
-		}
+    /**
+     * getLoader
+     *
+     * @return  \Twig_LoaderInterface
+     */
+    public function getLoader()
+    {
+        if (!$this->loader) {
+            $this->loader = new TwigFilesystemLoader($this->packageFinder, $this->dumpPaths(),
+                $this->config->get('path_separator'));
+        }
 
-		return $this->loader;
-	}
+        return $this->loader;
+    }
 }

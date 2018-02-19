@@ -20,96 +20,84 @@ use Windwalker\Filesystem\Folder;
  */
 class ClearCacheCommand extends CoreCommand
 {
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'clear-cache';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'clear-cache';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Clear cache.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Clear cache.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = '%s [<folder>] [options]';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = '%s [<folder>] [options]';
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int
-	 *
-	 * @since  2.0
-	 */
-	protected function doExecute()
-	{
-		$folders = $this->io->getArguments();
+    /**
+     * Execute this command.
+     *
+     * @return int
+     *
+     * @since  2.0
+     */
+    protected function doExecute()
+    {
+        $folders = $this->io->getArguments();
 
-		if (!count($folders))
-		{
-			$this->clearCacheRoot();
-		}
-		else
-		{
-			foreach ($folders as $folder)
-			{
-				$this->clearCacheFolder($folder);
-			}
-		}
+        if (!count($folders)) {
+            $this->clearCacheRoot();
+        } else {
+            foreach ($folders as $folder) {
+                $this->clearCacheFolder($folder);
+            }
+        }
 
-		$this->out('Cache cleared.');
-	}
+        $this->out('Cache cleared.');
+    }
 
-	protected function clearCacheRoot()
-	{
-		/** @var \SplFileInfo $file */
-		foreach (Filesystem::items(WINDWALKER_CACHE, false) as $file)
-		{
-			if (in_array($file->getBasename(), ['.gitignore', '.htaccess', 'web.config']))
-			{
-				continue;
-			}
+    protected function clearCacheRoot()
+    {
+        /** @var \SplFileInfo $file */
+        foreach (Filesystem::items(WINDWALKER_CACHE, false) as $file) {
+            if (in_array($file->getBasename(), ['.gitignore', '.htaccess', 'web.config'])) {
+                continue;
+            }
 
-			if ($file->isDir())
-			{
-				Folder::delete($file->getPathname());
-			}
-			else
-			{
-				File::delete($file->getPathname());
-			}
+            if ($file->isDir()) {
+                Folder::delete($file->getPathname());
+            } else {
+                File::delete($file->getPathname());
+            }
 
-			$this->out(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
-		}
-	}
+            $this->out(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
+        }
+    }
 
-	/**
-	 * clearCacheFolder
-	 *
-	 * @param string $folder
-	 *
-	 * @return  void
-	 */
-	protected function clearCacheFolder($folder)
-	{
-		$path = WINDWALKER_CACHE . '/' . $folder;
+    /**
+     * clearCacheFolder
+     *
+     * @param string $folder
+     *
+     * @return  void
+     */
+    protected function clearCacheFolder($folder)
+    {
+        $path = WINDWALKER_CACHE . '/' . $folder;
 
-		if (is_dir($path))
-		{
-			Folder::delete($path);
-		}
-		elseif (is_file($path))
-		{
-			File::delete($path);
-		}
+        if (is_dir($path)) {
+            Folder::delete($path);
+        } elseif (is_file($path)) {
+            File::delete($path);
+        }
 
-		$this->out(sprintf('[Deleted] <info>%s</info>', $path));
-	}
+        $this->out(sprintf('[Deleted] <info>%s</info>', $path));
+    }
 }

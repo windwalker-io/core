@@ -14,167 +14,164 @@ use Windwalker\Http\Helper\HeaderHelper;
 /**
  * The CorsHandler to modify headers in Response which follows MDN.
  *
- * @see  https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+ * @see    https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
  *
  * @since  3.1
  */
 class CorsHandler
 {
-	/**
-	 * Property response.
-	 *
-	 * @var  ResponseInterface
-	 */
-	protected $response;
+    /**
+     * Property response.
+     *
+     * @var  ResponseInterface
+     */
+    protected $response;
 
-	/**
-	 * create
-	 *
-	 * @param ResponseInterface $response
-	 *
-	 * @return  static
-	 */
-	public static function create(ResponseInterface $response = null)
-	{
-		return new static($response);
-	}
+    /**
+     * create
+     *
+     * @param ResponseInterface $response
+     *
+     * @return  static
+     */
+    public static function create(ResponseInterface $response = null)
+    {
+        return new static($response);
+    }
 
-	/**
-	 * CorsHandler constructor.
-	 *
-	 * @param ResponseInterface $response
-	 */
-	public function __construct(ResponseInterface $response = null)
-	{
-		$this->response = $response;
-	}
+    /**
+     * CorsHandler constructor.
+     *
+     * @param ResponseInterface $response
+     */
+    public function __construct(ResponseInterface $response = null)
+    {
+        $this->response = $response;
+    }
 
-	/**
-	 * allowOrigin
-	 *
-	 * @param string|array $domain
-	 * @param bool         $replace
-	 *
-	 * @return static
-	 */
-	public function allowOrigin($domain = '*', $replace = false)
-	{
-		$domain = implode(' ', (array) $domain);
+    /**
+     * allowOrigin
+     *
+     * @param string|array $domain
+     * @param bool         $replace
+     *
+     * @return static
+     */
+    public function allowOrigin($domain = '*', $replace = false)
+    {
+        $domain = implode(' ', (array) $domain);
 
-		if ($replace)
-		{
-			$this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
-		}
-		else
-		{
-			$this->response = $this->response->withAddedHeader('Access-Control-Allow-Origin', $domain);
-		}
+        if ($replace) {
+            $this->response = $this->response->withHeader('Access-Control-Allow-Origin', $domain);
+        } else {
+            $this->response = $this->response->withAddedHeader('Access-Control-Allow-Origin', $domain);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowMethods
-	 *
-	 * @param string|array $methods
-	 *
-	 * @return  static
-	 */
-	public function allowMethods($methods = '*')
-	{
-		$methods = array_map('strtoupper', (array) $methods);
-		$methods = implode(', ', $methods);
+    /**
+     * allowMethods
+     *
+     * @param string|array $methods
+     *
+     * @return  static
+     */
+    public function allowMethods($methods = '*')
+    {
+        $methods = array_map('strtoupper', (array) $methods);
+        $methods = implode(', ', $methods);
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Methods', $methods);
+        $this->response = $this->response->withHeader('Access-Control-Allow-Methods', $methods);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowHeaders
-	 *
-	 * @param array|string $headers
-	 *
-	 * @return  static
-	 */
-	public function allowHeaders($headers = '*')
-	{
-		$headers = array_map([HeaderHelper::class, 'normalizeHeaderName'], (array) $headers);
-		$headers = implode(', ', $headers);
+    /**
+     * allowHeaders
+     *
+     * @param array|string $headers
+     *
+     * @return  static
+     */
+    public function allowHeaders($headers = '*')
+    {
+        $headers = array_map([HeaderHelper::class, 'normalizeHeaderName'], (array) $headers);
+        $headers = implode(', ', $headers);
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
+        $this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * maxAge
-	 *
-	 * @param int $seconds
-	 *
-	 * @return  static
-	 */
-	public function maxAge($seconds)
-	{
-		$this->response = $this->response->withHeader('Access-Control-Max-Age', (int) $seconds);
+    /**
+     * maxAge
+     *
+     * @param int $seconds
+     *
+     * @return  static
+     */
+    public function maxAge($seconds)
+    {
+        $this->response = $this->response->withHeader('Access-Control-Max-Age', (int) $seconds);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * allowCredentials
-	 *
-	 * @param bool $bool
-	 *
-	 * @return  static
-	 */
-	public function allowCredentials($bool = true)
-	{
-		$bool = $bool ? 'true' : 'false';
+    /**
+     * allowCredentials
+     *
+     * @param bool $bool
+     *
+     * @return  static
+     */
+    public function allowCredentials($bool = true)
+    {
+        $bool = $bool ? 'true' : 'false';
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Credentials', $bool);
+        $this->response = $this->response->withHeader('Access-Control-Allow-Credentials', $bool);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * exposeHeaders
-	 *
-	 * @param string|array $headers
-	 *
-	 * @return  static
-	 */
-	public function exposeHeaders($headers = '*')
-	{
-		$headers = array_map([HeaderHelper::class, 'normalizeHeaderName'], (array) $headers);
-		$headers = implode(', ', $headers);
+    /**
+     * exposeHeaders
+     *
+     * @param string|array $headers
+     *
+     * @return  static
+     */
+    public function exposeHeaders($headers = '*')
+    {
+        $headers = array_map([HeaderHelper::class, 'normalizeHeaderName'], (array) $headers);
+        $headers = implode(', ', $headers);
 
-		$this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
+        $this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Response
-	 *
-	 * @return  ResponseInterface
-	 */
-	public function getResponse()
-	{
-		return $this->response;
-	}
+    /**
+     * Method to get property Response
+     *
+     * @return  ResponseInterface
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
 
-	/**
-	 * Method to set property response
-	 *
-	 * @param   ResponseInterface $response
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setResponse($response)
-	{
-		$this->response = $response;
+    /**
+     * Method to set property response
+     *
+     * @param   ResponseInterface $response
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
 
-		return $this;
-	}
+        return $this;
+    }
 }

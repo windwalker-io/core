@@ -13,33 +13,30 @@ use Windwalker\Environment\ServerHelper;
 
 /**
  * The Symlink class.
- * 
+ *
  * @since  2.1.1
  */
 class Symlink
 {
-	/**
-	 * make
-	 *
-	 * @param string $src
-	 * @param string $dest
-	 *
-	 * @return  string
-	 */
-	public function make($src, $dest)
-	{
-		$windows = PlatformHelper::isWindows();
+    /**
+     * make
+     *
+     * @param string $src
+     * @param string $dest
+     *
+     * @return  string
+     */
+    public function make($src, $dest)
+    {
+        $windows = PlatformHelper::isWindows();
 
-		$src    = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $src);
-		$dest = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dest);
+        $src  = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $src);
+        $dest = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dest);
 
-		if ($windows)
-		{
-			return exec("mklink /D {$dest} {$src}");
-		}
-		else
-		{
-			return exec("ln -s {$src} {$dest}");
-		}
-	}
+        if ($windows) {
+            return exec("mklink /D {$dest} {$src}");
+        } else {
+            return exec("ln -s {$src} {$dest}");
+        }
+    }
 }

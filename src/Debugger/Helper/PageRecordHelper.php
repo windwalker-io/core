@@ -10,44 +10,44 @@ namespace Windwalker\Debugger\Helper;
 
 /**
  * The DebuggerHelper class.
- * 
+ *
  * @since  2.1.1
  */
 class PageRecordHelper
 {
-	/**
-	 * getFolderName
-	 *
-	 * @param   string  $id
-	 *
-	 * @return  string
-	 */
-	public static function getFolderName($id)
-	{
-		return substr($id, 0, 4);
-	}
+    /**
+     * getFolderName
+     *
+     * @param   string $id
+     *
+     * @return  string
+     */
+    public static function getFolderName($id)
+    {
+        return substr($id, 0, 4);
+    }
 
-	/**
-	 * getFile
-	 *
-	 * @param   string  $id
-	 *
-	 * @return  string
-	 */
-	public static function getFile($id)
-	{
-		return static::getFolder($id) . '/' . $id;
-	}
+    /**
+     * getFile
+     *
+     * @param   string $id
+     *
+     * @return  string
+     */
+    public static function getFile($id)
+    {
+        return static::getFolder($id) . '/' . $id;
+    }
 
-	/**
-	 * getFolder
-	 *
-	 * @param   string  $id
-	 *
-	 * @return  string
-	 */
-	public static function getFolder($id)
-	{
-		return WINDWALKER_CACHE . '/profiler/' . static::getFolderName($id);
-	}
+    /**
+     * getFolder
+     *
+     * @param   string $id
+     *
+     * @return  string
+     */
+    public static function getFolder($id)
+    {
+        return WINDWALKER_CACHE . '/profiler/' . static::getFolderName($id);
+    }
 }

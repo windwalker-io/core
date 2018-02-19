@@ -21,41 +21,40 @@ use Windwalker\Structure\Structure;
  */
 class SwiftMailerProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->share(\Swift_Mailer::class, [$this, 'swiftmailer'])
-			->alias('swiftmailer', \Swift_Mailer::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->share(\Swift_Mailer::class, [$this, 'swiftmailer'])
+            ->alias('swiftmailer', \Swift_Mailer::class);
 
-		$container->bindShared(MailerAdapterInterface::class, SwiftMailerAdapter::class)
-			->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class);
-	}
+        $container->bindShared(MailerAdapterInterface::class, SwiftMailerAdapter::class)
+            ->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class);
+    }
 
-	/**
-	 * swiftmailer
-	 *
-	 * @param Container $container
-	 *
-	 * @return  \Swift_Mailer
-	 */
-	public function swiftmailer(Container $container)
-	{
-		if (!class_exists('Swift_Mailer'))
-		{
-			throw new \LogicException('Please install swiftmailer/swiftmailer 5.* first.');
-		}
-		
-		/** @var Structure $config */
-		$config = $container->get('config');
+    /**
+     * swiftmailer
+     *
+     * @param Container $container
+     *
+     * @return  \Swift_Mailer
+     */
+    public function swiftmailer(Container $container)
+    {
+        if (!class_exists('Swift_Mailer')) {
+            throw new \LogicException('Please install swiftmailer/swiftmailer 5.* first.');
+        }
 
-		$transport = SwiftMailerAdapter::createTransport($config->get('mail.transport'), (array) $config->get('mail'));
+        /** @var Structure $config */
+        $config = $container->get('config');
 
-		return \Swift_Mailer::newInstance($transport);
-	}
+        $transport = SwiftMailerAdapter::createTransport($config->get('mail.transport'), (array) $config->get('mail'));
+
+        return \Swift_Mailer::newInstance($transport);
+    }
 }

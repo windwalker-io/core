@@ -14,38 +14,38 @@ use Windwalker\Core\Asset\Command\Asset\SyncCommand;
 
 /**
  * The AssetCommand class.
- * 
+ *
  * @since  2.1.1
  */
 class AssetCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'asset';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'asset';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Asset management';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Asset management';
 
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(new SyncCommand);
-		$this->addCommand(new MakesumCommand);
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(new SyncCommand);
+        $this->addCommand(new MakesumCommand);
 
-		$this->addGlobalOption('e')
-			->alias('env')
-			->description('The environment application name or class.')
-			->defaultValue('dev');
-	}
+        $this->addGlobalOption('e')
+            ->alias('env')
+            ->description('The environment application name or class.')
+            ->defaultValue('dev');
+    }
 }

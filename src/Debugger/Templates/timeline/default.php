@@ -11,20 +11,20 @@ use Windwalker\Profiler\Profiler;
 $this->extend('_global.html');
 
 /**
- * @var  Profiler  $profiler
+ * @var  Profiler $profiler
  */
 ?>
 
 <?php $this->block('page_title') ?>Timeline<?php $this->endblock(); ?>
 
 <?php $this->block('content') ?>
-<h2>System Process</h2>
+    <h2>System Process</h2>
 
 <?php echo $this->load('timeline', ['timeline' => $systemProcess]) ?>
 
-	<br /><br />
+    <br/><br/>
 
-<h2>All Process</h2>
+    <h2>All Process</h2>
 
 <?php echo $this->load('timeline', ['timeline' => $allProcess]) ?>
 <?php $this->endblock() ?>

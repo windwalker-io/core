@@ -15,53 +15,52 @@ namespace Windwalker\Core\Utilities\Classes;
  */
 trait MultiSingletonTrait
 {
-	/**
-	 * Property instances.
-	 *
-	 * @var  array
-	 */
-	protected static $instances = [];
+    /**
+     * Property instances.
+     *
+     * @var  array
+     */
+    protected static $instances = [];
 
-	/**
-	 * getInstance
-	 *
-	 * @param string $name
-	 * @param array  ...$args
-	 *
-	 * @return static
-	 */
-	public static function getInstance($name, ...$args)
-	{
-		if (empty(static::$instances[$name]))
-		{
-			static::$instances[$name] = new static(...$args);
-		}
+    /**
+     * getInstance
+     *
+     * @param string $name
+     * @param array  ...$args
+     *
+     * @return static
+     */
+    public static function getInstance($name, ...$args)
+    {
+        if (empty(static::$instances[$name])) {
+            static::$instances[$name] = new static(...$args);
+        }
 
-		return static::$instances[$name];
-	}
+        return static::$instances[$name];
+    }
 
-	/**
-	 * setInstance
-	 *
-	 * @param string $name
-	 * @param object $instance
-	 *
-	 * @return  mixed
-	 */
-	protected static function setInstance($name, $instance)
-	{
-		return static::$instances[$name] = $instance;
-	}
+    /**
+     * setInstance
+     *
+     * @param string $name
+     * @param object $instance
+     *
+     * @return  mixed
+     */
+    protected static function setInstance($name, $instance)
+    {
+        return static::$instances[$name] = $instance;
+    }
 
-	/**
-	 * hasInstance
-	 *
-	 * @param string $name
-	 *
-	 * @return  bool
-	 */
-	protected static function hasInstance($name)
-	{
-		return isset(static::$instances[$name]);
-	}
+    /**
+     * hasInstance
+     *
+     * @param string $name
+     *
+     * @return  bool
+     */
+    protected static function hasInstance($name)
+    {
+        return isset(static::$instances[$name]);
+    }
 }

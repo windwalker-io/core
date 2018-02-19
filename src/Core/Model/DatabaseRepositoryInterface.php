@@ -19,64 +19,64 @@ use Windwalker\Record\Record;
  */
 interface DatabaseRepositoryInterface
 {
-	/**
-	 * getRecord
-	 *
-	 * @param   string $name
-	 *
-	 * @return  Record
-	 */
-	public function getRecord($name = null);
+    /**
+     * getRecord
+     *
+     * @param   string $name
+     *
+     * @return  Record
+     */
+    public function getRecord($name = null);
 
-	/**
-	 * getDataMapper
-	 *
-	 * @param string $name
-	 *
-	 * @return  DataMapper
-	 */
-	public function getDataMapper($name = null);
+    /**
+     * getDataMapper
+     *
+     * @param string $name
+     *
+     * @return  DataMapper
+     */
+    public function getDataMapper($name = null);
 
-	/**
-	 * getDb
-	 *
-	 * @return  AbstractDatabaseDriver
-	 */
-	public function getDb();
+    /**
+     * getDb
+     *
+     * @return  AbstractDatabaseDriver
+     */
+    public function getDb();
 
-	/**
-	 * setDb
-	 *
-	 * @param   AbstractDatabaseDriver $db
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setDb($db);
+    /**
+     * setDb
+     *
+     * @param   AbstractDatabaseDriver $db
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDb($db);
 
-	/**
-	 * transactionStart
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionStart($nested = true);
+    /**
+     * transactionStart
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionStart($nested = true);
 
-	/**
-	 * transactionCommit
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionCommit($nested = true);
+    /**
+     * transactionCommit
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionCommit($nested = true);
 
-	/**
-	 * transactionRollback
-	 *
-	 * @param boolean $nested
-	 *
-	 * @return  static
-	 */
-	public function transactionRollback($nested = true);
+    /**
+     * transactionRollback
+     *
+     * @param boolean $nested
+     *
+     * @return  static
+     */
+    public function transactionRollback($nested = true);
 }

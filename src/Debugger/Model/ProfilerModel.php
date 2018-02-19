@@ -15,57 +15,54 @@ use Windwalker\Debugger\Helper\PageRecordHelper;
 
 /**
  * The ItemModel class.
- * 
+ *
  * @since  2.1.1
  */
 class ProfilerModel extends ModelRepository
 {
-	/**
-	 * getItem
-	 *
-	 * @param   string  $id
-	 *
-	 * @return  array
-	 */
-	public function getItem($id)
-	{
-		$file = PageRecordHelper::getFile($id);
+    /**
+     * getItem
+     *
+     * @param   string $id
+     *
+     * @return  array
+     */
+    public function getItem($id)
+    {
+        $file = PageRecordHelper::getFile($id);
 
-		if (!is_file($file))
-		{
-			return null;
-		}
+        if (!is_file($file)) {
+            return null;
+        }
 
-		$item = unserialize(file_get_contents($file));
+        $item = unserialize(file_get_contents($file));
 
-		$item = new Data((array) $item);
+        $item = new Data((array) $item);
 
-		if (!$item->profiler)
-		{
-			$item->profiler = new NullObject;
-		}
+        if (!$item->profiler) {
+            $item->profiler = new NullObject;
+        }
 
-		if (!$item->collector)
-		{
-			$item->collector = new NullObject;
-		}
+        if (!$item->collector) {
+            $item->collector = new NullObject;
+        }
 
-		$item->id = $id;
+        $item->id = $id;
 
-		return $item;
-	}
+        return $item;
+    }
 
-	/**
-	 * hasItem
-	 *
-	 * @param   string  $id
-	 *
-	 * @return  boolean
-	 */
-	public function hasItem($id)
-	{
-		$file = PageRecordHelper::getFile($id);
+    /**
+     * hasItem
+     *
+     * @param   string $id
+     *
+     * @return  boolean
+     */
+    public function hasItem($id)
+    {
+        $file = PageRecordHelper::getFile($id);
 
-		return is_file($file);
-	}
+        return is_file($file);
+    }
 }

@@ -18,15 +18,15 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class MailerProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(MailerManager::class);
-	}
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(MailerManager::class);
+    }
 }

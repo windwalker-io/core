@@ -14,25 +14,24 @@ use Windwalker\Event\Dispatcher;
 
 /**
  * The DispatcherAwareStaticTrait class.
- * 
+ *
  * @since  2.0
  */
 trait DispatcherAwareFacadeTrait
 {
-	use DispatcherAwareStaticTrait;
+    use DispatcherAwareStaticTrait;
 
-	/**
-	 * Method to get property Dispatcher
-	 *
-	 * @return  Dispatcher
-	 */
-	public static function getDispatcher()
-	{
-		if (!static::$dispatcher)
-		{
-			static::$dispatcher = Ioc::getDispatcher();
-		}
+    /**
+     * Method to get property Dispatcher
+     *
+     * @return  Dispatcher
+     */
+    public static function getDispatcher()
+    {
+        if (!static::$dispatcher) {
+            static::$dispatcher = Ioc::getDispatcher();
+        }
 
-		return static::$dispatcher;
-	}
+        return static::$dispatcher;
+    }
 }

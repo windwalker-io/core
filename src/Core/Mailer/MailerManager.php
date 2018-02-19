@@ -20,171 +20,166 @@ use Windwalker\Event\DispatcherAwareTrait;
  */
 class MailerManager
 {
-	use DispatcherAwareTrait;
+    use DispatcherAwareTrait;
 
-	/**
-	 * Property adapter.
-	 *
-	 * @var  MailerAdapterInterface
-	 */
-	protected $adapter;
+    /**
+     * Property adapter.
+     *
+     * @var  MailerAdapterInterface
+     */
+    protected $adapter;
 
-	/**
-	 * Property messageClass.
-	 *
-	 * @var  string
-	 */
-	protected $messageClass = MailMessage::class;
+    /**
+     * Property messageClass.
+     *
+     * @var  string
+     */
+    protected $messageClass = MailMessage::class;
 
-	/**
-	 * Mailer constructor.
-	 *
-	 * @param MailerAdapterInterface $adapter
-	 * @param EventDispatcher        $dispatcher
-	 */
-	public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
-	{
-		$this->adapter = $adapter;
-		$this->dispatcher = $dispatcher ? : new EventDispatcher;
-	}
+    /**
+     * Mailer constructor.
+     *
+     * @param MailerAdapterInterface $adapter
+     * @param EventDispatcher        $dispatcher
+     */
+    public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
+    {
+        $this->adapter    = $adapter;
+        $this->dispatcher = $dispatcher ?: new EventDispatcher;
+    }
 
-	/**
-	 * createMessage
-	 *
-	 * @param string $subject
-	 * @param string $content
-	 * @param bool   $html
-	 *
-	 * @return  MailMessage
-	 */
-	public function createMessage($subject = null, $content = null, $html = true)
-	{
-		$class = $this->messageClass;
+    /**
+     * createMessage
+     *
+     * @param string $subject
+     * @param string $content
+     * @param bool   $html
+     *
+     * @return  MailMessage
+     */
+    public function createMessage($subject = null, $content = null, $html = true)
+    {
+        $class = $this->messageClass;
 
-		$message = new $class($subject, $content, $html);
+        $message = new $class($subject, $content, $html);
 
-		$this->triggerEvent('onMailerAfterCreateMessage', [
-			'message' => $message,
-			'manager' => $this
-		]);
+        $this->triggerEvent('onMailerAfterCreateMessage', [
+            'message' => $message,
+            'manager' => $this,
+        ]);
 
-		return $message;
-	}
+        return $message;
+    }
 
-	/**
-	 * send
-	 *
-	 * @param MailMessage|callable $message
-	 *
-	 * @return  boolean
-	 *
-	 * @throws \InvalidArgumentException
-	 */
-	public function send($message)
-	{
-		if (is_callable($message))
-		{
-			$msgObject = $this->createMessage();
+    /**
+     * send
+     *
+     * @param MailMessage|callable $message
+     *
+     * @return  boolean
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function send($message)
+    {
+        if (is_callable($message)) {
+            $msgObject = $this->createMessage();
 
-			$message = $message($msgObject, $this);
+            $message = $message($msgObject, $this);
 
-			if (!$message instanceof MailMessage)
-			{
-				$message = $msgObject;
-			}
-		}
+            if (!$message instanceof MailMessage) {
+                $message = $msgObject;
+            }
+        }
 
-		if (!$message instanceof MailMessage)
-		{
-			throw new \InvalidArgumentException(sprintf('Mail Message should instance of %s', MailMessage::class));
-		}
+        if (!$message instanceof MailMessage) {
+            throw new \InvalidArgumentException(sprintf('Mail Message should instance of %s', MailMessage::class));
+        }
 
-		$this->triggerEvent('onMailerBeforeSend', [
-			'message' => $message,
-			'manager' => $this
-		]);
+        $this->triggerEvent('onMailerBeforeSend', [
+            'message' => $message,
+            'manager' => $this,
+        ]);
 
-		// Set default sender
-		if (!$message->getFrom())
-		{
-			$config = Ioc::getConfig();
+        // Set default sender
+        if (!$message->getFrom()) {
+            $config = Ioc::getConfig();
 
-			if ($config->exists('mail.from.email'))
-			{
-				$message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
-			}
-		}
+            if ($config->exists('mail.from.email')) {
+                $message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
+            }
+        }
 
-		$result = $this->getAdapter()->send($message);
+        $result = $this->getAdapter()->send($message);
 
-		$this->triggerEvent('onMailerAfterSend', [
-			'message' => $message,
-			'manager' => $this,
-			'result'  => &$result
-		]);
+        $this->triggerEvent('onMailerAfterSend', [
+            'message' => $message,
+            'manager' => $this,
+            'result' => &$result,
+        ]);
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Method to set property messageClass
-	 *
-	 * @param   mixed $messageClass
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMessageClass($messageClass)
-	{
-		$this->messageClass = $messageClass;
+    /**
+     * Method to set property messageClass
+     *
+     * @param   mixed $messageClass
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setMessageClass($messageClass)
+    {
+        $this->messageClass = $messageClass;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Adapter
-	 *
-	 * @return  MailerAdapterInterface
-	 */
-	public function getAdapter()
-	{
-		return $this->adapter;
-	}
+    /**
+     * Method to get property Adapter
+     *
+     * @return  MailerAdapterInterface
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
 
-	/**
-	 * Method to set property adapter
-	 *
-	 * @param   MailerAdapterInterface $adapter
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setAdapter(MailerAdapterInterface $adapter)
-	{
-		$this->adapter = $adapter;
+    /**
+     * Method to set property adapter
+     *
+     * @param   MailerAdapterInterface $adapter
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setAdapter(MailerAdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Messages
-	 *
-	 * @return  \callable[]
-	 */
-	public function getMessages()
-	{
-		return $this->messages;
-	}
+    /**
+     * Method to get property Messages
+     *
+     * @return  \callable[]
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
 
-	/**
-	 * Method to set property messages
-	 *
-	 * @param   \callable[] $messages
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMessages($messages)
-	{
-		$this->messages=$messages;
+    /**
+     * Method to set property messages
+     *
+     * @param   \callable[] $messages
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setMessages($messages)
+    {
+        $this->messages = $messages;
 
-		return $this;
-	}
+        return $this;
+    }
 }

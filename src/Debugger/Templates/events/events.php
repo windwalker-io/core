@@ -8,15 +8,15 @@
 
 ?>
 <table class="table table-bordered">
-	<thead>
-	<tr>
-		<th>Event Name</th>
-		<th>Times</th>
-		<th>Listener</th>
-	</tr>
-	</thead>
-	<tbody>
-	<?php foreach ($events as $name => $listeners): ?>
+    <thead>
+    <tr>
+        <th>Event Name</th>
+        <th>Times</th>
+        <th>Listener</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($events as $name => $listeners): ?>
         <?php if (count($listeners)): ?>
             <?php $i = 0; ?>
             <?php foreach ($listeners as $event): ?>
@@ -48,6 +48,6 @@
                 </td>
             </tr>
         <?php endif; ?>
-	<?php endforeach; ?>
-	</tbody>
+    <?php endforeach; ?>
+    </tbody>
 </table>

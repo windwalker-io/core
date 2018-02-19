@@ -14,37 +14,36 @@ use Windwalker\DI\ServiceProviderInterface;
 
 /**
  * The DateTimeProvider class.
- * 
+ *
  * @since  2.0
  */
 class DateTimeProvider implements ServiceProviderInterface
 {
-	/**
-	 * boot
-	 *
-	 * @return  void
-	 */
-	public function boot()
-	{
-		date_default_timezone_set('UTC');
-	}
+    /**
+     * boot
+     *
+     * @return  void
+     */
+    public function boot()
+    {
+        date_default_timezone_set('UTC');
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$closure = function(Container $container)
-		{
-			$tz = $container->get('config')->get('system.timezone', 'UTC');
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $closure = function (Container $container) {
+            $tz = $container->get('config')->get('system.timezone', 'UTC');
 
-			return new Chronos('now', new \DateTimeZone($tz));
-		};
+            return new Chronos('now', new \DateTimeZone($tz));
+        };
 
-		$container->set(Chronos::class, $closure);
-	}
+        $container->set(Chronos::class, $closure);
+    }
 }

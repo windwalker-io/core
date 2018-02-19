@@ -15,34 +15,34 @@ namespace Windwalker\Core\Asset;
  */
 trait AssetAwareTrait
 {
-	/**
-	 * Property asset.
-	 *
-	 * @var  AssetManager
-	 */
-	protected $asset;
+    /**
+     * Property asset.
+     *
+     * @var  AssetManager
+     */
+    protected $asset;
 
-	/**
-	 * Method to get property Asset
-	 *
-	 * @return  AssetManager
-	 */
-	public function getAsset()
-	{
-		return $this->asset;
-	}
+    /**
+     * Method to get property Asset
+     *
+     * @return  AssetManager
+     */
+    public function getAsset()
+    {
+        return $this->asset;
+    }
 
-	/**
-	 * Method to set property asset
-	 *
-	 * @param   AssetManager $asset
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setAsset($asset)
-	{
-		$this->asset = $asset;
+    /**
+     * Method to set property asset
+     *
+     * @param   AssetManager $asset
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setAsset($asset)
+    {
+        $this->asset = $asset;
 
-		return $this;
-	}
+        return $this;
+    }
 }

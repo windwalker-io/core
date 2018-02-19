@@ -21,44 +21,41 @@ use Windwalker\Core\Mailer\MailMessage;
  */
 class GetController extends AbstractController
 {
-	/**
-	 * Do execute action.
-	 *
-	 * @return  mixed
-	 *
-	 * @throws \Exception
-	 */
-	protected function doExecute()
-	{
-		$class = $this->input->getString('class');
+    /**
+     * Do execute action.
+     *
+     * @return  mixed
+     *
+     * @throws \Exception
+     */
+    protected function doExecute()
+    {
+        $class = $this->input->getString('class');
 
-		$view = $this->getView();
+        $view = $this->getView();
 
-		if ($class && is_subclass_of($class, MailMessage::class))
-		{
-			Mailer::getContainer()
-				->prepareSharedObject(DebugMailerAdapter::class)
-				->bindShared(MailerAdapterInterface::class, DebugMailerAdapter::class);
+        if ($class && is_subclass_of($class, MailMessage::class)) {
+            Mailer::getContainer()
+                ->prepareSharedObject(DebugMailerAdapter::class)
+                ->bindShared(MailerAdapterInterface::class, DebugMailerAdapter::class);
 
-			/** @var MailMessage $message */
-			$message = Mailer::send($class::create());
+            /** @var MailMessage $message */
+            $message = Mailer::send($class::create());
 
-			$view['message'] = $message;
+            $view['message'] = $message;
 
-			// Set default sender
-			if (!$message->getFrom())
-			{
-				$config = $this->app->config;
+            // Set default sender
+            if (!$message->getFrom()) {
+                $config = $this->app->config;
 
-				if ($config->exists('mail.from.email'))
-				{
-					$message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
-				}
-			}
-		}
+                if ($config->exists('mail.from.email')) {
+                    $message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
+                }
+            }
+        }
 
-		$view['class'] = $class;
+        $view['class'] = $class;
 
-		return $view->render();
-	}
+        return $view->render();
+    }
 }

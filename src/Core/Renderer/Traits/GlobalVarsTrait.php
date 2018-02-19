@@ -15,63 +15,63 @@ namespace Windwalker\Core\Renderer\Traits;
  */
 trait GlobalVarsTrait
 {
-	/**
-	 * Property globals.
-	 *
-	 * @var  array
-	 */
-	protected $globals = [];
+    /**
+     * Property globals.
+     *
+     * @var  array
+     */
+    protected $globals = [];
 
-	/**
-	 * addGlobal
-	 *
-	 * @param   string  $name
-	 * @param   mixed   $value
-	 *
-	 * @return  static
-	 */
-	public function addGlobal($name, $value)
-	{
-		$this->globals[$name] = $value;
+    /**
+     * addGlobal
+     *
+     * @param   string $name
+     * @param   mixed  $value
+     *
+     * @return  static
+     */
+    public function addGlobal($name, $value)
+    {
+        $this->globals[$name] = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * removeGlobal
-	 *
-	 * @param   string  $name
-	 *
-	 * @return  static
-	 */
-	public function removeGlobal($name)
-	{
-		unset($this->globals[$name]);
+    /**
+     * removeGlobal
+     *
+     * @param   string $name
+     *
+     * @return  static
+     */
+    public function removeGlobal($name)
+    {
+        unset($this->globals[$name]);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Globals
-	 *
-	 * @return  array
-	 */
-	public function getGlobals()
-	{
-		return $this->globals;
-	}
+    /**
+     * Method to get property Globals
+     *
+     * @return  array
+     */
+    public function getGlobals()
+    {
+        return $this->globals;
+    }
 
-	/**
-	 * Method to set property globals
-	 *
-	 * @param   array $globals
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setGlobals($globals)
-	{
-		$this->globals = $globals;
+    /**
+     * Method to set property globals
+     *
+     * @param   array $globals
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setGlobals($globals)
+    {
+        $this->globals = $globals;
 
-		return $this;
-	}
+        return $this;
+    }
 }

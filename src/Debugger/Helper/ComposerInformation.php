@@ -14,82 +14,79 @@ use Windwalker\Utilities\ArrayHelper;
 
 /**
  * The ComposerInformation class.
- * 
+ *
  * @since  2.1.1
  */
 class ComposerInformation
 {
-	/**
-	 * Property cache.
-	 *
-	 * @var  Structure
-	 */
-	protected static $lock;
+    /**
+     * Property cache.
+     *
+     * @var  Structure
+     */
+    protected static $lock;
 
-	/**
-	 * Property json.
-	 *
-	 * @var Structure
-	 */
-	protected static $json;
+    /**
+     * Property json.
+     *
+     * @var Structure
+     */
+    protected static $json;
 
-	/**
-	 * getLock
-	 *
-	 * @return  Structure
-	 */
-	public static function getLock()
-	{
-		if (!static::$lock)
-		{
-			$root = Ioc::getConfig()->get('path.root');
-			$file = realpath($root . '/composer.lock');
+    /**
+     * getLock
+     *
+     * @return  Structure
+     */
+    public static function getLock()
+    {
+        if (!static::$lock) {
+            $root = Ioc::getConfig()->get('path.root');
+            $file = realpath($root . '/composer.lock');
 
-			$data = file_get_contents($file);
-			$data = json_decode($data);
+            $data = file_get_contents($file);
+            $data = json_decode($data);
 
-			static::$lock = new Structure($data);
-		}
+            static::$lock = new Structure($data);
+        }
 
-		return static::$lock;
-	}
+        return static::$lock;
+    }
 
-	/**
-	 * getJson
-	 *
-	 * @return  Structure
-	 */
-	public static function getJson()
-	{
-		if (!static::$json)
-		{
-			$root = Ioc::getConfig()->get('path.root');
-			$file = realpath($root . '/composer.json');
+    /**
+     * getJson
+     *
+     * @return  Structure
+     */
+    public static function getJson()
+    {
+        if (!static::$json) {
+            $root = Ioc::getConfig()->get('path.root');
+            $file = realpath($root . '/composer.json');
 
-			static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
-		}
+            static::$json = new Structure(is_file($file) ? file_get_contents($file) : null);
+        }
 
-		return static::$json;
-	}
+        return static::$json;
+    }
 
-	/**
-	 * getInstalledVersion
-	 *
-	 * @param   string  $package
-	 *
-	 * @return  string
-	 */
-	public static function getInstalledVersion($package)
-	{
-		$composer = ComposerInformation::getLock();
+    /**
+     * getInstalledVersion
+     *
+     * @param   string $package
+     *
+     * @return  string
+     */
+    public static function getInstalledVersion($package)
+    {
+        $composer = ComposerInformation::getLock();
 
-		$data = ArrayHelper::query($composer['packages'], ['name' => $package]);
+        $data = ArrayHelper::query($composer['packages'], ['name' => $package]);
 
-		if (isset($data[0]['version']))
-		{
-			return $data[0]['version'];
-		}
+        if (isset($data[0]['version'])) {
+            return $data[0]['version'];
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

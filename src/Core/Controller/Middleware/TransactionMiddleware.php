@@ -15,39 +15,34 @@ namespace Windwalker\Core\Controller\Middleware;
  */
 class TransactionMiddleware extends AbstractControllerMiddleware
 {
-	/**
-	 * Call next middleware.
-	 *
-	 * @param   ControllerData $data
-	 *
-	 * @return mixed
-	 *
-	 * @throws \Exception
-	 * @throws \Throwable
-	 */
-	public function execute($data = null)
-	{
-		$data->model->transactionStart(true);
+    /**
+     * Call next middleware.
+     *
+     * @param   ControllerData $data
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function execute($data = null)
+    {
+        $data->model->transactionStart(true);
 
-		try
-		{
-			$result = $this->next->execute($data);
-		}
-		catch (\Exception $e)
-		{
-			$data->model->transactionRollback(true);
+        try {
+            $result = $this->next->execute($data);
+        } catch (\Exception $e) {
+            $data->model->transactionRollback(true);
 
-			throw $e;
-		}
-		catch (\Throwable $e)
-		{
-			$data->model->transactionRollback(true);
+            throw $e;
+        } catch (\Throwable $e) {
+            $data->model->transactionRollback(true);
 
-			throw $e;
-		}
+            throw $e;
+        }
 
-		$data->model->transactionCommit(true);
+        $data->model->transactionCommit(true);
 
-		return $result;
-	}
+        return $result;
+    }
 }

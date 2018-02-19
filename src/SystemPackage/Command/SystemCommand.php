@@ -18,42 +18,42 @@ use Windwalker\SystemPackage\Command\System\UpCommand;
  */
 class SystemCommand extends Command
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'system';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'system';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'System operation.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'System operation.';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addCommand(GenerateCommand::class);
-		$this->addCommand(ClearCacheCommand::class);
-		$this->addCommand(LangMergeCommand::class);
-		$this->addCommand(MailTestCommand::class);
-		$this->addCommand(UpCommand::class);
-		$this->addCommand(DownCommand::class);
-		$this->addCommand(ModeCommand::class);
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addCommand(GenerateCommand::class);
+        $this->addCommand(ClearCacheCommand::class);
+        $this->addCommand(LangMergeCommand::class);
+        $this->addCommand(MailTestCommand::class);
+        $this->addCommand(UpCommand::class);
+        $this->addCommand(DownCommand::class);
+        $this->addCommand(ModeCommand::class);
 
-  		parent::init();
-	}
+        parent::init();
+    }
 }

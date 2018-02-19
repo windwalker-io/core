@@ -20,99 +20,95 @@ use Windwalker\Filesystem\File;
  */
 class CopyConfigCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'copy-config';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'copy-config';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Copy package config to etc';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Copy package config to etc';
 
-	/**
-	 * Initialise command.
-	 *
-	 * @return void
-	 *
-	 * @since  2.0
-	 */
-	protected function init()
-	{
-		parent::init();
-	}
+    /**
+     * Initialise command.
+     *
+     * @return void
+     *
+     * @since  2.0
+     */
+    protected function init()
+    {
+        parent::init();
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int
-	 *
-	 * @since  2.0
-	 */
-	protected function doExecute()
-	{
-		$env = $this->getOption('env');
-		$resolver = new PackageResolver($this->app->getContainer());
-		
-		$packages = $env::loadPackages();
+    /**
+     * Execute this command.
+     *
+     * @return int
+     *
+     * @since  2.0
+     */
+    protected function doExecute()
+    {
+        $env      = $this->getOption('env');
+        $resolver = new PackageResolver($this->app->getContainer());
 
-		foreach ($packages as $name => $package)
-		{
-			$resolver->addPackage($name, $package);
-		}
+        $packages = $env::loadPackages();
 
-		$pkgName = $this->getArgument(0);
+        foreach ($packages as $name => $package) {
+            $resolver->addPackage($name, $package);
+        }
 
-		if (!$pkgName)
-		{
-			throw new \InvalidArgumentException('No package input.');
-		}
+        $pkgName = $this->getArgument(0);
 
-		$package = $resolver->getPackage($pkgName);
+        if (!$pkgName) {
+            throw new \InvalidArgumentException('No package input.');
+        }
 
-		if (!$package)
-		{
-			throw new \InvalidArgumentException('Package: ' . $pkgName . ' not found.');
-		}
+        $package = $resolver->getPackage($pkgName);
 
-		$dir = $package->getDir();
+        if (!$package) {
+            throw new \InvalidArgumentException('Package: ' . $pkgName . ' not found.');
+        }
 
-		// Config
-		$targetFolder = $this->console->get('path.etc') . '/package';
-		$file = $dir . '/config.dist.yml';
-		$target = $targetFolder . '/' . $pkgName . '.yml';
+        $dir = $package->getDir();
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.yml</info> exists,\n do you want to copy it to <info>etc/package/" . $pkgName . '.yml</info> [Y/n]: ', true))
-		{
-			if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ', false))
-			{
-				File::delete($target);
-			}
+        // Config
+        $targetFolder = $this->console->get('path.etc') . '/package';
+        $file         = $dir . '/config.dist.yml';
+        $target       = $targetFolder . '/' . $pkgName . '.yml';
 
-			if (!is_file($target) && File::copy($file, $target))
-			{
-				$this->out('Copy to <info>etc/package/' . $pkgName . '.yml</info> successfully.');
-			}
-		}
+        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.yml</info> exists,\n do you want to copy it to <info>etc/package/" . $pkgName . '.yml</info> [Y/n]: ',
+                true)) {
+            if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ',
+                    false)) {
+                File::delete($target);
+            }
 
-		$file = $dir . '/secret.dist.yml';
-		$target = $this->console->get('path.etc') . '/secret.yml';
+            if (!is_file($target) && File::copy($file, $target)) {
+                $this->out('Copy to <info>etc/package/' . $pkgName . '.yml</info> successfully.');
+            }
+        }
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <info>etc/secret.yml</info> [Y/n]: ", true))
-		{
-			$secret = file_get_contents($target);
-			$new = file_get_contents($file);
-			$secret = $secret . "\n\n# " . $pkgName . "\n" . ltrim($new);
+        $file   = $dir . '/secret.dist.yml';
+        $target = $this->console->get('path.etc') . '/secret.yml';
 
-			file_put_contents($target, $secret);
+        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <info>etc/secret.yml</info> [Y/n]: ",
+                true)) {
+            $secret = file_get_contents($target);
+            $new    = file_get_contents($file);
+            $secret = $secret . "\n\n# " . $pkgName . "\n" . ltrim($new);
 
-			$this->out('Copy to <info>etc/secret.yml</info> successfully.');
-		}
-		
-		return true;
-	}
+            file_put_contents($target, $secret);
+
+            $this->out('Copy to <info>etc/secret.yml</info> successfully.');
+        }
+
+        return true;
+    }
 }

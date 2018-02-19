@@ -17,13 +17,13 @@ use Windwalker\Core\Controller\Middleware\TransactionMiddleware;
  */
 trait TransactionalTrait
 {
-	/**
-	 * bootTranslationableTrait
-	 *
-	 * @return  void
-	 */
-	public function bootTransactionalTrait()
-	{
-		$this->addMiddleware(TransactionMiddleware::class);
-	}
+    /**
+     * bootTranslationableTrait
+     *
+     * @return  void
+     */
+    public function bootTransactionalTrait()
+    {
+        $this->addMiddleware(TransactionMiddleware::class);
+    }
 }

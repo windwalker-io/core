@@ -9,18 +9,18 @@
 use Windwalker\Form\Field\AbstractField;
 
 /**
- * @var  AbstractField  $field
+ * @var  AbstractField $field
  */
 ?>
 <?php foreach ($fields as $field): ?>
-	<div class="form-group">
-		<?php
-		$field->set('class', $field->get('class') . ' form-control');
-		$field->set('labelClass', $field->get('labelClass') . ' control-label ' . $label_cols);
-		?>
-		<?php echo $field->renderLabel(); ?>
-		<div class="<?php echo $input_cols; ?>">
-			<?php echo $field->renderInput(); ?>
-		</div>
-	</div>
+    <div class="form-group">
+        <?php
+        $field->set('class', $field->get('class') . ' form-control');
+        $field->set('labelClass', $field->get('labelClass') . ' control-label ' . $label_cols);
+        ?>
+        <?php echo $field->renderLabel(); ?>
+        <div class="<?php echo $input_cols; ?>">
+            <?php echo $field->renderInput(); ?>
+        </div>
+    </div>
 <?php endforeach; ?>

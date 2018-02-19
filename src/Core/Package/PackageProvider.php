@@ -27,74 +27,69 @@ use Windwalker\Form\ValidatorHelper;
  */
 class PackageProvider implements ServiceProviderInterface
 {
-	use PackageAwareTrait;
+    use PackageAwareTrait;
 
-	/**
-	 * PackageProvider constructor.
-	 *
-	 * @param AbstractPackage $package
-	 */
-	public function __construct(AbstractPackage $package)
-	{
-		$this->package = $package;
-	}
+    /**
+     * PackageProvider constructor.
+     *
+     * @param AbstractPackage $package
+     */
+    public function __construct(AbstractPackage $package)
+    {
+        $this->package = $package;
+    }
 
-	/**
-	 * boot
-	 *
-	 * @return  void
-	 */
-	public function boot()
-	{
-		$ns = (new \ReflectionClass($this->package))->getNamespaceName();
+    /**
+     * boot
+     *
+     * @return  void
+     */
+    public function boot()
+    {
+        $ns = (new \ReflectionClass($this->package))->getNamespaceName();
 
-		RecordResolver::addNamespace($ns . '\Record');
-		DataMapperResolver::addNamespace($ns . '\DataMapper');
-		FieldHelper::addNamespace($ns . '\Field');
-		ValidatorHelper::addNamespace($ns . 'Validator');
-		// FieldDefinitionResolver::addNamespace($ns . '\Form');
-	}
+        RecordResolver::addNamespace($ns . '\Record');
+        DataMapperResolver::addNamespace($ns . '\DataMapper');
+        FieldHelper::addNamespace($ns . '\Field');
+        ValidatorHelper::addNamespace($ns . 'Validator');
+        // FieldDefinitionResolver::addNamespace($ns . '\Form');
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->share(get_class($this->package), $this->package)
-			->bindShared(AbstractPackage::class, get_class($this->package));
-		
-		$container->share('controller.resolver', function(Container $container)
-		{
-			return new ControllerResolver($this->package, $container);
-		});
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->share(get_class($this->package), $this->package)
+            ->bindShared(AbstractPackage::class, get_class($this->package));
 
-		$container->share('model.resolver', function(Container $container)
-		{
-			return new ModelResolver($this->package, $container);
-		});
+        $container->share('controller.resolver', function (Container $container) {
+            return new ControllerResolver($this->package, $container);
+        });
 
-		$container->share('view.resolver', function(Container $container)
-		{
-			return new ViewResolver($this->package, $container);
-		});
+        $container->share('model.resolver', function (Container $container) {
+            return new ModelResolver($this->package, $container);
+        });
 
-		$container->share('mvc.resolver', function(Container $container)
-		{
-			return new MvcResolver(
-				$container->get('controller.resolver'),
-				$container->get('model.resolver'),
-				$container->get('view.resolver')
-			);
-		});
+        $container->share('view.resolver', function (Container $container) {
+            return new ViewResolver($this->package, $container);
+        });
 
-		if ($this->package->app->isWeb())
-		{
-			// Router
-			$container->prepareSharedObject(PackageRouter::class)->alias('router', PackageRouter::class);
-		}
-	}
+        $container->share('mvc.resolver', function (Container $container) {
+            return new MvcResolver(
+                $container->get('controller.resolver'),
+                $container->get('model.resolver'),
+                $container->get('view.resolver')
+            );
+        });
+
+        if ($this->package->app->isWeb()) {
+            // Router
+            $container->prepareSharedObject(PackageRouter::class)->alias('router', PackageRouter::class);
+        }
+    }
 }

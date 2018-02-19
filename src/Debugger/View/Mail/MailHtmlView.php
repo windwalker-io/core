@@ -18,17 +18,17 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
  */
 class MailHtmlView extends AbstractDebuggerHtmlView
 {
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		parent::prepareData($data);
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        parent::prepareData($data);
 
-		$data->item = new Data;
-	}
+        $data->item = new Data;
+    }
 }

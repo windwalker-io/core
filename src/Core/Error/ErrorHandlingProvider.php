@@ -22,87 +22,80 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class ErrorHandlingProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property config.
-	 *
-	 * @var  Config
-	 */
-	protected $config;
+    /**
+     * Property config.
+     *
+     * @var  Config
+     */
+    protected $config;
 
-	/**
-	 * ErrorHandlingProvider constructor.
-	 *
-	 * @param Config $config
-	 */
-	public function __construct(Config $config)
-	{
-		$this->config = $config;
-	}
+    /**
+     * ErrorHandlingProvider constructor.
+     *
+     * @param Config $config
+     */
+    public function __construct(Config $config)
+    {
+        $this->config = $config;
+    }
 
-	/**
-	 * boot
-	 *
-	 * @param Container $container
-	 *
-	 * @return  void
-	 * @throws \InvalidArgumentException
-	 * @throws \UnexpectedValueException
-	 */
-	public function boot(Container $container)
-	{
-		error_reporting($this->config->get('system.error_reporting', 0));
+    /**
+     * boot
+     *
+     * @param Container $container
+     *
+     * @return  void
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
+     */
+    public function boot(Container $container)
+    {
+        error_reporting($this->config->get('system.error_reporting', 0));
 
-		/** @var ErrorManager $handler */
-		$handler = $container->get(ErrorManager::class);
-		
-		$handler->setErrorTemplate(
-			$this->config->get('error.template', 'windwalker.error.default'),
-			$this->config->get('error.engine', 'php')
-		);
-		
-		$handler->register(true, null, true);
-	}
+        /** @var ErrorManager $handler */
+        $handler = $container->get(ErrorManager::class);
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 * @throws \UnexpectedValueException
-	 * @throws \InvalidArgumentException
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(ErrorManager::class, function (ErrorManager $error, Container $container)
-		{
-			foreach ((array) $this->config->get('error.handlers', []) as $key => $handler)
-			{
-				if (is_string($handler))
-				{
-					$handler = $container->newInstance($handler);
-				}
+        $handler->setErrorTemplate(
+            $this->config->get('error.template', 'windwalker.error.default'),
+            $this->config->get('error.engine', 'php')
+        );
 
-				$error->addHandler($handler, is_numeric($key) ? null : $key);
-			}
+        $handler->register(true, null, true);
+    }
 
-			return $error;
-		});
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(ErrorManager::class, function (ErrorManager $error, Container $container) {
+            foreach ((array) $this->config->get('error.handlers', []) as $key => $handler) {
+                if (is_string($handler)) {
+                    $handler = $container->newInstance($handler);
+                }
 
-		$container->extend(LoggerManager::class, function (LoggerManager $manager, Container $container)
-		{
-			if ($container->get('config')->get('error.log', false))
-			{
-				$logger = $manager->createRotatingLogger('error', LogLevel::ERROR);
-			}
-			else
-			{
-				$logger = new NullLogger;
-			}
+                $error->addHandler($handler, is_numeric($key) ? null : $key);
+            }
 
-			$manager->addLogger('error', $logger);
+            return $error;
+        });
 
-			return $manager;
-		});
-	}
+        $container->extend(LoggerManager::class, function (LoggerManager $manager, Container $container) {
+            if ($container->get('config')->get('error.log', false)) {
+                $logger = $manager->createRotatingLogger('error', LogLevel::ERROR);
+            } else {
+                $logger = new NullLogger;
+            }
+
+            $manager->addLogger('error', $logger);
+
+            return $manager;
+        });
+    }
 }

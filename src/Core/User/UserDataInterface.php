@@ -12,22 +12,22 @@ use Windwalker\Data\DataInterface;
 
 /**
  * The UserDataInterface class.
- * 
+ *
  * @since  2.0
  */
 interface UserDataInterface extends DataInterface
 {
-	/**
-	 * isGuest
-	 *
-	 * @return  boolean
-	 */
-	public function isGuest();
+    /**
+     * isGuest
+     *
+     * @return  boolean
+     */
+    public function isGuest();
 
-	/**
-	 * isMember
-	 *
-	 * @return  boolean
-	 */
-	public function isMember();
+    /**
+     * isMember
+     *
+     * @return  boolean
+     */
+    public function isMember();
 }

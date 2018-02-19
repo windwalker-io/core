@@ -29,106 +29,101 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class SecurityProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(CsrfGuard::class)
-			->alias('security.csrf', CsrfGuard::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(CsrfGuard::class)
+            ->alias('security.csrf', CsrfGuard::class);
 
-		// Always new instance in every usage
-		$container->bind(CipherInterface::class, function (Container $container)
-		{
-			$config = $container->get('config');
-			$class = $this->getCipher($config->get('crypt.cipher', 'blowfish'));
+        // Always new instance in every usage
+        $container->bind(CipherInterface::class, function (Container $container) {
+            $config = $container->get('config');
+            $class  = $this->getCipher($config->get('crypt.cipher', 'blowfish'));
 
-			return $container->newInstance($class);
-		});
+            return $container->newInstance($class);
+        });
 
-		$container->share(Crypt::class, function (Container $container)
-		{
-			$config = $container->get('config');
-			$key = md5('Windwalker-Crypt::' . $config->get('system.secret'));
+        $container->share(Crypt::class, function (Container $container) {
+            $config = $container->get('config');
+            $key    = md5('Windwalker-Crypt::' . $config->get('system.secret'));
 
-			return $container->newInstance(Crypt::class, ['key' => $key]);
-		})->bindShared(CryptInterface::class, Crypt::class);
+            return $container->newInstance(Crypt::class, ['key' => $key]);
+        })->bindShared(CryptInterface::class, Crypt::class);
 
-		$container->share(Password::class, function (Container $container)
-		{
-			$config = $container->get('config');
+        $container->share(Password::class, function (Container $container) {
+            $config = $container->get('config');
 
-			return new Password(
-				$this->getHashingAlgorithm($config->get('crypt.hash_algo', 'blowfish')),
-				(int) $config->get('crypt.hash_cost')
-			);
-		})->bindShared(HasherInterface::class, Password::class);
-	}
+            return new Password(
+                $this->getHashingAlgorithm($config->get('crypt.hash_algo', 'blowfish')),
+                (int) $config->get('crypt.hash_cost')
+            );
+        })->bindShared(HasherInterface::class, Password::class);
+    }
 
-	/**
-	 * getCipher
-	 *
-	 * @param   string  $cipher
-	 *
-	 * @return  string
-	 */
-	protected function getCipher($cipher)
-	{
-		switch ($cipher)
-		{
-			case 'blowfish':
-			case 'bf':
-				return BlowfishCipher::class;
+    /**
+     * getCipher
+     *
+     * @param   string $cipher
+     *
+     * @return  string
+     */
+    protected function getCipher($cipher)
+    {
+        switch ($cipher) {
+            case 'blowfish':
+            case 'bf':
+                return BlowfishCipher::class;
 
-			case 'des3':
-			case '3des':
-				return Des3Cipher::class;
+            case 'des3':
+            case '3des':
+                return Des3Cipher::class;
 
-			case 'aes-256':
-			case 'aes':
-				return Aes256Cipher::class;
+            case 'aes-256':
+            case 'aes':
+                return Aes256Cipher::class;
 
-			case 'sodium':
-				return SodiumCipher::class;
-		}
+            case 'sodium':
+                return SodiumCipher::class;
+        }
 
-		return PhpAesCipher::class;
-	}
+        return PhpAesCipher::class;
+    }
 
-	/**
-	 * getPasswordAlgorithm
-	 *
-	 * @param string $type
-	 *
-	 * @return  int
-	 */
-	public function getHashingAlgorithm($type)
-	{
-		switch ($type)
-		{
-			case 'md5':
-				return Password::MD5;
+    /**
+     * getPasswordAlgorithm
+     *
+     * @param string $type
+     *
+     * @return  int
+     */
+    public function getHashingAlgorithm($type)
+    {
+        switch ($type) {
+            case 'md5':
+                return Password::MD5;
 
-			case 'sha256':
-				return Password::SHA256;
+            case 'sha256':
+                return Password::SHA256;
 
-			case 'sha512':
-				return Password::SHA512;
+            case 'sha512':
+                return Password::SHA512;
 
-			case 'argon2':
-				return Password::SODIUM_ARGON2;
+            case 'argon2':
+                return Password::SODIUM_ARGON2;
 
-			case 'scrypt':
-				return Password::SODIUM_SCRYPT;
+            case 'scrypt':
+                return Password::SODIUM_SCRYPT;
 
-			case 'blowfish':
-			case 'bf':
-			default:
-				return Password::BLOWFISH;
-		}
-	}
+            case 'blowfish':
+            case 'bf':
+            default:
+                return Password::BLOWFISH;
+        }
+    }
 }

@@ -20,9 +20,9 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 /**
  * The User class.
  *
- * @see UserManager
- * @see Authentication
- * @see Authorisation
+ * @see    UserManager
+ * @see    Authentication
+ * @see    Authorisation
  *
  * @method static boolean          authenticate(Credential $credential)
  * @method static integer[]        getAuthResults()
@@ -49,10 +49,10 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  */
 class User extends AbstractProxyFacade
 {
-	/**
-	 * Property key.
-	 *
-	 * @var  string
-	 */
-	protected static $_key = 'user.manager';
+    /**
+     * Property key.
+     *
+     * @var  string
+     */
+    protected static $_key = 'user.manager';
 }

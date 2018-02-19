@@ -12,30 +12,29 @@ use Windwalker\Core\Ioc;
 
 /**
  * The TableHelper class.
- * 
+ *
  * @since  2.1.1
  */
 class TableHelper
 {
-	/**
-	 * stripPrefix
-	 *
-	 * @param string $table
-	 * @param string $prefix
-	 *
-	 * @return  string
-	 */
-	public static function stripPrefix($table, $prefix = null)
-	{
-		$prefix = $prefix ?: Ioc::getDatabase()->getPrefix();
+    /**
+     * stripPrefix
+     *
+     * @param string $table
+     * @param string $prefix
+     *
+     * @return  string
+     */
+    public static function stripPrefix($table, $prefix = null)
+    {
+        $prefix = $prefix ?: Ioc::getDatabase()->getPrefix();
 
-		$num = strlen($prefix);
+        $num = strlen($prefix);
 
-		if (substr($table, 0, $num) == $prefix)
-		{
-			$table = '#__' . substr($table, $num);
-		}
+        if (substr($table, 0, $num) == $prefix) {
+            $table = '#__' . substr($table, $num);
+        }
 
-		return $table;
-	}
+        return $table;
+    }
 }

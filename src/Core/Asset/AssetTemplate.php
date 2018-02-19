@@ -18,143 +18,138 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
  */
 class AssetTemplate
 {
-	use OptionAccessTrait;
+    use OptionAccessTrait;
 
-	/**
-	 * Property templates.
-	 *
-	 * @var  array
-	 */
-	protected $templates = [];
+    /**
+     * Property templates.
+     *
+     * @var  array
+     */
+    protected $templates = [];
 
-	/**
-	 * Property currentName.
-	 *
-	 * @var  string
-	 */
-	protected $currentName;
+    /**
+     * Property currentName.
+     *
+     * @var  string
+     */
+    protected $currentName;
 
-	/**
-	 * AssetTemplate constructor.
-	 *
-	 * @param array $options
-	 */
-	public function __construct(array $options = [])
-	{
-		$this->options = $options;
-	}
+    /**
+     * AssetTemplate constructor.
+     *
+     * @param array $options
+     */
+    public function __construct(array $options = [])
+    {
+        $this->options = $options;
+    }
 
-	/**
-	 * addTemplate
-	 *
-	 * @param string $name
-	 * @param string $string
-	 * @param array  $data
-	 *
-	 * @return  static
-	 */
-	public function addTemplate($name, $string, $data = [])
-	{
-		$this->templates[$name] = SimpleTemplate::render($string, $data);
+    /**
+     * addTemplate
+     *
+     * @param string $name
+     * @param string $string
+     * @param array  $data
+     *
+     * @return  static
+     */
+    public function addTemplate($name, $string, $data = [])
+    {
+        $this->templates[$name] = SimpleTemplate::render($string, $data);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * removeTemplate
-	 *
-	 * @param   string  $name
-	 *
-	 * @return  static
-	 */
-	public function removeTemplate($name)
-	{
-		if (isset($this->templates[$name]))
-		{
-			unset($this->templates[$name]);
-		}
+    /**
+     * removeTemplate
+     *
+     * @param   string $name
+     *
+     * @return  static
+     */
+    public function removeTemplate($name)
+    {
+        if (isset($this->templates[$name])) {
+            unset($this->templates[$name]);
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * resetTemplates
-	 *
-	 * @return  static
-	 */
-	public function resetTemplates()
-	{
-		$this->templates = [];
+    /**
+     * resetTemplates
+     *
+     * @return  static
+     */
+    public function resetTemplates()
+    {
+        $this->templates = [];
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * renderTemplate
-	 *
-	 * @return  string
-	 */
-	public function renderTemplates()
-	{
-		$html = '';
+    /**
+     * renderTemplate
+     *
+     * @return  string
+     */
+    public function renderTemplates()
+    {
+        $html = '';
 
-		if ($this->getOption('debug'))
-		{
-			$html .= "\n\n<!-- Start Asset Template -->\n\n";
-		}
+        if ($this->getOption('debug')) {
+            $html .= "\n\n<!-- Start Asset Template -->\n\n";
+        }
 
-		foreach ($this->templates as $name => $template)
-		{
-			if ($this->getOption('debug'))
-			{
-				$html .= sprintf("\n<!-- $name -->\n");
-			}
+        foreach ($this->templates as $name => $template) {
+            if ($this->getOption('debug')) {
+                $html .= sprintf("\n<!-- $name -->\n");
+            }
 
-			$html .= $template;
-		}
+            $html .= $template;
+        }
 
-		return $html;
-	}
+        return $html;
+    }
 
-	/**
-	 * startTemplate
-	 *
-	 * @param string $__assetTemplateName
-	 * @param array  $__assetTemplateData
-	 *
-	 * @return  $this
-	 */
-	public function startTemplate($__assetTemplateName, $__assetTemplateData = [])
-	{
-		if ($this->currentName)
-		{
-			throw new \LogicException('Do not support nested template for: ' . $__assetTemplateName . '. current template is: ' . $this->currentName);
-		}
+    /**
+     * startTemplate
+     *
+     * @param string $__assetTemplateName
+     * @param array  $__assetTemplateData
+     *
+     * @return  $this
+     */
+    public function startTemplate($__assetTemplateName, $__assetTemplateData = [])
+    {
+        if ($this->currentName) {
+            throw new \LogicException('Do not support nested template for: ' . $__assetTemplateName . '. current template is: ' . $this->currentName);
+        }
 
-		$this->currentName = $__assetTemplateName;
+        $this->currentName = $__assetTemplateName;
 
-		extract((array) $__assetTemplateData);
+        extract((array) $__assetTemplateData);
 
-		ob_start();
+        ob_start();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * endTemplate
-	 *
-	 * @return  static
-	 */
-	public function endTemplate()
-	{
-		$content = ob_get_contents();
+    /**
+     * endTemplate
+     *
+     * @return  static
+     */
+    public function endTemplate()
+    {
+        $content = ob_get_contents();
 
-		ob_end_clean();
+        ob_end_clean();
 
-		$this->addTemplate($this->currentName, $content);
+        $this->addTemplate($this->currentName, $content);
 
-		$this->currentName = null;
+        $this->currentName = null;
 
-		return $this;
-	}
+        return $this;
+    }
 }

@@ -21,78 +21,77 @@ use Windwalker\Structure\Structure;
  */
 class SyncQueueDriver implements QueueDriverInterface
 {
-	/**
-	 * Property worker.
-	 *
-	 * @var  Container
-	 */
-	protected $container;
+    /**
+     * Property worker.
+     *
+     * @var  Container
+     */
+    protected $container;
 
-	/**
-	 * SyncQueueDriver constructor.
-	 *
-	 * @param Container $container
-	 */
-	public function __construct(Container $container)
-	{
-		$this->container = $container;
-	}
+    /**
+     * SyncQueueDriver constructor.
+     *
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
-	/**
-	 * push
-	 *
-	 * @param QueueMessage $message
-	 *
-	 * @return int|string
-	 */
-	public function push(QueueMessage $message)
-	{
-		/** @var Worker $worker */
-		$worker = $this->container->get('queue.worker');
+    /**
+     * push
+     *
+     * @param QueueMessage $message
+     *
+     * @return int|string
+     */
+    public function push(QueueMessage $message)
+    {
+        /** @var Worker $worker */
+        $worker = $this->container->get('queue.worker');
 
-		$worker->getDispatcher()->listen('onWorkerJobFailure', function (Event $event)
-		{
-			throw $event['exception'];
-		});
+        $worker->getDispatcher()->listen('onWorkerJobFailure', function (Event $event) {
+            throw $event['exception'];
+        });
 
-		$worker->process($message, new Structure);
+        $worker->process($message, new Structure);
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * pop
-	 *
-	 * @param string $queue
-	 *
-	 * @return QueueMessage
-	 */
-	public function pop($queue = null)
-	{
-		return new QueueMessage;
-	}
+    /**
+     * pop
+     *
+     * @param string $queue
+     *
+     * @return QueueMessage
+     */
+    public function pop($queue = null)
+    {
+        return new QueueMessage;
+    }
 
-	/**
-	 * delete
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function delete(QueueMessage $message)
-	{
-		return $this;
-	}
+    /**
+     * delete
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function delete(QueueMessage $message)
+    {
+        return $this;
+    }
 
-	/**
-	 * release
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function release(QueueMessage $message)
-	{
-		return $this;
-	}
+    /**
+     * release
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function release(QueueMessage $message)
+    {
+        return $this;
+    }
 }

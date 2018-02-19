@@ -15,53 +15,52 @@ namespace Windwalker\Core\Utilities\Exception;
  */
 trait MultiMessagesExceptionTrait
 {
-	/**
-	 * Property messages.
-	 *
-	 * @var  array
-	 */
-	protected $messages;
+    /**
+     * Property messages.
+     *
+     * @var  array
+     */
+    protected $messages;
 
-	/**
-	 * Class init.
-	 *
-	 * @param string|array $messages
-	 * @param int          $code
-	 * @param \Exception   $previous
-	 */
-	public function __construct($messages = null, $code = 0, \Exception $previous = null)
-	{
-		$this->messages = (array) $messages;
+    /**
+     * Class init.
+     *
+     * @param string|array $messages
+     * @param int          $code
+     * @param \Exception   $previous
+     */
+    public function __construct($messages = null, $code = 0, \Exception $previous = null)
+    {
+        $this->messages = (array) $messages;
 
-		foreach ($this->messages as &$msgs)
-		{
-			$msgs = implode(PHP_EOL, (array) $msgs);
-		}
+        foreach ($this->messages as &$msgs) {
+            $msgs = implode(PHP_EOL, (array) $msgs);
+        }
 
-		parent::__construct(implode(PHP_EOL, (array) $this->messages), $code, $previous);
-	}
+        parent::__construct(implode(PHP_EOL, (array) $this->messages), $code, $previous);
+    }
 
-	/**
-	 * Method to get property Messages
-	 *
-	 * @return  array
-	 */
-	public function getMessages()
-	{
-		return $this->messages;
-	}
+    /**
+     * Method to get property Messages
+     *
+     * @return  array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
 
-	/**
-	 * Method to set property messages
-	 *
-	 * @param   array $messages
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setMessages($messages)
-	{
-		$this->messages = $messages;
+    /**
+     * Method to set property messages
+     *
+     * @param   array $messages
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setMessages($messages)
+    {
+        $this->messages = $messages;
 
-		return $this;
-	}
+        return $this;
+    }
 }

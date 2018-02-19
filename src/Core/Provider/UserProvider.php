@@ -24,133 +24,123 @@ use Windwalker\Event\DispatcherInterface;
 
 /**
  * The AuthenticateProvider class.
- * 
+ *
  * @since  2.0
  */
 class UserProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property dispatcher.
-	 *
-	 * @var  DispatcherInterface
-	 */
-	protected $dispatcher;
+    /**
+     * Property dispatcher.
+     *
+     * @var  DispatcherInterface
+     */
+    protected $dispatcher;
 
-	/**
-	 * UserProvider constructor.
-	 *
-	 * @param DispatcherInterface $dispatcher
-	 */
-	public function __construct(DispatcherInterface $dispatcher)
-	{
-		$this->dispatcher = $dispatcher;
-	}
+    /**
+     * UserProvider constructor.
+     *
+     * @param DispatcherInterface $dispatcher
+     */
+    public function __construct(DispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		// Authentication
-		$container->share(Authentication::class, [$this, 'authentication'])
-			->bindShared(AuthenticationInterface::class, Authentication::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        // Authentication
+        $container->share(Authentication::class, [$this, 'authentication'])
+            ->bindShared(AuthenticationInterface::class, Authentication::class);
 
-		// Authorisation
-		$container->share(Authorisation::class, [$this, 'authorisation'])
-			->bindShared(AuthorisationInterface::class, Authorisation::class);
+        // Authorisation
+        $container->share(Authorisation::class, [$this, 'authorisation'])
+            ->bindShared(AuthorisationInterface::class, Authorisation::class);
 
-		// User Handler
-		$this->prepareHandler($container);
+        // User Handler
+        $this->prepareHandler($container);
 
-		// User Manager
-		$container->prepareSharedObject(UserManager::class);
-	}
+        // User Manager
+        $container->prepareSharedObject(UserManager::class);
+    }
 
-	/**
-	 * authentication
-	 *
-	 * @param Container $container
-	 *
-	 * @return  AuthenticationInterface
-	 * @throws \Windwalker\DI\Exception\DependencyResolutionException
-	 */
-	public function authentication(Container $container)
-	{
-		$auth = $container->newInstance(Authentication::class);
+    /**
+     * authentication
+     *
+     * @param Container $container
+     *
+     * @return  AuthenticationInterface
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     */
+    public function authentication(Container $container)
+    {
+        $auth = $container->newInstance(Authentication::class);
 
-		foreach ((array) $container->get('config')->get('user.methods') as $name => $method)
-		{
-			if ($method !== false)
-			{
-				$auth->addMethod($container->newInstance($method), $method);
-			}
-		}
+        foreach ((array) $container->get('config')->get('user.methods') as $name => $method) {
+            if ($method !== false) {
+                $auth->addMethod($container->newInstance($method), $method);
+            }
+        }
 
-		/** @var EventDispatcher $dispatcher */
-		$this->dispatcher->triggerEvent('onLoadAuthenticationMethods', ['auth' => $auth]);
+        /** @var EventDispatcher $dispatcher */
+        $this->dispatcher->triggerEvent('onLoadAuthenticationMethods', ['auth' => $auth]);
 
-		return $auth;
-	}
+        return $auth;
+    }
 
-	/**
-	 * authorisation
-	 *
-	 * @param Container $container
-	 *
-	 * @return  AuthorisationInterface
-	 * @throws \InvalidArgumentException
-	 */
-	public function authorisation(Container $container)
-	{
-		$auth = new Authorisation;
-		$config = $container->get('config');
+    /**
+     * authorisation
+     *
+     * @param Container $container
+     *
+     * @return  AuthorisationInterface
+     * @throws \InvalidArgumentException
+     */
+    public function authorisation(Container $container)
+    {
+        $auth   = new Authorisation;
+        $config = $container->get('config');
 
-		foreach ((array) $config->get('user.policies') as $name => $policy)
-		{
-			if (is_subclass_of($policy, PolicyInterface::class))
-			{
-				$auth->addPolicy($name, $container->newInstance($policy));
-			}
-			elseif (is_subclass_of($policy, PolicyProviderInterface::class))
-			{
-				$auth->registerPolicyProvider($container->newInstance($policy));
-			}
-			elseif ($policy === false)
-			{
-				continue;
-			}
-			else
-			{
-				throw new \InvalidArgumentException(sprintf(
-					'Please register instance of %s or %s',
-					PolicyInterface::class,
-					PolicyProviderInterface::class
-				));
-			}
-		}
+        foreach ((array) $config->get('user.policies') as $name => $policy) {
+            if (is_subclass_of($policy, PolicyInterface::class)) {
+                $auth->addPolicy($name, $container->newInstance($policy));
+            } elseif (is_subclass_of($policy, PolicyProviderInterface::class)) {
+                $auth->registerPolicyProvider($container->newInstance($policy));
+            } elseif ($policy === false) {
+                continue;
+            } else {
+                throw new \InvalidArgumentException(sprintf(
+                    'Please register instance of %s or %s',
+                    PolicyInterface::class,
+                    PolicyProviderInterface::class
+                ));
+            }
+        }
 
-		/** @var EventDispatcher $dispatcher */
-		$this->dispatcher->triggerEvent('onLoadAuthorisationPolicies', ['auth' => $auth]);
+        /** @var EventDispatcher $dispatcher */
+        $this->dispatcher->triggerEvent('onLoadAuthorisationPolicies', ['auth' => $auth]);
 
-		return $auth;
-	}
+        return $auth;
+    }
 
-	/**
-	 * handler
-	 *
-	 * @param Container $container
-	 *
-	 * @return  UserHandlerInterface
-	 * @throws \UnexpectedValueException
-	 */
-	public function prepareHandler(Container $container)
-	{
-		$handler = $container->get('config')->get('user.handler') ? : NullUserHandler::class;
+    /**
+     * handler
+     *
+     * @param Container $container
+     *
+     * @return  UserHandlerInterface
+     * @throws \UnexpectedValueException
+     */
+    public function prepareHandler(Container $container)
+    {
+        $handler = $container->get('config')->get('user.handler') ?: NullUserHandler::class;
 
-		$container->bindShared(UserHandlerInterface::class, $handler);
-	}
+        $container->bindShared(UserHandlerInterface::class, $handler);
+    }
 }

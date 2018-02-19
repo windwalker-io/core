@@ -29,172 +29,160 @@ use Windwalker\Utilities\Arr;
 
 /**
  * The DebuggerListener class.
- * 
+ *
  * @since  2.1.1
  */
 class DebuggerListener
 {
-	/**
-	 * Property app.
-	 *
-	 * @var  WebApplication
-	 */
-	protected $app;
+    /**
+     * Property app.
+     *
+     * @var  WebApplication
+     */
+    protected $app;
 
-	/**
-	 * Property package.
-	 *
-	 * @var  DebuggerPackage
-	 */
-	protected $package;
+    /**
+     * Property package.
+     *
+     * @var  DebuggerPackage
+     */
+    protected $package;
 
-	/**
-	 * Class init.
-	 *
-	 * @param  DebuggerPackage $package
-	 */
-	public function __construct(DebuggerPackage $package)
-	{
-		$this->package = $package;
-		$this->app = $package->app;
-	}
+    /**
+     * Class init.
+     *
+     * @param  DebuggerPackage $package
+     */
+    public function __construct(DebuggerPackage $package)
+    {
+        $this->package = $package;
+        $this->app     = $package->app;
+    }
 
-	/**
-	 * onAfterInitialise
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onAfterInitialise(Event $event)
-	{
-		$this->app = $event['app'];
-	}
+    /**
+     * onAfterInitialise
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onAfterInitialise(Event $event)
+    {
+        $this->app = $event['app'];
+    }
 
-	/**
-	 * onPackageBeforeExecute
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onPackageBeforeExecute(Event $event)
-	{
-		if ($event['hmvc'])
-		{
-			return;
-		}
+    /**
+     * onPackageBeforeExecute
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onPackageBeforeExecute(Event $event)
+    {
+        if ($event['hmvc']) {
+            return;
+        }
 
-		/** @var Input $input */
-		$package = $event['package'];
+        /** @var Input $input */
+        $package = $event['package'];
 
-		if (!$package instanceof DebuggerPackage)
-		{
-			return;
-		}
+        if (!$package instanceof DebuggerPackage) {
+            return;
+        }
 
-		$controller = $event['controller'];
-		$input = $controller->getInput();
-		$app   = Ioc::getApplication();
-		$uri   = Ioc::getUriData();
+        $controller = $event['controller'];
+        $input      = $controller->getInput();
+        $app        = Ioc::getApplication();
+        $uri        = Ioc::getUriData();
 
-		$noRedirect = [
-			'asset',
-			'mail'
-		];
-		
-		if (in_array($app->get('route.short_name'), $noRedirect))
-		{
-			return;
-		}
+        $noRedirect = [
+            'asset',
+            'mail',
+        ];
 
-		/** @var ModelRepository $model */
-		$model = $controller->getModel('Dashboard');
+        if (in_array($app->get('route.short_name'), $noRedirect)) {
+            return;
+        }
 
-		if ($input->get('refresh'))
-		{
-			$hash = $input->getString('hash');
-			$hash = $hash ? '#' . $hash : '';
+        /** @var ModelRepository $model */
+        $model = $controller->getModel('Dashboard');
 
-			$input->set('id', null);
+        if ($input->get('refresh')) {
+            $hash = $input->getString('hash');
+            $hash = $hash ? '#' . $hash : '';
 
-			if (Ioc::exists('session'))
-			{
-				$session = Ioc::getSession();
-				$session->set('debugger.current.id', null);
-			}
+            $input->set('id', null);
 
-			$item = $model->getLastItem();
+            if (Ioc::exists('session')) {
+                $session = Ioc::getSession();
+                $session->set('debugger.current.id', null);
+            }
 
-			if ($item)
-			{
-				$app->redirect($package->router->route($app->get('route.matched'), ['id' => $item['id']]) . $hash);
+            $item = $model->getLastItem();
 
-				return;
-			}
-		}
+            if ($item) {
+                $app->redirect($package->router->route($app->get('route.matched'), ['id' => $item['id']]) . $hash);
 
-		if (!$id = $input->get('id'))
-		{
-			$session = Ioc::getSession();
+                return;
+            }
+        }
 
-			// Get id from session
-			$id = $session->get('debugger.current.id');
+        if (!$id = $input->get('id')) {
+            $session = Ioc::getSession();
 
-			// If session not exists, get last item.
-			if (!$id)
-			{
-				$item = $model->getLastItem();
+            // Get id from session
+            $id = $session->get('debugger.current.id');
 
-				// No item, redirect to front-end.
-				if (!$item)
-				{
-					$app->redirect($uri['base.full'] . $uri['script']);
+            // If session not exists, get last item.
+            if (!$id) {
+                $item = $model->getLastItem();
 
-					return;
-				}
+                // No item, redirect to front-end.
+                if (!$item) {
+                    $app->redirect($uri['base.full'] . $uri['script']);
 
-				$id = $item['id'];
-			}
+                    return;
+                }
 
-			// set id to session and redirect
-			$session->set('debugger.current.id', $id);
+                $id = $item['id'];
+            }
 
-			$app->redirect($package->router->route($app->get('route.matched'), ['id' => $id]));
+            // set id to session and redirect
+            $session->set('debugger.current.id', $id);
 
-			return;
-		}
+            $app->redirect($package->router->route($app->get('route.matched'), ['id' => $id]));
 
-		$itemModel = $controller->getModel('Profiler');
+            return;
+        }
 
-		if (!$itemModel->hasItem($id))
-		{
-			$session = Ioc::getSession();
-			$session->set('debugger.current.id', null);
+        $itemModel = $controller->getModel('Profiler');
 
-			$app->redirect($package->router->route('dashboard'));
-		}
+        if (!$itemModel->hasItem($id)) {
+            $session = Ioc::getSession();
+            $session->set('debugger.current.id', null);
 
-		if (Ioc::exists('session'))
-		{
-			$session = Ioc::getSession();
-			$session->set('debugger.current.id', $id);
-		}
-	}
+            $app->redirect($package->router->route('dashboard'));
+        }
 
-	/**
-	 * onViewBeforeRender
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onViewBeforeRender(Event $event)
-	{
-		if (!PackageHelper::getPackage() instanceof DebuggerPackage)
-		{
-			return;
-		}
+        if (Ioc::exists('session')) {
+            $session = Ioc::getSession();
+            $session->set('debugger.current.id', $id);
+        }
+    }
+
+    /**
+     * onViewBeforeRender
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onViewBeforeRender(Event $event)
+    {
+        if (!PackageHelper::getPackage() instanceof DebuggerPackage) {
+            return;
+        }
 
 //		$theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
 //
@@ -206,154 +194,147 @@ class DebuggerListener
 //		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
 //
 //		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
-	}
+    }
 
-	/**
-	 * onAfterRespond
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onAfterRespond(Event $event)
-	{
-		/** @var ResponseInterface $response */
-		$response = $event['response'];
+    /**
+     * onAfterRespond
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onAfterRespond(Event $event)
+    {
+        /** @var ResponseInterface $response */
+        $response = $event['response'];
 
-		if (strpos($response->getHeaderLine('Content-Type'), 'html') === false)
-		{
-			DebuggerHelper::disableConsole();
-		}
-	}
+        if (strpos($response->getHeaderLine('Content-Type'), 'html') === false) {
+            DebuggerHelper::disableConsole();
+        }
+    }
 
-	/**
-	 * onAfterRender
-	 *
-	 * @return  void
-	 */
-	public function __destruct()
-	{
-		if (!$this->app instanceof WebApplication)
-		{
-			return;
-		}
+    /**
+     * onAfterRender
+     *
+     * @return  void
+     */
+    public function __destruct()
+    {
+        if (!$this->app instanceof WebApplication) {
+            return;
+        }
 
-		if ($this->app->getPackage() instanceof DebuggerPackage)
-		{
-			return;
-		}
+        if ($this->app->getPackage() instanceof DebuggerPackage) {
+            return;
+        }
 
-		ProfilerListener::collectAllInformation();
+        ProfilerListener::collectAllInformation();
 
-		$container = $this->app->getContainer();
+        $container = $this->app->getContainer();
 
-		$profiler = $container->get('profiler');
-		$collector = $container->get('debugger.collector');
+        $profiler  = $container->get('profiler');
+        $collector = $container->get('debugger.collector');
 
-		$id = uniqid();
-		$collector['id'] = $id;
+        $id              = uniqid();
+        $collector['id'] = $id;
 
-		$this->pushDebugConsole($collector, $profiler);
+        $this->pushDebugConsole($collector, $profiler);
 
-		$this->deleteOldFiles();
+        $this->deleteOldFiles();
 
-		$data = [
-			'profiler'  => $profiler,
-			'collector' => $collector
-		];
+        $data = [
+            'profiler' => $profiler,
+            'collector' => $collector,
+        ];
 
-		$data = serialize($data);
+        $data = serialize($data);
 
-		$dir = WINDWALKER_CACHE . '/profiler/' . PageRecordHelper::getFolderName($id);
+        $dir = WINDWALKER_CACHE . '/profiler/' . PageRecordHelper::getFolderName($id);
 
-		File::write($dir . '/' . $id, $data);
-	}
+        File::write($dir . '/' . $id, $data);
+    }
 
-	/**
-	 * pushDebugConsole
-	 *
-	 * @param Structure $collector
-	 * @param Profiler  $profiler
-	 */
-	protected function pushDebugConsole(Structure $collector, Profiler $profiler)
-	{
-		if (!$this->package->config->get('console.enabled', 1))
-		{
-			return;
-		}
+    /**
+     * pushDebugConsole
+     *
+     * @param Structure $collector
+     * @param Profiler  $profiler
+     */
+    protected function pushDebugConsole(Structure $collector, Profiler $profiler)
+    {
+        if (!$this->package->config->get('console.enabled', 1)) {
+            return;
+        }
 
-		// Prepare CSS
-		$style = $this->package->getDir() . '/Resources/asset/css/console/style.css';
+        // Prepare CSS
+        $style = $this->package->getDir() . '/Resources/asset/css/console/style.css';
 
-		// Prepare Time
-		$points = $profiler->getPoints();
-		$first = array_shift($points);
-		$last = array_pop($points);
-		$time = $profiler->getTimeBetween($first->getName(), $last->getName());
-		$memory = $profiler->getMemoryBetween($first->getName(), $last->getName());
+        // Prepare Time
+        $points = $profiler->getPoints();
+        $first  = array_shift($points);
+        $last   = array_pop($points);
+        $time   = $profiler->getTimeBetween($first->getName(), $last->getName());
+        $memory = $profiler->getMemoryBetween($first->getName(), $last->getName());
 
-		$data = new Data;
-		$data->collector = $collector;
-		$data->style = file_get_contents($style);
+        $data            = new Data;
+        $data->collector = $collector;
+        $data->style     = file_get_contents($style);
 
-		// Execute Time
-		$data->time = $time * 1000;
-		$data->memory = $memory / 1048576;
+        // Execute Time
+        $data->time   = $time * 1000;
+        $data->memory = $memory / 1048576;
 
-		// Queries
-		$data->queryTimes = $collector['database.query.times'] ?: 0;
-		$data->queryTotalTime = $collector['database.query.total.time'] * 1000;
-		$data->queryTotalMemory = $collector['database.query.total.memory'] / 1048576;
+        // Queries
+        $data->queryTimes       = $collector['database.query.times'] ?: 0;
+        $data->queryTotalTime   = $collector['database.query.total.time'] * 1000;
+        $data->queryTotalMemory = $collector['database.query.total.memory'] / 1048576;
 
-		// Messages
-		$data->messages = (array) $collector['request.session._flash'];
-		$data->debugMessages = (array) $collector['debug.messages'];
-		$data->messagesCount = [
-			'messages' => count(Arr::flatten($data->messages)),
-			'debug' => count($data->debugMessages)
-		];
+        // Messages
+        $data->messages      = (array) $collector['request.session._flash'];
+        $data->debugMessages = (array) $collector['debug.messages'];
+        $data->messagesCount = [
+            'messages' => count(Arr::flatten($data->messages)),
+            'debug' => count($data->debugMessages),
+        ];
 
-		$data->timeStyle = TimelineHelper::getStateColor($data->time, 250);
-		$data->memoryStyle = TimelineHelper::getStateColor($data->memory, 5);
+        $data->timeStyle   = TimelineHelper::getStateColor($data->time, 250);
+        $data->memoryStyle = TimelineHelper::getStateColor($data->memory, 5);
 
-		$widget = new Widget('debugger.console', 'php', $this->package->getName());
+        $widget = new Widget('debugger.console', 'php', $this->package->getName());
 
-		echo $widget->render($data);
-	}
+        echo $widget->render($data);
+    }
 
-	/**
-	 * deleteOldFiles
-	 *
-	 * @return  void
-	 */
-	protected function deleteOldFiles()
-	{
-		$model = new DashboardModel;
+    /**
+     * deleteOldFiles
+     *
+     * @return  void
+     */
+    protected function deleteOldFiles()
+    {
+        $model = new DashboardModel;
 
-		$files = $model->getFiles();
-		$items = [];
+        $files = $model->getFiles();
+        $items = [];
 
-		/** @var \SplFileInfo $file */
-		foreach ($files as $file)
-		{
-			$items[$file->getMTime()] = $file;
-		}
+        /** @var \SplFileInfo $file */
+        foreach ($files as $file) {
+            $items[$file->getMTime()] = $file;
+        }
 
-		krsort($items);
+        krsort($items);
 
-		$i = 0;
+        $i = 0;
 
-		/** @var \SplFileInfo $file */
-		foreach ($items as $file)
-		{
-			$i++;
+        /** @var \SplFileInfo $file */
+        foreach ($items as $file) {
+            $i++;
 
-			if ($i < 100)
-			{
-				continue;
-			}
+            if ($i < 100) {
+                continue;
+            }
 
-			File::delete($file->getPathname());
-		}
-	}
+            File::delete($file->getPathname());
+        }
+    }
 }

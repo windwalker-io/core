@@ -15,63 +15,63 @@ namespace Windwalker\Core\User;
  */
 class NullUserHandler implements UserHandlerInterface
 {
-	/**
-	 * load
-	 *
-	 * @param array $conditions
-	 *
-	 * @return  mixed|false
-	 */
-	public function load($conditions)
-	{
-		return new UserData;
-	}
+    /**
+     * load
+     *
+     * @param array $conditions
+     *
+     * @return  mixed|false
+     */
+    public function load($conditions)
+    {
+        return new UserData;
+    }
 
-	/**
-	 * save
-	 *
-	 * @param UserDataInterface $user
-	 *
-	 * @return  UserDataInterface
-	 */
-	public function save(UserDataInterface $user)
-	{
-		return $user;
-	}
+    /**
+     * save
+     *
+     * @param UserDataInterface $user
+     *
+     * @return  UserDataInterface
+     */
+    public function save(UserDataInterface $user)
+    {
+        return $user;
+    }
 
-	/**
-	 * delete
-	 *
-	 * @param array $conditions
-	 *
-	 * @return boolean
-	 */
-	public function delete($conditions)
-	{
-		return true;
-	}
+    /**
+     * delete
+     *
+     * @param array $conditions
+     *
+     * @return boolean
+     */
+    public function delete($conditions)
+    {
+        return true;
+    }
 
-	/**
-	 * login
-	 *
-	 * @param UserDataInterface $user
-	 *
-	 * @return  boolean
-	 */
-	public function login(UserDataInterface $user)
-	{
-		return false;
-	}
+    /**
+     * login
+     *
+     * @param UserDataInterface $user
+     *
+     * @return  boolean
+     */
+    public function login(UserDataInterface $user)
+    {
+        return false;
+    }
 
-	/**
-	 * logout
-	 *
-	 * @param UserDataInterface $user
-	 *
-	 * @return bool
-	 */
-	public function logout(UserDataInterface $user = null)
-	{
-		return true;
-	}
+    /**
+     * logout
+     *
+     * @param UserDataInterface $user
+     *
+     * @return bool
+     */
+    public function logout(UserDataInterface $user = null)
+    {
+        return true;
+    }
 }

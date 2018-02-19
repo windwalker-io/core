@@ -17,39 +17,39 @@ use Windwalker\Core\Queue\QueueMessage;
  */
 interface QueueDriverInterface
 {
-	/**
-	 * push
-	 *
-	 * @param QueueMessage $message
-	 *
-	 * @return int|string
-	 */
-	public function push(QueueMessage $message);
+    /**
+     * push
+     *
+     * @param QueueMessage $message
+     *
+     * @return int|string
+     */
+    public function push(QueueMessage $message);
 
-	/**
-	 * pop
-	 *
-	 * @param string $queue
-	 *
-	 * @return QueueMessage
-	 */
-	public function pop($queue = null);
+    /**
+     * pop
+     *
+     * @param string $queue
+     *
+     * @return QueueMessage
+     */
+    public function pop($queue = null);
 
-	/**
-	 * delete
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function delete(QueueMessage $message);
+    /**
+     * delete
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function delete(QueueMessage $message);
 
-	/**
-	 * release
-	 *
-	 * @param QueueMessage|string $message
-	 *
-	 * @return static
-	 */
-	public function release(QueueMessage $message);
+    /**
+     * release
+     *
+     * @param QueueMessage|string $message
+     *
+     * @return static
+     */
+    public function release(QueueMessage $message);
 }

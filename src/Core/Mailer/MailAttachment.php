@@ -17,145 +17,141 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
  */
 class MailAttachment
 {
-	use OptionAccessTrait;
+    use OptionAccessTrait;
 
-	/**
-	 * Property filename.
-	 *
-	 * @var  string
-	 */
-	protected $filename;
+    /**
+     * Property filename.
+     *
+     * @var  string
+     */
+    protected $filename;
 
-	/**
-	 * Property contentType.
-	 *
-	 * @var  string
-	 */
-	protected $contentType;
+    /**
+     * Property contentType.
+     *
+     * @var  string
+     */
+    protected $contentType;
 
-	/**
-	 * Property fileData.
-	 *
-	 * @var  string
-	 */
-	protected $body;
+    /**
+     * Property fileData.
+     *
+     * @var  string
+     */
+    protected $body;
 
-	/**
-	 * MailAttachment constructor.
-	 *
-	 * @param string $filePath
-	 * @param string $contentType
-	 */
-	public function __construct($filePath = null, $contentType = null)
-	{
-		if (is_file($filePath))
-		{
-			$this->loadFile($filePath);
-		}
+    /**
+     * MailAttachment constructor.
+     *
+     * @param string $filePath
+     * @param string $contentType
+     */
+    public function __construct($filePath = null, $contentType = null)
+    {
+        if (is_file($filePath)) {
+            $this->loadFile($filePath);
+        }
 
-		$this->contentType = $contentType;
-	}
+        $this->contentType = $contentType;
+    }
 
-	/**
-	 * loadFile
-	 *
-	 * @param   string  $file
-	 *
-	 * @return  static
-	 */
-	public function loadFile($file)
-	{
-		if (!is_file($file))
-		{
-			throw new \RuntimeException(sprintf('File: %s not found.', $file));
-		}
+    /**
+     * loadFile
+     *
+     * @param   string $file
+     *
+     * @return  static
+     */
+    public function loadFile($file)
+    {
+        if (!is_file($file)) {
+            throw new \RuntimeException(sprintf('File: %s not found.', $file));
+        }
 
-		$this->body = function () use ($file)
-		{
-		    return file_get_contents($file);
-		};
+        $this->body = function () use ($file) {
+            return file_get_contents($file);
+        };
 
-		$this->setFilename(pathinfo($file, PATHINFO_BASENAME));
+        $this->setFilename(pathinfo($file, PATHINFO_BASENAME));
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property ContentType
-	 *
-	 * @return  string
-	 */
-	public function getContentType()
-	{
-		return $this->contentType;
-	}
+    /**
+     * Method to get property ContentType
+     *
+     * @return  string
+     */
+    public function getContentType()
+    {
+        return $this->contentType;
+    }
 
-	/**
-	 * Method to set property contentType
-	 *
-	 * @param   string $contentType
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setContentType($contentType)
-	{
-		$this->contentType = $contentType;
+    /**
+     * Method to set property contentType
+     *
+     * @param   string $contentType
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setContentType($contentType)
+    {
+        $this->contentType = $contentType;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Filename
-	 *
-	 * @return  string
-	 */
-	public function getFilename()
-	{
-		return $this->filename;
-	}
+    /**
+     * Method to get property Filename
+     *
+     * @return  string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
 
-	/**
-	 * Method to set property filename
-	 *
-	 * @param   string $filename
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setFilename($filename)
-	{
-		$this->filename = $filename;
+    /**
+     * Method to set property filename
+     *
+     * @param   string $filename
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Body
-	 *
-	 * @return  string
-	 */
-	public function getBody()
-	{
-		if ($this->body instanceof \Closure)
-		{
-			$method = $this->body;
-			
-			$this->body = $method();
-		}
+    /**
+     * Method to get property Body
+     *
+     * @return  string
+     */
+    public function getBody()
+    {
+        if ($this->body instanceof \Closure) {
+            $method = $this->body;
 
-		return $this->body;
-	}
+            $this->body = $method();
+        }
 
-	/**
-	 * Method to set property body
-	 *
-	 * @param   string $body
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setBody($body)
-	{
-		$this->body = $body;
+        return $this->body;
+    }
 
-		return $this;
-	}
+    /**
+     * Method to set property body
+     *
+     * @param   string $body
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+
+        return $this;
+    }
 }

@@ -12,18 +12,18 @@ use Windwalker\Core\View\HtmlView;
 
 /**
  * The AbstractDebuggerHtmlView class.
- * 
+ *
  * @since  2.1.1
  */
 class AbstractDebuggerHtmlView extends HtmlView
 {
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->boot();
-	}
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->boot();
+    }
 }

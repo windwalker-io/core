@@ -19,36 +19,33 @@ use Windwalker\DI\ServiceProviderInterface;
  */
 class QueueProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 * @throws \Windwalker\DI\Exception\DependencyResolutionException
-	 */
-	public function register(Container $container)
-	{
-		$container->prepareSharedObject(QueueManager::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     */
+    public function register(Container $container)
+    {
+        $container->prepareSharedObject(QueueManager::class);
 
-		$container->share(Queue::class, function (Container $container)
-		{
-			return $container->get('queue.manager')->getManager();
-		});
+        $container->share(Queue::class, function (Container $container) {
+            return $container->get('queue.manager')->getManager();
+        });
 
-		// Worker
-		$container->share(Worker::class, function (Container $container)
-		{
-		    return $container->newInstance(
-		    	Worker::class,
-			    ['logger' => $container->get('logger')->createRotatingLogger('queue')]
-		    );
-		})->alias('queue.worker', Worker::class);
+        // Worker
+        $container->share(Worker::class, function (Container $container) {
+            return $container->newInstance(
+                Worker::class,
+                ['logger' => $container->get('logger')->createRotatingLogger('queue')]
+            );
+        })->alias('queue.worker', Worker::class);
 
-		// Failer
-		$container->share(QueueFailerInterface::class, function (Container $container)
-		{
-			return $container->get('queue.manager')->createFailer();
-		})->alias('queue.failer', QueueFailerInterface::class);
-	}
+        // Failer
+        $container->share(QueueFailerInterface::class, function (Container $container) {
+            return $container->get('queue.manager')->createFailer();
+        })->alias('queue.failer', QueueFailerInterface::class);
+    }
 }

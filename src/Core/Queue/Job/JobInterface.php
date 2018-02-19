@@ -15,12 +15,12 @@ namespace Windwalker\Core\Queue\Job;
  */
 interface JobInterface
 {
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName();
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName();
 
-	public function execute();
+    public function execute();
 }

@@ -18,35 +18,34 @@ use Psr\Log\NullLogger;
  */
 trait LoggerAwareTrait
 {
-	/**
-	 * Property logger.
-	 *
-	 * @var  LoggerInterface
-	 */
-	protected $logger;
+    /**
+     * Property logger.
+     *
+     * @var  LoggerInterface
+     */
+    protected $logger;
 
-	/**
-	 * Sets a logger.
-	 *
-	 * @param LoggerInterface $logger
-	 */
-	public function setLogger(LoggerInterface $logger)
-	{
-		$this->logger = $logger;
-	}
+    /**
+     * Sets a logger.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
-	/**
-	 * getLogger
-	 *
-	 * @return  LoggerInterface
-	 */
-	public function getLogger()
-	{
-		if (!$this->logger instanceof LoggerInterface)
-		{
-			$this->logger = new NullLogger;
-		}
+    /**
+     * getLogger
+     *
+     * @return  LoggerInterface
+     */
+    public function getLogger()
+    {
+        if (!$this->logger instanceof LoggerInterface) {
+            $this->logger = new NullLogger;
+        }
 
-		return $this->logger;
-	}
+        return $this->logger;
+    }
 }

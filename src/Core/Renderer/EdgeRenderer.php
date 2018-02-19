@@ -18,6 +18,6 @@ use Windwalker\Core\Renderer\Traits\PackageFinderTrait;
  */
 class EdgeRenderer extends \Windwalker\Renderer\EdgeRenderer
 {
-	use PackageFinderTrait;
-	use GlobalVarsTrait;
+    use PackageFinderTrait;
+    use GlobalVarsTrait;
 }

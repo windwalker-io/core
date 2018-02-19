@@ -19,74 +19,71 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
  */
 class DropAllCommand extends CoreCommand
 {
-	use MigrationCommandTrait;
+    use MigrationCommandTrait;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'drop-all';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'drop-all';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Drop all tables if migration can not work.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Drop all tables if migration can not work.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'drop-all <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'drop-all <option>[option]</option>';
 
-	/**
-	 * Configure command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-	}
+    /**
+     * Configure command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		if ($this->console->getMode() !== 'dev')
-		{
-			throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
-		}
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        if ($this->console->getMode() !== 'dev') {
+            throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+        }
 
-		if (!(new BooleanPrompter)->ask('This action will drop all tables, do you really want to do this? [N/y]', false))
-		{
-			$this->out('  Canceled.');
+        if (!(new BooleanPrompter)->ask('This action will drop all tables, do you really want to do this? [N/y]',
+            false)) {
+            $this->out('  Canceled.');
 
-			return false;
-		}
+            return false;
+        }
 
-		if (!$this->io->getOption('no-backup'))
-		{
-			// backup
-			$this->backup();
-		}
+        if (!$this->io->getOption('no-backup')) {
+            // backup
+            $this->backup();
+        }
 
-		$db = $this->console->database;
+        $db = $this->console->database;
 
-		$tables = $db->getDatabase()->getTables(true);
+        $tables = $db->getDatabase()->getTables(true);
 
-		foreach ($tables as $table)
-		{
-			$db->getTable($table, true)->drop(true);
+        foreach ($tables as $table) {
+            $db->getTable($table, true)->drop(true);
 
-			$this->out('  Drop table: <comment>' . $table . '</comment>');
-		}
+            $this->out('  Drop table: <comment>' . $table . '</comment>');
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

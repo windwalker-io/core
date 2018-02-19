@@ -12,18 +12,18 @@ use Windwalker\Event\Event;
 
 /**
  * The DispatcherAwareFacadeInterface class.
- * 
+ *
  * @since  2.0
  */
 interface DispatcherAwareStaticInterface
 {
-	/**
-	 * triggerEvent
-	 *
-	 * @param string|Event $event
-	 * @param array        $args
-	 *
-	 * @return  mixed
-	 */
-	public static function triggerEvent($event, $args = []);
+    /**
+     * triggerEvent
+     *
+     * @param string|Event $event
+     * @param array        $args
+     *
+     * @return  mixed
+     */
+    public static function triggerEvent($event, $args = []);
 }

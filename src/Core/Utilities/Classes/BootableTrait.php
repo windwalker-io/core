@@ -18,21 +18,19 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 trait BootableTrait
 {
-	/**
-	 * bootTraits
-	 *
-	 * @param array $args
-	 */
-	protected function bootTraits(...$args)
-	{
-		foreach (TraitHelper::classUsesRecursive($this) as $trait)
-		{
-			$method = 'boot' . ReflectionHelper::getShortName($trait);
+    /**
+     * bootTraits
+     *
+     * @param array $args
+     */
+    protected function bootTraits(...$args)
+    {
+        foreach (TraitHelper::classUsesRecursive($this) as $trait) {
+            $method = 'boot' . ReflectionHelper::getShortName($trait);
 
-			if (method_exists($this, $method))
-			{
-				$this->$method(...$args);
-			}
-		}
-	}
+            if (method_exists($this, $method)) {
+                $this->$method(...$args);
+            }
+        }
+    }
 }

@@ -18,30 +18,30 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class ControllerResolver extends AbstractClassResolver
 {
-	/**
-	 * Property baseClass.
-	 *
-	 * @var  string
-	 */
-	protected $baseClass = AbstractController::class;
+    /**
+     * Property baseClass.
+     *
+     * @var  string
+     */
+    protected $baseClass = AbstractController::class;
 
-	/**
-	 * Get container key prefix.
-	 *
-	 * @return  string
-	 */
-	public static function getPrefix()
-	{
-		return 'controller';
-	}
+    /**
+     * Get container key prefix.
+     *
+     * @return  string
+     */
+    public static function getPrefix()
+    {
+        return 'controller';
+    }
 
-	/**
-	 * getDefaultNamespace
-	 *
-	 * @return  string
-	 */
-	protected function getDefaultNamespace()
-	{
-		return ReflectionHelper::getNamespaceName($this->getPackage()) . '\Controller';
-	}
+    /**
+     * getDefaultNamespace
+     *
+     * @return  string
+     */
+    protected function getDefaultNamespace()
+    {
+        return ReflectionHelper::getNamespaceName($this->getPackage()) . '\Controller';
+    }
 }

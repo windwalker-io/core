@@ -13,8 +13,8 @@ use Windwalker\Profiler\Point\Collector;
 $this->extend('_global.html');
 
 /**
- * @var  Collector  $collector
- * @var  Data       $exception
+ * @var  Collector $collector
+ * @var  Data      $exception
  */
 ?>
 
@@ -23,42 +23,42 @@ $this->extend('_global.html');
 <?php $this->block('content') ?>
 
 <?php if ($exception->notNull()): ?>
-	<h2>Exception Information</h2>
+    <h2>Exception Information</h2>
 
-	<?php
-	echo BootstrapKeyValueGrid::create()
-		->addHeader()
-		->addItem('Type', $exception->type)
-		->addItem('Message', $this->escape($exception->message))
-		->addItem('File', $exception->file . ' (' . $exception->line . ')');
-	?>
+    <?php
+    echo BootstrapKeyValueGrid::create()
+        ->addHeader()
+        ->addItem('Type', $exception->type)
+        ->addItem('Message', $this->escape($exception->message))
+        ->addItem('File', $exception->file . ' (' . $exception->line . ')');
+    ?>
 
-	<br /><br />
+    <br/><br/>
 
-	<h2>Call Stack</h2>
+    <h2>Call Stack</h2>
 
-	<table class="table table-striped">
-		<?php foreach ((array) $exception->trace as $i => $trace): ?>
-			<?php
-			$trace = new Data($trace);
+    <table class="table table-striped">
+        <?php foreach ((array) $exception->trace as $i => $trace): ?>
+            <?php
+            $trace = new Data($trace);
 
-			$args = [];
-			?>
-			<tr>
-				<td>
-					<?php echo $i + 1; ?>
-				</td>
-				<td>
-					<?php echo $trace['file']; ?>
-				</td>
-				<td>
-					<?php echo $trace['class']; ?><?php echo $trace['type']; ?><?php echo $trace['function']; ?>
-				</td>
-			</tr>
-		<?php endforeach; ?>
-	</table>
+            $args = [];
+            ?>
+            <tr>
+                <td>
+                    <?php echo $i + 1; ?>
+                </td>
+                <td>
+                    <?php echo $trace['file']; ?>
+                </td>
+                <td>
+                    <?php echo $trace['class']; ?><?php echo $trace['type']; ?><?php echo $trace['function']; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 <?php else: ?>
-	No Exception caught.
+    No Exception caught.
 <?php endif; ?>
 
 <?php $this->endblock() ?>

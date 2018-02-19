@@ -24,84 +24,80 @@ use Windwalker\Structure\Structure;
  */
 class DatabaseProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		$closure = function(Container $container)
-		{
-			/** @var Structure $config */
-			$config = $container->get('config');
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        $closure = function (Container $container) {
+            /** @var Structure $config */
+            $config = $container->get('config');
 
-			$option = [
-				'driver'   => $config->get('database.driver', 'mysql'),
-				'host'     => $config->get('database.host', 'localhost'),
-				'user'     => $config->get('database.user', 'root'),
-				'password' => $config->get('database.password', ''),
-				'database' => $config->get('database.name'),
-				'prefix'   => $config->get('database.prefix', 'wind_'),
-			];
+            $option = [
+                'driver' => $config->get('database.driver', 'mysql'),
+                'host' => $config->get('database.host', 'localhost'),
+                'user' => $config->get('database.user', 'root'),
+                'password' => $config->get('database.password', ''),
+                'database' => $config->get('database.name'),
+                'prefix' => $config->get('database.prefix', 'wind_'),
+            ];
 
-			$db = DatabaseFactory::getDbo($option['driver'], $option);
+            $db = DatabaseFactory::getDbo($option['driver'], $option);
 
-			if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true))
-			{
-				$this->strictMode($db);
-			}
+            if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true)) {
+                $this->strictMode($db);
+            }
 
-			return $db;
-		};
+            return $db;
+        };
 
-		$container->share(AbstractDatabaseDriver::class, $closure);
+        $container->share(AbstractDatabaseDriver::class, $closure);
 
-		DatabaseContainer::setDb(function () use ($container)
-		{
-		    return $container->get('database');
-		});
+        DatabaseContainer::setDb(function () use ($container) {
+            return $container->get('database');
+        });
 
-		// For Exporter
-		$closure = function(Container $container)
-		{
-			/** @var Structure $config */
-			$config = $container->get('config');
+        // For Exporter
+        $closure = function (Container $container) {
+            /** @var Structure $config */
+            $config = $container->get('config');
 
-			$driver = $config->get('database.driver', 'mysql');
+            $driver = $config->get('database.driver', 'mysql');
 
-			$class = 'Windwalker\Core\Database\Exporter\\' . ucfirst($driver) . 'Exporter';
+            $class = 'Windwalker\Core\Database\Exporter\\' . ucfirst($driver) . 'Exporter';
 
-			return new $class;
-		};
+            return new $class;
+        };
 
-		$container->share(AbstractExporter::class, $closure);
-	}
+        $container->share(AbstractExporter::class, $closure);
+    }
 
-	/**
-	 * strictMode
-	 *
-	 * @param MysqlDriver $db
-	 *
-	 * @return  void
-	 */
-	public function strictMode(MysqlDriver $db)
-	{
-		// Set Mysql to strict mode
-		$modes = array(
-			// 'ONLY_FULL_GROUP_BY',
-			'STRICT_TRANS_TABLES',
-			'ERROR_FOR_DIVISION_BY_ZERO',
-			'NO_AUTO_CREATE_USER',
-			'NO_ENGINE_SUBSTITUTION',
-			'NO_ZERO_DATE',
-			'NO_ZERO_IN_DATE'
-		);
+    /**
+     * strictMode
+     *
+     * @param MysqlDriver $db
+     *
+     * @return  void
+     */
+    public function strictMode(MysqlDriver $db)
+    {
+        // Set Mysql to strict mode
+        $modes = [
+            // 'ONLY_FULL_GROUP_BY',
+            'STRICT_TRANS_TABLES',
+            'ERROR_FOR_DIVISION_BY_ZERO',
+            'NO_AUTO_CREATE_USER',
+            'NO_ENGINE_SUBSTITUTION',
+            'NO_ZERO_DATE',
+            'NO_ZERO_IN_DATE',
+        ];
 
-		$db->connect()
-			->getConnection()
-			->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
-	}
+        $db->connect()
+            ->getConnection()
+            ->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+    }
 }

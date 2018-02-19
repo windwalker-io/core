@@ -15,31 +15,31 @@ namespace Windwalker\SystemPackage\Command\System;
  */
 class UpCommand extends DownCommand
 {
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'up';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'up';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Make site online.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Make site online.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = '%s [options]';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = '%s [options]';
 
-	/**
-	 * Property offline.
-	 *
-	 * @var  boolean
-	 */
-	protected $offline = false;
+    /**
+     * Property offline.
+     *
+     * @var  boolean
+     */
+    protected $offline = false;
 }

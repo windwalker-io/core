@@ -10,62 +10,62 @@ namespace Windwalker\Core\Object;
 
 /**
  * The SilencerInterface class.
- * 
+ *
  * @since  2.0
  */
 interface SilencerObjectInterface
 {
-	/**
-	 * __get
-	 *
-	 * @param $name
-	 *
-	 * @return  mixed
-	 */
-	public function __get($name);
+    /**
+     * __get
+     *
+     * @param $name
+     *
+     * @return  mixed
+     */
+    public function __get($name);
 
-	/**
-	 * __set
-	 *
-	 * @param $name
-	 * @param $value
-	 *
-	 * @return mixed
-	 */
-	public function __set($name, $value);
+    /**
+     * __set
+     *
+     * @param $name
+     * @param $value
+     *
+     * @return mixed
+     */
+    public function __set($name, $value);
 
-	/**
-	 * __isset
-	 *
-	 * @param $name
-	 *
-	 * @return  mixed
-	 */
-	public function __isset($name);
+    /**
+     * __isset
+     *
+     * @param $name
+     *
+     * @return  mixed
+     */
+    public function __isset($name);
 
-	/**
-	 * __toString
-	 *
-	 * @return  mixed
-	 */
-	public function __toString();
+    /**
+     * __toString
+     *
+     * @return  mixed
+     */
+    public function __toString();
 
-	/**
-	 * __unset
-	 *
-	 * @param $name
-	 *
-	 * @return  mixed
-	 */
-	public function __unset($name);
+    /**
+     * __unset
+     *
+     * @param $name
+     *
+     * @return  mixed
+     */
+    public function __unset($name);
 
-	/**
-	 * __call
-	 *
-	 * @param $name
-	 * @param $args
-	 *
-	 * @return  mixed
-	 */
-	public function __call($name, $args);
+    /**
+     * __call
+     *
+     * @param $name
+     * @param $args
+     *
+     * @return  mixed
+     */
+    public function __call($name, $args);
 }

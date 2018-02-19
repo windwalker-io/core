@@ -18,130 +18,128 @@ use Windwalker\Utilities\Arr;
  */
 class StructureView extends AbstractView implements \JsonSerializable
 {
-	const FORMAT_JSON = 'json';
-	const FORMAT_XML  = 'xml';
-	const FORMAT_YAML = 'yaml';
-	const FORMAT_INI  = 'ini';
-	const FORMAT_PHP  = 'php';
+    const FORMAT_JSON = 'json';
+    const FORMAT_XML = 'xml';
+    const FORMAT_YAML = 'yaml';
+    const FORMAT_INI = 'ini';
+    const FORMAT_PHP = 'php';
 
-	/**
-	 * Property data.
-	 *
-	 * @var  array|Structure
-	 */
-	protected $data = [];
+    /**
+     * Property data.
+     *
+     * @var  array|Structure
+     */
+    protected $data = [];
 
-	/**
-	 * Property format.
-	 *
-	 * @var  string
-	 */
-	protected $format = self::FORMAT_JSON;
+    /**
+     * Property format.
+     *
+     * @var  string
+     */
+    protected $format = self::FORMAT_JSON;
 
-	/**
-	 * Method to instantiate the view.
-	 *
-	 * @param   array  $data     The data array.
-	 * @param   array  $config  The options array.
-	 */
-	public function __construct(array $data = [], $config = null)
-	{
-		parent::__construct($data, $config);
+    /**
+     * Method to instantiate the view.
+     *
+     * @param   array $data   The data array.
+     * @param   array $config The options array.
+     */
+    public function __construct(array $data = [], $config = null)
+    {
+        parent::__construct($data, $config);
 
-		// Init registry object.
-		$this->data = new Structure($data);
-	}
+        // Init registry object.
+        $this->data = new Structure($data);
+    }
 
-	/**
-	 * prepareData
-	 *
-	 * @param Structure $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-	}
+    /**
+     * prepareData
+     *
+     * @param Structure $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+    }
 
-	/**
-	 * doRender
-	 *
-	 * @param  Structure $data
-	 *
-	 * @return string
-	 */
-	protected function doRender($data)
-	{
-		if ($data instanceof Structure)
-		{
-			return $data->toString($this->format, (array) $this->config->get('options', []));
-		}
+    /**
+     * doRender
+     *
+     * @param  Structure $data
+     *
+     * @return string
+     */
+    protected function doRender($data)
+    {
+        if ($data instanceof Structure) {
+            return $data->toString($this->format, (array) $this->config->get('options', []));
+        }
 
-		return Arr::dump($data, $this->config->get('options.level', 5));
-	}
+        return Arr::dump($data, $this->config->get('options.level', 5));
+    }
 
-	/**
-	 * getData
-	 *
-	 * @return  Structure
-	 */
-	public function getData()
-	{
-		if (!$this->data)
-		{
-			$this->data = new Structure;
-		}
+    /**
+     * getData
+     *
+     * @return  Structure
+     */
+    public function getData()
+    {
+        if (!$this->data) {
+            $this->data = new Structure;
+        }
 
-		return $this->data;
-	}
+        return $this->data;
+    }
 
-	/**
-	 * setData
-	 *
-	 * @param   array|Structure $data
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setData($data)
-	{
-		$this->data = $data instanceof Structure ? $data : new Structure($data);
+    /**
+     * setData
+     *
+     * @param   array|Structure $data
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setData($data)
+    {
+        $this->data = $data instanceof Structure ? $data : new Structure($data);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Method to get property Format
-	 *
-	 * @return  string
-	 */
-	public function getFormat()
-	{
-		return $this->format;
-	}
+    /**
+     * Method to get property Format
+     *
+     * @return  string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
 
-	/**
-	 * Method to set property format
-	 *
-	 * @param   string $format
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setFormat($format)
-	{
-		$this->format = $format;
+    /**
+     * Method to set property format
+     *
+     * @param   string $format
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Return data which should be serialized by json_encode().
-	 *
-	 * @return  mixed
-	 *
-	 * @throws \RuntimeException
-	 */
-	public function jsonSerialize()
-	{
-		return $result = $this->getHandledData();
-	}
+    /**
+     * Return data which should be serialized by json_encode().
+     *
+     * @return  mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function jsonSerialize()
+    {
+        return $result = $this->getHandledData();
+    }
 }

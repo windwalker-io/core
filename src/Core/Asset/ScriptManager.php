@@ -15,56 +15,55 @@ namespace Windwalker\Core\Asset;
  */
 class ScriptManager
 {
-	use AssetAwareTrait;
+    use AssetAwareTrait;
 
-	/**
-	 * Property inited.
-	 *
-	 * @var  array
-	 */
-	protected static $inited = [];
+    /**
+     * Property inited.
+     *
+     * @var  array
+     */
+    protected static $inited = [];
 
-	/**
-	 * ScriptManager constructor.
-	 *
-	 * @param AssetManager $asset
-	 */
-	public function __construct(AssetManager $asset)
-	{
-		$this->asset = $asset;
-	}
+    /**
+     * ScriptManager constructor.
+     *
+     * @param AssetManager $asset
+     */
+    public function __construct(AssetManager $asset)
+    {
+        $this->asset = $asset;
+    }
 
-	/**
-	 * inited
-	 *
-	 * @param   string $name
-	 * @param   mixed  ...$data
-	 *
-	 * @return bool
-	 */
-	public function inited($name, ...$data)
-	{
-		$id = $this->getInitedId(...$data);
+    /**
+     * inited
+     *
+     * @param   string $name
+     * @param   mixed  ...$data
+     *
+     * @return bool
+     */
+    public function inited($name, ...$data)
+    {
+        $id = $this->getInitedId(...$data);
 
-		if (!isset(static::$inited[$name][$id]))
-		{
-			static::$inited[$name][$id] = true;
+        if (!isset(static::$inited[$name][$id])) {
+            static::$inited[$name][$id] = true;
 
-			return false;
-		}
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * getInitedId
-	 *
-	 * @param   mixed  ...$data
-	 *
-	 * @return  string
-	 */
-	public function getInitedId(...$data)
-	{
-		return sha1(serialize($data));
-	}
+    /**
+     * getInitedId
+     *
+     * @param   mixed ...$data
+     *
+     * @return  string
+     */
+    public function getInitedId(...$data)
+    {
+        return sha1(serialize($data));
+    }
 }

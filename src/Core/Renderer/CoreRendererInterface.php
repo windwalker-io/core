@@ -17,12 +17,12 @@ use Windwalker\Core\Renderer\Finder\PackageFinderInterface;
  */
 interface CoreRendererInterface
 {
-	/**
-	 * setRendererFinder
-	 *
-	 * @param PackageFinderInterface $finder
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setPackageFinder(PackageFinderInterface $finder);
+    /**
+     * setRendererFinder
+     *
+     * @param PackageFinderInterface $finder
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPackageFinder(PackageFinderInterface $finder);
 }

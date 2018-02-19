@@ -17,101 +17,97 @@ use Windwalker\Structure\Format\XmlFormat;
  */
 class SimpleXmlView extends AbstractView
 {
-	/**
-	 * Property data.
-	 *
-	 * @var  array|\SimpleXMLElement
-	 */
-	protected $data = [];
+    /**
+     * Property data.
+     *
+     * @var  array|\SimpleXMLElement
+     */
+    protected $data = [];
 
-	/**
-	 * Property root.
-	 *
-	 * @var  string
-	 */
-	protected $root = 'windwalker';
+    /**
+     * Property root.
+     *
+     * @var  string
+     */
+    protected $root = 'windwalker';
 
-	/**
-	 * Property nodeName.
-	 *
-	 * @var  string
-	 */
-	protected $nodeName = 'node';
+    /**
+     * Property nodeName.
+     *
+     * @var  string
+     */
+    protected $nodeName = 'node';
 
-	/**
-	 * Method to instantiate the view.
-	 *
-	 * @param   array  $data  The data array.
-	 */
-	public function __construct($data = null)
-	{
-		parent::__construct();
+    /**
+     * Method to instantiate the view.
+     *
+     * @param   array $data The data array.
+     */
+    public function __construct($data = null)
+    {
+        parent::__construct();
 
-		// Init registry object.
-		if ($data instanceof \SimpleXMLElement)
-		{
-			$this->data = $data;
-		}
-		else
-		{
-			$this->data = new \SimpleXMLElement(XmlFormat::structToString($data, ['name' => $this->root, 'nodeName' => $this->nodeName]));
-		}
-	}
+        // Init registry object.
+        if ($data instanceof \SimpleXMLElement) {
+            $this->data = $data;
+        } else {
+            $this->data = new \SimpleXMLElement(XmlFormat::structToString($data,
+                ['name' => $this->root, 'nodeName' => $this->nodeName]));
+        }
+    }
 
-	/**
-	 * prepareData
-	 *
-	 * @param \SimpleXMLElement $xml
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($xml)
-	{
-	}
+    /**
+     * prepareData
+     *
+     * @param \SimpleXMLElement $xml
+     *
+     * @return  void
+     */
+    protected function prepareData($xml)
+    {
+    }
 
-	/**
-	 * doRender
-	 *
-	 * @param  \SimpleXMLElement $registry
-	 *
-	 * @return string
-	 */
-	protected function doRender($registry)
-	{
-		return $this->data->asXML();
-	}
+    /**
+     * doRender
+     *
+     * @param  \SimpleXMLElement $registry
+     *
+     * @return string
+     */
+    protected function doRender($registry)
+    {
+        return $this->data->asXML();
+    }
 
-	/**
-	 * getData
-	 *
-	 * @return  \SimpleXMLElement
-	 */
-	public function getData()
-	{
-		if (!$this->data)
-		{
-			$this->data = new \SimpleXMLElement("<{$this->root} />");
-		}
+    /**
+     * getData
+     *
+     * @return  \SimpleXMLElement
+     */
+    public function getData()
+    {
+        if (!$this->data) {
+            $this->data = new \SimpleXMLElement("<{$this->root} />");
+        }
 
-		return $this->data;
-	}
+        return $this->data;
+    }
 
-	/**
-	 * setData
-	 *
-	 * @param   \SimpleXMLElement $data
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setData($data)
-	{
-		if (!$data instanceof \SimpleXMLElement)
-		{
-			throw new \InvalidArgumentException(__METHOD__ . ' argument should be instance of ' . \SimpleXMLElement::class);
-		}
+    /**
+     * setData
+     *
+     * @param   \SimpleXMLElement $data
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setData($data)
+    {
+        if (!$data instanceof \SimpleXMLElement) {
+            throw new \InvalidArgumentException(__METHOD__ . ' argument should be instance of ' . \SimpleXMLElement::class);
+        }
 
-		$this->data = $data;
+        $this->data = $data;
 
-		return $this;
-	}
+        return $this;
+    }
 }

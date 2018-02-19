@@ -17,71 +17,69 @@ use Windwalker\Core\Migration\Repository\BackupRepository;
  */
 class ClearCommand extends CoreCommand
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'clear';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'clear';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Clear seeders.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Clear seeders.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'clear <cmd><command></cmd> <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'clear <cmd><command></cmd> <option>[option]</option>';
 
-	/**
-	 * Initialise command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-		parent::init();
-	}
+    /**
+     * Initialise command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+        parent::init();
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		if ($this->console->getMode() != 'dev')
-		{
-			throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
-		}
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        if ($this->console->getMode() != 'dev') {
+            throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
+        }
 
-		// backup
-		if (!$this->getOption('no-backup'))
-		{
-			BackupRepository::getInstance()->setCommand($this)->backup();
-		}
+        // backup
+        if (!$this->getOption('no-backup')) {
+            BackupRepository::getInstance()->setCommand($this)->backup();
+        }
 
-		$class = $this->console->get('seed.class');
+        $class = $this->console->get('seed.class');
 
-		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
-		$seeder = new $class(Ioc::getDatabase(), $this);
+        /** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
+        $seeder = new $class(Ioc::getDatabase(), $this);
 
-		$seeder->doClear();
+        $seeder->doClear();
 
-		$this->out('All data has been cleared.');
+        $this->out('All data has been cleared.');
 
-		return true;
-	}
+        return true;
+    }
 }

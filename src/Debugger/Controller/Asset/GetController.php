@@ -18,51 +18,50 @@ use Windwalker\Http\Response\TextResponse;
  */
 class GetController extends AbstractController
 {
-	/**
-	 * doExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$type = $this->input->get('type', 'css');
+    /**
+     * doExecute
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        $type = $this->input->get('type', 'css');
 
-		$media = WINDWALKER_DEBUGGER_ROOT . '/Resources/asset';
-		$content = '';
-		$contentType = 'text/html';
+        $media       = WINDWALKER_DEBUGGER_ROOT . '/Resources/asset';
+        $content     = '';
+        $contentType = 'text/html';
 
-		switch ($type)
-		{
-			case 'css':
-				$content .= file_get_contents($media . '/css/bootstrap.min.css');
-				$content .= file_get_contents($media . '/css/microtip.css');
-				$content .= file_get_contents($media . '/css/debugger.css');
-				$contentType = 'text/css';
-				break;
+        switch ($type) {
+            case 'css':
+                $content     .= file_get_contents($media . '/css/bootstrap.min.css');
+                $content     .= file_get_contents($media . '/css/microtip.css');
+                $content     .= file_get_contents($media . '/css/debugger.css');
+                $contentType = 'text/css';
+                break;
 
-			case 'fonts':
-				$content .= file_get_contents($media . '/fonts/glyphicons-halflings-regular.woff2');
-				$contentType = null;
-				break;
-		}
+            case 'fonts':
+                $content     .= file_get_contents($media . '/fonts/glyphicons-halflings-regular.woff2');
+                $contentType = null;
+                break;
+        }
 
-		$this->response = (new TextResponse)->withContentType($contentType);
-		$this->app->server->cachable(true);
+        $this->response = (new TextResponse)->withContentType($contentType);
+        $this->app->server->cachable(true);
 
-		return $content;
-	}
+        return $content;
+    }
 
-	/**
-	 * returnFail
-	 *
-	 * @param int $code
-	 *
-	 * @return  string
-	 */
-	protected function returnFail($code = 404)
-	{
-		$this->app->response->setHeader('STATUS', $code);
+    /**
+     * returnFail
+     *
+     * @param int $code
+     *
+     * @return  string
+     */
+    protected function returnFail($code = 404)
+    {
+        $this->app->response->setHeader('STATUS', $code);
 
-		return false;
-	}
+        return false;
+    }
 }

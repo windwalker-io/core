@@ -13,34 +13,32 @@ use Windwalker\Dom\HtmlElement;
 
 /**
  * The SystemHtmlView class.
- * 
+ *
  * @since  2.1.1
  */
 class SystemHtmlView extends AbstractDebuggerHtmlView
 {
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		$data->collector = $data->item['collector'];
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        $data->collector = $data->item['collector'];
 
-		$customData = [];
+        $customData = [];
 
-		foreach ((array) $data->collector['custom.data'] as $key => $item)
-		{
-			if (is_array($item))
-			{
-				$item = (string) new HtmlElement('pre', print_r($item, 1));
-			}
+        foreach ((array) $data->collector['custom.data'] as $key => $item) {
+            if (is_array($item)) {
+                $item = (string) new HtmlElement('pre', print_r($item, 1));
+            }
 
-			$customData[$key] = $item;
-		}
+            $customData[$key] = $item;
+        }
 
-		$data->collector['custom.data'] = $customData;
-	}
+        $data->collector['custom.data'] = $customData;
+    }
 }

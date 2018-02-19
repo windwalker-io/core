@@ -17,63 +17,63 @@ use Windwalker\Renderer\AbstractRenderer;
  */
 interface LayoutRenderableInterface
 {
-	/**
-	 * Method to get property Layout
-	 *
-	 * @return  string
-	 */
-	public function getLayout();
+    /**
+     * Method to get property Layout
+     *
+     * @return  string
+     */
+    public function getLayout();
 
-	/**
-	 * Method to set property layout
-	 *
-	 * @param   string $layout
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setLayout($layout);
+    /**
+     * Method to set property layout
+     *
+     * @param   string $layout
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setLayout($layout);
 
-	/**
-	 * Method to get property Renderer
-	 *
-	 * @return  AbstractRenderer
-	 */
-	public function getRenderer();
+    /**
+     * Method to get property Renderer
+     *
+     * @return  AbstractRenderer
+     */
+    public function getRenderer();
 
-	/**
-	 * Method to set property renderer
-	 *
-	 * @param   AbstractRenderer|string $renderer
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRenderer($renderer);
+    /**
+     * Method to set property renderer
+     *
+     * @param   AbstractRenderer|string $renderer
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRenderer($renderer);
 
-	/**
-	 * registerPaths
-	 *
-	 * @param bool $refresh
-	 *
-	 * @return static
-	 */
-	public function registerPaths($refresh = false);
+    /**
+     * registerPaths
+     *
+     * @param bool $refresh
+     *
+     * @return static
+     */
+    public function registerPaths($refresh = false);
 
-	/**
-	 * dumpPaths
-	 *
-	 * @param bool $multilingual
-	 *
-	 * @return  array
-	 */
-	public function dumpPaths($multilingual = false);
+    /**
+     * dumpPaths
+     *
+     * @param bool $multilingual
+     *
+     * @return  array
+     */
+    public function dumpPaths($multilingual = false);
 
-	/**
-	 * addPath
-	 *
-	 * @param string $path
-	 * @param int    $priority
-	 *
-	 * @return  static
-	 */
-	public function addPath($path, $priority = 100);
+    /**
+     * addPath
+     *
+     * @param string $path
+     * @param int    $priority
+     *
+     * @return  static
+     */
+    public function addPath($path, $priority = 100);
 }

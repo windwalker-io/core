@@ -12,20 +12,20 @@ use Windwalker\Debugger\View\AbstractDebuggerHtmlView;
 
 /**
  * The SystemHtmlView class.
- * 
+ *
  * @since  2.1.1
  */
 class RequestHtmlView extends AbstractDebuggerHtmlView
 {
-	/**
-	 * prepareData
-	 *
-	 * @param \Windwalker\Data\Data $data
-	 *
-	 * @return  void
-	 */
-	protected function prepareData($data)
-	{
-		$data->collector = $data->item['collector'];
-	}
+    /**
+     * prepareData
+     *
+     * @param \Windwalker\Data\Data $data
+     *
+     * @return  void
+     */
+    protected function prepareData($data)
+    {
+        $data->collector = $data->item['collector'];
+    }
 }

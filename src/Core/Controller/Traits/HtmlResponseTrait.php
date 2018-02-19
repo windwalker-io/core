@@ -18,15 +18,15 @@ use Windwalker\Core\Controller\Middleware\HtmlResponseMiddleware;
  */
 trait HtmlResponseTrait
 {
-	/**
-	 * bootHtmlResponseTrait
-	 *
-	 * @param AbstractController $controller
-	 *
-	 * @return  void
-	 */
-	public function bootHtmlResponseTrait(AbstractController $controller)
-	{
-		$controller->addMiddleware(HtmlResponseMiddleware::class);
-	}
+    /**
+     * bootHtmlResponseTrait
+     *
+     * @param AbstractController $controller
+     *
+     * @return  void
+     */
+    public function bootHtmlResponseTrait(AbstractController $controller)
+    {
+        $controller->addMiddleware(HtmlResponseMiddleware::class);
+    }
 }

@@ -31,172 +31,170 @@ use Windwalker\Uri\UriData;
  */
 class ConsoleHelper
 {
-	/**
-	 * loadPackages
-	 *
-	 * @param string      $env
-	 * @param CoreConsole $console
-	 *
-	 * @return array
-	 */
-	public static function loadPackages($env = 'dev', CoreConsole $console = null)
-	{
-		$console = $console ? : Ioc::getApplication();
+    /**
+     * loadPackages
+     *
+     * @param string      $env
+     * @param CoreConsole $console
+     *
+     * @return array
+     */
+    public static function loadPackages($env = 'dev', CoreConsole $console = null)
+    {
+        $console = $console ?: Ioc::getApplication();
 
-		return (array) (new Structure)
-			->loadFile($console->get('path.etc') . '/app/console.php', 'php')
-			->loadFile($console->get('path.etc') . '/app/' . $env . '.php', 'php')
-			->get('packages');
-	}
+        return (array) (new Structure)
+            ->loadFile($console->get('path.etc') . '/app/console.php', 'php')
+            ->loadFile($console->get('path.etc') . '/app/' . $env . '.php', 'php')
+            ->get('packages');
+    }
 
-	/**
-	 * getAllPackagesResolver
-	 *
-	 * @param string      $env
-	 * @param CoreConsole $console
-	 *
-	 * @return  PackageResolver
-	 */
-	public static function getAllPackagesResolver($env = 'dev', CoreConsole $console = null)
-	{
-		$console = $console ? : Ioc::getApplication();
+    /**
+     * getAllPackagesResolver
+     *
+     * @param string      $env
+     * @param CoreConsole $console
+     *
+     * @return  PackageResolver
+     */
+    public static function getAllPackagesResolver($env = 'dev', CoreConsole $console = null)
+    {
+        $console = $console ?: Ioc::getApplication();
 
-		$container = clone $console->container;
-		$container->share(EventDispatcher::class, $container->newInstance(EventDispatcher::class));
+        $container = clone $console->container;
+        $container->share(EventDispatcher::class, $container->newInstance(EventDispatcher::class));
 
-		$resolver = new PackageResolver($container);
+        $resolver = new PackageResolver($container);
 
-		foreach (static::loadPackages($env, $console) as $name => $package)
-		{
-			$resolver->addPackage($name, $package);
-		}
+        foreach (static::loadPackages($env, $console) as $name => $package) {
+            $resolver->addPackage($name, $package);
+        }
 
-		return $resolver;
-	}
+        return $resolver;
+    }
 
-	/**
-	 * executeWeb
-	 *
-	 * @param Request $request
-	 * @param array   $config
-	 * @param string  $appClass
-	 *
-	 * @return  Response
-	 */
-	public static function executeWeb(Request $request, $config = [], $appClass = 'Windwalker\Web\Application')
-	{
-		$profile = Ioc::getProfile();
+    /**
+     * executeWeb
+     *
+     * @param Request $request
+     * @param array   $config
+     * @param string  $appClass
+     *
+     * @return  Response
+     */
+    public static function executeWeb(Request $request, $config = [], $appClass = 'Windwalker\Web\Application')
+    {
+        $profile = Ioc::getProfile();
 
-		Ioc::setProfile('web');
+        Ioc::setProfile('web');
 
-		if (!class_exists($appClass))
-		{
-			throw new \LogicException($appClass . ' not found, you have to provide an exists Application class name.');
-		}
+        if (!class_exists($appClass)) {
+            throw new \LogicException($appClass . ' not found, you have to provide an exists Application class name.');
+        }
 
-		if (!is_subclass_of($appClass, WebApplication::class))
-		{
-			throw new \LogicException('Application class should be sub class of ' . WebApplication::class);
-		}
+        if (!is_subclass_of($appClass, WebApplication::class)) {
+            throw new \LogicException('Application class should be sub class of ' . WebApplication::class);
+        }
 
-		/** @var WebApplication $app */
-		$app = new $appClass($request);
+        /** @var WebApplication $app */
+        $app = new $appClass($request);
 
-		$app->getConfig()->load($config);
+        $app->getConfig()->load($config);
 
-		$app->set('output.return_body', true);
+        $app->set('output.return_body', true);
 
-		$app->server->setOutput(new NoHeaderOutput);
+        $app->server->setOutput(new NoHeaderOutput);
 
-		$response = $app->execute();
+        $response = $app->execute();
 
-		Ioc::setProfile($profile);
+        Ioc::setProfile($profile);
 
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * Execute a package in CLI environment.
-	 *
-	 * @param string   $package
-	 * @param string   $task
-	 * @param Request  $request
-	 * @param array    $config
-	 * @param string   $appClass
-	 *
-	 * @return Response
-	 */
-	public static function executePackage($package, $task, Request $request, $config = [], $appClass = 'Windwalker\Web\Application')
-	{
-		$profile = Ioc::getProfile();
+    /**
+     * Execute a package in CLI environment.
+     *
+     * @param string  $package
+     * @param string  $task
+     * @param Request $request
+     * @param array   $config
+     * @param string  $appClass
+     *
+     * @return Response
+     */
+    public static function executePackage(
+        $package,
+        $task,
+        Request $request,
+        $config = [],
+        $appClass = 'Windwalker\Web\Application'
+    ) {
+        $profile = Ioc::getProfile();
 
-		Ioc::setProfile('web');
+        Ioc::setProfile('web');
 
-		if (!class_exists($appClass))
-		{
-			throw new \LogicException($appClass . ' not found, you have to provide an exists Application class name.');
-		}
+        if (!class_exists($appClass)) {
+            throw new \LogicException($appClass . ' not found, you have to provide an exists Application class name.');
+        }
 
-		if (!is_subclass_of($appClass, WebApplication::class))
-		{
-			throw new \LogicException('Application class should be sub class of ' . WebApplication::class);
-		}
+        if (!is_subclass_of($appClass, WebApplication::class)) {
+            throw new \LogicException('Application class should be sub class of ' . WebApplication::class);
+        }
 
-		/** @var WebApplication $app */
-		$app = new $appClass($request);
-		$app->boot();
-		$app->getRouter();
+        /** @var WebApplication $app */
+        $app = new $appClass($request);
+        $app->boot();
+        $app->getRouter();
 
-		$package = $app->getPackage($package);
+        $package = $app->getPackage($package);
 
-		$container = $app->getContainer();
+        $container = $app->getContainer();
 
-		$container->share('current.package', $package);
-		$container->get('config')->load($config);
+        $container->share('current.package', $package);
+        $container->get('config')->load($config);
 
-		$response = $package->execute($task, $request, new \Windwalker\Http\Response\Response);
+        $response = $package->execute($task, $request, new \Windwalker\Http\Response\Response);
 
-		Ioc::setProfile($profile);
+        Ioc::setProfile($profile);
 
-		return $response;
-	}
+        return $response;
+    }
 
-	/**
-	 * prepareWebEnvironment
-	 *
-	 * @param string $url
-	 * @param string $script
-	 * @param array  $routeFiles
-	 *
-	 * @return  void
-	 */
-	public static function prepareWebEnvironment($env = 'web', $url = '', $script = null, $routeFiles = [])
-	{
-		$container = Ioc::factory();
-		$app = $container->get('app');
+    /**
+     * prepareWebEnvironment
+     *
+     * @param string $url
+     * @param string $script
+     * @param array  $routeFiles
+     *
+     * @return  void
+     */
+    public static function prepareWebEnvironment($env = 'web', $url = '', $script = null, $routeFiles = [])
+    {
+        $container = Ioc::factory();
+        $app       = $container->get('app');
 
-		if (!$app instanceof Console)
-		{
-			return;
-		}
+        if (!$app instanceof Console) {
+            return;
+        }
 
-		// Prepare server and uri object
-		$server = new WebHttpServer(null, ServerRequestFactory::createFromUri($url, $script));
+        // Prepare server and uri object
+        $server = new WebHttpServer(null, ServerRequestFactory::createFromUri($url, $script));
 
-		$container->share(UriData::class, $server->getUriData())->alias('uri', UriData::class);
+        $container->share(UriData::class, $server->getUriData())->alias('uri', UriData::class);
 
-		// Register providers
-		$container->registerServiceProvider($container->newInstance(RouterProvider::class))
-			->registerServiceProvider($container->newInstance(RendererProvider::class))
-			->registerServiceProvider($container->newInstance(AssetProvider::class));
+        // Register providers
+        $container->registerServiceProvider($container->newInstance(RouterProvider::class))
+            ->registerServiceProvider($container->newInstance(RendererProvider::class))
+            ->registerServiceProvider($container->newInstance(AssetProvider::class));
 
-		// Prepare routers
-		$router = $container->get('router');
-		$resolver = static::getAllPackagesResolver($env);
+        // Prepare routers
+        $router   = $container->get('router');
+        $resolver = static::getAllPackagesResolver($env);
 
-		foreach ($routeFiles as $routeFile)
-		{
-			$router->registerRawRouting($router::loadRoutingFile($routeFile), $resolver);
-		}
-	}
+        foreach ($routeFiles as $routeFile) {
+            $router->registerRawRouting($router::loadRoutingFile($routeFile), $resolver);
+        }
+    }
 }

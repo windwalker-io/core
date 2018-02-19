@@ -22,7 +22,7 @@ use Windwalker\Structure\Structure;
  */
 class PhpStormMetaListener
 {
-	protected $tmpl = <<<TMPL
+    protected $tmpl = <<<TMPL
 <?php
 	
 namespace PHPSTORM_META
@@ -41,39 +41,37 @@ namespace PHPSTORM_META
 }
 TMPL;
 
-	/**
-	 * onAfterExecute
-	 *
-	 * @param Event $event
-	 *
-	 * @return  void
-	 */
-	public function onAfterInitialise(Event $event)
-	{
-		$config = new Structure;
+    /**
+     * onAfterExecute
+     *
+     * @param Event $event
+     *
+     * @return  void
+     */
+    public function onAfterInitialise(Event $event)
+    {
+        $config = new Structure;
 
-		$files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
+        $files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
 
-		/** @var PathLocator $file */
-		foreach ($files->find('.*\.[php|json|yml|yaml]', true) as $file)
-		{
-			if (!in_array($file->getExtension(), ['php', 'json', 'yml', 'yaml']) || $file->getBasename() == 'define.php')
-			{
-				continue;
-			}
+        /** @var PathLocator $file */
+        foreach ($files->find('.*\.[php|json|yml|yaml]', true) as $file) {
+            if (!in_array($file->getExtension(),
+                    ['php', 'json', 'yml', 'yaml']) || $file->getBasename() == 'define.php') {
+                continue;
+            }
 
-			$config->loadFile($file->getPathname(), $file->getExtension());
-		}
+            $config->loadFile($file->getPathname(), $file->getExtension());
+        }
 
-		$array = $config->flatten();
-		
-		$keys = array_map(function ($value)
-		{
-		    return StringHelper::quote($value) . ' instanceof mixed';
-		}, array_keys($array));
+        $array = $config->flatten();
 
-		$data = str_replace('{config}', implode(",\n", $keys), $this->tmpl);
+        $keys = array_map(function ($value) {
+            return StringHelper::quote($value) . ' instanceof mixed';
+        }, array_keys($array));
 
-		File::write(WINDWALKER_TEMP . '/ide/.phpstorm.meta.php', $data);
-	}
+        $data = str_replace('{config}', implode(",\n", $keys), $this->tmpl);
+
+        File::write(WINDWALKER_TEMP . '/ide/.phpstorm.meta.php', $data);
+    }
 }

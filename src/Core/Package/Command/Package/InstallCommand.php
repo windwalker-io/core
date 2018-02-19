@@ -23,147 +23,141 @@ use Windwalker\Filesystem\Folder;
  */
 class InstallCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'install';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'install';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Install package';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Install package';
 
-	/**
-	 * Initialise command.
-	 *
-	 * @return void
-	 *
-	 * @since  2.0
-	 */
-	protected function init()
-	{
-		$this->addOption('hard')
-			->description('Hard copy assets.')
-			->defaultValue(false);
-	}
+    /**
+     * Initialise command.
+     *
+     * @return void
+     *
+     * @since  2.0
+     */
+    protected function init()
+    {
+        $this->addOption('hard')
+            ->description('Hard copy assets.')
+            ->defaultValue(false);
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int
-	 *
-	 * @since  2.0
-	 */
-	protected function doExecute()
-	{
-		$env      = $this->getOption('env');
-		$resolver = ConsoleHelper::getAllPackagesResolver($env, $this->console);
-		$names    = $this->io->getArguments();
+    /**
+     * Execute this command.
+     *
+     * @return int
+     *
+     * @since  2.0
+     */
+    protected function doExecute()
+    {
+        $env      = $this->getOption('env');
+        $resolver = ConsoleHelper::getAllPackagesResolver($env, $this->console);
+        $names    = $this->io->getArguments();
 
-		if (!$names)
-		{
-			throw new \InvalidArgumentException('No package input.');
-		}
+        if (!$names) {
+            throw new \InvalidArgumentException('No package input.');
+        }
 
-		foreach ($names as $name)
-		{
-			$this->out()
-				->out('Start installing package: <info>' . $name . '</info>')
-				->out('---------------------------');
+        foreach ($names as $name) {
+            $this->out()
+                ->out('Start installing package: <info>' . $name . '</info>')
+                ->out('---------------------------');
 
-			$package = $resolver->getPackage($name);
+            $package = $resolver->getPackage($name);
 
-			if (!$package)
-			{
-				$this->err('<comment>Package: ' . $name . ' not found.</comment>');
+            if (!$package) {
+                $this->err('<comment>Package: ' . $name . ' not found.</comment>');
 
-				continue;
-			}
+                continue;
+            }
 
-			$this->installConfig($package);
-			$this->installRouting($package);
-			$this->copyMigration($package);
-			$this->copySeeders($package);
-			$this->syncAssets($package);
+            $this->installConfig($package);
+            $this->installRouting($package);
+            $this->copyMigration($package);
+            $this->copySeeders($package);
+            $this->syncAssets($package);
 
-			if (is_callable([$package, 'install']))
-			{
-				$package->install($this);
-			}
-		}
+            if (is_callable([$package, 'install'])) {
+                $package->install($this);
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * installConfig
-	 *
-	 * @param AbstractPackage $package
-	 *
-	 * @return  void
-	 */
-	protected function installConfig(AbstractPackage $package)
-	{
-		$dir = $package->getDir() . '/Resources/config';
+    /**
+     * installConfig
+     *
+     * @param AbstractPackage $package
+     *
+     * @return  void
+     */
+    protected function installConfig(AbstractPackage $package)
+    {
+        $dir = $package->getDir() . '/Resources/config';
 
-		// Config
-		$targetFolder = $this->console->get('path.etc') . '/package';
-		$file = $dir . '/config.dist.php';
-		$target = $targetFolder . '/' . $package->name . '.php';
+        // Config
+        $targetFolder = $this->console->get('path.etc') . '/package';
+        $file         = $dir . '/config.dist.php';
+        $target       = $targetFolder . '/' . $package->name . '.php';
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <comment>etc/package/" . $package->name . '.php</comment> [Y/n]: ', true))
-		{
-			if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ', false))
-			{
-				File::delete($target);
-			}
-			else
-			{
-				$this->out('  Config file: <comment>etc/package/' . $package->name . '.php</comment> exists, do not copy.');
-			}
+        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <comment>etc/package/" . $package->name . '.php</comment> [Y/n]: ',
+                true)) {
+            if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ',
+                    false)) {
+                File::delete($target);
+            } else {
+                $this->out('  Config file: <comment>etc/package/' . $package->name . '.php</comment> exists, do not copy.');
+            }
 
-			if (!is_file($target) && File::copy($file, $target))
-			{
-				$this->out('  Copy to <info>etc/package/' . $package->name . '.php</info> successfully.');
-			}
-		}
- 
-		$file = $dir . '/secret.dist.yml';
-		$target = $this->console->get('path.etc') . '/secret.yml';
+            if (!is_file($target) && File::copy($file, $target)) {
+                $this->out('  Copy to <info>etc/package/' . $package->name . '.php</info> successfully.');
+            }
+        }
 
-		if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <comment>etc/secret.yml</comment> [Y/n]: ", true))
-		{
-			$secret = ltrim(file_get_contents($target));
-			$new = file_get_contents($file);
-			$secret = $secret . "\n# " . $package->name . "\n" . ltrim($new);
+        $file   = $dir . '/secret.dist.yml';
+        $target = $this->console->get('path.etc') . '/secret.yml';
 
-			File::write($target, $secret);
+        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <comment>etc/secret.yml</comment> [Y/n]: ",
+                true)) {
+            $secret = ltrim(file_get_contents($target));
+            $new    = file_get_contents($file);
+            $secret = $secret . "\n# " . $package->name . "\n" . ltrim($new);
 
-			$this->out('  Copy to <info>etc/secret.yml</info> successfully.');
-		}
-	}
+            File::write($target, $secret);
 
-	/**
-	 * installRouting
-	 *
-	 * @param   AbstractPackage  $package
-	 *
-	 * @return  void
-	 */
-	protected function installRouting(AbstractPackage $package)
-	{
-		if (!(new BooleanPrompter)->ask('Do your want to add routing profile to <comment>etc/routing.yml</comment>? [Y/n]: ', true))
-		{
-			return;
-		}
+            $this->out('  Copy to <info>etc/secret.yml</info> successfully.');
+        }
+    }
 
-		$pattern = (new TextPrompter)->ask('The URL pattern prefix [<info>/' . $package->name . '</info>]: ', '/' . $package->name);
+    /**
+     * installRouting
+     *
+     * @param   AbstractPackage $package
+     *
+     * @return  void
+     */
+    protected function installRouting(AbstractPackage $package)
+    {
+        if (!(new BooleanPrompter)->ask('Do your want to add routing profile to <comment>etc/routing.yml</comment>? [Y/n]: ',
+            true)) {
+            return;
+        }
 
-		$routing = <<<ROUTE
+        $pattern = (new TextPrompter)->ask('The URL pattern prefix [<info>/' . $package->name . '</info>]: ',
+            '/' . $package->name);
+
+        $routing = <<<ROUTE
 
 # Routing of package: %s
 %s:
@@ -172,137 +166,127 @@ class InstallCommand extends CoreCommand
 
 ROUTE;
 
-		$routing = sprintf($routing, $package->name, $package->name, $pattern, $package->name);
+        $routing = sprintf($routing, $package->name, $package->name, $pattern, $package->name);
 
-		$target = $this->console->get('path.etc') . '/routing.yml';
+        $target = $this->console->get('path.etc') . '/routing.yml';
 
-		$content = file_get_contents($target);
-		$content .= $routing;
+        $content = file_get_contents($target);
+        $content .= $routing;
 
-		file_put_contents($target, $content);
+        file_put_contents($target, $content);
 
-		$this->out()->out('  Added routing profile to <comment>etc/routing.yml</comment>');
-	}
+        $this->out()->out('  Added routing profile to <comment>etc/routing.yml</comment>');
+    }
 
-	/**
-	 * syncAssets
-	 *
-	 * @param AbstractPackage $package
-	 *
-	 * @return  void
-	 */
-	public function syncAssets(AbstractPackage $package)
-	{
-		$this->out();
+    /**
+     * syncAssets
+     *
+     * @param AbstractPackage $package
+     *
+     * @return  void
+     */
+    public function syncAssets(AbstractPackage $package)
+    {
+        $this->out();
 
-		try
-		{
-			$this->console->executeByPath('asset sync ' . $package->name, ['hard' => $this->getOption('hard')]);
-		}
-		catch (\Exception $e)
-		{
-			$this->err($e->getMessage());
-		}
-	}
+        try {
+            $this->console->executeByPath('asset sync ' . $package->name, ['hard' => $this->getOption('hard')]);
+        } catch (\Exception $e) {
+            $this->err($e->getMessage());
+        }
+    }
 
-	/**
-	 * copyMigration
-	 *
-	 * @param AbstractPackage $package
-	 *
-	 * @return  void
-	 */
-	protected function copyMigration(AbstractPackage $package)
-	{
-		$dir = $package->getDir() . '/Migration';
+    /**
+     * copyMigration
+     *
+     * @param AbstractPackage $package
+     *
+     * @return  void
+     */
+    protected function copyMigration(AbstractPackage $package)
+    {
+        $dir = $package->getDir() . '/Migration';
 
-		// Config
-		$targetFolder = $this->console->get('path.resources') . '/migrations';
+        // Config
+        $targetFolder = $this->console->get('path.resources') . '/migrations';
 
-		$relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
+        $relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
 
-		if (!is_dir($dir))
-		{
-			return;
-		}
+        if (!is_dir($dir)) {
+            return;
+        }
 
-		if (!(new BooleanPrompter)->ask('Do your want to copy migrations to <comment>' . $relativePath . '</comment>? [Y/n]: ', true))
-		{
-			return;
-		}
+        if (!(new BooleanPrompter)->ask('Do your want to copy migrations to <comment>' . $relativePath . '</comment>? [Y/n]: ',
+            true)) {
+            return;
+        }
 
-		$files = Folder::files($dir, true, Folder::PATH_RELATIVE);
+        $files = Folder::files($dir, true, Folder::PATH_RELATIVE);
 
-		/** @var \SplFileInfo $file */
-		foreach ($files as $file)
-		{
-			$dest = new \SplFileInfo($targetFolder . '/' . $file);
+        /** @var \SplFileInfo $file */
+        foreach ($files as $file) {
+            $dest = new \SplFileInfo($targetFolder . '/' . $file);
 
-			if (is_file($dest->getPathname()))
-			{
-				$this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
+            if (is_file($dest->getPathname())) {
+                $this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
 
-				continue;
-			}
+                continue;
+            }
 
-			File::copy($dir . '/' . $file, $dest);
+            File::copy($dir . '/' . $file, $dest);
 
-			$this->out(sprintf('  [<info>Copied</info>] ' . $file));
-		}
+            $this->out(sprintf('  [<info>Copied</info>] ' . $file));
+        }
 
-		$this->out()->out('  Copy migrations completed.');
-	}
+        $this->out()->out('  Copy migrations completed.');
+    }
 
-	/**
-	 * copySeeders
-	 *
-	 * @param   AbstractPackage  $package
-	 *
-	 * @return  void
-	 */
-	protected function copySeeders(AbstractPackage $package)
-	{
-		$dir = $package->getDir() . '/Seed';
+    /**
+     * copySeeders
+     *
+     * @param   AbstractPackage $package
+     *
+     * @return  void
+     */
+    protected function copySeeders(AbstractPackage $package)
+    {
+        $dir = $package->getDir() . '/Seed';
 
-		// Config
-		$targetFolder = $this->console->get('path.resources') . '/seeders';
+        // Config
+        $targetFolder = $this->console->get('path.resources') . '/seeders';
 
-		$relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
+        $relativePath = str_replace($this->console->get('path.root') . DIRECTORY_SEPARATOR, '', $targetFolder);
 
-		if (!is_dir($dir))
-		{
-			return;
-		}
+        if (!is_dir($dir)) {
+            return;
+        }
 
-		if (!(new BooleanPrompter)->ask('Do your want to copy seeders to <comment>' . $relativePath . '</comment>? [Y/n]: ', true))
-		{
-			return;
-		}
+        if (!(new BooleanPrompter)->ask('Do your want to copy seeders to <comment>' . $relativePath . '</comment>? [Y/n]: ',
+            true)) {
+            return;
+        }
 
-		$files = Folder::files($dir, true, Folder::PATH_RELATIVE);
+        $files = Folder::files($dir, true, Folder::PATH_RELATIVE);
 
-		/** @var \SplFileInfo $file */
-		foreach ($files as $file)
-		{
-			if ($file == 'MainSeeder.php')
-			{
-				continue;
-			}
+        /** @var \SplFileInfo $file */
+        foreach ($files as $file) {
+            if ($file == 'MainSeeder.php') {
+                continue;
+            }
 
-			$dest = new \SplFileInfo($targetFolder . '/' . $file);
+            $dest = new \SplFileInfo($targetFolder . '/' . $file);
 
-			if (is_file($dest->getPathname()))
-			{
-				$this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
+            if (is_file($dest->getPathname())) {
+                $this->out(sprintf('  [<comment>File exists</comment>] ' . $file));
 
-				continue;
-			}
+                continue;
+            }
 
-			File::copy($dir . '/' . $file, $dest);
+            File::copy($dir . '/' . $file, $dest);
 
-			$this->out(sprintf('  [<info>Copied</info>] ' . $file));
-		}
+            $this->out(sprintf('  [<info>Copied</info>] ' . $file));
+        }
 
-		$this->out()->out('  Copy seeders completed.');
-	}
+        $this->out()->out('  Copy seeders completed.');
+    }
 }

@@ -18,30 +18,30 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class ModelResolver extends AbstractClassResolver
 {
-	/**
-	 * Property baseClass.
-	 *
-	 * @var  string
-	 */
-	protected $baseClass = ModelRepository::class;
+    /**
+     * Property baseClass.
+     *
+     * @var  string
+     */
+    protected $baseClass = ModelRepository::class;
 
-	/**
-	 * Get container key prefix.
-	 *
-	 * @return  string
-	 */
-	public static function getPrefix()
-	{
-		return 'model';
-	}
+    /**
+     * Get container key prefix.
+     *
+     * @return  string
+     */
+    public static function getPrefix()
+    {
+        return 'model';
+    }
 
-	/**
-	 * If didn't found any exists class, fallback to default class which in current package..
-	 *
-	 * @return string Found class name.
-	 */
-	protected function getDefaultNamespace()
-	{
-		return ReflectionHelper::getNamespaceName($this->package) . '\Model';
-	}
+    /**
+     * If didn't found any exists class, fallback to default class which in current package..
+     *
+     * @return string Found class name.
+     */
+    protected function getDefaultNamespace()
+    {
+        return ReflectionHelper::getNamespaceName($this->package) . '\Model';
+    }
 }

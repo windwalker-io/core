@@ -15,68 +15,68 @@ namespace Windwalker\Core\Router;
  */
 interface RouteBuilderInterface
 {
-	const TYPE_RAW = 'raw';
-	const TYPE_PATH = 'path';
-	const TYPE_FULL = 'full';
-	
-	/**
-	 * build
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 * @param string $type
-	 *
-	 * @return string
-	 */
-	public function route($route, $queries = [], $type = MainRouter::TYPE_PATH);
+    const TYPE_RAW = 'raw';
+    const TYPE_PATH = 'path';
+    const TYPE_FULL = 'full';
 
-	/**
-	 * to
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  RouteString
-	 */
-	public function to($route, $queries = []);
+    /**
+     * build
+     *
+     * @param string $route
+     * @param array  $queries
+     * @param string $type
+     *
+     * @return string
+     */
+    public function route($route, $queries = [], $type = MainRouter::TYPE_PATH);
 
-	/**
-	 * generate
-	 *
-	 * @param string  $route
-	 * @param array   $queries
-	 * @param string  $type
-	 *
-	 * @return  string
-	 */
-	public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH);
+    /**
+     * to
+     *
+     * @param string $route
+     * @param array  $queries
+     *
+     * @return  RouteString
+     */
+    public function to($route, $queries = []);
 
-	/**
-	 * fullRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function fullRoute($route, $queries = []);
+    /**
+     * generate
+     *
+     * @param string $route
+     * @param array  $queries
+     * @param string $type
+     *
+     * @return  string
+     */
+    public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH);
 
-	/**
-	 * rawRoute
-	 *
-	 * @param string $route
-	 * @param array  $queries
-	 *
-	 * @return  string
-	 */
-	public function rawRoute($route, $queries = []);
+    /**
+     * fullRoute
+     *
+     * @param string $route
+     * @param array  $queries
+     *
+     * @return  string
+     */
+    public function fullRoute($route, $queries = []);
 
-	/**
-	 * escape
-	 *
-	 * @param   string  $text
-	 *
-	 * @return  string
-	 */
-	public function escape($text);
+    /**
+     * rawRoute
+     *
+     * @param string $route
+     * @param array  $queries
+     *
+     * @return  string
+     */
+    public function rawRoute($route, $queries = []);
+
+    /**
+     * escape
+     *
+     * @param   string $text
+     *
+     * @return  string
+     */
+    public function escape($text);
 }

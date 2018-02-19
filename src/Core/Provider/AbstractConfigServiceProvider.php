@@ -13,25 +13,25 @@ use Windwalker\Structure\Structure;
 
 /**
  * The AbstractConfigServiceProvider class.
- * 
+ *
  * @since  2.0
  */
 abstract class AbstractConfigServiceProvider implements ServiceProviderInterface
 {
-	/**
-	 * Property config.
-	 *
-	 * @var \Windwalker\Structure\Structure
-	 */
-	protected $config;
+    /**
+     * Property config.
+     *
+     * @var \Windwalker\Structure\Structure
+     */
+    protected $config;
 
-	/**
-	 * Class init.
-	 *
-	 * @param $config
-	 */
-	public function __construct(Structure $config = null)
-	{
-		$this->config = $config ? : new Structure;
-	}
+    /**
+     * Class init.
+     *
+     * @param $config
+     */
+    public function __construct(Structure $config = null)
+    {
+        $this->config = $config ?: new Structure;
+    }
 }

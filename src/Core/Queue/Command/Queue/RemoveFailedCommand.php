@@ -18,84 +18,77 @@ use Windwalker\Core\Console\CoreCommand;
  */
 class RemoveFailedCommand extends CoreCommand
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'remove-failed';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'remove-failed';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Remove failed jobs.';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Remove failed jobs.';
 
-	/**
-	 * Property usage.
-	 *
-	 * @var  string
-	 */
-	protected $usage = '%s <cmd><ids...></cmd> <option>[option]</option>';
+    /**
+     * Property usage.
+     *
+     * @var  string
+     */
+    protected $usage = '%s <cmd><ids...></cmd> <option>[option]</option>';
 
-	/**
-	 * init
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->addOption('a')
-			->alias('all')
-			->defaultValue(false)
-			->description('Clear all failed jobs.');
-	}
+    /**
+     * init
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->addOption('a')
+            ->alias('all')
+            ->defaultValue(false)
+            ->description('Clear all failed jobs.');
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  bool
-	 */
-	protected function doExecute()
-	{
-		$failer = $this->console->container->get('queue.failer');
+    /**
+     * doExecute
+     *
+     * @return  bool
+     */
+    protected function doExecute()
+    {
+        $failer = $this->console->container->get('queue.failer');
 
-		$all = $this->getOption('all');
+        $all = $this->getOption('all');
 
-		if ($all)
-		{
-			$ids = array_column($failer->all(), 'id');
-		}
-		else
-		{
-			$ids = $this->io->getArguments();
+        if ($all) {
+            $ids = array_column($failer->all(), 'id');
+        } else {
+            $ids = $this->io->getArguments();
 
-			if (!count($ids))
-			{
-				throw new WrongArgumentException('No id provided');
-			}
-		}
+            if (!count($ids)) {
+                throw new WrongArgumentException('No id provided');
+            }
+        }
 
-		foreach ($ids as $id)
-		{
-			$failer->remove($id);
+        foreach ($ids as $id) {
+            $failer->remove($id);
 
-			if (!$all)
-			{
-				$this->out(sprintf('Remove failed-job: <info>%s</info>', $id));
+            if (!$all) {
+                $this->out(sprintf('Remove failed-job: <info>%s</info>', $id));
 
-				$failer->remove($id);
-			}
-		}
+                $failer->remove($id);
+            }
+        }
 
-		if ($all)
-		{
-			$failer->clear();
+        if ($all) {
+            $failer->clear();
 
-			$this->out('All failed jobs cleared.');
-		}
+            $this->out('All failed jobs cleared.');
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

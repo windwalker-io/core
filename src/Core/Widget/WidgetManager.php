@@ -15,114 +15,111 @@ use Windwalker\Renderer\RendererInterface;
 
 /**
  * The WidgetHelper class.
- * 
+ *
  * @since  2.1.1
  */
 class WidgetManager
 {
-	const PHP      = 'php';
-	const BLADE    = 'blade';
-	const EDGE     = 'edge';
-	const TWIG     = 'twig';
-	const MUSTACHE = 'mustache';
+    const PHP = 'php';
+    const BLADE = 'blade';
+    const EDGE = 'edge';
+    const TWIG = 'twig';
+    const MUSTACHE = 'mustache';
 
-	/**
-	 * Property widgetClass.
-	 *
-	 * @var  string
-	 */
-	protected $widgetClass = Widget::class;
+    /**
+     * Property widgetClass.
+     *
+     * @var  string
+     */
+    protected $widgetClass = Widget::class;
 
-	/**
-	 * Property rendererManager.
-	 *
-	 * @var  RendererManager
-	 */
-	protected $rendererManager;
+    /**
+     * Property rendererManager.
+     *
+     * @var  RendererManager
+     */
+    protected $rendererManager;
 
-	/**
-	 * WidgetManager constructor.
-	 *
-	 * @param RendererManager $rendererManager
-	 */
-	public function __construct(RendererManager $rendererManager)
-	{
-		$this->rendererManager = $rendererManager;
-	}
+    /**
+     * WidgetManager constructor.
+     *
+     * @param RendererManager $rendererManager
+     */
+    public function __construct(RendererManager $rendererManager)
+    {
+        $this->rendererManager = $rendererManager;
+    }
 
-	/**
-	 * render
-	 *
-	 * @param string                 $layout
-	 * @param array                  $data
-	 * @param string                 $engine
-	 * @param string|AbstractPackage $package
-	 *
-	 * @return string
-	 */
-	public function render($layout, $data = [], $engine = self::PHP, $package = null)
-	{
-		return $this->createWidget($layout, $engine, $package)->render($data);
-	}
+    /**
+     * render
+     *
+     * @param string                 $layout
+     * @param array                  $data
+     * @param string                 $engine
+     * @param string|AbstractPackage $package
+     *
+     * @return string
+     */
+    public function render($layout, $data = [], $engine = self::PHP, $package = null)
+    {
+        return $this->createWidget($layout, $engine, $package)->render($data);
+    }
 
-	/**
-	 * create
-	 *
-	 * @param string                   $layout
-	 * @param string|RendererInterface $engine
-	 * @param string|AbstractPackage   $package
-	 *
-	 * @return  Widget
-	 */
-	public function createWidget($layout, $engine = null, $package = null)
-	{
-		// TODO: If we don't need boot() anymore, remove RendererHelper::boot()
+    /**
+     * create
+     *
+     * @param string                   $layout
+     * @param string|RendererInterface $engine
+     * @param string|AbstractPackage   $package
+     *
+     * @return  Widget
+     */
+    public function createWidget($layout, $engine = null, $package = null)
+    {
+        // TODO: If we don't need boot() anymore, remove RendererHelper::boot()
 //		RendererHelper::boot();
-		$engine = $this->rendererManager->getRenderer($engine ? : static::PHP);
+        $engine = $this->rendererManager->getRenderer($engine ?: static::PHP);
 
-		// Prepare package
-		$package = $package ? : Ioc::get('package.resolver')->getPackage();
+        // Prepare package
+        $package = $package ?: Ioc::get('package.resolver')->getPackage();
 
-		if (class_exists($layout) && is_subclass_of($layout, WidgetComponent::class))
-		{
-			$class = $layout;
+        if (class_exists($layout) && is_subclass_of($layout, WidgetComponent::class)) {
+            $class = $layout;
 
-			$widget = new $class($package);
-		}
-		else
-		{
-			$class = $this->widgetClass;
+            $widget = new $class($package);
+        } else {
+            $class = $this->widgetClass;
 
-			/** @var Widget $widget */
-			$widget = new $class($layout, $engine, $package);
-		}
+            /** @var Widget $widget */
+            $widget = new $class($layout, $engine, $package);
+        }
 
-		$widget->setData($this->rendererManager->getGlobals());
+        $widget->setData($this->rendererManager->getGlobals());
 
-		return $widget;
-	}
+        return $widget;
+    }
 
-	/**
-	 * Method to get property RendererManager
-	 *
-	 * @return  RendererManager
-	 */
-	public function getRendererManager()
-	{
-		return $this->rendererManager;
-	}
+    /**
+     * Method to get property RendererManager
+     *
+     * @return  RendererManager
+     */
+    public function getRendererManager()
+    {
+        return $this->rendererManager;
+    }
 
-	/**
-	 * Method to set property rendererManager
-	 *
-	 * @param   RendererManager $rendererManager
-	 *
-	 * @return  static  Return self to support chaining.
-	 */
-	public function setRendererManager($rendererManager)
-	{
-		$this->rendererManager = $rendererManager;
+    /**
+     * Method to set property rendererManager
+     *
+     * @param   RendererManager $rendererManager
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRendererManager($rendererManager)
+    {
+        $this->rendererManager = $rendererManager;
 
-		return $this;
-	}
+        return $this;
+    }
 }

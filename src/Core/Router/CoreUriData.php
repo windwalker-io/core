@@ -14,7 +14,7 @@ use Windwalker\Uri\UriData;
 /**
  * The CoreUriData class.
  *
- * @see  UriData
+ * @see    UriData
  *
  * @method static string full()
  * @method static string current()
@@ -29,10 +29,10 @@ use Windwalker\Uri\UriData;
  */
 class CoreUriData extends AbstractProxyFacade
 {
-	/**
-	 * Property _key.
-	 *
-	 * @var  string
-	 */
-	protected static $_key = 'uri';
+    /**
+     * Property _key.
+     *
+     * @var  string
+     */
+    protected static $_key = 'uri';
 }

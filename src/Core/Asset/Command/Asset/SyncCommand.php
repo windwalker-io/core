@@ -18,133 +18,122 @@ use Windwalker\Filesystem\Folder;
 
 /**
  * The SyncCommand class.
- * 
+ *
  * @since  2.1.1
  */
 class SyncCommand extends Command
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'sync';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'sync';
 
-	/**
-	 * Property description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Sync asset to main media folder';
+    /**
+     * Property description.
+     *
+     * @var  string
+     */
+    protected $description = 'Sync asset to main media folder';
 
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	public function init()
-	{
-		$this->addOption('s')
-			->alias('symbol')
-			->defaultValue(true)
-			->description('Use symbol link to link asset folders');
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    public function init()
+    {
+        $this->addOption('s')
+            ->alias('symbol')
+            ->defaultValue(true)
+            ->description('Use symbol link to link asset folders');
 
-		$this->addOption('hard')
-			->defaultValue(false)
-			->description('Hard copy assets to media folders');
+        $this->addOption('hard')
+            ->defaultValue(false)
+            ->description('Hard copy assets to media folders');
 
-		$this->addOption('force')
-			->alias('f')
-			->defaultValue(false)
-			->description('Force replace exists link or folder.');
-	}
+        $this->addOption('force')
+            ->alias('f')
+            ->defaultValue(false)
+            ->description('Force replace exists link or folder.');
+    }
 
-	/**
-	 * doExecute
-	 *
-	 * @return  int
-	 */
-	protected function doExecute()
-	{
-		$hard = $this->getOption('hard');
+    /**
+     * doExecute
+     *
+     * @return  int
+     */
+    protected function doExecute()
+    {
+        $hard = $this->getOption('hard');
 
-		// Prepare path
-		$name = $this->io->getArgument(0);
+        // Prepare path
+        $name = $this->io->getArgument(0);
 
-		/** @var WebApplication $env */
-		$env = $this->getOption('env');
+        /** @var WebApplication $env */
+        $env = $this->getOption('env');
 
-		$resolver = ConsoleHelper::getAllPackagesResolver($env, $this->console);
+        $resolver = ConsoleHelper::getAllPackagesResolver($env, $this->console);
 
-		if (!$name)
-		{
-			throw new \InvalidArgumentException('No package input.');
-		}
+        if (!$name) {
+            throw new \InvalidArgumentException('No package input.');
+        }
 
-		$package = $resolver->getPackage($name);
+        $package = $resolver->getPackage($name);
 
-		if ($package)
-		{
-			$dir = $package->getDir() . '/Resources/asset';
-		}
-		else
-		{
-			throw new \InvalidArgumentException('Package ' . $name . ' not found.');
-		}
+        if ($package) {
+            $dir = $package->getDir() . '/Resources/asset';
+        } else {
+            throw new \InvalidArgumentException('Package ' . $name . ' not found.');
+        }
 
-		if (!is_dir($dir))
-		{
-			throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder so nothing synced.');
-		}
+        if (!is_dir($dir)) {
+            throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder so nothing synced.');
+        }
 
-		$folder = $this->console->get('asset.folder');
-		$target = $this->getArgument(1, $name);
-		$target = $this->console->get('path.public') . '/' . trim($folder, '/') . '/' . $target;
+        $folder = $this->console->get('asset.folder');
+        $target = $this->getArgument(1, $name);
+        $target = $this->console->get('path.public') . '/' . trim($folder, '/') . '/' . $target;
 
-		$symlink = new Symlink;
-		$force = $this->getOption('force');
+        $symlink = new Symlink;
+        $force   = $this->getOption('force');
 
-		if (is_link($target))
-		{
-			if (!$force)
-			{
-				throw new \RuntimeException('Link ' . $target . ' already created.');
-			}
+        if (is_link($target)) {
+            if (!$force) {
+                throw new \RuntimeException('Link ' . $target . ' already created.');
+            }
 
-			$this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
+            $this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
 
-			File::delete($target);
-		}
+            File::delete($target);
+        }
 
-		if ($hard)
-		{
-			$this->hardCopy($dir, $target);
+        if ($hard) {
+            $this->hardCopy($dir, $target);
 
-			$this->out('Copy folder ' . $dir . ' to ' . $target);
-		}
-		else
-		{
-			$this->out($symlink->make($dir, $target));
+            $this->out('Copy folder ' . $dir . ' to ' . $target);
+        } else {
+            $this->out($symlink->make($dir, $target));
 
-			if (!PlatformHelper::isWindows())
-			{
-				$this->out('Link success <info>' . $dir . '</info> <====> <info>' . $target . '</info>');
-			}
-		}
+            if (!PlatformHelper::isWindows()) {
+                $this->out('Link success <info>' . $dir . '</info> <====> <info>' . $target . '</info>');
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * hardCopy
-	 *
-	 * @param string $src
-	 * @param string $dest
-	 *
-	 * @return  void
-	 */
-	protected function hardCopy($src, $dest)
-	{
-		Folder::copy($src, $dest);
-	}
+    /**
+     * hardCopy
+     *
+     * @param string $src
+     * @param string $dest
+     *
+     * @return  void
+     */
+    protected function hardCopy($src, $dest)
+    {
+        Folder::copy($src, $dest);
+    }
 }

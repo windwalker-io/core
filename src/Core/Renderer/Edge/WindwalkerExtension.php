@@ -17,47 +17,47 @@ use Windwalker\Edge\Extension\EdgeExtensionInterface;
  */
 class WindwalkerExtension implements EdgeExtensionInterface
 {
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName()
-	{
-		return 'windwalker';
-	}
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName()
+    {
+        return 'windwalker';
+    }
 
-	/**
-	 * getDirectives
-	 *
-	 * @return  callable[]
-	 */
-	public function getDirectives()
-	{
-		return [
-			'lang'      => [$this, 'translate'],
-			'translate' => [$this, 'translate'],
-			'sprintf'   => [$this, 'sprintf'],
-			'plural'    => [$this, 'plural'],
-			'choice'    => [$this, 'plural'],
-			'messages'  => [$this, 'messages'],
-			'widget'    => [$this, 'widget'],
-			'route'     => [$this, 'route'],
-			'formToken' => [$this, 'formToken'],
+    /**
+     * getDirectives
+     *
+     * @return  callable[]
+     */
+    public function getDirectives()
+    {
+        return [
+            'lang' => [$this, 'translate'],
+            'translate' => [$this, 'translate'],
+            'sprintf' => [$this, 'sprintf'],
+            'plural' => [$this, 'plural'],
+            'choice' => [$this, 'plural'],
+            'messages' => [$this, 'messages'],
+            'widget' => [$this, 'widget'],
+            'route' => [$this, 'route'],
+            'formToken' => [$this, 'formToken'],
 
-			// Authorisation
-			'auth'      => [$this, 'auth'],
-			'can'       => [$this, 'auth'],
-			'cannot'    => [$this, 'cannot'],
-			'endcan'    => [$this, 'endauth'],
-			'endcannot' => [$this, 'endauth'],
-			'endauth'   => [$this, 'endauth'],
+            // Authorisation
+            'auth' => [$this, 'auth'],
+            'can' => [$this, 'auth'],
+            'cannot' => [$this, 'cannot'],
+            'endcan' => [$this, 'endauth'],
+            'endcannot' => [$this, 'endauth'],
+            'endauth' => [$this, 'endauth'],
 
-			// Asset
-			'css' => [$this, 'css'],
-			'js'  => [$this, 'js'],
-			'assetTemplate' => [$this, 'assetTemplate'],
-			'endTemplate'   => [$this, 'endTemplate'],
+            // Asset
+            'css' => [$this, 'css'],
+            'js' => [$this, 'js'],
+            'assetTemplate' => [$this, 'assetTemplate'],
+            'endTemplate' => [$this, 'endTemplate'],
 
             // Debug
             'shown' => [$this, 'shown'],
@@ -65,200 +65,200 @@ class WindwalkerExtension implements EdgeExtensionInterface
             'die' => [$this, 'dead'],
             'debug' => [$this, 'debug'],
             'enddebug' => [$this, 'endauth'],
-		];
-	}
+        ];
+    }
 
-	/**
-	 * getGlobals
-	 *
-	 * @return  array
-	 */
-	public function getGlobals()
-	{
-		return [];
-	}
+    /**
+     * getGlobals
+     *
+     * @return  array
+     */
+    public function getGlobals()
+    {
+        return [];
+    }
 
-	/**
-	 * getParsers
-	 *
-	 * @return  callable[]
-	 */
-	public function getParsers()
-	{
-		return [];
-	}
+    /**
+     * getParsers
+     *
+     * @return  callable[]
+     */
+    public function getParsers()
+    {
+        return [];
+    }
 
-	/**
-	 * translate
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function translate($expression)
-	{
-		return "<?php echo \$translator->translate{$expression} ?>";
-	}
+    /**
+     * translate
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function translate($expression)
+    {
+        return "<?php echo \$translator->translate{$expression} ?>";
+    }
 
-	/**
-	 * sprintf
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function sprintf($expression)
-	{
-		return "<?php echo \$translator->sprintf{$expression} ?>";
-	}
-	
-	/**
-	 * plural
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function plural($expression)
-	{
-		return "<?php echo \$translator->plural{$expression} ?>";
-	}
-	
-	/**
-	 * widget
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function widget($expression)
-	{
-		return "<?php echo \$widget->render{$expression} ?>";
-	}
-	
-	/**
-	 * messages
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function messages($expression)
-	{
-		$expression = trim(static::stripParentheses($expression));
+    /**
+     * sprintf
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function sprintf($expression)
+    {
+        return "<?php echo \$translator->sprintf{$expression} ?>";
+    }
 
-		$expression = $expression ? ', ' . $expression : '';
+    /**
+     * plural
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function plural($expression)
+    {
+        return "<?php echo \$translator->plural{$expression} ?>";
+    }
 
-		return "<?php echo \\Windwalker\\Core\\Message\\MessageHelper::render(\$widget{$expression}) ?>";
-	}
+    /**
+     * widget
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function widget($expression)
+    {
+        return "<?php echo \$widget->render{$expression} ?>";
+    }
 
-	/**
-	 * route
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function route($expression)
-	{
-		return "<?php echo htmlspecialchars(\$router->generate{$expression}) ?>";
-	}
+    /**
+     * messages
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function messages($expression)
+    {
+        $expression = trim(static::stripParentheses($expression));
 
-	/**
-	 * css
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function css($expression)
-	{
-		return "<?php \$asset->addCSS{$expression} ?>";
-	}
+        $expression = $expression ? ', ' . $expression : '';
 
-	/**
-	 * js
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function js($expression)
-	{
-		return "<?php \$asset->addJS{$expression} ?>";
-	}
+        return "<?php echo \\Windwalker\\Core\\Message\\MessageHelper::render(\$widget{$expression}) ?>";
+    }
 
-	/**
-	 * route
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function assetTemplate($expression)
-	{
-		return "<?php \$asset->getTemplate()->startTemplate{$expression} ?>";
-	}
+    /**
+     * route
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function route($expression)
+    {
+        return "<?php echo htmlspecialchars(\$router->generate{$expression}) ?>";
+    }
 
-	/**
-	 * route
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function endTemplate($expression)
-	{
-		return "<?php \$asset->getTemplate()->endTemplate() ?>";
-	}
+    /**
+     * css
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function css($expression)
+    {
+        return "<?php \$asset->addCSS{$expression} ?>";
+    }
 
-	/**
-	 * auth
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function auth($expression)
-	{
-		return "<?php if (\$app->user->authorise{$expression}): ?>";
-	}
+    /**
+     * js
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function js($expression)
+    {
+        return "<?php \$asset->addJS{$expression} ?>";
+    }
 
-	/**
-	 * cannot
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function cannot($expression)
-	{
-		return "<?php if (!\$app->user->authorise{$expression}): ?>";
-	}
+    /**
+     * route
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function assetTemplate($expression)
+    {
+        return "<?php \$asset->getTemplate()->startTemplate{$expression} ?>";
+    }
 
-	/**
-	 * endauth
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function endauth($expression)
-	{
-		return "<?php endif; ?>";
-	}
+    /**
+     * route
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function endTemplate($expression)
+    {
+        return "<?php \$asset->getTemplate()->endTemplate() ?>";
+    }
 
-	/**
-	 * formToken
-	 *
-	 * @param   string  $expression
-	 *
-	 * @return  string
-	 */
-	public function formToken($expression)
-	{
-		return "<?php echo \$package->csrf->input{$expression} ?>";
-	}
+    /**
+     * auth
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function auth($expression)
+    {
+        return "<?php if (\$app->user->authorise{$expression}): ?>";
+    }
+
+    /**
+     * cannot
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function cannot($expression)
+    {
+        return "<?php if (!\$app->user->authorise{$expression}): ?>";
+    }
+
+    /**
+     * endauth
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function endauth($expression)
+    {
+        return "<?php endif; ?>";
+    }
+
+    /**
+     * formToken
+     *
+     * @param   string $expression
+     *
+     * @return  string
+     */
+    public function formToken($expression)
+    {
+        return "<?php echo \$package->csrf->input{$expression} ?>";
+    }
 
     /**
      * show
@@ -270,7 +270,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
     public function shown($expression)
     {
         return "<?php show{$expression} ?>";
-	}
+    }
 
     /**
      * dead
@@ -282,7 +282,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
     public function dd($expression)
     {
         return "<?php show{$expression}; die; ?>";
-	}
+    }
 
     /**
      * dead
@@ -294,7 +294,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
     public function dead($expression)
     {
         return "<?php die{$expression} ?>";
-	}
+    }
 
     /**
      * dead
@@ -305,30 +305,28 @@ class WindwalkerExtension implements EdgeExtensionInterface
      */
     public function debug($expression)
     {
-        if ($expression)
-        {
-	        $expression = static::stripParentheses($expression);
+        if ($expression) {
+            $expression = static::stripParentheses($expression);
 
-	        return "<?php if(\$app->get('system.debug')) { {$expression}; } ?>";
+            return "<?php if(\$app->get('system.debug')) { {$expression}; } ?>";
         }
 
         return "<?php if(\$app->get('system.debug')): ?>";
-	}
+    }
 
-	/**
-	 * Strip the parentheses from the given expression.
-	 *
-	 * @param  string $expression
-	 *
-	 * @return string
-	 */
-	public static function stripParentheses($expression)
-	{
-		if (strpos($expression, '(') === 0)
-		{
-			$expression = substr($expression, 1, -1);
-		}
+    /**
+     * Strip the parentheses from the given expression.
+     *
+     * @param  string $expression
+     *
+     * @return string
+     */
+    public static function stripParentheses($expression)
+    {
+        if (strpos($expression, '(') === 0) {
+            $expression = substr($expression, 1, -1);
+        }
 
-		return $expression;
-	}
+        return $expression;
+    }
 }

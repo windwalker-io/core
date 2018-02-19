@@ -15,10 +15,10 @@ namespace Windwalker\Core\Package;
  */
 class DefaultPackage extends AbstractPackage
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '_default';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '_default';
 }

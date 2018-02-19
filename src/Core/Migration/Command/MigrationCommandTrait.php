@@ -19,45 +19,45 @@ use Windwalker\Structure\Structure;
  */
 trait MigrationCommandTrait
 {
-	/**
-	 * getModel
-	 *
-	 * @param array     $config
-	 * @param Structure $state
-	 *
-	 * @return  MigrationsRepository
-	 */
-	public function getRepository($config = null, Structure $state = null)
-	{
-		$repository = (new MigrationsRepository($config, $state, $this->console->database))
-			->setCommand($this)
-			->setIo($this->io);
+    /**
+     * getModel
+     *
+     * @param array     $config
+     * @param Structure $state
+     *
+     * @return  MigrationsRepository
+     */
+    public function getRepository($config = null, Structure $state = null)
+    {
+        $repository = (new MigrationsRepository($config, $state, $this->console->database))
+            ->setCommand($this)
+            ->setIo($this->io);
 
-		$repository['path'] = $this->console->get('migration.dir') ? : $this->console->get('path.migrations');
+        $repository['path'] = $this->console->get('migration.dir') ?: $this->console->get('path.migrations');
 
-		return $repository;
-	}
+        return $repository;
+    }
 
-	/**
-	 * getModel
-	 *
-	 * @param array     $config
-	 * @param Structure $state
-	 *
-	 * @return  BackupRepository
-	 */
-	public function getBackupRepository($config = null, Structure $state = null)
-	{
-		return (new BackupRepository($config, $state, $this->console->database))->setCommand($this);
-	}
+    /**
+     * getModel
+     *
+     * @param array     $config
+     * @param Structure $state
+     *
+     * @return  BackupRepository
+     */
+    public function getBackupRepository($config = null, Structure $state = null)
+    {
+        return (new BackupRepository($config, $state, $this->console->database))->setCommand($this);
+    }
 
-	/**
-	 * backup
-	 *
-	 * @return  void
-	 */
-	public function backup()
-	{
-		$this->getBackupRepository()->backup();
-	}
+    /**
+     * backup
+     *
+     * @return  void
+     */
+    public function backup()
+    {
+        $this->getBackupRepository()->backup();
+    }
 }

@@ -17,21 +17,22 @@ use Windwalker\Http\Response\RedirectResponse;
  */
 class RedirectResponseMiddleware extends AbstractControllerMiddleware
 {
-	/**
-	 * Call next middleware.
-	 *
-	 * @param   ControllerData $data
-	 *
-	 * @return  mixed
-	 */
-	public function execute($data = null)
-	{
-		$result = $this->next->execute($data);
+    /**
+     * Call next middleware.
+     *
+     * @param   ControllerData $data
+     *
+     * @return  mixed
+     */
+    public function execute($data = null)
+    {
+        $result = $this->next->execute($data);
 
-		$response = $data->response;
+        $response = $data->response;
 
-		$this->controller->setResponse(new RedirectResponse($result, $response->getStatusCode(), $response->getHeaders()));
+        $this->controller->setResponse(new RedirectResponse($result, $response->getStatusCode(),
+            $response->getHeaders()));
 
-		return $this->next->execute($data);
-	}
+        return $this->next->execute($data);
+    }
 }

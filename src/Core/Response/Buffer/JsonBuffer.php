@@ -15,23 +15,23 @@ namespace Windwalker\Core\Response\Buffer;
  */
 class JsonBuffer extends AbstractBuffer
 {
-	/**
-	 * Method for sending the response in JSON format
-	 *
-	 * @return  string  The response in JSON format
-	 */
-	public function toString()
-	{
-		return json_encode(get_object_vars($this));
-	}
+    /**
+     * Method for sending the response in JSON format
+     *
+     * @return  string  The response in JSON format
+     */
+    public function toString()
+    {
+        return json_encode(get_object_vars($this));
+    }
 
-	/**
-	 * getMimeType
-	 *
-	 * @return  string
-	 */
-	public function getMimeType()
-	{
-		return 'application/json';
-	}
+    /**
+     * getMimeType
+     *
+     * @return  string
+     */
+    public function getMimeType()
+    {
+        return 'application/json';
+    }
 }

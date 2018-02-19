@@ -14,51 +14,51 @@ define('WINDWALKER_DEBUGGER_ROOT', __DIR__);
 
 /**
  * The WebProfilerPackage class.
- * 
+ *
  * @since  2.1.1
  */
 class DebuggerPackage extends AbstractPackage
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = '_debugger';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = '_debugger';
 
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	public function boot()
-	{
-		parent::boot();
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    public function boot()
+    {
+        parent::boot();
 
-		$this->getContainer()->getParent()->share('windwalker.debugger', $this);
-	}
+        $this->getContainer()->getParent()->share('windwalker.debugger', $this);
+    }
 
-	/**
-	 * enableConsole
-	 *
-	 * @return  static
-	 */
-	public function enableConsole()
-	{
-		$this->config->set('console.enabled', 1);
+    /**
+     * enableConsole
+     *
+     * @return  static
+     */
+    public function enableConsole()
+    {
+        $this->config->set('console.enabled', 1);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * disableConsole
-	 *
-	 * @return  static
-	 */
-	public function disableConsole()
-	{
-		$this->config->set('console.enabled', 0);
+    /**
+     * disableConsole
+     *
+     * @return  static
+     */
+    public function disableConsole()
+    {
+        $this->config->set('console.enabled', 0);
 
-		return $this;
-	}
+        return $this;
+    }
 }

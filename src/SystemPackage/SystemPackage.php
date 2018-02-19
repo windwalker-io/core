@@ -17,10 +17,10 @@ use Windwalker\Core\Package\AbstractPackage;
  */
 class SystemPackage extends AbstractPackage
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'system';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'system';
 }

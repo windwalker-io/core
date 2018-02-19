@@ -8,12 +8,11 @@
 
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 use Windwalker\Profiler\Point\Collector;
-use Windwalker\Utilities\Arr;
 
 $this->extend('_global.html');
 
 /**
- * @var  Collector  $collector
+ * @var  Collector $collector
  */
 ?>
 
@@ -23,59 +22,58 @@ $this->extend('_global.html');
 <h2>Windwalker</h2>
 
 <table class="table table-bordered">
-	<tbody>
-	<tr>
-		<td width="30%">
-			Framework Version
-		</td>
-		<td>
-			<?php echo $collector['windwalker.version.framework']; ?>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Core Version
-		</td>
-		<td>
-			<?php echo $collector['windwalker.version.core']; ?>
-		</td>
-	</tr>
-	<tr>
-		<td width="30%">
-			PHP
-		</td>
-		<td>
-			<?php echo $collector['system.php.version']; ?>
-		</td>
-	</tr>
-	</tbody>
+    <tbody>
+    <tr>
+        <td width="30%">
+            Framework Version
+        </td>
+        <td>
+            <?php echo $collector['windwalker.version.framework']; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Core Version
+        </td>
+        <td>
+            <?php echo $collector['windwalker.version.core']; ?>
+        </td>
+    </tr>
+    <tr>
+        <td width="30%">
+            PHP
+        </td>
+        <td>
+            <?php echo $collector['system.php.version']; ?>
+        </td>
+    </tr>
+    </tbody>
 </table>
 
-	<br /><br />
+<br/><br/>
 
 <h2>Custom Data</h2>
 
 <?php
 echo BootstrapKeyValueGrid::create()
-	->addHeader()
-	->addItems((array) $collector['custom.data']);
+    ->addHeader()
+    ->addItems((array) $collector['custom.data']);
 ?>
 
 <div class="alert alert-info">
-	<p>
-		Add Custom data by use <code>Windwalker\Debugger\Helper\DebuggerHelper::addCustomData('key', $value)</code>
-	</p>
+    <p>
+        Add Custom data by use <code>Windwalker\Debugger\Helper\DebuggerHelper::addCustomData('key', $value)</code>
+    </p>
 </div>
 
-<br /><br />
+<br/><br/>
 
 <h2>Debug Messages</h2>
 
 <?php
 echo BootstrapKeyValueGrid::create()
     ->addHeader('Type', 'Message')
-    ->configure((array) $collector['debug.messages'], function (BootstrapKeyValueGrid $grid, $key, $item)
-    {
+    ->configure((array) $collector['debug.messages'], function (BootstrapKeyValueGrid $grid, $key, $item) {
         $grid->addItem(
             @$item['type'],
             @$item['message'],
@@ -84,7 +82,7 @@ echo BootstrapKeyValueGrid::create()
     });
 ?>
 
-<br /><br />
+<br/><br/>
 
 <h2>Config</h2>
 

@@ -16,33 +16,32 @@ use Windwalker\Structure\Structure;
 
 /**
  * The CacheProvider class.
- * 
+ *
  * @since  2.0
  */
 class CacheProvider implements ServiceProviderInterface
 {
-	/**
-	 * Registers the service provider with a DI container.
-	 *
-	 * @param   Container $container The DI container.
-	 *
-	 * @return  void
-	 */
-	public function register(Container $container)
-	{
-		// Get cache factory object.
-		$container->prepareSharedObject(CacheManager::class);
+    /**
+     * Registers the service provider with a DI container.
+     *
+     * @param   Container $container The DI container.
+     *
+     * @return  void
+     */
+    public function register(Container $container)
+    {
+        // Get cache factory object.
+        $container->prepareSharedObject(CacheManager::class);
 
-		// Get global cache object.
-		$container->share(Cache::class, function(Container $container)
-		{
-			/** @var Structure $config */
-			$config = $container->get('config');
+        // Get global cache object.
+        $container->share(Cache::class, function (Container $container) {
+            /** @var Structure $config */
+            $config = $container->get('config');
 
-			$storage = $config->get('cache.storage', 'file');
-			$handler = $config->get('cache.serializer', 'php');
+            $storage = $config->get('cache.storage', 'file');
+            $handler = $config->get('cache.serializer', 'php');
 
-			return $container->get(CacheManager::class)->create('windwalker', $storage, $handler);
-		});
-	}
+            return $container->get(CacheManager::class)->create('windwalker', $storage, $handler);
+        });
+    }
 }

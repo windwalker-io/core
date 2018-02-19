@@ -17,5 +17,5 @@ use Windwalker\Core\Model\Traits\DatabaseRepositoryTrait;
  */
 class DatabaseModelRepository extends ModelRepository implements DatabaseRepositoryInterface
 {
-	use DatabaseRepositoryTrait;
+    use DatabaseRepositoryTrait;
 }

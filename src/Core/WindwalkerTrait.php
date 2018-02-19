@@ -28,330 +28,307 @@ use Windwalker\Structure\Structure;
  */
 trait WindwalkerTrait
 {
-	/**
-	 * Property booted.
-	 *
-	 * @var  boolean
-	 */
-	protected $booted = false;
+    /**
+     * Property booted.
+     *
+     * @var  boolean
+     */
+    protected $booted = false;
 
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * bootWindwalkerTrait
-	 *
-	 * @param WindwalkerApplicationInterface $app
-	 *
-	 * @return  void
-	 */
-	protected function bootWindwalkerTrait(WindwalkerApplicationInterface $app)
-	{
+    /**
+     * bootWindwalkerTrait
+     *
+     * @param WindwalkerApplicationInterface $app
+     *
+     * @return  void
+     */
+    protected function bootWindwalkerTrait(WindwalkerApplicationInterface $app)
+    {
 //		$this->config = new ConfigRegistry($this->config->toArray());
-	}
+    }
 
-	/**
-	 * getConfig
-	 *
-	 * @return  Structure
-	 */
-	public function getConfig()
-	{
-		return $this->config;
-	}
+    /**
+     * getConfig
+     *
+     * @return  Structure
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
 
-	/**
-	 * boot
-	 *
-	 * @return  void
-	 */
-	public function boot()
-	{
-		if ($this->booted)
-		{
-			return;
-		}
+    /**
+     * boot
+     *
+     * @return  void
+     */
+    public function boot()
+    {
+        if ($this->booted) {
+            return;
+        }
 
-		// Version check
-		if (version_compare(PHP_VERSION, '5.6', '<'))
-		{
-			exit('Please use PHP 5.6 or later.');
-		}
+        // Version check
+        if (version_compare(PHP_VERSION, '5.6', '<')) {
+            exit('Please use PHP 5.6 or later.');
+        }
 
-		$this->bootTraits($this);
+        $this->bootTraits($this);
 
-		$this->mode = $this->loadMode();
+        $this->mode = $this->loadMode();
 
-		$this->loadConfiguration($this->config);
+        $this->loadConfiguration($this->config);
 
-		$this->registerProviders();
+        $this->registerProviders();
 
-		// Set some default objects
-		if ($this->container->exists('dispatcher'))
-		{
-			$this->dispatcher = $this->container->get('dispatcher');
-		}
-		else
-		{
-			$this->dispatcher = new NullObject;
-		}
+        // Set some default objects
+        if ($this->container->exists('dispatcher')) {
+            $this->dispatcher = $this->container->get('dispatcher');
+        } else {
+            $this->dispatcher = new NullObject;
+        }
 
-		$this->logger = $this->container->get('logger');
+        $this->logger = $this->container->get('logger');
 
-		$this->registerListeners();
+        $this->registerListeners();
 
-		$this->registerPackages();
+        $this->registerPackages();
 
-		$this->triggerEvent('onAfterInitialise', ['app' => $this]);
+        $this->triggerEvent('onAfterInitialise', ['app' => $this]);
 
-		$this->booted = true;
-	}
+        $this->booted = true;
+    }
 
-	/**
-	 * loadConfiguration
-	 *
-	 * @param Structure $config
-	 * @param string    $name
-	 *
-	 * @return  void
-	 */
-	protected function loadConfiguration(Structure $config, $name = null)
-	{
-		$name = $name ? : $this->getName();
+    /**
+     * loadConfiguration
+     *
+     * @param Structure $config
+     * @param string    $name
+     *
+     * @return  void
+     */
+    protected function loadConfiguration(Structure $config, $name = null)
+    {
+        $name = $name ?: $this->getName();
 
-		// Load library config
-		$configName = $this->isWeb() ? 'web' : 'console';
+        // Load library config
+        $configName = $this->isWeb() ? 'web' : 'console';
 
-		$config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php', ['load_raw' => true]);
+        $config->loadFile(__DIR__ . '/../../config/' . $configName . '.php', 'php', ['load_raw' => true]);
 
-		// Load application config
-		$file = $this->rootPath . '/etc/app/' . $name . '.php';
+        // Load application config
+        $file = $this->rootPath . '/etc/app/' . $name . '.php';
 
-		if (is_file($file))
-		{
-			$config->loadFile($file, 'php', ['load_raw' => true]);
-		}
+        if (is_file($file)) {
+            $config->loadFile($file, 'php', ['load_raw' => true]);
+        }
 
-		$configs = (array) $config->get('configs', []);
+        $configs = (array) $config->get('configs', []);
 
-		ksort($configs);
-		
-		foreach ($configs as $file)
-		{
-			if ($file === false || !is_file($file))
-			{
-				continue;
-			}
+        ksort($configs);
 
-			$config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
-		}
+        foreach ($configs as $file) {
+            if ($file === false || !is_file($file)) {
+                continue;
+            }
 
-		// TODO: Variables override
-	}
+            $config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
+        }
 
-	/**
-	 * registerProviders
-	 *
-	 * @return  void
-	 */
-	protected function registerProviders()
-	{
-		/** @var Container $container */
-		$container = $this->getContainer();
+        // TODO: Variables override
+    }
 
-		// Register Aliases
-		$aliases = (array) $this->get('di.aliases');
+    /**
+     * registerProviders
+     *
+     * @return  void
+     */
+    protected function registerProviders()
+    {
+        /** @var Container $container */
+        $container = $this->getContainer();
 
-		foreach ($aliases as $alias => $target)
-		{
-			$container->alias($alias, $target);
-		}
+        // Register Aliases
+        $aliases = (array) $this->get('di.aliases');
 
-		$container->registerServiceProvider(new SystemProvider($this, $this->config));
+        foreach ($aliases as $alias => $target) {
+            $container->alias($alias, $target);
+        }
 
-		$providers = (array) $this->config->get('providers');
+        $container->registerServiceProvider(new SystemProvider($this, $this->config));
 
-		foreach ($providers as &$provider)
-		{
-			if (is_string($provider) && class_exists($provider))
-			{
-				$provider = $container->newInstance($provider);
-			}
+        $providers = (array) $this->config->get('providers');
 
-			if ($provider === false)
-			{
-				continue;
-			}
+        foreach ($providers as &$provider) {
+            if (is_string($provider) && class_exists($provider)) {
+                $provider = $container->newInstance($provider);
+            }
 
-			$container->registerServiceProvider($provider);
+            if ($provider === false) {
+                continue;
+            }
 
-			if (is_callable([$provider, 'boot']))
-			{
-				$provider->boot($container);
-			}
-		}
+            $container->registerServiceProvider($provider);
 
-		foreach ($providers as $provider)
-		{
-			if (is_callable([$provider, 'bootDeferred']))
-			{
-				$provider->bootDeferred($container);
-			}
-		}
-	}
+            if (is_callable([$provider, 'boot'])) {
+                $provider->boot($container);
+            }
+        }
 
-	/**
-	 * registerPackages
-	 *
-	 * @return  static
-	 */
-	protected function registerPackages()
-	{
-		$packages = (array) $this->config->get('packages');
+        foreach ($providers as $provider) {
+            if (is_callable([$provider, 'bootDeferred'])) {
+                $provider->bootDeferred($container);
+            }
+        }
+    }
 
-		/** @var PackageResolver $resolver */
-		$resolver = $this->container->get('package.resolver');
+    /**
+     * registerPackages
+     *
+     * @return  static
+     */
+    protected function registerPackages()
+    {
+        $packages = (array) $this->config->get('packages');
 
-		$resolver->registerPackages($packages);
+        /** @var PackageResolver $resolver */
+        $resolver = $this->container->get('package.resolver');
 
-		return $this;
-	}
+        $resolver->registerPackages($packages);
 
-	/**
-	 * registerListeners
-	 *
-	 * @return  void
-	 */
-	protected function registerListeners()
-	{
-		$listeners = (array) $this->get('listeners');
-		$dispatcher = $this->getDispatcher();
+        return $this;
+    }
 
-		$defaultOptions = [
-			'class'    => '',
-			'priority' => ListenerPriority::NORMAL,
-			'enabled'  => true
-		];
+    /**
+     * registerListeners
+     *
+     * @return  void
+     */
+    protected function registerListeners()
+    {
+        $listeners  = (array) $this->get('listeners');
+        $dispatcher = $this->getDispatcher();
 
-		foreach ($listeners as $name => $listener)
-		{
-			if (is_string($listener) || is_callable($listener))
-			{
-				$listener = ['class' => $listener];
-			}
+        $defaultOptions = [
+            'class' => '',
+            'priority' => ListenerPriority::NORMAL,
+            'enabled' => true,
+        ];
 
-			$listener = array_merge($defaultOptions, (array) $listener);
+        foreach ($listeners as $name => $listener) {
+            if (is_string($listener) || is_callable($listener)) {
+                $listener = ['class' => $listener];
+            }
 
-			if (!$listener['enabled'])
-			{
-				continue;
-			}
+            $listener = array_merge($defaultOptions, (array) $listener);
 
-			if (is_callable($listener['class']) && !is_numeric($name))
-			{
-				$dispatcher->listen($name, $listener['class']);
-			}
-			else
-			{
-				$dispatcher->addListener($this->container->newInstance($listener['class']), $listener['priority']);
-			}
-		}
-	}
+            if (!$listener['enabled']) {
+                continue;
+            }
 
-	/**
-	 * getPackage
-	 *
-	 * @param string $name
-	 *
-	 * @return  AbstractPackage
-	 */
-	public function getPackage($name = null)
-	{
-		/** @var PackageResolver $resolver */
-		$resolver = $this->container->get('package.resolver');
+            if (is_callable($listener['class']) && !is_numeric($name)) {
+                $dispatcher->listen($name, $listener['class']);
+            } else {
+                $dispatcher->addListener($this->container->newInstance($listener['class']), $listener['priority']);
+            }
+        }
+    }
 
-		return $resolver->getPackage($name);
-	}
+    /**
+     * getPackage
+     *
+     * @param string $name
+     *
+     * @return  AbstractPackage
+     */
+    public function getPackage($name = null)
+    {
+        /** @var PackageResolver $resolver */
+        $resolver = $this->container->get('package.resolver');
 
-	/**
-	 * addPackage
-	 *
-	 * @param string          $name
-	 * @param AbstractPackage $package
-	 *
-	 * @return  static
-	 */
-	public function addPackage($name, AbstractPackage $package)
-	{
-		/** @var PackageResolver $resolver */
-		$resolver = $this->container->get('package.resolver');
+        return $resolver->getPackage($name);
+    }
 
-		$resolver->addPackage($name, $package);
+    /**
+     * addPackage
+     *
+     * @param string          $name
+     * @param AbstractPackage $package
+     *
+     * @return  static
+     */
+    public function addPackage($name, AbstractPackage $package)
+    {
+        /** @var PackageResolver $resolver */
+        $resolver = $this->container->get('package.resolver');
 
-		return $this;
-	}
+        $resolver->addPackage($name, $package);
 
-	/**
-	 * isConsole
-	 *
-	 * @return  boolean
-	 */
-	public function isConsole()
-	{
-		return $this instanceof CoreConsole;
-	}
+        return $this;
+    }
 
-	/**
-	 * isWeb
-	 *
-	 * @return  boolean
-	 */
-	public function isWeb()
-	{
-		return $this instanceof WebApplication;
-	}
+    /**
+     * isConsole
+     *
+     * @return  boolean
+     */
+    public function isConsole()
+    {
+        return $this instanceof CoreConsole;
+    }
 
-	/**
-	 * loadMode
-	 *
-	 * @return  string
-	 */
-	protected function loadMode()
-	{
-		if (isset($_ENV['WINDWLAKER_MODE']))
-		{
-			return $_ENV['WINDWLAKER_MODE'];
-		}
+    /**
+     * isWeb
+     *
+     * @return  boolean
+     */
+    public function isWeb()
+    {
+        return $this instanceof WebApplication;
+    }
 
-		$file = $this->rootPath . '/.mode';
+    /**
+     * loadMode
+     *
+     * @return  string
+     */
+    protected function loadMode()
+    {
+        if (isset($_ENV['WINDWLAKER_MODE'])) {
+            return $_ENV['WINDWLAKER_MODE'];
+        }
 
-		if (!is_file($file))
-		{
-			return 'dev';
-		}
+        $file = $this->rootPath . '/.mode';
 
-		$mode = trim(file_get_contents($file));
-		$mode = $mode ? : 'dev';
+        if (!is_file($file)) {
+            return 'dev';
+        }
 
-		return $mode;
-	}
+        $mode = trim(file_get_contents($file));
+        $mode = $mode ?: 'dev';
 
-	/**
-	 * isOffline
-	 *
-	 * @return  bool
-	 */
-	public function isOffline()
-	{
-		$file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
+        return $mode;
+    }
 
-		return is_file($file);
-	}
+    /**
+     * isOffline
+     *
+     * @return  bool
+     */
+    public function isOffline()
+    {
+        $file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
+
+        return is_file($file);
+    }
 }

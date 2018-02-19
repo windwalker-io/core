@@ -18,30 +18,30 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  */
 class ViewResolver extends AbstractClassResolver
 {
-	/**
-	 * Property baseClass.
-	 *
-	 * @var  string
-	 */
-	protected $baseClass = AbstractView::class;
+    /**
+     * Property baseClass.
+     *
+     * @var  string
+     */
+    protected $baseClass = AbstractView::class;
 
-	/**
-	 * Get container key prefix.
-	 *
-	 * @return  string
-	 */
-	public static function getPrefix()
-	{
-		return 'view';
-	}
+    /**
+     * Get container key prefix.
+     *
+     * @return  string
+     */
+    public static function getPrefix()
+    {
+        return 'view';
+    }
 
-	/**
-	 * If didn't found any exists class, fallback to default class which in current package..
-	 *
-	 * @return string Found class name.
-	 */
-	protected function getDefaultNamespace()
-	{
-		return ReflectionHelper::getNamespaceName($this->package) . '\View';
-	}
+    /**
+     * If didn't found any exists class, fallback to default class which in current package..
+     *
+     * @return string Found class name.
+     */
+    protected function getDefaultNamespace()
+    {
+        return ReflectionHelper::getNamespaceName($this->package) . '\View';
+    }
 }

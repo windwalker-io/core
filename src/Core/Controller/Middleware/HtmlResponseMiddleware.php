@@ -17,21 +17,22 @@ use Windwalker\Http\Response\HtmlResponse;
  */
 class HtmlResponseMiddleware extends AbstractControllerMiddleware
 {
-	/**
-	 * Call next middleware.
-	 *
-	 * @param   ControllerData $data
-	 *
-	 * @return  mixed
-	 */
-	public function execute($data = null)
-	{
-		$this->controller->setResponse(new HtmlResponse('', $data->response->getStatusCode(), $data->response->getHeaders()));
+    /**
+     * Call next middleware.
+     *
+     * @param   ControllerData $data
+     *
+     * @return  mixed
+     */
+    public function execute($data = null)
+    {
+        $this->controller->setResponse(new HtmlResponse('', $data->response->getStatusCode(),
+            $data->response->getHeaders()));
 
-		$result = $this->next->execute($data);
+        $result = $this->next->execute($data);
 
-		$this->controller->setRedirect(null);
+        $this->controller->setRedirect(null);
 
-		return $result;
-	}
+        return $result;
+    }
 }

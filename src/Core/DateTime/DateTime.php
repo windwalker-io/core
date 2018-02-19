@@ -11,7 +11,7 @@ namespace Windwalker\Core\DateTime;
 /**
  * The DateTime class.
  *
- * @since  2.1.1
+ * @since       2.1.1
  *
  * @deprecated  Use \Windwalker\Core\DateTime\Chronos instead.
  */

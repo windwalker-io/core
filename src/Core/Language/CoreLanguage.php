@@ -22,144 +22,137 @@ use Windwalker\Structure\Structure;
  */
 class CoreLanguage extends Language
 {
-	/**
-	 * Property config.
-	 *
-	 * @var  Structure
-	 */
-	protected $config;
+    /**
+     * Property config.
+     *
+     * @var  Structure
+     */
+    protected $config;
 
-	/**
-	 * Property packageResolver.
-	 *
-	 * @var  PackageResolver
-	 */
-	protected $packageResolver;
+    /**
+     * Property packageResolver.
+     *
+     * @var  PackageResolver
+     */
+    protected $packageResolver;
 
-	/**
-	 * CoreLanguage constructor.
-	 *
-	 * @param Config          $config
-	 * @param PackageResolver $packageResolver
-	 */
-	public function __construct(Config $config, PackageResolver $packageResolver)
-	{
-		$this->config = $config;
-		$this->packageResolver = $packageResolver;
+    /**
+     * CoreLanguage constructor.
+     *
+     * @param Config          $config
+     * @param PackageResolver $packageResolver
+     */
+    public function __construct(Config $config, PackageResolver $packageResolver)
+    {
+        $this->config          = $config;
+        $this->packageResolver = $packageResolver;
 
-		parent::__construct(
-			$config->get('language.locale', 'en-GB'),
-			$config->get('language.default', 'en-GB')
-		);
+        parent::__construct(
+            $config->get('language.locale', 'en-GB'),
+            $config->get('language.default', 'en-GB')
+        );
 
-		$debug     = $config['system.debug'] ? : false;
-		$langDebug = $config['language.debug'] ? : false;
-		
-		$this->setDebug(($debug && $langDebug));
-	}
+        $debug     = $config['system.debug'] ?: false;
+        $langDebug = $config['language.debug'] ?: false;
 
-	/**
-	 * load
-	 *
-	 * @param string $file
-	 * @param string $format
-	 * @param string $package
-	 *
-	 * @return static
-	 */
-	public function loadFile($file, $format = 'ini', $package = null)
-	{
-		$config = $this->config;
+        $this->setDebug(($debug && $langDebug));
+    }
 
-		$format = $format ? : $config->get('language.format', 'ini');
+    /**
+     * load
+     *
+     * @param string $file
+     * @param string $format
+     * @param string $package
+     *
+     * @return static
+     */
+    public function loadFile($file, $format = 'ini', $package = null)
+    {
+        $config = $this->config;
 
-		$default = $config['language.default'] ? : 'en-GB';
-		$locale  = $config['language.locale']  ? : 'en-GB';
+        $format = $format ?: $config->get('language.format', 'ini');
 
-		$ext = $format == 'yaml' ? 'yml' : $format;
+        $default = $config['language.default'] ?: 'en-GB';
+        $locale  = $config['language.locale'] ?: 'en-GB';
 
-		$default = LanguageNormalize::toLanguageTag($default);
-		$locale  = LanguageNormalize::toLanguageTag($locale);
+        $ext = $format == 'yaml' ? 'yml' : $format;
 
-		// If package name exists, we load package language first, that global can override it.
-		if (is_string($package))
-		{
-			$package = $this->packageResolver->getPackage($package);
-		}
+        $default = LanguageNormalize::toLanguageTag($default);
+        $locale  = LanguageNormalize::toLanguageTag($locale);
 
-		if ($package instanceof AbstractPackage)
-		{
-			$path = $package->getDir() . '/Resources/language/%s/%s.%s';
+        // If package name exists, we load package language first, that global can override it.
+        if (is_string($package)) {
+            $package = $this->packageResolver->getPackage($package);
+        }
 
-			// Get Package language
-			if (!$config->get('language.debug') || $locale == $default)
-			{
-				$this->loadLanguageFile(sprintf($path, $default, $file, $ext), $format);
-			}
+        if ($package instanceof AbstractPackage) {
+            $path = $package->getDir() . '/Resources/language/%s/%s.%s';
 
-			// If locale not equals default locale, load it to override default
-			if ($locale != $default)
-			{
-				$this->loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
-			}
-		}
+            // Get Package language
+            if (!$config->get('language.debug') || $locale == $default) {
+                $this->loadLanguageFile(sprintf($path, $default, $file, $ext), $format);
+            }
 
-		// Get Global language
-		$path = $config->get('path.languages') . '/%s/%s.%s';
+            // If locale not equals default locale, load it to override default
+            if ($locale != $default) {
+                $this->loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
+            }
+        }
 
-		if (!$config->get('language.debug') || $locale == $default)
-		{
-			$this->loadLanguageFile(sprintf($path, $default, $file, $format), $format);
-		}
+        // Get Global language
+        $path = $config->get('path.languages') . '/%s/%s.%s';
 
-		// If locale not equals default locale, load it to override default
-		if ($locale != $default)
-		{
-			$this->loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
-		}
-		
-		return $this;
-	}
+        if (!$config->get('language.debug') || $locale == $default) {
+            $this->loadLanguageFile(sprintf($path, $default, $file, $format), $format);
+        }
 
-	/**
-	 * loadFile
-	 *
-	 * @param string $file
-	 * @param string $format
-	 *
-	 * @return  static
-	 */
-	protected function loadLanguageFile($file, $format)
-	{
-		if (is_file($file))
-		{
-			$this->load($file, $format);
+        // If locale not equals default locale, load it to override default
+        if ($locale != $default) {
+            $this->loadLanguageFile(sprintf($path, $locale, $file, $format), $format);
+        }
 
-			$loaded = $this->config['language.loaded'];
+        return $this;
+    }
 
-			$loaded[] = $file;
+    /**
+     * loadFile
+     *
+     * @param string $file
+     * @param string $format
+     *
+     * @return  static
+     */
+    protected function loadLanguageFile($file, $format)
+    {
+        if (is_file($file)) {
+            $this->load($file, $format);
 
-			$this->config->set('language.loaded', $loaded);
-		}
+            $loaded = $this->config['language.loaded'];
 
-		return $this;
-	}
+            $loaded[] = $file;
 
-	/**
-	 * Alias of translate().
-	 *
-	 * @param string $string
-	 *
-	 * @return  string
-	 */
-	public function _($string)
-	{
-		$this->setTraceLevelOffset(1);
+            $this->config->set('language.loaded', $loaded);
+        }
 
-		$result = $this->translate($string);
+        return $this;
+    }
 
-		$this->setTraceLevelOffset(0);
+    /**
+     * Alias of translate().
+     *
+     * @param string $string
+     *
+     * @return  string
+     */
+    public function _($string)
+    {
+        $this->setTraceLevelOffset(1);
 
-		return $result;
-	}
+        $result = $this->translate($string);
+
+        $this->setTraceLevelOffset(0);
+
+        return $result;
+    }
 }

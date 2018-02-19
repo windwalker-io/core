@@ -18,29 +18,29 @@ use Windwalker\Middleware\AbstractMiddleware;
  */
 abstract class AbstractControllerMiddleware extends AbstractMiddleware
 {
-	/**
-	 * Property controller.
-	 *
-	 * @var  AbstractController
-	 */
-	protected $controller;
+    /**
+     * Property controller.
+     *
+     * @var  AbstractController
+     */
+    protected $controller;
 
-	/**
-	 * AbstractControllerMiddleware constructor.
-	 *
-	 * @param AbstractController $controller
-	 */
-	public function __construct(AbstractController $controller)
-	{
-		$this->controller = $controller;
-	}
+    /**
+     * AbstractControllerMiddleware constructor.
+     *
+     * @param AbstractController $controller
+     */
+    public function __construct(AbstractController $controller)
+    {
+        $this->controller = $controller;
+    }
 
-	/**
-	 * Call next middleware.
-	 *
-	 * @param   ControllerData $data
-	 *
-	 * @return  mixed
-	 */
-	abstract public function execute($data = null);
+    /**
+     * Call next middleware.
+     *
+     * @param   ControllerData $data
+     *
+     * @return  mixed
+     */
+    abstract public function execute($data = null);
 }

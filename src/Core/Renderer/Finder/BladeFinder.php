@@ -18,44 +18,47 @@ use Illuminate\View\FileViewFinder;
  */
 class BladeFinder extends FileViewFinder
 {
-	/**
-	 * Property finder.
-	 *
-	 * @var  PackageFinderInterface
-	 */
-	private $finder;
+    /**
+     * Property finder.
+     *
+     * @var  PackageFinderInterface
+     */
+    private $finder;
 
-	/**
-	 * Create a new file view loader instance.
-	 *
-	 * @param  PackageFinderInterface            $finder
-	 * @param  \Illuminate\Filesystem\Filesystem $files
-	 * @param  array                             $paths
-	 * @param  array                             $extensions
-	 */
-	public function __construct(PackageFinderInterface $finder, Filesystem $files, array $paths, array $extensions = null)
-	{
-		parent::__construct($files, $paths, $extensions);
+    /**
+     * Create a new file view loader instance.
+     *
+     * @param  PackageFinderInterface $finder
+     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param  array $paths
+     * @param  array $extensions
+     */
+    public function __construct(
+        PackageFinderInterface $finder,
+        Filesystem $files,
+        array $paths,
+        array $extensions = null
+    ) {
+        parent::__construct($files, $paths, $extensions);
 
-		$this->finder = $finder;
-	}
+        $this->finder = $finder;
+    }
 
-	/**
-	 * Get the fully qualified location of the view.
-	 *
-	 * @param  string $name
-	 *
-	 * @return string
-	 */
-	public function find($name)
-	{
-		$path = $this->finder->find($name);
+    /**
+     * Get the fully qualified location of the view.
+     *
+     * @param  string $name
+     *
+     * @return string
+     */
+    public function find($name)
+    {
+        $path = $this->finder->find($name);
 
-		if ($path && !in_array($path, $this->paths))
-		{
-			array_unshift($this->paths, $path);
-		}
+        if ($path && !in_array($path, $this->paths)) {
+            array_unshift($this->paths, $path);
+        }
 
-		return parent::find($name);
-	}
+        return parent::find($name);
+    }
 }

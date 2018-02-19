@@ -10,44 +10,44 @@ namespace Windwalker\Core\Database\Exporter;
 
 /**
  * The Exporter class.
- * 
+ *
  * @since  3.0
  */
 class PostgresqlExporter extends AbstractExporter
 {
-	/**
-	 * export
-	 *
-	 * @return mixed|string
-	 */
-	public function export()
-	{
-		echo 'Postgresql exporter not yet prepared.';
+    /**
+     * export
+     *
+     * @return mixed|string
+     */
+    public function export()
+    {
+        echo 'Postgresql exporter not yet prepared.';
 
-		return '';
-	}
+        return '';
+    }
 
-	/**
-	 * getCreateTable
-	 *
-	 * @param $table
-	 *
-	 * @return array|mixed|string
-	 */
-	protected function getCreateTable($table)
-	{
+    /**
+     * getCreateTable
+     *
+     * @param $table
+     *
+     * @return array|mixed|string
+     */
+    protected function getCreateTable($table)
+    {
 
-	}
+    }
 
-	/**
-	 * getInserts
-	 *
-	 * @param $table
-	 *
-	 * @return mixed|null|string
-	 */
-	protected function getInserts($table)
-	{
+    /**
+     * getInserts
+     *
+     * @param $table
+     *
+     * @return mixed|null|string
+     */
+    protected function getInserts($table)
+    {
 
-	}
+    }
 }

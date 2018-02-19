@@ -12,24 +12,24 @@ use Windwalker\Core\Controller\AbstractController;
 
 /**
  * The GetController class.
- * 
+ *
  * @since  2.1.1
  */
 class GetController extends AbstractController
 {
-	/**
-	 * doExecute
-	 *
-	 * @return  mixed
-	 */
-	protected function doExecute()
-	{
-		$view = $this->getView();
+    /**
+     * doExecute
+     *
+     * @return  mixed
+     */
+    protected function doExecute()
+    {
+        $view = $this->getView();
 
-		$view->setModel($model = $this->getModel(), true);
+        $view->setModel($model = $this->getModel(), true);
 
-		$view['item'] = $this->getModel('Profiler')->getItem($this->input->get('id'));
+        $view['item'] = $this->getModel('Profiler')->getItem($this->input->get('id'));
 
-		return $view->render();
-	}
+        return $view->render();
+    }
 }

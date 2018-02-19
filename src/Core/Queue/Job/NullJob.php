@@ -15,18 +15,18 @@ namespace Windwalker\Core\Queue\Job;
  */
 class NullJob implements JobInterface
 {
-	/**
-	 * getName
-	 *
-	 * @return  string
-	 */
-	public function getName()
-	{
-		return 'null';
-	}
+    /**
+     * getName
+     *
+     * @return  string
+     */
+    public function getName()
+    {
+        return 'null';
+    }
 
-	public function execute()
-	{
+    public function execute()
+    {
 
-	}
+    }
 }

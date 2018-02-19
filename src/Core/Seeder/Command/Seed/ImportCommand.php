@@ -17,72 +17,70 @@ use Windwalker\Core\Migration\Repository\BackupRepository;
  */
 class ImportCommand extends CoreCommand
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'import';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'import';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Import seeders.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Import seeders.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'import <cmd><command></cmd> <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'import <cmd><command></cmd> <option>[option]</option>';
 
-	/**
-	 * Initialise command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-		parent::init();
+    /**
+     * Initialise command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+        parent::init();
 
-		$this->addOption('no-backup')
-			->description('Do not backup database.');
-	}
+        $this->addOption('no-backup')
+            ->description('Do not backup database.');
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		if ($this->console->getMode() != 'dev')
-		{
-			throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
-		}
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        if ($this->console->getMode() != 'dev') {
+            throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
+        }
 
-		if (!$this->getOption('no-backup'))
-		{
-			// backup
-			BackupRepository::getInstance()->setCommand($this)->backup();
-		}
+        if (!$this->getOption('no-backup')) {
+            // backup
+            BackupRepository::getInstance()->setCommand($this)->backup();
+        }
 
-		$class = $this->console->get('seed.class');
+        $class = $this->console->get('seed.class');
 
-		/** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
-		$seeder = new $class(Ioc::getDatabase(), $this);
+        /** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
+        $seeder = new $class(Ioc::getDatabase(), $this);
 
-		$seeder->doExecute();
+        $seeder->doExecute();
 
-		return true;
-	}
+        return true;
+    }
 }

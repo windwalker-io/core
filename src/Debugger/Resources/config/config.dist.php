@@ -7,31 +7,31 @@
  */
 
 return [
-	'providers' =>[
-		300 => \Windwalker\Debugger\Provider\ProfilerProvider::class
-	],
+    'providers' => [
+        300 => \Windwalker\Debugger\Provider\ProfilerProvider::class,
+    ],
 
-	'routing' => [
-		'files' => [
-			'debugger' => WINDWALKER_DEBUGGER_ROOT . '/routing.yml'
-		]
-	],
+    'routing' => [
+        'files' => [
+            'debugger' => WINDWALKER_DEBUGGER_ROOT . '/routing.yml',
+        ],
+    ],
 
-	'middlewares' => [
+    'middlewares' => [
 
-	],
+    ],
 
-	'configs' => [
+    'configs' => [
 
-	],
+    ],
 
-	'listeners' => [
-		300 => \Windwalker\Debugger\Listener\DebuggerListener::class
-	],
+    'listeners' => [
+        300 => \Windwalker\Debugger\Listener\DebuggerListener::class,
+    ],
 
-	'console' => [
-		'commands' => [
-		
-		]
-	]
+    'console' => [
+        'commands' => [
+
+        ],
+    ],
 ];

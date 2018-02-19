@@ -13,72 +13,71 @@ use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 
 /**
  * The CreateCommand class.
- * 
+ *
  * @since  2.0
  */
 class CreateCommand extends CoreCommand
 {
-	use MigrationCommandTrait;
+    use MigrationCommandTrait;
 
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static $isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static $isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'create';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected $name = 'create';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected $description = 'Create a migration version.';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected $description = 'Create a migration version.';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected $usage = 'create <cmd><command></cmd> <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected $usage = 'create <cmd><command></cmd> <option>[option]</option>';
 
-	/**
-	 * Configure command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-	}
+    /**
+     * Configure command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		$repository = $this->getRepository();
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        $repository = $this->getRepository();
 
-		$name = $this->getArgument(0);
+        $name = $this->getArgument(0);
 
-		if (!$name)
-		{
-			throw new \InvalidArgumentException('Missing first argument "name"');
-		}
+        if (!$name) {
+            throw new \InvalidArgumentException('Missing first argument "name"');
+        }
 
-		// Get template
-		$repository->copyMigration(
-			$name,
-			__DIR__ . '/../../../Resources/Templates/migration/migration.tpl'
-		);
+        // Get template
+        $repository->copyMigration(
+            $name,
+            __DIR__ . '/../../../Resources/Templates/migration/migration.tpl'
+        );
 
-		return true;
-	}
+        return true;
+    }
 }
