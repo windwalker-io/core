@@ -18,9 +18,8 @@ date_default_timezone_set('UTC');
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 
-if (!is_file($autoload))
-{
-	$autoload = __DIR__ . '/../../../autoload.php';
+if (!is_file($autoload)) {
+    $autoload = __DIR__ . '/../../../autoload.php';
 }
 
 include_once $autoload;
@@ -35,132 +34,128 @@ define('WINDWALKER_CORE_ROOT', realpath(__DIR__ . '/../vendor/windwalker/core'))
  */
 class GenTest extends AbstractCliApplication
 {
-	/**
-	 * Execute the controller.
-	 *
-	 * @return  boolean  True if controller finished execution, false if the controller did not
-	 *                   finish execution. A controller might return false if some precondition for
-	 *                   the controller to run has not been satisfied.
-	 *
-	 * @throws  \LogicException
-	 * @throws  \RuntimeException
-	 */
-	public function doExecute()
-	{
-		$package = $this->io->getArgument(0, new ValidatePrompter('Enter package name: '));
-		$class   = $this->io->getArgument(1, new ValidatePrompter('Enter class name: '));
-		$class   = StringNormalise::toClassNamespace($class);
-		$target  = $this->io->getArgument(2, $package . '\\' . $class . 'Test');
-		$target  = StringNormalise::toClassNamespace($target);
-		$package = ucfirst($package);
+    /**
+     * Execute the controller.
+     *
+     * @return  boolean  True if controller finished execution, false if the controller did not
+     *                   finish execution. A controller might return false if some precondition for
+     *                   the controller to run has not been satisfied.
+     *
+     * @throws  \LogicException
+     * @throws  \RuntimeException
+     */
+    public function doExecute()
+    {
+        $package = $this->io->getArgument(0, new ValidatePrompter('Enter package name: '));
+        $class   = $this->io->getArgument(1, new ValidatePrompter('Enter class name: '));
+        $class   = StringNormalise::toClassNamespace($class);
+        $target  = $this->io->getArgument(2, $package . '\\' . $class . 'Test');
+        $target  = StringNormalise::toClassNamespace($target);
+        $package = ucfirst($package);
 
-		if (!class_exists($class))
-		{
-			$class = 'Windwalker\\Core\\' . $package . '\\' . $class;
-		}
+        if (!class_exists($class)) {
+            $class = 'Windwalker\\Core\\' . $package . '\\' . $class;
+        }
 
-		if (!class_exists($class))
-		{
-			$this->out('Class not exists: ' . $class);
+        if (!class_exists($class)) {
+            $this->out('Class not exists: ' . $class);
 
-			exit();
-		}
+            exit();
+        }
 
-		$replace = new Structure;
+        $replace = new Structure;
 
-		$ref = new \ReflectionClass($class);
+        $ref = new \ReflectionClass($class);
 
-		$replace['origin.class.dir']  = dirname($ref->getFileName());
-		$replace['origin.class.file'] = $ref->getFileName();
-		$replace['origin.class.name'] = $ref->getName();
-		$replace['origin.class.shortname'] = $ref->getShortName();
-		$replace['origin.class.namespace'] = $ref->getNamespaceName();
+        $replace['origin.class.dir']       = dirname($ref->getFileName());
+        $replace['origin.class.file']      = $ref->getFileName();
+        $replace['origin.class.name']      = $ref->getName();
+        $replace['origin.class.shortname'] = $ref->getShortName();
+        $replace['origin.class.namespace'] = $ref->getNamespaceName();
 
-		$replace['test.dir'] = WINDWALKER_ROOT . DIRECTORY_SEPARATOR . 'test';
+        $replace['test.dir'] = WINDWALKER_ROOT . DIRECTORY_SEPARATOR . 'test';
 
-		$replace['test.class.name'] = 'Windwalker\\Core\\Test\\' . $target;
-		$replace['test.class.file'] = Path::clean($replace['test.dir'] . DIRECTORY_SEPARATOR . $target . '.php');
-		$replace['test.class.dir']  = dirname($replace['test.class.file']);
-		$replace['test.class.shortname'] = $this->getShortname(StringNormalise::toClassNamespace($replace['test.class.name']));
-		$replace['test.class.namespace'] = $this->getNamespace($replace['test.class.name']);
+        $replace['test.class.name']      = 'Windwalker\\Core\\Test\\' . $target;
+        $replace['test.class.file']      = Path::clean($replace['test.dir'] . DIRECTORY_SEPARATOR . $target . '.php');
+        $replace['test.class.dir']       = dirname($replace['test.class.file']);
+        $replace['test.class.shortname'] = $this->getShortname(StringNormalise::toClassNamespace($replace['test.class.name']));
+        $replace['test.class.namespace'] = $this->getNamespace($replace['test.class.name']);
 
-		$methods = $ref->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC);
-		$methodTmpl = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testMethod.tpl');
-		$methodCodes = [];
+        $methods     = $ref->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC);
+        $methodTmpl  = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testMethod.tpl');
+        $methodCodes = [];
 
-		foreach ($methods as $method)
-		{
-			if ($method->getDeclaringClass()->getName() != $replace['origin.class.name'])
-			{
-				continue;
-			}
+        foreach ($methods as $method) {
+            if ($method->getDeclaringClass()->getName() != $replace['origin.class.name']) {
+                continue;
+            }
 
-			$replace['origin.method'] = $method->getName();
-			$replace['test.method'] = ucfirst($method->getName());
+            $replace['origin.method'] = $method->getName();
+            $replace['test.method']   = ucfirst($method->getName());
 
-			$methodCodes[] = SimpleTemplate::render($methodTmpl, $replace->toArray());
-		}
+            $methodCodes[] = SimpleTemplate::render($methodTmpl, $replace->toArray());
+        }
 
-		$replace['test.methods'] = implode("", $methodCodes);
+        $replace['test.methods'] = implode("", $methodCodes);
 
-		$this->genClass($replace);
+        $this->genClass($replace);
 
-		$this->out(sprintf(
-			'Generate test class: <info>%s</info> to file: <info>%s</info>',
-			$replace['test.class.name'],
-			$replace['test.class.file']
-		));
+        $this->out(sprintf(
+            'Generate test class: <info>%s</info> to file: <info>%s</info>',
+            $replace['test.class.name'],
+            $replace['test.class.file']
+        ));
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 * genClass
-	 *
-	 * @param Structure $replace
-	 *
-	 * @return  void
-	 */
-	protected function genClass(Structure $replace)
-	{
-		$tmpl = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testClass.tpl');
+    /**
+     * genClass
+     *
+     * @param Structure $replace
+     *
+     * @return  void
+     */
+    protected function genClass(Structure $replace)
+    {
+        $tmpl = file_get_contents(WINDWALKER_ROOT . '/src/Core/Resources/templates/test/testClass.tpl');
 
-		$file = SimpleTemplate::render($tmpl, $replace->toArray());
+        $file = SimpleTemplate::render($tmpl, $replace->toArray());
 
-		Folder::create(dirname($replace['test.class.file']));
+        Folder::create(dirname($replace['test.class.file']));
 
-		file_put_contents($replace['test.class.file'], $file);
-	}
+        file_put_contents($replace['test.class.file'], $file);
+    }
 
-	/**
-	 * getShortname
-	 *
-	 * @param string $class
-	 *
-	 * @return  mixed
-	 */
-	protected function getShortname($class)
-	{
-		$class = explode('\\', $class);
+    /**
+     * getShortname
+     *
+     * @param string $class
+     *
+     * @return  mixed
+     */
+    protected function getShortname($class)
+    {
+        $class = explode('\\', $class);
 
-		return array_pop($class);
-	}
+        return array_pop($class);
+    }
 
-	/**
-	 * getNamespace
-	 *
-	 * @param string $class
-	 *
-	 * @return  string
-	 */
-	protected function getNamespace($class)
-	{
-		$class = explode('\\', $class);
+    /**
+     * getNamespace
+     *
+     * @param string $class
+     *
+     * @return  string
+     */
+    protected function getNamespace($class)
+    {
+        $class = explode('\\', $class);
 
-		array_pop($class);
+        array_pop($class);
 
-		return implode('\\', $class);
-	}
+        return implode('\\', $class);
+    }
 }
 
 $app = new GenTest;
