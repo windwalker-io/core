@@ -116,7 +116,7 @@
   z-index: 5;
 }
 #windwalker-debugger .windwalker-debugger-badge {
-  background-color: #BBBBBB;
+  background-color: #bbbbbb;
   color: #ffffff;
   border-radius: 20px;
   padding: 4px 9px;
@@ -138,7 +138,7 @@
   min-width: 300px;
   padding: 15px;
   border: 1px solid #e0e0e0;
-  background-color: #FBFBFB;
+  background-color: #fbfbfb;
   z-index: -1;
   visibility: hidden;
   opacity: 0;

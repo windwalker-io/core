@@ -16,27 +16,26 @@ use Windwalker\Database\Schema\Schema;
  */
 class {{className}} extends AbstractMigration
 {
-	/**
-	 * Migrate Up.
-	 */
-	public function up()
-	{
-		$this->createTable('queue_failed_jobs', function (Schema $schema)
-		{
-			$schema->primary('id');
-			$schema->varchar('connection');
-			$schema->varchar('queue');
-			$schema->longtext('body');
-			$schema->longtext('exception');
-			$schema->datetime('created');
-		});
-	}
+    /**
+     * Migrate Up.
+     */
+    public function up()
+    {
+        $this->createTable('queue_failed_jobs', function (Schema $schema) {
+            $schema->primary('id');
+            $schema->varchar('connection');
+            $schema->varchar('queue');
+            $schema->longtext('body');
+            $schema->longtext('exception');
+            $schema->datetime('created');
+        });
+    }
 
-	/**
-	 * Migrate Down.
-	 */
-	public function down()
-	{
-		$this->drop('queue_fail_jobs');
-	}
+    /**
+     * Migrate Down.
+     */
+    public function down()
+    {
+        $this->drop('queue_fail_jobs');
+    }
 }

@@ -42,8 +42,8 @@ use Windwalker\Core\Pagination\PaginationResult;
                class="hasTooltip btn btn-default" title="Next Page">
                 <span class="glyphicon glyphicon-forward"></span>
                 <span class="sr-only">
-					Next Page
-				</span>
+                    Next Page
+                </span>
             </a>
         <?php endif; ?>
     </div>

@@ -15,31 +15,31 @@ namespace {{ test.class.namespace }};
  */
 class {{ test.class.shortname }} extends \PHPUnit_Framework_TestCase
 {
-	/**
-	 * Test instance.
-	 *
-	 * @var \{{ origin.class.name }}
-	 */
-	protected $instance;
+    /**
+     * Test instance.
+     *
+     * @var \{{ origin.class.name }}
+     */
+    protected $instance;
 
-	/**
-	 * Sets up the fixture, for example, opens a network connection.
-	 * This method is called before a test is executed.
-	 *
-	 * @return void
-	 */
-	protected function setUp()
-	{
-		$this->instance = new \{{ origin.class.name }};
-	}
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     *
+     * @return void
+     */
+    protected function setUp()
+    {
+        $this->instance = new \{{ origin.class.name }};
+    }
 
-	/**
-	 * Tears down the fixture, for example, closes a network connection.
-	 * This method is called after a test is executed.
-	 *
-	 * @return void
-	 */
-	protected function tearDown()
-	{
-	}
-	{{ test.methods }}}
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     *
+     * @return void
+     */
+    protected function tearDown()
+    {
+    }
+    {{ test.methods }}}

@@ -16,19 +16,19 @@ use Windwalker\Database\Schema\Schema;
  */
 class {{className}} extends AbstractMigration
 {
-	/**
-	 * Migrate Up.
-	 */
-	public function up()
-	{
+    /**
+     * Migrate Up.
+     */
+    public function up()
+    {
 
-	}
+    }
 
-	/**
-	 * Migrate Down.
-	 */
-	public function down()
-	{
+    /**
+     * Migrate Down.
+     */
+    public function down()
+    {
 
-	}
+    }
 }
