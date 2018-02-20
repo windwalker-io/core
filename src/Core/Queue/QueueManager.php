@@ -14,6 +14,7 @@ use Windwalker\Queue\Driver\BeanstalkdQueueDriver;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Driver\IronmqQueueDriver;
 use Windwalker\Queue\Driver\NullQueueDriver;
+use Windwalker\Queue\Driver\PdoQueueDriver;
 use Windwalker\Queue\Driver\QueueDriverInterface;
 use Windwalker\Queue\Driver\RabbitmqQueueDriver;
 use Windwalker\Queue\Driver\ResqueQueueDriver;
@@ -176,11 +177,18 @@ class QueueManager
                 );
 
             case 'sync':
-                return new SyncQueueDriver($this->container->get('queue.worker'));
+                return new SyncQueueDriver();
 
             case 'database':
                 return new DatabaseQueueDriver(
                     $this->container->get('db'),
+                    $queueConfig->get('queue', 'default'),
+                    $queueConfig->get('table', 'queue_jobs')
+                );
+
+            case 'pdo':
+                return new PdoQueueDriver(
+                    $this->container->get('db')->getConnection(),
                     $queueConfig->get('queue', 'default'),
                     $queueConfig->get('table', 'queue_jobs')
                 );

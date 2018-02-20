@@ -202,7 +202,15 @@ class WorkerCommand extends CoreCommand
                 /** @var \Exception $e */
                 $e = $event['exception'];
 
-                $this->console->addMessage($e->getMessage(), 'error');
+                $this->console->addMessage(
+                    sprintf(
+                        '%s File: %s (%s)',
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getLine()
+                    ),
+                    'error'
+                );
             })
             ->listen('onWorkerLoopCycleEnd', function (Event $event) {
                 /** @var QueueManager $manager */

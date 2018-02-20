@@ -40,11 +40,6 @@ class QueueProvider implements ServiceProviderInterface
             $manager = $container->get('queue.manager');
             $queue = $manager->create(false);
 
-            // B/C
-            $queue->setNewInstanceHandler(function ($class) use ($container) {
-                return $container->newInstance($class);
-            });
-
             // Worker also uses Queue object, share it once to prevent infinity loop
             $container->share(Queue::class, $queue);
 
