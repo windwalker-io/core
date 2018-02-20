@@ -22,6 +22,7 @@ use Windwalker\Queue\Driver\SqsQueueDriver;
 use Windwalker\Queue\Driver\SyncQueueDriver;
 use Windwalker\Queue\Failer\DatabaseQueueFailer;
 use Windwalker\Queue\Failer\NullQueueFailer;
+use Windwalker\Queue\Failer\PdoQueueFailer;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\DI\Container;
 use Windwalker\Queue\Queue;
@@ -250,6 +251,17 @@ class QueueManager
                 if ($failer->isSupported()) {
                     return $failer;
                 }
+                break;
+            case 'pdo':
+                $failer = new PdoQueueFailer(
+                    $this->container->get('db')->getConnection(),
+                    $this->config->get('queue.failer.table')
+                );
+
+                if ($failer->isSupported()) {
+                    return $failer;
+                }
+                break;
             case 'null':
             default:
                 return new NullQueueFailer;
