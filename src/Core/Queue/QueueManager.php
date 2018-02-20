@@ -10,19 +10,20 @@ namespace Windwalker\Core\Queue;
 
 use Pheanstalk\Pheanstalk;
 use Windwalker\Core\Config\Config;
-use Windwalker\Core\Queue\Driver\BeanstalkdQueueDriver;
-use Windwalker\Core\Queue\Driver\DatabaseQueueDriver;
-use Windwalker\Core\Queue\Driver\IronmqQueueDriver;
-use Windwalker\Core\Queue\Driver\NullQueueDriver;
-use Windwalker\Core\Queue\Driver\QueueDriverInterface;
-use Windwalker\Core\Queue\Driver\RabbitmqQueueDriver;
-use Windwalker\Core\Queue\Driver\ResqueQueueDriver;
-use Windwalker\Core\Queue\Driver\SqsQueueDriver;
-use Windwalker\Core\Queue\Driver\SyncQueueDriver;
-use Windwalker\Core\Queue\Failer\DatabaseQueueFailer;
-use Windwalker\Core\Queue\Failer\NullQueueFailer;
-use Windwalker\Core\Queue\Failer\QueueFailerInterface;
+use Windwalker\Queue\Driver\BeanstalkdQueueDriver;
+use Windwalker\Queue\Driver\DatabaseQueueDriver;
+use Windwalker\Queue\Driver\IronmqQueueDriver;
+use Windwalker\Queue\Driver\NullQueueDriver;
+use Windwalker\Queue\Driver\QueueDriverInterface;
+use Windwalker\Queue\Driver\RabbitmqQueueDriver;
+use Windwalker\Queue\Driver\ResqueQueueDriver;
+use Windwalker\Queue\Driver\SqsQueueDriver;
+use Windwalker\Queue\Driver\SyncQueueDriver;
+use Windwalker\Queue\Failer\DatabaseQueueFailer;
+use Windwalker\Queue\Failer\NullQueueFailer;
+use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\DI\Container;
+use Windwalker\Queue\Queue;
 use Windwalker\Structure\Structure;
 
 /**
@@ -81,9 +82,13 @@ class QueueManager
      */
     public function create($connection = null)
     {
-        $driver = $this->createDriverByConnection($connection);
+        $driver = null;
 
-        return new Queue($driver, $this->container);
+        if ($connection !== false) {
+            $driver = $this->createDriverByConnection($connection);
+        }
+
+        return new Queue($driver);
     }
 
     /**
@@ -95,7 +100,7 @@ class QueueManager
      */
     public function getManager($connection = null)
     {
-        $connection = strtolower($connection);
+        $connection = $connection ? strtolower($connection) : 'default';
 
         if (!isset($this->managers[$connection])) {
             $this->managers[$connection] = $this->create($connection);
@@ -171,7 +176,7 @@ class QueueManager
                 );
 
             case 'sync':
-                return new SyncQueueDriver($this->container);
+                return new SyncQueueDriver($this->container->get('queue.worker'));
 
             case 'database':
                 return new DatabaseQueueDriver(

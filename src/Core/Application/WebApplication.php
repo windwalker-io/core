@@ -28,6 +28,7 @@ use Windwalker\Language\Language;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7InvokableInterface;
 use Windwalker\Middleware\Psr7Middleware;
+use Windwalker\Queue\Queue;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Session\Session;
 use Windwalker\Uri\UriData;
@@ -53,7 +54,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\User\UserManager         user
  * @property-read  Core\Security\CsrfGuard       csrf
  * @property-read  Core\Package\PackageResolver  packageResolver
- * @property-read  Core\Queue\Queue              queue
+ * @property-read  Queue                         queue
  *
  * @since  2.0
  */

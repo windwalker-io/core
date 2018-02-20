@@ -9,8 +9,9 @@
 namespace Windwalker\Core\Queue;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
-use Windwalker\Core\Queue\Driver\QueueDriverInterface;
-use Windwalker\Core\Queue\Failer\QueueFailerInterface;
+use Windwalker\Queue\Driver\QueueDriverInterface;
+use Windwalker\Queue\Failer\QueueFailerInterface;
+use Windwalker\Queue\Queue;
 use Windwalker\Structure\Structure;
 
 /**
