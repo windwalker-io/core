@@ -53,6 +53,12 @@ class MailMessage
      * @var  array
      */
     protected $bcc = [];
+    /**
+     * Property replyto.
+     *
+     * @var  array
+     */
+    protected $replyTo = [];
 
     /**
      * Property content.
@@ -169,6 +175,21 @@ class MailMessage
     public function bcc($email, $name = null)
     {
         $this->addEmail('bcc', $email, $name);
+
+        return $this;
+    }
+
+    /**
+     * bcc
+     *
+     * @param string $email
+     * @param string $name
+     *
+     * @return  static
+     */
+    public function replyTo($email, $name = null)
+    {
+        $this->addEmail('replyTo', $email, $name);
 
         return $this;
     }
@@ -303,6 +324,18 @@ class MailMessage
     public function getBcc()
     {
         return $this->bcc;
+    }
+
+    /**
+     * Method to get property ReplyTo
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getReplyTo()
+    {
+        return $this->replyTo;
     }
 
     /**
