@@ -331,7 +331,7 @@ class MailMessage
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function getReplyTo()
     {

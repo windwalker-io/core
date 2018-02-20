@@ -25,7 +25,7 @@
             "Windwalker\\Core\\Test\\": "test/"
         },
         "files": [
-            "src/Utilities/helpers.php"
+            "src/Core/Utilities/helpers.php"
         ]
     },
     "extra": {

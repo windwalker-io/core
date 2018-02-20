@@ -18,7 +18,7 @@ if (function_exists('__')) {
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     function __($text, ...$args) {
         if ($args !== []) {
@@ -38,7 +38,7 @@ if (function_exists('trans')) {
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     function trans($text, ...$args) {
         if ($args !== []) {
@@ -59,7 +59,7 @@ if (function_exists('__plural')) {
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     function __plural($text, $number = 1, ...$args) {
         return Translator::plural($text, $number, ...$args);
