@@ -96,8 +96,12 @@ class DatabaseProvider implements ServiceProviderInterface
             'NO_ZERO_IN_DATE',
         ];
 
-        $db->connect()
-            ->getConnection()
-            ->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+        try {
+            $db->connect()
+                ->getConnection()
+                ->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+        } catch (\RuntimeException $e) {
+            // If not success, hide error.
+        }
     }
 }
