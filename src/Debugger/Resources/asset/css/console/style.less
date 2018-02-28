@@ -51,6 +51,7 @@
   left: 0;
   width: 100%;
   z-index: 9000;
+  overflow-x: scroll;
 
   #windwalker-debugger-inner {
     width: 100%;
@@ -58,6 +59,7 @@
     background-color: #eee;
     color: #333;
     height: 40px;
+    display: flex;
   }
 
   h3 {
@@ -87,10 +89,11 @@
 
   .windwalker-debugger-block {
     height: 40px;
-    float: left;
     border-right: 1px solid #e0e0e0;
     // border-left: 1px solid #E8E8E8;
     position: relative;
+    display: inline-flex;
+    white-space: nowrap;
   }
 
   .windwalker-debugger-block-inner {

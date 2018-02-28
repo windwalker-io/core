@@ -18,6 +18,7 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
     <title><?php $this->block('page_title'); ?><?php $this->endblock(); ?></title>
 
     <link rel="shortcut icon" type="image/x-icon"
@@ -119,7 +120,7 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
             /
             ID: <span class="text-muted"><?php echo $item->id; ?></span>
             /
-            <a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?>" target="_blank">
+            <a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?>" style="word-break: break-all" target="_blank">
                 <?php echo $item['collector']['system.uri.full'] ?>
                 <small class="glyphicon glyphicon-new-window"></small>
             </a>
