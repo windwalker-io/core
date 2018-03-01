@@ -19,76 +19,79 @@ $types = [
 ];
 ?>
 
-<div class="panel panel-<?php echo $timeline['time']['style'] ?>">
-    <div class="panel-heading">
+<div class="card border-<?php echo $timeline['time']['style'] ?>">
+    <div class="card-header">
         <div id="query-<?php echo $name; ?>" style="position: relative; top: -70px;"></div>
-        <div class="pull-right">
-            <a href="#query-<?php echo $name; ?>">
-                <span class="glyphicon glyphicon-link"></span>
-            </a>
-            &nbsp;
-            &nbsp;
-            <a href="<?php echo $router->route('database',
-                ['id' => $item->id, 'refresh' => 1, 'hash' => 'query-' . $name]); ?>"
-               class="hasTooltip" title="Refresh and back to this query.">
-                <span class="glyphicon glyphicon-refresh"></span>
-            </a>
+        <div class="d-flex">
+            <h4 class="card-title d-lg-inline-block mb-0">
+                Query: <?php echo $timeline['data']['serial'] ?>
+            </h4>
+
+            <div class="query-actions d-lg-inline-block ml-auto">
+                <a class="btn btn-sm btn-outline-primary" href="#query-<?php echo $name; ?>">
+                    <span class="fa far fa-link"></span>
+                </a>
+
+                <a class="btn btn-sm btn-outline-success hasTooltip" href="<?php echo $router->route('database',
+                    ['id' => $item->id, 'refresh' => 1, 'hash' => 'query-' . $name]); ?>"
+                    title="Refresh and back to this query.">
+                    <span class="fa far fa-sync"></span>
+                </a>
+            </div>
         </div>
-        <h3 class="panel-title">
-            Query: <?php echo $timeline['data']['serial'] ?>
-        </h3>
     </div>
-    <div class="panel-body">
-        <pre><?php echo $view->highlightQuery($timeline['data']['query']); ?></pre>
+    <div class="card-body">
+        <pre class="bg-light p-4"><?php echo $view->highlightQuery($timeline['data']['query']); ?></pre>
         <hr/>
         Query Time: <span
-            class="label label-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'],
+            class="badge badge-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'],
                 2) ?> ms</span>
         Memory: <span
-            class="label label-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'],
+            class="badge badge-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'],
                 3) ?> MB</span>
-        Return Rows: <span class="label label-info"><?php echo $timeline['data']['rows'] ?></span>
+        Return Rows: <span class="badge badge-info"><?php echo $timeline['data']['rows'] ?></span>
     </div>
     <?php if (!empty($timeline['data']['bounded'])): ?>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Bounded Key</th>
-                <th>Value</th>
-                <th>Data Type</th>
-                <th>Length</th>
-                <th>Driver Options</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ((array) $timeline['data']['bounded'] as $key => $item): ?>
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
                 <tr>
-                    <td><?php echo $key ?></td>
-                    <td><?php echo $item['value'] ?></td>
-                    <td><?php echo isset($types[$item['dataType']]) ? $types[$item['dataType']] : 'UNKNOWN' ?></td>
-                    <td><?php echo $item['length'] ?></td>
-                    <td><?php echo print_r($item['driverOptions'], true) ?></td>
+                    <th class="text-nowrap">Bounded Key</th>
+                    <th class="text-nowrap">Value</th>
+                    <th class="text-nowrap">Data Type</th>
+                    <th class="text-nowrap">Length</th>
+                    <th class="text-nowrap">Driver Options</th>
                 </tr>
-            <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <hr/>
+                </thead>
+                <tbody>
+                <?php foreach ((array) $timeline['data']['bounded'] as $key => $item): ?>
+                    <tr>
+                        <td><?php echo $key ?></td>
+                        <td><?php echo $item['value'] ?></td>
+                        <td><?php echo isset($types[$item['dataType']]) ? $types[$item['dataType']] : 'UNKNOWN' ?></td>
+                        <td><?php echo $item['length'] ?></td>
+                        <td><?php echo print_r($item['driverOptions'], true) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 
     <?php if (isset($timeline['data']['explain'])): ?>
-        <table class="table table-striped">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Select Type</th>
-                <th>Table</th>
-                <th>Type</th>
-                <th>Possible Keys</th>
-                <th>Key</th>
-                <th>Key Length</th>
+                <th class="text-nowrap">ID</th>
+                <th class="text-nowrap">Select Type</th>
+                <th class="text-nowrap">Table</th>
+                <th class="text-nowrap">Type</th>
+                <th class="text-nowrap">Possible Keys</th>
+                <th class="text-nowrap">Key</th>
+                <th class="text-nowrap">Key Length</th>
                 <th>Reference</th>
-                <th>Rows</th>
+                <th class="text-nowrap">Rows</th>
                 <th width="10%">Extra</th>
             </tr>
             </thead>
@@ -110,6 +113,7 @@ $types = [
             <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
     <?php endif; ?>
 
 </div>

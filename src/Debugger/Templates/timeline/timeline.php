@@ -34,22 +34,22 @@
                 <?php echo $name; ?>
             </td>
             <td>
-				<span class="label label-<?php echo $point['total_time']['style'] ?>">
+				<span class="badge badge-<?php echo $point['total_time']['style'] ?>">
 					<?php echo round($point['total_time']['value'], 2) ?> ms
 				</span>
             </td>
             <td>
-				<span class="label label-<?php echo $point['time']['style'] ?>">
+				<span class="badge badge-<?php echo $point['time']['style'] ?>">
 					<?php echo round($point['time']['value'], 2) ?> ms
 				</span>
             </td>
             <td>
-				<span class="label label-<?php echo $point['total_memory']['style'] ?>">
+				<span class="badge badge-<?php echo $point['total_memory']['style'] ?>">
 					<?php echo round($point['total_memory']['value'], 2) ?> MB
 				</span>
             </td>
             <td>
-				<span class="label label-<?php echo $point['memory']['style'] ?>">
+				<span class="badge badge-<?php echo $point['memory']['style'] ?>">
 					<?php echo round($point['memory']['value'], 2) ?> MB
 				</span>
             </td>
@@ -60,13 +60,13 @@
     <tfoot>
     <tr>
         <td colspan="20">
-            <span class="label label-info">Avg Time: <?php echo round($timeline['avg_time'], 2) ?> ms</span>
+            <span class="badge badge-info">Avg Time: <?php echo round($timeline['avg_time'], 2) ?> ms</span>
             /
-            <span class="label label-info">Total Time: <?php echo round($timeline['full_time'], 2) ?> ms</span>
+            <span class="badge badge-info">Total Time: <?php echo round($timeline['full_time'], 2) ?> ms</span>
             -
-            <span class="label label-info">Avg Memory: <?php echo round($timeline['avg_memory'], 2) ?> MB</span>
+            <span class="badge badge-info">Avg Memory: <?php echo round($timeline['avg_memory'], 2) ?> MB</span>
             /
-            <span class="label label-info">Total Memory: <?php echo round($timeline['full_memory'], 2) ?> MB</span>
+            <span class="badge badge-info">Total Memory: <?php echo round($timeline['full_memory'], 2) ?> MB</span>
         </td>
     </tr>
     </tfoot>

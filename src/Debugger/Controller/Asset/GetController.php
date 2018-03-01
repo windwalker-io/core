@@ -34,13 +34,14 @@ class GetController extends AbstractController
         switch ($type) {
             case 'css':
                 $content     .= file_get_contents($media . '/css/bootstrap.min.css');
+                $content     .= file_get_contents($media . '/css/fontawesome5.min.css');
                 $content     .= file_get_contents($media . '/css/microtip.css');
                 $content     .= file_get_contents($media . '/css/debugger.css');
                 $contentType = 'text/css';
                 break;
 
             case 'fonts':
-                $content     .= file_get_contents($media . '/fonts/glyphicons-halflings-regular.woff2');
+                $content     .= file_get_contents($media . '/webfonts/fa-solid-900.ttf');
                 $contentType = null;
                 break;
         }

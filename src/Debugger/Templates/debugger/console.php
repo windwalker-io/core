@@ -65,7 +65,7 @@
                 <a class="windwalker-debugger-link"
                    href="<?php echo $router->route('routing', ['id' => $collector['id']]); ?>">
                     <div class="windwalker-debugger-block-inner">
-				<span class="windwalker-debugger-badge" style="background-color: #5cb85c">
+				<span class="windwalker-debugger-badge windwalker-debugger-color-success">
 					<?php echo $this->escape($collector['system.http.status']); ?>
 				</span>
                         &nbsp;

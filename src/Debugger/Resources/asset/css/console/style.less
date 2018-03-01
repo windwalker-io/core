@@ -1,9 +1,9 @@
 // Variables
-@color-primary: #337ab7;
-@color-success: #5cb85c;
-@color-info: #5bc0de;
-@color-warning: #f0ad4e;
-@color-danger: #d9534f;
+@color-primary: #007bff;
+@color-success: #28a745;
+@color-info: #17a2b8;
+@color-warning: #ffc107;
+@color-danger: #dc3545;
 
 /* Reset */
 #windwalker-debugger {
@@ -46,12 +46,19 @@
   text-shadow: none;
   font-size: 15px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #eee;
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   z-index: 9000;
-  overflow-x: scroll;
+  overflow-x: visible;
+  overflow-y: visible;
+
+  @media (max-width: 991px) {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 
   #windwalker-debugger-inner {
     width: 100%;
@@ -60,6 +67,7 @@
     color: #333;
     height: 40px;
     display: flex;
+    z-index: 1;
   }
 
   h3 {

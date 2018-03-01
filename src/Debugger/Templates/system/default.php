@@ -86,6 +86,6 @@ echo BootstrapKeyValueGrid::create()
 
 <h2>Config</h2>
 
-<pre><?php echo \Symfony\Component\Yaml\Yaml::dump($collector['windwalker.config'], 5); ?></pre>
+<pre class="bg-light p-4"><?php echo \Symfony\Component\Yaml\Yaml::dump($collector['windwalker.config'], 5); ?></pre>
 
 <?php $this->endblock() ?>

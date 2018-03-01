@@ -31,7 +31,8 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
     <link rel="stylesheet" href="<?php echo $router->route('asset', ['type' => 'css']); ?>"/>
     <style>
         @font-face {
-            font-family: 'Glyphicons Halflings';
+            font-family: 'Font Awesome 5 Free';
+            font-style: normal;
             src: url('<?php echo $router->route('asset', ['type' => 'fonts']); ?>');
         }
     </style>
@@ -40,56 +41,59 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
 
     <?php $this->block('script'); ?>
     <?php $this->endblock(); ?>
+
+    <style>
+        .navbar-toggler:focus + .collapse {
+            display: block !important;
+
+        }
+    </style>
 </head>
 <body>
 <?php $this->block('navbar'); ?>
-<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="<?php echo $router->route('dashboard'); ?>">
-                Windwalker Debugger
-            </a>
-        </div>
-        <div class="collapse navbar-collapse">
+        <a class="navbar-brand" href="<?php echo $router->route('dashboard'); ?>">
+            W Debugger
+        </a>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="main-nav" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <?php $this->block('nav'); ?>
-                <li class="<?php echo $helper->view->isActiveRoute('system') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('system') ?>"
                         href="<?php echo $router->route('system', $item->id); ?>">System</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('request') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('request') ?>"
                         href="<?php echo $router->route('request', $item->id); ?>">Request</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('routing') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('routing') ?>"
                         href="<?php echo $router->route('routing', $item->id); ?>">Routing</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('timeline') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('timeline') ?>"
                         href="<?php echo $router->route('timeline', $item->id); ?>">Timeline</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('events') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('events') ?>"
                         href="<?php echo $router->route('events', $item->id); ?>">Events</a></li>
 
-                <li class="<?php echo $helper->view->isActiveRoute('database') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('database') ?>"
                         href="<?php echo $router->route('database', $item->id); ?>">Database</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('exception') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('exception') ?>"
                         href="<?php echo $router->route('exception', $item->id); ?>">Exception</a></li>
-                <li class="<?php echo $helper->view->isActiveRoute('mail') ?>"><a
+                <li class="nav-item"><a class="nav-link <?php echo $helper->view->isActiveRoute('mail') ?>"
                         href="<?php echo $router->route('mail'); ?>">Mail</a></li>
                 <?php $this->endblock(); ?>
             </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a class="" href="<?php echo $router->route($app->get('route.matched'),
+            <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="btn btn-outline-success mr-2" href="<?php echo $router->route($app->get('route.matched'),
                         ['refresh' => 1, 'id' => $item['id']]); ?>"
                        data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
-                        <span class="glyphicon glyphicon-refresh"></span>
+                        <span class="fa fa-sync"></span>
                         Refresh
                     </a>
                 </li>
-                <li>
-                    <a target="_blank" href="<?php echo $uri->path . '/' . $uri->script; ?>">
-                        <span class="glyphicon glyphicon-globe"></span>
-                        Preview
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary" target="_blank" href="<?php echo $uri->path . '/' . $uri->script; ?>">
+                        <span class="fa fa-globe"></span>
+                        Site
                     </a>
                 </li>
             </ul>
@@ -110,30 +114,32 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
         <p>
             <a class="btn btn-sm btn-info" href="<?php echo $router->route('dashboard'); ?>"
                data-toggle="tooltip" data-placement="top" title="Choose other URLs">
-                <span class="glyphicon glyphicon-list"></span>
+                <span class="fa fa-list"></span>
             </a>
             <a class="btn btn-sm btn-success"
                href="<?php echo $router->route($app->get('route.matched'), ['refresh' => 1, 'id' => $item['id']]); ?>"
                data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
-                <span class="glyphicon glyphicon-refresh"></span>
+                <span class="fa fa-sync"></span>
             </a>
             /
             ID: <span class="text-muted"><?php echo $item->id; ?></span>
             /
             <a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?>" style="word-break: break-all" target="_blank">
                 <?php echo $item['collector']['system.uri.full'] ?>
-                <small class="glyphicon glyphicon-new-window"></small>
+                <small class="fa fa-external-link-alt"></small>
             </a>
         </p>
     </div>
 </div>
 <?php $this->endblock() ?>
 
+<?php $this->block('body') ?>
 <div class="main-body container">
     <?php $this->block('content') ?>
     Content
     <?php $this->endblock(); ?>
 </div>
+<?php $this->endblock() ?>
 
 <?php $this->block('copyright') ?>
 <div id="copyright">
