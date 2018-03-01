@@ -10,6 +10,8 @@ namespace Windwalker\Core\Renderer\Edge;
 
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
 
+include_once __DIR__ . '/lastfix.php';
+
 /**
  * The WindwalkerExtension class.
  *
