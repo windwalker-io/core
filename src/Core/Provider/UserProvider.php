@@ -84,7 +84,7 @@ class UserProvider implements ServiceProviderInterface
 
         foreach ((array) $container->get('config')->get('user.methods') as $name => $method) {
             if ($method !== false) {
-                $auth->addMethod($container->newInstance($method), $method);
+                $auth->addMethod($name, $container->newInstance($method));
             }
         }
 
