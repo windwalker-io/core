@@ -15,7 +15,7 @@ use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Filesystem\File;
 use Windwalker\Ioc;
-use Windwalker\String\StringHelper;
+use Windwalker\String\Str;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Arr;
 
@@ -272,6 +272,11 @@ class AssetManager implements DispatcherAwareInterface
                 $attribs['href'] .= '?' . $this->getVersion();
             }
 
+            if (isset($style['options']['sri'])) {
+                $attribs['integrity'] = $style['options']['sri'];
+                $attribs['crossorigin'] = 'anonymous';
+            }
+
             if (isset($style['options']['conditional'])) {
                 $html[] = '<!--[if ' . $style['options']['conditional'] . ']>';
             }
@@ -317,6 +322,11 @@ class AssetManager implements DispatcherAwareInterface
 
             if ($script['options']['version'] !== false) {
                 $attribs['src'] .= '?' . $this->getVersion();
+            }
+
+            if (isset($script['options']['sri'])) {
+                $attribs['integrity'] = $script['options']['sri'];
+                $attribs['crossorigin'] = 'anonymous';
             }
 
             if (isset($script['options']['conditional'])) {
@@ -697,7 +707,7 @@ class AssetManager implements DispatcherAwareInterface
     {
         $ext = File::getExtension($uri);
 
-        if (StringHelper::endsWith($uri, '.min.' . $ext)) {
+        if (Str::endsWith($uri, '.min.' . $ext)) {
             $assetFile    = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
             $assetMinFile = $uri;
         } else {
