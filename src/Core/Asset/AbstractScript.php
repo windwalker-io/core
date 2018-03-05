@@ -112,6 +112,20 @@ abstract class AbstractScript
     }
 
     /**
+     * import
+     *
+     * @param string $url
+     * @param array  $options
+     * @param array  $attribs
+     *
+     * @return  AssetManager
+     */
+    protected static function import($url, array $options = [], array $attribs = [])
+    {
+        return static::getAsset()->import($url, $options, $attribs);
+    }
+
+    /**
      * internalStyle
      *
      * @param string $content
@@ -148,8 +162,8 @@ abstract class AbstractScript
         $quote = array_pop($data);
 
         if (!is_bool($quote)) {
-            array_push($data, $quote);
-            $quote = false;
+            $data[] = $quote;
+            $quote  = false;
         }
 
         if (count($data) > 1) {

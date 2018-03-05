@@ -198,6 +198,24 @@ class AssetManager implements DispatcherAwareInterface
     }
 
     /**
+     * import
+     *
+     * @param string $url
+     * @param array  $options
+     * @param array  $attribs
+     *
+     * @return  AssetManager
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function import($url, array $options = [], array $attribs = [])
+    {
+        $attribs['rel'] = 'import';
+
+        return $this->addStyle($url, $options, $attribs);
+    }
+
+    /**
      * internalStyle
      *
      * @param string $content
@@ -621,7 +639,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  string
      */
-    protected function handleUri($uri)
+    public function handleUri($uri)
     {
         $uri = $this->resolveAlias($uri);
 
@@ -778,7 +796,7 @@ class AssetManager implements DispatcherAwareInterface
     {
         if ($data === null) {
             return 'null';
-        };
+        }
 
         $output = '';
 

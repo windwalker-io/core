@@ -15,12 +15,13 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * @see    AssetManager
  *
- * @method  static AssetManager  addStyle()                addStyle($url, $version = null, $attribs = [])
- * @method  static AssetManager  addScript()               addScript($url, $version = null, $attribs = [])
+ * @method  static AssetManager  addStyle()                addStyle($url, array $options = [], array $attribs = [])
+ * @method  static AssetManager  addScript()               addScript($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  internalStyle()           internalStyle($content)
  * @method  static AssetManager  internalScript()          internalScript($content)
- * @method  static AssetManager  addCSS()                  addCSS($url, array $options = [], $attribs = [])
- * @method  static AssetManager  addJS()                   addJS($url, array $options = [], $attribs = [])
+ * @method  static AssetManager  addCSS()                  addCSS($url, array $options = [], array $attribs = [])
+ * @method  static AssetManager  addJS()                   addJS($url, array $options = [], array $attribs = [])
+ * @method  static AssetManager  import()                  import($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  internalCSS()             internalCSS($content)
  * @method  static AssetManager  internalJS()              internalJS($content)
  * @method  static string        renderStyles()            renderStyles($withInternal = false)
