@@ -11,6 +11,7 @@ namespace Windwalker\Core\Queue;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Queue\Job\JobInterface;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\Worker;
 
@@ -33,6 +34,7 @@ class QueueProvider implements ServiceProviderInterface
     public function register(Container $container)
     {
         class_alias(Queue::class, \Windwalker\Core\Queue\Queue::class);
+        class_alias(JobInterface::class, \Windwalker\Core\Queue\Job\JobInterface::class);
 
         $container->prepareSharedObject(QueueManager::class);
 
