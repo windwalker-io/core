@@ -24,6 +24,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static AssetManager  import()                  import($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  internalCSS()             internalCSS($content)
  * @method  static AssetManager  internalJS()              internalJS($content)
+ * @method  static string|false  exists()                  exists(string $uri, bool $strict = false)
  * @method  static string        renderStyles()            renderStyles($withInternal = false)
  * @method  static string        renderScripts()           renderScripts($withInternal = false)
  * @method  static string        renderInternalStyles()    renderInternalStyles()
