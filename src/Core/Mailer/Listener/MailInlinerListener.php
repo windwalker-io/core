@@ -50,16 +50,20 @@ class MailInlinerListener
         $body = OutputFilter::stripStyle($body);
         $body = OutputFilter::stripLinks($body);
 
-        /** @var AssetManager $asset */
-        $asset = Asset::getInstance();
-
         $css = '';
 
-        // Loop outside styles
-        foreach ($asset->getStyles() as $style) {
-            $path = $asset->addSysPath($style['url']);
+        try {
+            /** @var AssetManager $asset */
+            $asset = Asset::getInstance();
 
-            $css .= file_get_contents($path) . "\n";
+            // Loop outside styles
+            foreach ($asset->getStyles() as $style) {
+                $path = $asset->addSysPath($style['url']);
+
+                $css .= file_get_contents($path) . "\n";
+            }
+        } catch (\UnexpectedValueException $e) {
+            // No action
         }
 
         // Loop internal styles
