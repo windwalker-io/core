@@ -60,6 +60,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
             'js' => [$this, 'js'],
             'assetTemplate' => [$this, 'assetTemplate'],
             'endTemplate' => [$this, 'endTemplate'],
+            'attr' => [$this, 'attr'],
 
             // Debug
             'shown' => [$this, 'shown'],
@@ -262,6 +263,20 @@ class WindwalkerExtension implements EdgeExtensionInterface
         $expression = trim(static::stripParentheses($expression));
 
         return "<?php echo \$package->csrf->input({$expression}); ?>";
+    }
+
+    /**
+     * attr
+     *
+     * @param string $expression
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function attr($expression)
+    {
+        return "<?php echo \Windwalker\Core\Renderer\Edge\EdgeHelper::attr{$expression}; ?>";
     }
 
     /**
