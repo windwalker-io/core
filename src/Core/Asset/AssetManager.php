@@ -210,9 +210,15 @@ class AssetManager implements DispatcherAwareInterface
      */
     public function import($url, array $options = [], array $attribs = [])
     {
-        $attribs['rel'] = 'import';
+        if (Arr::get($options, 'as') === 'style') {
+            $attribs['rel'] = 'import';
 
-        return $this->addStyle($url, $options, $attribs);
+            return $this->addStyle($url, $options, $attribs);
+        }
+
+        $options['import'] = true;
+
+        return $this->addScript($url, $options, $attribs);
     }
 
     /**
@@ -333,7 +339,14 @@ class AssetManager implements DispatcherAwareInterface
                 $html[] = '<!--[if ' . $script['options']['conditional'] . ']>';
             }
 
-            $html[] = (string) new HtmlElement('script', null, $attribs);
+            if (isset($script['options']['import'])) {
+                $attribs['href'] = $attribs['src'];
+                $attribs['rel'] = 'import';
+                unset($attribs['src']);
+                $html[] = (string) new HtmlElement('link', null, $attribs);
+            } else {
+                $html[] = (string) new HtmlElement('script', null, $attribs);
+            }
 
             if (isset($script['options']['conditional'])) {
                 $html[] = '<![endif]-->';
