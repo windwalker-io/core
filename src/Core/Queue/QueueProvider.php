@@ -15,6 +15,10 @@ use Windwalker\Queue\Job\JobInterface;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\Worker;
 
+// B/C
+class_alias(Queue::class, \Windwalker\Core\Queue\Queue::class);
+class_alias(JobInterface::class, \Windwalker\Core\Queue\Job\JobInterface::class);
+
 /**
  * The QueueProvider class.
  *
@@ -28,14 +32,10 @@ class QueueProvider implements ServiceProviderInterface
      * @param   Container $container The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @throws \UnexpectedValueException
      */
     public function register(Container $container)
     {
-        class_alias(Queue::class, \Windwalker\Core\Queue\Queue::class);
-        class_alias(JobInterface::class, \Windwalker\Core\Queue\Job\JobInterface::class);
-
         $container->prepareSharedObject(QueueManager::class);
 
         $container->share(Queue::class, function (Container $container) {
