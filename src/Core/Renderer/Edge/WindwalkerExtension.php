@@ -259,7 +259,9 @@ class WindwalkerExtension implements EdgeExtensionInterface
      */
     public function formToken($expression)
     {
-        return "<?php echo \$package->csrf->input{$expression} ?>";
+        $expression = trim(static::stripParentheses($expression));
+
+        return "<?php echo \$package->csrf->input({$expression}); ?>";
     }
 
     /**

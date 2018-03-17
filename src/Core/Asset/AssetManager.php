@@ -250,6 +250,49 @@ class AssetManager implements DispatcherAwareInterface
     }
 
     /**
+     * Check asset uri exists in system and return actual path.
+     *
+     * @param string $uri     The file uri to check.
+     * @param bool   $strict  Check .min file or un-min file exists again if input file not exists.
+     *
+     * @return  bool|string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function exists($uri, $strict = false)
+    {
+        if (static::isAbsoluteUrl($uri)) {
+            return $uri;
+        }
+
+        $assetUri = $this->path;
+
+        if (static::isAbsoluteUrl($assetUri)) {
+            return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
+        }
+
+        $root = $this->addSysPath($assetUri);
+
+        $this->normalizeUri($uri, $assetFile, $assetMinFile);
+
+        if (is_file($root . '/' . $uri)) {
+            return $this->addBase($uri, 'path');
+        }
+
+        if (!$strict) {
+            if (is_file($root . '/' . $assetFile)) {
+                return $this->addBase($assetFile, 'path');
+            }
+
+            if (is_file($root . '/' . $assetMinFile)) {
+                return $this->addBase($assetMinFile, 'path');
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * renderStyles
      *
      * @param bool $withInternal
@@ -692,8 +735,8 @@ class AssetManager implements DispatcherAwareInterface
             if (is_file($root . '/' . $assetMinFile)) {
                 return $this->addBase($assetMinFile, 'path');
             }
-        } // Use min file first
-        else {
+        } else {
+            // Use min file first
             if (is_file($root . '/' . $assetMinFile)) {
                 return $this->addBase($assetMinFile, 'path');
             }
