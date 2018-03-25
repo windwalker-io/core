@@ -9,7 +9,7 @@
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
 
-if (function_exists('__')) {
+if (!function_exists('__')) {
     /**
      * Translate
      *
@@ -21,7 +21,7 @@ if (function_exists('__')) {
      * @since  3.3
      */
     function __($text, ...$args) {
-        if ($args !== []) {
+        if ($args === []) {
             return Translator::translate($text);
         }
 
@@ -29,7 +29,7 @@ if (function_exists('__')) {
     }
 }
 
-if (function_exists('trans')) {
+if (!function_exists('trans')) {
     /**
      * trans
      *
@@ -41,7 +41,7 @@ if (function_exists('trans')) {
      * @since  3.3
      */
     function trans($text, ...$args) {
-        if ($args !== []) {
+        if ($args === []) {
             return Translator::translate($text);
         }
 
@@ -49,7 +49,7 @@ if (function_exists('trans')) {
     }
 }
 
-if (function_exists('__plural')) {
+if (!function_exists('__plural')) {
     /**
      * __plural
      *
@@ -66,7 +66,7 @@ if (function_exists('__plural')) {
     }
 }
 
-if (function_exists('date_compare')) {
+if (!function_exists('date_compare')) {
     /**
      * date_compare
      *
@@ -80,4 +80,3 @@ if (function_exists('date_compare')) {
         return Chronos::compare($date1, $date2, $operator);
     }
 }
-
