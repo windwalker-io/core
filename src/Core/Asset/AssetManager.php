@@ -295,11 +295,12 @@ class AssetManager implements DispatcherAwareInterface
     /**
      * renderStyles
      *
-     * @param bool $withInternal
+     * @param bool  $withInternal
+     * @param array $internalAttrs
      *
      * @return string
      */
-    public function renderStyles($withInternal = false)
+    public function renderStyles($withInternal = false, array $internalAttrs = [])
     {
         $html = [];
 
@@ -338,7 +339,7 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         if ($withInternal && $this->internalStyles) {
-            $html[] = (string) new HtmlElement('style', "\n" . $this->renderInternalStyles() . "\n" . $this->indents);
+            $html[] = (string) new HtmlElement('style', "\n" . $this->renderInternalStyles() . "\n" . $this->indents, $internalAttrs);
         }
 
         return implode("\n" . $this->indents, $html);
@@ -347,11 +348,12 @@ class AssetManager implements DispatcherAwareInterface
     /**
      * renderStyles
      *
-     * @param bool $withInternal
+     * @param bool  $withInternal
+     * @param array $internalAttrs
      *
      * @return string
      */
-    public function renderScripts($withInternal = false)
+    public function renderScripts($withInternal = false, array $internalAttrs = [])
     {
         $html = [];
 
@@ -397,7 +399,7 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         if ($withInternal && $this->internalScripts) {
-            $html[] = (string) new HtmlElement('script', "\n" . $this->renderInternalScripts() . "\n" . $this->indents);
+            $html[] = (string) new HtmlElement('script', "\n" . $this->renderInternalScripts() . "\n" . $this->indents, $internalAttrs);
         }
 
         return implode("\n" . $this->indents, $html);
