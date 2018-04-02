@@ -209,8 +209,17 @@ class RendererProvider implements ServiceProviderInterface
             'endauth' => [$extension, 'endauth'],
 
             // Asset
+            'css' => [$this, 'css'],
+            'js' => [$this, 'js'],
             'assetTemplate' => [$extension, 'assetTemplate'],
             'endTemplate' => [$extension, 'endTemplate'],
+            'attr' => [$this, 'attr'],
+
+            // Debug
+            'shown' => [$this, 'shown'],
+            'die' => [$this, 'dead'],
+            'debug' => [$this, 'debug'],
+            'enddebug' => [$this, 'endauth'],
         ];
 
         foreach ($directives as $name => $callback) {
