@@ -87,6 +87,23 @@ class MvcResolver
     }
 
     /**
+     * resolveModel
+     *
+     * @param   string|AbstractPackage $package
+     * @param   string                 $name
+     *
+     * @return  false|string
+     *
+     * @since  __DEPLOY_VERSION__
+     *
+     * @deprecated  Use resolveRepository() instead.
+     */
+    public function resolveModel($package, $name)
+    {
+        return $this->resolveRepository($package, $name);
+    }
+
+    /**
      * Resolve class path.
      *
      * @param   string|AbstractPackage $package
@@ -189,6 +206,32 @@ class MvcResolver
         $this->repositoryResolver = $repositoryResolver;
 
         return $this;
+    }
+
+    /**
+     * Method to get property ModelResolver
+     *
+     * @return  RepositoryResolver
+     *
+     * @deprecated Use getRepositoryResolver().
+     */
+    public function getModelResolver()
+    {
+        return $this->getRepositoryResolver();
+    }
+
+    /**
+     * Method to set property modelResolver
+     *
+     * @param   RepositoryResolver $repositoryResolver
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @deprecated Use setRepositoryResolver().
+     */
+    public function setModelResolver($repositoryResolver)
+    {
+        return $this->setRepositoryResolver($repositoryResolver);
     }
 
     /**
