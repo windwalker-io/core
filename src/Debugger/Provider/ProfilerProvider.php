@@ -9,6 +9,7 @@
 namespace Windwalker\Debugger\Provider;
 
 use Windwalker\Core\Object\NullObject;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Debugger\Listener\ProfilerListener;
@@ -110,7 +111,7 @@ class ProfilerProvider implements ServiceProviderInterface
                     return;
                 }
 
-                $collector['database.query.times'] = $collector['database.query.times'] + 1;
+                $collector['database.query.times'] += 1;
 
                 $queryData = [
                     'serial' => $collector['database.query.times'],
@@ -129,13 +130,14 @@ class ProfilerProvider implements ServiceProviderInterface
                 $queryData['memory']['duration'] = abs($queryData['memory']['end'] - $queryData['memory']['start']);
                 $queryData['query']              = $db->getLastQuery();
                 $queryData['rows']               = $db->getReader()->countAffected();
+                $queryData['backtrace']          = BacktraceHelper::normalizeBacktraces(array_slice(debug_backtrace(), 6));
 
                 $queryData = array_merge((array) $data, $queryData);
 
                 $collector->push('database.queries', $queryData);
 
-                $collector['database.query.total.time']   = $collector['database.query.total.time'] + $queryData['time']['duration'];
-                $collector['database.query.total.memory'] = $collector['database.query.total.memory'] + $queryData['memory']['duration'];
+                $collector['database.query.total.time']   += $queryData['time']['duration'];
+                $collector['database.query.total.memory'] += $queryData['memory']['duration'];
             }
         ));
     }

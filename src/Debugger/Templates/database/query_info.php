@@ -43,13 +43,25 @@ $types = [
     <div class="card-body">
         <pre class="bg-light p-4"><?php echo $view->highlightQuery($timeline['data']['query']); ?></pre>
         <hr/>
-        Query Time: <span
-            class="badge badge-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'],
-                2) ?> ms</span>
-        Memory: <span
-            class="badge badge-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'],
-                3) ?> MB</span>
-        Return Rows: <span class="badge badge-info"><?php echo $timeline['data']['rows'] ?></span>
+        <div class="d-flex">
+            <div>
+                Query Time: <span
+                    class="badge badge-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'],
+                        2) ?> ms</span>
+                Memory: <span
+                    class="badge badge-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'],
+                        3) ?> MB</span>
+                Return Rows: <span class="badge badge-info"><?php echo $timeline['data']['rows'] ?></span>
+            </div>
+            <div class="ml-auto">
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                    data-target="#backtrace-modal-<?php echo $timeline['data']['serial']; ?>">
+                    <span class="fa fa-list"></span>
+                    Backtrace
+                </button>
+            </div>
+        </div>
+
     </div>
     <?php if (!empty($timeline['data']['bounded'])): ?>
         <div class="table-responsive">
@@ -80,7 +92,7 @@ $types = [
 
     <?php if (isset($timeline['data']['explain'])): ?>
     <div class="table-responsive">
-        <table class="table table-striped mb-0">
+        <table class="explain-table table table-striped mb-0">
             <thead>
             <tr>
                 <th class="text-nowrap">ID</th>
@@ -116,4 +128,41 @@ $types = [
     </div>
     <?php endif; ?>
 
+    <?php if (isset($timeline['data']['backtrace'])): ?>
+        <div class="modal fade backtrace-modal" id="backtrace-modal-<?php echo $timeline['data']['serial']; ?>" tabindex="-1"
+            role="dialog" aria-labelledby="backtrace-modal-label-<?php echo $timeline['data']['serial']; ?>" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="backtrace-modal-label-<?php echo $timeline['data']['serial']; ?>">
+                            Query <?php echo $timeline['data']['serial']; ?> Backtrace
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered table-striped">
+                            <?php $num = count($timeline['data']['backtrace']); ?>
+                            <?php foreach ($timeline['data']['backtrace'] as $trace): ?>
+                            <tr>
+                                <td class="text-nowrap">
+                                    <?php echo $num--; ?>
+                                </td>
+                                <td class="48%">
+                                    <?php echo $trace['function']; ?>
+                                </td>
+                                <td class="48%">
+                                    <?php echo $trace['file']; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+    <!-- Backtrace -->
 </div>

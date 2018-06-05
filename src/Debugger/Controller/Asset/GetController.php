@@ -40,6 +40,12 @@ class GetController extends AbstractController
                 $contentType = 'text/css';
                 break;
 
+            case 'bootstrap-js':
+                $content     .= file_get_contents($media . '/js/jquery.min.js');
+                $content     .= file_get_contents($media . '/js/bootstrap.bundle.min.js');
+                $contentType = 'text/javascript';
+                break;
+
             case 'fonts':
                 $content     .= file_get_contents($media . '/webfonts/fa-solid-900.ttf');
                 $contentType = null;

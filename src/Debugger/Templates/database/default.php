@@ -21,6 +21,25 @@ $this->extend('_global.html');
 
 <?php $this->block('content') ?>
 
+<style>
+    @media (min-width: 992px) {
+        .backtrace-modal .modal-dialog {
+            max-width: 1200px;
+        }
+    }
+
+    .backtrace-modal .modal-dialog table td {
+        font-size: 13px;
+        word-break: break-all;
+        font-family: monospace;
+    }
+
+    .explain-table tbody td {
+        font-size: 13px;
+        font-family: monospace;
+    }
+</style>
+
     <h2>Database Information</h2>
 
 <?php
@@ -45,9 +64,6 @@ echo BootstrapKeyValueGrid::create()
 
 <?php endforeach; ?>
 
-    <script src="<?php echo $router->route('asset', ['type' => 'tooltip-js']); ?>"></script>
-    <script>
-        $('.hasTooltip').tooltip();
-    </script>
+    <script src="<?php echo $router->route('asset', ['type' => 'bootstrap-js']); ?>" async></script>
 
 <?php $this->endblock() ?>
