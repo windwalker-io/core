@@ -19,7 +19,7 @@ use Windwalker\Debugger\DebuggerPackage;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Debugger\Helper\PageRecordHelper;
 use Windwalker\Debugger\Helper\TimelineHelper;
-use Windwalker\Debugger\Model\DashboardModel;
+use Windwalker\Debugger\Repository\DashboardRepository;
 use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
@@ -312,7 +312,7 @@ class DebuggerListener
      */
     protected function deleteOldFiles()
     {
-        $model = new DashboardModel;
+        $model = new DashboardRepository;
 
         $files = $model->getFiles();
         $items = [];

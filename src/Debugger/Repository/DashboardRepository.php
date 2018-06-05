@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Debugger\Model;
+namespace Windwalker\Debugger\Repository;
 
 use Windwalker\Core\Repository\Repository;
 use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
@@ -16,7 +16,7 @@ use Windwalker\Filesystem\Iterator\RecursiveDirectoryIterator;
  *
  * @since  2.1.1
  */
-class DashboardModel extends Repository
+class DashboardRepository extends Repository
 {
     /**
      * getItems

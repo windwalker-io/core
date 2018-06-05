@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-namespace Windwalker\Debugger\Model;
+namespace Windwalker\Debugger\Repository;
 
 use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Object\NullObject;
@@ -18,7 +18,7 @@ use Windwalker\Debugger\Helper\PageRecordHelper;
  *
  * @since  2.1.1
  */
-class ProfilerModel extends Repository
+class ProfilerRepository extends Repository
 {
     /**
      * getItem
