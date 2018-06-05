@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 
 /**
  * The ViewModel class.
@@ -20,21 +20,21 @@ class ViewModel implements \ArrayAccess
     /**
      * Property nullModel.
      *
-     * @var ModelRepository
+     * @var Repository
      */
     protected $nullModel;
 
     /**
      * Property model.
      *
-     * @var ModelRepository
+     * @var Repository
      */
     protected $model;
 
     /**
      * Property models.
      *
-     * @var ModelRepository[]
+     * @var Repository[]
      */
     protected $models;
 
@@ -43,7 +43,7 @@ class ViewModel implements \ArrayAccess
      *
      * @param  string $name
      *
-     * @return ModelRepository
+     * @return Repository
      */
     public function getModel($name = null)
     {
@@ -63,13 +63,13 @@ class ViewModel implements \ArrayAccess
     /**
      * Method to set property model
      *
-     * @param   ModelRepository $model
-     * @param   bool            $default
-     * @param   string          $customName
+     * @param   Repository $model
+     * @param   bool       $default
+     * @param   string     $customName
      *
      * @return static Return self to support chaining.
      */
-    public function setModel(ModelRepository $model, $default = null, $customName = null)
+    public function setModel(Repository $model, $default = null, $customName = null)
     {
         if ($default === true) {
             $this->model = $model;
@@ -246,12 +246,12 @@ class ViewModel implements \ArrayAccess
     /**
      * Method to get property NullModel
      *
-     * @return  ModelRepository
+     * @return  Repository
      */
     public function getNullModel()
     {
         if (!$this->nullModel) {
-            $this->nullModel = new ModelRepository;
+            $this->nullModel = new Repository;
 
             $this->nullModel['is.null'] = true;
             $this->nullModel['null']    = true;
@@ -265,7 +265,7 @@ class ViewModel implements \ArrayAccess
     /**
      * Method to set property nullModel
      *
-     * @param   ModelRepository $nullModel
+     * @param   Repository $nullModel
      *
      * @return  static  Return self to support chaining.
      */

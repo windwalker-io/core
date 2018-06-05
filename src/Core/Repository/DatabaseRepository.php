@@ -6,16 +6,16 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Model;
+namespace Windwalker\Core\Repository;
 
-use Windwalker\Core\Model\Traits\DatabaseRepositoryTrait;
+use Windwalker\Core\Repository\Traits\DatabaseRepositoryTrait;
 
 /**
- * The ModelRepository class.
+ * The DatabaseRepository class.
  *
  * @since  3.0
  */
-class DatabaseModelRepository extends ModelRepository implements DatabaseRepositoryInterface
+class DatabaseRepository extends Repository implements DatabaseRepositoryInterface
 {
     use DatabaseRepositoryTrait;
 }

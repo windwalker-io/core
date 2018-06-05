@@ -6,7 +6,7 @@
  * @license    GNU Lesser General Public License version 3 or later. see LICENSE
  */
 
-namespace Windwalker\Core\Model;
+namespace Windwalker\Core\Repository;
 
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
@@ -16,13 +16,13 @@ use Windwalker\Core\Utilities\Classes\SingletonTrait;
 use Windwalker\Structure\Structure;
 
 /**
- * Class DatabaseModel
+ * Class Repository
  *
  * @property-read  Structure $config  Config object.
  *
  * @since 1.0
  */
-class ModelRepository implements \ArrayAccess
+class Repository implements \ArrayAccess
 {
     use BootableTrait;
     use SingletonTrait;
@@ -120,7 +120,7 @@ class ModelRepository implements \ArrayAccess
         $allow = false;
 
         foreach ($this->magicMethodPrefix as $prefix) {
-            if (substr($name, 0, strlen($prefix)) == $prefix) {
+            if (0 === strpos($name, $prefix)) {
                 $allow = true;
 
                 break;
@@ -128,7 +128,7 @@ class ModelRepository implements \ArrayAccess
         }
 
         if (!$allow) {
-            throw new \BadMethodCallException(sprintf("Method %s::%s not found.", get_called_class(), $name));
+            throw new \BadMethodCallException(sprintf('Method %s::%s not found.', static::class, $name));
         }
 
         return null;
@@ -162,6 +162,7 @@ class ModelRepository implements \ArrayAccess
      * Method to get property Name
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public function getName()
     {
@@ -170,7 +171,7 @@ class ModelRepository implements \ArrayAccess
                 return $this->name = $this->config['name'];
             }
 
-            $ref = new \ReflectionClass(get_called_class());
+            $ref = new \ReflectionClass(static::class);
 
             $name = substr($ref->getShortName(), 0, -5);
 
@@ -203,7 +204,7 @@ class ModelRepository implements \ArrayAccess
      */
     public function getCacheId($id = null)
     {
-        $id = $id . serialize($this->state->toArray());
+        $id .= serialize($this->state->toArray());
 
         return sha1($id);
     }
@@ -391,11 +392,11 @@ class ModelRepository implements \ArrayAccess
      *
      * @param string $name
      *
-     * @return  Structure
+     * @return  mixed
      */
     public function __get($name)
     {
-        if ($name == 'config') {
+        if ($name === 'config') {
             return $this->config;
         }
 

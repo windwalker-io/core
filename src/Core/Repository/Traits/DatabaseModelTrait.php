@@ -6,10 +6,10 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Model\Traits;
+namespace Windwalker\Core\Repository\Traits;
 
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
@@ -29,11 +29,11 @@ trait DatabaseModelTrait
     /**
      * bootDatabaseModelTrait
      *
-     * @param ModelRepository $model
+     * @param Repository $model
      *
      * @return  void
      */
-    public function bootDatabaseModelTrait(ModelRepository $model)
+    public function bootDatabaseModelTrait(Repository $model)
     {
         // Prepare DB
         $this->getDb();

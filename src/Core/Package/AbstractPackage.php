@@ -20,7 +20,6 @@ use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Security\CsrfGuard;
-use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -205,11 +204,10 @@ class AbstractPackage implements DispatcherAwareInterface
 
         // @event: onPackageBeforeExecute
         $this->getDispatcher()->triggerEvent('onPackageBeforeExecute', [
-                'package' => $this,
-                'controller' => &$controller,
-                'task' => $controller,
-            ]
-        );
+            'package' => $this,
+            'controller' => &$controller,
+            'task' => $controller,
+        ]);
 
         $result = $controller->execute();
 
@@ -217,11 +215,10 @@ class AbstractPackage implements DispatcherAwareInterface
 
         // @event: onPackageAfterExecute
         $this->getDispatcher()->triggerEvent('onPackageAfterExecute', [
-                'package' => $this,
-                'controller' => $controller,
-                'result' => &$result,
-            ]
-        );
+            'package' => $this,
+            'controller' => $controller,
+            'result' => &$result
+        ]);
 
         $response = $controller->getResponse();
 
@@ -329,7 +326,7 @@ class AbstractPackage implements DispatcherAwareInterface
         $defaultOptions = [
             'class' => '',
             'priority' => ListenerPriority::NORMAL,
-            'enabled' => true,
+            'enabled' => true
         ];
 
         foreach ($listeners as $name => $listener) {
@@ -740,7 +737,7 @@ class AbstractPackage implements DispatcherAwareInterface
             'input' => 'input',
             'dispatcher' => 'dispatcher',
             'csrf' => 'security.csrf',
-            'router' => 'router',
+            'router' => 'router'
         ];
 
         if (isset($diMapping[$name])) {

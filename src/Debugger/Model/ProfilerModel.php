@@ -8,7 +8,7 @@
 
 namespace Windwalker\Debugger\Model;
 
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\PageRecordHelper;
@@ -18,7 +18,7 @@ use Windwalker\Debugger\Helper\PageRecordHelper;
  *
  * @since  2.1.1
  */
-class ProfilerModel extends ModelRepository
+class ProfilerModel extends Repository
 {
     /**
      * getItem

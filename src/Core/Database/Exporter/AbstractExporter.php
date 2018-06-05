@@ -8,15 +8,15 @@
 
 namespace Windwalker\Core\Database\Exporter;
 
-use Windwalker\Core\Model\ModelRepository;
-use Windwalker\Core\Model\Traits\DatabaseModelTrait;
+use Windwalker\Core\Repository\Repository;
+use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
 
 /**
  * The AbstractExporter class.
  *
  * @since  2.1.1
  */
-abstract class AbstractExporter extends ModelRepository
+abstract class AbstractExporter extends Repository
 {
     use DatabaseModelTrait;
 

@@ -8,11 +8,11 @@
 
 namespace Windwalker\Core\View;
 
-use Windwalker\Core\Model\ModelRepository;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
@@ -22,9 +22,10 @@ use Windwalker\Structure\Structure;
 /**
  * The AbstractView class.
  *
- * @property-read  ViewModel|mixed $model   The ViewModel object.
- * @property-read  Structure       $config  Config object.
- * @property-read  PackageRouter   $router  Router object.
+ * @property-read  ViewModel|mixed $repository   The ViewModel object.
+ * @property-read  ViewModel|mixed $model        The ViewModel object.
+ * @property-read  Structure       $config       Config object.
+ * @property-read  PackageRouter   $router       Router object.
  *
  * @since  2.1.5.3
  */
@@ -70,7 +71,7 @@ abstract class AbstractView implements \ArrayAccess
      *
      * @var ViewModel
      */
-    protected $model;
+    protected $repository;
 
     /**
      * Property booted.
@@ -87,8 +88,8 @@ abstract class AbstractView implements \ArrayAccess
      */
     public function __construct($data = null, $config = null)
     {
-        $this->config = $config instanceof Structure ? $config : new Structure($config);
-        $this->model  = new ViewModel;
+        $this->config     = $config instanceof Structure ? $config : new Structure($config);
+        $this->repository = new ViewModel;
 
         $this->setData($data);
 
@@ -155,10 +156,9 @@ abstract class AbstractView implements \ArrayAccess
         $dispatcher = $this->getPackage()->getDispatcher();
 
         $dispatcher->triggerEvent('onViewAfterHandleData', [
-                'data' => &$data,
-                'view' => $this,
-            ]
-        );
+            'data' => &$data,
+            'view' => $this
+        ]);
 
         return $this;
     }
@@ -245,21 +245,19 @@ abstract class AbstractView implements \ArrayAccess
         $dispatcher = $this->getPackage()->getDispatcher();
 
         $dispatcher->triggerEvent('onViewBeforeRender', [
-                'data' => $this->data,
-                'view' => $this,
-            ]
-        );
+            'data' => $this->data,
+            'view' => $this
+        ]);
 
         $output = $this->doRender($data);
 
         $output = $this->postRender($output);
 
         $dispatcher->triggerEvent('onViewAfterRender', [
-                'data' => $this->data,
-                'view' => $this,
-                'output' => &$output,
-            ]
-        );
+            'data' => $this->data,
+            'view' => $this,
+            'output' => &$output
+        ]);
 
         return $output;
     }
@@ -295,9 +293,9 @@ abstract class AbstractView implements \ArrayAccess
         try {
             return (string) $this->render();
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_ERROR);
+            trigger_error($e->getMessage(), E_USER_ERROR);
         } catch (\Throwable $e) {
-            trigger_error($e->getMessage(), E_ERROR);
+            trigger_error($e->getMessage(), E_USER_ERROR);
         }
     }
 
@@ -497,8 +495,8 @@ abstract class AbstractView implements \ArrayAccess
             return $this->config;
         }
 
-        if ($name === 'model') {
-            return $this->model;
+        if ($name === 'model' || $name === 'repository') {
+            return $this->repository;
         }
 
         if ($name === 'router') {
@@ -513,24 +511,24 @@ abstract class AbstractView implements \ArrayAccess
      *
      * @param  string $name
      *
-     * @return ModelRepository
+     * @return Repository
      */
-    public function getModel($name = null)
+    public function getRepository($name = null)
     {
-        return $this->model->getModel($name);
+        return $this->repository->getModel($name);
     }
 
     /**
      * Method to set property model
      *
-     * @param   ModelRepository $model
-     * @param   bool            $default
-     * @param   callable        $handler
-     * @param   string          $customName
+     * @param   Repository $model
+     * @param   bool       $default
+     * @param   callable   $handler
+     * @param   string     $customName
      *
      * @return static Return self to support chaining.
      */
-    public function setModel(ModelRepository $model, $default = null, $handler = null, $customName = null)
+    public function setRepository(Repository $model, $default = null, callable $handler = null, $customName = null)
     {
         // B/C
         if (is_string($handler)) {
@@ -539,7 +537,7 @@ abstract class AbstractView implements \ArrayAccess
             $handler($model, $this);
         }
 
-        $this->model->setModel($model, $default, $customName);
+        $this->repository->setModel($model, $default, $customName);
 
         return $this;
     }
@@ -547,14 +545,14 @@ abstract class AbstractView implements \ArrayAccess
     /**
      * Method to add model with name.
      *
-     * @param string          $name
-     * @param ModelRepository $model
-     * @param callable        $handler
-     * @param string          $default
+     * @param string        $name
+     * @param Repository    $model
+     * @param callable|bool $handler
+     * @param string        $default
      *
-     * @return static Return self to support chaining.
+     * @return  static  Return self to support chaining.
      */
-    public function addModel($name, ModelRepository $model, $handler = null, $default = null)
+    public function addRepository($name, Repository $model, callable $handler = null, $default = null)
     {
         // B/C
         if (is_bool($handler)) {
@@ -563,23 +561,87 @@ abstract class AbstractView implements \ArrayAccess
             $handler($model, $this);
         }
 
-        $this->setModel($model, $default, $handler, $name);
+        $this->repository->setModel($model, $default, $name);
 
         return $this;
     }
 
     /**
-     * Configure a model by name alias.
+     * removeModel
      *
-     * @param string|callable $name    The name alias of model, keep NULL as default model.
-     *                                 Or just send a callable here as handler.
-     * @param callable        $handler The callback handler.
+     * @param string $name
      *
      * @return  static
      */
-    public function configureModel($name, $handler = null)
+    public function removeRepository($name)
     {
-        $this->pipe($name, $handler);
+        $this->repository->removeModel($name);
+
+        return $this;
+    }
+
+    /**
+     * Method to get property Model
+     *
+     * @param  string $name
+     *
+     * @return Repository
+     *
+     * @deprecated use repository instead.
+     */
+    public function getModel($name = null)
+    {
+        return $this->getRepository($name);
+    }
+
+    /**
+     * Method to set property model
+     *
+     * @param   Repository $model
+     * @param   bool       $default
+     * @param   string     $customName
+     *
+     * @return static Return self to support chaining.
+     *
+     * @deprecated use repository instead.
+     */
+    public function setModel(Repository $model, $default = null, $customName = null)
+    {
+        $this->setRepository($model, $default, $customName);
+
+        return $this;
+    }
+
+    /**
+     * Method to add model with name.
+     *
+     * @param string     $name
+     * @param Repository $model
+     * @param string     $default
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @deprecated use repository instead.
+     */
+    public function addModel($name, Repository $model, $default = null)
+    {
+        $this->addRepository($name, $model, $default);
+
+        return $this;
+    }
+
+    /**
+     * removeModel
+     *
+     * @param string $name
+     *
+     * @return  static
+     *
+     * @deprecated use repository instead.
+     */
+    public function removeModel($name)
+    {
+        $this->removeRepository($name);
 
         return $this;
     }
@@ -620,20 +682,6 @@ abstract class AbstractView implements \ArrayAccess
         }
 
         $handler($this->getModel($name), $this->getData());
-
-        return $this;
-    }
-
-    /**
-     * removeModel
-     *
-     * @param string $name
-     *
-     * @return  static
-     */
-    public function removeModel($name)
-    {
-        $this->model->removeModel($name);
 
         return $this;
     }

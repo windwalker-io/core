@@ -11,7 +11,7 @@ namespace Windwalker\Debugger\Listener;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Ioc;
-use Windwalker\Core\Model\ModelRepository;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
 use Windwalker\Data\Data;
@@ -105,7 +105,7 @@ class DebuggerListener
             return;
         }
 
-        /** @var ModelRepository $model */
+        /** @var Repository $model */
         $model = $controller->getModel('Dashboard');
 
         if ($input->get('refresh')) {

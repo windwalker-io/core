@@ -6,7 +6,7 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace Windwalker\Core\Model;
+namespace Windwalker\Core\Repository;
 
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DataMapper\DataMapper;
