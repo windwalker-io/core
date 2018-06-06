@@ -140,6 +140,7 @@ class MvcResolver
     public function addNamespace($namespace, $priority = PriorityQueue::NORMAL)
     {
         $this->controllerResolver->addNamespace($namespace . '\Controller', $priority);
+        $this->repositoryResolver->addNamespace($namespace . '\Repository', $priority);
         $this->repositoryResolver->addNamespace($namespace . '\Model', $priority);
         $this->viewResolver->addNamespace($namespace . '\View', $priority);
 

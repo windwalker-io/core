@@ -20,6 +20,7 @@ use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Security\CsrfGuard;
+use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Event\DispatcherAwareInterface;
@@ -193,6 +194,8 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param callable $next
      *
      * @return Response
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function dispatch(Request $request, Response $response, $next = null)
     {
@@ -248,8 +251,11 @@ class AbstractPackage implements DispatcherAwareInterface
      */
     public function executeTask($task, $input = null)
     {
-        return $this->execute($this->getController($task, $input), $this->app->request,
-            new \Windwalker\Http\Response\Response);
+        return $this->execute(
+            $this->getController($task, $input),
+            $this->app->request,
+            new \Windwalker\Http\Response\Response
+        );
     }
 
     /**
@@ -279,6 +285,8 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param Container $container
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function registerProviders(Container $container)
     {
@@ -318,6 +326,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param DispatcherInterface $dispatcher
      *
      * @return  void
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function registerListeners(DispatcherInterface $dispatcher)
     {
@@ -401,6 +410,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * getMiddlewareChain
      *
      * @return  Psr7ChainBuilder
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function getMiddlewareChain()
     {
@@ -455,6 +465,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param   Structure $config
      *
      * @return  static
+     * @throws \ReflectionException
      */
     public function loadConfig(Structure $config)
     {
@@ -563,10 +574,11 @@ class AbstractPackage implements DispatcherAwareInterface
      * getFile
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public function getFile()
     {
-        $ref = new \ReflectionClass(get_called_class());
+        $ref = new \ReflectionClass(static::class);
 
         return $ref->getFileName();
     }
@@ -575,6 +587,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * getDir
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public function getDir()
     {
@@ -744,15 +757,15 @@ class AbstractPackage implements DispatcherAwareInterface
             return $this->getContainer()->get($diMapping[$name]);
         }
 
-        if ($name == 'container') {
+        if ($name === 'container') {
             return $this->getContainer();
         }
 
-        if ($name == 'config') {
+        if ($name === 'config') {
             return $this->getConfig();
         }
 
-        if ($name == 'name') {
+        if ($name === 'name') {
             return $this->getName();
         }
 
