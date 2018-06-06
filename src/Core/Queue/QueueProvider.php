@@ -8,9 +8,9 @@
 
 namespace Windwalker\Core\Queue;
 
-use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Job\JobInterface;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\Worker;

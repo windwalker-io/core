@@ -10,6 +10,7 @@ namespace Windwalker\Core\Queue;
 
 use Pheanstalk\Pheanstalk;
 use Windwalker\Core\Config\Config;
+use Windwalker\DI\Container;
 use Windwalker\Queue\Driver\BeanstalkdQueueDriver;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Driver\IronmqQueueDriver;
@@ -24,7 +25,6 @@ use Windwalker\Queue\Failer\DatabaseQueueFailer;
 use Windwalker\Queue\Failer\NullQueueFailer;
 use Windwalker\Queue\Failer\PdoQueueFailer;
 use Windwalker\Queue\Failer\QueueFailerInterface;
-use Windwalker\DI\Container;
 use Windwalker\Queue\Queue;
 use Windwalker\Structure\Structure;
 

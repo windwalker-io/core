@@ -8,8 +8,8 @@
 
 namespace Windwalker\Debugger\Repository;
 
-use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Object\NullObject;
+use Windwalker\Core\Repository\Repository;
 use Windwalker\Data\Data;
 use Windwalker\Debugger\Helper\PageRecordHelper;
 
