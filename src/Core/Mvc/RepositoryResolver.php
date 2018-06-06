@@ -45,7 +45,7 @@ class RepositoryResolver extends AbstractClassResolver
     {
         parent::__construct($package, $container, $namespaces);
 
-        $this->modelResolver = new ModelResolver($package, $container, $namespaces);
+        $this->modelResolver = new ModelResolver($package, $container, $namespaces, $this);
     }
 
     /**
@@ -83,12 +83,21 @@ class RepositoryResolver extends AbstractClassResolver
             if (substr($name, -10) === 'Repository') {
                 $name = substr($name, 0, -10);
                 $name .= 'Model';
-            }
 
-            try {
-                return $this->modelResolver->resolve($name);
-            } catch (\DomainException $ex) {
-                throw $e;
+                try {
+                    return parent::resolve($name);
+                } catch (\DomainException $ex) {
+                    throw new \DomainException($e->getMessage(), $e->getCode(), $e);
+                }
+            } elseif (substr($name, -5) === 'Model') {
+                $name = substr($name, 0, -5);
+                $name .= 'Repository';
+
+                try {
+                    return parent::resolve($name);
+                } catch (\DomainException $ex) {
+                    throw new \DomainException($e->getMessage(), $e->getCode(), $e);
+                }
             }
         }
     }

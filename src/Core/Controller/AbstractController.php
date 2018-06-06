@@ -525,7 +525,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
                     } catch (\DomainException $e) {
                         // Use ModelResolver to get legacy Model classes
                         // @deprecated
-                        $repoResolver->getModelResolver()->resolve($modelName);
+                        $class = $repoResolver->getModelResolver()->resolve($modelName);
                     }
 
                     // Create object by container, container will auto inject all necessary dependencies
