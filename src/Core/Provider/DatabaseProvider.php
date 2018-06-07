@@ -48,6 +48,8 @@ class DatabaseProvider implements ServiceProviderInterface
 
             $db = DatabaseFactory::getDbo($option['driver'], $option);
 
+            $db->setDebug($config->get('system.debug', false));
+
             if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true)) {
                 $this->strictMode($db);
             }

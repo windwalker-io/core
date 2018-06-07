@@ -186,6 +186,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param string                    $package The package for this controller, can be string or AbstractPackage.
      *
      * @return mixed
+     * @throws \Throwable
      */
     public function hmvc($task, $input = null, $package = null)
     {
@@ -698,6 +699,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param int $backwards
      *
      * @return AbstractPackage
+     * @throws \ReflectionException
      */
     public function getPackage($backwards = 4)
     {
@@ -748,6 +750,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param   AbstractPackage $package
      *
      * @return  static  Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function setPackage(AbstractPackage $package)
     {
@@ -764,6 +767,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * registerMiddlewares
      *
      * @return  ChainBuilder
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function getMiddlewareChain()
     {
@@ -790,6 +794,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * Method to get property Container
      *
      * @return  Container
+     * @throws \ReflectionException
      */
     public function getContainer()
     {
@@ -821,6 +826,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @return  WebApplication
      * @throws \UnexpectedValueException
+     * @throws \ReflectionException
      */
     public function getApplication()
     {
@@ -883,7 +889,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
     public function getName($backwards = 2)
     {
         if (!$this->name) {
-            $this->name = MvcHelper::guessName(get_called_class(), $backwards);
+            $this->name = MvcHelper::guessName(static::class, $backwards);
         }
 
         return $this->name;
@@ -951,6 +957,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @throws \UnexpectedValueException
      *
      * @since   2.0
+     * @throws \ReflectionException
      */
     public function triggerEvent($event, $args = [])
     {
