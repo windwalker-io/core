@@ -30,6 +30,7 @@ use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
+use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Structure\Structure;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
@@ -103,8 +104,9 @@ class AbstractPackage implements DispatcherAwareInterface
     /**
      * initialise
      *
-     * @throws  \LogicException
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function boot()
     {
@@ -151,7 +153,11 @@ class AbstractPackage implements DispatcherAwareInterface
 
             $input = $input ?: $container->get('input');
 
-            $controller = $resolver->create($task, $input, $this, $container);
+            try {
+                $controller = $resolver->create($task, $input, $this, $container);
+            } catch (\DomainException $e) {
+                throw new RouteNotFoundException($e->getMessage(), 404, $e);
+            }
 
             $container->share($key, $controller);
         }
@@ -168,6 +174,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param bool                      $hmvc
      *
      * @return Response
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function execute($controller, Request $request, Response $response, $hmvc = false)
     {
@@ -248,6 +255,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param array|Input               $input
      *
      * @return  Response
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function executeTask($task, $input = null)
     {
@@ -698,6 +706,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @return  Structure
      *
      * @since   2.1
+     * @throws \ReflectionException
      */
     public function getConfig()
     {
@@ -742,6 +751,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param string $name
      *
      * @return  mixed
+     * @throws \ReflectionException
      */
     public function __get($name)
     {
