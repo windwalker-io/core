@@ -75,8 +75,33 @@ if (!function_exists('date_compare')) {
      * @param string                    $operator
      *
      * @return  bool|int
+     *
+     * @since  3.3
      */
     function date_compare($date1, $date2, $operator = null) {
         return Chronos::compare($date1, $date2, $operator);
+    }
+}
+
+if (!function_exists('html_escape')) {
+    /**
+     * html_escape
+     *
+     * @param string $string
+     * @param bool   $nl2br
+     * @param bool   $doubleEncode
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function html_escape($string, $nl2br = false, $doubleEncode = true) {
+        $string = htmlspecialchars($string, ENT_QUOTES, 'UTF-8', $doubleEncode);
+
+        if ($nl2br) {
+            $string = nl2br($string);
+        }
+
+        return $string;
     }
 }
