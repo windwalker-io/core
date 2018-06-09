@@ -45,10 +45,12 @@ class NullDataMapper extends DataMapper
      * @param   integer $start       Limit start number.
      * @param   integer $limit       Limit rows.
      *
+     * @param null      $key
+     *
      * @return  mixed|DataSet Found rows data set.
      * @since   2.0
      */
-    public function find($conditions = [], $order = null, $start = null, $limit = null)
+    public function find($conditions = [], $order = null, $start = null, $limit = null, $key = null)
     {
         $class = $this->getDatasetClass();
 
@@ -69,7 +71,7 @@ class NullDataMapper extends DataMapper
      *
      * @return mixed|DataSet Found rows data set.
      */
-    public function findAll($order = null, $start = null, $limit = null)
+    public function findAll($order = null, $start = null, $limit = null, $key = null)
     {
         $class = $this->getDatasetClass();
 
@@ -120,7 +122,7 @@ class NullDataMapper extends DataMapper
      *
      * @throws \InvalidArgumentException
      */
-    public function findColumn($column, $conditions = [], $order = null, $start = null, $limit = null)
+    public function findColumn($column, $conditions = [], $order = null, $start = null, $limit = null, $key = null)
     {
         return [];
     }
