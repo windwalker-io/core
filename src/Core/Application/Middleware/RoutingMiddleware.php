@@ -218,13 +218,10 @@ class RoutingMiddleware extends AbstractWebMiddleware
         $input     = $this->app->input;
 
         // Save to input & ServerRequest
-        foreach ($variables as $name => $value) {
-            $input->def($name, UriHelper::decode($value));
-            // Don't forget to do an explicit set on the GET superglobal.
-            $input->get->def($name, UriHelper::decode($value));
-
-            $request = $request->withAttribute($name, UriHelper::decode($value));
-        }
+        $input->merge($variables, true);
+        // Don't forget to do an explicit set on the GET superglobal.
+        $input->get->merge($variables, true);
+        $request = $request->withQueryParams($input->get->getRawData());
 
         $this->app->server->setRequest($request);
 
