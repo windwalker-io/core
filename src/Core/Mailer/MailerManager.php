@@ -75,14 +75,20 @@ class MailerManager
      * send
      *
      * @param MailMessage|callable $message
+     * @param array                $options
      *
      * @return  boolean
      *
-     * @throws \InvalidArgumentException
      */
-    public function send($message)
+    public function send($message, array $options = [])
     {
-        if (is_callable($message)) {
+        $config = Ioc::getConfig();
+
+        if (empty($options['force']) && !$config->get('mail.enabled', false)) {
+            return true;
+        }
+
+        if (\is_callable($message)) {
             $msgObject = $this->createMessage();
 
             $message = $message($msgObject, $this);
@@ -103,7 +109,7 @@ class MailerManager
 
         // Set default sender
         if (!$message->getFrom()) {
-            $config = Ioc::getConfig();
+
 
             if ($config->exists('mail.from.email')) {
                 $message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
@@ -155,30 +161,6 @@ class MailerManager
     public function setAdapter(MailerAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
-
-        return $this;
-    }
-
-    /**
-     * Method to get property Messages
-     *
-     * @return  \callable[]
-     */
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
-    /**
-     * Method to set property messages
-     *
-     * @param   \callable[] $messages
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMessages($messages)
-    {
-        $this->messages = $messages;
 
         return $this;
     }

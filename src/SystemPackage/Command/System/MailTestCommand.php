@@ -9,6 +9,7 @@
 namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailMessage;
 
@@ -34,6 +35,24 @@ class MailTestCommand extends CoreCommand
     protected $description = 'This command will send a test mail by your mail settings.';
 
     /**
+     * init
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function init()
+    {
+        $this->addOption('m')
+            ->alias('message')
+            ->description('Message to add to mail body.');
+
+        $this->addOption('s')
+            ->alias('subject')
+            ->description('Mail subject title.');
+    }
+
+    /**
      * Execute this command.
      *
      * @return int
@@ -43,13 +62,14 @@ class MailTestCommand extends CoreCommand
      */
     protected function doExecute()
     {
+        $custom = $this->getOption('message', '');
+        $subject = $this->getOption('subject');
+
         $to = $this->getArgument(0, $this->console->get('mail.from.email'));
 
         if (!$to) {
             throw new \InvalidArgumentException('Please add email to your mail settings.');
         }
-
-        $custom = $this->getOption('c', '');
 
         if ($custom) {
             $custom = '<p><strong>Custom message:</strong> ' . $custom . '</p>';
@@ -58,11 +78,16 @@ class MailTestCommand extends CoreCommand
         $body = sprintf($this->getBody(), $custom);
 
         try {
-            Mailer::send(function (MailMessage $message) use ($to, $body) {
-                $message->subject('Test Message from Windwalker')
+            $this->out('Sending...');
+
+            Mailer::send(function (MailMessage $message) use ($to, $body, $subject) {
+                $title = 'Test Message from Windwalker' . ($subject ? ': ' . $subject : '')
+                    . ' - ' . Chronos::toLocalTime('now', 'Y-m-d H:i:s');
+
+                $message->subject($title)
                     ->to($to)
                     ->body($body);
-            });
+            }, ['force' => true]);
         } catch (\Exception $e) {
             $this->out('<error>[ERROR] Send mail failure.</error>')
                 ->out()
