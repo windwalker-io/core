@@ -87,12 +87,13 @@ class ErrorManager
      * down
      *
      * @return  void
+     * @throws \ErrorException
      */
     public function down()
     {
         $error = error_get_last();
 
-        if ($error['type'] == E_ERROR) {
+        if ($error['type'] === E_ERROR) {
             $this->error(...array_values($error));
         }
     }
@@ -125,7 +126,7 @@ class ErrorManager
             $e = new \Exception;
         }
 
-        throw new \ErrorException($content, $code, E_ERROR, $file, $line, $e);
+        throw new \ErrorException($content, 500, $code, $file, $line, $e);
     }
 
     /**
@@ -148,17 +149,17 @@ class ErrorManager
 
             if ($this->app->get('system.debug')) {
                 exit($msg);
-            } else {
-                exit($e->getMessage());
             }
+
+            exit($e->getMessage());
         } catch (\Exception $e) {
             $msg = "Infinity loop in exception handler. \nException:\n" . $e;
 
             if ($this->app->get('system.debug')) {
                 exit($msg);
-            } else {
-                exit($e->getMessage());
             }
+
+            exit($e->getMessage());
         }
 
         exit();
@@ -211,7 +212,7 @@ class ErrorManager
      */
     public function setErrorTemplate($errorTemplate, $engine = null)
     {
-        if (!is_string($errorTemplate)) {
+        if (!\is_string($errorTemplate)) {
             throw new \InvalidArgumentException('Please use string as template name (Example: "folder.file").');
         }
 
