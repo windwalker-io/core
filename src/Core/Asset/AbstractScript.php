@@ -195,6 +195,25 @@ abstract class AbstractScript
     }
 
     /**
+     * wrapFunction
+     *
+     * @param string $body
+     * @param string $interface
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function wrapFunction($body, $interface = '')
+    {
+        return <<<JS
+\\function ($interface) {
+    $body
+}
+JS;
+    }
+
+    /**
      * mergeOptions
      *
      * @param array $options1
