@@ -297,6 +297,8 @@ abstract class AbstractView implements \ArrayAccess
         } catch (\Throwable $e) {
             trigger_error($e->getMessage(), E_USER_ERROR);
         }
+
+        return (string) $e;
     }
 
     /**
@@ -367,14 +369,14 @@ abstract class AbstractView implements \ArrayAccess
                 return $this->name = $this->config['name'];
             }
 
-            $class = get_called_class();
+            $class = static::class;
 
             // If we are using this class as default view, return default name.
             if ($class === HtmlView::class) {
                 return $this->name = 'default';
             }
 
-            $this->name = MvcHelper::guessName(get_called_class(), $backwards);
+            $this->name = MvcHelper::guessName(static::class, $backwards);
         }
 
         return $this->name;
@@ -429,6 +431,7 @@ abstract class AbstractView implements \ArrayAccess
      * @param   AbstractPackage $package
      *
      * @return  static  Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function setPackage(AbstractPackage $package)
     {
@@ -681,7 +684,7 @@ abstract class AbstractView implements \ArrayAccess
             $name    = null;
         }
 
-        $handler($this->getModel($name), $this->getData());
+        $handler($this->getRepository($name), $this->getData());
 
         return $this;
     }

@@ -32,7 +32,7 @@ trait LayoutRenderableTrait
     /**
      * Property renderer.
      *
-     * @var  AbstractRenderer
+     * @var  string|AbstractRenderer
      */
     protected $renderer;
 
