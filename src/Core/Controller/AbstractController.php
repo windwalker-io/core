@@ -140,6 +140,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param Input           $input
      * @param AbstractPackage $package
      * @param Container       $container
+     *
+     * @throws \ReflectionException
      */
     public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
     {
@@ -358,10 +360,11 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @return string
      * @throws \LogicException
+     * @throws \Exception
      */
     public function renderView($view, $layout = 'default', $engine = 'php', array $data = [])
     {
-        if (is_string($view)) {
+        if (\is_string($view)) {
             $view = class_exists($view) ? new $view : $this->getView($view, 'html', $engine);
         }
 
@@ -469,10 +472,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
                         $config['name'] = $name;
 
                         return new HtmlView([], $config, $engine);
-                    } // Otherwise we throw exception to notice developers that they did something wrong.
-                    else {
-                        throw $e;
                     }
+
+                    // Otherwise we throw exception to notice developers that they did something wrong.
+                    throw $e;
                 }
             });
         }
