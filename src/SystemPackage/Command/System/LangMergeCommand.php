@@ -41,7 +41,7 @@ class LangMergeCommand extends CoreCommand
      *
      * @var string
      */
-    protected $usage = '%s <file> [<lang_code>] [<origin_lang_code>] [-p=package]';
+    protected $usage = '%s <file> [<lang_code>] [<origin_lang_code>] [-p=package] [-r|--replace]';
 
     /**
      * Initialise command.
@@ -79,6 +79,7 @@ class LangMergeCommand extends CoreCommand
      *
      * @since  3.2.8
      * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     protected function doExecute()
     {
@@ -90,15 +91,15 @@ class LangMergeCommand extends CoreCommand
             throw new WrongArgumentException('Please provide file name.');
         }
 
-        $package = null;
-        $name    = $this->getOption('p');
+        $package     = null;
+        $packageName = $this->getOption('p');
 
-        if ($name) {
+        if ($packageName) {
             $resolver = ConsoleHelper::getAllPackagesResolver();
-            $package  = $resolver->getPackage($name);
+            $package  = $resolver->getPackage($packageName);
 
             if (!$package) {
-                throw new \RuntimeException('Package: ' . $name . ' not found.');
+                throw new \RuntimeException('Package: ' . $packageName . ' not found.');
             }
         }
 
@@ -122,26 +123,35 @@ class LangMergeCommand extends CoreCommand
         $fromData = $structure->loadFile($fromFile, 'ini', ['processSections' => !$flat]);
 
         if (is_file($toFile)) {
-            $structure->loadFile($toFile, 'ini', ['processSections' => !$flat]);
+            $structure->loadFile($toFile, 'ini', ['processSections' => !$flat, 'only_exists' => true]);
         }
 
         $data = $structure->toArray();
 
         if ($sort) {
             foreach ($data as $k => &$v) {
-                if (is_array($v)) {
+                if (\is_array($v)) {
                     ksort($v);
                 }
             }
+
+            unset($v);
+
+            ksort($data);
         }
 
         $data = IniFormat::structToString($data);
+        $replace = $this->getOption('r');
 
-        $dest = $this->getOption('r') ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
+        $dest = $replace ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
 
         File::write($dest, $data);
 
-        $this->out(sprintf('File created: <info>%s</info>', $dest));
+        $this->out()->out(sprintf('File created: <info>%s</info>', $dest));
+
+        if (!$replace) {
+            $this->out()->out('(You can use -r|--replace to just override language file instead save to tmp.)');
+        }
 
         return true;
     }
