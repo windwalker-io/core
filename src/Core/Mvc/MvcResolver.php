@@ -94,8 +94,6 @@ class MvcResolver
      *
      * @return  false|string
      *
-     * @since  __DEPLOY_VERSION__
-     *
      * @deprecated  Use resolveRepository() instead.
      */
     public function resolveModel($package, $name)

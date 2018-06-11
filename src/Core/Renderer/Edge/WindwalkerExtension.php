@@ -270,7 +270,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function attr($expression)
     {
@@ -283,6 +283,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
      * @param string $expression
      *
      * @return  string
+     *
+     * @since  3.3
      */
     public function shown($expression)
     {
@@ -295,6 +297,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
      * @param string $expression
      *
      * @return  string
+     *
+     * @since   3.3
      */
     public function dd($expression)
     {
@@ -307,6 +311,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
      * @param string $expression
      *
      * @return  string
+     *
+     * @since   3.3
      */
     public function dead($expression)
     {
@@ -319,6 +325,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
      * @param string $expression
      *
      * @return  string
+     *
+     * @since  3.3
      */
     public function debug($expression)
     {

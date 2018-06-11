@@ -206,7 +206,9 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  AssetManager
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
+     *
+     * @deprecated  HTML imports has been deprecated.
      */
     public function import($url, array $options = [], array $attribs = [])
     {
@@ -257,7 +259,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  bool|string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public function exists($uri, $strict = false)
     {

@@ -16,7 +16,7 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 /**
  * The RepositoryResolver class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.4
  */
 class RepositoryResolver extends AbstractClassResolver
 {

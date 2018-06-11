@@ -93,7 +93,7 @@ if (!function_exists('html_escape')) {
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4
      */
     function html_escape($string, $nl2br = false, $doubleEncode = true) {
         $string = htmlspecialchars($string, ENT_QUOTES, 'UTF-8', $doubleEncode);

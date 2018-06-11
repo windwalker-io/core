@@ -157,7 +157,7 @@ abstract class AbstractScript
      *
      * @return  bool|string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     protected static function exists($uri, $strict = false)
     {
@@ -202,7 +202,7 @@ abstract class AbstractScript
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4
      */
     public static function wrapFunction($body, $interface = '')
     {

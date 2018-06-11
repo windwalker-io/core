@@ -145,7 +145,7 @@ class LangMergeCommand extends CoreCommand
 
         $dest = $replace ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
 
-        File::write($dest, $data);
+        File::write($dest, rtrim($data) . "\n");
 
         $this->out()->out(sprintf('File created: <info>%s</info>', $dest));
 

@@ -13,7 +13,7 @@ use Windwalker\Dom\Builder\HtmlBuilder;
 /**
  * The EdgeHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.3
  */
 class EdgeHelper
 {
@@ -25,7 +25,7 @@ class EdgeHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.3
      */
     public static function attr($name, $value = null)
     {
