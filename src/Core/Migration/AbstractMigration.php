@@ -123,8 +123,6 @@ abstract class AbstractMigration
      */
     public function updateTable($name, callable $callback)
     {
-        $options = $this->prepareBCOptions($options);
-
         return $this->getTable($name)->update($callback);
     }
 
