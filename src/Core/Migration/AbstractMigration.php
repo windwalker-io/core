@@ -12,6 +12,7 @@ use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Database\Traits\DateFormatTrait;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Utilities\Arr;
 
 /**
  * The AbstractMigration class.
@@ -24,6 +25,9 @@ abstract class AbstractMigration
 
     const UP = 'up';
     const DOWN = 'down';
+
+    const CHARSET_UTF8 = 'utf8';
+    const CHARSET_UTF8MB4 = 'utf8mb4';
 
     /**
      * Property db.
@@ -45,6 +49,13 @@ abstract class AbstractMigration
      * @var string
      */
     protected $version;
+
+    /**
+     * Property defaultCharset.
+     *
+     * @var  string
+     */
+    public static $defaultCharset = self::CHARSET_UTF8MB4;
 
     /**
      * Class init.
@@ -97,6 +108,8 @@ abstract class AbstractMigration
      */
     public function createTable($name, callable $callback, $ifNotExists = true, $options = [])
     {
+        $options = $this->prepareBCOptions($options);
+
         return $this->getTable($name)->create($callback, $ifNotExists, $options);
     }
 
@@ -110,6 +123,8 @@ abstract class AbstractMigration
      */
     public function updateTable($name, callable $callback)
     {
+        $options = $this->prepareBCOptions($options);
+
         return $this->getTable($name)->update($callback);
     }
 
@@ -125,6 +140,8 @@ abstract class AbstractMigration
      */
     public function saveTable($name, callable $callback, $ifNotExists = true, $options = [])
     {
+        $options = $this->prepareBCOptions($options);
+
         return $this->getTable($name)->save($callback, $ifNotExists, $options);
     }
 
@@ -212,5 +229,26 @@ abstract class AbstractMigration
         $this->version = $version;
 
         return $this;
+    }
+
+    /**
+     * prepareBCOptions
+     *
+     * @param array $options
+     *
+     * @return  array
+     *
+     * @since  3.4.0.1
+     */
+    protected function prepareBCOptions(array $options)
+    {
+        $options = (array) Arr::def($options, 'charset', static::$defaultCharset);
+        $options = (array) Arr::def(
+            $options,
+            'collate',
+            static::$defaultCharset === static::CHARSET_UTF8 ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci'
+        );
+
+        return $options;
     }
 }
