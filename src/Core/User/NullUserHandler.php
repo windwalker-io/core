@@ -24,7 +24,7 @@ class NullUserHandler implements UserHandlerInterface
      */
     public function load($conditions)
     {
-        return new UserData;
+        return new UserData();
     }
 
     /**

@@ -358,7 +358,7 @@ class Widget implements \ArrayAccess
     public function getPackage()
     {
         if (!$this->package) {
-            $this->package = new NullPackage;
+            $this->package = new NullPackage();
         }
 
         return $this->package;
@@ -395,7 +395,7 @@ class Widget implements \ArrayAccess
             $this->renderer->reset();
         }
 
-        $this->renderer->setPaths(new PriorityQueue);
+        $this->renderer->setPaths(new PriorityQueue());
 
         return $this;
     }

@@ -90,7 +90,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface
             if ($container->get('config')->get('error.log', false)) {
                 $logger = $manager->createRotatingLogger('error', LogLevel::ERROR);
             } else {
-                $logger = new NullLogger;
+                $logger = new NullLogger();
             }
 
             $manager->addLogger('error', $logger);

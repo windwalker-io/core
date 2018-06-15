@@ -19,9 +19,13 @@ use Windwalker\Utilities\Arr;
 class StructureView extends AbstractView implements \JsonSerializable
 {
     const FORMAT_JSON = 'json';
+
     const FORMAT_XML = 'xml';
+
     const FORMAT_YAML = 'yaml';
+
     const FORMAT_INI = 'ini';
+
     const FORMAT_PHP = 'php';
 
     /**
@@ -87,7 +91,7 @@ class StructureView extends AbstractView implements \JsonSerializable
     public function getData()
     {
         if (!$this->data) {
-            $this->data = new Structure;
+            $this->data = new Structure();
         }
 
         return $this->data;

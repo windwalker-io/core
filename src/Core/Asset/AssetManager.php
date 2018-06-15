@@ -206,7 +206,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  AssetManager
      *
-     * @since  3.3
+     * @since       3.3
      *
      * @deprecated  HTML imports has been deprecated.
      */
@@ -254,8 +254,8 @@ class AssetManager implements DispatcherAwareInterface
     /**
      * Check asset uri exists in system and return actual path.
      *
-     * @param string $uri     The file uri to check.
-     * @param bool   $strict  Check .min file or un-min file exists again if input file not exists.
+     * @param string $uri    The file uri to check.
+     * @param bool   $strict Check .min file or un-min file exists again if input file not exists.
      *
      * @return  bool|string
      *
@@ -325,7 +325,7 @@ class AssetManager implements DispatcherAwareInterface
             }
 
             if (isset($style['options']['sri'])) {
-                $attribs['integrity'] = $style['options']['sri'];
+                $attribs['integrity']   = $style['options']['sri'];
                 $attribs['crossorigin'] = 'anonymous';
             }
 
@@ -378,7 +378,7 @@ class AssetManager implements DispatcherAwareInterface
             }
 
             if (isset($script['options']['sri'])) {
-                $attribs['integrity'] = $script['options']['sri'];
+                $attribs['integrity']   = $script['options']['sri'];
                 $attribs['crossorigin'] = 'anonymous';
             }
 
@@ -388,7 +388,7 @@ class AssetManager implements DispatcherAwareInterface
 
             if (isset($script['options']['import'])) {
                 $attribs['href'] = $attribs['src'];
-                $attribs['rel'] = 'import';
+                $attribs['rel']  = 'import';
                 unset($attribs['src']);
                 $html[] = (string) new HtmlElement('link', null, $attribs);
             } else {
@@ -803,7 +803,7 @@ class AssetManager implements DispatcherAwareInterface
     public function getTemplate()
     {
         if (!$this->template) {
-            return $this->template = new AssetTemplate;
+            return $this->template = new AssetTemplate();
         }
 
         return $this->template;

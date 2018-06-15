@@ -36,7 +36,6 @@ class PostgresqlExporter extends AbstractExporter
      */
     protected function getCreateTable($table)
     {
-
     }
 
     /**
@@ -48,6 +47,5 @@ class PostgresqlExporter extends AbstractExporter
      */
     protected function getInserts($table)
     {
-
     }
 }

@@ -32,6 +32,6 @@ abstract class AbstractConfigServiceProvider implements ServiceProviderInterface
      */
     public function __construct(Structure $config = null)
     {
-        $this->config = $config ?: new Structure;
+        $this->config = $config ?: new Structure();
     }
 }

@@ -78,7 +78,7 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
      */
     public function define(Form $form)
     {
-        $this->namespaces = new PriorityQueue;
+        $this->namespaces = new PriorityQueue();
         $this->namespaces->insert('Windwalker\Form\Field', PriorityQueue::NORMAL);
 
         $this->bootTraits($this);

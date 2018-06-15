@@ -278,7 +278,7 @@ class NullPackage extends AbstractPackage implements SilencerObjectInterface
     public function getConfig()
     {
         if (!$this->config) {
-            $this->config = new Structure;
+            $this->config = new Structure();
 
             $this->loadConfig($this->config);
         }

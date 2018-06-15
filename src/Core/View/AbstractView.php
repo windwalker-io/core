@@ -89,7 +89,7 @@ abstract class AbstractView implements \ArrayAccess
     public function __construct($data = null, $config = null)
     {
         $this->config     = $config instanceof Structure ? $config : new Structure($config);
-        $this->repository = new ViewModel;
+        $this->repository = new ViewModel();
 
         $this->setData($data);
 
@@ -181,7 +181,7 @@ abstract class AbstractView implements \ArrayAccess
     public function getData()
     {
         if (!$this->data) {
-            $this->data = new Data;
+            $this->data = new Data();
         }
 
         return $this->data;
@@ -416,7 +416,7 @@ abstract class AbstractView implements \ArrayAccess
 
             // If package not found, use NullPackage instead.
             if (!$this->package) {
-                $this->package = new NullPackage;
+                $this->package = new NullPackage();
 
                 $this->package->setName($name);
             }
@@ -462,7 +462,7 @@ abstract class AbstractView implements \ArrayAccess
     public function getConfig()
     {
         if (!$this->config) {
-            $this->config = new Structure;
+            $this->config = new Structure();
         }
 
         return $this->config;

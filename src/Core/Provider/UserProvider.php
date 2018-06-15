@@ -104,7 +104,7 @@ class UserProvider implements ServiceProviderInterface
      */
     public function authorisation(Container $container)
     {
-        $auth   = new Authorisation;
+        $auth   = new Authorisation();
         $config = $container->get('config');
 
         foreach ((array) $config->get('user.policies') as $name => $policy) {

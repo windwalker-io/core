@@ -6,155 +6,155 @@
  * @license    GNU General Public License version 2 or later.
  */
 
-namespace PHPSTORM_META
-{
-	$STATIC_METHOD_TYPES = [
-		\Windwalker\DI\Container::get('') => [
-			// System
-			'application' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
-			'app'         instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
-			'package.resolver' instanceof \Windwalker\Core\Package\PackageResolver,
-			'config' instanceof \Windwalker\Structure\Structure,
+namespace PHPSTORM_META {
 
-			// Web
-			'input'       instanceof \Windwalker\IO\Input,
-			'environment' instanceof \Windwalker\Environment\WebEnvironment,
-			'browser'     instanceof \Windwalker\Environment\Browser\Browser,
-			'platform'    instanceof \Windwalker\Environment\Platform,
-			'uri'         instanceof \Windwalker\Uri\UriData,
+    $STATIC_METHOD_TYPES = [
+        \Windwalker\DI\Container::get('') => [
+            // System
+            'application' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
+            'app' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
+            'package.resolver' instanceof \Windwalker\Core\Package\PackageResolver,
+            'config' instanceof \Windwalker\Structure\Structure,
 
-			// Error
-			'error.handler' instanceof \Windwalker\Core\Error\ErrorManager,
+            // Web
+            'input' instanceof \Windwalker\IO\Input,
+            'environment' instanceof \Windwalker\Environment\WebEnvironment,
+            'browser' instanceof \Windwalker\Environment\Browser\Browser,
+            'platform' instanceof \Windwalker\Environment\Platform,
+            'uri' instanceof \Windwalker\Uri\UriData,
 
-			// Logger
-			'logger' instanceof \Windwalker\Core\Logger\LoggerManager,
+            // Error
+            'error.handler' instanceof \Windwalker\Core\Error\ErrorManager,
 
-			// Event
-			'dispatcher' instanceof \Windwalker\Core\Event\EventDispatcher,
+            // Logger
+            'logger' instanceof \Windwalker\Core\Logger\LoggerManager,
 
-			// Database
-			'database'     instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
-			'db'           instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
-			'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
+            // Event
+            'dispatcher' instanceof \Windwalker\Core\Event\EventDispatcher,
 
-			// Router
-			'router' instanceof \Windwalker\Core\Router\MainRouter,
+            // Database
+            'database' instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
+            'db' instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
+            'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
 
-			// Language
-			'language' instanceof \Windwalker\Core\Language\CoreLanguage,
+            // Router
+            'router' instanceof \Windwalker\Core\Router\MainRouter,
 
-			// Renderer
-			'renderer.manager' instanceof \Windwalker\Core\Renderer\RendererManager,
-			'renderer'         instanceof \Windwalker\Core\Renderer\RendererManager,
-			'package.finder'   instanceof \Windwalker\Core\Renderer\Finder\PackageFinder,
-			'widget.manager'   instanceof \Windwalker\Core\Widget\WidgetManager,
+            // Language
+            'language' instanceof \Windwalker\Core\Language\CoreLanguage,
 
-			// Cache
-			'cache.manager' instanceof \Windwalker\Core\Cache\CacheManager,
-			'cache' instanceof \Windwalker\Cache\CacheInterface,
+            // Renderer
+            'renderer.manager' instanceof \Windwalker\Core\Renderer\RendererManager,
+            'renderer' instanceof \Windwalker\Core\Renderer\RendererManager,
+            'package.finder' instanceof \Windwalker\Core\Renderer\Finder\PackageFinder,
+            'widget.manager' instanceof \Windwalker\Core\Widget\WidgetManager,
 
-			// Session
-			'session' instanceof \Windwalker\Session\Session,
+            // Cache
+            'cache.manager' instanceof \Windwalker\Core\Cache\CacheManager,
+            'cache' instanceof \Windwalker\Cache\CacheInterface,
 
-			// User
-			'authentication' instanceof \Windwalker\Authentication\Authentication,
-			'authorisation' instanceof \Windwalker\Authorisation\Authorisation,
-			'user.manager' instanceof \Windwalker\Core\User\UserManager,
-			'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
+            // Session
+            'session' instanceof \Windwalker\Session\Session,
 
-			// Security
-			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
-			'crypt' instanceof \Windwalker\Crypt\Crypt,
-			'hasher' instanceof \Windwalker\Crypt\Password,
+            // User
+            'authentication' instanceof \Windwalker\Authentication\Authentication,
+            'authorisation' instanceof \Windwalker\Authorisation\Authorisation,
+            'user.manager' instanceof \Windwalker\Core\User\UserManager,
+            'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
 
-			// DateTime
-			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
+            // Security
+            'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
+            'crypt' instanceof \Windwalker\Crypt\Crypt,
+            'hasher' instanceof \Windwalker\Crypt\Password,
 
-			// Asset
-			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+            // DateTime
+            'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
 
-			// Mailer
-			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
+            // Asset
+            'asset' instanceof \Windwalker\Core\Asset\AssetManager,
+            'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
 
-			// Queue
-			'queue' instanceof \Windwalker\Core\Queue\Queue,
-			'queue.manager' instanceof \Windwalker\Core\Queue\QueueManager,
-			'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
-		],
+            // Mailer
+            'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
 
-		new \Windwalker\DI\Container => [
-			// System
-			'application' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
-			'app'         instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
-			'package.resolver' instanceof \Windwalker\Core\Package\PackageResolver,
-			'config' instanceof \Windwalker\Structure\Structure,
+            // Queue
+            'queue' instanceof \Windwalker\Core\Queue\Queue,
+            'queue.manager' instanceof \Windwalker\Core\Queue\QueueManager,
+            'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
+        ],
 
-			// Web
-			'input'       instanceof \Windwalker\IO\Input,
-			'environment' instanceof \Windwalker\Environment\WebEnvironment,
-			'browser'     instanceof \Windwalker\Environment\Browser\Browser,
-			'platform'    instanceof \Windwalker\Environment\Platform,
-			'uri'         instanceof \Windwalker\Uri\UriData,
+        new \Windwalker\DI\Container() => [
+            // System
+            'application' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
+            'app' instanceof \Windwalker\Core\Application\WindwalkerApplicationInterface,
+            'package.resolver' instanceof \Windwalker\Core\Package\PackageResolver,
+            'config' instanceof \Windwalker\Structure\Structure,
 
-			// Error
-			'error.handler' instanceof \Windwalker\Core\Error\ErrorManager,
+            // Web
+            'input' instanceof \Windwalker\IO\Input,
+            'environment' instanceof \Windwalker\Environment\WebEnvironment,
+            'browser' instanceof \Windwalker\Environment\Browser\Browser,
+            'platform' instanceof \Windwalker\Environment\Platform,
+            'uri' instanceof \Windwalker\Uri\UriData,
 
-			// Logger
-			'logger' instanceof \Windwalker\Core\Logger\LoggerManager,
+            // Error
+            'error.handler' instanceof \Windwalker\Core\Error\ErrorManager,
 
-			// Event
-			'dispatcher' instanceof \Windwalker\Core\Event\EventDispatcher,
+            // Logger
+            'logger' instanceof \Windwalker\Core\Logger\LoggerManager,
 
-			// Database
-			'database'     instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
-			'db'           instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
-			'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
+            // Event
+            'dispatcher' instanceof \Windwalker\Core\Event\EventDispatcher,
 
-			// Router
-			'router' instanceof \Windwalker\Core\Router\MainRouter,
+            // Database
+            'database' instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
+            'db' instanceof \Windwalker\Database\Driver\AbstractDatabaseDriver,
+            'sql.exporter' instanceof \Windwalker\Core\Database\Exporter\AbstractExporter,
 
-			// Language
-			'language' instanceof \Windwalker\Core\Language\CoreLanguage,
+            // Router
+            'router' instanceof \Windwalker\Core\Router\MainRouter,
 
-			// Renderer
-			'renderer.manager' instanceof \Windwalker\Core\Renderer\RendererManager,
-			'renderer'         instanceof \Windwalker\Core\Renderer\RendererManager,
-			'package.finder'   instanceof \Windwalker\Core\Renderer\Finder\PackageFinder,
-			'widget.manager'   instanceof \Windwalker\Core\Widget\WidgetManager,
+            // Language
+            'language' instanceof \Windwalker\Core\Language\CoreLanguage,
 
-			// Cache
-			'cache.manager' instanceof \Windwalker\Core\Cache\CacheManager,
-			'cache' instanceof \Windwalker\Cache\CacheInterface,
+            // Renderer
+            'renderer.manager' instanceof \Windwalker\Core\Renderer\RendererManager,
+            'renderer' instanceof \Windwalker\Core\Renderer\RendererManager,
+            'package.finder' instanceof \Windwalker\Core\Renderer\Finder\PackageFinder,
+            'widget.manager' instanceof \Windwalker\Core\Widget\WidgetManager,
 
-			// Session
-			'session' instanceof \Windwalker\Session\Session,
+            // Cache
+            'cache.manager' instanceof \Windwalker\Core\Cache\CacheManager,
+            'cache' instanceof \Windwalker\Cache\CacheInterface,
 
-			// User
-			'authentication' instanceof \Windwalker\Authentication\Authentication,
-			'authorisation' instanceof \Windwalker\Authorisation\Authorisation,
-			'user.manager' instanceof \Windwalker\Core\User\UserManager,
-			'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
+            // Session
+            'session' instanceof \Windwalker\Session\Session,
 
-			// Security
-			'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
-			'crypt' instanceof \Windwalker\Crypt\Crypt,
-			'hasher' instanceof \Windwalker\Crypt\Password,
+            // User
+            'authentication' instanceof \Windwalker\Authentication\Authentication,
+            'authorisation' instanceof \Windwalker\Authorisation\Authorisation,
+            'user.manager' instanceof \Windwalker\Core\User\UserManager,
+            'user.handler' instanceof \Windwalker\Core\User\UserHandlerInterface,
 
-			// DateTime
-			'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
+            // Security
+            'security.csrf' instanceof \Windwalker\Core\Security\CsrfGuard,
+            'crypt' instanceof \Windwalker\Crypt\Crypt,
+            'hasher' instanceof \Windwalker\Crypt\Password,
 
-			// Asset
-			'asset' instanceof \Windwalker\Core\Asset\AssetManager,
-			'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
+            // DateTime
+            'datetime' instanceof \Windwalker\Core\DateTime\Chronos,
 
-			// Mailer
-			'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
+            // Asset
+            'asset' instanceof \Windwalker\Core\Asset\AssetManager,
+            'script.manager' instanceof \Windwalker\Core\Asset\ScriptManager,
 
-			// Queue
-			'queue' instanceof \Windwalker\Core\Queue\Queue,
-			'queue.manager' instanceof \Windwalker\Core\Queue\QueueManager,
-			'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
-		]
-	];
+            // Mailer
+            'mailer' instanceof \Windwalker\Core\Mailer\MailerManager,
+
+            // Queue
+            'queue' instanceof \Windwalker\Core\Queue\Queue,
+            'queue.manager' instanceof \Windwalker\Core\Queue\QueueManager,
+            'queue.failer' instanceof \Windwalker\Core\Queue\Failer\QueueFailerInterface,
+        ]
+    ];
 }

@@ -63,7 +63,7 @@ class GenTest extends AbstractCliApplication
             exit();
         }
 
-        $replace = new Structure;
+        $replace = new Structure();
 
         $ref = new \ReflectionClass($class);
 
@@ -158,5 +158,5 @@ class GenTest extends AbstractCliApplication
     }
 }
 
-$app = new GenTest;
+$app = new GenTest();
 $app->execute();

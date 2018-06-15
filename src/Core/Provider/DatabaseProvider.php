@@ -72,7 +72,7 @@ class DatabaseProvider implements ServiceProviderInterface
 
             $class = 'Windwalker\Core\Database\Exporter\\' . ucfirst($driver) . 'Exporter';
 
-            return new $class;
+            return new $class();
         };
 
         $container->share(AbstractExporter::class, $closure);

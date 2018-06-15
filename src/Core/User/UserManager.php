@@ -39,12 +39,14 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
      * @var  UserHandlerInterface
      */
     protected $handler;
+
     /**
      * Property authentication.
      *
      * @var  AuthenticationInterface
      */
     private $authentication;
+
     /**
      * Property authorisation.
      *
@@ -66,10 +68,10 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
         AuthorisationInterface $authorisation = null,
         DispatcherInterface $dispatcher = null
     ) {
-        $this->handler        = $handler ?: new NullUserHandler;
-        $this->authentication = $authentication ?: new Authentication;
-        $this->authorisation  = $authorisation ?: new Authorisation;
-        $this->dispatcher     = $dispatcher ?: new EventDispatcher;
+        $this->handler        = $handler ?: new NullUserHandler();
+        $this->authentication = $authentication ?: new Authentication();
+        $this->authorisation  = $authorisation ?: new Authorisation();
+        $this->dispatcher     = $dispatcher ?: new EventDispatcher();
     }
 
     /**

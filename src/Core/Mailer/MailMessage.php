@@ -53,6 +53,7 @@ class MailMessage
      * @var  array
      */
     protected $bcc = [];
+
     /**
      * Property replyto.
      *
@@ -88,7 +89,7 @@ class MailMessage
      */
     public static function create()
     {
-        return new static;
+        return new static();
     }
 
     /**

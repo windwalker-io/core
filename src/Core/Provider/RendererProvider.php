@@ -162,7 +162,7 @@ class RendererProvider implements ServiceProviderInterface
      */
     protected function prepareEdge(Container $container)
     {
-        Renderer\Edge\GlobalContainer::addExtension(new EdgeExtension);
+        Renderer\Edge\GlobalContainer::addExtension(new EdgeExtension());
     }
 
     /**
@@ -193,7 +193,7 @@ class RendererProvider implements ServiceProviderInterface
             return;
         }
 
-        $extension = new EdgeExtension;
+        $extension = new EdgeExtension();
 
         $directives = [
             'translate' => [$extension, 'translate'],

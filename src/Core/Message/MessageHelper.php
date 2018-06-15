@@ -29,10 +29,10 @@ class MessageHelper
     /**
      * render
      *
-     * @param WidgetManager $widget
-     * @param string $template
-     * @param array $messages
-     * @param string $engine
+     * @param WidgetManager        $widget
+     * @param string               $template
+     * @param array                $messages
+     * @param string               $engine
      * @param AbstractPackage|null $package
      *
      * @return  string

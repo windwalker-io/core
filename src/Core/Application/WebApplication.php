@@ -116,7 +116,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      */
     public function __construct(Request $request = null, Config $config = null, WebEnvironment $environment = null)
     {
-        $this->config   = $config instanceof Config ? $config : new Config;
+        $this->config   = $config instanceof Config ? $config : new Config();
         $this->name     = $this->config->get('name', $this->name);
         $this->rootPath = $this->config->get('path.root', $this->rootPath);
 
@@ -329,7 +329,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
     {
         $middlewares = array_reverse(iterator_to_array(clone $this->getMiddlewares()));
 
-        $chain = new Psr7ChainBuilder;
+        $chain = new Psr7ChainBuilder();
 
         foreach ($middlewares as $middleware) {
             if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
@@ -354,7 +354,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
     public function getMiddlewares()
     {
         if (!$this->middlewares) {
-            $this->middlewares = new PriorityQueue;
+            $this->middlewares = new PriorityQueue();
         }
 
         return $this->middlewares;

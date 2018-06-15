@@ -24,24 +24,28 @@ use Windwalker\Session\Session;
 class CsrfGuard
 {
     const TOKEN_KEY = 'form.token';
+
     /**
      * Property config.
      *
      * @var  Config
      */
     private $config;
+
     /**
      * Property input.
      *
      * @var  Input
      */
     private $input;
+
     /**
      * Property session.
      *
      * @var  Session
      */
     private $session;
+
     /**
      * Property userManager.
      *

@@ -30,7 +30,7 @@ class RoutingHtmlView extends AbstractDebuggerHtmlView
     protected function prepareData($data)
     {
         $data->collector    = $data->item['collector'];
-        $data->routes       = new DataSet;
+        $data->routes       = new DataSet();
         $data->matchedRoute = new Data($data->collector['routing.matched']);
 
         foreach ((array) $data->collector['routing.routes'] as $name => $route) {

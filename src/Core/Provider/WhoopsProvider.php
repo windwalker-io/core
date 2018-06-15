@@ -67,9 +67,9 @@ class WhoopsProvider implements ServiceProviderInterface
         $config = $container->get('config');
 
         if ($config->get('system.debug')) {
-            $whoops = new Whoops;
+            $whoops = new Whoops();
 
-            $handler = new PrettyPageHandler;
+            $handler = new PrettyPageHandler();
             $handler->setEditor($config->get('whoops.editor', 'phpstorm'));
 
             $whoops->pushHandler($handler);

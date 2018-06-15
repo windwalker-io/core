@@ -141,7 +141,7 @@ class PackageRouter implements RouteBuilderInterface
     public function setPackage(AbstractPackage $package = null)
     {
         if ($package === null) {
-            $package = new NullPackage;
+            $package = new NullPackage();
         }
 
         $this->package = $package;

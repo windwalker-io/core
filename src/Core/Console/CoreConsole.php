@@ -102,7 +102,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      */
     public function __construct(IOInterface $io = null, Config $config = null)
     {
-        $this->config = $config instanceof Config ? $config : new Config;
+        $this->config = $config instanceof Config ? $config : new Config();
         $this->name   = $this->config->get('name', $this->name);
 
         Core\Ioc::setProfile($this->name);
@@ -212,7 +212,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         }
 
         if ($this->getRootCommand()->getOption('n')) {
-            IOFactory::getIO()->setInput(new NullInput);
+            IOFactory::getIO()->setInput(new NullInput());
         }
     }
 

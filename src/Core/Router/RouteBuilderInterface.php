@@ -16,7 +16,9 @@ namespace Windwalker\Core\Router;
 interface RouteBuilderInterface
 {
     const TYPE_RAW = 'raw';
+
     const TYPE_PATH = 'path';
+
     const TYPE_FULL = 'full';
 
     /**

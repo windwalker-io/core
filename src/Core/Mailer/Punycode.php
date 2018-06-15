@@ -32,7 +32,7 @@ class Punycode
     public static function getInstance()
     {
         if (!static::$instance) {
-            static::$instance = new \idna_convert;
+            static::$instance = new \idna_convert();
         }
 
         return static::$instance;

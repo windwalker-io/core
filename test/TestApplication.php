@@ -14,48 +14,48 @@ use Windwalker\Database\Test\TestDsnResolver;
 
 /**
  * The TestApplication class.
- * 
+ *
  * @since  2.1.1
  */
 class TestApplication extends WebApplication
 {
-	/**
-	 * Property name.
-	 *
-	 * @var  string
-	 */
-	protected $name = 'test';
+    /**
+     * Property name.
+     *
+     * @var  string
+     */
+    protected $name = 'test';
 
-	/**
-	 * Property configPath.
-	 *
-	 * @var  string
-	 */
-	protected $rootPath = WINDWALKER_ROOT;
+    /**
+     * Property configPath.
+     *
+     * @var  string
+     */
+    protected $rootPath = WINDWALKER_ROOT;
 
-	/**
-	 * initialise
-	 *
-	 * @return  void
-	 */
-	protected function init()
-	{
-		$this->boot();
+    /**
+     * initialise
+     *
+     * @return  void
+     */
+    protected function init()
+    {
+        $this->boot();
 
-		restore_error_handler();
-		restore_exception_handler();
+        restore_error_handler();
+        restore_exception_handler();
 
-		// Resolve DB info
-		$dsn = TestDsnResolver::getDsn($this->get('database.driver'));
+        // Resolve DB info
+        $dsn = TestDsnResolver::getDsn($this->get('database.driver'));
 
-		$this->config['database.host'] = $dsn['host'];
-		// $this->config['database.name'] = $dsn['dbname'];
-		$this->config['database.user'] = $dsn['user'];
-		$this->config['database.password'] = $dsn['pass'];
-		$this->config['database.prefix'] = $dsn['prefix'];
-		$this->config['database.dsn'] = $dsn;
+        $this->config['database.host'] = $dsn['host'];
+        // $this->config['database.name'] = $dsn['dbname'];
+        $this->config['database.user']     = $dsn['user'];
+        $this->config['database.password'] = $dsn['pass'];
+        $this->config['database.prefix']   = $dsn['prefix'];
+        $this->config['database.dsn']      = $dsn;
 
-		// Start session
-		Ioc::getSession()->start();
-	}
+        // Start session
+        Ioc::getSession()->start();
+    }
 }

@@ -77,7 +77,7 @@ class TimelineHelper
     public static function prepareTimeline(array $points, $tag = null)
     {
         if (!$points) {
-            return new NullObject;
+            return new NullObject();
         }
 
         $set = static::getPoints($points, $tag);
@@ -144,7 +144,7 @@ class TimelineHelper
     public static function prepareQueryTimeline(array $queries)
     {
         if (!$queries) {
-            return new NullObject;
+            return new NullObject();
         }
 
         // Prepare timeline data

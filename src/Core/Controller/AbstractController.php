@@ -159,7 +159,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
         $this->app       = $this->getApplication();
 
         // Prepare middlewares queue
-        $this->middlewares = (new PriorityQueue)->insertArray((array) $this->middlewares);
+        $this->middlewares = (new PriorityQueue())->insertArray((array) $this->middlewares);
 
         // Boot all traits used
         $this->bootTraits($this);
@@ -219,7 +219,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
         // If task is string, find controller by package
         $package = $package ? $this->app->getPackage($package) : $this->package;
 
-        $response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response, true);
+        $response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response(), true);
 
         // Take back the redirect information.
         $this->passRedirect($package->getCurrentController());
@@ -365,7 +365,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
     public function renderView($view, $layout = 'default', $engine = 'php', array $data = [])
     {
         if (\is_string($view)) {
-            $view = class_exists($view) ? new $view : $this->getView($view, 'html', $engine);
+            $view = class_exists($view) ? new $view() : $this->getView($view, 'html', $engine);
         }
 
         if (!$view instanceof LayoutRenderableInterface) {
@@ -735,7 +735,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
             // If package not found, use NullPackage instead.
             if (!$package) {
                 $ref     = new \ReflectionClass($this);
-                $package = new NullPackage;
+                $package = new NullPackage();
 
                 $package->setName($name);
                 $package->dir = realpath(dirname($ref->getFileName()) . str_repeat('/..', $backwards - 2));
@@ -776,7 +776,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
     {
         $middlewares = array_reverse(iterator_to_array(clone $this->middlewares));
 
-        $chain = new ChainBuilder;
+        $chain = new ChainBuilder();
 
         foreach ($middlewares as $middleware) {
             // If is class name, just create it.
@@ -862,7 +862,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
     public function getInput()
     {
         if (!$this->input) {
-            $this->input = new Input;
+            $this->input = new Input();
         }
 
         return $this->input;
@@ -1080,7 +1080,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
     public function getMiddlewares()
     {
         if (!$this->middlewares) {
-            $this->middlewares = new PriorityQueue;
+            $this->middlewares = new PriorityQueue();
         }
 
         return $this->middlewares;

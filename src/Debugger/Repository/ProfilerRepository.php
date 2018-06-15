@@ -40,11 +40,11 @@ class ProfilerRepository extends Repository
         $item = new Data((array) $item);
 
         if (!$item->profiler) {
-            $item->profiler = new NullObject;
+            $item->profiler = new NullObject();
         }
 
         if (!$item->collector) {
-            $item->collector = new NullObject;
+            $item->collector = new NullObject();
         }
 
         $item->id = $id;

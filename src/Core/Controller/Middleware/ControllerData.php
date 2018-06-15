@@ -34,5 +34,4 @@ use Windwalker\IO\Input;
  */
 class ControllerData extends Data
 {
-
 }

@@ -55,7 +55,7 @@ abstract class Ioc
 
         // Get Root container.
         if (!isset(self::$instances[$profile])) {
-            $container = new Container;
+            $container = new Container();
 
             $container->name    = 'windwalker.root';
             $container->profile = $profile;

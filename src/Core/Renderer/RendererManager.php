@@ -29,9 +29,13 @@ class RendererManager
     use GlobalVarsTrait;
 
     const PHP = 'php';
+
     const BLADE = 'blade';
+
     const EDGE = 'edge';
+
     const TWIG = 'twig';
+
     const MUSTACHE = 'mustache';
 
     /**
@@ -257,7 +261,7 @@ class RendererManager
     protected function getPaths()
     {
         if (!$this->paths) {
-            $this->paths = new PriorityQueue;
+            $this->paths = new PriorityQueue();
 
             $this->registerPaths();
         }

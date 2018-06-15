@@ -56,7 +56,7 @@ class MigrationsRepository extends Repository
 
         $files = Filesystem::files($path);
 
-        $migrations = new DataSet;
+        $migrations = new DataSet();
 
         foreach ($files as $file) {
             $ext = File::getExtension($file->getBasename());
@@ -69,7 +69,7 @@ class MigrationsRepository extends Repository
 
             list($id, $name) = explode('_', $name, 2);
 
-            $mig = new Data;
+            $mig = new Data();
 
             $mig['id']      = $id;
             $mig['version'] = $id;

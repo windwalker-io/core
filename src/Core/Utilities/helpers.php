@@ -20,7 +20,8 @@ if (!function_exists('__')) {
      *
      * @since  3.3
      */
-    function __($text, ...$args) {
+    function __($text, ...$args)
+    {
         if ($args === []) {
             return Translator::translate($text);
         }
@@ -40,7 +41,8 @@ if (!function_exists('trans')) {
      *
      * @since  3.3
      */
-    function trans($text, ...$args) {
+    function trans($text, ...$args)
+    {
         if ($args === []) {
             return Translator::translate($text);
         }
@@ -61,7 +63,8 @@ if (!function_exists('__plural')) {
      *
      * @since  3.3
      */
-    function __plural($text, $number = 1, ...$args) {
+    function __plural($text, $number = 1, ...$args)
+    {
         return Translator::plural($text, $number, ...$args);
     }
 }
@@ -78,7 +81,8 @@ if (!function_exists('date_compare')) {
      *
      * @since  3.3
      */
-    function date_compare($date1, $date2, $operator = null) {
+    function date_compare($date1, $date2, $operator = null)
+    {
         return Chronos::compare($date1, $date2, $operator);
     }
 }
@@ -95,7 +99,8 @@ if (!function_exists('html_escape')) {
      *
      * @since  3.4
      */
-    function html_escape($string, $nl2br = false, $doubleEncode = true) {
+    function html_escape($string, $nl2br = false, $doubleEncode = true)
+    {
         $string = htmlspecialchars($string, ENT_QUOTES, 'UTF-8', $doubleEncode);
 
         if ($nl2br) {

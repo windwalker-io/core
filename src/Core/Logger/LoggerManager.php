@@ -315,7 +315,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
         $handler = $handler ?: new StreamHandler($this->getLogFile($categoey), $level);
         $handler->setFormatter(new LineFormatter(null, null, true));
 
-        $logger->pushProcessor(new PsrLogMessageProcessor);
+        $logger->pushProcessor(new PsrLogMessageProcessor());
 
         // Basic string handler
         $logger->pushHandler($handler);
@@ -422,7 +422,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
     public function getNullLogger()
     {
         if (!$this->nullLogger) {
-            $this->nullLogger = new NullLogger;
+            $this->nullLogger = new NullLogger();
         }
 
         return $this->nullLogger;

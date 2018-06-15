@@ -40,8 +40,8 @@ class AssetCommand extends Command
      */
     protected function init()
     {
-        $this->addCommand(new SyncCommand);
-        $this->addCommand(new MakesumCommand);
+        $this->addCommand(new SyncCommand());
+        $this->addCommand(new MakesumCommand());
 
         $this->addGlobalOption('e')
             ->alias('env')

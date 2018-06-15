@@ -35,9 +35,13 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 abstract class RendererHelper extends AbstractProxyFacade
 {
     const PHP = 'php';
+
     const BLADE = 'blade';
+
     const EDGE = 'edge';
+
     const TWIG = 'twig';
+
     const MUSTACHE = 'mustache';
 
     protected static $_key = 'renderer.manager';

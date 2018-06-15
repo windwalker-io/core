@@ -21,9 +21,13 @@ use Windwalker\Renderer\RendererInterface;
 class WidgetManager
 {
     const PHP = 'php';
+
     const BLADE = 'blade';
+
     const EDGE = 'edge';
+
     const TWIG = 'twig';
+
     const MUSTACHE = 'mustache';
 
     /**

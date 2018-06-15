@@ -28,10 +28,10 @@ class BladeFinder extends FileViewFinder
     /**
      * Create a new file view loader instance.
      *
-     * @param  PackageFinderInterface $finder
+     * @param  PackageFinderInterface            $finder
      * @param  \Illuminate\Filesystem\Filesystem $files
-     * @param  array $paths
-     * @param  array $extensions
+     * @param  array                             $paths
+     * @param  array                             $extensions
      */
     public function __construct(
         PackageFinderInterface $finder,

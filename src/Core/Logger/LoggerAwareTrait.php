@@ -43,7 +43,7 @@ trait LoggerAwareTrait
     public function getLogger()
     {
         if (!$this->logger instanceof LoggerInterface) {
-            $this->logger = new NullLogger;
+            $this->logger = new NullLogger();
         }
 
         return $this->logger;

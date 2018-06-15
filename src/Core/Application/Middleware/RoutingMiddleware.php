@@ -17,7 +17,6 @@ use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Route;
 use Windwalker\String\StringHelper;
 use Windwalker\String\StringNormalise;
-use Windwalker\Uri\UriHelper;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -156,7 +155,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
 
         // If package not found but class exists, try create one
         if (!$resolver->getAlias($ns) && class_exists($ns)) {
-            $resolver->addPackage(end($route), new $ns);
+            $resolver->addPackage(end($route), new $ns());
         }
 
         // Get package, if not exists, return DefaultPackage

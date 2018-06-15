@@ -50,7 +50,7 @@ TMPL;
      */
     public function onAfterInitialise(Event $event)
     {
-        $config = new Structure;
+        $config = new Structure();
 
         $files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
 

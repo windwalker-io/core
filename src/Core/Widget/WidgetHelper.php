@@ -23,9 +23,13 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
 class WidgetHelper extends AbstractProxyFacade
 {
     const PHP = 'php';
+
     const BLADE = 'blade';
+
     const EDGE = 'edge';
+
     const TWIG = 'twig';
+
     const MUSTACHE = 'mustache';
 
     /**

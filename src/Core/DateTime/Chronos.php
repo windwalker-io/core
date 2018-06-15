@@ -32,7 +32,9 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 class Chronos extends \DateTime
 {
     const FORMAT_YMD = 'Y-m-d';
+
     const FORMAT_YMD_HI = 'Y-m-d H:i';
+
     const FORMAT_YMD_HIS = 'Y-m-d H:i:s';
 
     const TZ_LOCALE = true;

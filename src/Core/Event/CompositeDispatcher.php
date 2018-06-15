@@ -181,7 +181,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
         $name = strtolower($name);
 
         if (!isset($this->dispatchers[$name])) {
-            $this->addDispatcher($name, new Dispatcher);
+            $this->addDispatcher($name, new Dispatcher());
         }
 
         return $this->dispatchers[$name];

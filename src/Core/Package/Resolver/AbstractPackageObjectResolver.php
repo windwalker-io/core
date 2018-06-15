@@ -173,7 +173,7 @@ abstract class AbstractPackageObjectResolver
         $called = get_called_class();
 
         if (!isset(static::$namespaces[$called])) {
-            static::$namespaces[$called] = new PriorityQueue;
+            static::$namespaces[$called] = new PriorityQueue();
         }
 
         return static::$namespaces[$called];
@@ -191,7 +191,7 @@ abstract class AbstractPackageObjectResolver
         $called = get_called_class();
 
         if (!$namespaces instanceof PriorityQueue) {
-            $namespaces = new PriorityQueue;
+            $namespaces = new PriorityQueue();
         }
 
         static::$namespaces[$called] = $namespaces;
@@ -214,7 +214,7 @@ abstract class AbstractPackageObjectResolver
      */
     public static function reset()
     {
-        static::setNamespaces(new PriorityQueue);
+        static::setNamespaces(new PriorityQueue());
     }
 
     /**

@@ -51,7 +51,7 @@ class ProfilerProvider implements ServiceProviderInterface
 
                 return $profiler;
             } else {
-                return new NullProfiler;
+                return new NullProfiler();
             }
         };
 
@@ -62,9 +62,9 @@ class ProfilerProvider implements ServiceProviderInterface
             $config = $container->get('config');
 
             if ($config->get('system.debug')) {
-                return new Structure;
+                return new Structure();
             } else {
-                return new NullObject;
+                return new NullObject();
             }
         };
 
@@ -156,7 +156,7 @@ class ProfilerProvider implements ServiceProviderInterface
 
         $dispatcher->setDebug(true);
 
-        $dispatcher->addListener(new ProfilerListener, ListenerPriority::LOW);
+        $dispatcher->addListener(new ProfilerListener(), ListenerPriority::LOW);
     }
 
     /**

@@ -212,7 +212,7 @@ class Pagination
      */
     public function build()
     {
-        $this->result = new PaginationResult;
+        $this->result = new PaginationResult();
 
         if ($this->total === 0 || $this->limit === 0 || $this->pages === 1) {
             return $this;

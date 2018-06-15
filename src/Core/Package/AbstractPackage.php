@@ -262,7 +262,7 @@ class AbstractPackage implements DispatcherAwareInterface
         return $this->execute(
             $this->getController($task, $input),
             $this->app->request,
-            new \Windwalker\Http\Response\Response
+            new \Windwalker\Http\Response\Response()
         );
     }
 
@@ -424,7 +424,7 @@ class AbstractPackage implements DispatcherAwareInterface
     {
         $middlewares = array_reverse(iterator_to_array(clone $this->getMiddlewares()));
 
-        $chain = new Psr7ChainBuilder;
+        $chain = new Psr7ChainBuilder();
 
         foreach ($middlewares as $middleware) {
             if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
@@ -447,7 +447,7 @@ class AbstractPackage implements DispatcherAwareInterface
     public function getMiddlewares()
     {
         if (!$this->middlewares) {
-            $this->middlewares = new PriorityQueue;
+            $this->middlewares = new PriorityQueue();
         }
 
         return $this->middlewares;
@@ -711,7 +711,7 @@ class AbstractPackage implements DispatcherAwareInterface
     public function getConfig()
     {
         if (!$this->config) {
-            $this->config = new Structure;
+            $this->config = new Structure();
 
             $this->loadConfig($this->config);
         }

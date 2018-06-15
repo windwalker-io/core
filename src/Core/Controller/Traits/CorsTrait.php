@@ -31,7 +31,7 @@ trait CorsTrait
      */
     public function bootCorsTrait()
     {
-        $this->corsHandler = new CorsHandler;
+        $this->corsHandler = new CorsHandler();
     }
 
     /**

@@ -59,7 +59,7 @@ class WidgetComponent extends Widget
     public function registerPaths($refresh = false)
     {
         if (!$this->pathRegistered || $refresh) {
-            $this->renderer->setPaths(new PriorityQueue);
+            $this->renderer->setPaths(new PriorityQueue());
 
             $package = $this->getPackage();
 

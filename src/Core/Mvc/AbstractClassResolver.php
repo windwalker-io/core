@@ -222,7 +222,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
      */
     public function reset()
     {
-        $this->setNamespaces(new PriorityQueue);
+        $this->setNamespaces(new PriorityQueue());
         $this->setClassAliases([]);
 
         return $this;

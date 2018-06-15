@@ -18,14 +18,17 @@ use Windwalker\Core\Widget\WidgetManager;
 class Bootstrap
 {
     const MSG_SUCCESS = 'success';
+
     const MSG_INFO = 'info';
+
     const MSG_WARNING = 'warning';
+
     const MSG_DANGER = 'danger';
 
     /**
      * renderFields
      *
-     * @param array $fields
+     * @param array  $fields
      * @param string $labelCols
      * @param string $inputCols
      * @param string $tmpl

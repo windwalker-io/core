@@ -34,7 +34,9 @@ use Windwalker\Router\Route;
 abstract class CoreRouter extends AbstractProxyFacade
 {
     const TYPE_RAW = 'raw';
+
     const TYPE_PATH = 'path';
+
     const TYPE_FULL = 'full';
 
     /**

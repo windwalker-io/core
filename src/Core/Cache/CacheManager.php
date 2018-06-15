@@ -209,7 +209,7 @@ class CacheManager
             throw new \DomainException(sprintf('Cache Serializer: %s not supported.', ucfirst($serializer)));
         }
 
-        return new $class;
+        return new $class();
     }
 
     /**

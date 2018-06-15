@@ -40,7 +40,7 @@ class QueueProvider implements ServiceProviderInterface
 
         $container->share(Queue::class, function (Container $container) {
             $manager = $container->get('queue.manager');
-            $queue = $manager->create(false);
+            $queue   = $manager->create(false);
 
             // Worker also uses Queue object, share it once to prevent infinity loop
             $container->share(Queue::class, $queue);

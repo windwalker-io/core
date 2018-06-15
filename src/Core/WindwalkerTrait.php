@@ -95,7 +95,7 @@ trait WindwalkerTrait
         if ($this->container->exists('dispatcher')) {
             $this->dispatcher = $this->container->get('dispatcher');
         } else {
-            $this->dispatcher = new NullObject;
+            $this->dispatcher = new NullObject();
         }
 
         $this->logger = $this->container->get('logger');
@@ -144,7 +144,6 @@ trait WindwalkerTrait
 
             $config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
         }
-
         // TODO: Variables override
     }
 

@@ -225,7 +225,7 @@ class QueueManager
                 );
 
             default:
-                return new NullQueueDriver;
+                return new NullQueueDriver();
         }
     }
 
@@ -264,7 +264,7 @@ class QueueManager
                 break;
             case 'null':
             default:
-                return new NullQueueFailer;
+                return new NullQueueFailer();
         }
     }
 

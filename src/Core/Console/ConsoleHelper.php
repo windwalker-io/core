@@ -43,7 +43,7 @@ class ConsoleHelper
     {
         $console = $console ?: Ioc::getApplication();
 
-        return (array) (new Structure)
+        return (array) (new Structure())
             ->loadFile($console->get('path.etc') . '/app/console.php', 'php')
             ->loadFile($console->get('path.etc') . '/app/' . $env . '.php', 'php')
             ->get('packages');
@@ -103,7 +103,7 @@ class ConsoleHelper
 
         $app->set('output.return_body', true);
 
-        $app->server->setOutput(new NoHeaderOutput);
+        $app->server->setOutput(new NoHeaderOutput());
 
         $response = $app->execute();
 
@@ -154,7 +154,7 @@ class ConsoleHelper
         $container->share('current.package', $package);
         $container->get('config')->load($config);
 
-        $response = $package->execute($task, $request, new \Windwalker\Http\Response\Response);
+        $response = $package->execute($task, $request, new \Windwalker\Http\Response\Response());
 
         Ioc::setProfile($profile);
 

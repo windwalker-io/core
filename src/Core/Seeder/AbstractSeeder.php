@@ -70,7 +70,7 @@ abstract class AbstractSeeder
 
             include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
-            $seeder = new $seeder;
+            $seeder = new $seeder();
         }
 
         $seeder->setDb($this->db)
@@ -106,7 +106,7 @@ abstract class AbstractSeeder
 
             include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
-            $seeder = new $seeder;
+            $seeder = new $seeder();
         }
 
         $seeder->setDb($this->db);

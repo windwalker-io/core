@@ -131,7 +131,7 @@ class SeedCommand extends Command
         $path = dirname(ReflectionHelper::getPath($class));
 
         $files  = Filesystem::files($path);
-        $loader = new ClassLoader;
+        $loader = new ClassLoader();
         $loader->register();
 
         /** @var \SplFileInfo $file */

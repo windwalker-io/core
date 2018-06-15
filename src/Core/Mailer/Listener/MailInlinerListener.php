@@ -75,6 +75,6 @@ class MailInlinerListener
             $css .= $match[1] . "\n";
         }
 
-        $message->body((new CssToInlineStyles)->convert($body, $css));
+        $message->body((new CssToInlineStyles())->convert($body, $css));
     }
 }

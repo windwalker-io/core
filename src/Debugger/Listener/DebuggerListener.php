@@ -276,7 +276,7 @@ class DebuggerListener
         $time   = $profiler->getTimeBetween($first->getName(), $last->getName());
         $memory = $profiler->getMemoryBetween($first->getName(), $last->getName());
 
-        $data            = new Data;
+        $data            = new Data();
         $data->collector = $collector;
         $data->style     = file_get_contents($style);
 
@@ -312,7 +312,7 @@ class DebuggerListener
      */
     protected function deleteOldFiles()
     {
-        $model = new DashboardRepository;
+        $model = new DashboardRepository();
 
         $files = $model->getFiles();
         $items = [];

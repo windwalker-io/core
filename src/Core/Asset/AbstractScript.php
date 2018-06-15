@@ -152,8 +152,8 @@ abstract class AbstractScript
     /**
      * Check asset uri exists in system and return actual path.
      *
-     * @param string $uri     The file uri to check.
-     * @param bool   $strict  Check .min file or un-min file exists again if input file not exists.
+     * @param string $uri    The file uri to check.
+     * @param bool   $strict Check .min file or un-min file exists again if input file not exists.
      *
      * @return  bool|string
      *

@@ -54,7 +54,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -75,7 +75,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -99,7 +99,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDataClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -140,7 +140,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -155,7 +155,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDataClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -172,7 +172,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -189,7 +189,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDataClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -229,7 +229,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**
@@ -247,7 +247,7 @@ class NullDataMapper extends DataMapper
     {
         $class = $this->getDatasetClass();
 
-        return new $class;
+        return new $class();
     }
 
     /**

@@ -83,7 +83,7 @@ class Repository implements \ArrayAccess
      */
     public function __construct($config = null, Structure $state = null, $source = null)
     {
-        $this->state  = ($state instanceof Structure) ? $state : new Structure;
+        $this->state  = ($state instanceof Structure) ? $state : new Structure();
         $this->source = $source;
 
         $this->setConfig($config);
@@ -255,7 +255,7 @@ class Repository implements \ArrayAccess
      */
     public function resetCache()
     {
-        $this->cache = new Cache(new ArrayStorage, new RawSerializer);
+        $this->cache = new Cache(new ArrayStorage(), new RawSerializer());
 
         return $this;
     }

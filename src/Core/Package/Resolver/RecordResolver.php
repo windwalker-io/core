@@ -41,7 +41,7 @@ class RecordResolver extends AbstractPackageObjectResolver
             return new $class(...$args);
         } catch (\Exception $e) {
             if ($e instanceof \InvalidArgumentException || $e->getPrevious() instanceof \PDOException) {
-                return new NullRecord;
+                return new NullRecord();
             }
 
             throw $e;

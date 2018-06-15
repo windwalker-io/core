@@ -45,7 +45,7 @@ class MailerManager
     public function __construct(MailerAdapterInterface $adapter = null, EventDispatcher $dispatcher = null)
     {
         $this->adapter    = $adapter;
-        $this->dispatcher = $dispatcher ?: new EventDispatcher;
+        $this->dispatcher = $dispatcher ?: new EventDispatcher();
     }
 
     /**
@@ -109,8 +109,6 @@ class MailerManager
 
         // Set default sender
         if (!$message->getFrom()) {
-
-
             if ($config->exists('mail.from.email')) {
                 $message->from($config->get('mail.from.email'), $config->get('mail.from.name'));
             }

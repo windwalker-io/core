@@ -24,9 +24,11 @@ abstract class AbstractMigration
     use DateFormatTrait;
 
     const UP = 'up';
+
     const DOWN = 'down';
 
     const CHARSET_UTF8 = 'utf8';
+
     const CHARSET_UTF8MB4 = 'utf8mb4';
 
     /**

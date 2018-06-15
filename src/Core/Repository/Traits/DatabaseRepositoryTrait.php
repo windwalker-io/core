@@ -52,7 +52,7 @@ trait DatabaseRepositoryTrait
         $recordName = $name ?: $this->record;
 
         if ($recordName === false) {
-            return new NullRecord;
+            return new NullRecord();
         }
 
         $recordName = $recordName ?: $this->getName();
@@ -117,7 +117,7 @@ trait DatabaseRepositoryTrait
         $mapperName = $name ?: $this->dataMapper;
 
         if ($mapperName === false) {
-            return new NullDataMapper;
+            return new NullDataMapper();
         }
 
         $mapperName = $mapperName ?: $this->getName();

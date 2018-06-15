@@ -251,7 +251,7 @@ class ViewModel implements \ArrayAccess
     public function getNullModel()
     {
         if (!$this->nullModel) {
-            $this->nullModel = new Repository;
+            $this->nullModel = new Repository();
 
             $this->nullModel['is.null'] = true;
             $this->nullModel['null']    = true;

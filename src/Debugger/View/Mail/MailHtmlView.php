@@ -29,6 +29,6 @@ class MailHtmlView extends AbstractDebuggerHtmlView
     {
         parent::prepareData($data);
 
-        $data->item = new Data;
+        $data->item = new Data();
     }
 }

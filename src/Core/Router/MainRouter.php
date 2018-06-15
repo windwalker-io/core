@@ -88,7 +88,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      */
     public function __construct(MatcherInterface $matcher, UriData $uri, DispatcherInterface $dispatcher)
     {
-        $this->cache = new Cache(new ArrayStorage, new RawSerializer);
+        $this->cache = new Cache(new ArrayStorage(), new RawSerializer());
 
         $this->uri        = $uri;
         $this->dispatcher = $dispatcher;
@@ -360,7 +360,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      */
     public static function loadRoutingFiles(array $files)
     {
-        $routing = new Structure;
+        $routing = new Structure();
 
         foreach ($files as $file) {
             if (!in_array(pathinfo($file, PATHINFO_EXTENSION), ['json', 'yml', 'yaml', 'php'])) {

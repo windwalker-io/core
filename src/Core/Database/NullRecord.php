@@ -49,7 +49,7 @@ class NullRecord extends Record
     public function __construct($table = null, $keys = null, $mapper = null)
     {
         $this->data   = [];
-        $this->mapper = new NullDataMapper;
+        $this->mapper = new NullDataMapper();
         $this->keys   = $keys ?: ['id'];
         $this->db     = DatabaseFactory::getDbo();
     }
