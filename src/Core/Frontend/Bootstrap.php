@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Frontend;
 
+use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Core\Widget\WidgetManager;
 
 /**
@@ -41,11 +42,10 @@ class Bootstrap
         $inputCols = 'col-md-9',
         $tmpl = 'bootstrap.form.fields'
     ) {
-        return WidgetManager::render($tmpl, [
-                'fields' => $fields,
-                'label_cols' => $labelCols,
-                'input_cols' => $inputCols,
-            ]
-        );
+        return WidgetHelper::render($tmpl, [
+            'fields' => $fields,
+            'label_cols' => $labelCols,
+            'input_cols' => $inputCols,
+        ]);
     }
 }

@@ -120,8 +120,12 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
         }
 
         if ($field === false || !class_exists($field)) {
-            throw new \InvalidArgumentException(sprintf('Field: %s (%s) not found. (Namespaces: %s)', $name,
-                ucfirst($name) . 'Field', implode(" |\n ", iterator_to_array(clone $this->namespaces))));
+            throw new \InvalidArgumentException(sprintf(
+                'Field: %s (%s) not found. (Namespaces: %s)',
+                $name,
+                ucfirst($name) . 'Field',
+                implode(" |\n ", iterator_to_array(clone $this->namespaces))
+            ));
         }
 
         $field = new $field(...$args);
