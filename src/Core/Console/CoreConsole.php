@@ -262,6 +262,8 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      * @param AbstractPackage $package
      *
      * @return  static
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function addPackage($name, AbstractPackage $package)
     {

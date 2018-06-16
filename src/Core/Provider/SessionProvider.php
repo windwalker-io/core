@@ -67,6 +67,7 @@ class SessionProvider implements ServiceProviderInterface
      * @param Container $container
      *
      * @return \Windwalker\Session\Handler\HandlerInterface
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function handler(Container $container)

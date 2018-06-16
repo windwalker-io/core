@@ -36,6 +36,7 @@ class MessageHelper
      * @param AbstractPackage|null $package
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public static function render(
         WidgetManager $widget,

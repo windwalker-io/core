@@ -51,6 +51,8 @@ class WebApplicationTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @covers Windwalker\Core\Application\WebApplication::__construct
      * @TODO   Implement test__construct().
      */

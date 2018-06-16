@@ -65,6 +65,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function emergency($channel, $message, array $context = [])
     {
@@ -84,6 +85,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function alert($channel, $message, array $context = [])
     {
@@ -102,6 +104,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function critical($channel, $message, array $context = [])
     {
@@ -119,6 +122,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function error($channel, $message, array $context = [])
     {
@@ -138,6 +142,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function warning($channel, $message, array $context = [])
     {
@@ -154,6 +159,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function notice($channel, $message, array $context = [])
     {
@@ -172,6 +178,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function info($channel, $message, array $context = [])
     {
@@ -188,6 +195,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function debug($channel, $message, array $context = [])
     {
@@ -205,6 +213,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param array        $context
      *
      * @return static
+     * @throws \Exception
      */
     public function log($channel, $level, $message, array $context = [])
     {
@@ -254,6 +263,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  LoggerInterface
      *
+     * @throws \Exception
      * @deprecated  Use createChannel() instead.
      */
     public function createCategory($channel, $level = Logger::DEBUG)
@@ -268,6 +278,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param string $level
      *
      * @return  LoggerInterface
+     * @throws \Exception
      */
     public function createChannel($channel, $level = Logger::DEBUG)
     {
@@ -281,6 +292,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param string $level
      *
      * @return LoggerInterface
+     * @throws \Exception
      */
     public function getLogger($channel, $level = Logger::DEBUG)
     {
@@ -340,6 +352,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @param int    $maxFiles
      *
      * @return  LoggerInterface
+     * @throws \Exception
      */
     public function createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7)
     {
@@ -456,8 +469,8 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param mixed $offset Offset key.
      *
-     * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
+     * @throws \Exception
      */
     public function offsetGet($offset)
     {

@@ -41,6 +41,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
      * @param  \Exception|\Throwable $e
      *
      * @return  void
+     * @throws \Exception
      */
     public function __invoke($e)
     {

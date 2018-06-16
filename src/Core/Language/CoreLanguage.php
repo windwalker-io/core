@@ -145,6 +145,7 @@ class CoreLanguage extends Language
      * @param string $string
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public function _($string)
     {

@@ -55,7 +55,7 @@ class PackageRouter implements RouteBuilderInterface
      * @param string $type
      *
      * @return string
-     * @throws \OutOfRangeException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
     {

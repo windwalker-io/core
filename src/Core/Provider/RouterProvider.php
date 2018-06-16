@@ -40,6 +40,7 @@ class RouterProvider implements ServiceProviderInterface
      * @param Container $container
      *
      * @return  MatcherInterface
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function matcher(Container $container)

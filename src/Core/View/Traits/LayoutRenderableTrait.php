@@ -151,6 +151,7 @@ trait LayoutRenderableTrait
      * @param bool $refresh
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function registerMultilingualPaths($refresh = false)
     {
@@ -182,6 +183,7 @@ trait LayoutRenderableTrait
      * @param bool $multilingual
      *
      * @return  array
+     * @throws \ReflectionException
      */
     public function dumpPaths($multilingual = false)
     {

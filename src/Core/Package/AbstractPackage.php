@@ -174,6 +174,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param bool                      $hmvc
      *
      * @return Response
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function execute($controller, Request $request, Response $response, $hmvc = false)
@@ -255,6 +256,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param array|Input               $input
      *
      * @return  Response
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function executeTask($task, $input = null)
@@ -334,6 +336,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param DispatcherInterface $dispatcher
      *
      * @return  void
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function registerListeners(DispatcherInterface $dispatcher)
@@ -418,6 +421,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * getMiddlewareChain
      *
      * @return  Psr7ChainBuilder
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function getMiddlewareChain()

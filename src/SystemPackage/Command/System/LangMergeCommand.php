@@ -77,9 +77,9 @@ class LangMergeCommand extends CoreCommand
      *
      * @return int
      *
-     * @since  3.2.8
-     * @throws \RuntimeException
      * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     * @since  3.2.8
      */
     protected function doExecute()
     {

@@ -60,6 +60,8 @@ class RunCommand extends CoreCommand
      * doExecute
      *
      * @return  boolean
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {

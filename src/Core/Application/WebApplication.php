@@ -149,6 +149,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      *
      * @return  Response
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since   2.0
      */
     public function execute()
@@ -193,6 +195,8 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      *
      * @return  Response
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since   2.0
      */
     protected function doExecute()
@@ -213,6 +217,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      *
      * @return  Response  The returned response object.
      *
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since   3.0
      */
@@ -325,6 +330,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      * getMiddlewareChain
      *
      * @return  Psr7ChainBuilder
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function getMiddlewareChain()

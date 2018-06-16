@@ -34,6 +34,8 @@ class RoutingMiddleware extends AbstractWebMiddleware
      * @param   callable|MiddlewareInterface $next     The next middleware.
      *
      * @return  Response
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function __invoke(Request $request, Response $response, $next = null)
     {
@@ -76,6 +78,8 @@ class RoutingMiddleware extends AbstractWebMiddleware
      * @param string     $route
      *
      * @return  Route
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function match(MainRouter $router, $route = null)
     {
@@ -134,6 +138,8 @@ class RoutingMiddleware extends AbstractWebMiddleware
      * @param MainRouter $router
      *
      * @return  bool|Route
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function matchSimpleRouting($route, $method, MainRouter $router)
     {
@@ -205,6 +211,8 @@ class RoutingMiddleware extends AbstractWebMiddleware
      * @param Request $request
      *
      * @return Request
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function handleMatched(Route $route, Request $request)
     {

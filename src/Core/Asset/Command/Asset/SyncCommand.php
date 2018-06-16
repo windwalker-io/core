@@ -64,6 +64,7 @@ class SyncCommand extends Command
      *
      * @return  int
      * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {

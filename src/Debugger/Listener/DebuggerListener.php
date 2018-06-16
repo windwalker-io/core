@@ -77,6 +77,7 @@ class DebuggerListener
      * @param Event $event
      *
      * @return  void
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function onPackageBeforeExecute(Event $event)
     {
@@ -217,6 +218,7 @@ class DebuggerListener
      * onAfterRender
      *
      * @return  void
+     * @throws \ReflectionException
      */
     public function __destruct()
     {

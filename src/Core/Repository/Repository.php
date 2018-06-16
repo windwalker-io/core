@@ -229,6 +229,7 @@ class Repository implements \ArrayAccess
      * @param mixed  $item
      *
      * @return  mixed
+     * @throws \Exception
      */
     protected function setCache($id = null, $item = null)
     {
@@ -269,6 +270,7 @@ class Repository implements \ArrayAccess
      * @param callable $closure
      *
      * @return  mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function fetch($id, $closure)
     {

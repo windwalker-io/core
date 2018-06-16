@@ -37,6 +37,8 @@ class TestApplication extends WebApplication
      * initialise
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function init()
     {

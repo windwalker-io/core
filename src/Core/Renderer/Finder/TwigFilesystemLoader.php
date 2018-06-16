@@ -42,6 +42,7 @@ class TwigFilesystemLoader extends \Windwalker\Renderer\Twig\TwigFilesystemLoade
      * @param   string $name
      *
      * @return  string
+     * @throws \ReflectionException
      */
     protected function normalizeName($name)
     {

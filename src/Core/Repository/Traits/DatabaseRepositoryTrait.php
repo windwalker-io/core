@@ -167,6 +167,7 @@ trait DatabaseRepositoryTrait
      * getTableName
      *
      * @return  string
+     * @throws \Exception
      */
     public function getTableName()
     {
@@ -180,7 +181,7 @@ trait DatabaseRepositoryTrait
      *
      * @return  array|string
      *
-     * @throws \LogicException
+     * @throws \Exception
      */
     public function getKeyName($multiple = false)
     {

@@ -375,6 +375,7 @@ class Pagination
      * render
      *
      * @return string
+     * @throws \ReflectionException
      */
     public function render()
     {

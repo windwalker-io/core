@@ -72,10 +72,12 @@ class RendererProvider implements ServiceProviderInterface
     /**
      * prepareFactory
      *
-     * @param Container       $container
      * @param RendererManager $manager
      *
+     * @param Container       $container
+     *
      * @return RendererManager
+     * @throws \ReflectionException
      */
     public function manager(RendererManager $manager, Container $container)
     {
@@ -125,6 +127,7 @@ class RendererProvider implements ServiceProviderInterface
      * @param RendererManager $manager
      *
      * @return  RendererManager
+     * @throws \ReflectionException
      */
     protected function prepareGlobals(Container $container, RendererManager $manager)
     {

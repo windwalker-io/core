@@ -22,6 +22,7 @@ class DashboardRepository extends Repository
      * getItems
      *
      * @return array
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getItems()
     {
@@ -74,6 +75,7 @@ class DashboardRepository extends Repository
      * getLastItem
      *
      * @return  array
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function getLastItem()
     {

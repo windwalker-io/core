@@ -24,6 +24,7 @@ class DashboardHtmlView extends AbstractDebuggerHtmlView
      * @param \Windwalker\Data\Data $data
      *
      * @return  void
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function prepareData($data)
     {

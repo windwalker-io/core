@@ -530,6 +530,7 @@ abstract class AbstractView implements \ArrayAccess
      * @param   string     $customName
      *
      * @return static Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function setRepository(Repository $model, $default = null, callable $handler = null, $customName = null)
     {
@@ -554,6 +555,7 @@ abstract class AbstractView implements \ArrayAccess
      * @param string        $default
      *
      * @return  static  Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function addRepository($name, Repository $model, callable $handler = null, $default = null)
     {
@@ -606,6 +608,7 @@ abstract class AbstractView implements \ArrayAccess
      *
      * @return static Return self to support chaining.
      *
+     * @throws \ReflectionException
      * @deprecated use repository instead.
      */
     public function setModel(Repository $model, $default = null, $customName = null)
@@ -624,6 +627,7 @@ abstract class AbstractView implements \ArrayAccess
      *
      * @return  static  Return self to support chaining.
      *
+     * @throws \ReflectionException
      * @deprecated use repository instead.
      */
     public function addModel($name, Repository $model, $default = null)

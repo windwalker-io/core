@@ -127,6 +127,7 @@ class Widget implements \ArrayAccess
      * @param array $data
      *
      * @return string
+     * @throws \ReflectionException
      */
     public function render($data = [])
     {

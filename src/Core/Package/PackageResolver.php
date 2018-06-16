@@ -58,6 +58,8 @@ class PackageResolver implements ContainerAwareInterface
      * @param   array|AbstractPackage[] $packages
      *
      * @return  static
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function registerPackages(array $packages)
     {
@@ -75,6 +77,7 @@ class PackageResolver implements ContainerAwareInterface
      * @param string|AbstractPackage $package
      *
      * @return  AbstractPackage
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function addPackage($alias, $package)

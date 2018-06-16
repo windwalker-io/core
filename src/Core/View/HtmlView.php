@@ -87,7 +87,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
      *
      * @return  string
      *
-     * @throws \RuntimeException
+     * @throws \ReflectionException
      */
     public function render()
     {

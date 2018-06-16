@@ -34,6 +34,7 @@ class ProfilerProvider implements ServiceProviderInterface
      * @param   Container $container The DI container.
      *
      * @return  void
+     * @throws \ReflectionException
      */
     public function register(Container $container)
     {
@@ -85,6 +86,7 @@ class ProfilerProvider implements ServiceProviderInterface
      * @param Structure $config
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function registerDatabaseProfiler(Container $container, Structure $config)
     {

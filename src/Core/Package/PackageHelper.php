@@ -45,9 +45,10 @@ class PackageHelper extends AbstractProxyFacade
      *
      * @param string $package
      *
+     * @return  string
+     * @throws \ReflectionException
      * @see  PackageResolver::getPath
      *
-     * @return  string
      */
     public static function getPath($package)
     {

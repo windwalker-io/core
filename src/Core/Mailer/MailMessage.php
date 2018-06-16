@@ -266,6 +266,7 @@ class MailMessage
      * @param string                   $prefix
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
     {

@@ -55,6 +55,7 @@ class WidgetComponent extends Widget
      * @param bool $refresh
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function registerPaths($refresh = false)
     {

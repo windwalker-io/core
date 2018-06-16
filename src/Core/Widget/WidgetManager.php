@@ -63,6 +63,7 @@ class WidgetManager
      * @param string|AbstractPackage $package
      *
      * @return string
+     * @throws \ReflectionException
      */
     public function render($layout, $data = [], $engine = self::PHP, $package = null)
     {

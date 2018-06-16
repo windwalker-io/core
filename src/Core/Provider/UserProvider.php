@@ -76,6 +76,7 @@ class UserProvider implements ServiceProviderInterface
      * @param Container $container
      *
      * @return  AuthenticationInterface
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function authentication(Container $container)
@@ -100,6 +101,7 @@ class UserProvider implements ServiceProviderInterface
      * @param Container $container
      *
      * @return  AuthorisationInterface
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function authorisation(Container $container)

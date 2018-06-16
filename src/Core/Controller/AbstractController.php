@@ -770,6 +770,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * registerMiddlewares
      *
      * @return  ChainBuilder
+     * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function getMiddlewareChain()
