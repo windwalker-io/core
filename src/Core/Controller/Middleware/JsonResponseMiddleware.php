@@ -25,8 +25,7 @@ class JsonResponseMiddleware extends AbstractControllerMiddleware
      * @param   ControllerData $data
      *
      * @return  mixed
-     * @throws \InvalidArgumentException
-     * @throws \UnexpectedValueException
+     * @throws \ReflectionException
      */
     public function execute($data = null)
     {

@@ -48,6 +48,7 @@ class PackageFinder implements PackageFinderInterface
      * @param  string $file
      *
      * @return string
+     * @throws \ReflectionException
      */
     public function find(&$file)
     {

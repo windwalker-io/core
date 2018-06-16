@@ -30,6 +30,8 @@ class DebuggerPackage extends AbstractPackage
      * initialise
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function boot()
     {

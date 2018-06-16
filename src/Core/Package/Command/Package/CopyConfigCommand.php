@@ -51,6 +51,8 @@ class CopyConfigCommand extends Command
      *
      * @return int
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  2.0
      */
     protected function doExecute()

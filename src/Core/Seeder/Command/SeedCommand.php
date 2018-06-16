@@ -82,6 +82,7 @@ class SeedCommand extends Command
      * prepareExecute
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {

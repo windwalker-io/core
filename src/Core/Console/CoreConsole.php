@@ -156,8 +156,9 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     /**
      * Execute the application.
      *
-     * @return  int  The Unix Console/Shell exit code.
+     * @return void Exit with the Unix Console/Shell exit code.
      *
+     * @throws \Exception
      * @since   2.0
      */
     public function execute()

@@ -68,6 +68,7 @@ class ViewModel implements \ArrayAccess
      * @param   string     $customName
      *
      * @return static Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function setModel(Repository $model, $default = null, $customName = null)
     {

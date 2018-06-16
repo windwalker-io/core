@@ -123,6 +123,7 @@ class MigrationsRepository extends Repository
      * @param string $version
      *
      * @return  void
+     * @throws \Exception
      */
     public function migrate($version = null)
     {

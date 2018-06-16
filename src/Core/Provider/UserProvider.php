@@ -100,7 +100,7 @@ class UserProvider implements ServiceProviderInterface
      * @param Container $container
      *
      * @return  AuthorisationInterface
-     * @throws \InvalidArgumentException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function authorisation(Container $container)
     {

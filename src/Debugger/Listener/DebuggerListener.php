@@ -259,6 +259,8 @@ class DebuggerListener
      *
      * @param Structure $collector
      * @param Profiler  $profiler
+     *
+     * @throws \ReflectionException
      */
     protected function pushDebugConsole(Structure $collector, Profiler $profiler)
     {

@@ -356,6 +356,7 @@ class ProfilerListener
      * collectAllInformation
      *
      * @return  void
+     * @throws \ReflectionException
      */
     public static function collectAllInformation()
     {

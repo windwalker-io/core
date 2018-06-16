@@ -101,6 +101,7 @@ class InstallCommand extends CoreCommand
      * @param AbstractPackage $package
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function installConfig(AbstractPackage $package)
     {
@@ -202,6 +203,7 @@ ROUTE;
      * @param AbstractPackage $package
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function copyMigration(AbstractPackage $package)
     {
@@ -247,6 +249,7 @@ ROUTE;
      * @param   AbstractPackage $package
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function copySeeders(AbstractPackage $package)
     {

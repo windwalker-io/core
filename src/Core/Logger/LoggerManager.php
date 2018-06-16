@@ -303,10 +303,11 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * createLogger
      *
      * @param string                $categoey
-     * @param int                   $level
+     * @param string                $level
      * @param HandlerInterface|null $handler
      *
      * @return  Monolog
+     * @throws \Exception
      */
     public function createLogger($categoey, $level = Logger::DEBUG, HandlerInterface $handler = null)
     {

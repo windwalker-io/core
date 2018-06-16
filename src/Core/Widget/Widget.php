@@ -232,6 +232,7 @@ class Widget implements \ArrayAccess
      * @param bool $refresh
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function registerPaths($refresh = false)
     {

@@ -99,6 +99,7 @@ trait LayoutRenderableTrait
      * @param bool $refresh
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function registerPaths($refresh = false)
     {

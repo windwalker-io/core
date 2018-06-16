@@ -56,6 +56,7 @@ class ConsoleHelper
      * @param CoreConsole $console
      *
      * @return  PackageResolver
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public static function getAllPackagesResolver($env = 'dev', CoreConsole $console = null)
     {
@@ -122,6 +123,7 @@ class ConsoleHelper
      * @param string  $appClass
      *
      * @return Response
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public static function executePackage(
         $package,
@@ -164,11 +166,13 @@ class ConsoleHelper
     /**
      * prepareWebEnvironment
      *
+     * @param string $env
      * @param string $url
      * @param string $script
      * @param array  $routeFiles
      *
      * @return  void
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public static function prepareWebEnvironment($env = 'web', $url = '', $script = null, $routeFiles = [])
     {

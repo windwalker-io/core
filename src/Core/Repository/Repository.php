@@ -215,6 +215,7 @@ class Repository implements \ArrayAccess
      * @param string $id
      *
      * @return  mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getCache($id = null)
     {
@@ -242,6 +243,7 @@ class Repository implements \ArrayAccess
      * @param string $id
      *
      * @return  bool
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function hasCache($id = null)
     {

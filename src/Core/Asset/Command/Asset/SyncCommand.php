@@ -63,6 +63,7 @@ class SyncCommand extends Command
      * doExecute
      *
      * @return  int
+     * @throws \ReflectionException
      */
     protected function doExecute()
     {

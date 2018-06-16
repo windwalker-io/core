@@ -104,7 +104,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      * @param string $type
      *
      * @return  string
-     * @throws \LogicException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function build($route, $queries = [], $type = MainRouter::TYPE_RAW)
     {

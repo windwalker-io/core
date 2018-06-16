@@ -151,6 +151,7 @@ trait WindwalkerTrait
      * registerProviders
      *
      * @return  void
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function registerProviders()
     {

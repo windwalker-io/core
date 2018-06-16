@@ -96,6 +96,7 @@ class ResetCommand extends CoreCommand
      * @param array $args
      *
      * @return  boolean
+     * @throws \Exception
      */
     protected function executeCommand($args)
     {

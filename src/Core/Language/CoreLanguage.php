@@ -66,6 +66,7 @@ class CoreLanguage extends Language
      * @param string $package
      *
      * @return static
+     * @throws \ReflectionException
      */
     public function loadFile($file, $format = 'ini', $package = null)
     {

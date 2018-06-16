@@ -39,6 +39,7 @@ class EventDispatcher extends Dispatcher
      * @param   array        $args  The arguments.
      *
      * @return  Event  The event after being passed through all listeners.
+     * @throws \ReflectionException
      */
     public function triggerEvent($event, $args = [])
     {

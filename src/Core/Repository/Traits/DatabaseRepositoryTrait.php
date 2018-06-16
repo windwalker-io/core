@@ -45,7 +45,7 @@ trait DatabaseRepositoryTrait
      * @param   string $name
      *
      * @return  Record
-     * @throws \LogicException
+     * @throws \Exception
      */
     public function getRecord($name = null)
     {
@@ -110,7 +110,7 @@ trait DatabaseRepositoryTrait
      * @param string $name
      *
      * @return  DataMapper
-     * @throws \LogicException
+     * @throws \Exception
      */
     public function getDataMapper($name = null)
     {

@@ -213,6 +213,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      *
      * @return  Response  The returned response object.
      *
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since   3.0
      */
     public function dispatch(Request $request, Response $response, $finalHandler = null)
@@ -324,6 +325,7 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
      * getMiddlewareChain
      *
      * @return  Psr7ChainBuilder
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function getMiddlewareChain()
     {

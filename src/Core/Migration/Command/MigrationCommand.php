@@ -73,6 +73,7 @@ class MigrationCommand extends CoreCommand
      * prepareExecute
      *
      * @return  void
+     * @throws \ReflectionException
      */
     protected function prepareExecute()
     {

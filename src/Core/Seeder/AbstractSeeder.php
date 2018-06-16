@@ -62,6 +62,7 @@ abstract class AbstractSeeder
      * @param AbstractSeeder|string $seeder
      *
      * @return  static
+     * @throws \ReflectionException
      */
     public function execute($seeder = null)
     {
@@ -98,6 +99,7 @@ abstract class AbstractSeeder
      * @param AbstractSeeder|string $seeder
      *
      * @return  static
+     * @throws \ReflectionException
      */
     public function clear($seeder = null)
     {

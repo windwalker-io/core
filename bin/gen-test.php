@@ -41,8 +41,7 @@ class GenTest extends AbstractCliApplication
      *                   finish execution. A controller might return false if some precondition for
      *                   the controller to run has not been satisfied.
      *
-     * @throws  \LogicException
-     * @throws  \RuntimeException
+     * @throws ReflectionException
      */
     public function doExecute()
     {

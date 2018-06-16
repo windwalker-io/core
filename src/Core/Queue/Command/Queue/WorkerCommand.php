@@ -96,6 +96,7 @@ class WorkerCommand extends CoreCommand
      * doExecute
      *
      * @return  bool
+     * @throws \Exception
      */
     protected function doExecute()
     {

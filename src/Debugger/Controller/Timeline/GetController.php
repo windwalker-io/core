@@ -21,6 +21,7 @@ class GetController extends AbstractController
      * doExecute
      *
      * @return  mixed
+     * @throws \Exception
      */
     protected function doExecute()
     {

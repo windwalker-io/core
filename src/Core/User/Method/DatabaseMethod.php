@@ -27,6 +27,7 @@ class DatabaseMethod extends AbstractMethod
      * @param Credential $credential
      *
      * @return  integer
+     * @throws \Exception
      */
     public function authenticate(Credential $credential)
     {
