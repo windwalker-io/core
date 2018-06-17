@@ -84,7 +84,7 @@ class MailerManager
     {
         $config = Ioc::getConfig();
 
-        if (empty($options['force']) && !$config->get('mail.enabled', false)) {
+        if (empty($options['force']) && !$config->get('mail.enabled', true)) {
             return true;
         }
 
