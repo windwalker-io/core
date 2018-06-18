@@ -173,7 +173,7 @@ class Repository implements \ArrayAccess
 
             $ref = new \ReflectionClass(static::class);
 
-            $name = substr($ref->getShortName(), 0, -5);
+            $name = substr($ref->getShortName(), 0, -10);
 
             return $this->name = strtolower($name);
         }
