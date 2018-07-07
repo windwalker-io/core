@@ -45,7 +45,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return Repository
      */
-    public function getModel($name = null)
+    public function getRepository($name = null)
     {
         $name = strtolower($name);
 
@@ -54,10 +54,10 @@ class ViewModel implements \ArrayAccess
                 return $this->models[$name];
             }
 
-            return $this->getNullModel();
+            return $this->getNullRepository();
         }
 
-        return $this->model ?: $this->getNullModel();
+        return $this->model ?: $this->getNullRepository();
     }
 
     /**
@@ -70,7 +70,7 @@ class ViewModel implements \ArrayAccess
      * @return static Return self to support chaining.
      * @throws \ReflectionException
      */
-    public function setModel(Repository $model, $default = null, $customName = null)
+    public function setRepository(Repository $model, $default = null, $customName = null)
     {
         if ($default === true) {
             $this->model = $model;
@@ -95,7 +95,7 @@ class ViewModel implements \ArrayAccess
      */
     public function get($name, $modelName = null, ...$args)
     {
-        $model = $this->getModel($modelName);
+        $model = $this->getRepository($modelName);
 
         if (!$model) {
             return null;
@@ -121,7 +121,7 @@ class ViewModel implements \ArrayAccess
      */
     public function load($name, $modelName = null, ...$args)
     {
-        $model = $this->getModel($modelName);
+        $model = $this->getRepository($modelName);
 
         if (!$model) {
             return null;
@@ -143,7 +143,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return  static
      */
-    public function removeModel($name)
+    public function removeRepository($name)
     {
         // If is default model, remove it.
         if ($this->models[$name] === $this->model) {
@@ -177,7 +177,13 @@ class ViewModel implements \ArrayAccess
      */
     public function __call($name, $args)
     {
-        $model = $this->getModel();
+        if (strtolower(substr($name, -5)) === 'model') {
+            $method = substr($name, 0, -5) . 'Repository';
+
+            return $this->$method(...$args);
+        }
+
+        $model = $this->getRepository();
 
         return $model->$name(...$args);
     }
@@ -204,7 +210,7 @@ class ViewModel implements \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return $this->getModel($offset);
+        return $this->getRepository($offset);
     }
 
     /**
@@ -231,7 +237,7 @@ class ViewModel implements \ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        $this->removeModel($offset);
+        $this->removeRepository($offset);
     }
 
     /**
@@ -249,7 +255,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return  Repository
      */
-    public function getNullModel()
+    public function getNullRepository()
     {
         if (!$this->nullModel) {
             $this->nullModel = new Repository();
@@ -270,7 +276,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return  static  Return self to support chaining.
      */
-    public function setNullModel($nullModel)
+    public function setNullRepository($nullModel)
     {
         $this->nullModel = $nullModel;
 
