@@ -110,3 +110,19 @@ if (!function_exists('html_escape')) {
         return $string;
     }
 }
+
+if (!function_exists('only_debug')) {
+    /**
+     * only_debug
+     *
+     * @param string $string
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function only_debug($string)
+    {
+        return WINDWALKER_DEBUG ? $string : '';
+    }
+}
