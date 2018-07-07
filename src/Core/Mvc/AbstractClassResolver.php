@@ -119,7 +119,7 @@ abstract class AbstractClassResolver implements ClassResolverInterface, Containe
     {
         $class = $this->resolve($name);
 
-        return new $class(...$args);
+        return $this->container->createSharedObject($class);
     }
 
     /**

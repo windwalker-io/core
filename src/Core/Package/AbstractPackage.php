@@ -23,6 +23,7 @@ use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
@@ -137,6 +138,7 @@ class AbstractPackage implements DispatcherAwareInterface
      * @param bool        $forceNew
      *
      * @return AbstractController
+     * @throws \ReflectionException
      */
     public function getController($task, $input = null, $forceNew = false)
     {
@@ -154,7 +156,12 @@ class AbstractPackage implements DispatcherAwareInterface
             $input = $input ?: $container->get('input');
 
             try {
+                /** @var AbstractController $controller */
                 $controller = $resolver->create($task, $input, $this, $container);
+                $controller->setApplication($this->app)
+                    ->setInput($input)
+                    ->setPackage($this)
+                    ->setContainer($container);
             } catch (\DomainException $e) {
                 throw new RouteNotFoundException($e->getMessage(), 404, $e);
             }
@@ -307,24 +314,35 @@ class AbstractPackage implements DispatcherAwareInterface
 
         $providers = (array) $this->get('providers');
 
-        foreach ($providers as &$provider) {
-            if (is_string($provider) && class_exists($provider)) {
-                $provider = $container->newInstance($provider);
-            }
+        foreach ($providers as $interface => &$provider) {
+            if (is_subclass_of($provider, ServiceProviderInterface::class)) {
+                // Handle provider
+                if (is_string($provider) && class_exists($provider)) {
+                    $provider = $container->newInstance($provider);
+                }
 
-            if (!$provider) {
-                continue;
-            }
+                if ($provider === false) {
+                    continue;
+                }
 
-            $container->registerServiceProvider($provider);
+                $container->registerServiceProvider($provider);
 
-            if (is_callable($provider, 'boot')) {
-                $provider->boot($container);
+                if (method_exists($provider, 'boot')) {
+                    $provider->boot($container);
+                }
+            } else {
+                // Handle Service
+                if (is_numeric($interface)) {
+                    $container->prepareSharedObject($provider);
+                } else {
+                    $container->bindShared($interface, $provider);
+                }
             }
         }
 
         foreach ($providers as $provider) {
-            if (is_callable([$provider, 'bootDeferred'])) {
+            if (is_subclass_of($provider, ServiceProviderInterface::class) &&
+                is_callable([$provider, 'bootDeferred'])) {
                 $provider->bootDeferred($container);
             }
         }

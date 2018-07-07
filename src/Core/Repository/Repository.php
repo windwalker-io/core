@@ -76,15 +76,12 @@ class Repository implements \ArrayAccess
      * Instantiate the model.
      *
      * @param   Structure|array $config The model config.
-     * @param   Structure       $state  The model state.
-     * @param   mixed           $source The data source.
      *
      * @since   1.0
      */
-    public function __construct($config = null, Structure $state = null, $source = null)
+    public function __construct($config = null)
     {
-        $this->state  = ($state instanceof Structure) ? $state : new Structure();
-        $this->source = $source;
+        $this->state  = new Structure();
 
         $this->setConfig($config);
 
@@ -191,6 +188,34 @@ class Repository implements \ArrayAccess
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Method to get property Source
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Method to set property source
+     *
+     * @param   mixed $source
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
 
         return $this;
     }

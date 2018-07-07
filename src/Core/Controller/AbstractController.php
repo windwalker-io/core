@@ -136,27 +136,10 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
     /**
      * Class init.
-     *
-     * @param Input           $input
-     * @param AbstractPackage $package
-     * @param Container       $container
-     *
-     * @throws \ReflectionException
      */
-    public function __construct(Input $input = null, AbstractPackage $package = null, Container $container = null)
+    public function __construct()
     {
         $this->config = $this->getConfig();
-
-        if ($package) {
-            $this->setPackage($package);
-        } else {
-            // Guess package
-            $this->getPackage();
-        }
-
-        $this->container = $container ?: $this->getContainer();
-        $this->input     = $input ?: $this->getInput();
-        $this->app       = $this->getApplication();
 
         // Prepare middlewares queue
         $this->middlewares = (new PriorityQueue())->insertArray((array) $this->middlewares);
@@ -205,6 +188,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
                 ->setRequest($this->request)
                 ->setResponse($this->response)
                 ->setPackage($this->package)
+                ->setApplication($this->package->app)
                 ->setInput($input);
 
             // Do action and return executed result.
@@ -271,9 +255,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
             // @ before event
             $this->triggerEvent('onControllerBeforeExecute', [
-                    'controller' => $this
-                ]
-            );
+                'controller' => $this
+            ]);
 
             // Prepare the last middleware, the last middleware is the real logic of this controller self.
             $chain = $this->getMiddlewareChain()->setEndMiddleware(function () {
@@ -304,8 +287,14 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
             throw $e;
         } catch (\Throwable $t) {
             // You can do some error handling in processFailure(), for example: rollback the transaction.
-            $this->processFailure(new \ErrorException($t->getMessage(), $t->getCode(), E_ERROR, $t->getFile(),
-                $t->getLine(), $t));
+            $this->processFailure(new \ErrorException(
+                $t->getMessage(),
+                $t->getCode(),
+                E_ERROR,
+                $t->getFile(),
+                $t->getLine(),
+                $t
+            ));
 
             throw $t;
         }
@@ -364,26 +353,26 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      */
     public function renderView($view, $layout = 'default', $engine = 'php', array $data = [])
     {
-        if (\is_string($view)) {
-            $view = class_exists($view) ? new $view() : $this->getView($view, 'html', $engine);
-        }
+        $viewObject = $view;
 
-        if (!$view instanceof LayoutRenderableInterface) {
-            throw new \LogicException('View should be instance of: ' . LayoutRenderableInterface::class);
+        if (\is_string($view)) {
+            $viewObject = class_exists($view)
+                ? $this->container->createSharedObject($view)
+                : $this->getView($view, 'html', $engine);
         }
 
         $this->setConfig($this->config);
 
         // Set data into View
         foreach ($data as $key => $value) {
-            $view[$key] = $value;
+            $viewObject[$key] = $value;
         }
 
-        if ($layout !== null) {
-            $view->setLayout($layout);
+        if ($layout !== null && $viewObject instanceof LayoutRenderableInterface) {
+            $viewObject->setLayout($layout);
         }
 
-        return $view->render();
+        return $viewObject->render();
     }
 
     /**
@@ -533,7 +522,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
                     }
 
                     // Create object by container, container will auto inject all necessary dependencies
-                    return $container->createSharedObject($class, ['source' => $source, 'config' => $config]);
+                    return $container->createSharedObject($class, ['config' => $config]);
                 } catch (\Exception $e) {
                     if (!$e instanceof \DomainException && !$e instanceof \UnexpectedValueException) {
                         throw $e;

@@ -16,6 +16,7 @@ use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Structure\Structure;
 
@@ -172,24 +173,35 @@ trait WindwalkerTrait
 
         $providers = (array) $this->config->get('providers');
 
-        foreach ($providers as &$provider) {
-            if (is_string($provider) && class_exists($provider)) {
-                $provider = $container->newInstance($provider);
-            }
+        foreach ($providers as $interface => &$provider) {
+            if (is_subclass_of($provider, ServiceProviderInterface::class)) {
+                // Handle provider
+                if (is_string($provider) && class_exists($provider)) {
+                    $provider = $container->newInstance($provider);
+                }
 
-            if ($provider === false) {
-                continue;
-            }
+                if ($provider === false) {
+                    continue;
+                }
 
-            $container->registerServiceProvider($provider);
+                $container->registerServiceProvider($provider);
 
-            if (is_callable([$provider, 'boot'])) {
-                $provider->boot($container);
+                if (method_exists($provider, 'boot')) {
+                    $provider->boot($container);
+                }
+            } else {
+                // Handle Service
+                if (is_numeric($interface)) {
+                    $container->prepareSharedObject($provider);
+                } else {
+                    $container->bindShared($interface, $provider);
+                }
             }
         }
 
         foreach ($providers as $provider) {
-            if (is_callable([$provider, 'bootDeferred'])) {
+            if (is_subclass_of($provider, ServiceProviderInterface::class)
+                && method_exists($provider, 'bootDeferred')) {
                 $provider->bootDeferred($container);
             }
         }
