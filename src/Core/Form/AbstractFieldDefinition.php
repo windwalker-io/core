@@ -48,6 +48,14 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
 {
     use BootableTrait;
 
+    /*
+     * MySQL text length. @see https://stackoverflow.com/a/23169977
+     */
+    const TEXT_MAX_ASCII     = 65535;
+    const TEXT_MAX_UTF8      = 21844;
+    const LONGTEXT_MAX_ASCII = 4294967295;
+    const LONGTEXT_MAX_UTF8  = 1431655765;
+
     /**
      * Property namespaces.
      *
