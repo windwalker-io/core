@@ -79,7 +79,7 @@ class SystemProvider implements ServiceProviderInterface
     {
         // Model to Repository
         class_alias(Repository\Exception\ValidateFailException::class,
-            'Windwalker\Core\Model\Exception\ValidateException');
+            'Windwalker\Core\Model\Exception\ValidateFailException');
         class_alias(Repository\Traits\CliOutputModelTrait::class, 'Windwalker\Core\Model\Traits\CliOutputModelTrait');
         class_alias(Repository\Traits\DatabaseModelTrait::class, 'Windwalker\Core\Model\Traits\DatabaseModelTrait');
         class_alias(Repository\Traits\DatabaseRepositoryTrait::class,
