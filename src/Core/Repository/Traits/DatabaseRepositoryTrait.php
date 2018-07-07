@@ -34,7 +34,7 @@ trait DatabaseRepositoryTrait
     public function bootDatabaseRepositoryTrait()
     {
         $this->table      = property_exists($this, 'table') ? $this->table : null;
-        $this->keys       = property_exists($this, 'keys') ? $this->keys : 'id';
+        $this->keys       = property_exists($this, 'keys') ? $this->keys : null;
         $this->record     = property_exists($this, 'record') ? $this->record : null;
         $this->dataMapper = property_exists($this, 'dataMapper') ? $this->dataMapper : null;
     }
@@ -60,7 +60,7 @@ trait DatabaseRepositoryTrait
         $mapper = $this->getDataMapper($name);
 
         if ($mapper instanceof AbstractDatabaseMapperProxy) {
-            $mapper = $mapper->getInstance();
+            $mapper = $mapper::getInstance();
         }
 
         // (1) If name is class, just new it.
@@ -73,12 +73,18 @@ trait DatabaseRepositoryTrait
             return $record;
         }
 
-        $errors[] = sprintf('Record: "%s" not found from namespaces: (%s)', $recordName,
-            implode(" |\n ", RecordResolver::dumpNamespaces()));
+        $errors[] = sprintf(
+            'Record: "%s" not found from namespaces: (%s)',
+            $recordName,
+            implode(" |\n ", RecordResolver::dumpNamespaces())
+        );
 
         // (3): Find from package directory.
-        $class = sprintf('%s\Record\%sRecord', MvcHelper::getPackageNamespace(get_called_class(), 2),
-            ucfirst($recordName));
+        $class = sprintf(
+            '%s\Record\%sRecord',
+            MvcHelper::getPackageNamespace(static::class, 2),
+            ucfirst($recordName)
+        );
 
         if (class_exists($class)) {
             return new $class($this->table, $this->keys, $mapper);
@@ -96,8 +102,10 @@ trait DatabaseRepositoryTrait
         $table = $name ?: $this->table;
 
         if (!$table) {
-            throw new \LogicException('Please add table property to ' . get_called_class() . " to support Record object. \n" . implode("\n- ",
-                    $errors));
+            throw new \LogicException(
+                'Please add table property to ' . get_called_class() . " to support Record object. \n" .
+                implode("\n- ", $errors)
+            );
         }
 
         // (4): If name is null, we get default object with table name provided.
@@ -132,12 +140,18 @@ trait DatabaseRepositoryTrait
             return $mapper;
         }
 
-        $errors[] = sprintf('DataMapper: "%s" not found from namespaces: (%s)', $mapperName,
-            implode(" |\n ", DataMapperResolver::dumpNamespaces()));
+        $errors[] = sprintf(
+            'DataMapper: "%s" not found from namespaces: (%s)',
+            $mapperName,
+            implode(" |\n ", DataMapperResolver::dumpNamespaces())
+        );
 
         // (3): Find from package directory.
-        $class = sprintf('%s\DataMapper\%sMapper', MvcHelper::getPackageNamespace(get_called_class(), 2),
-            ucfirst($mapperName));
+        $class = sprintf(
+            '%s\DataMapper\%sMapper',
+            MvcHelper::getPackageNamespace(get_called_class(), 2),
+            ucfirst($mapperName)
+        );
 
         if (class_exists($class)) {
             return new $class($this->table, $this->keys, $this->db);
@@ -155,8 +169,11 @@ trait DatabaseRepositoryTrait
         $table = $name ?: $this->table;
 
         if (!$table) {
-            throw new \LogicException('Please add table property to ' . get_called_class() . " to support DataMapper object. \n" . implode("\n- ",
-                    $errors));
+            throw new \LogicException(sprintf(
+                "Please add table property to %s to support DataMapper object. \n%s",
+                static::class,
+                implode("\n- ", $errors)
+            ));
         }
 
         // (4): If name is null, we get default object with table name provided.
@@ -186,7 +203,7 @@ trait DatabaseRepositoryTrait
     public function getKeyName($multiple = false)
     {
         if (isset($this->keys)) {
-            $keys = (array) $this->keys;
+            $keys = (array) ($this->keys ?: 'id');
 
             if ($multiple) {
                 return $keys;
