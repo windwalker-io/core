@@ -9,10 +9,13 @@
 namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Database\Exporter\AbstractExporter;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
+use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
+use Windwalker\Structure\Structure;
 
 /**
  * The BackupModel class.
@@ -38,6 +41,28 @@ class BackupRepository extends Repository
     public $lastBackup;
 
     /**
+     * Property exporter.
+     *
+     * @var  AbstractExporter
+     */
+    protected $exporter;
+
+    /**
+     * Instantiate the model.
+     *
+     * @param   Structure|array       $config   The model config.
+     * @param   AbstractExporter|null $exporter SQL Exporter.
+     *
+     * @since   1.0
+     */
+    public function __construct($config = null, AbstractExporter $exporter = null)
+    {
+        parent::__construct($config);
+
+        $this->exporter = $exporter;
+    }
+
+    /**
      * backup
      *
      * @return  boolean
@@ -49,10 +74,13 @@ class BackupRepository extends Repository
         $this->lastBackup = $sql = $this->getSQLExport();
 
         $config = Ioc::getConfig();
+        $dir = $config->get('path.temp') . '/migration/sql-backup';
 
-        Folder::create($config->get('path.temp') . '/sql-backup');
+        Folder::create($dir);
+        
+        $this->rotate($dir);
 
-        $file = $config->get('path.temp') . '/sql-backup/sql-backup-' . gmdate('Y-m-d-H-i-s-') . uniqid() . '.sql';
+        $file = $dir . '/sql-backup-' . gmdate('Y-m-d-H-i-s-') . uniqid() . '.sql';
 
         file_put_contents($file, $sql);
 
@@ -62,15 +90,33 @@ class BackupRepository extends Repository
     }
 
     /**
+     * rotate
+     *
+     * @param string $dir
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function rotate($dir)
+    {
+        $files = Folder::files($dir);
+
+        rsort($files);
+
+        array_splice($files, 0, 20);
+
+        return File::delete($files);
+    }
+
+    /**
      * getSQLExport
      *
      * @return  string
      */
     public function getSQLExport()
     {
-        $exporter = Ioc::get('sql.exporter');
-
-        return $exporter->export();
+        return $this->exporter->export();
     }
 
     /**

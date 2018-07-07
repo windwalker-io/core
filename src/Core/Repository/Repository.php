@@ -11,6 +11,7 @@ namespace Windwalker\Core\Repository;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\Utilities\Classes\SingletonTrait;
 use Windwalker\Structure\Structure;
@@ -25,7 +26,6 @@ use Windwalker\Structure\Structure;
 class Repository implements \ArrayAccess
 {
     use BootableTrait;
-    use SingletonTrait;
 
     /**
      * Make sure state at the first to easily debug.
@@ -71,6 +71,33 @@ class Repository implements \ArrayAccess
         'get',
         'load',
     ];
+
+    /**
+     * Property instances.
+     *
+     * @var  array
+     */
+    protected static $instances = [];
+
+    /**
+     * getInstance
+     *
+     * @param array ...$args
+     *
+     * @return static
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     */
+    public static function getInstance(...$args)
+    {
+        $class = static::class;
+
+        if (empty(static::$instances[$class])) {
+            static::$instances[$class] = Ioc::getContainer()->newInstance($class, ...$args);
+        }
+
+        return static::$instances[$class];
+    }
 
     /**
      * Instantiate the model.

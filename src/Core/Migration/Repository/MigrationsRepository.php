@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Repository\Traits\CliOutputModelTrait;
@@ -16,8 +17,10 @@ use Windwalker\Core\Repository\Traits\DatabaseModelTrait;
 use Windwalker\Data\Data;
 use Windwalker\Data\DataSet;
 use Windwalker\Database\Schema\Schema;
+use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Http\Stream\Stream;
 use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
 
@@ -143,41 +146,60 @@ class MigrationsRepository extends Repository
             }
         }
 
+        // Prepare SQL logs
+        if (is_file($this->getLogFile())) {
+            File::delete($this->getLogFile());
+        }
+
+        $queryLogStream = new Stream($this->getLogFile(), Stream::MODE_WRITE_ONLY_FROM_END);
+        $logListener = function (Event $event) use ($queryLogStream) {
+            $queryLogStream->write($event['query'] . "\n\n");
+        };
+        Ioc::getDispatcher()->listen('onMigrationAfterQuery', $logListener);
+
         $direction = ($version > $currentVersion) ? AbstractMigration::UP : AbstractMigration::DOWN;
 
         $migrations = iterator_to_array($migrations);
 
         $count = 0;
 
-        if ($direction == AbstractMigration::DOWN) {
-            krsort($migrations);
+        try {
+            if ($direction === AbstractMigration::DOWN) {
+                krsort($migrations);
+
+                foreach ($migrations as $migration) {
+                    if ($migration['version'] <= $version) {
+                        break;
+                    }
+
+                    if (in_array($migration['version'], $versions)) {
+                        $this->executeMigration($migration, AbstractMigration::DOWN);
+                    }
+
+                    $count++;
+                }
+            }
+
+            ksort($migrations);
 
             foreach ($migrations as $migration) {
-                if ($migration['version'] <= $version) {
+                if ($migration['version'] > $version) {
                     break;
                 }
 
-                if (in_array($migration['version'], $versions)) {
-                    $this->executeMigration($migration, AbstractMigration::DOWN);
+                if (!in_array($migration['version'], $versions)) {
+                    $this->executeMigration($migration, AbstractMigration::UP);
                 }
 
                 $count++;
             }
+        } catch (\PDOException $e) {
+            $queryLogStream->write("-- ERROR: {$e->getMessage()}\n" . $this->db->getQuery());
+
+            throw $e;
         }
 
-        ksort($migrations);
-
-        foreach ($migrations as $migration) {
-            if ($migration['version'] > $version) {
-                break;
-            }
-
-            if (!in_array($migration['version'], $versions)) {
-                $this->executeMigration($migration, AbstractMigration::UP);
-            }
-
-            $count++;
-        }
+        Ioc::getDispatcher()->removeListener($logListener);
 
         if (!$count) {
             $this->out('No change.');
@@ -208,24 +230,18 @@ class MigrationsRepository extends Repository
         $tran = $this->db->getTransaction()->start();
 
         try {
-            $tmpl = <<<LOG
-
-    Migrate <cmd>%s</cmd> the version: <info>%s_%s</info>
-LOG;
+            $tmpl = '<info>%s_%s</info> <comment>%s</comment>... ';
 
             $this->out(sprintf(
                 $tmpl,
-                strtoupper($direction),
                 $migrationItem['id'],
-                $migrationItem['name']
-            ));
+                $migrationItem['name'],
+                strtoupper($direction)
+            ), false);
 
             $migration->$direction();
 
-            $tmpl = <<<LOG
-    ------------------------------------------------------------
-    <option>Success</option>
-LOG;
+            $tmpl = ' <option>Success</option>';
 
             $this->out($tmpl);
         } catch (\Exception $e) {
@@ -259,7 +275,7 @@ LOG;
      */
     public function storeVersion($migration, $direction, $start, $end)
     {
-        if ($direction == AbstractMigration::UP) {
+        if ($direction === AbstractMigration::UP) {
             $data['version']    = $migration['version'];
             $data['start_time'] = gmdate('Y-m-d H:i:s', $start);
             $data['end_time']   = gmdate('Y-m-d H:i:s', $end);
@@ -339,7 +355,10 @@ LOG;
         // Check name not exists
         foreach ($migrations as $migration) {
             if (strtolower($name) == strtolower($migration['name'])) {
-                throw new \RuntimeException('Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" . $migration['path'] . '</info>');
+                throw new \RuntimeException(
+                    'Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" .
+                    $migration['path'] . '</info>'
+                );
             }
         }
 
@@ -363,5 +382,19 @@ LOG;
 
         $this->out()->out('Migration version: <info>' . $file . '</info> created.');
         $this->out('File path: <info>' . realpath($filePath) . '</info>');
+    }
+
+    /**
+     * getLogFile
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function getLogFile()
+    {
+        $config = Ioc::getConfig();
+
+        return $config->get('path.temp') . '/migration/last-migration-queries.sql';
     }
 }

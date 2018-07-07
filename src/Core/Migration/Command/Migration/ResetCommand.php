@@ -80,11 +80,11 @@ class ResetCommand extends CoreCommand
             $this->backup();
         }
 
-        $this->out('<cmd>Rollback to 0 version...</cmd>');
+        $this->out()->out('<cmd>Rollback to 0 version...</cmd>');
 
         $this->executeCommand(['migration', 'migrate', '0']);
 
-        $this->out('<cmd>Migrating to latest version...</cmd>');
+        $this->out()->out('<cmd>Migrating to latest version...</cmd>');
 
         $this->executeCommand(['migration', 'migrate']);
 

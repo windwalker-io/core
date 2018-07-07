@@ -11,6 +11,8 @@ namespace Windwalker\Core\Migration\Command;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Database\Middleware\DbProfilerMiddleware;
 
 /**
  * The MigrationCommand class.
@@ -107,15 +109,36 @@ class MigrationCommand extends CoreCommand
         $dir = $dir ?: $this->console->get('path.migrations');
 
         $this->console->set('migration.dir', $dir);
+
+        // DB log
+        static $loggerRegistered = false;
+
+        if (!$loggerRegistered) {
+            $this->console->database->addMiddleware(new DbProfilerMiddleware(
+                function () {
+                    //
+                },
+                function (AbstractDatabaseDriver $db, \stdClass $data) {
+                    $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $db->getLastQuery()]);
+                }
+            ));
+
+            $loggerRegistered = true;
+        }
     }
 
     /**
      * Execute this command.
      *
      * @return int|void
+     * @throws \ReflectionException
      */
     protected function doExecute()
     {
-        return parent::doExecute();
+        $result = parent::doExecute();
+
+        $this->console->database->resetMiddlewares();
+
+        return $result;
     }
 }

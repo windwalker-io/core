@@ -22,21 +22,21 @@ class ViewModel implements \ArrayAccess
      *
      * @var Repository
      */
-    protected $nullModel;
+    protected $nullRepository;
 
     /**
      * Property model.
      *
      * @var Repository
      */
-    protected $model;
+    protected $repository;
 
     /**
      * Property models.
      *
      * @var Repository[]
      */
-    protected $models;
+    protected $repositories;
 
     /**
      * Method to get property Model
@@ -50,14 +50,14 @@ class ViewModel implements \ArrayAccess
         $name = strtolower($name);
 
         if ($name) {
-            if (isset($this->models[$name])) {
-                return $this->models[$name];
+            if (isset($this->repositories[$name])) {
+                return $this->repositories[$name];
             }
 
             return $this->getNullRepository();
         }
 
-        return $this->model ?: $this->getNullRepository();
+        return $this->repository ?: $this->getNullRepository();
     }
 
     /**
@@ -73,13 +73,13 @@ class ViewModel implements \ArrayAccess
     public function setRepository(Repository $model, $default = null, $customName = null)
     {
         if ($default === true) {
-            $this->model = $model;
+            $this->repository = $model;
         }
 
         $name = $customName ?: $model->getName();
         $name = $name ?: uniqid();
 
-        $this->models[strtolower($name)] = $model;
+        $this->repositories[strtolower($name)] = $model;
 
         return $this;
     }
@@ -88,52 +88,52 @@ class ViewModel implements \ArrayAccess
      * get
      *
      * @param string $name
-     * @param string $modelName
+     * @param string $repoName
      * @param array  $args
      *
      * @return mixed
      */
-    public function get($name, $modelName = null, ...$args)
+    public function get($name, $repoName = null, ...$args)
     {
-        $model = $this->getRepository($modelName);
+        $repo = $this->getRepository($repoName);
 
-        if (!$model) {
+        if (!$repo) {
             return null;
         }
 
         $method = 'get' . ucfirst($name);
 
-        if (!is_callable([$model, $method])) {
+        if (!is_callable([$repo, $method])) {
             return null;
         }
 
-        return $model->$method(...$args);
+        return $repo->$method(...$args);
     }
 
     /**
      * get
      *
      * @param string $name
-     * @param string $modelName
+     * @param string $repoName
      * @param array  $args
      *
      * @return mixed
      */
-    public function load($name, $modelName = null, ...$args)
+    public function load($name, $repoName = null, ...$args)
     {
-        $model = $this->getRepository($modelName);
+        $repo = $this->getRepository($repoName);
 
-        if (!$model) {
+        if (!$repo) {
             return null;
         }
 
         $method = 'load' . ucfirst($name);
 
-        if (!is_callable([$model, $method])) {
+        if (!is_callable([$repo, $method])) {
             return null;
         }
 
-        return $model->$method(...$args);
+        return $repo->$method(...$args);
     }
 
     /**
@@ -146,11 +146,11 @@ class ViewModel implements \ArrayAccess
     public function removeRepository($name)
     {
         // If is default model, remove it.
-        if ($this->models[$name] === $this->model) {
-            $this->model = null;
+        if ($this->repositories[$name] === $this->repository) {
+            $this->repository = null;
         }
 
-        unset($this->models[$name]);
+        unset($this->repositories[$name]);
 
         return $this;
     }
@@ -164,7 +164,7 @@ class ViewModel implements \ArrayAccess
      */
     public function exists($name)
     {
-        return isset($this->models[$name]);
+        return isset($this->repositories[$name]);
     }
 
     /**
@@ -247,7 +247,7 @@ class ViewModel implements \ArrayAccess
      */
     public function count()
     {
-        return count($this->models);
+        return count($this->repositories);
     }
 
     /**
@@ -257,28 +257,28 @@ class ViewModel implements \ArrayAccess
      */
     public function getNullRepository()
     {
-        if (!$this->nullModel) {
-            $this->nullModel = new Repository();
+        if (!$this->nullRepository) {
+            $this->nullRepository = new Repository();
 
-            $this->nullModel['is.null'] = true;
-            $this->nullModel['null']    = true;
+            $this->nullRepository['is.null'] = true;
+            $this->nullRepository['null']    = true;
 
-            return $this->nullModel;
+            return $this->nullRepository;
         }
 
-        return $this->nullModel;
+        return $this->nullRepository;
     }
 
     /**
      * Method to set property nullModel
      *
-     * @param   Repository $nullModel
+     * @param   Repository $nullRepo
      *
      * @return  static  Return self to support chaining.
      */
-    public function setNullRepository($nullModel)
+    public function setNullRepository($nullRepo)
     {
-        $this->nullModel = $nullModel;
+        $this->nullRepository = $nullRepo;
 
         return $this;
     }

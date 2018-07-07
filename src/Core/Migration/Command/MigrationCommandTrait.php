@@ -22,14 +22,13 @@ trait MigrationCommandTrait
     /**
      * getModel
      *
-     * @param array     $config
-     * @param Structure $state
-     *
      * @return  MigrationsRepository
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getRepository($config = null, Structure $state = null)
+    public function getRepository()
     {
-        $repository = (new MigrationsRepository($config, $state, $this->console->database))
+        $repository = MigrationsRepository::getInstance()
             ->setCommand($this)
             ->setIo($this->io);
 
@@ -41,20 +40,21 @@ trait MigrationCommandTrait
     /**
      * getModel
      *
-     * @param array     $config
-     * @param Structure $state
-     *
      * @return  BackupRepository
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getBackupRepository($config = null, Structure $state = null)
+    public function getBackupRepository()
     {
-        return (new BackupRepository($config, $state, $this->console->database))->setCommand($this);
+        return BackupRepository::getInstance()->setCommand($this);
     }
 
     /**
      * backup
      *
      * @return  void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function backup()
     {
