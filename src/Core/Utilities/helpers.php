@@ -119,7 +119,7 @@ if (!function_exists('only_debug')) {
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     function only_debug($string)
     {

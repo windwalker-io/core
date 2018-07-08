@@ -224,7 +224,7 @@ class Repository implements \ArrayAccess
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     public function getSource()
     {
@@ -238,7 +238,7 @@ class Repository implements \ArrayAccess
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     public function setSource($source)
     {

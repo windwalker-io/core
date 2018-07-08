@@ -96,7 +96,7 @@ class BackupRepository extends Repository
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     protected function rotate($dir)
     {

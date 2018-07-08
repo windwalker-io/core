@@ -389,7 +389,7 @@ class MigrationsRepository extends Repository
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     protected function getLogFile()
     {

@@ -360,7 +360,7 @@ abstract class Ioc
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.2
      */
     public static function make($key, array $args = [])
     {
