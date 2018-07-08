@@ -203,7 +203,12 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
         // If task is string, find controller by package
         $package = $package ? $this->app->getPackage($package) : $this->package;
 
-        $response = $package->execute($package->getController($task, $input), $this->getRequest(), new Response(), true);
+        $response = $package->execute(
+            $package->getController($task, $input),
+            $this->getRequest(),
+            new Response(),
+            true
+        );
 
         // Take back the redirect information.
         $this->passRedirect($package->getCurrentController());
@@ -260,7 +265,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
             // Prepare the last middleware, the last middleware is the real logic of this controller self.
             $chain = $this->getMiddlewareChain()->setEndMiddleware(function () {
-                return $this->doExecute();
+                return $this->container->call([$this, 'doExecute'], [], $this);
             });
 
             // Do execute, run middlewares.
@@ -324,16 +329,17 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param   array  $args The arguments we provides.
      *
      * @return mixed
-     * @throws \LogicException
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function delegate($task, ...$args)
     {
-        if (is_callable([$this, $task])) {
-            return $this->$task(...$args);
+        if (method_exists($this, $task)) {
+            return $this->container->call([$this, $task], $args, $this);
         }
 
         if (is_callable($task)) {
-            return $task(...$args);
+            return $this->container->call($task, $args, $this);
         }
 
         throw new \LogicException('Task: ' . $task . ' not found.');

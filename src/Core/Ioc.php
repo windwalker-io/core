@@ -350,6 +350,24 @@ abstract class Ioc
     }
 
     /**
+     * make
+     *
+     * @param string $key
+     * @param array  $args
+     *
+     * @return  mixed
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function make($key, array $args = [])
+    {
+        return static::getContainer()->newInstance($key, $args);
+    }
+
+    /**
      * Convenience method for creating shared keys.
      *
      * @param   string   $key      Name of dataStore key to set.
