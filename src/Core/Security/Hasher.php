@@ -9,22 +9,22 @@
 namespace Windwalker\Core\Security;
 
 use Windwalker\Core\Facade\AbstractProxyFacade;
-use Windwalker\Crypt\Password;
 
 /**
  * The Hasher class.
  *
- * @see    Password
+ * @see    ModernPassword
  *
- * @method static string    create(string $password)
+ * @method static string    create(string $password, int $algo = 1, array $options = []))
  * @method static boolean   verify(string $password, string $hash)
+ * @method static boolean   needsRehash(string $password, int $algo = 1, array $options = [])
  * @method static string    genRandomPassword(int $length = 8)
  * @method static string    getSalt()
- * @method static Password  setSalt(string $salt)
+ * @method static ModernPassword  setSalt(string $salt)
  * @method static int       getCost()
- * @method static Password  setCost(int $cost)
+ * @method static ModernPassword  setCost(int $cost)
  * @method static int       getType()
- * @method static Password  setType(int $type)
+ * @method static ModernPassword  setType(int $type)
  * @method static bool      isSodiumAlgo(int $type)
  * @method static bool      isSodiumHash(string $hash)
  *
