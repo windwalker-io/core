@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Security\CsrfGuard;
+use Windwalker\Core\Security\ModernPassword;
 use Windwalker\Crypt\Cipher\Aes256Cipher;
 use Windwalker\Crypt\Cipher\BlowfishCipher;
 use Windwalker\Crypt\Cipher\CipherInterface;
@@ -56,14 +57,9 @@ class SecurityProvider implements ServiceProviderInterface
             return $container->newInstance(Crypt::class, ['key' => $key]);
         })->bindShared(CryptInterface::class, Crypt::class);
 
-        $container->share(Password::class, function (Container $container) {
-            $config = $container->get('config');
-
-            return new Password(
-                $this->getHashingAlgorithm($config->get('crypt.hash_algo', 'blowfish')),
-                (int) $config->get('crypt.hash_cost')
-            );
-        })->bindShared(HasherInterface::class, Password::class);
+        $container->prepareSharedObject(ModernPassword::class)
+            ->bindShared(HasherInterface::class, ModernPassword::class)
+            ->bindShared(Password::class, ModernPassword::class);
     }
 
     /**
