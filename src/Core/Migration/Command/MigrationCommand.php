@@ -86,7 +86,7 @@ class MigrationCommand extends CoreCommand
 
         $config['database.name'] = null;
 
-        $db = $this->console->database;
+        $db = $this->console->container->get(AbstractDatabaseDriver::class, true);
 
         $db->getDatabase($name)->create(true);
 

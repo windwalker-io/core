@@ -46,7 +46,7 @@ class DatabaseProvider implements ServiceProviderInterface
                 'prefix' => $config->get('database.prefix', 'wind_'),
             ];
 
-            $db = DatabaseFactory::getDbo($option['driver'], $option);
+            $db = DatabaseFactory::getDbo($option['driver'], $option, true);
 
             $db->setDebug($config->get('system.debug', false));
 
