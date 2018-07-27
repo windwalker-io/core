@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Migration\Repository;
 
 use Windwalker\Console\Command\AbstractCommand;
+use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Core\Repository\Repository;
@@ -229,6 +230,9 @@ class MigrationsRepository extends Repository
         // Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite does.
         $tran = $this->db->getTransaction()->start();
 
+        /** @var CoreConsole $console */
+        $console = $this->command->getApplication();
+
         try {
             $tmpl = '<info>%s_%s</info> <comment>%s</comment>... ';
 
@@ -239,15 +243,23 @@ class MigrationsRepository extends Repository
                 strtoupper($direction)
             ), false);
 
-            $migration->$direction();
+            $console->container->call([$migration, $direction]);
 
             $tmpl = ' <option>Success</option>';
 
             $this->out($tmpl);
-        } catch (\Exception $e) {
-            $tran->rollback();
+        } catch (\PDOException $e) {
+            if ($this->command->getOption('v')) {
+                $e = new \PDOException(
+                    $e->getMessage() . "\n\nSQL: " . $this->db->getQuery(),
+                    $e->getCode(),
+                    $e
+                );
+            }
 
             throw $e;
+        } finally {
+            $tran->rollback();
         }
 
         $tran->commit();

@@ -61,11 +61,13 @@ class ImportCommand extends CoreCommand
     /**
      * Execute this command.
      *
-     * @return int|void
+     * @return bool
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {
-        if ($this->console->getMode() != 'dev') {
+        if ($this->console->getMode() !== 'dev') {
             throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
         }
 
@@ -77,9 +79,21 @@ class ImportCommand extends CoreCommand
         $class = $this->console->get('seed.class');
 
         /** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
-        $seeder = new $class(Ioc::getDatabase(), $this);
+        $seeder = $this->console->container->newInstance($class, ['command' => $this]);
 
-        $seeder->doExecute();
+        try {
+            $this->console->container->call([$seeder, 'doExecute']);
+        } catch (\PDOException $e) {
+            if ($this->getOption('v')) {
+                $e = new \PDOException(
+                    $e->getMessage() . "\n\nSQL: " . $this->console->database->getQuery(),
+                    $e->getCode(),
+                    $e
+                );
+            }
+
+            throw $e;
+        }
 
         return true;
     }
