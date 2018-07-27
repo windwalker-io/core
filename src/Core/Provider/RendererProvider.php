@@ -131,6 +131,11 @@ class RendererProvider implements ServiceProviderInterface
      */
     protected function prepareGlobals(Container $container, RendererManager $manager)
     {
+        $chronos = new Chronos(
+            'now',
+            new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC'))
+        );
+
         $globals = [
             'uri' => $container->exists('uri') ? $container->get('uri') : null,
             'app' => $container->get('application'),
@@ -138,8 +143,8 @@ class RendererProvider implements ServiceProviderInterface
             'messages' => [], // Deprecated this variable after 4.0
             'translator' => $container->exists('language') ? $container->get('language') : null,
             'widget' => $container->exists('widget.manager') ? $container->get('widget.manager') : null,
-            'datetime' => new Chronos('now',
-                new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC'))),
+            'datetime' => $chronos,
+            'chronos' => $chronos,
         ];
 
         $manager->setGlobals($globals);

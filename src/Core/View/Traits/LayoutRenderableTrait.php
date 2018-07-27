@@ -131,10 +131,14 @@ trait LayoutRenderableTrait
         $paths->insert($this->config['tmpl_path.view'], PriorityQueue::LOW);
         $paths->insert($this->config['tmpl_path.package'], PriorityQueue::LOW);
 
-        $paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $viewName),
-            PriorityQueue::LOW - 10);
-        $paths->insert(Path::normalize($config->get('path.templates') . '/' . $package->getName()),
-            PriorityQueue::LOW - 10);
+        $paths->insert(
+            Path::normalize($config->get('path.templates') . '/' . $package->getName() . '/' . $viewName),
+            PriorityQueue::LOW - 10
+        );
+        $paths->insert(
+            Path::normalize($config->get('path.templates') . '/' . $package->getName()),
+            PriorityQueue::LOW - 10
+        );
 
         $this->renderer->setPaths($paths);
 
@@ -164,12 +168,16 @@ trait LayoutRenderableTrait
         $locale  = $this->getPackage()->app->get('language.locale');
         $default = $this->getPackage()->app->get('language.default');
 
-        $this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.locale'),
-            PriorityQueue::BELOW_NORMAL);
+        $this->addPath(
+            $this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.locale'),
+            PriorityQueue::BELOW_NORMAL
+        );
 
         if ($locale != $default) {
-            $this->addPath($this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.default'),
-                PriorityQueue::BELOW_NORMAL);
+            $this->addPath(
+                $this->config['tmpl_path.view'] . '/' . $this->getPackage()->app->get('language.default'),
+                PriorityQueue::BELOW_NORMAL
+            );
         }
 
         $this->config['path.multilingual_registered'] = true;
