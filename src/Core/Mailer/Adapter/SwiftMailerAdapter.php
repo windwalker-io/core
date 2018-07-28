@@ -132,7 +132,6 @@ class SwiftMailerAdapter implements MailerAdapterInterface
 
         switch ($transport) {
             case 'smtp':
-
                 $instance = \Swift_SmtpTransport::newInstance(
                     $config->get('smtp.host'),
                     $config->get('smtp.port', 2525),
@@ -151,7 +150,6 @@ class SwiftMailerAdapter implements MailerAdapterInterface
                 break;
 
             case 'sendmail':
-
                 $instance = \Swift_SendmailTransport::newInstance($config->get('sendmail'));
 
                 break;

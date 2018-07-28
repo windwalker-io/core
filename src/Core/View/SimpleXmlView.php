@@ -51,8 +51,9 @@ class SimpleXmlView extends AbstractView
         if ($data instanceof \SimpleXMLElement) {
             $this->data = $data;
         } else {
-            $this->data = new \SimpleXMLElement(XmlFormat::structToString($data,
-                ['name' => $this->root, 'nodeName' => $this->nodeName]));
+            $this->data = new \SimpleXMLElement(
+                XmlFormat::structToString($data, ['name' => $this->root, 'nodeName' => $this->nodeName])
+            );
         }
     }
 

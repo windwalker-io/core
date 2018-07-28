@@ -78,15 +78,22 @@ class SystemProvider implements ServiceProviderInterface
     protected function registerClassAlias()
     {
         // Model to Repository
-        class_alias(Repository\Exception\ValidateFailException::class,
-            'Windwalker\Core\Model\Exception\ValidateFailException');
+        class_alias(
+            Repository\Exception\ValidateFailException::class,
+            'Windwalker\Core\Model\Exception\ValidateFailException'
+        );
         class_alias(Repository\Traits\CliOutputModelTrait::class, 'Windwalker\Core\Model\Traits\CliOutputModelTrait');
         class_alias(Repository\Traits\DatabaseModelTrait::class, 'Windwalker\Core\Model\Traits\DatabaseModelTrait');
-        class_alias(Repository\Traits\DatabaseRepositoryTrait::class,
-            'Windwalker\Core\Model\Traits\DatabaseRepositoryTrait');
+        class_alias(
+            Repository\Traits\DatabaseRepositoryTrait::class,
+            'Windwalker\Core\Model\Traits\DatabaseRepositoryTrait'
+        );
         class_alias(Repository\DatabaseRepository::class, 'Windwalker\Core\Model\DatabaseModelRepository');
         class_alias(Repository\DatabaseRepository::class, 'Windwalker\Core\Repository\DatabaseModelRepository');
-        class_alias(Repository\DatabaseRepositoryInterface::class, 'Windwalker\Core\Model\DatabaseRepositoryInterface');
+        class_alias(
+            Repository\DatabaseRepositoryInterface::class,
+            'Windwalker\Core\Model\DatabaseRepositoryInterface'
+        );
         class_alias(Repository\Repository::class, 'Windwalker\Core\Model\ModelRepository');
         class_alias(Repository\Repository::class, 'Windwalker\Core\Repository\ModelRepository');
     }

@@ -107,10 +107,12 @@ class SeedCommand extends Command
             $file = $package ? $package->getDir() . '/Seed/' . $class . '.php' : null;
 
             if (!$file || !is_file($file)) {
-                $file = $this->getOption('d', Ioc::getConfig()->get('path.seeders')) . '/' . str_replace('\\',
-                        DIRECTORY_SEPARATOR, $class) . '.php';
+                $file = $this->getOption(
+                    'd',
+                    Ioc::getConfig()->get('path.seeders')
+                ) . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
-                if ($file[0] != '/' && substr($file, 1, 2) != ':\\') {
+                if ($file[0] !== '/' && substr($file, 1, 2) !== ':\\') {
                     $file = $this->console->get('path.root') . '/' . $file;
                 }
             }

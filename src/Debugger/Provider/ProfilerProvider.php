@@ -47,13 +47,17 @@ class ProfilerProvider implements ServiceProviderInterface
             if ($config->get('system.debug')) {
                 $profiler = new Profiler('windwalker');
 
-                $profiler->setPoint(new Point('start', $config['execution.start'] ?: microtime(true),
-                    $config['execution.memory'] ?: memory_get_usage(true), ['tag' => 'system.process']));
+                $profiler->setPoint(new Point(
+                    'start',
+                    $config['execution.start'] ?: microtime(true),
+                    $config['execution.memory'] ?: memory_get_usage(true),
+                    ['tag' => 'system.process']
+                ));
 
                 return $profiler;
-            } else {
-                return new NullProfiler();
             }
+
+            return new NullProfiler();
         };
 
         $container->share('profiler', $closure);

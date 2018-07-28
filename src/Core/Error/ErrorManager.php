@@ -177,8 +177,10 @@ class ErrorManager
     {
         $renderer = $this->app->renderer->getRenderer($this->engine);
 
-        $body = $renderer->render($this->app->get('error.template', 'windwalker.error.default'),
-            ['exception' => $exception]);
+        $body = $renderer->render(
+            $this->app->get('error.template', 'windwalker.error.default'),
+            ['exception' => $exception]
+        );
 
         $code = $exception->getCode();
 

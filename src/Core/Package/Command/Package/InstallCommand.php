@@ -19,6 +19,8 @@ use Windwalker\Filesystem\Folder;
 /**
  * The InstallCommand class.
  *
+ * phpcs:disable -- Too many CS errors.
+ *
  * @since  3.0
  */
 class InstallCommand extends CoreCommand
@@ -114,9 +116,9 @@ class InstallCommand extends CoreCommand
         $file         = $dir . '/config.dist.php';
         $target       = $targetFolder . '/' . $package->name . '.php';
 
-        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <comment>etc/package/" . $package->name . '.php</comment> [Y/n]: ',
+        if (is_file($file) && (new BooleanPrompter)->ask("File: <info>config.dist.php</info> exists,\n do you want to copy it to <comment>etc/package/" . $package->name . '.php</comment> [Y/n]: ',
                 true)) {
-            if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ',
+            if (is_file($target) && (new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ',
                     false)) {
                 File::delete($target);
             } else {

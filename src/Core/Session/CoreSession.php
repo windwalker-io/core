@@ -67,6 +67,8 @@ class CoreSession extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'session';
+    // phpcs:enable
 }

@@ -35,6 +35,8 @@ abstract class CsrfProtection extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'security.csrf';
+    // phpcs:enable
 }

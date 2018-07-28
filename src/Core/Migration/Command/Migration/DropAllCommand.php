@@ -54,7 +54,9 @@ class DropAllCommand extends CoreCommand
     /**
      * Execute this command.
      *
-     * @return int|void
+     * @return bool
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {
@@ -62,8 +64,8 @@ class DropAllCommand extends CoreCommand
             throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
         }
 
-        if (!(new BooleanPrompter)->ask('This action will drop all tables, do you really want to do this? [N/y]',
-            false)) {
+        if (!(new BooleanPrompter())
+            ->ask('This action will drop all tables, do you really want to do this? [N/y]', false)) {
             $this->out('  Canceled.');
 
             return false;

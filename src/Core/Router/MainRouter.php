@@ -119,8 +119,11 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
         if (isset($extra['hook']['build'])) {
             if (!is_callable($extra['hook']['build'])) {
-                throw new \LogicException(sprintf('The build hook: "%s" of route: "%s" not found',
-                    implode('::', (array) $extra['hook']['build']), $route));
+                throw new \LogicException(sprintf(
+                    'The build hook: "%s" of route: "%s" not found',
+                    implode('::', (array) $extra['hook']['build']),
+                    $route
+                ));
             }
 
             call_user_func($extra['hook']['build'], $this, $route, $queries, $type);
@@ -181,23 +184,21 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     public function match($rawRoute, $method = 'GET', $options = [])
     {
         $this->triggerEvent('onRouterBeforeRouteMatch', [
-                'route' => &$rawRoute,
-                'method' => &$method,
-                'options' => &$options,
-                'router' => $this,
-            ]
-        );
+            'route' => &$rawRoute,
+            'method' => &$method,
+            'options' => &$options,
+            'router' => $this,
+        ]);
 
         $route = parent::match($rawRoute, $method, $options);
 
         $this->triggerEvent('onRouterAfterRouteMatch', [
-                'route' => &$rawRoute,
-                'matched' => $route,
-                'method' => &$method,
-                'options' => &$options,
-                'router' => $this,
-            ]
-        );
+            'route' => &$rawRoute,
+            'matched' => $route,
+            'method' => &$method,
+            'options' => &$options,
+            'router' => $this,
+        ]);
 
         $extra = $route->getExtraValues();
 
@@ -221,8 +222,11 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
         // Hooks
         if (isset($extra['hook']['match'])) {
             if (!is_callable($extra['hook']['match'])) {
-                throw new \LogicException(sprintf('The match hook: "%s" of route: "%s" not found',
-                    implode('::', (array) $extra['hook']['match']), $route->getName()));
+                throw new \LogicException(sprintf(
+                    'The match hook: "%s" of route: "%s" not found',
+                    implode('::', (array) $extra['hook']['match']),
+                    $route->getName()
+                ));
             }
 
             call_user_func($extra['hook']['match'], $this, $route, $method, $options);
@@ -403,8 +407,11 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
                 }
 
                 if (!$resolver->exists($route['package'])) {
-                    throw new \InvalidArgumentException(sprintf('Package %s not exists when register routing: %s.',
-                        $route['package'], $key));
+                    throw new \InvalidArgumentException(sprintf(
+                        'Package %s not exists when register routing: %s.',
+                        $route['package'],
+                        $key
+                    ));
                 }
 
                 $package = $resolver->getPackage($route['package']);

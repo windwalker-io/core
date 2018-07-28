@@ -82,7 +82,7 @@ class WidgetManager
     public function createWidget($layout, $engine = null, $package = null)
     {
         // TODO: If we don't need boot() anymore, remove RendererHelper::boot()
-//		RendererHelper::boot();
+//        RendererHelper::boot();
         $engine = $this->rendererManager->getRenderer($engine ?: static::PHP);
 
         // Prepare package

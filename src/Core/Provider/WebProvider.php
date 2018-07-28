@@ -44,8 +44,8 @@ class WebProvider implements ServiceProviderInterface
         })->bindShared(PsrInput::class, Input::class);
 
         // Request
-//		$container->share(ServerRequest::class, $app->getRequest())
-//			->alias(ServerRequestInterface::class, ServerRequest::class);
+//        $container->share(ServerRequest::class, $app->getRequest())
+//            ->alias(ServerRequestInterface::class, ServerRequest::class);
 
         // Environment
         $container->share(WebEnvironment::class, $app->getEnvironment());

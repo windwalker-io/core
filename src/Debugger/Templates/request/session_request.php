@@ -12,7 +12,7 @@ use Windwalker\Dom\HtmlElement;
 ?>
     <h2><?php echo strtoupper($type) ?> Variables</h2>
 
-<?php if (!empty($collector['request'][$type])): ?>
+<?php if (!empty($collector['request'][$type])) : ?>
     <?php
     $gridObject = BootstrapKeyValueGrid::create()->addHeader();
 
@@ -40,7 +40,7 @@ use Windwalker\Dom\HtmlElement;
     echo $gridObject;
     ?>
     <br/><br/>
-<?php else: ?>
+<?php else : ?>
     No data.
     <br/><br/>
 <?php endif; ?>

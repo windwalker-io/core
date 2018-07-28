@@ -32,8 +32,11 @@ $types = [
                     <span class="fa far fa-link"></span>
                 </a>
 
-                <a class="btn btn-sm btn-outline-success hasTooltip" href="<?php echo $router->route('database',
-                    ['id' => $item->id, 'refresh' => 1, 'hash' => 'query-' . $name]); ?>"
+                <a class="btn btn-sm btn-outline-success hasTooltip"
+                    href="<?php echo $router->route(
+                        'database',
+                        ['id' => $item->id, 'refresh' => 1, 'hash' => 'query-' . $name]
+                    ); ?>"
                     title="Refresh and back to this query.">
                     <span class="fa far fa-sync"></span>
                 </a>
@@ -46,11 +49,11 @@ $types = [
         <div class="d-flex">
             <div>
                 Query Time: <span
-                    class="badge badge-<?php echo $timeline['time']['style'] ?>"><?php echo round($timeline['time']['value'],
-                        2) ?> ms</span>
+                    class="badge badge-<?php echo $timeline['time']['style'] ?>">
+                    <?php echo round($timeline['time']['value'], 2) ?> ms</span>
                 Memory: <span
-                    class="badge badge-<?php echo $timeline['memory']['style'] ?>"><?php echo round($timeline['memory']['value'],
-                        3) ?> MB</span>
+                    class="badge badge-<?php echo $timeline['memory']['style'] ?>">
+                    <?php echo round($timeline['memory']['value'], 3) ?> MB</span>
                 Return Rows: <span class="badge badge-info"><?php echo $timeline['data']['rows'] ?></span>
             </div>
             <div class="ml-auto">
@@ -63,7 +66,7 @@ $types = [
         </div>
 
     </div>
-    <?php if (!empty($timeline['data']['bounded'])): ?>
+    <?php if (!empty($timeline['data']['bounded'])) : ?>
         <div class="table-responsive">
             <table class="table table-striped mb-0">
                 <thead>
@@ -76,7 +79,7 @@ $types = [
                 </tr>
                 </thead>
                 <tbody>
-                <?php foreach ((array) $timeline['data']['bounded'] as $key => $item): ?>
+                <?php foreach ((array) $timeline['data']['bounded'] as $key => $item) : ?>
                     <tr>
                         <td><?php echo $key ?></td>
                         <td><?php echo $item['value'] ?></td>
@@ -90,7 +93,7 @@ $types = [
         </div>
     <?php endif; ?>
 
-    <?php if (isset($timeline['data']['explain'])): ?>
+    <?php if (isset($timeline['data']['explain'])) : ?>
     <div class="table-responsive">
         <table class="explain-table table table-striped mb-0">
             <thead>
@@ -109,7 +112,8 @@ $types = [
             </thead>
             <tbody>
             <?php $explain = new DataSet($timeline['data']['explain']); ?>
-            <?php foreach ($explain as $item): ?>
+
+            <?php foreach ($explain as $item) : ?>
                 <tr>
                     <td><?php echo $item->id ?></td>
                     <td><?php echo $item->select_type ?></td>
@@ -128,7 +132,7 @@ $types = [
     </div>
     <?php endif; ?>
 
-    <?php if (isset($timeline['data']['backtrace'])): ?>
+    <?php if (isset($timeline['data']['backtrace'])) : ?>
         <div class="modal fade backtrace-modal" id="backtrace-modal-<?php echo $timeline['data']['serial']; ?>" tabindex="-1"
             role="dialog" aria-labelledby="backtrace-modal-label-<?php echo $timeline['data']['serial']; ?>" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -144,7 +148,8 @@ $types = [
                     <div class="modal-body">
                         <table class="table table-bordered table-striped">
                             <?php $num = count($timeline['data']['backtrace']); ?>
-                            <?php foreach ($timeline['data']['backtrace'] as $trace): ?>
+
+                            <?php foreach ($timeline['data']['backtrace'] as $trace) : ?>
                             <tr>
                                 <td class="text-nowrap">
                                     <?php echo $num--; ?>

@@ -76,7 +76,7 @@
 <h2>BackTrace</h2>
 
 <table>
-    <?php foreach ($exception->getTrace() as $i => $trace): ?>
+    <?php foreach ($exception->getTrace() as $i => $trace) : ?>
         <tr>
             <td>
                 #<?php echo $i; ?>
@@ -91,7 +91,7 @@
                 ?>
             </td>
             <td>
-                <?php if (!empty($trace['file'])): ?>
+                <?php if (!empty($trace['file'])) : ?>
                     <?php echo $trace['file']; ?> (line: <?php echo $trace['line']; ?>)
                 <?php endif; ?>
             </td>

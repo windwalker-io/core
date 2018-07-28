@@ -37,6 +37,8 @@ class QueueFactory extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'queue.manager';
+    // phpcs:enable
 }

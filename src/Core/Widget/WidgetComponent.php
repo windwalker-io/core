@@ -68,11 +68,11 @@ class WidgetComponent extends Widget
                 $locale  = $package->app->get('language.locale', 'en-GB');
                 $default = $package->app->get('language.default', 'en-GB');
 
-                $selfPath = dirname(ReflectionHelper::getPath(get_called_class()));
+                $selfPath = dirname(ReflectionHelper::getPath(static::class));
 
                 $this->renderer->addPath($selfPath . '/templates/' . $locale, PriorityQueue::BELOW_NORMAL);
 
-                if ($default != $locale) {
+                if ($default !== $locale) {
                     $this->renderer->addPath($selfPath . '/templates/' . $default, PriorityQueue::BELOW_NORMAL);
                 }
 
@@ -81,12 +81,16 @@ class WidgetComponent extends Widget
                 if ($this->name) {
                     $globalPath = $this->getPackage()->app->get('path.templates');
 
-                    $this->renderer->addPath($globalPath . '/' . $this->getName() . '/' . $locale,
-                        PriorityQueue::BELOW_NORMAL);
+                    $this->renderer->addPath(
+                        $globalPath . '/' . $this->getName() . '/' . $locale,
+                        PriorityQueue::BELOW_NORMAL
+                    );
 
-                    if ($default != $locale) {
-                        $this->renderer->addPath($globalPath . '/' . $this->getName() . '/' . $default,
-                            PriorityQueue::BELOW_NORMAL);
+                    if ($default !== $locale) {
+                        $this->renderer->addPath(
+                            $globalPath . '/' . $this->getName() . '/' . $default,
+                            PriorityQueue::BELOW_NORMAL
+                        );
                     }
 
                     $this->renderer->addPath($globalPath . '/' . $this->getName(), PriorityQueue::BELOW_NORMAL);

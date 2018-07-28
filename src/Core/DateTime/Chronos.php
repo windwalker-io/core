@@ -354,7 +354,7 @@ class Chronos extends \DateTime
                 return $this->format('z', true);
 
             case 'isleapyear':
-                return (boolean) $this->format('L', true);
+                return (bool) $this->format('L', true);
 
             case 'day':
                 return $this->format('d', true);

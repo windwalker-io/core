@@ -28,8 +28,10 @@ abstract class DebuggerHelper extends AbstractFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'debugger.collector';
+    // phpcs:enable
 
     /**
      * addData

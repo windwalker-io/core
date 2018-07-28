@@ -247,19 +247,25 @@ class Widget implements \ArrayAccess
 
                 $prefix = $this->pathPrefix ? '/' . $this->pathPrefix : null;
 
-                $this->renderer->addPath($package->getDir() . '/Templates' . $prefix . '/' . $locale,
-                    PriorityQueue::BELOW_NORMAL);
+                $this->renderer->addPath(
+                    $package->getDir() . '/Templates' . $prefix . '/' . $locale,
+                    PriorityQueue::BELOW_NORMAL
+                );
 
-                if ($locale != $default) {
-                    $this->renderer->addPath($package->getDir() . '/Templates' . $prefix . '/' . $default,
-                        PriorityQueue::BELOW_NORMAL);
+                if ($locale !== $default) {
+                    $this->renderer->addPath(
+                        $package->getDir() . '/Templates' . $prefix . '/' . $default,
+                        PriorityQueue::BELOW_NORMAL
+                    );
                 }
 
                 $this->renderer->addPath($package->getDir() . '/Templates' . $prefix, PriorityQueue::BELOW_NORMAL);
 
                 if ($this->pathPrefix) {
-                    $this->renderer->addPath($package->app->get('path.templates') . '/' . $this->pathPrefix,
-                        PriorityQueue::LOW);
+                    $this->renderer->addPath(
+                        $package->app->get('path.templates') . '/' . $this->pathPrefix,
+                        PriorityQueue::LOW
+                    );
                 }
             }
 

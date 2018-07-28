@@ -24,20 +24,20 @@ class PhpStormMetaListener
 {
     protected $tmpl = <<<TMPL
 <?php
-	
+    
 namespace PHPSTORM_META
 {
-	\$STATIC_METHOD_TYPES = [
-		\Windwalker\Application\AbstractApplication::get('') => [
-			{config}
-		],
-		\Windwalker\Core\Config\Config::get('') => [
-			{config}
-		],
-		new \Windwalker\Core\Config\Config => [
-			{config}
-		]
-	];
+    \$STATIC_METHOD_TYPES = [
+        \Windwalker\Application\AbstractApplication::get('') => [
+            {config}
+        ],
+        \Windwalker\Core\Config\Config::get('') => [
+            {config}
+        ],
+        new \Windwalker\Core\Config\Config => [
+            {config}
+        ]
+    ];
 }
 TMPL;
 
@@ -56,8 +56,8 @@ TMPL;
 
         /** @var PathLocator $file */
         foreach ($files->find('.*\.[php|json|yml|yaml]', true) as $file) {
-            if (!in_array($file->getExtension(),
-                    ['php', 'json', 'yml', 'yaml']) || $file->getBasename() == 'define.php') {
+            if (!in_array($file->getExtension(), ['php', 'json', 'yml', 'yaml'])
+                || $file->getBasename() === 'define.php') {
                 continue;
             }
 

@@ -12,7 +12,7 @@ use Windwalker\Form\Field\AbstractField;
  * @var  AbstractField $field
  */
 ?>
-<?php foreach ($fields as $field): ?>
+<?php foreach ($fields as $field) : ?>
     <div class="form-group">
         <?php
         $field->set('class', $field->get('class') . ' form-control');

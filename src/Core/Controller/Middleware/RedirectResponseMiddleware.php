@@ -30,8 +30,11 @@ class RedirectResponseMiddleware extends AbstractControllerMiddleware
 
         $response = $data->response;
 
-        $this->controller->setResponse(new RedirectResponse($result, $response->getStatusCode(),
-            $response->getHeaders()));
+        $this->controller->setResponse(new RedirectResponse(
+            $result,
+            $response->getStatusCode(),
+            $response->getHeaders()
+        ));
 
         return $this->next->execute($data);
     }

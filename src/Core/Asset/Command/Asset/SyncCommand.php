@@ -91,14 +91,16 @@ class SyncCommand extends Command
         }
 
         if (!is_dir($dir)) {
-            throw new \InvalidArgumentException('This package has no <comment>/Resources/asset</comment> folder so nothing synced.');
+            throw new \InvalidArgumentException(
+                'This package has no <comment>/Resources/asset</comment> folder so nothing synced.'
+            );
         }
 
         $folder = $this->console->get('asset.folder');
         $target = $this->getArgument(1, $name);
         $target = $this->console->get('path.public') . '/' . trim($folder, '/') . '/' . $target;
 
-        $symlink = new Symlink;
+        $symlink = new Symlink();
         $force   = $this->getOption('force');
 
         if (is_link($target)) {

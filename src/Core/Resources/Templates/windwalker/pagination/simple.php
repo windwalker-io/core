@@ -15,7 +15,7 @@ use Windwalker\Core\Pagination\PaginationResult;
 ?>
 <div class="windwalker-pagination">
     <div class="btn-group pull-left">
-        <?php if ($pagination->getFirst()): ?>
+        <?php if ($pagination->getFirst()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>"
                class="hasTooltip btn btn-default" title="First Page">
                 <span class="glyphicon glyphicon-fast-backward"></span>
@@ -25,7 +25,7 @@ use Windwalker\Core\Pagination\PaginationResult;
             </a>
         <?php endif; ?>
 
-        <?php if ($pagination->getPrevious()): ?>
+        <?php if ($pagination->getPrevious()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>"
                class="hasTooltip btn btn-default" title="Previous Page">
                 <span class="glyphicon glyphicon-backward"></span>
@@ -37,7 +37,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     </div>
 
     <div class="pull-right">
-        <?php if ($pagination->getNext()): ?>
+        <?php if ($pagination->getNext()) : ?>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>"
                class="hasTooltip btn btn-default" title="Next Page">
                 <span class="glyphicon glyphicon-forward"></span>

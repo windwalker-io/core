@@ -36,6 +36,8 @@ class WidgetHelper extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'widget.manager';
+    // phpcs:enable
 }

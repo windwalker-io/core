@@ -27,7 +27,7 @@ $this->extend('_global.html');
 <?php $this->block('content') ?>
 <div id="mail-tester-body" class="container">
     <div class="row">
-        <?php if (isset($message)): ?>
+        <?php if (isset($message)) : ?>
             <div class="col-md-4">
                 <h3>Mail Information</h3>
 
@@ -36,11 +36,11 @@ $this->extend('_global.html');
                         <td>From</td>
                         <td>
                             <ul>
-                                <?php foreach ($message->getFrom() as $mail => $name): ?>
+                                <?php foreach ($message->getFrom() as $mail => $name) : ?>
                                     <li>
                                         <?php echo $mail; ?>
 
-                                        <?php if ($name): ?>
+                                        <?php if ($name) : ?>
                                             &lt;<?php echo $name; ?>&gt;
                                         <?php endif; ?>
                                     </li>
@@ -52,11 +52,11 @@ $this->extend('_global.html');
                         <td>To</td>
                         <td>
                             <ul>
-                                <?php foreach ($message->getTo() as $mail => $name): ?>
+                                <?php foreach ($message->getTo() as $mail => $name) : ?>
                                     <li>
                                         <?php echo $mail; ?>
 
-                                        <?php if ($name): ?>
+                                        <?php if ($name) : ?>
                                             &lt;<?php echo $name; ?>&gt;
                                         <?php endif; ?>
                                     </li>
@@ -68,11 +68,11 @@ $this->extend('_global.html');
                         <td>CC</td>
                         <td>
                             <ul>
-                                <?php foreach ($message->getCc() as $mail => $name): ?>
+                                <?php foreach ($message->getCc() as $mail => $name) : ?>
                                     <li>
                                         <?php echo $mail; ?>
 
-                                        <?php if ($name): ?>
+                                        <?php if ($name) : ?>
                                             &lt;<?php echo $name; ?>&gt;
                                         <?php endif; ?>
                                     </li>
@@ -84,11 +84,11 @@ $this->extend('_global.html');
                         <td>BCC</td>
                         <td>
                             <ul>
-                                <?php foreach ($message->getBcc() as $mail => $name): ?>
+                                <?php foreach ($message->getBcc() as $mail => $name) : ?>
                                     <li>
                                         <?php echo $mail; ?>
 
-                                        <?php if ($name): ?>
+                                        <?php if ($name) : ?>
                                             &lt;<?php echo $name; ?>&gt;
                                         <?php endif; ?>
                                     </li>
@@ -101,9 +101,9 @@ $this->extend('_global.html');
         <?php endif; ?>
 
         <div id="mail-tester-wrapper" class="col-md-8" style="margin-top: 30px; margin-bottom: 30px; padding: 0">
-            <?php if (isset($message)): ?>
+            <?php if (isset($message)) : ?>
                 <iframe id="mail-tester-frame" frameborder="0" style="width: 100%; height: 550px;"></iframe>
-            <?php else: ?>
+            <?php else : ?>
                 <h3 class="text-center">Mail Provider: <code><?php echo $class; ?></code> Not Found</h3>
             <?php endif; ?>
         </div>
@@ -111,7 +111,7 @@ $this->extend('_global.html');
 </div>
 
 <script id="mail-tester-template" type="text/template">
-    <?php if (isset($message)): ?>
+    <?php if (isset($message)) : ?>
         <?php echo $message->getBody(); ?>
     <?php endif; ?>
 </script>

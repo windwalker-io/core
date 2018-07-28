@@ -26,8 +26,11 @@ class HtmlResponseMiddleware extends AbstractControllerMiddleware
      */
     public function execute($data = null)
     {
-        $this->controller->setResponse(new HtmlResponse('', $data->response->getStatusCode(),
-            $data->response->getHeaders()));
+        $this->controller->setResponse(new HtmlResponse(
+            '',
+            $data->response->getStatusCode(),
+            $data->response->getHeaders()
+        ));
 
         $result = $this->next->execute($data);
 

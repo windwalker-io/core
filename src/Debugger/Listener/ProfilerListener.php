@@ -70,18 +70,17 @@ class ProfilerListener
             ];
         });
 
-        $collector['system.name']          = $event['app']->getName();
-        $collector['system.time']          = Chronos::create('now',
-            Chronos::TZ_LOCALE)->format(Chronos::FORMAT_YMD_HIS);
-        $collector['system.uri']           = get_object_vars($container->get('uri'));
-        $collector['system.ip']            = $input->server->getString('REMOTE_ADDR');
+        $collector['system.name'] = $event['app']->getName();
+        $collector['system.time'] = Chronos::create('now', Chronos::TZ_LOCALE)->format(Chronos::FORMAT_YMD_HIS);
+        $collector['system.uri']  = get_object_vars($container->get('uri'));
+        $collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
+
         $collector['system.method.http']   = $input->getMethod();
         $collector['system.method.custom'] = strtoupper($input->get('_method'));
 
         $profiler->mark(__FUNCTION__, [
-                'tag' => 'system.process',
-            ]
-        );
+            'tag' => 'system.process',
+        ]);
     }
 
     /**
@@ -102,9 +101,8 @@ class ProfilerListener
         $profiler  = $container->get('profiler');
 
         $profiler->mark(__FUNCTION__, [
-                'tag' => 'system.process',
-            ]
-        );
+            'tag' => 'system.process',
+        ]);
     }
 
     /**
@@ -136,9 +134,8 @@ class ProfilerListener
         $collector['routing.routes']  = StructureHelper::dumpObjectValues($router->getRoutes());
 
         $profiler->mark(__FUNCTION__, [
-                'tag' => 'system.process',
-            ]
-        );
+            'tag' => 'system.process',
+        ]);
     }
 
     /**
@@ -160,9 +157,8 @@ class ProfilerListener
         $name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
         $profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
-                'tag' => 'package.process',
-            ]
-        );
+            'tag' => 'package.process',
+        ]);
     }
 
     /**
@@ -184,9 +180,8 @@ class ProfilerListener
         $name = $event['controller']->getPackage()->name . '@' . $event['controller']->getName() . '::' . ReflectionHelper::getShortName($event['controller']);
 
         $profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
-                'tag' => 'package.process',
-            ]
-        );
+            'tag' => 'package.process',
+        ]);
     }
 
     /**
@@ -208,9 +203,8 @@ class ProfilerListener
         $name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
         $profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
-                'tag' => 'package.process',
-            ]
-        );
+            'tag' => 'package.process',
+        ]);
     }
 
     /**
@@ -232,9 +226,8 @@ class ProfilerListener
         $name = $event['view']->getPackage()->name . '@' . $event['view']->getName();
 
         $profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
-                'tag' => 'package.process',
-            ]
-        );
+            'tag' => 'package.process',
+        ]);
     }
 
     /**
@@ -265,19 +258,17 @@ class ProfilerListener
         $collector['controller.main'] = get_class($controller);
 
         $collector->push('controller.executed', [
-                'controller' => get_class($controller),
-                'task' => $event['task'],
-                'input' => $controller->getInput()->toArray(),
-                'variables' => $event['variables'],
-            ]
-        );
+            'controller' => get_class($controller),
+            'task' => $event['task'],
+            'input' => $controller->getInput()->toArray(),
+            'variables' => $event['variables'],
+        ]);
 
         $name = $package->getName();
 
         $profiler->mark(__FUNCTION__ . ' / ' . $name . ' (' . uniqid() . ')', [
-                'tag' => 'package.process',
-            ]
-        );
+            'tag' => 'package.process',
+        ]);
     }
 
     /**
@@ -299,9 +290,8 @@ class ProfilerListener
         $profiler  = $container->get('profiler');
 
         $profiler->mark(__FUNCTION__, [
-                'tag' => 'system.process',
-            ]
-        );
+            'tag' => 'system.process',
+        ]);
     }
 
     /**
@@ -347,9 +337,8 @@ class ProfilerListener
         $profiler  = $container->get('profiler');
 
         $profiler->mark(__FUNCTION__, [
-                'tag' => 'system.process',
-            ]
-        );
+            'tag' => 'system.process',
+        ]);
     }
 
     /**

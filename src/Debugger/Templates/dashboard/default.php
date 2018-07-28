@@ -27,7 +27,7 @@ $this->extend('_global.fluid-layout');
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $item): ?>
+            <?php foreach ($items as $item) : ?>
                 <tr>
                     <td>
                         <a class="text-muted" href="<?php echo $item->link ?>">
@@ -55,12 +55,12 @@ $this->extend('_global.fluid-layout');
                         <?php echo $item->time; ?>
                     </td>
                     <td class="text-nowrap">
-				<span class="<?php echo $item->status_style ?>" aria-label="Http Status: <?php echo $item->status ?>"
+                <span class="<?php echo $item->status_style ?>" aria-label="Http Status: <?php echo $item->status ?>"
                     data-microtip-position="top" role="tooltip">
-					<?php echo $item->status; ?>
-				</span>
+                    <?php echo $item->status; ?>
+                </span>
                         &nbsp;
-                        <?php if ($item->exception->notNull()): ?>
+                        <?php if ($item->exception->notNull()) : ?>
                             <span class="badge badge-danger" aria-label="<?php echo $item->exception->type ?>"
                                 data-microtip-position="top" role="tooltip">E</span>
                         <?php endif; ?>

@@ -56,12 +56,10 @@ echo BootstrapKeyValueGrid::create()
     <div id="queries" style="position: relative; top: -50px;"></div>
     <h2>Queries</h2>
 
-<?php foreach ((array) $queryProcess as $name => $timeline): ?>
-
+<?php foreach ((array) $queryProcess as $name => $timeline) : ?>
     <br/>
     <?php echo $this->load('query_info', ['name' => $name, 'timeline' => $timeline]) ?>
     <br/>
-
 <?php endforeach; ?>
 
     <script src="<?php echo $router->route('asset', ['type' => 'bootstrap-js']); ?>" async></script>

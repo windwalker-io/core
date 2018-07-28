@@ -6,7 +6,10 @@
  * @license    GNU General Public License version 2 or later;
  */
 
-use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRouter;use Windwalker\Structure\Structure;use Windwalker\Uri\UriData;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Structure\Structure;
+use Windwalker\Uri\UriData;
 
 /**
  * @var Structure       $uri
@@ -83,9 +86,12 @@ use Windwalker\Core\Package\AbstractPackage;use Windwalker\Core\Router\PackageRo
             </ul>
             <ul class="nav navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="btn btn-outline-success mr-2" href="<?php echo $router->route($app->get('route.matched'),
-                        ['refresh' => 1, 'id' => $item['id']]); ?>"
-                       data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
+                    <a class="btn btn-outline-success mr-2"
+                        href="<?php echo $router->route(
+                            $app->get('route.matched'),
+                            ['refresh' => 1, 'id' => $item['id']]
+                        ); ?>"
+                        data-toggle="tooltip" data-placement="top" title="Refresh to latest URL">
                         <span class="fa fa-sync"></span>
                         Refresh
                     </a>

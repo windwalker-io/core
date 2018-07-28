@@ -50,6 +50,8 @@ abstract class Asset extends AbstractProxyFacade
      * Property key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'asset';
+    // phpcs:enable
 }

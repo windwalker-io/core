@@ -185,16 +185,16 @@ class DebuggerListener
             return;
         }
 
-//		$theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
+//        $theme = $this->package->getDir() . '/Resources/media/css/theme.min.css';
 //
-//		if (!is_file($theme))
-//		{
-//			$theme = $this->package->getDir() . '/Resources/media/css/theme.css';
-//		}
+//        if (!is_file($theme))
+//        {
+//            $theme = $this->package->getDir() . '/Resources/media/css/theme.css';
+//        }
 //
-//		$main = $this->package->getDir() . '/Resources/media/css/debugger.css';
+//        $main = $this->package->getDir() . '/Resources/media/css/debugger.css';
 //
-//		$event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
+//        $event['data']->themeStyle = file_get_contents($theme) . "\n\n" . file_get_contents($main);
     }
 
     /**

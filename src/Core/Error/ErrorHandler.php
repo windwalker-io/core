@@ -37,6 +37,8 @@ class ErrorHandler extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'error.handler';
+    // phpcs:enable
 }

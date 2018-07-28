@@ -217,8 +217,11 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
         $user = $this->getUser($conditions);
 
         // Before logout event
-        $event = $this->triggerEvent('onUserBeforeLogout',
-            ['user' => $user, 'conditions' => &$conditions, 'options' => &$options]);
+        $event = $this->triggerEvent('onUserBeforeLogout', [
+            'user' => $user,
+            'conditions' => &$conditions,
+            'options' => &$options
+        ]);
 
         // Do logout
         $result = $this->getHandler()->logout($event['user']);
@@ -233,8 +236,11 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 
         // Fail event
         if (!$event['result']) {
-            $this->triggerEvent('onUserLogoutFailure',
-                ['user' => $user, 'conditions' => $conditions, 'options' => &$options]);
+            $this->triggerEvent('onUserLogoutFailure', [
+                'user' => $user,
+                'conditions' => $conditions,
+                'options' => &$options
+            ]);
 
             return false;
         }
@@ -326,8 +332,11 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
         try {
             $this->getHandler()->delete($conditions);
         } catch (\Exception $e) {
-            $this->triggerEvent('onUserDeleteFailure',
-                ['conditions' => $conditions, 'exception' => $e, 'options' => $options]);
+            $this->triggerEvent('onUserDeleteFailure', [
+                'conditions' => $conditions,
+                'exception' => $e,
+                'options' => $options
+            ]);
 
             return false;
         }

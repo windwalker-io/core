@@ -264,11 +264,10 @@ class NullDataMapper extends DataMapper
     {
         // Event
         $this->triggerEvent('onBefore' . ucfirst(__FUNCTION__), [
-                'data' => &$data,
-                'condFields' => &$condFields,
-                'updateNulls' => &$updateNulls,
-            ]
-        );
+            'data' => &$data,
+            'condFields' => &$condFields,
+            'updateNulls' => &$updateNulls,
+        ]);
 
         $dataset = $this->save($this->bindDataset([$data]), $condFields, $updateNulls);
 
@@ -276,9 +275,8 @@ class NullDataMapper extends DataMapper
 
         // Event
         $this->triggerEvent('onAfter' . ucfirst(__FUNCTION__), [
-                'result' => &$result,
-            ]
-        );
+            'result' => &$result,
+        ]);
 
         return $result;
     }

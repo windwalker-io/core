@@ -28,30 +28,30 @@
     </tr>
     </thead>
     <tbody>
-    <?php foreach ((array) $timeline['timeline'] as $name => $point): ?>
+    <?php foreach ((array) $timeline['timeline'] as $name => $point) : ?>
         <tr>
             <td>
                 <?php echo $name; ?>
             </td>
             <td>
-				<span class="badge badge-<?php echo $point['total_time']['style'] ?>">
-					<?php echo round($point['total_time']['value'], 2) ?> ms
-				</span>
+                <span class="badge badge-<?php echo $point['total_time']['style'] ?>">
+                    <?php echo round($point['total_time']['value'], 2) ?> ms
+                </span>
             </td>
             <td>
-				<span class="badge badge-<?php echo $point['time']['style'] ?>">
-					<?php echo round($point['time']['value'], 2) ?> ms
-				</span>
+                <span class="badge badge-<?php echo $point['time']['style'] ?>">
+                    <?php echo round($point['time']['value'], 2) ?> ms
+                </span>
             </td>
             <td>
-				<span class="badge badge-<?php echo $point['total_memory']['style'] ?>">
-					<?php echo round($point['total_memory']['value'], 2) ?> MB
-				</span>
+                <span class="badge badge-<?php echo $point['total_memory']['style'] ?>">
+                    <?php echo round($point['total_memory']['value'], 2) ?> MB
+                </span>
             </td>
             <td>
-				<span class="badge badge-<?php echo $point['memory']['style'] ?>">
-					<?php echo round($point['memory']['value'], 2) ?> MB
-				</span>
+                <span class="badge badge-<?php echo $point['memory']['style'] ?>">
+                    <?php echo round($point['memory']['value'], 2) ?> MB
+                </span>
             </td>
         </tr>
     <?php endforeach; ?>

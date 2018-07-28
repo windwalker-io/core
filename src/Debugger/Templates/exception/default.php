@@ -22,7 +22,7 @@ $this->extend('_global.html');
 
 <?php $this->block('content') ?>
 
-<?php if ($exception->notNull()): ?>
+<?php if ($exception->notNull()) : ?>
     <h2>Exception Information</h2>
 
     <?php
@@ -38,7 +38,7 @@ $this->extend('_global.html');
     <h2>Call Stack</h2>
 
     <table class="table table-striped">
-        <?php foreach ((array) $exception->trace as $i => $trace): ?>
+        <?php foreach ((array) $exception->trace as $i => $trace) : ?>
             <?php
             $trace = new Data($trace);
 
@@ -57,7 +57,7 @@ $this->extend('_global.html');
             </tr>
         <?php endforeach; ?>
     </table>
-<?php else: ?>
+<?php else : ?>
     No Exception caught.
 <?php endif; ?>
 

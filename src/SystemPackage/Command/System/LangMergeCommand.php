@@ -115,7 +115,7 @@ class LangMergeCommand extends CoreCommand
             throw new \RuntimeException('File: ' . $fromFile . ' not exists.');
         }
 
-        $structure = new Structure;
+        $structure = new Structure();
 
         $flat = $this->getOption('f');
         $sort = $this->getOption('s');
@@ -140,7 +140,7 @@ class LangMergeCommand extends CoreCommand
             ksort($data);
         }
 
-        $data = IniFormat::structToString($data);
+        $data    = IniFormat::structToString($data);
         $replace = $this->getOption('r');
 
         $dest = $replace ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;

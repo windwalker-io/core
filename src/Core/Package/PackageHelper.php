@@ -37,8 +37,10 @@ class PackageHelper extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'package.resolver';
+    // phpcs:enable
 
     /**
      * getPath

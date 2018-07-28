@@ -43,6 +43,8 @@ abstract class CoreRouter extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'router';
+    // phpcs:enable
 }

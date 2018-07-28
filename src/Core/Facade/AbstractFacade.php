@@ -22,22 +22,28 @@ abstract class AbstractFacade
      * Property key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key;
+    // phpcs:enable
 
     /**
      * Property child.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_child;
+    // phpcs:enable
 
     /**
      * Property profile.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_profile;
+    // phpcs:enable
 
     /**
      * getInstance

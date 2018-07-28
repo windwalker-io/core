@@ -49,8 +49,13 @@ class ErrorLogHandler implements ErrorHandlerInterface
         $code = $e->getCode();
 
         if ($code < 400 || $code >= 500) {
-            $message = sprintf('Code: %s - %s - File: %s (%d)', $e->getCode(), $e->getMessage(), $e->getFile(),
-                $e->getLine());
+            $message = sprintf(
+                'Code: %s - %s - File: %s (%d)',
+                $e->getCode(),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
 
             $traces = '';
 

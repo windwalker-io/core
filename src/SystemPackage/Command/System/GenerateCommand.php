@@ -68,55 +68,55 @@ use Windwalker\Console\Command\Command;
  */
 class {{CLASS}}Command extends Command
 {
-	/**
-	 * An enabled flag.
-	 *
-	 * @var bool
-	 */
-	public static \$isEnabled = true;
+    /**
+     * An enabled flag.
+     *
+     * @var bool
+     */
+    public static \$isEnabled = true;
 
-	/**
-	 * Console(Argument) name.
-	 *
-	 * @var  string
-	 */
-	protected \$name = '{{NAME}}';
+    /**
+     * Console(Argument) name.
+     *
+     * @var  string
+     */
+    protected \$name = '{{NAME}}';
 
-	/**
-	 * The command description.
-	 *
-	 * @var  string
-	 */
-	protected \$description = '{{DESCRIPTION}}';
+    /**
+     * The command description.
+     *
+     * @var  string
+     */
+    protected \$description = '{{DESCRIPTION}}';
 
-	/**
-	 * The usage to tell user how to use this command.
-	 *
-	 * @var string
-	 */
-	protected \$usage = '{{NAME}} <cmd><command></cmd> <option>[option]</option>';
+    /**
+     * The usage to tell user how to use this command.
+     *
+     * @var string
+     */
+    protected \$usage = '{{NAME}} <cmd><command></cmd> <option>[option]</option>';
 
-	/**
-	 * Initialise command information.
-	 *
-	 * @return void
-	 */
-	public function init()
-	{
-		// \$this->addArgument();
+    /**
+     * Initialise command information.
+     *
+     * @return void
+     */
+    public function init()
+    {
+        // \$this->addArgument();
 
-		parent::init();
-	}
+        parent::init();
+    }
 
-	/**
-	 * Execute this command.
-	 *
-	 * @return int|void
-	 */
-	protected function doExecute()
-	{
-		return parent::doExecute();
-	}
+    /**
+     * Execute this command.
+     *
+     * @return int|void
+     */
+    protected function doExecute()
+    {
+        return parent::doExecute();
+    }
 }
 
 TMPL;

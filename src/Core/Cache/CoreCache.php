@@ -40,6 +40,8 @@ class CoreCache extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'cache';
+    // phpcs:enable
 }

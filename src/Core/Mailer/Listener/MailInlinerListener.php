@@ -43,7 +43,7 @@ class MailInlinerListener
         $body = $message->getBody();
 
         preg_match_all('/<style.*?>(.*?)<\/style>/s', $body, $matches, PREG_SET_ORDER);
-//		preg_match_all('/<link.*?href="(.*?)"/s', $body, $linkMatches, PREG_SET_ORDER);
+//        preg_match_all('/<link.*?href="(.*?)"/s', $body, $linkMatches, PREG_SET_ORDER);
 
         // Remove script & style
         $body = OutputFilter::stripScript($body);

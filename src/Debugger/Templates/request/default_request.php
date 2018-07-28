@@ -11,7 +11,7 @@ use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 ?>
     <h2><?php echo strtoupper($type) ?> Variables</h2>
 
-<?php if (!empty($collector['request'][$type])): ?>
+<?php if (!empty($collector['request'][$type])) : ?>
     <?php
     $gridObject = BootstrapKeyValueGrid::create()->addHeader();
 
@@ -26,7 +26,7 @@ use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
     echo $gridObject;
     ?>
     <br/><br/>
-<?php else: ?>
+<?php else : ?>
     No data.
     <br/><br/>
 <?php endif; ?>

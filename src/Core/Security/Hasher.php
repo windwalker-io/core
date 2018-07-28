@@ -36,6 +36,8 @@ class Hasher extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'hasher';
+    // phpcs:enable
 }

@@ -53,6 +53,8 @@ class User extends AbstractProxyFacade
      * Property key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'user.manager';
+    // phpcs:enable
 }

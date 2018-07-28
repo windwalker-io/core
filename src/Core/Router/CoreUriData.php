@@ -33,6 +33,8 @@ class CoreUriData extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'uri';
+    // phpcs:enable
 }

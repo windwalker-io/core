@@ -52,7 +52,7 @@ class GetController extends AbstractController
                 break;
         }
 
-        $this->response = (new TextResponse)->withContentType($contentType);
+        $this->response = (new TextResponse())->withContentType($contentType);
         $this->app->server->cachable(true);
 
         return $content;

@@ -23,8 +23,10 @@ class Profiler extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'profiler';
+    // phpcs:enable
 
     /**
      * mark

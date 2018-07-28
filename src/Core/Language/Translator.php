@@ -39,6 +39,8 @@ abstract class Translator extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'language';
+    // phpcs:enable
 }

@@ -356,8 +356,11 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7)
     {
-        return $this->createLogger($channel, $level,
-            new RotatingFileHandler($this->getLogFile($channel), $maxFiles, $level));
+        return $this->createLogger(
+            $channel,
+            $level,
+            new RotatingFileHandler($this->getLogFile($channel), $maxFiles, $level)
+        );
     }
 
     /**

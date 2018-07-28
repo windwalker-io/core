@@ -19,7 +19,7 @@ use Windwalker\Core\Pagination\PaginationResult;
     }
 </style>
 <ul class="pagination windwalker-pagination">
-    <?php if ($pagination->getFirst()): ?>
+    <?php if ($pagination->getFirst()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getFirst()])); ?>">
                 <span class="glyphicon glyphicon-fast-backward"></span>
@@ -28,7 +28,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getPrevious()): ?>
+    <?php if ($pagination->getPrevious()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getPrevious()])); ?>">
                 <span class="glyphicon glyphicon-backward"></span>
@@ -37,7 +37,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getLess()): ?>
+    <?php if ($pagination->getLess()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getLess()])); ?>">
                 Less
@@ -45,14 +45,15 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php foreach ($pagination->getPages() as $k => $page): ?>
+    <?php foreach ($pagination->getPages() as $k => $page) : ?>
         <?php $active = ($page == 'current') ? 'active' : ''; ?>
         <li class="<?php echo $active; ?>">
-            <?php if (!$active): ?>
+
+            <?php if (!$active) : ?>
                 <a href="<?php echo $this->escape($route(['page' => $k])); ?>">
                     <?php echo $k; ?>
                 </a>
-            <?php else: ?>
+            <?php else : ?>
                 <a href="javascript:void(0);">
                     <?php echo $k; ?>
                 </a>
@@ -60,7 +61,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endforeach; ?>
 
-    <?php if ($pagination->getMore()): ?>
+    <?php if ($pagination->getMore()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getMore()])); ?>">
                 More
@@ -68,7 +69,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getNext()): ?>
+    <?php if ($pagination->getNext()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getNext()])); ?>">
                 <span class="glyphicon glyphicon-forward"></span>
@@ -77,7 +78,7 @@ use Windwalker\Core\Pagination\PaginationResult;
         </li>
     <?php endif; ?>
 
-    <?php if ($pagination->getLast()): ?>
+    <?php if ($pagination->getLast()) : ?>
         <li>
             <a href="<?php echo $this->escape($route(['page' => $pagination->getLast()])); ?>">
                 <span class="glyphicon glyphicon-fast-forward"></span>

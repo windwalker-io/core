@@ -16,12 +16,13 @@
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($events as $name => $listeners): ?>
-        <?php if (count($listeners)): ?>
+    <?php foreach ($events as $name => $listeners) : ?>
+        <?php if (count($listeners)) : ?>
             <?php $i = 0; ?>
-            <?php foreach ($listeners as $event): ?>
+
+            <?php foreach ($listeners as $event) : ?>
                 <tr>
-                    <?php if ($i == 0): ?>
+                    <?php if ($i == 0) : ?>
                         <td rowspan="<?php echo count($listeners); ?>">
                             <?php echo $name; ?>
                         </td>
@@ -35,7 +36,7 @@
                 </tr>
                 <?php $i++; ?>
             <?php endforeach; ?>
-        <?php else: ?>
+        <?php else : ?>
             <tr>
                 <td>
                     <?php echo $name; ?>

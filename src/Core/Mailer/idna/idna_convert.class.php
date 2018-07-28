@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable
+
 // {{{ license
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */

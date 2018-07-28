@@ -52,8 +52,10 @@ class ViewHelper extends AbstractHelper
             'asset' => $container->get('asset'),
             'messages' => static::$messages,
             'translator' => $container->get('language'),
-            'datetime' => new \DateTime('now',
-                new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC'))),
+            'datetime' => new \DateTime(
+                'now',
+                new \DateTimeZone($container->get('config')->get('system.timezone', 'UTC'))
+            ),
         ];
     }
 
@@ -121,10 +123,10 @@ class ViewHelper extends AbstractHelper
 
         foreach ((array) $flashes as $type => $typeBag) {
             $html .= '<div class="alert alert-' . $type . ' alert-dismissible" role="alert">
-						<button type="button" class="close" data-dismiss="alert">
-						  <span aria-hidden="true">&times;</span>
-						  <span class="sr-only">Close</span>
-						</button>';
+                        <button type="button" class="close" data-dismiss="alert">
+                          <span aria-hidden="true">&times;</span>
+                          <span class="sr-only">Close</span>
+                        </button>';
 
             foreach ((array) $typeBag as $msg) {
                 $html .= '<p>' . $msg . '</p>';

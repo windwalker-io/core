@@ -55,7 +55,7 @@ trait WindwalkerTrait
      */
     protected function bootWindwalkerTrait(WindwalkerApplicationInterface $app)
     {
-//		$this->config = new ConfigRegistry($this->config->toArray());
+//        $this->config = new ConfigRegistry($this->config->toArray());
     }
 
     /**

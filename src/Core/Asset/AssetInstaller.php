@@ -100,7 +100,7 @@ class AssetInstaller extends AbstractCommand
             $this->runHook('after-' . $vendor, $vendor, $files);
         }
 
-//		Folder::delete($this->getVendorPath());
+//        Folder::delete($this->getVendorPath());
 
         $this->out('Install complete');
     }

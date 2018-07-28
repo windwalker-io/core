@@ -360,11 +360,10 @@ class AssetManager implements DispatcherAwareInterface
         $html = [];
 
         $this->triggerEvent('onAssetRenderScripts', [
-                'asset' => $this,
-                'withInternal' => &$withInternal,
-                'html' => &$html,
-            ]
-        );
+            'asset' => $this,
+            'withInternal' => &$withInternal,
+            'html' => &$html,
+        ]);
 
         foreach ($this->scripts as $url => $script) {
             $defaultAttribs = [
@@ -471,8 +470,12 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         $time  = '';
-        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->addSysPath($assetUri),
-            \FilesystemIterator::FOLLOW_SYMLINKS));
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $this->addSysPath($assetUri),
+                \FilesystemIterator::FOLLOW_SYMLINKS
+            )
+        );
 
         /** @var \SplFileInfo $file */
         foreach ($files as $file) {
@@ -892,7 +895,7 @@ class AssetManager implements DispatcherAwareInterface
                     $output .= '[' . implode(',', $child) . ']';
                     break;
                 }
-
+                // No break
             case 'object':
                 $array = is_object($data) ? get_object_vars($data) : $data;
 

@@ -778,8 +778,8 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
             // If is class name, just create it.
             if (is_string($middleware) && is_subclass_of($middleware, AbstractControllerMiddleware::class)) {
                 $middleware = $this->container->newInstance($middleware, ['controller' => $this]);
-            } // If is closure, we bind $this to current object
-            elseif ($middleware instanceof \Closure) {
+            } elseif ($middleware instanceof \Closure) {
+                // If is closure, we bind $this to current object
                 $middleware->bindTo($this);
             }
 

@@ -117,11 +117,15 @@ class TimelineHelper
 
         foreach ($timeline as &$item) {
             $item['total_time']['style']   = 'secondary';
-            $item['time']['style']         = TimelineHelper::getStateColor($item['time']['value'],
-                $fullTime / count($set));
+            $item['time']['style']         = TimelineHelper::getStateColor(
+                $item['time']['value'],
+                $fullTime / count($set)
+            );
             $item['total_memory']['style'] = 'secondary';
-            $item['memory']['style']       = TimelineHelper::getStateColor($item['memory']['value'],
-                $fullMemory / count($set));
+            $item['memory']['style']       = TimelineHelper::getStateColor(
+                $item['memory']['value'],
+                $fullMemory / count($set)
+            );
         }
 
         return [

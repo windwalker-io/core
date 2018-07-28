@@ -33,6 +33,8 @@ class CoreQueue extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'queue';
+    // phpcs:enable
 }

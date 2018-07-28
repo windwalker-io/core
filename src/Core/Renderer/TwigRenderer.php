@@ -30,8 +30,11 @@ class TwigRenderer extends \Windwalker\Renderer\TwigRenderer implements CoreRend
     public function getLoader()
     {
         if (!$this->loader) {
-            $this->loader = new TwigFilesystemLoader($this->packageFinder, $this->dumpPaths(),
-                $this->config->get('path_separator'));
+            $this->loader = new TwigFilesystemLoader(
+                $this->packageFinder,
+                $this->dumpPaths(),
+                $this->config->get('path_separator')
+            );
         }
 
         return $this->loader;

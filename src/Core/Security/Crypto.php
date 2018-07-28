@@ -37,6 +37,8 @@ class Crypto extends AbstractProxyFacade
      * Property _key.
      *
      * @var  string
-     */
+     * phpcs:disable
+    */
     protected static $_key = 'crypt';
+    // phpcs:enable
 }

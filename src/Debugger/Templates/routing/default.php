@@ -73,8 +73,7 @@ if ($collector['system.uri']) {
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($routes as $route): ?>
-
+    <?php foreach ($routes as $route) : ?>
         <tr class="<?php echo $route->matched ? 'table-success' : ''; ?>">
             <td>
                 <?php echo $route->package; ?>

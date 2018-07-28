@@ -85,10 +85,13 @@ class CopyConfigCommand extends Command
         $file         = $dir . '/config.dist.yml';
         $target       = $targetFolder . '/' . $pkgName . '.yml';
 
-        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>config.dist.yml</info> exists,\n do you want to copy it to <info>etc/package/" . $pkgName . '.yml</info> [Y/n]: ',
-                true)) {
-            if (is_file($target) && with(new BooleanPrompter)->ask('File exists, do you want to override it? [N/y]: ',
-                    false)) {
+        if (is_file($file) && (new BooleanPrompter())->ask(
+            "File: <info>config.dist.yml</info> exists,\n do you want to copy it to <info>etc/package/" .
+            $pkgName . '.yml</info> [Y/n]: ',
+            true
+        )) {
+            if (is_file($target)
+                && (new BooleanPrompter())->ask('File exists, do you want to override it? [N/y]: ', false)) {
                 File::delete($target);
             }
 
@@ -100,8 +103,11 @@ class CopyConfigCommand extends Command
         $file   = $dir . '/secret.dist.yml';
         $target = $this->console->get('path.etc') . '/secret.yml';
 
-        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <info>etc/secret.yml</info> [Y/n]: ",
-                true)) {
+        if (is_file($file) && (new BooleanPrompter())->ask(
+            "File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of " .
+            '<info>etc/secret.yml</info> [Y/n]: ',
+            true
+        )) {
             $secret = file_get_contents($target);
             $new    = file_get_contents($file);
             $secret = $secret . "\n\n# " . $pkgName . "\n" . ltrim($new);

@@ -88,7 +88,7 @@ class MigrateCommand extends CoreCommand
         try {
             $repository->migrate($this->getArgument(0, null));
 
-            if ($this->getOption('seed') && ((string) $this->getArgument(0)) != '0') {
+            if ($this->getOption('seed') && (string) $this->getArgument(0) !== '0') {
                 $io = clone $this->io;
 
                 $io->setArguments(['seed', 'import']);
@@ -97,7 +97,7 @@ class MigrateCommand extends CoreCommand
                 $this->console->getRootCommand()->setIO($io)->execute();
             }
         } catch (\Exception $e) {
-            $prompter = new BooleanPrompter;
+            $prompter = new BooleanPrompter();
 
             $this->out()->out('<error>An error occurred: ' . $e->getMessage() . '</error>');
 
