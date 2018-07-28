@@ -13,7 +13,6 @@ use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
-use Windwalker\Core\Utilities\Classes\SingletonTrait;
 use Windwalker\Structure\Structure;
 
 /**

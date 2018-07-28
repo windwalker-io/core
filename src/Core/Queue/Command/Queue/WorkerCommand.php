@@ -9,12 +9,12 @@
 namespace Windwalker\Core\Queue\Command\Queue;
 
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Queue\QueueManager;
+use Windwalker\Event\Event;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Job\JobInterface;
-use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Queue\QueueMessage;
 use Windwalker\Queue\Worker;
-use Windwalker\Event\Event;
 use Windwalker\Structure\Structure;
 
 /**

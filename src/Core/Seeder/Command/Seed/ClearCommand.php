@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**

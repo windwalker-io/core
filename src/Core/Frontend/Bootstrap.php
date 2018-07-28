@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Frontend;
 
 use Windwalker\Core\Widget\WidgetHelper;
-use Windwalker\Core\Widget\WidgetManager;
 
 /**
  * The Bootstrap class.
