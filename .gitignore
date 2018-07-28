@@ -2,6 +2,7 @@
 .*
 !.gitignore
 !.gitkeep
+!.circleci
 !ide/*
 !.phpstorm.meta.php
 
