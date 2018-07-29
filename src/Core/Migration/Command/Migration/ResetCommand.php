@@ -64,6 +64,18 @@ class ResetCommand extends CoreCommand
     }
 
     /**
+     * Prepare execute hook.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        $this->createDatabase();
+
+        parent::prepareExecute();
+    }
+
+    /**
      * Execute this command.
      *
      * @return int|void
