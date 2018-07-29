@@ -10,6 +10,7 @@ namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Core\Migration\Repository\BackupRepository;
 use Windwalker\Core\Migration\Repository\MigrationsRepository;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 
 /**
  * The MigrationCommandTrait class.
@@ -58,5 +59,30 @@ trait MigrationCommandTrait
     public function backup()
     {
         $this->getBackupRepository()->backup();
+    }
+
+    /**
+     * createDatabase
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function createDatabase()
+    {
+        $config = $this->console->config;
+
+        // Auto create database
+        $name = $config['database.name'];
+
+        $config['database.name'] = null;
+
+        $db = $this->console->container->get(AbstractDatabaseDriver::class, true);
+
+        $db->getDatabase($name)->create(true);
+
+        $db->select($name);
+
+        $config['database.name'] = $name;
     }
 }

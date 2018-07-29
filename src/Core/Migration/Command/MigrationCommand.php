@@ -79,21 +79,6 @@ class MigrationCommand extends CoreCommand
      */
     protected function prepareExecute()
     {
-        $config = $this->console->config;
-
-        // Auto create database
-        $name = $config['database.name'];
-
-        $config['database.name'] = null;
-
-        $db = $this->console->container->get(AbstractDatabaseDriver::class, true);
-
-        $db->getDatabase($name)->create(true);
-
-        $db->select($name);
-
-        $config['database.name'] = $name;
-
         // Prepare migration path
         $packageName = $this->getOption('p');
 

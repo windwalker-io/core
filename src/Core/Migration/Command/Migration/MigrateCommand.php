@@ -65,6 +65,20 @@ class MigrateCommand extends CoreCommand
     }
 
     /**
+     * Prepare execute hook.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        if (!$this->getOption('no-create-database')) {
+            $this->createDatabase();
+        }
+
+        parent::prepareExecute();
+    }
+
+    /**
      * Execute this command.
      *
      * @return int|void

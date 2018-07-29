@@ -58,9 +58,23 @@ class StatusCommand extends CoreCommand
     }
 
     /**
+     * Prepare execute hook.
+     *
+     * @return  void
+     */
+    protected function prepareExecute()
+    {
+        $this->createDatabase();
+
+        parent::prepareExecute();
+    }
+
+    /**
      * Execute this command.
      *
      * @return int|void
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {

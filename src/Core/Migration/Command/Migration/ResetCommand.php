@@ -105,6 +105,7 @@ class ResetCommand extends CoreCommand
 
         $io->setArguments($args);
         $io->setOption('no-backup', true);
+        $io->setOption('no-create-database', true);
 
 //        foreach ($this->io->getOptions() as $k => $v)
 //        {
