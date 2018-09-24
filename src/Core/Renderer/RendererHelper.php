@@ -17,8 +17,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  *
  * @see    RendererManager
  *
- * @method  static AbstractRenderer|CoreRendererInterface  getRenderer($type = RendererManager::ENGINE_PHP, $config =
- *          [])
+ * @method  static AbstractRenderer|CoreRendererInterface  getRenderer($type = RendererManager::PHP, $config = [])
  * @method  static PhpRenderer      getPhpRenderer($config = [])
  * @method  static BladeRenderer    getBladeRenderer($config = [])
  * @method  static EdgeRenderer     getEdgeRenderer($config = [])
@@ -27,6 +26,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @method  static RendererManager  addGlobalPath($path, $priority = PriorityQueue::LOW)
  * @method  static RendererManager  addPath($path, $priority = PriorityQueue::LOW)
  * @method  static PriorityQueue    getPaths()
+ * @method  static array            getGlobals()
  * @method  static RendererManager  reset()
  * @method  static RendererManager  setPaths($paths)
  *
