@@ -315,6 +315,10 @@ class AbstractPackage implements DispatcherAwareInterface
         $providers = (array) $this->get('providers');
 
         foreach ($providers as $interface => &$provider) {
+            if ($provider === false) {
+                continue;
+            }
+
             if (is_subclass_of($provider, ServiceProviderInterface::class)) {
                 // Handle provider
                 if (is_string($provider) && class_exists($provider)) {
@@ -341,6 +345,10 @@ class AbstractPackage implements DispatcherAwareInterface
         }
 
         foreach ($providers as $provider) {
+            if ($provider === false) {
+                continue;
+            }
+
             if (is_subclass_of($provider, ServiceProviderInterface::class) &&
                 is_callable([$provider, 'bootDeferred'])) {
                 $provider->bootDeferred($container);
