@@ -11,6 +11,7 @@ namespace Windwalker\Core\Repository;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\Serializer\RawSerializer;
 use Windwalker\Cache\Storage\ArrayStorage;
+use Windwalker\Core\Cache\RuntimeCacheTrait;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Structure\Structure;
@@ -25,6 +26,7 @@ use Windwalker\Structure\Structure;
 class Repository implements \ArrayAccess
 {
     use BootableTrait;
+    use RuntimeCacheTrait;
 
     /**
      * Make sure state at the first to easily debug.
@@ -32,13 +34,6 @@ class Repository implements \ArrayAccess
      * @var  Structure
      */
     protected $state;
-
-    /**
-     * Property cache.
-     *
-     * @var  Cache
-     */
-    protected $cache;
 
     /**
      * Property config.
@@ -247,88 +242,6 @@ class Repository implements \ArrayAccess
     }
 
     /**
-     * getStoredId
-     *
-     * @param string $id
-     *
-     * @return  string
-     */
-    public function getCacheId($id = null)
-    {
-        $id .= serialize($this->state->toArray());
-
-        return sha1($id);
-    }
-
-    /**
-     * getCache
-     *
-     * @param string $id
-     *
-     * @return  mixed
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    protected function getCache($id = null)
-    {
-        return $this->cache->get($this->getCacheId($id));
-    }
-
-    /**
-     * setCache
-     *
-     * @param string $id
-     * @param mixed  $item
-     *
-     * @return  mixed
-     * @throws \Exception
-     */
-    protected function setCache($id = null, $item = null)
-    {
-        $this->cache->set($this->getCacheId($id), $item);
-
-        return $item;
-    }
-
-    /**
-     * hasCache
-     *
-     * @param string $id
-     *
-     * @return  bool
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    protected function hasCache($id = null)
-    {
-        return $this->cache->exists($this->getCacheId($id));
-    }
-
-    /**
-     * resetCache
-     *
-     * @return  static
-     */
-    public function resetCache()
-    {
-        $this->cache = new Cache(new ArrayStorage(), new RawSerializer());
-
-        return $this;
-    }
-
-    /**
-     * fetch
-     *
-     * @param string   $id
-     * @param callable $closure
-     *
-     * @return  mixed
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    protected function fetch($id, $closure)
-    {
-        return $this->cache->call($this->getCacheId($id), $closure);
-    }
-
-    /**
      * Get the model state.
      *
      * @return  Structure  The state object.
@@ -348,6 +261,20 @@ class Repository implements \ArrayAccess
     public function setState(Structure $state)
     {
         $this->state = $state;
+    }
+
+    /**
+     * getStoredId
+     *
+     * @param string $id
+     *
+     * @return  string
+     */
+    public function getCacheId($id = null)
+    {
+        $id .= serialize($this->state->toArray());
+
+        return sha1($id);
     }
 
     /**
