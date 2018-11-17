@@ -21,6 +21,7 @@ use Windwalker\Database\Schema\Schema;
 use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Folder;
 use Windwalker\Http\Stream\Stream;
 use Windwalker\String\SimpleTemplate;
 use Windwalker\String\StringNormalise;
@@ -151,6 +152,8 @@ class MigrationsRepository extends Repository
         if (is_file($this->getLogFile())) {
             File::delete($this->getLogFile());
         }
+
+        Folder::create(dirname($this->getLogFile()));
 
         $queryLogStream = new Stream($this->getLogFile(), Stream::MODE_WRITE_ONLY_FROM_END);
         $logListener = function (Event $event) use ($queryLogStream) {
