@@ -8,6 +8,7 @@
 
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
+use Windwalker\Core\Utilities\Debug\Dumper;
 
 if (!function_exists('__')) {
     /**
@@ -124,5 +125,25 @@ if (!function_exists('only_debug')) {
     function only_debug($string)
     {
         return WINDWALKER_DEBUG ? $string : '';
+    }
+}
+
+if (!function_exists('ds')) {
+    /**
+     * Dump to server.
+     *
+     * If server not running, will dump to HTML.
+     *
+     * @param mixed ...$args
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function ds(...$args)
+    {
+        $dumper = new Dumper();
+
+        $dumper->dump($args);
     }
 }

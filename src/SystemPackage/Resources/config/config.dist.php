@@ -30,6 +30,7 @@ return [
     'console' => [
         'commands' => [
             \Windwalker\SystemPackage\Command\SystemCommand::class,
+            \Windwalker\SystemPackage\Command\DumpServerCommand::class,
             \Windwalker\SystemPackage\Command\RunCommand::class,
         ],
     ],

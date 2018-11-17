@@ -407,7 +407,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
         foreach ($commands as $class) {
             if (class_exists($class) && is_subclass_of($class, Command::class)) {
-                $console->addCommand($class);
+                $console->addCommand($this->container->createObject($class));
             }
         }
     }

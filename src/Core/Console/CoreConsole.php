@@ -149,6 +149,10 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
                 continue;
             }
 
+            if (is_string($command)) {
+                $command = $this->container->createObject($command);
+            }
+
             $this->addCommand($command);
         }
     }

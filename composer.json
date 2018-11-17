@@ -20,7 +20,8 @@
     },
     "suggest": {
         "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts.",
-        "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
+        "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner.",
+        "symfony/var-dumper": "Install ^4.1 if you need ver-dumper server and use ds() to dump data."
     },
     "autoload" : {
         "psr-4" : {
