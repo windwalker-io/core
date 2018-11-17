@@ -96,9 +96,11 @@ class MigrationCommand extends CoreCommand
         $this->console->set('migration.dir', $dir);
 
         // DB log
-        static $loggerRegistered = false;
+        $middlewares = $this->console->database->getMiddlewares()->dumpStack();
+        
+        $classes = array_map('get_class', $middlewares);
 
-        if (!$loggerRegistered) {
+        if (!\in_array(DbProfilerMiddleware::class, $classes, true)) {
             $this->console->database->addMiddleware(new DbProfilerMiddleware(
                 function () {
                     //
@@ -107,8 +109,6 @@ class MigrationCommand extends CoreCommand
                     $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $db->getLastQuery()]);
                 }
             ));
-
-            $loggerRegistered = true;
         }
     }
 

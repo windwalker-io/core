@@ -157,7 +157,7 @@ class MigrationsRepository extends Repository
 
         $queryLogStream = new Stream($this->getLogFile(), Stream::MODE_WRITE_ONLY_FROM_END);
         $logListener = function (Event $event) use ($queryLogStream) {
-            $queryLogStream->write($event['query'] . "\n\n");
+            $queryLogStream->write($event['query'] . ";\n\n");
         };
         Ioc::getDispatcher()->listen('onMigrationAfterQuery', $logListener);
 
