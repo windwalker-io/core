@@ -13,7 +13,7 @@ use Windwalker\Crypt\HasherInterface;
 /**
  * The ModernPassword class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.4.6
  */
 class ModernPassword implements HasherInterface
 {
@@ -54,7 +54,7 @@ class ModernPassword implements HasherInterface
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function needsRehash($text, $algo = PASSWORD_DEFAULT, array $options = [])
     {

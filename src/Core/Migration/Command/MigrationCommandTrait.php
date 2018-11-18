@@ -66,7 +66,7 @@ trait MigrationCommandTrait
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     protected function createDatabase()
     {

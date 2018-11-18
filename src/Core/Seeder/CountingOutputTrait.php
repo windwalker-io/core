@@ -14,7 +14,7 @@ use Windwalker\Environment\PlatformHelper;
 /**
  * The CountingOutputTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.4.6
  */
 trait CountingOutputTrait
 {
@@ -53,7 +53,7 @@ trait CountingOutputTrait
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function resetCount()
     {
