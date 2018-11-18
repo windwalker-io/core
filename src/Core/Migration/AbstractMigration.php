@@ -10,6 +10,7 @@ namespace Windwalker\Core\Migration;
 
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Database\Traits\DateFormatTrait;
+use Windwalker\Core\Seeder\CountingOutputTrait;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Utilities\Arr;
@@ -22,6 +23,7 @@ use Windwalker\Utilities\Arr;
 abstract class AbstractMigration
 {
     use DateFormatTrait;
+    use CountingOutputTrait;
 
     const UP = 'up';
 

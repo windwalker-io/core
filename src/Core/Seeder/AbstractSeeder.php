@@ -22,6 +22,7 @@ use Windwalker\Environment\PlatformHelper;
 abstract class AbstractSeeder
 {
     use DateFormatTrait;
+    use CountingOutputTrait;
 
     /**
      * Property db.
@@ -36,13 +37,6 @@ abstract class AbstractSeeder
      * @var Command
      */
     protected $command;
-
-    /**
-     * Property count.
-     *
-     * @var  int
-     */
-    protected $count = 0;
 
     /**
      * Class init.
@@ -200,28 +194,5 @@ abstract class AbstractSeeder
         $this->command = $command;
 
         return $this;
-    }
-
-    /**
-     * outCounting
-     *
-     * @return  Command
-     */
-    public function outCounting()
-    {
-        // @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
-        if (PlatformHelper::isWindows()) {
-            $loading = ['|', '/', '-', '\\'];
-        } else {
-            $loading = ['◐', '◓', '◑', '◒'];
-        }
-
-        $this->count++;
-
-        $icon = $loading[$this->count % count($loading)];
-
-        $this->command->out("\r  ({$this->count}) $icon ", false);
-
-        return $this->command;
     }
 }
