@@ -113,12 +113,20 @@ trait RuntimeCacheTrait
      *
      * @param string   $id
      * @param callable $closure
+     * @param bool     $refresh
      *
      * @return  mixed
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function fetch($id, $closure)
+    protected function fetch($id, $closure, $refresh = false)
     {
-        return $this->getCacheInstance()->call($this->getCacheId($id), $closure);
+        $key = $this->getCacheId($id);
+        $cache = $this->getCacheInstance();
+
+        if ($refresh) {
+            $cache->remove($key);
+        }
+
+        return $cache->call($key, $closure);
     }
 }
