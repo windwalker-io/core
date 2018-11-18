@@ -107,7 +107,7 @@ class DebuggerListener
         }
 
         /** @var Repository $model */
-        $model = $controller->getModel('Dashboard');
+        $repository = $controller->getRepository('Dashboard');
 
         if ($input->get('refresh')) {
             $hash = $input->getString('hash');
@@ -120,7 +120,7 @@ class DebuggerListener
                 $session->set('debugger.current.id', null);
             }
 
-            $item = $model->getLastItem();
+            $item = $repository->getLastItem();
 
             if ($item) {
                 $app->redirect($package->router->route($app->get('route.matched'), ['id' => $item['id']]) . $hash);
@@ -137,7 +137,7 @@ class DebuggerListener
 
             // If session not exists, get last item.
             if (!$id) {
-                $item = $model->getLastItem();
+                $item = $repository->getLastItem();
 
                 // No item, redirect to front-end.
                 if (!$item) {
@@ -157,7 +157,7 @@ class DebuggerListener
             return;
         }
 
-        $itemModel = $controller->getModel('Profiler');
+        $itemModel = $controller->getRepository('Profiler');
 
         if (!$itemModel->hasItem($id)) {
             $session = Ioc::getSession();
@@ -316,9 +316,9 @@ class DebuggerListener
      */
     protected function deleteOldFiles()
     {
-        $model = new DashboardRepository();
+        $repository = new DashboardRepository();
 
-        $files = $model->getFiles();
+        $files = $repository->getFiles();
         $items = [];
 
         /** @var \SplFileInfo $file */

@@ -70,16 +70,16 @@ class ViewModel implements \ArrayAccess
      * @return static Return self to support chaining.
      * @throws \ReflectionException
      */
-    public function setRepository(Repository $model, $default = null, $customName = null)
+    public function setRepository(Repository $repository, $default = null, $customName = null)
     {
         if ($default === true) {
-            $this->repository = $model;
+            $this->repository = $repository;
         }
 
-        $name = $customName ?: $model->getName();
+        $name = $customName ?: $repository->getName();
         $name = $name ?: uniqid();
 
-        $this->repositories[strtolower($name)] = $model;
+        $this->repositories[strtolower($name)] = $repository;
 
         return $this;
     }
@@ -183,9 +183,9 @@ class ViewModel implements \ArrayAccess
             return $this->$method(...$args);
         }
 
-        $model = $this->getRepository();
+        $repository = $this->getRepository();
 
-        return $model->$name(...$args);
+        return $repository->$name(...$args);
     }
 
     /**
@@ -224,7 +224,7 @@ class ViewModel implements \ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        throw new \BadMethodCallException('Use setModel() instead array access.');
+        throw new \BadMethodCallException('Use setRepository() instead array access.');
     }
 
     /**
