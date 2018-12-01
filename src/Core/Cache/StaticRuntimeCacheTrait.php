@@ -43,7 +43,7 @@ trait StaticRuntimeCacheTrait
      *
      * @return  Cache
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public static function getCacheInstance()
     {

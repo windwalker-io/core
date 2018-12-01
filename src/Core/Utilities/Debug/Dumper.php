@@ -15,7 +15,7 @@ use Windwalker\Core\Ioc;
 /**
  * The Dumper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.4.6
  */
 class Dumper
 {
@@ -56,7 +56,7 @@ class Dumper
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function dump(...$args)
     {
@@ -76,7 +76,7 @@ class Dumper
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function dumpToServer(...$args): bool
     {
@@ -94,7 +94,7 @@ class Dumper
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     protected function handleValues(array $args): array
     {
@@ -114,7 +114,7 @@ class Dumper
      *
      * @return  Connection
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function getConnection()
     {
@@ -128,7 +128,7 @@ class Dumper
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     public function setConnection(Connection $connection)
     {

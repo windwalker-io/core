@@ -518,7 +518,7 @@ abstract class AbstractView implements \ArrayAccess
      */
     public function getRepository($name = null)
     {
-        return $this->repository->getModel($name);
+        return $this->repository->getRepository($name);
     }
 
     /**
@@ -541,7 +541,7 @@ abstract class AbstractView implements \ArrayAccess
             $handler($model, $this);
         }
 
-        $this->repository->setModel($model, $default, $customName);
+        $this->repository->setRepository($model, $default, $customName);
 
         return $this;
     }
@@ -566,7 +566,7 @@ abstract class AbstractView implements \ArrayAccess
             $handler($model, $this);
         }
 
-        $this->repository->setModel($model, $default, $name);
+        $this->repository->setRepository($model, $default, $name);
 
         return $this;
     }
@@ -669,7 +669,7 @@ abstract class AbstractView implements \ArrayAccess
             $name    = null;
         }
 
-        return $handler($this->getModel($name), $this);
+        return $handler($this->getRepository($name), $this);
     }
 
     /**

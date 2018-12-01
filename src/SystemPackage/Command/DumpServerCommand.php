@@ -16,7 +16,7 @@ use Windwalker\Core\Console\CoreCommand;
 /**
  * The DumpServerCommand class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.4.6
  */
 class DumpServerCommand extends CoreCommand
 {

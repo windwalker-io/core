@@ -138,7 +138,7 @@ if (!function_exists('ds')) {
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.6
      */
     function ds(...$args)
     {
