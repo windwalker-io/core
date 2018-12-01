@@ -63,6 +63,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
             // Debug
             'shown' => [$this, 'shown'],
             'dd' => [$this, 'dd'],
+            'ds' => [$this, 'ds'],
             'die' => [$this, 'dead'],
             'debug' => [$this, 'debug'],
             'enddebug' => [$this, 'endauth'],
@@ -98,7 +99,7 @@ class WindwalkerExtension implements EdgeExtensionInterface
      */
     public function translate($expression)
     {
-        return "<?php echo \$translator->translate{$expression} ?>";
+        return "<?php echo __{$expression} ?>";
     }
 
     /**
@@ -303,6 +304,20 @@ class WindwalkerExtension implements EdgeExtensionInterface
     public function dd($expression)
     {
         return "<?php show{$expression}; die; ?>";
+    }
+
+    /**
+     * ds
+     *
+     * @param string $expression
+     *
+     * @return  string
+     *
+     * @since  3.4.8
+     */
+    public function ds($expression)
+    {
+        return "<?php ds{$expression}; ?>";
     }
 
     /**
