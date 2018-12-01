@@ -191,7 +191,7 @@ class MigrationsRepository extends Repository
                     break;
                 }
 
-                if (!in_array($migration['version'], $versions)) {
+                if (!in_array($migration['version'], $versions, true)) {
                     $this->executeMigration($migration, AbstractMigration::UP);
                 }
 
@@ -224,17 +224,17 @@ class MigrationsRepository extends Repository
     {
         $class = $migrationItem['class'];
 
+        /** @var CoreConsole $console */
+        $console = $this->command->getApplication();
+
         include_once $migrationItem['path'];
 
-        $migration = new $class($this->getCommand(), $this->getDb());
+        $migration = $console->container->newInstance($class, [$this->getCommand(), $this->getDb()]);
 
         $start = time();
 
         // Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite does.
         $tran = $this->db->getTransaction()->start();
-
-        /** @var CoreConsole $console */
-        $console = $this->command->getApplication();
 
         try {
             $tmpl = '<info>%s_%s</info> <comment>%s</comment>... ';

@@ -10,6 +10,7 @@ namespace Windwalker\Core\Seeder;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\Core\Database\Traits\DateFormatTrait;
+use Windwalker\Core\Ioc;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Environment\PlatformHelper;
@@ -63,15 +64,18 @@ abstract class AbstractSeeder
      *
      * @return  static
      * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function execute($seeder = null)
     {
+        $container = Ioc::getContainer();
+
         if (is_string($seeder)) {
             $ref = new \ReflectionClass($this);
 
             include_once dirname($ref->getFileName()) . '/' . $seeder . '.php';
 
-            $seeder = new $seeder();
+            $seeder = $container->newInstance($seeder, ['db' => $this->db, 'command' => $this->command]);
         }
 
         $seeder->setDb($this->db)
@@ -79,7 +83,7 @@ abstract class AbstractSeeder
 
         $this->command->out()->out('Import seeder <info>' . get_class($seeder) . '</info>');
 
-        $seeder->doExecute();
+        $container->call([$seeder, 'doExecute']);
 
         $this->command->out()->out('  <option>Import completed...</option>');
 
