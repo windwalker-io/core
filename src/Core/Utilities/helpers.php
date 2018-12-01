@@ -144,6 +144,6 @@ if (!function_exists('ds')) {
     {
         $dumper = new Dumper();
 
-        $dumper->dump($args);
+        $dumper->dump(...$args);
     }
 }

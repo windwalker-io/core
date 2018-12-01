@@ -74,7 +74,7 @@ class Dumper
      *
      * @param array ...$args
      *
-     * @return  array
+     * @return  bool
      *
      * @since  3.4.6
      */
@@ -92,15 +92,17 @@ class Dumper
      *
      * @param array $args
      *
-     * @return  array
+     * @return  array|mixed
      *
      * @since  3.4.6
      */
-    protected function handleValues(array $args): array
+    protected function handleValues(array $args)
     {
-        if (count($args) === 1) {
+        if (\count($args) === 1) {
             $values = $args[0];
         } else {
+            $values = [];
+
             foreach ($args as $i => $arg) {
                 $values['Value ' . ($i + 1)] = $arg;
             }
