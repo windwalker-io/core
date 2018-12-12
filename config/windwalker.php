@@ -11,7 +11,7 @@ return [
 
     ],
 
-    'providers' =>[
+    'providers' => [
         'logger' => \Windwalker\Core\Provider\LoggerProvider::class,
         'event'  => \Windwalker\Core\Provider\EventProvider::class,
     ],

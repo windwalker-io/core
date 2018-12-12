@@ -583,11 +583,20 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      * @param string $url
      * @param int    $code
      * @param array  $headers
+     * @param bool   $allowOutside
      *
      * @return static
      */
-    public function setRedirect($url, $code = 303, array $headers = [])
+    public function setRedirect($url, $code = 303, array $headers = [], $allowOutside = false)
     {
+        if (!$allowOutside) {
+            $url = $this->validRedirectUrl($url);
+        }
+
+        if (is_callable([$url, '__toString'])) {
+            $url = (string) $url;
+        }
+
         $this->response = new RedirectResponse($url, $code, $headers ?: $this->response->getHeaders());
 
         return $this;
@@ -598,14 +607,47 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @param string $url
      * @param int    $code
+     * @param bool   $allowOutside
      */
-    public function redirect($url, $code = 303)
+    public function redirect($url, $code = 303, $allowOutside = false)
     {
         if ($this->isHmvc() || !$this->app) {
             return;
         }
 
+        if (!$allowOutside) {
+            $url = $this->validRedirectUrl($url);
+        }
+
+        if (is_callable([$url, '__toString'])) {
+            $url = (string) $url;
+        }
+
         $this->app->redirect($url, $code);
+    }
+
+    /**
+     * validRedirectUrl
+     *
+     * @param string $url
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function validRedirectUrl($url)
+    {
+        $root = $this->app->uri->root;
+
+        if (strpos($url, '/') === 0) {
+            return $url;
+        }
+
+        if (stripos($url, $root) !== 0) {
+            return $root;
+        }
+
+        return $url;
     }
 
     /**

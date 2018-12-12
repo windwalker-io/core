@@ -15,7 +15,7 @@ return Arr::mergeRecursive(
 
         ],
 
-        'providers' =>[
+        'providers' => [
             'web'      => \Windwalker\Core\Provider\WebProvider::class,
             'error'    => \Windwalker\Core\Error\ErrorHandlingProvider::class,
             'logger'   => \Windwalker\Core\Provider\LoggerProvider::class,
