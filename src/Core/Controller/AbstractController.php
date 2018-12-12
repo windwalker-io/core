@@ -593,7 +593,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
             $url = $this->validRedirectUrl($url);
         }
 
-        if (is_callable([$url, '__toString'])) {
+        if (is_stringable($url)) {
             $url = (string) $url;
         }
 
@@ -619,7 +619,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
             $url = $this->validRedirectUrl($url);
         }
 
-        if (is_callable([$url, '__toString'])) {
+        if (is_stringable($url)) {
             $url = (string) $url;
         }
 

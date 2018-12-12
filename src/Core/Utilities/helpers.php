@@ -128,6 +128,24 @@ if (!function_exists('only_debug')) {
     }
 }
 
+if (!function_exists('is_stringable')) {
+    /**
+     * is_stringable
+     *
+     * @param mixed $var
+     *
+     * @return  bool
+     *
+     * @since  3.4.9.2
+     */
+    function is_stringable($var)
+    {
+        return (
+            is_scalar($var) && !is_bool($var)) || (is_object($var) && method_exists($var, '__toString')
+        );
+    }
+}
+
 if (!function_exists('ds')) {
     /**
      * Dump to server.
