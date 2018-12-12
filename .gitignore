@@ -5,6 +5,7 @@
 !.circleci
 !ide/*
 !.phpstorm.meta.php
+!.ide-toolbox.metadata.json
 
 # Composer
 /vendor

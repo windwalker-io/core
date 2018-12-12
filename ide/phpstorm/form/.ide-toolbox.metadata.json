@@ -1,0 +1,22 @@
+{
+    "registrar": [
+        {
+            "language": "php",
+            "provider": "class_interface",
+            "signatures": [
+                {
+                    "class": "Windwalker\\Core\\Form\\AbstractFieldDefinition",
+                    "method": "add",
+                    "index": 1,
+                    "type": "type"
+                },
+                {
+                    "class": "Windwalker\\Form\\Form",
+                    "method": "add",
+                    "index": 1,
+                    "type": "type"
+                }
+            ]
+        }
+    ]
+}
