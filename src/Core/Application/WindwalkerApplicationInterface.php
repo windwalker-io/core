@@ -102,4 +102,17 @@ interface WindwalkerApplicationInterface
      * @return  bool
      */
     public function isOffline();
+
+    /**
+     * make
+     *
+     * @param string $class
+     * @param array  $args
+     * @param bool   $protected
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function make($class, array $args = [], $protected = false);
 }

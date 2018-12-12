@@ -37,6 +37,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
 /**
  * The WebApplication class.
  *
+ * @property-read  Config                        config
  * @property-read  Container                     container
  * @property-read  Core\Logger\LoggerManager     logger
  * @property-read  PsrInput                      input
@@ -58,7 +59,10 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  *
  * @since  2.0
  */
-class WebApplication extends AbstractWebApplication implements WindwalkerApplicationInterface, DispatcherAwareInterface, ContainerAwareInterface
+class WebApplication extends AbstractWebApplication implements
+    WindwalkerApplicationInterface,
+    DispatcherAwareInterface,
+    ContainerAwareInterface
 {
     use Core\WindwalkerTrait;
     use Core\Utilities\Classes\BootableTrait;

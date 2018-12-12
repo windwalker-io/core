@@ -10,6 +10,7 @@ namespace Windwalker\Core;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Core\Package\AbstractPackage;
@@ -61,7 +62,7 @@ trait WindwalkerTrait
     /**
      * getConfig
      *
-     * @return  Structure
+     * @return  Config
      */
     public function getConfig()
     {
@@ -82,7 +83,7 @@ trait WindwalkerTrait
         }
 
         // Version check
-        if (version_compare(PHP_VERSION, '5.6', '<')) {
+        if (PHP_VERSION_ID < 50600) {
             exit('Please use PHP 5.6 or later.');
         }
 
@@ -357,5 +358,21 @@ trait WindwalkerTrait
         $file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
 
         return is_file($file);
+    }
+
+    /**
+     * make
+     *
+     * @param string $class
+     * @param array  $args
+     * @param bool   $protected
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function make($class, array $args = [], $protected = false)
+    {
+        return $this->getContainer()->createSharedObject($class, $args, $protected);
     }
 }

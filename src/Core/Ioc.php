@@ -357,14 +357,11 @@ abstract class Ioc
      *
      * @return  mixed
      *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
      * @since  3.4.2
      */
     public static function make($key, array $args = [])
     {
-        return static::getContainer()->newInstance($key, $args);
+        return static::getContainer()->createSharedObject($key, $args);
     }
 
     /**
