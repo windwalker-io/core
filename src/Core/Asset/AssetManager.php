@@ -321,7 +321,7 @@ class AssetManager implements DispatcherAwareInterface
             $attribs = array_merge($defaultAttribs, $style['attribs']);
 
             if ($style['options']['version'] !== false) {
-                $attribs['href'] .= '?' . $this->getVersion();
+                $attribs['href'] = $this->appendVersion($attribs['href']);
             }
 
             if (isset($style['options']['sri'])) {
@@ -373,7 +373,7 @@ class AssetManager implements DispatcherAwareInterface
             $attribs = array_merge($defaultAttribs, $script['attribs']);
 
             if ($script['options']['version'] !== false) {
-                $attribs['src'] .= '?' . $this->getVersion();
+                $attribs['src'] = $this->appendVersion($attribs['src']);
             }
 
             if (isset($script['options']['sri'])) {
@@ -448,6 +448,29 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         return $this->version = trim(file_get_contents($sumFile));
+    }
+
+    /**
+     * appendVersion
+     *
+     * @param string $uri
+     * @param string $version
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function appendVersion($uri, $version = null)
+    {
+        $version = $version ?: $this->getVersion();
+
+        if (!$version) {
+            return $uri;
+        }
+
+        $sep = strpos($uri, '?') !== false ? '&' : '?';
+
+        return $uri . $sep . $version;
     }
 
     /**
