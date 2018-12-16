@@ -458,7 +458,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.4.9.3
      */
     public function appendVersion($uri, $version = null)
     {
