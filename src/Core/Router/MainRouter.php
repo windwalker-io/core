@@ -630,6 +630,20 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     }
 
     /**
+     * clearCache
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function clearCache()
+    {
+        $this->cache->clear();
+
+        return $this;
+    }
+
+    /**
      * Method to get property Matched
      *
      * @return  Route
