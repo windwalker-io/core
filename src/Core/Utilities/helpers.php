@@ -10,6 +10,23 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Language\Translator;
 use Windwalker\Core\Utilities\Debug\Dumper;
 
+if (!function_exists('env')) {
+    /**
+     * Translate
+     *
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return  string
+     *
+     * @since  3.3
+     */
+    function env(string $name, $default = null)
+    {
+        return $_ENV[$name] ?? $default;
+    }
+}
+
 if (!function_exists('__')) {
     /**
      * Translate
@@ -125,24 +142,6 @@ if (!function_exists('only_debug')) {
     function only_debug($string)
     {
         return WINDWALKER_DEBUG ? $string : '';
-    }
-}
-
-if (!function_exists('is_stringable')) {
-    /**
-     * is_stringable
-     *
-     * @param mixed $var
-     *
-     * @return  bool
-     *
-     * @since  3.4.9.2
-     */
-    function is_stringable($var)
-    {
-        return (
-            is_scalar($var) && !is_bool($var)) || (is_object($var) && method_exists($var, '__toString')
-        );
     }
 }
 
