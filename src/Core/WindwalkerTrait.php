@@ -371,8 +371,23 @@ trait WindwalkerTrait
      *
      * @since  __DEPLOY_VERSION__
      */
-    public function make($class, array $args = [], $protected = false)
+    public function make(string $class, array $args = [], bool $protected = false)
     {
         return $this->getContainer()->createSharedObject($class, $args, $protected);
+    }
+
+    /**
+     * service
+     *
+     * @param string $class
+     * @param bool   $forceNew
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function service(string $class, bool $forceNew = false)
+    {
+        return $this->getContainer()->get($class, $forceNew);
     }
 }

@@ -114,5 +114,17 @@ interface WindwalkerApplicationInterface
      *
      * @since  __DEPLOY_VERSION__
      */
-    public function make($class, array $args = [], $protected = false);
+    public function make(string $class, array $args = [], bool $protected = false);
+
+    /**
+     * service
+     *
+     * @param string $class
+     * @param bool   $forceNew
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function service(string $class, bool $forceNew = false);
 }

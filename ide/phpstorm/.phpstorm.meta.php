@@ -23,6 +23,13 @@ namespace PHPSTORM_META {
     );
 
     override(
+        WindwalkerTrait::service(0),
+        map([
+            '' => '@'
+        ])
+    );
+
+    override(
         Container::newInstance(0),
         map([
             '' => '@'
