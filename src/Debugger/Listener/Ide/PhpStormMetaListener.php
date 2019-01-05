@@ -13,6 +13,7 @@ use Windwalker\Event\Event;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Path\PathCollection;
 use Windwalker\Filesystem\Path\PathLocator;
+use Windwalker\Ioc;
 use Windwalker\String\StringHelper;
 use Windwalker\Structure\Structure;
 
@@ -23,6 +24,11 @@ use Windwalker\Structure\Structure;
  */
 class PhpStormMetaListener
 {
+    /**
+     * Property tmpl.
+     *
+     * @var  string
+     */
     protected $tmpl = <<<TMPL
 <?php
     
@@ -49,21 +55,9 @@ TMPL;
      *
      * @return  void
      */
-    public function onAfterInitialise(Event $event)
+    public function onAfterRender(Event $event)
     {
-        $config = new Structure();
-
-        $files = new PathCollection([WINDWALKER_ETC, WINDWALKER_VENDOR . '/windwalker/core/config']);
-
-        /** @var PathLocator $file */
-        foreach ($files->find('.*\.[php|json|yml|yaml]', true) as $file) {
-            if (!in_array($file->getExtension(), ['php', 'json', 'yml', 'yaml'])
-                || $file->getBasename() === 'define.php') {
-                continue;
-            }
-
-            $config->loadFile($file->getPathname(), $file->getExtension());
-        }
+        $config = Ioc::getConfig();
 
         $array = $config->flatten();
 
