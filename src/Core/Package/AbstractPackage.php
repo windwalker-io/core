@@ -537,10 +537,6 @@ class AbstractPackage implements DispatcherAwareInterface
 
         $router->group($group, function (MainRouter $router) use ($routing) {
             $router->addRouteFromFiles($routing, $this);
-
-            if (is_file($this->getDir() . '/routing.yml')) {
-                $router->addRouteFromFile($this->getDir() . '/routing.yml', $this);
-            }
         });
 
         return $router;
@@ -630,6 +626,34 @@ class AbstractPackage implements DispatcherAwareInterface
     public function getDir()
     {
         return dirname($this->getFile());
+    }
+
+    /**
+     * dir
+     *
+     * @return  string
+     *
+     * @throws \ReflectionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function dir(): string
+    {
+        return dirname(static::file());
+    }
+
+    /**
+     * file
+     *
+     * @return  string
+     *
+     * @throws \ReflectionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function file(): string
+    {
+        return (new \ReflectionClass(static::class))->getFileName();
     }
 
     /**

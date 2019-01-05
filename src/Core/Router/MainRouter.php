@@ -18,6 +18,7 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
+use Windwalker\Filesystem\File;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
@@ -204,18 +205,22 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
         $controller = Arr::get($extra, 'controller');
 
-        if (!$controller) {
-            throw new \LogicException('Route profile should have "controller" element, the matched route: ' . $route->getName());
-        }
-
         // Suffix
         $suffix = $this->fetchControllerSuffix($method, Arr::get($extra, 'action', []));
 
-        $suffix = '\\' . $suffix;
+        if (!$controller && !$suffix) {
+            throw new \LogicException('Route profile should have "controller" or "action" element, the matched route: ' . $route->getName());
+        }
 
-        $controller = trim($controller, '\\') . $suffix;
+        if (!class_exists($controller) && !class_exists($suffix)) {
+            $controller = trim($controller, '\\') . '\\' . $suffix;
+        } elseif (class_exists($suffix)) {
+            $controller = $suffix;
+        }
 
-        $extra['controller'] = $this->controller = $controller;
+        if ($controller) {
+            $extra['controller'] = $this->controller = $controller;
+        }
 
         $route->setExtraValues($extra);
 
@@ -367,7 +372,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
         $routing = new Structure();
 
         foreach ($files as $file) {
-            if (!in_array(pathinfo($file, PATHINFO_EXTENSION), ['json', 'yml', 'yaml', 'php'])) {
+            if (!in_array(pathinfo($file, PATHINFO_EXTENSION), ['json', 'yml', 'yaml'])) {
                 continue;
             }
 
@@ -446,6 +451,42 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     }
 
     /**
+     * register
+     *
+     * @param string                      $path
+     * @param string|AbstractPackage|null $package
+     * @param array                       $data
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function register(string $path, array $data = [], $package = null)
+    {
+        if ($package && !$package instanceof AbstractPackage) {
+            $package = PackageHelper::getPackage($package);
+        }
+
+        $router = new RouteCreator($this, $package);
+
+        $router->group(
+            'root',
+            $data,
+            function (RouteCreator $router) use ($path) {
+                require $path;
+            }
+        );
+
+        foreach ($router->getRoutes() as $name => $route) {
+            $route = $router->handleRoute($route);
+
+            $this->addRouteByConfig($route->getName(), $route->getOptions(), $package);
+        }
+
+        return $this;
+    }
+
+    /**
      * addRouteByFile
      *
      * @param string                 $file
@@ -456,6 +497,12 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     public function addRouteFromFile($file, $package = null)
     {
         $routes = static::loadRoutingFile($file);
+
+        if (File::getExtension($file) === 'php') {
+            $this->register($file, [], $package);
+
+            return $this;
+        }
 
         return $this->addRouteByConfigs($routes, $package);
     }

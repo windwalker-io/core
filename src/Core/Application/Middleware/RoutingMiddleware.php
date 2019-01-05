@@ -246,6 +246,13 @@ class RoutingMiddleware extends AbstractWebMiddleware
         $this->app->container->share('current.package', $package);
         $this->app->container->share('current.route', $route);
 
+        // Set middlewares
+        $middlewares = $route->getExtra('middlewares') ?: [];
+
+        foreach ($middlewares as $middleware) {
+            $package->addMiddleware($middleware);
+        }
+
         return $request->withAttribute('_controller', Arr::get($extra, 'controller'));
     }
 }
