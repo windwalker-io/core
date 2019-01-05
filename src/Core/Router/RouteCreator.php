@@ -229,6 +229,7 @@ class RouteCreator
      * @return  RouteCreator
      *
      * @since  __DEPLOY_VERSION__
+     * @throws \ReflectionException
      */
     public function registerPackage(string $package, string $pattern): self
     {

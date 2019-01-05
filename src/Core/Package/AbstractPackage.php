@@ -567,10 +567,13 @@ class AbstractPackage implements DispatcherAwareInterface
      * @return  RouteCreator
      *
      * @since  __DEPLOY_VERSION__
+     * @throws \ReflectionException
      */
     public function registerRoutes(RouteCreator $router, string $prefix): RouteCreator
     {
         $files = (array) $this->get('routing.files');
+
+        $files[] = static::dir() . '/routing.php';
 
         $router->group($this->getName())
             ->package($this->getName())

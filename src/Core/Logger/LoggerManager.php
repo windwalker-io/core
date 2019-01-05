@@ -17,7 +17,9 @@ use Monolog\Processor\PsrLogMessageProcessor;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\Logger\Monolog\GlobalContainer;
+use Windwalker\DI\Container;
 
 /**
  * The LoggerFactory class.
@@ -48,13 +50,31 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
     protected $logPath;
 
     /**
+     * Property container.
+     *
+     * @var  Container
+     */
+    protected $container;
+
+    /**
+     * Property config.
+     *
+     * @var  Config
+     */
+    protected $config;
+
+    /**
      * LoggerPool constructor.
      *
-     * @param  string $logPath
+     * @param  string   $logPath
+     * @param Config    $config
+     * @param Container $container
      */
-    public function __construct($logPath)
+    public function __construct(string $logPath, Config $config, Container $container)
     {
         $this->logPath = $logPath;
+        $this->container = $container;
+        $this->config = $config;
     }
 
     /**
@@ -266,7 +286,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws \Exception
      * @deprecated  Use createChannel() instead.
      */
-    public function createCategory($channel, $level = Logger::DEBUG)
+    public function createCategory(string $channel, ?string $level = null): LoggerInterface
     {
         return $this->createChannel($channel, $level);
     }
@@ -280,7 +300,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @return  LoggerInterface
      * @throws \Exception
      */
-    public function createChannel($channel, $level = Logger::DEBUG)
+    public function createChannel(string $channel, ?string $level = null): LoggerInterface
     {
         return $this->getLogger($channel, $level);
     }
@@ -294,7 +314,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @return LoggerInterface
      * @throws \Exception
      */
-    public function getLogger($channel, $level = Logger::DEBUG)
+    public function getLogger(string $channel, ?string $level = null): LoggerInterface
     {
         $channel = strtolower($channel);
 
@@ -314,24 +334,84 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
     /**
      * createLogger
      *
-     * @param string                $categoey
+     * @param string                $channel
      * @param string                $level
      * @param HandlerInterface|null $handler
      *
      * @return  Monolog
      * @throws \Exception
      */
-    public function createLogger($categoey, $level = Logger::DEBUG, HandlerInterface $handler = null)
+    public function createLogger(?string $channel = null, ?string $level = null, HandlerInterface $handler = null): LoggerInterface
     {
-        $logger = new Monolog($categoey);
+        $config = $this->config->extract('logs.channels.' . $channel);
 
-        $handler = $handler ?: new StreamHandler($this->getLogFile($categoey), $level);
-        $handler->setFormatter(new LineFormatter(null, null, true));
+        if (!$config->get('enabled')) {
+            return $this->getNullLogger();
+        }
 
-        $logger->pushProcessor(new PsrLogMessageProcessor());
+        $level = $level ?: $config->get('level', LogLevel::DEBUG);
 
-        // Basic string handler
-        $logger->pushHandler($handler);
+        $logger = new Monolog($channel);
+
+        if (!$handler) {
+            $handlers = [];
+            $handlerProfiles = $config->get('handlers', StreamHandler::class);
+
+            foreach ($handlerProfiles as $class) {
+                $args = [];
+
+                $args['level'] = $level;
+
+                if (is_array($class)) {
+                    $args = $class['args'] ?? [];
+                    $args['level'] = $class['level'] ?? $level;
+
+                    if (isset($class['file_argument'])) {
+                        $args[$class['file_argument']] = $this->getLogFile($channel);
+                    }
+
+                    $class = $class['class'];
+                }
+
+                switch ($class) {
+                    case 'stream':
+                    case StreamHandler::class:
+                        $args['stream'] = $args['stream'] ?? $this->getLogFile($channel);
+
+                        $handler = $this->container->newInstance(
+                            StreamHandler::class,
+                            $args
+                        );
+                        break;
+
+                    case 'rotating':
+                    case RotatingFileHandler::class:
+                        $args['filename'] = $args['filename'] ?? $this->getLogFile($channel);
+
+                        $handler = $this->container->newInstance(
+                            RotatingFileHandler::class,
+                            $args
+                        );
+                        break;
+
+                    default:
+                        $handler = $this->container->newInstance($class, $args);
+                }
+
+                $handlers[] = $handler;
+            }
+        } else {
+            $handlers = [$handler];
+        }
+
+        foreach ($handlers as $handler) {
+            $handler->setFormatter(new LineFormatter(null, null, true));
+
+            $logger->pushProcessor(new PsrLogMessageProcessor());
+
+            // Basic string handler
+            $logger->pushHandler($handler);
+        }
 
         foreach (GlobalContainer::getHandlers() as $handler) {
             $logger->pushHandler(clone $handler);
@@ -354,7 +434,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @return  LoggerInterface
      * @throws \Exception
      */
-    public function createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7)
+    public function createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7): LoggerInterface
     {
         return $this->createLogger(
             $channel,
@@ -370,7 +450,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  string
      */
-    public function getLogFile($categoey)
+    public function getLogFile($categoey): string
     {
         return $this->logPath . '/' . $categoey . '.log';
     }
@@ -382,7 +462,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  boolean
      */
-    public function hasLogger($channel)
+    public function hasLogger($channel): bool
     {
         $channel = strtolower($channel);
 
@@ -410,7 +490,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  LoggerInterface[]
      */
-    public function getLoggers()
+    public function getLoggers(): array
     {
         return $this->loggers;
     }
@@ -436,7 +516,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  NullLogger
      */
-    public function getNullLogger()
+    public function getNullLogger(): NullLogger
     {
         if (!$this->nullLogger) {
             $this->nullLogger = new NullLogger();

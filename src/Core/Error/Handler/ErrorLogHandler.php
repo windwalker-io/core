@@ -63,7 +63,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
                 $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
             }
 
-            $this->manager->error('error', $message . "\n" . $traces);
+            $this->manager->error('error', $message . "\n" . $traces, ['exception' => $e]);
         }
     }
 }

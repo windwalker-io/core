@@ -31,16 +31,9 @@ class LoggerProvider implements ServiceProviderInterface
     public function register(Container $container)
     {
         $closure = function (Container $container) {
-            $manager = new LoggerManager($container->get('config')->get('path.logs'));
-
-            $manager->addLogger(
-                'message',
-                $manager->createLogger(
-                    'message',
-                    LogLevel::DEBUG,
-                    $container->createSharedObject(MessageHandler::class)
-                )
-            );
+            $manager = $container->newInstance(LoggerManager::class, [
+                'logPath' => $container->get('config')->get('path.logs')
+            ]);
 
             return $manager;
         };
