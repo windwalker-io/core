@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Symfony\Component\Dotenv\Dotenv;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Package\PackageResolver;

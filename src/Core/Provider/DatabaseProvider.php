@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Database\DatabaseAdapter;
+use Windwalker\Core\Database\DatabaseService;
 use Windwalker\Core\Database\Exporter\AbstractExporter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
@@ -33,77 +35,28 @@ class DatabaseProvider implements ServiceProviderInterface
      */
     public function register(Container $container)
     {
+        $container->prepareSharedObject(DatabaseService::class);
+
         $closure = function (Container $container) {
-            /** @var Structure $config */
-            $config = $container->get('config');
+            $service = $container->get(DatabaseService::class);
 
-            $option = [
-                'driver' => $config->get('database.driver', 'mysql'),
-                'host' => $config->get('database.host', 'localhost'),
-                'user' => $config->get('database.user', 'root'),
-                'password' => $config->get('database.password', ''),
-                'database' => $config->get('database.name'),
-                'prefix' => $config->get('database.prefix', 'wind_'),
-            ];
-
-            $db = DatabaseFactory::getDbo($option['driver'], $option, true);
-
-            $db->setDebug($config->get('system.debug', false));
-
-            if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true)) {
-                $this->strictMode($db);
-            }
-
-            return $db;
+            return $service->createConnection();
         };
 
+        class_alias(AbstractDatabaseDriver::class, DatabaseAdapter::class);
         $container->share(AbstractDatabaseDriver::class, $closure);
 
         DatabaseContainer::setDb(function () use ($container) {
-            return $container->get('database');
+            return $container->get(AbstractDatabaseDriver::class);
         });
 
         // For Exporter
         $closure = function (Container $container) {
-            /** @var Structure $config */
-            $config = $container->get('config');
+            $service = $container->get(DatabaseService::class);
 
-            $driver = $config->get('database.driver', 'mysql');
-
-            $class = 'Windwalker\Core\Database\Exporter\\' . ucfirst($driver) . 'Exporter';
-
-            return new $class();
+            return $service->getExporter();
         };
 
         $container->share(AbstractExporter::class, $closure);
-    }
-
-    /**
-     * strictMode
-     *
-     * @param MysqlDriver $db
-     *
-     * @return  void
-     */
-    public function strictMode(MysqlDriver $db)
-    {
-        // Set Mysql to strict mode
-        $modes = [
-            // 'ONLY_FULL_GROUP_BY',
-            'STRICT_TRANS_TABLES',
-            'ERROR_FOR_DIVISION_BY_ZERO',
-            'NO_AUTO_CREATE_USER',
-            'NO_ENGINE_SUBSTITUTION',
-            'NO_ZERO_DATE',
-            'NO_ZERO_IN_DATE',
-        ];
-
-        try {
-            $db->connect()
-                ->getConnection()
-                ->exec("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
-        } catch (\RuntimeException $e) {
-            // If not success, hide error.
-        }
     }
 }
