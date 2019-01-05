@@ -23,6 +23,7 @@ use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\Environment\WebEnvironment;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
+use Windwalker\Filesystem\File;
 use Windwalker\IO\PsrInput;
 use Windwalker\Language\Language;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
@@ -250,9 +251,17 @@ class WebApplication extends AbstractWebApplication implements
             /** @var Core\Router\MainRouter $router */
             $router = $this->container->get('router');
 
-            $routes = $router::loadRoutingFiles((array) $this->get('routing.files'));
+            $files = (array) $this->get('routing.files');
 
-            $router->registerRawRouting($routes, $this->container->get('package.resolver'));
+            foreach ($files as $file) {
+                if (File::getExtension($file) === 'php') {
+                    $router->register($file);
+                } else {
+                    $routes = $router::loadRoutingFile($file);
+
+                    $router->registerRawRouting($routes, $this->container->get('package.resolver'));
+                }
+            }
 
             $this->router = $router;
         }
@@ -320,11 +329,11 @@ class WebApplication extends AbstractWebApplication implements
     protected function registerMiddlewares()
     {
         // Init middlewares
-        $queue = $this->getMiddlewares();
-
         $middlewares = (array) $this->config->get('middlewares', []);
 
-        $queue->insertArray($middlewares);
+        foreach ($middlewares as $k => $middleware) {
+            $this->addMiddleware($middleware, is_numeric($k) ? $k : PriorityQueue::NORMAL);
+        }
 
         // Remove closures
         $this->config->set('middlewares', null);
@@ -344,8 +353,17 @@ class WebApplication extends AbstractWebApplication implements
         $chain = new Psr7ChainBuilder();
 
         foreach ($middlewares as $middleware) {
+            $data = [];
+
+            if (is_array($middleware)) {
+                $data = $middleware;
+                $middleware = $data['middleware'];
+
+                unset($data['middleware']);
+            }
+
             if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
-                $middleware = new Psr7Middleware($this->container->newInstance($middleware));
+                $middleware = new Psr7Middleware($this->container->newInstance($middleware, $data));
             } elseif ($middleware instanceof \Closure) {
                 $middleware->bindTo($this);
             } elseif ($middleware === false) {

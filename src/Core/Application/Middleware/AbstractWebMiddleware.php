@@ -10,6 +10,7 @@ namespace Windwalker\Core\Application\Middleware;
 
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\Middleware\Psr7InvokableInterface;
 
 /**
@@ -22,6 +23,8 @@ abstract class AbstractWebMiddleware implements Psr7InvokableInterface
     /**
      * Property app.
      *
+     * @Inject()
+     *
      * @var  WebApplication
      */
     protected $app;
@@ -29,19 +32,9 @@ abstract class AbstractWebMiddleware implements Psr7InvokableInterface
     /**
      * Property package.
      *
+     * @Inject()
+     *
      * @var  AbstractPackage
      */
     protected $package;
-
-    /**
-     * AbstractApplicationMiddleware constructor.
-     *
-     * @param WebApplication  $app
-     * @param AbstractPackage $package
-     */
-    public function __construct(WebApplication $app, AbstractPackage $package = null)
-    {
-        $this->app     = $app;
-        $this->package = $package;
-    }
 }

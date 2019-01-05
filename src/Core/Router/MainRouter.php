@@ -81,18 +81,31 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     protected $matched;
 
     /**
+     * Property routeCreator.
+     *
+     * @var  RouteCreator
+     */
+    protected $routeCreator;
+
+    /**
      * Class init.
      *
      * @param MatcherInterface    $matcher
+     * @param RouteCreator        $routeCreator
      * @param UriData             $uri
      * @param DispatcherInterface $dispatcher
      */
-    public function __construct(MatcherInterface $matcher, UriData $uri, DispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        MatcherInterface $matcher,
+        RouteCreator $routeCreator,
+        UriData $uri,
+        DispatcherInterface $dispatcher
+    ) {
         $this->cache = new Cache(new ArrayStorage(), new RawSerializer());
 
         $this->uri        = $uri;
         $this->dispatcher = $dispatcher;
+        $this->routeCreator = $routeCreator;
 
         parent::__construct([], $matcher);
     }
@@ -467,20 +480,21 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             $package = PackageHelper::getPackage($package);
         }
 
-        $router = new RouteCreator($this, $package);
+        $this->routeCreator
+            ->group('root')
+            ->setOptions($data)
+            ->register(function (RouteCreator $router) use ($path) {
+                $router->load($path);
+            });
 
-        $router->group(
-            'root',
-            $data,
-            function (RouteCreator $router) use ($path) {
-                require $path;
-            }
-        );
+        foreach ($this->routeCreator->getRoutes() as $name => $route) {
+            $route = $this->routeCreator->handleRoute($route);
 
-        foreach ($router->getRoutes() as $name => $route) {
-            $route = $router->handleRoute($route);
-
-            $this->addRouteByConfig($route->getName(), $route->getOptions(), $package);
+            $this->addRouteByConfig(
+                $route->getName(),
+                $route->getOptions(),
+                $package ?: $route->getOption('package')
+            );
         }
 
         return $this;

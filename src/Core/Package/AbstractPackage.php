@@ -19,6 +19,7 @@ use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\RouteCreator;
 use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\Container;
@@ -418,11 +419,11 @@ class AbstractPackage implements DispatcherAwareInterface
     protected function registerMiddlewares()
     {
         // init middlewares
-        $queue = $this->getMiddlewares();
-
         $middlewares = (array) $this->get('middlewares', []);
 
-        $queue->insertArray($middlewares);
+        foreach ($middlewares as $k => $middleware) {
+            $this->addMiddleware($middleware, is_numeric($k) ? $k : PriorityQueue::NORMAL);
+        }
 
         // Remove closures
         $this->set('middlewares', null);
@@ -438,6 +439,10 @@ class AbstractPackage implements DispatcherAwareInterface
      */
     public function addMiddleware($middleware, $priority = PriorityQueue::NORMAL)
     {
+        if (is_array($middleware) && isset($middleware['priority'])) {
+            $priority = $middleware['priority'];
+        }
+
         $this->getMiddlewares()->insert($middleware, $priority);
 
         return $this;
@@ -457,10 +462,21 @@ class AbstractPackage implements DispatcherAwareInterface
         $chain = new Psr7ChainBuilder();
 
         foreach ($middlewares as $middleware) {
+            $data = [];
+
+            if (is_array($middleware)) {
+                $data = $middleware;
+                $middleware = $data['middleware'];
+
+                unset($data['middleware']);
+            }
+
             if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
-                $middleware = new Psr7Middleware($this->container->newInstance($middleware));
+                $middleware = new Psr7Middleware($this->container->newInstance($middleware, $data));
             } elseif ($middleware instanceof \Closure) {
                 $middleware->bindTo($this);
+            } elseif ($middleware === false) {
+                continue;
             }
 
             $chain->add($middleware);
@@ -538,6 +554,30 @@ class AbstractPackage implements DispatcherAwareInterface
         $router->group($group, function (MainRouter $router) use ($routing) {
             $router->addRouteFromFiles($routing, $this);
         });
+
+        return $router;
+    }
+
+    /**
+     * registerRoutes
+     *
+     * @param RouteCreator $router
+     * @param string       $prefix
+     *
+     * @return  RouteCreator
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerRoutes(RouteCreator $router, string $prefix): RouteCreator
+    {
+        $files = (array) $this->get('routing.files');
+
+        $router->group($this->getName())
+            ->package($this->getName())
+            ->prefix($prefix)
+            ->register(function (RouteCreator $router) use ($files) {
+                $router->load($files);
+            });
 
         return $router;
     }

@@ -8,8 +8,10 @@
 
 namespace Windwalker\Core\Router;
 
-use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Data\Data;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Classes\ImmutableHelperTrait;
 
 /**
  * The RouteCreator class.
@@ -18,10 +20,13 @@ use Windwalker\Utilities\Arr;
  */
 class RouteCreator
 {
+    use RouteConfigureTrait;
+    use ImmutableHelperTrait;
+
     /**
      * Property routes.
      *
-     * @var RouteData[]
+     * @var RouteData[]|Data
      */
     protected $routes = [];
 
@@ -35,34 +40,38 @@ class RouteCreator
     /**
      * Property preparedGroups.
      *
-     * @var  array
+     * @var  Data
      */
     protected $preparedGroups = [];
 
     /**
-     * Property router.
+     * Property group.
      *
-     * @var MainRouter
+     * @var  string
      */
-    protected $router;
+    protected $group;
 
     /**
-     * Property package.
+     * Property packageResolver.
      *
-     * @var  AbstractPackage
+     * @var  PackageResolver
      */
-    protected $package;
+    protected $packageResolver;
 
     /**
      * RouteCreator constructor.
      *
-     * @param MainRouter      $router
-     * @param AbstractPackage $package
+     * @param PackageResolver $packageResolver
+     * @param string          $group
      */
-    public function __construct(MainRouter $router, AbstractPackage $package = null)
+    public function __construct(PackageResolver $packageResolver, $group = 'root')
     {
-        $this->router = $router;
-        $this->package = $package;
+        $this->packageResolver = $packageResolver;
+        $this->group = $group;
+
+        // Make this object referenced in whole tree
+        $this->routes         = new Data();
+        $this->preparedGroups = new Data();
     }
 
     /**
@@ -76,39 +85,42 @@ class RouteCreator
      *
      * @since  __DEPLOY_VERSION__
      */
-    public function group(string $group, array $data, ?callable $callback = null): self
+    public function group(string $group, array $data = [], ?callable $callback = null): self
     {
-        if ($callback) {
-            // Has callback, set group routes.
+        // Has callback, set group routes.
 
-            // Find parents
-            if (isset($data['parents'])) {
-                foreach ((array) $data['parents'] as $parent) {
-                    if (!isset($this->preparedGroups[$parent])) {
-                        throw new \LogicException(sprintf(
-                            'Unable to find parent group: %s for route group: %s',
-                            $parent,
-                            $group
-                        ));
-                    }
-
-                    $data = Arr::mergeRecursive($this->preparedGroups[$parent], $data);
+        // Find parents
+        if (isset($data['parents'])) {
+            foreach ((array) $data['parents'] as $parent) {
+                if (!isset($this->preparedGroups[$parent])) {
+                    throw new \LogicException(sprintf(
+                        'Unable to find parent group: %s for route group: %s',
+                        $parent,
+                        $group
+                    ));
                 }
-            }
 
-            $this->groups[$group] = $data;
-
-            $callback($this);
-
-            array_pop($this->groups);
-        } else {
-            // No callback, set prepared group
-            foreach ((array) $group as $g) {
-                $this->preparedGroups[$g] = $data;
+                $data = Arr::mergeRecursive($this->preparedGroups[$parent], $data);
             }
         }
 
-        return $this;
+        // No callback, set prepared group
+        $this->preparedGroups[$group] = $data;
+
+        $this->groups[$group] = $data;
+
+        $new = $this->cloneInstance();
+        $new->setOptions($data);
+        $new->package((string) $this->getOption('package'));
+        $new->group = $group;
+
+        if ($callback) {
+            $callback($this);
+
+            array_pop($this->groups);
+        }
+
+        return $new;
     }
 
     /**
@@ -127,6 +139,7 @@ class RouteCreator
         $groups = $this->groups;
 
         $route = new RouteData($name);
+
         $this->routes[$name] = $route;
 
         $route->setOptions($options);
@@ -144,7 +157,8 @@ class RouteCreator
             $route->middlewares($middlewares);
         }
 
-        $route->groups($this->groups);
+        $route->groups($this->groups)
+            ->package((string) $this->getOption('package'));
 
         return $route;
     }
@@ -160,7 +174,7 @@ class RouteCreator
      */
     public function handleRoute(RouteData $route): RouteData
     {
-        $name = $route->getName();
+        $name   = $route->getName();
         $groups = $route->getGroups();
 
         // Set group data
@@ -193,16 +207,33 @@ class RouteCreator
 
         $options['pattern'] = rtrim(implode('/', $prefixes) . $options['pattern'], '/');
 
-        $options['extra']['controller'] = $options['controller'] ?? '';
-        $options['extra']['action'] = $options['actions'] ?? [];
-        $options['extra']['package'] = $options['package'] ?? '';
-        $options['extra']['hook'] = $options['hooks'] ?? [];
+        $options['extra']['controller']  = $options['controller'] ?? '';
+        $options['extra']['action']      = $options['actions'] ?? [];
+        $options['extra']['package']     = $options['package'] ?? '';
+        $options['extra']['hook']        = $options['hooks'] ?? [];
         $options['extra']['middlewares'] = $options['middlewares'] ?? [];
-        $options['extra']['groups'] = $groups;
+//        $options['extra']['package']     = $options['package'];
+        $options['extra']['groups']      = $groups;
 
         $route->setOptions($options);
 
         return $route;
+    }
+
+    /**
+     * registerPackage
+     *
+     * @param string $package
+     * @param string $pattern
+     *
+     * @return  RouteCreator
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerPackage(string $package, string $pattern): self
+    {
+        return $this->packageResolver->getPackage($package)
+            ->registerRoutes($this, $pattern);
     }
 
     /**
@@ -302,6 +333,22 @@ class RouteCreator
     }
 
     /**
+     * prefix
+     *
+     * @param string $prefix
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function prefix(string $prefix)
+    {
+        $this->setOption('prefix', $prefix);
+
+        return $this;
+    }
+
+    /**
      * load
      *
      * @param string|array $paths
@@ -324,6 +371,26 @@ class RouteCreator
     }
 
     /**
+     * register
+     *
+     * @param callable $callable
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function register(callable $callable)
+    {
+        $this->groups[$this->group] = $this->options;
+
+        $callable($this);
+
+        array_pop($this->groups);
+
+        return $this;
+    }
+
+    /**
      * Method to get property Routes
      *
      * @return  RouteData[]
@@ -332,6 +399,34 @@ class RouteCreator
      */
     public function getRoutes(): array
     {
-        return $this->routes;
+        return $this->routes->dump();
+    }
+
+    /**
+     * Method to get property Groups
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * Method to set property groups
+     *
+     * @param   array $groups
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+
+        return $this;
     }
 }
