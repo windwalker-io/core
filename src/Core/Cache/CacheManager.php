@@ -14,6 +14,7 @@ use Windwalker\Cache\CacheInterface;
 use Windwalker\Cache\Serializer\SerializerInterface;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Ioc;
+use Windwalker\DI\Container;
 use Windwalker\String\StringNormalise;
 
 /**
@@ -52,15 +53,64 @@ class CacheManager
     protected $cacheClass = Cache::class;
 
     /**
+     * Property container.
+     *
+     * @var  Container
+     */
+    protected $container;
+
+    /**
      * Class init.
      *
-     * @param   Config $config
+     * @param Config    $config
+     * @param Container $container
      *
      * @since  3.0
      */
-    public function __construct(Config $config)
+    public function __construct(Config $config, Container $container)
     {
         $this->config = $config;
+        $this->container = $container;
+    }
+
+    /**
+     * getCacheInstance
+     *
+     * @param string $profile
+     * @param array  $options
+     *
+     * @return  CacheInterface
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getCacheInstance(?string $profile = null, array $options = []): CacheInterface
+    {
+        $config = $this->config;
+
+        $config = $config->extract('cache');
+
+        $profile = $profile ?: $config->get('default', 'global');
+
+        if ($config->exists('profiles')) {
+            $config = $config->extract('profiles.' . $profile);
+        }
+
+        $options = array_merge([
+            'name' => 'windwalker',
+            'storage' => 'array',
+            'serializer' => 'php',
+            'force_enabled' => false
+        ], $config->toArray(), $options);
+
+        return $this->getCache(
+            $options['name'],
+            $options['storage'],
+            $options['serializer'],
+            $options
+        );
     }
 
     /**
@@ -72,16 +122,25 @@ class CacheManager
      * @param array  $options
      *
      * @return  CacheInterface
-     * @throws \UnexpectedValueException
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @deprecated Use getCacheInstance() instead.
      */
-    public function getCache($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
-    {
+    public function getCache(
+        string $name = 'windwalker',
+        string $storage = 'array',
+        string $serializer = 'php',
+        array $options = []
+    ): CacheInterface {
         $config = $this->config;
 
         $debug   = $config->get('system.debug', false);
         $enabled = $config->get('cache.enabled', false);
 
-        if (($debug || !$enabled) && !$this->ignoreGlobal) {
+        $forceEnabled = $options['force_enabled'] ?? false;
+
+        if (!$forceEnabled && ($debug || !$enabled) && !$this->ignoreGlobal) {
             $storage    = 'null';
             $serializer = 'raw';
         }
@@ -98,9 +157,15 @@ class CacheManager
      * @param array  $options
      *
      * @return  CacheInterface
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function create($name = 'windwalker', $storage = 'array', $serializer = 'php', $options = [])
-    {
+    public function create(
+        string $name = 'windwalker',
+        string $storage = 'array',
+        string $serializer = 'php',
+        array $options = []
+    ): CacheInterface {
         $storage    = $storage ?: 'array';
         $serializer = $serializer ?: 'php';
 
@@ -116,7 +181,10 @@ class CacheManager
         $handler = $this->getSerializer($serializer);
 
         $class = $this->cacheClass;
-        $cache = new $class($storage, $handler);
+        $cache = $this->container->newInstance(
+            $class,
+            [$storage, $handler]
+        );
 
         return static::$caches[$hash] = $cache;
     }
@@ -128,7 +196,7 @@ class CacheManager
      *
      * @return  CacheInterface
      */
-    public function getGlobal($forceNew = false)
+    public function getGlobal(bool $forceNew = false): CacheInterface
     {
         return Ioc::get('cache', $forceNew);
     }
@@ -142,12 +210,17 @@ class CacheManager
      *
      * @return CacheItemPoolInterface
      *
-     * @throws \UnexpectedValueException
-     * @throws \DomainException
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getStorage($storage, $options = [], $name = 'windwalker')
-    {
-        $class = sprintf('Windwalker\Cache\Storage\%sStorage', StringNormalise::toCamelCase($storage));
+    public function getStorage(
+        string $storage,
+        array $options = [],
+        string $name = 'windwalker'
+    ): CacheItemPoolInterface {
+        $class = class_exists($storage)
+            ? $storage
+            : sprintf('Windwalker\Cache\Storage\%sStorage', StringNormalise::toCamelCase($storage));
 
         if (!class_exists($class)) {
             throw new \DomainException(sprintf('Cache Storage: %s not supported.', ucfirst($storage)));
@@ -155,9 +228,9 @@ class CacheManager
 
         $config = Ioc::getConfig();
 
-        $options['cache_time']  = isset($options['cache_time']) ? $options['cache_time'] : $config->get('cache.time');
-        $options['cache_dir']   = isset($options['cache_dir']) ? $options['cache_dir'] : $config->get('path.cache');
-        $options['deny_access'] = isset($options['deny_access']) ? $options['deny_access'] : $config->get('cache.denyAccess');
+        $options['cache_time']  = $options['cache_time'] ?? $config->get('cache.time');
+        $options['cache_dir']   = $options['cache_dir'] ?? $config->get('path.cache');
+        $options['deny_access'] = $options['deny_access'] ?? $config->get('cache.denyAccess');
 
         // Convert seconds to minutes
         $options['cache_time'] *= 60;
@@ -180,16 +253,25 @@ class CacheManager
 
                 $group = ($name === 'windwalker') ? null : $name;
 
-                return new $class($path, $group, $denyAccess, $options['cache_time'], $options);
+                return $this->container->newInstance(
+                    $class,
+                    [$path, $group, $denyAccess, $options['cache_time'], $options]
+                );
                 break;
 
             case 'redis':
             case 'memcached':
-                return new $class(null, $options['cache_time'], $options);
+                return $this->container->newInstance(
+                    $class,
+                    [null, $options['cache_time'], $options]
+                );
                 break;
 
             default:
-                return new $class($options['cache_time'], $options);
+                return $this->container->newInstance(
+                    $class,
+                    [$options['cache_time'], $options]
+                );
                 break;
         }
     }
@@ -197,19 +279,23 @@ class CacheManager
     /**
      * getDataHandler
      *
-     * @param $serializer
+     * @param string $serializer
      *
      * @return  SerializerInterface
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getSerializer($serializer)
+    public function getSerializer(string $serializer): SerializerInterface
     {
-        $class = sprintf('Windwalker\Cache\Serializer\%sSerializer', StringNormalise::toCamelCase($serializer));
+        $class = class_exists($serializer)
+            ? $serializer
+            : sprintf('Windwalker\Cache\Serializer\%sSerializer', StringNormalise::toCamelCase($serializer));
 
         if (!class_exists($class)) {
             throw new \DomainException(sprintf('Cache Serializer: %s not supported.', ucfirst($serializer)));
         }
 
-        return new $class();
+        return $this->container->newInstance($class);
     }
 
     /**
@@ -219,7 +305,7 @@ class CacheManager
      *
      * @return boolean
      */
-    public function ignoreGlobal($bool = null)
+    public function ignoreGlobal(?bool $bool = null): bool
     {
         if ($bool === null) {
             return $this->ignoreGlobal;
@@ -235,7 +321,7 @@ class CacheManager
      *
      * @return  string
      */
-    public function getCacheClass()
+    public function getCacheClass(): string
     {
         return $this->cacheClass;
     }

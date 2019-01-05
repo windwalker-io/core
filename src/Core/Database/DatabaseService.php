@@ -58,7 +58,7 @@ class DatabaseService
      *
      * @since  __DEPLOY_VERSION__
      */
-    public function getConnection(?string $connection = 'default', array $options = []): AbstractDatabaseDriver
+    public function getConnection(?string $connection = 'local', array $options = []): AbstractDatabaseDriver
     {
         $key = 'connection.' . $connection;
 
@@ -85,7 +85,7 @@ class DatabaseService
 
         // Check is new or legacy
         if ($config->get('connections')) {
-            $connection = $connection ?: $config->get('connection', 'default');
+            $connection = $connection ?: $config->get('default', 'local');
             $config     = $config->extract('connections.' . $connection);
         }
 
