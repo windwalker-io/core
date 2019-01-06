@@ -107,14 +107,15 @@ class RouteCreator
         // No callback, set prepared group
         $this->preparedGroups[$group] = $data;
 
-        $this->groups[$group] = $data;
-
         $new = $this->cloneInstance();
         $new->setOptions($data);
         $new->package((string) $this->getOption('package'));
         $new->group = $group;
+        $new->groups[$group] = $data;
 
         if ($callback) {
+            $this->groups[$group] = $data;
+
             $callback($this);
 
             array_pop($this->groups);
@@ -140,7 +141,7 @@ class RouteCreator
 
         $route = new RouteData($name);
 
-        $this->routes[$name] = $route;
+        $this->routes[implode('.', array_keys($groups)) . '@' . $name] = $route;
 
         $route->setOptions($options);
 

@@ -4,6 +4,7 @@ namespace Windwalker\SystemPackage\Command;
 
 use Windwalker\Console\Command\Command;
 use Windwalker\SystemPackage\Command\System\ClearCacheCommand;
+use Windwalker\SystemPackage\Command\System\ConvertRoutingCommand;
 use Windwalker\SystemPackage\Command\System\DownCommand;
 use Windwalker\SystemPackage\Command\System\GenerateCommand;
 use Windwalker\SystemPackage\Command\System\LangMergeCommand;
@@ -53,6 +54,7 @@ class SystemCommand extends Command
         $this->addCommand(UpCommand::class);
         $this->addCommand(DownCommand::class);
         $this->addCommand(ModeCommand::class);
+        $this->addCommand(ConvertRoutingCommand::class);
 
         parent::init();
     }
