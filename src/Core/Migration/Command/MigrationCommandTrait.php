@@ -8,10 +8,10 @@
 
 namespace Windwalker\Core\Migration\Command;
 
+use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Database\DatabaseService;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 use Windwalker\Core\Migration\Repository\MigrationsRepository;
-use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\DI\Container;
 
 /**
@@ -74,16 +74,16 @@ trait MigrationCommandTrait
     {
         /** @var Container $container */
         $container = $this->console->container;
-        
+
         $dbService = $container->get(DatabaseService::class);
-        $config = $dbService->getDbConfig();
+        $config    = $dbService->getDbConfig();
 
         // Auto create database
         $name = $config['name'];
 
         $config['database.name'] = null;
 
-        $db = $container->get(AbstractDatabaseDriver::class, true);
+        $db = $container->get(DatabaseAdapter::class, true);
 
         $db->getDatabase($name)->create(true);
 

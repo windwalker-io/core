@@ -11,13 +11,10 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Database\DatabaseService;
 use Windwalker\Core\Database\Exporter\AbstractExporter;
-use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
-use Windwalker\Database\Driver\Mysql\MysqlDriver;
 use Windwalker\DataMapper\DatabaseContainer;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Structure\Structure;
 
 /**
  * Class WhoopsProvider
