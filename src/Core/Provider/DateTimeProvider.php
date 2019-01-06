@@ -17,14 +17,16 @@ use Windwalker\DI\ServiceProviderInterface;
  *
  * @since  2.0
  */
-class DateTimeProvider implements ServiceProviderInterface
+class DateTimeProvider implements ServiceProviderInterface, BootableProviderInterface
 {
     /**
      * boot
      *
+     * @param Container $container
+     *
      * @return  void
      */
-    public function boot()
+    public function boot(Container $container)
     {
         date_default_timezone_set('UTC');
     }

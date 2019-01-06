@@ -25,7 +25,7 @@ use Windwalker\Renderer;
  *
  * @since  2.1.1
  */
-class RendererProvider implements ServiceProviderInterface
+class RendererProvider implements ServiceProviderInterface, BootableDeferredProviderInterface
 {
     /**
      * Property messages.

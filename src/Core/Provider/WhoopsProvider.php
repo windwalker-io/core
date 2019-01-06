@@ -18,7 +18,7 @@ use Windwalker\DI\ServiceProviderInterface;
  *
  * @since 1.0
  */
-class WhoopsProvider implements ServiceProviderInterface
+class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterface
 {
     /**
      * boot

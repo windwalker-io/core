@@ -15,6 +15,8 @@ use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Object\NullObject;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageResolver;
+use Windwalker\Core\Provider\BootableDeferredProviderInterface;
+use Windwalker\Core\Provider\BootableProviderInterface;
 use Windwalker\Core\Provider\SystemProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -191,7 +193,8 @@ trait WindwalkerTrait
 
                 $container->registerServiceProvider($provider);
 
-                if (method_exists($provider, 'boot')) {
+                if ($provider instanceof BootableProviderInterface
+                    || method_exists($provider, 'boot')) {
                     $provider->boot($container);
                 }
             } else {
@@ -210,7 +213,10 @@ trait WindwalkerTrait
             }
 
             if (is_subclass_of($provider, ServiceProviderInterface::class)
-                && method_exists($provider, 'bootDeferred')) {
+                && (
+                    $provider instanceof BootableDeferredProviderInterface
+                    || method_exists($provider, 'bootDeferred')
+                )) {
                 $provider->bootDeferred($container);
             }
         }

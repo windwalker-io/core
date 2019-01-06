@@ -12,6 +12,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Logger\LoggerManager;
+use Windwalker\Core\Provider\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -20,7 +21,7 @@ use Windwalker\DI\ServiceProviderInterface;
  *
  * @since  3.0
  */
-class ErrorHandlingProvider implements ServiceProviderInterface
+class ErrorHandlingProvider implements ServiceProviderInterface, BootableProviderInterface
 {
     /**
      * Property config.

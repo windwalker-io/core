@@ -17,6 +17,8 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
 use Windwalker\Core\Mvc\MvcResolver;
+use Windwalker\Core\Provider\BootableDeferredProviderInterface;
+use Windwalker\Core\Provider\BootableProviderInterface;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RouteCreator;
@@ -334,7 +336,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
                 $container->registerServiceProvider($provider);
 
-                if (method_exists($provider, 'boot')) {
+                if ($provider instanceof BootableProviderInterface || method_exists($provider, 'boot')) {
                     $provider->boot($container);
                 }
             } else {
@@ -352,8 +354,10 @@ class AbstractPackage implements DispatcherAwareInterface
                 continue;
             }
 
-            if (is_subclass_of($provider, ServiceProviderInterface::class) &&
-                is_callable([$provider, 'bootDeferred'])) {
+            if (is_subclass_of($provider, ServiceProviderInterface::class) && (
+                $provider instanceof BootableDeferredProviderInterface
+                || method_exists($provider, 'bootDeferred')
+            )) {
                 $provider->bootDeferred($container);
             }
         }
