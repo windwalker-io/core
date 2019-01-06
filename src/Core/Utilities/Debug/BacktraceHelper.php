@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Utilities\Debug;
 
 use Windwalker\Data\Data;
+use Windwalker\String\Mbstring;
+use Windwalker\String\Str;
 use Windwalker\String\StringHelper;
 use Windwalker\String\Utf8String;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
@@ -51,12 +53,12 @@ class BacktraceHelper
             } elseif (is_object($arg)) {
                 $arg = ReflectionHelper::getShortName($arg);
             } elseif (is_string($arg)) {
-                if (Utf8String::strlen($arg) > 20) {
+                if (Mbstring::strlen($arg) > 20) {
                     $arg = Utf8String::substr($arg, 0, 20) . '...';
                 }
 
-                $arg = StringHelper::quote($arg);
-            } elseif (is_null($arg)) {
+                $arg = Str::wrap($arg);
+            } elseif ($arg === null) {
                 $arg = 'NULL';
             } elseif (is_bool($arg)) {
                 $arg = $arg ? 'TRUE' : 'FALSE';
@@ -65,14 +67,12 @@ class BacktraceHelper
             $args[] = $arg;
         }
 
-        if (!empty($trace['file'])) {
-            $trace['file'] = static::replaceRoot($trace['file']);
-        }
-
         return [
-            'file' => $trace['file'] ? $trace['file'] . ' (' . $trace['line'] . ')' : null,
+            'file' => !empty($trace['file']) ? static::replaceRoot($trace['file']) . ' (' . $trace['line'] . ')' : null,
             'function' => ($trace['class'] ? $trace['class'] . $trace['type'] : null) . $trace['function'] .
                 sprintf('(%s)', implode(', ', $args)),
+            'pathname' => $trace['file'],
+            'line' => $trace['line']
         ];
     }
 

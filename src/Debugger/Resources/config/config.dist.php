@@ -34,4 +34,6 @@ return [
 
         ],
     ],
+
+    'editor' => env('DEBUGGER_EDITOR') ?? 'phpstorm'
 ];

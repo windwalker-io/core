@@ -17,6 +17,8 @@ $types = [
     PDO::PARAM_STMT => 'STMT',
     PDO::PARAM_INPUT_OUTPUT => 'INPUT_OUTPUT',
 ];
+
+$editor = $package->get('editor');
 ?>
 
 <div class="card border-<?php echo $timeline['time']['style'] ?>">
@@ -158,7 +160,14 @@ $types = [
                                     <?php echo $trace['function']; ?>
                                 </td>
                                 <td class="48%">
-                                    <?php echo $trace['file']; ?>
+                                    <?php if ($editor): ?>
+                                        <a href="<?php echo $editor; ?>://open?file=<?php echo $this->escape($trace['pathname']); ?>&line=<?php echo $this->escape($trace['line']); ?>">
+                                            <?php echo $trace['file']; ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <?php echo $trace['file']; ?>
+                                    <?php endif; ?>
+
                                 </td>
                             </tr>
                             <?php endforeach; ?>
