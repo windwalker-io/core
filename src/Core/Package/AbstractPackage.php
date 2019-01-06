@@ -28,12 +28,14 @@ use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\ListenerPriority;
+use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
 use Windwalker\Middleware\Psr7Middleware;
 use Windwalker\Router\Exception\RouteNotFoundException;
 use Windwalker\Structure\Structure;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Queue\PriorityQueue;
 use Windwalker\Utilities\Reflection\ReflectionHelper;
 
@@ -579,7 +581,16 @@ class AbstractPackage implements DispatcherAwareInterface
             ->package($this->getName())
             ->prefix($prefix)
             ->register(function (RouteCreator $router) use ($files) {
-                $router->load($files);
+                foreach ($files as $file) {
+                    if (File::getExtension($file) === 'php') {
+                        $router->load($file);
+                    } else {
+                        $this->router->getRouter()
+                            ->group($this->getName(), function (MainRouter $router) use ($file) {
+                                $router->addRouteFromFile($file, $this);
+                            });
+                    }
+                }
             });
 
         return $router;
