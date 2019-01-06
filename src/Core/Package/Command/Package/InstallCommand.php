@@ -15,6 +15,7 @@ use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Folder;
+use Windwalker\Http\Stream\Stream;
 
 /**
  * The InstallCommand class.
@@ -130,18 +131,23 @@ class InstallCommand extends CoreCommand
             }
         }
 
-        $file   = $dir . '/secret.dist.yml';
-        $target = $this->console->get('path.etc') . '/secret.yml';
+        $file   = $dir . '/.env.dist';
+        $target = $this->console->get('path.root') . '/.env';
+        $targetDist = $this->console->get('path.root') . '/.env.dist';
 
-        if (is_file($file) && with(new BooleanPrompter)->ask("File: <info>secret.dist.yml</info> exists,\n do you want to copy content to bottom of <comment>etc/secret.yml</comment> [Y/n]: ",
-                true)) {
-            $secret = ltrim(file_get_contents($target));
-            $new    = file_get_contents($file);
-            $secret = $secret . "\n# " . $package->name . "\n" . ltrim($new);
+        if (is_file($file) && (new BooleanPrompter)->ask("File: <info>.env.dist</info> exists,\n do you want to copy content to bottom of <comment>/.env</comment> and <comment>/.env.dist</comment> [Y/n]: ", true)) {
 
-            File::write($target, $secret);
+            $stream = new Stream($target, Stream::MODE_WRITE_ONLY_FROM_END);
+            $stream->write("\n# " . ucfirst($package->name) . "\n" . ltrim(file_get_contents($file)));
+            $stream->close();
 
-            $this->out('  Copy to <info>etc/secret.yml</info> successfully.');
+            $this->out('  Copy to <info>/.env</info> successfully.');
+
+            $stream = new Stream($targetDist, Stream::MODE_WRITE_ONLY_FROM_END);
+            $stream->write("\n# " . ucfirst($package->name) . "\n" . ltrim(file_get_contents($file)));
+            $stream->close();
+
+            $this->out('  Copy to <info>/.env.dist</info> successfully.');
         }
     }
 

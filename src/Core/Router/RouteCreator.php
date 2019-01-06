@@ -360,12 +360,40 @@ class RouteCreator
      */
     public function load($paths): self
     {
-        $paths = (array) $paths;
+        $paths = Arr::toArray($paths);
 
         $router = $this;
 
         foreach ($paths as $path) {
-            require $path;
+            $files = \Windwalker\glob($path);
+
+            foreach ($files as $file) {
+                require $file;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * loadFolder
+     *
+     * @param string|array $paths
+     *
+     * @return  RouteCreator
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function loadFolder($paths): self
+    {
+        $paths = Arr::toArray($paths);
+
+        $router = $this;
+
+        foreach ($paths as $path) {
+            $files = \Windwalker\glob($path . '/*.php');
+
+            $this->load($files);
         }
 
         return $this;
