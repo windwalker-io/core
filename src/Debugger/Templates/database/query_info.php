@@ -161,7 +161,7 @@ $editor = $package->get('editor');
                                 </td>
                                 <td class="48%">
                                     <?php if ($editor): ?>
-                                        <a href="<?php echo $editor; ?>://open?file=<?php echo $this->escape($trace['pathname']); ?>&line=<?php echo $this->escape($trace['line']); ?>">
+                                        <a href="<?php echo $editor; ?>://open?file=<?php echo urlencode($trace['pathname']); ?>&amp;line=<?php echo urlencode($trace['line']); ?>">
                                             <?php echo $trace['file']; ?>
                                         </a>
                                     <?php else: ?>
