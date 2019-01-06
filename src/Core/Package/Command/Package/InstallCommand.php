@@ -160,7 +160,7 @@ class InstallCommand extends CoreCommand
      */
     protected function installRouting(AbstractPackage $package)
     {
-        if (!(new BooleanPrompter)->ask('Do your want to add routing profile to <comment>etc/routing.yml</comment>? [Y/n]: ',
+        if (!(new BooleanPrompter)->ask('Do your want to add routing profile to <comment>etc/routing.php</comment>? [Y/n]: ',
             true)) {
             return;
         }
@@ -170,23 +170,21 @@ class InstallCommand extends CoreCommand
 
         $routing = <<<ROUTE
 
-# Routing of package: %s
-%s:
-    pattern: %s
-    package: %s
+// Routing of package: %s
+\$router->registerPackage('%s', '%s');
 
 ROUTE;
 
-        $routing = sprintf($routing, $package->name, $package->name, $pattern, $package->name);
+        $routing = sprintf($routing, $package->name, $package->name, $pattern);
 
-        $target = $this->console->get('path.etc') . '/routing.yml';
+        $target = $this->console->get('path.etc') . '/routing.php';
 
         $content = file_get_contents($target);
         $content .= $routing;
 
         file_put_contents($target, $content);
 
-        $this->out()->out('  Added routing profile to <comment>etc/routing.yml</comment>');
+        $this->out()->out('  Added routing profile to <comment>etc/routing.php</comment>');
     }
 
     /**
