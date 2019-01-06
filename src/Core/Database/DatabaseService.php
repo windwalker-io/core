@@ -14,6 +14,7 @@ use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Database\Driver\Mysql\MysqlDriver;
 use Windwalker\DI\Container;
+use Windwalker\Structure\Structure;
 
 /**
  * The DatabaseService class.
@@ -46,6 +47,28 @@ class DatabaseService
     {
         $this->config    = $config;
         $this->container = $container;
+    }
+
+    /**
+     * getDbConfig
+     *
+     * @param string|null $connection
+     *
+     * @return  Structure
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getDbConfig(?string $connection = null): Structure
+    {
+        $config = $this->config->extract('database');
+
+        // Check is new or legacy
+        if ($config->get('connections')) {
+            $connection = $connection ?: $config->get('default', 'local');
+            $config     = $config->extract('connections.' . $connection);
+        }
+
+        return $config;
     }
 
     /**
