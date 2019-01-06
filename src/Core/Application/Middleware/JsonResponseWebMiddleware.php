@@ -10,6 +10,7 @@ namespace Windwalker\Core\Application\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Windwalker\Core\Error\ErrorManager;
 use Windwalker\Debugger\Helper\DebuggerHelper;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Middleware\MiddlewareInterface;
@@ -38,24 +39,25 @@ class JsonResponseWebMiddleware extends AbstractWebMiddleware
         }
 
         // Replace Default Error handler
-        $error = $this->app->container->get('error.handler');
-        $error->addHandler(function ($exception) {
-            /** @var \Exception|\Throwable $exception */
-            $message = !WINDWALKER_DEBUG ? $exception->getMessage() : sprintf(
-                '#%d %s - File: %s (%d)',
-                $exception->getCode(),
-                $exception->getMessage(),
-                $exception->getFile(),
-                $exception->getLine()
-            );
-
-            $this->app
-                ->getServer()
-                ->getOutput()
-                ->respond(
-                    new JsonResponse(['error' => $message], $exception->getCode())
+        $this->app->container
+            ->get(ErrorManager::class)
+            ->addHandler(function ($exception) {
+                /** @var \Exception|\Throwable $exception */
+                $message = !WINDWALKER_DEBUG ? $exception->getMessage() : sprintf(
+                    '#%d %s - File: %s (%d)',
+                    $exception->getCode(),
+                    $exception->getMessage(),
+                    $exception->getFile(),
+                    $exception->getLine()
                 );
-        }, 'default');
+
+                $this->app
+                    ->getServer()
+                    ->getOutput()
+                    ->respond(
+                        new JsonResponse(['error' => $message], $exception->getCode())
+                    );
+            }, 'default');
 
         /** @var Response $response */
         $response = $next($request, $response);

@@ -16,6 +16,8 @@ use Windwalker\Http\Response\JsonResponse;
  * The RenderViewMiddleware class.
  *
  * @since  3.0
+ *
+ * @deprecated  Use web middleware instead.
  */
 class JsonResponseMiddleware extends AbstractControllerMiddleware
 {

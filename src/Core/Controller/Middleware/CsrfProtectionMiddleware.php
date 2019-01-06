@@ -14,6 +14,8 @@ use Windwalker\Core\Security\CsrfProtection;
  * The CsrfTokenMiddleware class.
  *
  * @since  3.0
+ *
+ * @deprecated  Use web middleware instead.
  */
 class CsrfProtectionMiddleware extends AbstractControllerMiddleware
 {

@@ -16,6 +16,8 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * The HtmlResponseTrait class.
  *
  * @since  3.0
+ *
+ * @deprecated  Use web middleware instead.
  */
 trait JsonApiTrait
 {

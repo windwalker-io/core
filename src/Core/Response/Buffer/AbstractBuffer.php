@@ -13,7 +13,7 @@ namespace Windwalker\Core\Response\Buffer;
  *
  * @since  3.0
  */
-abstract class AbstractBuffer
+abstract class AbstractBuffer implements ResponseBufferInterface
 {
     /**
      * Determines whether the request was successful

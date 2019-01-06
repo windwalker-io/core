@@ -15,6 +15,8 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * The CsrfProtectionTrait class.
  *
  * @since  3.0
+ *
+ * @deprecated  Use web middleware instead.
  */
 trait CsrfProtectionTrait
 {
