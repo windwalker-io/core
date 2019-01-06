@@ -12,6 +12,8 @@ namespace Windwalker\Core\Controller\Middleware;
  * The TranslationMiddleware class.
  *
  * @since  3.0
+ *
+ * @deprecated Do not manually use this.
  */
 class TransactionMiddleware extends AbstractControllerMiddleware
 {
@@ -27,21 +29,21 @@ class TransactionMiddleware extends AbstractControllerMiddleware
      */
     public function execute($data = null)
     {
-        $data->model->transactionStart(true);
+        $data->repository->transactionStart(true);
 
         try {
             $result = $this->next->execute($data);
         } catch (\Exception $e) {
-            $data->model->transactionRollback(true);
+            $data->repository->transactionRollback(true);
 
             throw $e;
         } catch (\Throwable $e) {
-            $data->model->transactionRollback(true);
+            $data->repository->transactionRollback(true);
 
             throw $e;
         }
 
-        $data->model->transactionCommit(true);
+        $data->repository->transactionCommit(true);
 
         return $result;
     }

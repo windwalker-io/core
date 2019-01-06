@@ -14,6 +14,8 @@ use Windwalker\Http\Response\RedirectResponse;
  * The RedirectResponseMiddleware class.
  *
  * @since  3.0
+ *
+ * @deprecated Do not manually use this.
  */
 class RedirectResponseMiddleware extends AbstractControllerMiddleware
 {

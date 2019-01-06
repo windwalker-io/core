@@ -14,6 +14,8 @@ use Windwalker\Http\Response\HtmlResponse;
  * The HtmlResponseMiddleware class.
  *
  * @since  3.0
+ *
+ * @deprecated Do not manually use this.
  */
 class HtmlResponseMiddleware extends AbstractControllerMiddleware
 {
