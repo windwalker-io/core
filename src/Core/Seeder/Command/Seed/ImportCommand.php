@@ -84,11 +84,7 @@ class ImportCommand extends CoreCommand
             $this->console->container->call([$seeder, 'doExecute']);
         } catch (\PDOException $e) {
             if ($this->getOption('v')) {
-                $e = new \PDOException(
-                    $e->getMessage() . "\n\nSQL: " . $this->console->database->getQuery(),
-                    $e->getCode(),
-                    $e
-                );
+                $this->out("\n\nError SQL: " . $this->console->database->getQuery());
             }
 
             throw $e;

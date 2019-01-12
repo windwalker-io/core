@@ -250,11 +250,7 @@ class MigrationsRepository extends Repository
             $this->out($tmpl);
         } catch (\PDOException $e) {
             if ($this->command->getOption('v')) {
-                $e = new \PDOException(
-                    $e->getMessage() . "\n\nSQL: " . $this->db->getQuery(),
-                    $e->getCode(),
-                    $e
-                );
+                $this->command->out("\n\nError SQL: " . $this->db->getQuery());
             }
 
             throw $e;
