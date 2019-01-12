@@ -41,7 +41,8 @@ class DatabaseProvider implements ServiceProviderInterface
         };
 
         class_alias(AbstractDatabaseDriver::class, DatabaseAdapter::class);
-        $container->share(AbstractDatabaseDriver::class, $closure);
+        $container->share(AbstractDatabaseDriver::class, $closure)
+            ->alias(DatabaseAdapter::class, AbstractDatabaseDriver::class);
 
         DatabaseContainer::setDb(function () use ($container) {
             return $container->get(AbstractDatabaseDriver::class);

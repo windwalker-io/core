@@ -12,6 +12,9 @@ use Windwalker\Core\Object\NullObject;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
+use Windwalker\Database\Monitor\CallbackMonitor;
+use Windwalker\Database\Monitor\CompositeMonitor;
+use Windwalker\Database\Monitor\DebugMonitor;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -19,6 +22,7 @@ use Windwalker\Event\ListenerPriority;
 use Windwalker\Profiler\NullProfiler;
 use Windwalker\Profiler\Point\Point;
 use Windwalker\Profiler\Profiler;
+use Windwalker\Query\Query\PreparableInterface;
 use Windwalker\Structure\Structure;
 
 /**
@@ -90,7 +94,6 @@ class ProfilerProvider implements ServiceProviderInterface
      * @param Structure $config
      *
      * @return  void
-     * @throws \ReflectionException
      */
     protected function registerDatabaseProfiler(Container $container, Structure $config)
     {
@@ -111,9 +114,12 @@ class ProfilerProvider implements ServiceProviderInterface
         $db = $container->get('database');
 
         // Set profiler to DatabaseDriver
-        $db->addMiddleware(new DbProfilerMiddleware(
-            function (AbstractDatabaseDriver $db, \stdClass $data) use ($container, $collector, &$queryData) {
-                if (stripos(trim($data->sql), 'EXPLAIN') === 0) {
+        $monitor = new CompositeMonitor();
+        $db->setMonitor(new CompositeMonitor());
+
+        $monitor->addMonitor(new CallbackMonitor(
+            function ($query) use ($db, $collector, &$queryData) {
+                if (stripos(trim($query), 'EXPLAIN') === 0) {
                     return;
                 }
 
@@ -125,10 +131,16 @@ class ProfilerProvider implements ServiceProviderInterface
                     'memory' => ['start' => memory_get_usage(false)],
                 ];
             },
-            function (AbstractDatabaseDriver $db, \stdClass $data) use ($container, $collector, &$queryData) {
-                if (stripos(trim($data->sql), 'EXPLAIN') === 0) {
+            function () use ($db, $collector, &$queryData) {
+                $query = $db->getQuery(true);
+
+                if (stripos(trim((string) $query), 'EXPLAIN') === 0) {
                     return;
                 }
+
+                $queryData['bounded'] = $db->getQuery(true) instanceof PreparableInterface
+                    ? (new \ArrayObject($query->getBounded()))->getArrayCopy()
+                    : [];
 
                 $queryData['time']['end']        = microtime(true);
                 $queryData['time']['duration']   = abs($queryData['time']['end'] - $queryData['time']['start']);
@@ -136,9 +148,9 @@ class ProfilerProvider implements ServiceProviderInterface
                 $queryData['memory']['duration'] = abs($queryData['memory']['end'] - $queryData['memory']['start']);
                 $queryData['query']              = $db->getLastQuery();
                 $queryData['rows']               = $db->getReader()->countAffected();
-                $queryData['backtrace']          = BacktraceHelper::normalizeBacktraces(array_slice(debug_backtrace(), 6));
-
-                $queryData = array_merge((array) $data, $queryData);
+                $queryData['backtrace']          = BacktraceHelper::normalizeBacktraces(
+                    array_slice(debug_backtrace(), 6)
+                );
 
                 $collector->push('database.queries', $queryData);
 

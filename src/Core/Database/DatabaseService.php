@@ -126,9 +126,9 @@ class DatabaseService
 
         $db = DatabaseFactory::getDbo($options['driver'], $options, true);
 
-        $db->setDebug($config->get('system.debug', false));
+        $db->setDebug($this->config->get('system.debug', false));
 
-        if ($db instanceof MysqlDriver && $config->get('database.mysql.strict', true)) {
+        if ($db instanceof MysqlDriver && $config->get('strict', true)) {
             $this->strictMode($db);
         }
 
@@ -150,9 +150,9 @@ class DatabaseService
 
         // Check is new or legacy
         if ($config->get('connections')) {
-            $connection = $connection ?: $config->get('connection', 'default');
+            $connection = $connection ?: $config->get('connection', 'local');
 
-            $config = $config->extract($connection);
+            $config = $config->extract('connections.' . $connection);
         }
 
         $driver = $config->get('driver', 'mysql');

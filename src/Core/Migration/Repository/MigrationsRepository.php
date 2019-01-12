@@ -233,9 +233,6 @@ class MigrationsRepository extends Repository
 
         $start = time();
 
-        // Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite does.
-        $tran = $this->db->getTransaction()->start();
-
         try {
             $tmpl = '<info>%s_%s</info> <comment>%s</comment>... ';
 
@@ -261,11 +258,7 @@ class MigrationsRepository extends Repository
             }
 
             throw $e;
-        } finally {
-            $tran->rollback();
         }
-
-        $tran->commit();
 
         $end = time();
 

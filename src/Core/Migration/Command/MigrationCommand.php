@@ -13,6 +13,8 @@ use Windwalker\Core\Migration\Command\Migration;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Database\Middleware\DbProfilerMiddleware;
+use Windwalker\Database\Monitor\CallbackMonitor;
+use Windwalker\Database\Monitor\NullMonitor;
 
 /**
  * The MigrationCommand class.
@@ -96,33 +98,25 @@ class MigrationCommand extends CoreCommand
         $this->console->set('migration.dir', $dir);
 
         // DB log
-        $middlewares = $this->console->database->getMiddlewares()->dumpStack();
-        
-        $classes = array_map('get_class', $middlewares);
+        $this->console->database->setDebug(true);
 
-        if (!\in_array(DbProfilerMiddleware::class, $classes, true)) {
-            $this->console->database->addMiddleware(new DbProfilerMiddleware(
-                function () {
-                    //
-                },
-                function (AbstractDatabaseDriver $db, \stdClass $data) {
-                    $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $db->getLastQuery()]);
-                }
-            ));
-        }
+        $this->console->database->setMonitor(
+            new CallbackMonitor(function ($query) {
+                $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $query]);
+            })
+        );
     }
 
     /**
      * Execute this command.
      *
-     * @return int|void
-     * @throws \ReflectionException
+     * @return int
      */
     protected function doExecute()
     {
         $result = parent::doExecute();
 
-        $this->console->database->resetMiddlewares();
+        $this->console->database->setMonitor(new NullMonitor());
 
         return $result;
     }

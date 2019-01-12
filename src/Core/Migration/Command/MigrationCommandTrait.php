@@ -81,14 +81,14 @@ trait MigrationCommandTrait
         // Auto create database
         $name = $config['name'];
 
-        $config['database.name'] = null;
+        $config['name'] = null;
 
-        $db = $container->get(DatabaseAdapter::class, true);
+        $db = $dbService->createConnection('_preset', $config->toArray());
 
         $db->getDatabase($name)->create(true);
 
         $db->select($name);
 
-        $config['database.name'] = $name;
+        $config['name'] = $name;
     }
 }
