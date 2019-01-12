@@ -99,6 +99,7 @@ namespace {
          * @return  bool|int
          *
          * @since  3.3
+         * @throws Exception
          */
         function date_compare($date1, $date2, $operator = null)
         {
@@ -170,20 +171,18 @@ namespace {
 namespace Windwalker {
     use Windwalker\Filesystem\Filesystem;
 
-    if (!function_exists('globstar')) {
-        /**
-         * Support node style double star finder.
-         *
-         * @param string $pattern
-         * @param int    $flags
-         *
-         * @return  array
-         *
-         * @since  3.5
-         */
-        function glob(string $pattern, int $flags = 0): array
-        {
-            return Filesystem::glob($pattern, $flags);
-        }
+    /**
+     * Support node style double star finder.
+     *
+     * @param string $pattern
+     * @param int    $flags
+     *
+     * @return  array
+     *
+     * @since  3.5
+     */
+    function glob(string $pattern, int $flags = 0): array
+    {
+        return Filesystem::glob($pattern, $flags);
     }
 }
