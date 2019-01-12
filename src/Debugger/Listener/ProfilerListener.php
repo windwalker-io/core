@@ -383,22 +383,24 @@ class ProfilerListener
             $queries = $collector['database.queries'];
             $db      = Ioc::getDatabase();
 
-            foreach ($queries as $k => $data) {
-                if (stripos(trim($data['query']), 'SELECT') !== 0) {
-                    continue;
-                }
-
-                $query = $db->getQuery(true);
-                $query->setQuery('EXPLAIN ' . $data['query']);
-
-                if (!empty($data['bounded'])) {
-                    foreach ((array) $data['bounded'] as $key => $bind) {
-                        $bind = (object) $bind;
-                        $query->bind($key, $bind->value, $bind->dataType, $bind->length, $bind->driverOptions);
+            if ($db->getName() === 'mysql') {
+                foreach ($queries as $k => $data) {
+                    if (stripos(trim($data['query']), 'SELECT') !== 0) {
+                        continue;
                     }
-                }
 
-                $collector['database.queries.' . $k . '.explain'] = $db->setQuery($query)->loadAll();
+                    $query = $db->getQuery(true);
+                    $query->setQuery('EXPLAIN ' . $data['query']);
+
+                    if (!empty($data['bounded'])) {
+                        foreach ((array) $data['bounded'] as $key => $bind) {
+                            $bind = (object) $bind;
+                            $query->bind($key, $bind->value, $bind->dataType, $bind->length, $bind->driverOptions);
+                        }
+                    }
+
+                    $collector['database.queries.' . $k . '.explain'] = $db->prepare($query)->loadAll();
+                }
             }
 
             // Database Information
