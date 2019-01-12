@@ -13,6 +13,7 @@ use Windwalker\Core\Database\Traits\DateFormatTrait;
 use Windwalker\Core\Ioc;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\Environment\PlatformHelper;
 
 /**
@@ -38,6 +39,15 @@ abstract class AbstractSeeder
      * @var Command
      */
     protected $command;
+
+    /**
+     * Property faker.
+     *
+     * @Inject()
+     *
+     * @var FakerService
+     */
+    protected $faker;
 
     /**
      * Class init.
