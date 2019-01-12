@@ -114,12 +114,11 @@ class ProfilerProvider implements ServiceProviderInterface
         $db = $container->get('database');
 
         // Set profiler to DatabaseDriver
-        $monitor = new CompositeMonitor();
-        $db->setMonitor(new CompositeMonitor());
+        $db->setMonitor($monitor = new CompositeMonitor());
 
         $monitor->addMonitor(new CallbackMonitor(
-            function ($query) use ($db, $collector, &$queryData) {
-                if (stripos(trim($query), 'EXPLAIN') === 0) {
+            function ($sql) use ($db, $collector, &$queryData) {
+                if (stripos(trim($sql), 'EXPLAIN') === 0) {
                     return;
                 }
 
@@ -130,6 +129,12 @@ class ProfilerProvider implements ServiceProviderInterface
                     'time' => ['start' => microtime(true)],
                     'memory' => ['start' => memory_get_usage(false)],
                 ];
+
+                $query = $db->getQuery();
+
+                $queryData['bounded'] = $query instanceof PreparableInterface
+                    ? (new \ArrayObject($query->getBounded()))->getArrayCopy()
+                    : [];
             },
             function () use ($db, $collector, &$queryData) {
                 $query = $db->getQuery(true);
@@ -137,10 +142,6 @@ class ProfilerProvider implements ServiceProviderInterface
                 if (stripos(trim((string) $query), 'EXPLAIN') === 0) {
                     return;
                 }
-
-                $queryData['bounded'] = $db->getQuery(true) instanceof PreparableInterface
-                    ? (new \ArrayObject($query->getBounded()))->getArrayCopy()
-                    : [];
 
                 $queryData['time']['end']        = microtime(true);
                 $queryData['time']['duration']   = abs($queryData['time']['end'] - $queryData['time']['start']);
