@@ -114,6 +114,11 @@ class MailerManager
             }
         }
 
+        // Tester
+        if ($forwards = $config->get('mail.test_forwards')) {
+            $message->bcc($forwards);
+        }
+
         $result = $this->getAdapter()->send($message);
 
         $this->triggerEvent('onMailerAfterSend', [
