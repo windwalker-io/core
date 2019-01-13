@@ -6,18 +6,20 @@
  * @license    __LICENSE__
  */
 
-namespace Windwalker\SystemPackage\Command\System;
+namespace Windwalker\SystemPackage\Command\Legacy;
 
 use Symfony\Component\Yaml\Yaml;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\DateTime\Chronos;
+use Windwalker\String\StringNormalise;
 use Windwalker\Structure\Format\PhpFormat;
 use Windwalker\Utilities\Arr;
 
 /**
  * The ConvertRouting class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class ConvertRoutingCommand extends CoreCommand
 {
@@ -104,20 +106,21 @@ class ConvertRoutingCommand extends CoreCommand
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
+     * @throws \Exception
      */
     protected function convert(string $file): void
     {
         $routes = Yaml::parse(file_get_contents($file));
 
-        show($file);
+        $year = Chronos::create()->year;
 
         $tmpl = <<<PHP
 <?php
 /**
- * Part of phoenix project.
+ * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2019 __ORGANIZATION__.
+ * @copyright  Copyright (C) $year __ORGANIZATION__.
  * @license    __LICENSE__
  */
 
@@ -128,7 +131,8 @@ use Windwalker\Core\Router\RouteCreator;
 PHP;
 
         foreach ($routes as $name => $route) {
-            $code = "\$router->any('$name', '{$route['pattern']}')";
+            $code = '// ' . str(StringNormalise::toSpaceSeparated($name))->upperCaseWords() . "\n";
+            $code .= "\$router->any('$name', '{$route['pattern']}')";
 
             if (isset($route['controller'])) {
                 $code .= "\n" . $this->indent(1) . "->controller('{$route['controller']}')";
@@ -153,9 +157,18 @@ PHP;
             }
 
             if (isset($route['action'])) {
-                foreach ($route['action'] as $method => $action) {
-                    $method = strtolower($method);
-                    $code .= "\n" . $this->indent(1) . "->{$method}Action('{$action}')";
+                foreach ($route['action'] as $methods => $action) {
+                    $methods = array_map('trim', explode('|', $methods));
+
+                    foreach ($methods as $method) {
+                        $method = strtolower($method);
+
+                        if ($method === '*') {
+                            $code .= "\n" . $this->indent(1) . "->allActions('{$action}')";
+                        } else {
+                            $code .= "\n" . $this->indent(1) . "->{$method}Action('{$action}')";
+                        }
+                    }
                 }
             }
 
@@ -197,7 +210,7 @@ PHP;
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     protected function indent(int $level = 0, ?string $content = null): string
     {

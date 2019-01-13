@@ -14,7 +14,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
 /**
  * The RouteConfigureTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 trait RouteConfigureTrait
 {
@@ -27,7 +27,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function methods($methods)
     {
@@ -45,7 +45,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function actions(array $actions)
     {
@@ -62,7 +62,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function action(string $action, string $controller)
     {
@@ -78,11 +78,29 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function allActions(string $controller)
     {
         $this->options['actions']['*'] = $controller;
+
+        return $this;
+    }
+
+    /**
+     * Save actions: post, patch, put
+     *
+     * @param string $controller
+     *
+     * @return  static
+     *
+     * @since  3.5
+     */
+    public function saveAction(string $controller)
+    {
+        $this->postAction($controller);
+        $this->putAction($controller);
+        $this->patchAction($controller);
 
         return $this;
     }
@@ -94,7 +112,7 @@ trait RouteConfigureTrait
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function package(string $value)
     {
@@ -110,7 +128,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function variables(array $variables)
     {
@@ -130,7 +148,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function var(string $name, $value)
     {
@@ -146,7 +164,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function requirements(array $requirements)
     {
@@ -166,7 +184,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function requirement(string $name, string $value)
     {
@@ -182,7 +200,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function hooks(array $hooks)
     {
@@ -198,7 +216,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function matchHook(callable $callable)
     {
@@ -214,7 +232,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function buildHook(callable $callable)
     {
@@ -230,7 +248,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function middlewares(array $middlewares)
     {
@@ -248,7 +266,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function middleware($class)
     {
@@ -264,7 +282,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function port(string $value)
     {
@@ -280,7 +298,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function sslPort(string $value)
     {
@@ -296,7 +314,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function scheme(string $value)
     {
@@ -313,7 +331,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function extra(string $name, $value)
     {
@@ -329,7 +347,7 @@ trait RouteConfigureTrait
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function extraValues(array $values)
     {
@@ -348,7 +366,7 @@ trait RouteConfigureTrait
      *
      * @return  self
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function clear(string $name): self
     {
@@ -365,7 +383,7 @@ trait RouteConfigureTrait
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function __call($name, array $args = [])
     {

@@ -473,8 +473,6 @@ class Widget implements \ArrayAccess
     {
         try {
             return $this->render();
-        } catch (\Exception $e) {
-            echo $e;
         } catch (\Throwable $e) {
             echo $e;
         }

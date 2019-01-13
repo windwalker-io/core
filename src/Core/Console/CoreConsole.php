@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Console;
 
+use Windwalker\Console\Command\RootCommand;
 use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOFactory;
 use Windwalker\Console\IO\IOInterface;
@@ -194,7 +195,16 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      */
     public function registerRootCommand()
     {
-        parent::registerRootCommand();
+        if ($this->rootCommand) {
+            return $this;
+        }
+
+        $this->rootCommand = $this->make(RootCommand::class, ['io' => $this->io]);
+
+        $this->rootCommand->setApplication($this);
+
+        $this->description ? $this->rootCommand->description($this->description) : null;
+        $this->help ? $this->rootCommand->help($this->help) : null;
 
         $this->getRootCommand()
             ->addGlobalOption('n')

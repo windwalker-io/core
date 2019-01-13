@@ -633,7 +633,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function validRedirectUrl($url)
     {

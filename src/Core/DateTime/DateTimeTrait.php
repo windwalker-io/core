@@ -27,7 +27,7 @@ use Windwalker\Ioc;
  * @property-read  string week
  * @property-read  string year
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 trait DateTimeTrait
 {

@@ -84,7 +84,7 @@ class CacheManager
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getCacheInstance(?string $profile = null, array $options = []): CacheInterface
     {

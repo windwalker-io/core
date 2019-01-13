@@ -3,14 +3,15 @@
 namespace Windwalker\SystemPackage\Command;
 
 use Windwalker\Console\Command\Command;
-use Windwalker\SystemPackage\Command\System\ClearCacheCommand;
-use Windwalker\SystemPackage\Command\System\ConvertRoutingCommand;
-use Windwalker\SystemPackage\Command\System\DownCommand;
-use Windwalker\SystemPackage\Command\System\GenerateCommand;
-use Windwalker\SystemPackage\Command\System\LangMergeCommand;
-use Windwalker\SystemPackage\Command\System\MailTestCommand;
-use Windwalker\SystemPackage\Command\System\ModeCommand;
-use Windwalker\SystemPackage\Command\System\UpCommand;
+use Windwalker\SystemPackage\Command\System\{
+    ClearCacheCommand,
+    DownCommand,
+    GenerateCommand,
+    LangMergeCommand,
+    MailTestCommand,
+    ModeCommand,
+    UpCommand
+};
 
 /**
  * Class BuildCommand
@@ -54,7 +55,6 @@ class SystemCommand extends Command
         $this->addCommand(UpCommand::class);
         $this->addCommand(DownCommand::class);
         $this->addCommand(ModeCommand::class);
-        $this->addCommand(ConvertRoutingCommand::class);
 
         parent::init();
     }

@@ -21,7 +21,7 @@ use Windwalker\Utilities\Arr;
 /**
  * The JsonApiWebMiddleware class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class JsonApiWebMiddleware extends AbstractWebMiddleware
 {

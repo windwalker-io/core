@@ -33,10 +33,6 @@ class TransactionMiddleware extends AbstractControllerMiddleware
 
         try {
             $result = $this->next->execute($data);
-        } catch (\Exception $e) {
-            $data->repository->transactionRollback(true);
-
-            throw $e;
         } catch (\Throwable $e) {
             $data->repository->transactionRollback(true);
 

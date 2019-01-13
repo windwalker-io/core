@@ -7,6 +7,7 @@
  */
 
 namespace {
+
     use Windwalker\Core\DateTime\Chronos;
     use Windwalker\Core\Language\Translator;
     use Windwalker\Core\Utilities\Debug\Dumper;
@@ -169,7 +170,10 @@ namespace {
 }
 
 namespace Windwalker {
+
+    use Windwalker\Data\Collection;
     use Windwalker\Filesystem\Filesystem;
+    use Windwalker\Utilities\Iterator\ArrayObject;
 
     /**
      * Support node style double star finder.
@@ -184,5 +188,24 @@ namespace Windwalker {
     function glob(string $pattern, int $flags = 0): array
     {
         return Filesystem::glob($pattern, $flags);
+    }
+
+    /**
+     * collect
+     *
+     * @param array  $data
+     * @param int    $flags
+     * @param string $iteratorClass
+     *
+     * @return  Collection
+     *
+     * @since  3.5
+     */
+    function arr(
+        array $data = [],
+        int $flags = ArrayObject::STD_PROP_LIST,
+        string $iteratorClass = \ArrayIterator::class
+    ): Collection {
+        return new Collection($data, $flags, $iteratorClass);
     }
 }

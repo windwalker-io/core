@@ -19,7 +19,7 @@ use Windwalker\Structure\Structure;
 /**
  * The DatabaseService class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class DatabaseService
 {
@@ -56,7 +56,7 @@ class DatabaseService
      *
      * @return  Structure
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getDbConfig(?string $connection = null): Structure
     {
@@ -79,7 +79,7 @@ class DatabaseService
      *
      * @return  AbstractDatabaseDriver
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getConnection(?string $connection = 'local', array $options = []): AbstractDatabaseDriver
     {
@@ -100,7 +100,7 @@ class DatabaseService
      *
      * @return  AbstractDatabaseDriver
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function createConnection(?string $connection = null, array $options = []): AbstractDatabaseDriver
     {
@@ -142,7 +142,7 @@ class DatabaseService
      *
      * @return  AbstractExporter
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getExporter(?string $connection = null): AbstractExporter
     {

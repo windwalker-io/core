@@ -36,7 +36,8 @@ return Arr::mergeRecursive(
                 'migration' => \Windwalker\Core\Migration\Command\MigrationCommand::class,
                 'seed'      => \Windwalker\Core\Seeder\Command\SeedCommand::class,
                 'package'   => \Windwalker\Core\Package\Command\PackageCommand::class,
-                'queue'     => \Windwalker\Core\Queue\Command\QueueCommand::class
+                'queue'     => \Windwalker\Core\Queue\Command\QueueCommand::class,
+                'legacy'    => \Windwalker\SystemPackage\Command\LegacyCommand::class
             ],
         ],
 

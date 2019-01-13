@@ -11,7 +11,7 @@ namespace Windwalker\Core\DateTime;
 /**
  * Interface ChronosInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 interface ChronosInterface
 {

@@ -85,7 +85,8 @@ class StarterInstaller
 
             $supportedDrivers = [
                 1 => 'mysql',
-                2 => 'postgresql'
+                2 => 'postgresql',
+                3 => 'sqlsrv'
             ];
 
             $io->write('');

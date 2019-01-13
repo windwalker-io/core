@@ -152,14 +152,6 @@ class ErrorManager
             }
 
             exit($e->getMessage());
-        } catch (\Exception $e) {
-            $msg = "Infinity loop in exception handler. \nException:\n" . $e;
-
-            if ($this->app->get('system.debug')) {
-                exit($msg);
-            }
-
-            exit($e->getMessage());
         }
 
         exit();

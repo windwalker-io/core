@@ -292,8 +292,6 @@ abstract class AbstractView implements \ArrayAccess
     {
         try {
             return (string) $this->render();
-        } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_ERROR);
         } catch (\Throwable $e) {
             trigger_error($e->getMessage(), E_USER_ERROR);
         }
