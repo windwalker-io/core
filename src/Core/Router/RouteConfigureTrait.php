@@ -88,6 +88,24 @@ trait RouteConfigureTrait
     }
 
     /**
+     * Save actions: post, patch, put
+     *
+     * @param string $controller
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function saveAction(string $controller)
+    {
+        $this->postAction($controller);
+        $this->putAction($controller);
+        $this->patchAction($controller);
+
+        return $this;
+    }
+
+    /**
      * package
      *
      * @param string $value

@@ -11,8 +11,10 @@ namespace Windwalker\Core\Migration;
 use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Core\Database\Traits\DateFormatTrait;
 use Windwalker\Core\Seeder\CountingOutputTrait;
+use Windwalker\Core\Seeder\FakerService;
 use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -60,6 +62,15 @@ abstract class AbstractMigration
      * @var  string
      */
     public static $defaultCharset = self::CHARSET_UTF8MB4;
+
+    /**
+     * Property faker.
+     *
+     * @Inject()
+     *
+     * @var FakerService
+     */
+    protected $faker;
 
     /**
      * Class init.
