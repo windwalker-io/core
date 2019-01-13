@@ -19,7 +19,7 @@ use Windwalker\Utilities\Arr;
 /**
  * The ConvertRouting class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class ConvertRoutingCommand extends CoreCommand
 {
@@ -106,7 +106,7 @@ class ConvertRoutingCommand extends CoreCommand
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      * @throws \Exception
      */
     protected function convert(string $file): void
@@ -210,7 +210,7 @@ PHP;
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     protected function indent(int $level = 0, ?string $content = null): string
     {

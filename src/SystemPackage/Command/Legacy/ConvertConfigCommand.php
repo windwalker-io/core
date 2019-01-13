@@ -16,7 +16,7 @@ use Windwalker\Structure\Format\PhpFormat;
 /**
  * The ConvertRouting class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class ConvertConfigCommand extends CoreCommand
 {

@@ -14,7 +14,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * Interface BootableDeferredProviderInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 interface BootableDeferredProviderInterface extends ServiceProviderInterface
 {

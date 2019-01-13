@@ -19,7 +19,7 @@ namespace Windwalker\Core\Router;
  * @method $this headAction(string $controller)
  * @method $this optionsAction(string $controller)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class RouteData
 {
@@ -58,7 +58,7 @@ class RouteData
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function name($name): self
     {
@@ -74,7 +74,7 @@ class RouteData
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function pattern(string $value): self
     {
@@ -90,7 +90,7 @@ class RouteData
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function controller(string $value): self
     {
@@ -106,7 +106,7 @@ class RouteData
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function group(string $group): self
     {
@@ -122,7 +122,7 @@ class RouteData
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function groups(array $groups): self
     {
@@ -136,7 +136,7 @@ class RouteData
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getGroups(): array
     {
@@ -148,7 +148,7 @@ class RouteData
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getName()
     {

@@ -375,7 +375,7 @@ trait WindwalkerTrait
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function make(string $class, array $args = [], bool $protected = false)
     {
@@ -390,7 +390,7 @@ trait WindwalkerTrait
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function service(string $class, bool $forceNew = false)
     {

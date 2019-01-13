@@ -472,7 +472,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function register(string $path, array $data = [], $package = null)
     {
@@ -634,7 +634,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function clearCache()
     {

@@ -16,7 +16,7 @@ use Windwalker\Core\Cache\RuntimeCacheTrait;
 /**
  * The FakerService class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class FakerService
 {
@@ -29,7 +29,7 @@ class FakerService
      *
      * @return  FakerGenerator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function create(string $locale = FakerFactory::DEFAULT_LOCALE): FakerGenerator
     {
@@ -48,7 +48,7 @@ class FakerService
      *
      * @throws \Psr\Cache\InvalidArgumentException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getInstance(string $locale = FakerFactory::DEFAULT_LOCALE, bool $new = false): Generator
     {

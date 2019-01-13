@@ -16,7 +16,7 @@ use Windwalker\Utilities\Classes\ImmutableHelperTrait;
 /**
  * The RouteCreator class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class RouteCreator
 {
@@ -83,7 +83,7 @@ class RouteCreator
      *
      * @return  RouteCreator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function group(string $group, array $data = [], ?callable $callback = null): self
     {
@@ -133,7 +133,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function any(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -171,7 +171,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function handleRoute(RouteData $route): RouteData
     {
@@ -229,7 +229,7 @@ class RouteCreator
      *
      * @return  RouteCreator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      * @throws \ReflectionException
      */
     public function registerPackage(string $package, string $pattern): self
@@ -247,7 +247,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function get(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -263,7 +263,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function post(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -279,7 +279,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function put(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -295,7 +295,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function patch(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -311,7 +311,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function save(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -327,7 +327,7 @@ class RouteCreator
      *
      * @return  RouteData
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function delete(string $name, ?string $pattern = null, array $options = []): RouteData
     {
@@ -341,7 +341,7 @@ class RouteCreator
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function prefix(string $prefix)
     {
@@ -357,7 +357,7 @@ class RouteCreator
      *
      * @return  RouteCreator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function load($paths): self
     {
@@ -383,7 +383,7 @@ class RouteCreator
      *
      * @return  RouteCreator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function loadFolder($paths): self
     {
@@ -407,7 +407,7 @@ class RouteCreator
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function register(callable $callable)
     {
@@ -425,7 +425,7 @@ class RouteCreator
      *
      * @return  RouteData[]
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getRoutes(): array
     {
@@ -437,7 +437,7 @@ class RouteCreator
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function getGroups()
     {
@@ -451,7 +451,7 @@ class RouteCreator
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function setGroups($groups)
     {

@@ -199,7 +199,7 @@ namespace Windwalker {
      *
      * @return  Collection
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     function arr(
         array $data = [],

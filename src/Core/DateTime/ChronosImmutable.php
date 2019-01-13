@@ -11,7 +11,7 @@ namespace Windwalker\Core\DateTime;
 /**
  * The ChronosImmutable class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class ChronosImmutable extends \DateTimeImmutable implements ChronosInterface
 {

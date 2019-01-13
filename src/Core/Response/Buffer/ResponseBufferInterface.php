@@ -11,7 +11,7 @@ namespace Windwalker\Core\Response\Buffer;
 /**
  * Interface ResponseBufferInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 interface ResponseBufferInterface
 {

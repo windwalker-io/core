@@ -572,7 +572,7 @@ class AbstractPackage implements DispatcherAwareInterface
      *
      * @return  RouteCreator
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      * @throws \ReflectionException
      */
     public function registerRoutes(RouteCreator $router, string $prefix): RouteCreator
@@ -693,7 +693,7 @@ class AbstractPackage implements DispatcherAwareInterface
      *
      * @throws \ReflectionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public static function dir(): string
     {
@@ -707,7 +707,7 @@ class AbstractPackage implements DispatcherAwareInterface
      *
      * @throws \ReflectionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public static function file(): string
     {
