@@ -102,6 +102,7 @@ class ProfilerProvider implements ServiceProviderInterface
         }
 
         static $queryData = [];
+        static $isExplain = false;
 
         $collector = $container->get('debugger.collector');
 
@@ -117,8 +118,10 @@ class ProfilerProvider implements ServiceProviderInterface
         $db->setMonitor($monitor = new CompositeMonitor());
 
         $monitor->addMonitor(new CallbackMonitor(
-            function ($sql) use ($db, $collector, &$queryData) {
+            function ($sql) use ($db, $collector, &$queryData, &$isExplain) {
                 if (stripos(trim($sql), 'EXPLAIN') === 0) {
+                    $isExplain = true;
+
                     return;
                 }
 
@@ -136,10 +139,10 @@ class ProfilerProvider implements ServiceProviderInterface
                     ? (new \ArrayObject($query->getBounded()))->getArrayCopy()
                     : [];
             },
-            function () use ($db, $collector, &$queryData) {
-                $query = $db->getQuery(true);
+            function () use ($db, $collector, &$queryData, &$isExplain) {
+                if ($isExplain) {
+                    $isExplain = false;
 
-                if (stripos(trim((string) $query), 'EXPLAIN') === 0) {
                     return;
                 }
 
