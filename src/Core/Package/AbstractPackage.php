@@ -579,7 +579,7 @@ class AbstractPackage implements DispatcherAwareInterface
     {
         $files = (array) $this->get('routing.files');
 
-        $files[] = static::dir() . '/routing.php';
+        $files['main'] = static::dir() . '/routing.php';
 
         $router->group($this->getName())
             ->package($this->getName())
