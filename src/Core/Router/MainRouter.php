@@ -480,14 +480,18 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             $package = PackageHelper::getPackage($package);
         }
 
-        $this->routeCreator
+        // Workaround that RouteCreator should always be new one.
+        $routerCreator = new RouteCreator(PackageHelper::getInstance());
+
+        $routerCreator
             ->group('root')
             ->setOptions($data)
             ->register(function (RouteCreator $router) use ($path) {
                 $router->load($path);
             });
 
-        foreach ($this->routeCreator->getRoutes() as $name => $route) {
+        // TODO: Maybe move this handler to outside that support register() twice wothout side effect.
+        foreach ($routerCreator->getRoutes() as $name => $route) {
             $route = $this->routeCreator->handleRoute($route);
 
             $this->addRouteByConfig(
