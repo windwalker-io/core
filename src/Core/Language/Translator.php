@@ -230,7 +230,7 @@ abstract class Translator extends AbstractProxyFacade
     }
 
     /**
-     * getFormatter
+     * Alias of exists()
      *
      * @param   string $format
      *
@@ -247,5 +247,20 @@ abstract class Translator extends AbstractProxyFacade
         }
 
         throw new \DomainException(sprintf('Class: %s not exists', $class));
+    }
+
+    /**
+     * has
+     *
+     * @param string $string
+     * @param bool   $normalize
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function has(string $string, bool $normalize = true): bool
+    {
+        return static::exists($string, $normalize);
     }
 }
