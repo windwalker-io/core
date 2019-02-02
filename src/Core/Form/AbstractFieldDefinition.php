@@ -51,10 +51,21 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
     /*
      * MySQL text length. @see https://stackoverflow.com/a/23169977
      */
-    const TEXT_MAX_ASCII     = 65535;
-    const TEXT_MAX_UTF8      = 21844;
-    const LONGTEXT_MAX_ASCII = 4294967295;
-    const LONGTEXT_MAX_UTF8  = 1431655765;
+    public const TEXT_MAX_ASCII     = 65535;
+    public const TEXT_MAX_UTF8      = 21844;
+    public const LONGTEXT_MAX_ASCII = 4294967295;
+    public const LONGTEXT_MAX_UTF8  = 1431655765;
+
+    /*
+     * Integer length. @see https://yd514.iteye.com/blog/1909097
+     */
+    public const INT_SIGNED_MAX = 2147483647;
+    public const INT_SIGNED_MIN = -2147483648;
+    public const INT_UNSIGNED_MAX = 4294967295;
+
+    public const TINYINT_SIGNED_MAX = 127;
+    public const TINYINT_SIGNED_MIN = -128;
+    public const TINYINT_UNSIGNED_MAX = 255;
 
     /**
      * Property namespaces.
