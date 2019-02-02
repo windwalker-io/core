@@ -33,11 +33,29 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
 class ProfilerListener
 {
     /**
+     * Property container.
+     *
+     * @var  Container
+     */
+    protected $container;
+
+    /**
+     * ProfilerListener constructor.
+     *
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
      * onAfterInitialise
      *
      * @param Event $event
      *
      * @return  void
+     * @throws \Exception
      */
     public function onAfterInitialise(Event $event)
     {
@@ -105,6 +123,22 @@ class ProfilerListener
         ]);
     }
 
+    public function onRouterBeforeRouteMatch(Event $event)
+    {
+        /**
+         * @var Container $container
+         * @var Collector $collector
+         * @var Profiler  $profiler
+         */
+        $container = $this->container;
+        $collector = $container->get('debugger.collector');
+
+        /** @var MainRouter $router */
+        $router = $this->container->get('router');
+        $collector['routing.matcher'] = get_class($router->getMatcher());
+        $collector['routing.routes']  = StructureHelper::dumpObjectValues($router->getRoutes());
+    }
+
     /**
      * onAfterRouting
      *
@@ -129,9 +163,7 @@ class ProfilerListener
         $collector['package.name']    = $container->get('current.package')->getName();
         $collector['package.class']   = get_class($container->get('current.package'));
         $collector['controller.task'] = $container->get('current.package')->getTask();
-        $collector['routing.matcher'] = get_class($router->getMatcher());
         $collector['routing.matched'] = iterator_to_array($container->get('current.route'));
-        $collector['routing.routes']  = StructureHelper::dumpObjectValues($router->getRoutes());
 
         $profiler->mark(__FUNCTION__, [
             'tag' => 'system.process',

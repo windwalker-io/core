@@ -270,7 +270,7 @@ trait RouteConfigureTrait
      */
     public function middleware($class)
     {
-        $this->options['middlewares'][] = $class;
+        $this->pushOption('middlewares', $class);
 
         return $this;
     }

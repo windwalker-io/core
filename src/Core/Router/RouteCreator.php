@@ -72,6 +72,7 @@ class RouteCreator
         // Make this object referenced in whole tree
         $this->routes         = new Data();
         $this->preparedGroups = new Data();
+        $this->options        = new Data();
     }
 
     /**
@@ -87,22 +88,7 @@ class RouteCreator
      */
     public function group(string $group, array $data = [], ?callable $callback = null): self
     {
-        // Has callback, set group routes.
-
-        // Find parents
-        if (isset($data['parents'])) {
-            foreach ((array) $data['parents'] as $parent) {
-                if (!isset($this->preparedGroups[$parent])) {
-                    throw new \LogicException(sprintf(
-                        'Unable to find parent group: %s for route group: %s',
-                        $parent,
-                        $group
-                    ));
-                }
-
-                $data = Arr::mergeRecursive($this->preparedGroups[$parent], $data);
-            }
-        }
+        $data = new Data($data);
 
         // No callback, set prepared group
         $this->preparedGroups[$group] = $data;
@@ -113,6 +99,11 @@ class RouteCreator
         $new->group = $group;
         $new->groups[$group] = $data;
 
+        // Find parents
+        if (isset($data['parents'])) {
+            $this->parents((array) $data['parents']);
+        }
+
         if ($callback) {
             $this->groups[$group] = $data;
 
@@ -122,6 +113,44 @@ class RouteCreator
         }
 
         return $new;
+    }
+
+    /**
+     * parents
+     *
+     * @param array $parents
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function parents(array $parents): self
+    {
+        if ($parents === []) {
+            return $this;
+        }
+
+        $data = [];
+
+        foreach ($parents as $parent) {
+            if (!isset($this->preparedGroups[$parent])) {
+                throw new \LogicException(sprintf(
+                    'Unable to find parent group: %s for route group: %s',
+                    $parent,
+                    $this->group
+                ));
+            }
+
+            $data[] = $this->preparedGroups[$parent];
+        }
+
+        $old = $this->options->dump();
+        $data = Arr::mergeRecursive(...$data);
+
+        $this->options->bind($data);
+        $this->options->bind($old);
+
+        return $this;
     }
 
     /**

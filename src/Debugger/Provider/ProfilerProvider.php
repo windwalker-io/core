@@ -178,7 +178,7 @@ class ProfilerProvider implements ServiceProviderInterface
 
         $dispatcher->setDebug(true);
 
-        $dispatcher->addListener(new ProfilerListener(), ListenerPriority::LOW);
+        $dispatcher->addListener($container->createSharedObject(ProfilerListener::class), ListenerPriority::LOW);
     }
 
     /**
