@@ -368,7 +368,10 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 
                 if ($class instanceof ClassMeta) {
                     $args['channel'] = $channel;
-                    $args['filename'] = $this->getLogFile($channel);
+
+                    if (!$class->hasArgument('filename')) {
+                        $args['filename'] = $this->getLogFile($channel);
+                    }
 
                     $handler = $this->container->newInstance($class, $args);
                 } else {

@@ -150,7 +150,8 @@ trait WindwalkerTrait
 
             $config->loadFile($file, pathinfo($file, PATHINFO_EXTENSION), ['load_raw' => true]);
         }
-        // TODO: Variables override
+
+        $this->container->setParameters($config);
     }
 
     /**
