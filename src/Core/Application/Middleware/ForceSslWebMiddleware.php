@@ -22,9 +22,6 @@ class ForceSslWebMiddleware extends AbstractWebMiddleware
 {
     use OptionAccessTrait;
 
-    public const TYPE_REDIRECT = 1;
-    public const TYPE_HSTS = 2;
-
     /**
      * ForceSslWebMiddleware constructor.
      *
@@ -49,17 +46,28 @@ class ForceSslWebMiddleware extends AbstractWebMiddleware
         if ($this->getOption('enabled')) {
             $uri = $request->getUri();
 
+            $hstsOptions = (array) $this->getOption('hsts');
+
+            if ($hstsOptions['enabled'] ?? false) {
+                $header = 'max-age=' . ($hstsOptions['max_age'] ?? 31536000);
+
+                if ($hstsOptions['include_subdomain'] ?? false) {
+                    $header .= '; includeSubDomains';
+                }
+
+                if ($hstsOptions['preload'] ?? false) {
+                    $header .= '; preload';
+                }
+
+                header('Strict-Transport-Security: ' . $header);
+            }
+
             if ($uri->getScheme() === 'http') {
                 $uri = $uri->withScheme('https');
-            }
 
-            if ($this->getOption('redirect_type') === static::TYPE_HSTS) {
-                header('Strict-Transport-Security: max-age=' . $this->getOption('max_age', 31536000));
-            } else {
                 $this->app->redirect($uri, $this->getOption('redirect_code', 303));
+                die;
             }
-
-            die;
         }
 
         return $next($request, $response);
