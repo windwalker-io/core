@@ -19,6 +19,7 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Logger\Monolog\GlobalContainer;
+use Windwalker\DI\ClassMeta;
 use Windwalker\DI\Container;
 
 /**
@@ -341,11 +342,14 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @return  Monolog
      * @throws \Exception
      */
-    public function createLogger(?string $channel = null, ?string $level = null, HandlerInterface $handler = null): LoggerInterface
-    {
+    public function createLogger(
+        ?string $channel = null,
+        ?string $level = null,
+        HandlerInterface $handler = null
+    ): LoggerInterface {
         $config = $this->config->extract('logs.channels.' . $channel);
 
-        if (!$config->get('enabled')) {
+        if ($config->get('enabled') === false) {
             return $this->getNullLogger();
         }
 
@@ -355,47 +359,54 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 
         if (!$handler) {
             $handlers = [];
-            $handlerProfiles = $config->get('handlers', StreamHandler::class);
+            $handlerProfiles = (array) $config->get('handlers', [StreamHandler::class]);
 
             foreach ($handlerProfiles as $class) {
                 $args = [];
 
                 $args['level'] = $level;
 
-                if (is_array($class)) {
-                    $args = $class['args'] ?? [];
-                    $args['level'] = $class['level'] ?? $level;
+                if ($class instanceof ClassMeta) {
+                    $args['channel'] = $channel;
+                    $args['filename'] = $this->getLogFile($channel);
 
-                    if (isset($class['file_argument'])) {
-                        $args[$class['file_argument']] = $this->getLogFile($channel);
+                    $handler = $this->container->newInstance($class, $args);
+                } else {
+                    if (is_array($class)) {
+                        $args = $class['args'] ?? [];
+                        $args['level'] = $class['level'] ?? $level;
+
+                        if (isset($class['file_argument'])) {
+                            $args[$class['file_argument']] = $this->getLogFile($channel);
+                        }
+
+                        $class = $class['class'];
                     }
 
-                    $class = $class['class'];
-                }
+                    switch ($class) {
+                        case 'stream':
+                        case StreamHandler::class:
+                            $args['stream'] = $args['stream'] ?? $this->getLogFile($channel);
 
-                switch ($class) {
-                    case 'stream':
-                    case StreamHandler::class:
-                        $args['stream'] = $args['stream'] ?? $this->getLogFile($channel);
+                            $handler = $this->container->newInstance(
+                                StreamHandler::class,
+                                $args
+                            );
+                            break;
 
-                        $handler = $this->container->newInstance(
-                            StreamHandler::class,
-                            $args
-                        );
-                        break;
+                        case 'rotating':
+                        case RotatingFileHandler::class:
+                            $args['filename'] = $args['filename'] ?? $this->getLogFile($channel);
 
-                    case 'rotating':
-                    case RotatingFileHandler::class:
-                        $args['filename'] = $args['filename'] ?? $this->getLogFile($channel);
+                            $handler = $this->container->newInstance(
+                                RotatingFileHandler::class,
+                                $args
+                            );
+                            break;
 
-                        $handler = $this->container->newInstance(
-                            RotatingFileHandler::class,
-                            $args
-                        );
-                        break;
-
-                    default:
-                        $handler = $this->container->newInstance($class, $args);
+                        default:
+                            $handler = $this->container->newInstance($class, $args);
+                    }
                 }
 
                 $handlers[] = $handler;
