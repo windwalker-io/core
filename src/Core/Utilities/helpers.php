@@ -208,4 +208,21 @@ namespace Windwalker {
     ): Collection {
         return new Collection($data, $flags, $iteratorClass);
     }
+
+    /**
+     * Do some operation after value get.
+     *
+     * @param mixed    $value
+     * @param callable $callable
+     *
+     * @return  mixed
+     *
+     * @since  3.5.1
+     */
+    function tap($value, callable $callable)
+    {
+        $callable($value);
+
+        return $value;
+    }
 }

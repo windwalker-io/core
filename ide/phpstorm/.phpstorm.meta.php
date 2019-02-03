@@ -13,6 +13,7 @@ namespace PHPSTORM_META {
     use Windwalker\Core\WindwalkerTrait;
     use Windwalker\DI\Container;
     use Windwalker\Form\Form;
+    use function Windwalker\tap;
 
     // Container
     override(
@@ -77,5 +78,11 @@ namespace PHPSTORM_META {
         map([
             '' => '@'
         ])
+    );
+
+    // Helpers
+    override(
+        tap(0),
+        elementType(0)
     );
 }
