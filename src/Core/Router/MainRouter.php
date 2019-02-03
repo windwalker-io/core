@@ -24,6 +24,7 @@ use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Structure\Structure;
+use function Windwalker\tap;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Arr;
 
@@ -178,9 +179,9 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             $url = $uri->root . '/' . $script . $url;
         }
 
-        $this->cache->set($key, $url);
-
-        return $url;
+        return tap($url, function (string $url) use ($key) {
+            $this->cache->set($key, $url);
+        });
     }
 
     /**

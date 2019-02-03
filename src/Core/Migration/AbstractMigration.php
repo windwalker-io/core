@@ -27,13 +27,13 @@ abstract class AbstractMigration
     use DateFormatTrait;
     use CountingOutputTrait;
 
-    const UP = 'up';
+    public const UP = 'up';
 
-    const DOWN = 'down';
+    public const DOWN = 'down';
 
-    const CHARSET_UTF8 = 'utf8';
+    public const CHARSET_UTF8 = 'utf8';
 
-    const CHARSET_UTF8MB4 = 'utf8mb4';
+    public const CHARSET_UTF8MB4 = 'utf8mb4';
 
     /**
      * Property db.

@@ -15,7 +15,7 @@ use Windwalker\Cache\Storage\ArrayStorage;
 /**
  * RuntimeCacheTrait
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.4
  */
 trait RuntimeCacheTrait
 {
