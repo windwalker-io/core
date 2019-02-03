@@ -123,8 +123,8 @@ class MailMessage
     /**
      * to
      *
-     * @param string $email
-     * @param string $name
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  static
      */
@@ -138,8 +138,8 @@ class MailMessage
     /**
      * from
      *
-     * @param string $email
-     * @param string $name
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  static
      */
@@ -153,8 +153,8 @@ class MailMessage
     /**
      * cc
      *
-     * @param string $email
-     * @param string $name
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  static
      */
@@ -168,8 +168,8 @@ class MailMessage
     /**
      * bcc
      *
-     * @param string $email
-     * @param string $name
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  static
      */
@@ -183,8 +183,8 @@ class MailMessage
     /**
      * bcc
      *
-     * @param string $email
-     * @param string $name
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  static
      */
@@ -217,7 +217,7 @@ class MailMessage
     /**
      * html
      *
-     * @param   boolean $bool
+     * @param   bool $bool
      *
      * @return  static
      */
@@ -373,9 +373,9 @@ class MailMessage
     /**
      * add
      *
-     * @param string $field
-     * @param string $email
-     * @param string $name
+     * @param string       $field
+     * @param string|array $email
+     * @param string       $name
      *
      * @return  void
      */
