@@ -17,6 +17,7 @@ use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\DI\ClassMeta;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareInterface;
 use Windwalker\DI\ContainerAwareTrait;
@@ -362,7 +363,8 @@ class WebApplication extends AbstractWebApplication implements
                 unset($data['middleware']);
             }
 
-            if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
+            if ($middleware instanceof ClassMeta
+                || (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))) {
                 $middleware = new Psr7Middleware($this->container->newInstance($middleware, $data));
             } elseif ($middleware instanceof \Closure) {
                 $middleware->bindTo($this);

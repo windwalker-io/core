@@ -18,6 +18,7 @@ use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\BootableDeferredProviderInterface;
 use Windwalker\Core\Provider\BootableProviderInterface;
 use Windwalker\Core\Provider\SystemProvider;
+use Windwalker\DI\ClassMeta;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\ListenerPriority;
@@ -184,7 +185,7 @@ trait WindwalkerTrait
 
             if (is_subclass_of($provider, ServiceProviderInterface::class)) {
                 // Handle provider
-                if (is_string($provider) && class_exists($provider)) {
+                if ($provider instanceof ClassMeta || (is_string($provider) && class_exists($provider))) {
                     $provider = $container->newInstance($provider);
                 }
 

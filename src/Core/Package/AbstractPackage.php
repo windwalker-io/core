@@ -24,6 +24,7 @@ use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RouteCreator;
 use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
+use Windwalker\DI\ClassMeta;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\DI\ServiceProviderInterface;
@@ -326,7 +327,7 @@ class AbstractPackage implements DispatcherAwareInterface
 
             if (is_subclass_of($provider, ServiceProviderInterface::class)) {
                 // Handle provider
-                if (is_string($provider) && class_exists($provider)) {
+                if ($provider instanceof ClassMeta || (is_string($provider) && class_exists($provider))) {
                     $provider = $container->newInstance($provider);
                 }
 
@@ -477,7 +478,8 @@ class AbstractPackage implements DispatcherAwareInterface
                 unset($data['middleware']);
             }
 
-            if (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class)) {
+            if ($middleware instanceof ClassMeta
+                || (is_string($middleware) && is_subclass_of($middleware, AbstractWebMiddleware::class))) {
                 $middleware = new Psr7Middleware($this->container->newInstance($middleware, $data));
             } elseif ($middleware instanceof \Closure) {
                 $middleware->bindTo($this);
