@@ -18,6 +18,7 @@ use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\User\NullUserHandler;
 use Windwalker\Core\User\UserHandlerInterface;
 use Windwalker\Core\User\UserManager;
+use Windwalker\DI\ClassMeta;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherInterface;
@@ -110,10 +111,14 @@ class UserProvider implements ServiceProviderInterface
         $config = $container->get('config');
 
         foreach ((array) $config->get('user.policies') as $name => $policy) {
-            if (is_subclass_of($policy, PolicyInterface::class)) {
-                $auth->addPolicy($name, $container->newInstance($policy));
-            } elseif (is_subclass_of($policy, PolicyProviderInterface::class)) {
-                $auth->registerPolicyProvider($container->newInstance($policy));
+            if ($policy instanceof ClassMeta || (is_string($policy) && class_exists($policy))) {
+                $instance = $container->newInstance($policy);
+
+                if (is_subclass_of($instance, PolicyInterface::class)) {
+                    $auth->addPolicy($name, $instance);
+                } elseif (is_subclass_of($instance, PolicyProviderInterface::class)) {
+                    $auth->registerPolicyProvider($instance);
+                }
             } elseif ($policy === false) {
                 continue;
             } else {
@@ -136,7 +141,6 @@ class UserProvider implements ServiceProviderInterface
      *
      * @param Container $container
      *
-     * @return  UserHandlerInterface
      * @throws \UnexpectedValueException
      */
     public function prepareHandler(Container $container)

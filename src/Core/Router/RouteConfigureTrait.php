@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\DI\ClassMeta;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Classes\OptionAccessTrait;
 
@@ -262,7 +263,7 @@ trait RouteConfigureTrait
     /**
      * middleware
      *
-     * @param string|array|callable $class
+     * @param string|array|callable|ClassMeta $class
      *
      * @return  static
      *

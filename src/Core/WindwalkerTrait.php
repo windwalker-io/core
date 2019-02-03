@@ -260,7 +260,7 @@ trait WindwalkerTrait
         ];
 
         foreach ($listeners as $name => $listener) {
-            if (is_string($listener) || is_callable($listener)) {
+            if ($listener instanceof ClassMeta || is_string($listener) || is_callable($listener)) {
                 $listener = ['class' => $listener];
             }
 
@@ -270,7 +270,7 @@ trait WindwalkerTrait
                 continue;
             }
 
-            if (is_callable($listener['class']) && !is_numeric($name)) {
+            if (!is_numeric($name) && is_callable($listener['class'])) {
                 $dispatcher->listen($name, $listener['class']);
             } else {
                 $dispatcher->addListener($this->container->newInstance($listener['class']), $listener['priority']);
