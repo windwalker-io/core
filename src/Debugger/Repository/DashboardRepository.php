@@ -28,7 +28,7 @@ class DashboardRepository extends Repository
     {
         $state = $this->state;
 
-        return $this->fetch('items', function () use ($state) {
+        return $this->once('items', function () use ($state) {
             $files = $this->getFiles();
 
             if (!$files) {

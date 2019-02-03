@@ -52,7 +52,7 @@ class FakerService
      */
     public function getInstance(string $locale = FakerFactory::DEFAULT_LOCALE, bool $new = false): Generator
     {
-        return $this->fetch($locale, function () use ($locale) {
+        return $this->once($locale, function () use ($locale) {
             return $this->create($locale);
         }, $new);
     }

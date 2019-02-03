@@ -109,7 +109,7 @@ trait RuntimeCacheTrait
     }
 
     /**
-     * fetch
+     * Only get once if ID is same.
      *
      * @param string   $id
      * @param callable $closure
@@ -118,7 +118,7 @@ trait RuntimeCacheTrait
      * @return  mixed
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function fetch($id, $closure, $refresh = false)
+    protected function once($id, $closure, $refresh = false)
     {
         $key = $this->getCacheId($id);
         $cache = $this->getCacheInstance();
@@ -128,5 +128,22 @@ trait RuntimeCacheTrait
         }
 
         return $cache->call($key, $closure);
+    }
+
+    /**
+     * Alias of once().
+     *
+     * @param string   $id
+     * @param callable $closure
+     * @param bool     $refresh
+     *
+     * @return  mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     *
+     * @deprecated  Use once() instead.
+     */
+    protected function fetch($id, $closure, $refresh = false)
+    {
+        return $this->once($id, $closure, $refresh);
     }
 }
