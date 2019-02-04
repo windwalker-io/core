@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Middleware\MiddlewareInterface;
+use function Windwalker\tap;
 
 /**
  * The TransactionWebMiddleware class.
@@ -28,13 +29,22 @@ class TransactionWebMiddleware extends AbstractWebMiddleware
     protected $db;
 
     /**
+     * Property methods.
+     *
+     * @var  array|string
+     */
+    protected $methods;
+
+    /**
      * TransactionWebMiddleware constructor.
      *
      * @param DatabaseAdapter $db
+     * @param array|string    $methods
      */
-    public function __construct(DatabaseAdapter $db)
+    public function __construct(DatabaseAdapter $db, $methods = ['post', 'put', 'patch', 'delete'])
     {
         $this->db = $db;
+        $this->methods = array_map('strtolower', (array) $methods);
     }
 
     /**
@@ -49,14 +59,20 @@ class TransactionWebMiddleware extends AbstractWebMiddleware
      */
     public function __invoke(Request $request, Response $response, $next = null)
     {
+        $method = $request->getQueryParams()['_method'] ?? $request->getMethod();
+
+        $method = strtolower($method);
+
+        if ($this->methods !== ['*'] && !in_array($method, $this->methods, true)) {
+            return $next($request, $response);
+        }
+
         $trans = $this->db->getTransaction()->start();
 
         try {
-            $response = $next($request, $response);
-
-            $trans->commit();
-
-            return $response;
+            return tap($next($request, $response), function () use ($trans) {
+                $trans->commit();
+            });
         } catch (\Throwable $e) {
             $trans->rollback();
 
