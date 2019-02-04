@@ -7,34 +7,34 @@
  */
 
 return [
-	'packages' => [
-	],
+    'packages' => [
+    ],
 
-	'providers' =>[
-	],
+    'providers' => [
+    ],
 
-	'configs' => [
-		100 => WINDWALKER_ETC . '/config.yml'
-	],
+    'configs' => [
+        100 => WINDWALKER_ETC . '/config.yml'
+    ],
 
-	'listeners' => [
+    'listeners' => [
 
-	],
-	
-	'path' => [
-		'root'       => WINDWALKER_ROOT,
-		'bin'        => WINDWALKER_BIN,
-		'cache'      => WINDWALKER_CACHE,
-		'etc'        => WINDWALKER_ETC,
-		'logs'       => WINDWALKER_LOGS,
-		'resources'  => WINDWALKER_RESOURCES,
-		'source'     => WINDWALKER_SOURCE,
-		'temp'       => WINDWALKER_TEMP,
-		'templates'  => WINDWALKER_TEMPLATES,
-		'vendor'     => WINDWALKER_VENDOR,
-		'public'     => WINDWALKER_PUBLIC,
-		'migrations' => WINDWALKER_MIGRATIONS,
-		'seeders'    => WINDWALKER_SEEDERS,
-		'languages'  => WINDWALKER_LANGUAGES,
-	]
+    ],
+
+    'path' => [
+        'root' => WINDWALKER_ROOT,
+        'bin' => WINDWALKER_BIN,
+        'cache' => WINDWALKER_CACHE,
+        'etc' => WINDWALKER_ETC,
+        'logs' => WINDWALKER_LOGS,
+        'resources' => WINDWALKER_RESOURCES,
+        'source' => WINDWALKER_SOURCE,
+        'temp' => WINDWALKER_TEMP,
+        'templates' => WINDWALKER_TEMPLATES,
+        'vendor' => WINDWALKER_VENDOR,
+        'public' => WINDWALKER_PUBLIC,
+        'migrations' => WINDWALKER_MIGRATIONS,
+        'seeders' => WINDWALKER_SEEDERS,
+        'languages' => WINDWALKER_LANGUAGES,
+    ]
 ];

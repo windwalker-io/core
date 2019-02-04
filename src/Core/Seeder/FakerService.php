@@ -10,8 +10,10 @@ namespace Windwalker\Core\Seeder;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
-use Faker\Generator;
 use Windwalker\Core\Cache\RuntimeCacheTrait;
+use Windwalker\Event\Dispatcher;
+use Windwalker\Event\DispatcherAwareTrait;
+use function Windwalker\tap;
 
 /**
  * The FakerService class.
@@ -21,6 +23,15 @@ use Windwalker\Core\Cache\RuntimeCacheTrait;
 class FakerService
 {
     use RuntimeCacheTrait;
+    use DispatcherAwareTrait;
+
+    /**
+     * FakerService constructor.
+     */
+    public function __construct()
+    {
+        $this->dispatcher = new Dispatcher();
+    }
 
     /**
      * create
@@ -35,7 +46,9 @@ class FakerService
     {
         $locale = str_replace('-', '_', $locale);
 
-        return FakerFactory::create($locale);
+        return tap(FakerFactory::create($locale), function (FakerGenerator $faker) use ($locale) {
+            $this->dispatcher->triggerEvent('afterFakerCreated', ['faker' => $faker, 'locale' => $locale]);
+        });
     }
 
     /**
@@ -44,13 +57,13 @@ class FakerService
      * @param string $locale
      * @param bool   $new
      *
-     * @return  Generator
+     * @return  FakerGenerator
      *
      * @throws \Psr\Cache\InvalidArgumentException
      *
      * @since  3.5
      */
-    public function getInstance(string $locale = FakerFactory::DEFAULT_LOCALE, bool $new = false): Generator
+    public function getInstance(string $locale = FakerFactory::DEFAULT_LOCALE, bool $new = false): FakerGenerator
     {
         return $this->once($locale, function () use ($locale) {
             return $this->create($locale);

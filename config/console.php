@@ -27,7 +27,8 @@ return Arr::mergeRecursive(
             'security' => \Windwalker\Core\Provider\SecurityProvider::class,
             'mailer'   => \Windwalker\Core\Mailer\MailerProvider::class,
             'mailer_adapter' => \Windwalker\Core\Mailer\SwiftMailerProvider::class,
-            'queue'    => \Windwalker\Core\Queue\QueueProvider::class
+            'queue'    => \Windwalker\Core\Queue\QueueProvider::class,
+            'faker'  => \Windwalker\Core\Provider\FakerProvider::class,
         ],
 
         'console' => [

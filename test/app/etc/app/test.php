@@ -9,44 +9,43 @@
 use Windwalker\Utilities\Arr;
 
 return Arr::mergeRecursive(
-	include __DIR__ . '/windwalker.php',
-	[
-		'packages' => [
+    include __DIR__ . '/windwalker.php',
+    [
+        'packages' => [
 
-		],
+        ],
 
-		'providers' =>[
-			'web'      => \Windwalker\Core\Provider\WebProvider::class,
-			'whoops'   => \Windwalker\Core\Provider\WhoopsProvider::class,
-			'logger'   => \Windwalker\Core\Provider\LoggerProvider::class,
-			'event'    => \Windwalker\Core\Provider\EventProvider::class,
-			'database' => \Windwalker\Core\Provider\DatabaseProvider::class,
-			'router'   => \Windwalker\Core\Provider\RouterProvider::class,
-			'lang'     => \Windwalker\Core\Provider\LanguageProvider::class,
-			'template' => \Windwalker\Core\Provider\RendererProvider::class,
-			'cache'    => \Windwalker\Core\Provider\CacheProvider::class,
-			'session'  => \Windwalker\Core\Provider\SessionProvider::class,
-			'auth'     => \Windwalker\Core\Provider\UserProvider::class,
-			'security' => \Windwalker\Core\Provider\SecurityProvider::class,
-			'datetime' => \Windwalker\Core\Provider\DateTimeProvider::class
-		],
+        'providers' => [
+            'web' => \Windwalker\Core\Provider\WebProvider::class,
+            'whoops' => \Windwalker\Core\Provider\WhoopsProvider::class,
+            'logger' => \Windwalker\Core\Provider\LoggerProvider::class,
+            'event' => \Windwalker\Core\Provider\EventProvider::class,
+            'database' => \Windwalker\Core\Provider\DatabaseProvider::class,
+            'router' => \Windwalker\Core\Provider\RouterProvider::class,
+            'lang' => \Windwalker\Core\Provider\LanguageProvider::class,
+            'template' => \Windwalker\Core\Provider\RendererProvider::class,
+            'cache' => \Windwalker\Core\Provider\CacheProvider::class,
+            'session' => \Windwalker\Core\Provider\SessionProvider::class,
+            'auth' => \Windwalker\Core\Provider\UserProvider::class,
+            'security' => \Windwalker\Core\Provider\SecurityProvider::class,
+            'datetime' => \Windwalker\Core\Provider\DateTimeProvider::class
+        ],
 
-		'routing' => [
-			'files' => [
-//				WINDWALKER_ETC . '/routing.yml'
-			]
-		],
+        'routing' => [
+            'files' => [
+            ]
+        ],
 
-		'middlewares' => [
-//			\Windwalker\Core\Application\Middleware\SessionRaiseMiddleware::class,
-//			\Windwalker\Core\Application\Middleware\RoutingMiddleware::class
-		],
+        'middlewares' => [
+//            \Windwalker\Core\Application\Middleware\SessionRaiseMiddleware::class,
+//            \Windwalker\Core\Application\Middleware\RoutingMiddleware::class
+        ],
 
-		'configs' => [
-		],
+        'configs' => [
+        ],
 
-		'listeners' => [
+        'listeners' => [
 
-		]
-	]
+        ]
+    ]
 );
