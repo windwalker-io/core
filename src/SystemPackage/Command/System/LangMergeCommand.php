@@ -12,6 +12,7 @@ use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Folder;
 use Windwalker\Structure\Format\IniFormat;
 use Windwalker\Structure\Structure;
 
@@ -42,6 +43,24 @@ class LangMergeCommand extends CoreCommand
      * @var string
      */
     protected $usage = '%s <file> [<lang_code>] [<origin_lang_code>] [-p=package] [-r|--replace]';
+
+    /**
+     * Property help.
+     *
+     * @var  string
+     */
+    protected $help = <<<HELP
+Copy en-GB to zh-TW for one file:
+  php windwalker system lang-merge sakura.ini zh-TW en-GB -rsf -p=flower
+
+Re-sort en-GB file self.
+  php windwalker system lang-merge sakura.ini en-GB en-GB -rsf -p=flower
+
+Re-sort all files.
+  php windwalker system lang-merge '*' en-GB en-GB -rsf -p=flower
+
+HELP;
+
 
     /**
      * Initialise command.
@@ -88,7 +107,7 @@ class LangMergeCommand extends CoreCommand
         $from = $this->getArgument(2, $this->console->get('language.default', 'en-GB'));
 
         if (!$file) {
-            throw new WrongArgumentException('Please provide file name.');
+            throw new WrongArgumentException('Please provide file name or use `*`.');
         }
 
         $package     = null;
@@ -105,49 +124,59 @@ class LangMergeCommand extends CoreCommand
 
         $langPath = $package ? $package->getDir() . '/Resources/language' : WINDWALKER_RESOURCES . '/languages';
 
-        $fromPath = $langPath . '/' . $from;
-        $fromFile = $fromPath . '/' . $file;
-
-        $toPath = $langPath . '/' . $to;
-        $toFile = $toPath . '/' . $file;
-
-        if (!is_file($fromFile)) {
-            throw new \RuntimeException('File: ' . $fromFile . ' not exists.');
+        if ($file === '*') {
+            $files = Folder::files($langPath . '/' . $from, true, Folder::PATH_RELATIVE);
+        } else {
+            $files = [$file];
         }
 
-        $structure = new Structure();
+        $this->out();
 
-        $flat = $this->getOption('f');
-        $sort = $this->getOption('s');
+        foreach ($files as $file) {
+            $fromPath = $langPath . '/' . $from;
+            $fromFile = $fromPath . '/' . $file;
 
-        $fromData = $structure->loadFile($fromFile, 'ini', ['processSections' => !$flat]);
+            $toPath = $langPath . '/' . $to;
+            $toFile = $toPath . '/' . $file;
 
-        if (is_file($toFile)) {
-            $structure->loadFile($toFile, 'ini', ['processSections' => !$flat, 'only_exists' => true]);
-        }
-
-        $data = $structure->toArray();
-
-        if ($sort) {
-            foreach ($data as $k => &$v) {
-                if (\is_array($v)) {
-                    ksort($v);
-                }
+            if (!is_file($fromFile)) {
+                throw new \RuntimeException('File: ' . $fromFile . ' not exists.');
             }
 
-            unset($v);
+            $structure = new Structure();
 
-            ksort($data);
+            $flat = $this->getOption('f');
+            $sort = $this->getOption('s');
+
+            $fromData = $structure->loadFile($fromFile, 'ini', ['processSections' => !$flat]);
+
+            if (is_file($toFile)) {
+                $structure->loadFile($toFile, 'ini', ['processSections' => !$flat, 'only_exists' => true]);
+            }
+
+            $data = $structure->toArray();
+
+            if ($sort) {
+                foreach ($data as $k => &$v) {
+                    if (\is_array($v)) {
+                        ksort($v);
+                    }
+                }
+
+                unset($v);
+
+                ksort($data);
+            }
+
+            $data    = IniFormat::structToString($data);
+            $replace = $this->getOption('r');
+
+            $dest = $replace ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
+
+            File::write($dest, rtrim($data) . "\n");
+
+            $this->out(sprintf('File handled: <info>%s</info>', $dest));
         }
-
-        $data    = IniFormat::structToString($data);
-        $replace = $this->getOption('r');
-
-        $dest = $replace ? $toFile : WINDWALKER_TEMP . '/language/' . $to . '/' . $file;
-
-        File::write($dest, rtrim($data) . "\n");
-
-        $this->out()->out(sprintf('File created: <info>%s</info>', $dest));
 
         if (!$replace) {
             $this->out()->out('(You can use -r|--replace to just override language file instead save to tmp.)');
