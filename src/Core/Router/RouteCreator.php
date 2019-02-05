@@ -122,7 +122,7 @@ class RouteCreator
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public function parents(array $parents): self
     {

@@ -15,7 +15,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The FakerProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5
  */
 class FakerProvider implements ServiceProviderInterface
 {

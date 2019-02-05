@@ -257,7 +257,7 @@ abstract class Translator extends AbstractProxyFacade
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5
      */
     public static function has(string $string, bool $normalize = true): bool
     {
