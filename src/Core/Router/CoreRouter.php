@@ -18,7 +18,7 @@ use Windwalker\Router\Route;
  *
  * @method  static string  build($route, $queries = [], $type = MainRouter::TYPE_RAW)
  * @method  static string  route($route, $queries = [], $type = MainRouter::TYPE_RAW)
- * @method  static string  to($route, $queries = [])
+ * @method  static RouteString  to($route, $queries = [])
  * @method  static string  fullRoute($route, $queries = [])
  * @method  static string  rawRoute($route, $queries = [])
  * @method  static Route   match($rawRoute, $method = 'GET', $options = [])
@@ -33,11 +33,11 @@ use Windwalker\Router\Route;
  */
 abstract class CoreRouter extends AbstractProxyFacade
 {
-    const TYPE_RAW = 'raw';
+    public const TYPE_RAW = 'raw';
 
-    const TYPE_PATH = 'path';
+    public const TYPE_PATH = 'path';
 
-    const TYPE_FULL = 'full';
+    public const TYPE_FULL = 'full';
 
     /**
      * Property _key.
