@@ -336,7 +336,7 @@ trait RouteConfigureTrait
      */
     public function extra(string $name, $value)
     {
-        $this->options['extra'][$name] = $value;
+        $this->options['extra'] = Arr::set($this->options['extra'] ?? [], $name, $value);
 
         return $this;
     }
