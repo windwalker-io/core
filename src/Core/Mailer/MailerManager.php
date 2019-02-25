@@ -114,9 +114,21 @@ class MailerManager
             }
         }
 
-        // Tester
-        if ($forwards = $config->get('mail.test_forwards')) {
-            $message->bcc($forwards);
+        // CC/BCC
+        if ($cc = $config->get('mail.cc')) {
+            if (is_string($cc)) {
+                $cc = array_filter(array_map('trim', explode(',', $cc)), 'strlen');
+            }
+
+            $message->cc($cc);
+        }
+
+        if ($bcc = $config->get('mail.bcc')) {
+            if (is_string($bcc)) {
+                $bcc = array_filter(array_map('trim', explode(',', $bcc)), 'strlen');
+            }
+
+            $message->bcc($bcc);
         }
 
         $result = $this->getAdapter()->send($message);
