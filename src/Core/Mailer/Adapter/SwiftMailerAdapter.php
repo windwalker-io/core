@@ -139,7 +139,7 @@ class SwiftMailerAdapter implements MailerAdapterInterface
                 )->setUsername($config->get('smtp.username'))
                     ->setPassword($config->get('smtp.password'));
 
-                if ($config->exists('smtp.local')) {
+                if ($config->get('smtp.local')) {
                     $instance->setLocalDomain($config->get('local'));
                 }
 
