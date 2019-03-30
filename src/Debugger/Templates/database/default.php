@@ -46,8 +46,8 @@ $this->extend('_global.html');
 echo BootstrapKeyValueGrid::create()
     ->addHeader('Key', 'Value')
     ->addItem('Database Driver', $collector['database.driver.name'])
-    ->addItem('Database Driver Class', new HtmlElement('code', $collector['database.driver.class']))
-    ->addTitle(new HtmlElement('strong', 'Options'))
+    ->addItem('Database Driver Class', \Windwalker\h('code', [], $collector['database.driver.class']))
+    ->addTitle(\Windwalker\h('strong', [], 'Options'))
     ->addItems($options);
 ?>
 

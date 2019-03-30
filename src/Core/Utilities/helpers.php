@@ -172,6 +172,7 @@ namespace {
 namespace Windwalker {
 
     use Windwalker\Data\Collection;
+    use Windwalker\Dom\HtmlElement;
     use Windwalker\Filesystem\Filesystem;
     use Windwalker\Utilities\Iterator\ArrayObject;
 
@@ -207,5 +208,40 @@ namespace Windwalker {
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
         return new Collection($data, $flags, $iteratorClass);
+    }
+
+    /**
+     * collect
+     *
+     * @param array  $data
+     * @param int    $flags
+     * @param string $iteratorClass
+     *
+     * @return  Collection
+     *
+     * @since  3.5.2
+     */
+    function collect(
+        array $data = [],
+        int $flags = ArrayObject::STD_PROP_LIST,
+        string $iteratorClass = \ArrayIterator::class
+    ): Collection {
+        return arr($data, $flags, $iteratorClass);
+    }
+
+    /**
+     * Create Html Element
+     *
+     * @param string $name
+     * @param array  $attribs
+     * @param mixed  $content
+     *
+     * @return  HtmlElement
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function h(string $name, array $attribs = [], $content = null): HtmlElement
+    {
+        return new HtmlElement($name, $content, $attribs);
     }
 }

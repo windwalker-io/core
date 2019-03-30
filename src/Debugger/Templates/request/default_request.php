@@ -17,7 +17,7 @@ use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 
     foreach ($collector['request'][$type] as $key => $value) {
         if (is_array($value) || is_object($value)) {
-            $value = new \Windwalker\Dom\HtmlElement('pre', print_r($value, 1));
+            $value = \Windwalker\h('pre', [], print_r($value, 1));
         }
 
         $gridObject->addItem($key, $value);

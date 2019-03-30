@@ -11,6 +11,7 @@ namespace Windwalker\Debugger\Helper;
 use Windwalker\Core\Facade\AbstractFacade;
 use Windwalker\Debugger\DebuggerPackage;
 use Windwalker\Dom\HtmlElement;
+use function Windwalker\h;
 use Windwalker\Ioc;
 use Windwalker\Profiler\Point\Collector;
 use Windwalker\Utilities\Arr;
@@ -55,7 +56,7 @@ abstract class DebuggerHelper extends AbstractFacade
         }
 
         if (is_array($value) || is_object($value)) {
-            $value = new HtmlElement('pre', Arr::dump($value, $depth));
+            $value = h('pre', [], Arr::dump($value, $depth));
         }
 
         if (isset($data[$key]) && is_string($data[$key])) {

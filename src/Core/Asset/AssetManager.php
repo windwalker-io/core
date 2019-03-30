@@ -14,6 +14,7 @@ use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Filesystem\File;
+use function Windwalker\h;
 use Windwalker\Ioc;
 use Windwalker\String\Str;
 use Windwalker\Uri\UriData;
@@ -333,7 +334,7 @@ class AssetManager implements DispatcherAwareInterface
                 $html[] = '<!--[if ' . $style['options']['conditional'] . ']>';
             }
 
-            $html[] = (string) new HtmlElement('link', null, $attribs);
+            $html[] = (string) h('link', $attribs, null);
 
             if (isset($style['options']['conditional'])) {
                 $html[] = '<![endif]-->';
@@ -341,7 +342,11 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         if ($withInternal && $this->internalStyles) {
-            $html[] = (string) new HtmlElement('style', "\n" . $this->renderInternalStyles() . "\n" . $this->indents, $internalAttrs);
+            $html[] = (string) h(
+                'style',
+                $internalAttrs,
+                "\n" . $this->renderInternalStyles() . "\n" . $this->indents
+            );
         }
 
         return implode("\n" . $this->indents, $html);
@@ -389,9 +394,9 @@ class AssetManager implements DispatcherAwareInterface
                 $attribs['href'] = $attribs['src'];
                 $attribs['rel']  = 'import';
                 unset($attribs['src']);
-                $html[] = (string) new HtmlElement('link', null, $attribs);
+                $html[] = (string) h('link', $attribs, null);
             } else {
-                $html[] = (string) new HtmlElement('script', null, $attribs);
+                $html[] = (string) h('script', $attribs, null);
             }
 
             if (isset($script['options']['conditional'])) {
@@ -400,7 +405,11 @@ class AssetManager implements DispatcherAwareInterface
         }
 
         if ($withInternal && $this->internalScripts) {
-            $html[] = (string) new HtmlElement('script', "\n" . $this->renderInternalScripts() . "\n" . $this->indents, $internalAttrs);
+            $html[] = (string) h(
+                'script',
+                $internalAttrs,
+                "\n" . $this->renderInternalScripts() . "\n" . $this->indents
+            );
         }
 
         return implode("\n" . $this->indents, $html);

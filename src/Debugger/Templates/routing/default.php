@@ -28,13 +28,13 @@ $this->extend('_global.html');
 echo BootstrapKeyValueGrid::create()
     ->addHeader()
     ->addItem('Request Method', $collector['system.method.http'])
-    ->addItem('Route Matcher', new HtmlElement('code', $collector['routing.matcher']))
+    ->addItem('Route Matcher', \Windwalker\h('code', [], $collector['routing.matcher']))
     ->addItem('Route Number', count($routes))
     ->addItem('Matched Route', $matchedRoute->name)
     ->addItem('Package Name', $collector['package.name'])
-    ->addItem('Package Class', new HtmlElement('code', $collector['package.class']))
-    ->addItem('Controller', new HtmlElement('code', $controller))
-    ->addItem('Task', new HtmlElement('code', $collector['controller.task']));
+    ->addItem('Package Class', \Windwalker\h('code', [], $collector['package.class']))
+    ->addItem('Controller', \Windwalker\h('code', [], $controller))
+    ->addItem('Task', \Windwalker\h('code', [], $collector['controller.task']));
 ?>
 
 <br/><br/>

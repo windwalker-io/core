@@ -13,6 +13,7 @@ use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\Core\User\UserManager;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Filter\InputFilter;
+use function Windwalker\h;
 use Windwalker\IO\Input;
 use Windwalker\Session\Session;
 
@@ -79,7 +80,7 @@ class CsrfGuard
      */
     public function validate($justDie = false, $message = 'Invalid Token')
     {
-        if (!static::checkToken()) {
+        if (!$this->checkToken()) {
             if ($justDie) {
                 exit($message);
             }
@@ -97,14 +98,15 @@ class CsrfGuard
      * @param   array $attribs
      *
      * @return  HtmlElement
+     * @throws \Exception
      */
     public function input($userId = null, $attribs = [])
     {
         $attribs['type']  = 'hidden';
-        $attribs['name']  = static::getFormToken($userId);
+        $attribs['name']  = $this->getFormToken($userId);
         $attribs['value'] = 1;
 
-        return new HtmlElement('input', null, $attribs);
+        return h('input', $attribs, null);
     }
 
     /**
@@ -113,6 +115,7 @@ class CsrfGuard
      * @param   int $length Token string length.
      *
      * @return  string
+     * @throws \Exception
      */
     public function createToken($length = 12)
     {
@@ -123,7 +126,7 @@ class CsrfGuard
         $name  = session_name();
 
         for ($i = 0; $i < $length; ++$i) {
-            $token .= $chars[(mt_rand(0, $max))];
+            $token .= $chars[(random_int(0, $max))];
         }
 
         return md5($token . $name);
@@ -137,6 +140,7 @@ class CsrfGuard
      * @return  string
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
+     * @throws \Exception
      */
     public function getToken($forceNew = false)
     {
@@ -164,6 +168,7 @@ class CsrfGuard
      * @return string
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
+     * @throws \Exception
      */
     public function getFormToken($userId = null, $forceNew = false)
     {
@@ -184,6 +189,7 @@ class CsrfGuard
      * @return  boolean
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
+     * @throws \Exception
      */
     public function checkToken($userId = null, $method = null)
     {
@@ -199,8 +205,7 @@ class CsrfGuard
             return true;
         }
 
-        // TODO: Should remove strtolower() after Framework 3.2.5
-        if ($input->header->get(strtolower('X-CSRF-Token')) === $token) {
+        if ($input->header->get('X-CSRF-Token') === $token) {
             return true;
         }
 
