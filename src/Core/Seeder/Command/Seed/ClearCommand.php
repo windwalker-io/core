@@ -64,7 +64,9 @@ class ClearCommand extends CoreCommand
     protected function doExecute()
     {
         if ($this->console->getMode() !== 'dev') {
-            throw new \RuntimeException('<error>STOP!</error> <comment>you must run seeder in dev mode</comment>.');
+            throw new \RuntimeException(
+                '<error>STOP!</error> <comment>please set env WINDWALKER_MODE=dev</comment>.'
+            );
         }
 
         // backup

@@ -61,7 +61,9 @@ class DropAllCommand extends CoreCommand
     protected function doExecute()
     {
         if ($this->console->getMode() !== 'dev') {
-            throw new \RuntimeException('<error>STOP!</error> <comment>you must run migration in dev mode</comment>.');
+            throw new \RuntimeException(
+                '<error>STOP!</error> <comment>please set env WINDWALKER_MODE=dev</comment>.'
+            );
         }
 
         if (!(new BooleanPrompter())

@@ -10,7 +10,6 @@ namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Filesystem\File;
 
 /**
  * The ModeCommand class.
@@ -55,10 +54,10 @@ class ModeCommand extends CoreCommand
             throw new WrongArgumentException('Please provide mode name.');
         }
 
-        $file = WINDWALKER_ROOT . '/.mode';
+        putenv("WINDWALKER_MODE=$mode");
 
-        File::write($file, trim($mode));
+        $this->out('Set <comment>WINDWALKER_MODE</comment> to <info>' . $mode . '</info>');
 
-        $this->out('Set <comment>.mode</comment> file to <info>' . $mode . '</info>');
+        return true;
     }
 }
