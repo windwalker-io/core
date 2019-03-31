@@ -175,6 +175,8 @@ class RouteCreator
         $route->setOptions($options);
 
         if ($pattern) {
+            $pattern = '/' . ltrim($pattern, '/');
+
             $route->pattern($pattern);
         }
 
