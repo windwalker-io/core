@@ -15,9 +15,11 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Asset\AssetProvider;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Package\PackageResolver;
 use Windwalker\Core\Provider\RendererProvider;
 use Windwalker\Core\Provider\RouterProvider;
+use Windwalker\Core\Router\MainRouter;
 use Windwalker\Http\Output\NoHeaderOutput;
 use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Http\WebHttpServer;
@@ -199,11 +201,14 @@ class ConsoleHelper
             ->registerServiceProvider($container->newInstance(AssetProvider::class));
 
         // Prepare routers
+        /** @var MainRouter $router */
         $router   = $container->get('router');
         $resolver = static::getAllPackagesResolver($env);
 
+        $router->setPackageResolver($resolver);
+
         foreach ($routeFiles as $routeFile) {
-            $router->registerRawRouting($router::loadRoutingFile($routeFile), $resolver);
+            $router->register($routeFile);
         }
     }
 }

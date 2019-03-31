@@ -89,6 +89,13 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     protected $routeCreator;
 
     /**
+     * Property packageResolver.
+     *
+     * @var PackageResolver
+     */
+    protected $packageResolver;
+
+    /**
      * Class init.
      *
      * @param MatcherInterface    $matcher
@@ -339,7 +346,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     {
         if ($package) {
             if (!$package instanceof AbstractPackage) {
-                $package = PackageHelper::getPackage($package);
+                $package = $this->getPackageResolver()->getPackage($package);
             }
 
             $pattern = Arr::get($route, 'pattern');
@@ -470,8 +477,8 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      * register
      *
      * @param string                      $path
-     * @param string|AbstractPackage|null $package
      * @param array                       $data
+     * @param string|AbstractPackage|null $package
      *
      * @return  $this
      *
@@ -479,12 +486,14 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      */
     public function register(string $path, array $data = [], $package = null)
     {
+        $packageResolver = $this->getPackageResolver();
+
         if ($package && !$package instanceof AbstractPackage) {
-            $package = PackageHelper::getPackage($package);
+            $package = $packageResolver->getPackage($package);
         }
 
         // Workaround that RouteCreator should always be new one.
-        $routerCreator = new RouteCreator(PackageHelper::getInstance());
+        $routerCreator = new RouteCreator($packageResolver);
 
         $routerCreator
             ->group('root')
@@ -708,6 +717,34 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     public function listen($event, $callable, $priority = ListenerPriority::NORMAL)
     {
         $this->addListener($callable, [$event => $priority]);
+
+        return $this;
+    }
+
+    /**
+     * Method to get property PackageResolver
+     *
+     * @return  PackageResolver
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getPackageResolver(): PackageResolver
+    {
+        return $this->packageResolver ?: PackageHelper::getInstance();
+    }
+
+    /**
+     * Method to set property packageResolver
+     *
+     * @param   PackageResolver $packageResolver
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setPackageResolver(?PackageResolver $packageResolver)
+    {
+        $this->packageResolver = $packageResolver;
 
         return $this;
     }
