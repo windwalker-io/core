@@ -402,4 +402,16 @@ class MailMessage
 
         $this->{$field}[$email] = $name;
     }
+
+    /**
+     * dump
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function dump(): array
+    {
+        return get_object_vars($this);
+    }
 }

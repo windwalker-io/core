@@ -35,6 +35,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static LoggerInterface    getLogger($channel, $level = Logger::DEBUG)
  * @method  static LoggerInterface[]  getLoggers()
  * @method  static LoggerInterface    createChannel($channel, $level = Logger::DEBUG)
+ * @method  static LoggerInterface    createRotatingLogger($channel, $level = Logger::DEBUG, $maxFiles = 7)
  *
  * @since  2.1.1
  */
