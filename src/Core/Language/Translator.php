@@ -28,6 +28,7 @@ use Windwalker\Structure\StructureHelper;
  * @method  static string    sprintf($string, ...$more)
  * @method  static string    plural($string, ...$number)
  * @method  static bool      exists(string $key, bool $normalize = true)
+ * @method  static bool      has(string $key, bool $normalize = true)
  * @method  static CoreLanguage  load(string $file, string $format = 'ini', string $loader = 'file')
  * @method  static CoreLanguage  addString(string $key, string $string)
  * @method  static CoreLanguage  addStrings(array $strings)
@@ -38,6 +39,9 @@ use Windwalker\Structure\StructureHelper;
  * @method  static string    getDefaultLocale()
  * @method  static CoreLanguage  loadFile($file, $format = 'ini', $package = null)
  * @method  static CoreLanguage  getInstance($forceNew = false)
+ * @method  static array         getStrings()
+ * @method  static CoreLanguage  setStrings(array $strings)
+ * @method  static callable      getNormalizeHandler()
  *
  * @since  2.0
  */
@@ -247,20 +251,5 @@ abstract class Translator extends AbstractProxyFacade
         }
 
         throw new \DomainException(sprintf('Class: %s not exists', $class));
-    }
-
-    /**
-     * has
-     *
-     * @param string $string
-     * @param bool   $normalize
-     *
-     * @return  bool
-     *
-     * @since  3.5
-     */
-    public static function has(string $string, bool $normalize = true): bool
-    {
-        return static::exists($string, $normalize);
     }
 }
