@@ -957,12 +957,25 @@ class AssetManager implements DispatcherAwareInterface
     /**
      * Method to get property Path
      *
-     * @param   string $uri
+     * @param string $uri
+     * @param bool   $version
      *
      * @return string
      */
-    public function path($uri = null)
+    public function path($uri = null, $version = false)
     {
+        if ($version === true) {
+            $version = $this->getVersion();
+        }
+
+        if ($version) {
+            if (strpos($uri, '?') !== false) {
+                $uri .= '&' . $version;
+            } else {
+                $uri .= '?' . $version;
+            }
+        }
+
         if ($uri !== null) {
             return $this->path . '/' . $uri;
         }
@@ -974,11 +987,24 @@ class AssetManager implements DispatcherAwareInterface
      * Method to get property Root
      *
      * @param  string $uri
+     * @param  bool   $version
      *
      * @return string
      */
-    public function root($uri = null)
+    public function root($uri = null, $version = false)
     {
+        if ($version === true) {
+            $version = $this->getVersion();
+        }
+
+        if ($version) {
+            if (strpos($uri, '?') !== false) {
+                $uri .= '&' . $version;
+            } else {
+                $uri .= '?' . $version;
+            }
+        }
+
         if ($uri !== null) {
             return $this->root . '/' . $uri;
         }

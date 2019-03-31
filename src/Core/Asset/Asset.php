@@ -15,6 +15,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * @see    AssetManager
  *
+ * phpcs:disable
+ *
  * @method  static AssetManager  addStyle()                addStyle($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  addScript()               addScript($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  internalStyle()           internalStyle($content)
@@ -25,10 +27,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static AssetManager  internalCSS()             internalCSS($content)
  * @method  static AssetManager  internalJS()              internalJS($content)
  * @method  static string|false  exists()                  exists(string $uri, bool $strict = false)
- * @method  static string        renderStyles()            renderStyles($withInternal = false, array $internalAttrs =
- *          [])
- * @method  static string        renderScripts()           renderScripts($withInternal = false, array $internalAttrs =
- *          [])
+ * @method  static string        renderStyles()            renderStyles($withInternal = false, array $internalAttrs = [])
+ * @method  static string        renderScripts()           renderScripts($withInternal = false, array $internalAttrs = [])
  * @method  static string        renderInternalStyles()    renderInternalStyles()
  * @method  static string        renderInternalScripts()   renderInternalScripts()
  * @method  static AssetManager  alias()                   alias($target, $alias)
@@ -39,8 +39,10 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static AssetTemplate getTemplate()             getTemplate()
  * @method  static string        setTemplate()             setTemplate(AssetTemplate $template)
  * @method  static string        getJSObject()             getJSObject(array $array)
- * @method  static string        path()                    path($uri = null)
- * @method  static string        root()                    root($uri = null)
+ * @method  static string        path()                    path($uri = null, $version = false)
+ * @method  static string        root()                    root($uri = null, $version = false)
+ *
+ * phpcs:enable
  *
  * @since  1.0
  */
