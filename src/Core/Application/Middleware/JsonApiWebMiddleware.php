@@ -57,7 +57,7 @@ class JsonApiWebMiddleware extends AbstractWebMiddleware
 
             if (!$response instanceof JsonResponse) {
                 $response = new JsonResponse(
-                    new JsonBuffer($message, $response->getBody()->__toString()),
+                    new JsonBuffer($message, json_decode($response->getBody()->__toString(), true)),
                     $response->getStatusCode(),
                     $response->getHeaders()
                 );
