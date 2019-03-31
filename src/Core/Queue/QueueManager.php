@@ -248,9 +248,11 @@ class QueueManager
                     $this->config->get('queue.failer.table')
                 );
 
-                if ($failer->isSupported()) {
-                    return $failer;
+                if (!$failer->isSupported()) {
+                    return new NullQueueFailer();
                 }
+
+                return $failer;
                 break;
             case 'pdo':
                 $failer = new PdoQueueFailer(
@@ -259,8 +261,10 @@ class QueueManager
                 );
 
                 if ($failer->isSupported()) {
-                    return $failer;
+                    return new NullQueueFailer();
                 }
+
+                return $failer;
                 break;
             case 'null':
             default:

@@ -12,6 +12,7 @@ use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Logger\Logger;
 use Windwalker\Core\Queue\QueueManager;
+use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Event\Event;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Job\JobInterface;
@@ -182,6 +183,8 @@ class WorkerCommand extends CoreCommand
                         (string) $e
                     );
                 }
+
+                $this->console->handleException($e);
             })
             ->listen('onWorkerLoopCycleStart', function (Event $event) {
                 /** @var Worker $worker */
@@ -215,9 +218,9 @@ class WorkerCommand extends CoreCommand
                     'error'
                 );
 
-                Logger::error('error', (string) $e);
+                $this->console->handleException($e);
 
-                if ($this->console->database instanceof DatabaseAdapter) {
+                if ($this->console->database instanceof AbstractDatabaseDriver) {
                     $this->console->database->disconnect();
                 }
             })
@@ -231,7 +234,7 @@ class WorkerCommand extends CoreCommand
                     $driver->disconnect();
                 }
 
-                if ($this->console->database instanceof DatabaseAdapter) {
+                if ($this->console->database instanceof AbstractDatabaseDriver) {
                     $this->console->database->disconnect();
                 }
             });

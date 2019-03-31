@@ -17,6 +17,7 @@ use Windwalker\Core;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;
@@ -270,14 +271,51 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     }
 
     /**
+     * handleException
+     *
+     * @param \Throwable $e
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     * @throws \Exception
+     */
+    public function handleException(\Throwable $e): void
+    {
+        if (!$this->get('error.log', false)) {
+            return;
+        }
+
+        // Do not log 4xx errors
+        $code = $e->getCode();
+
+        if ($code < 400 || $code >= 500) {
+            $message = sprintf(
+                'Code: %s - %s - File: %s (%d)',
+                $e->getCode(),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
+
+            $traces = '';
+
+            foreach (BacktraceHelper::normalizeBacktraces($e->getTrace()) as $i => $trace) {
+                $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
+            }
+
+            $this->logger->createRotatingLogger('console-error', Core\Logger\Logger::DEBUG)
+                ->error($message . "\n" . $traces, ['exception' => $e]);
+        }
+    }
+
+    /**
      * addPackage
      *
      * @param string          $name
      * @param AbstractPackage $package
      *
      * @return  static
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     public function addPackage($name, AbstractPackage $package)
     {
