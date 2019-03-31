@@ -30,7 +30,7 @@ class {{className}} extends AbstractMigration
             $schema->datetime('visibility');
             $schema->datetime('reserved')->allowNull();
 
-            $schema->addIndex('queue');
+            $schema->addIndex('queue(150)');
         });
     }
 
