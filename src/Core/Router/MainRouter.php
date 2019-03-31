@@ -223,7 +223,9 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
         $suffix = $this->fetchControllerSuffix($method, Arr::get($extra, 'action', []));
 
         if (!$controller && !$suffix) {
-            throw new \LogicException('Route profile should have "controller" or "action" element, the matched route: ' . $route->getName());
+            throw new \LogicException(
+                'Route profile should have "controller" or "action" element, the matched route: ' . $route->getName()
+            );
         }
 
         if (!class_exists($controller) && !class_exists($suffix)) {

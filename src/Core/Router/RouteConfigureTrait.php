@@ -133,7 +133,7 @@ trait RouteConfigureTrait
      */
     public function variables(array $variables)
     {
-        Arr::mergeRecursive(
+        $this->options['variables'] = Arr::mergeRecursive(
             $this->options['variables'] ?? [],
             $variables
         );
@@ -169,7 +169,7 @@ trait RouteConfigureTrait
      */
     public function requirements(array $requirements)
     {
-        Arr::mergeRecursive(
+        $this->options['requirements'] = Arr::mergeRecursive(
             $this->options['requirements'] ?? [],
             $requirements
         );
