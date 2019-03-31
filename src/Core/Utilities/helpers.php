@@ -14,7 +14,7 @@ namespace {
 
     if (!function_exists('env')) {
         /**
-         * Translate
+         * Get ENV var.
          *
          * @param string $name
          * @param mixed  $default
@@ -23,9 +23,9 @@ namespace {
          *
          * @since  3.3
          */
-        function env(string $name, $default = null)
+        function env(string $name, $default = null):? string
         {
-            return $_SERVER[$name] ?? $default;
+            return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
         }
     }
 
@@ -173,6 +173,7 @@ namespace Windwalker {
 
     use Windwalker\Data\Collection;
     use Windwalker\Dom\HtmlElement;
+    use Windwalker\Dom\HtmlElements;
     use Windwalker\Filesystem\Filesystem;
     use Windwalker\Utilities\Iterator\ArrayObject;
 
@@ -243,5 +244,20 @@ namespace Windwalker {
     function h(string $name, array $attribs = [], $content = null): HtmlElement
     {
         return new HtmlElement($name, $content, $attribs);
+    }
+
+    /**
+     * Create Html Collection
+     *
+     * @param array $elements
+     * @param bool  $strict
+     *
+     * @return  HtmlElements
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function hs($elements = [], $strict = false): HtmlElements
+    {
+        return new HtmlElements($elements, $strict);
     }
 }
