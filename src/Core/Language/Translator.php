@@ -65,14 +65,16 @@ abstract class Translator extends AbstractProxyFacade
      * @return  void
      * @throws \ReflectionException
      */
-    public static function loadAll($package, $format = 'ini')
+    public static function loadAll($package = null, $format = 'ini')
     {
-        if (is_string($package)) {
-            $package = PackageHelper::getPackage($package);
+        if (!$package) {
+            static::loadAllFromPath(WINDWALKER_RESOURCES . '/languages', $format);
+
+            return;
         }
 
-        if (!$package) {
-            return;
+        if (is_string($package)) {
+            $package = PackageHelper::getPackage($package);
         }
 
         $path = $package->getDir() . '/Resources/language';

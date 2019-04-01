@@ -202,6 +202,12 @@ class AbstractPackage implements DispatcherAwareInterface
 
         $this->currentController = $controller;
 
+        $this->getDispatcher()->triggerEvent('onPackagePreprocess', [
+            'package' => $this,
+            'controller' => &$controller,
+            'task' => $controller,
+        ]);
+
         $chain = $this->getMiddlewareChain()->setEndMiddleware([$this, 'dispatch']);
 
         return $chain->execute($request, $response);
@@ -252,7 +258,9 @@ class AbstractPackage implements DispatcherAwareInterface
             // @see  https://bugs.php.net/bug.php?id=53648
             if ($result instanceof AbstractView) {
                 $result = $result->render();
-            } elseif (is_array($result)) {
+            } elseif (is_stringable($result)) {
+                $result = (string) $result;
+            } elseif (is_array($result) || is_object($result)) {
                 $result = json_encode($result);
             }
 
