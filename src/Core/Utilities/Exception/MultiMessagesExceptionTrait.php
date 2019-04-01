@@ -27,9 +27,9 @@ trait MultiMessagesExceptionTrait
      *
      * @param string|array $messages
      * @param int          $code
-     * @param \Exception   $previous
+     * @param \Throwable   $previous
      */
-    public function __construct($messages = null, $code = 0, \Exception $previous = null)
+    public function __construct($messages = null, $code = 0, \Throwable $previous = null)
     {
         $this->messages = (array) $messages;
 
