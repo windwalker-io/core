@@ -59,6 +59,31 @@ class CoreLanguage extends Language
     }
 
     /**
+     * setLocale
+     *
+     * @param   string $locale
+     *
+     * @return  Language  Return self to support chaining.
+     */
+    public function setLocale($locale)
+    {
+        $this->config->set('language.locale', $locale);
+
+        return parent::setLocale($locale);
+    }
+
+    /**
+     * getLocale
+     *
+     * @return  string
+     */
+    public function getLocale()
+    {
+        return $this->config->get('language.locale')
+            ?: $this->config->get('language.default', 'en-GB');
+    }
+
+    /**
      * load
      *
      * @param string $file

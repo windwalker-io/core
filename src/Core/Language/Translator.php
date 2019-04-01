@@ -36,6 +36,7 @@ use Windwalker\Structure\StructureHelper;
  * @method  static string    setTraceLevelOffset($level)
  * @method  static string    getTraceLevelOffset()
  * @method  static string    getLocale()
+ * @method  static CoreLanguage  setLocale(string $locale)
  * @method  static string    getDefaultLocale()
  * @method  static CoreLanguage  loadFile($file, $format = 'ini', $package = null)
  * @method  static CoreLanguage  getInstance($forceNew = false)
