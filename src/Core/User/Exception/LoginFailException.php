@@ -11,7 +11,7 @@ namespace Windwalker\Core\User\Exception;
 /**
  * The LoginFailException class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.2
  */
 class LoginFailException extends AuthenticateFailException
 {

@@ -239,7 +239,7 @@ namespace Windwalker {
      *
      * @return  HtmlElement
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      */
     function h(string $name, array $attribs = [], $content = null): HtmlElement
     {
@@ -254,7 +254,7 @@ namespace Windwalker {
      *
      * @return  HtmlElements
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      */
     function hs($elements = [], $strict = false): HtmlElements
     {

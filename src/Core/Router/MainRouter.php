@@ -726,7 +726,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      *
      * @return  PackageResolver
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      */
     public function getPackageResolver(): PackageResolver
     {
@@ -740,7 +740,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      */
     public function setPackageResolver(?PackageResolver $packageResolver)
     {

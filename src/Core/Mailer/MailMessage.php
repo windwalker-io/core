@@ -408,7 +408,7 @@ class MailMessage
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      */
     public function dump(): array
     {

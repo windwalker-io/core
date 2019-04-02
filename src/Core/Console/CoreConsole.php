@@ -277,7 +277,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.2
      * @throws \Exception
      */
     public function handleException(\Throwable $e): void
