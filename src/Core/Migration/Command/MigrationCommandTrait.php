@@ -10,9 +10,12 @@ namespace Windwalker\Core\Migration\Command;
 
 use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Database\DatabaseService;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 use Windwalker\Core\Migration\Repository\MigrationsRepository;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\DI\Container;
+use Windwalker\Environment\Environment;
 
 /**
  * The MigrationCommandTrait class.
@@ -21,6 +24,15 @@ use Windwalker\DI\Container;
  */
 trait MigrationCommandTrait
 {
+    /**
+     * Property environment.
+     *
+     * @Inject()
+     *
+     * @var Environment
+     */
+    protected $environment;
+
     /**
      * getModel
      *
@@ -90,5 +102,24 @@ trait MigrationCommandTrait
         $db->select($name);
 
         $config['name'] = $name;
+    }
+
+    /**
+     * getEnvCmd
+     *
+     * @param string $env
+     * @param string $value
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getEnvCmd(string $env = 'WINDWALKER_MODE', string $value = 'dev'): string
+    {
+        $prefix = $this->environment->getPlatform()->isWin()
+            ? 'setenv'
+            : 'export';
+
+        return sprintf('%s %s=%s', $prefix, $env, $value);
     }
 }

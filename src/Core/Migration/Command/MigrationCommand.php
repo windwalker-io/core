@@ -58,11 +58,11 @@ class MigrationCommand extends CoreCommand
      */
     public function init()
     {
-        $this->addCommand(new Migration\CreateCommand());
-        $this->addCommand(new Migration\StatusCommand());
-        $this->addCommand(new Migration\MigrateCommand());
-        $this->addCommand(new Migration\ResetCommand());
-        $this->addCommand(new Migration\DropAllCommand());
+        $this->addCommand(Migration\CreateCommand::class);
+        $this->addCommand(Migration\StatusCommand::class);
+        $this->addCommand(Migration\MigrateCommand::class);
+        $this->addCommand(Migration\ResetCommand::class);
+        $this->addCommand(Migration\DropAllCommand::class);
 
         $this->addGlobalOption('d')
             ->alias('dir')

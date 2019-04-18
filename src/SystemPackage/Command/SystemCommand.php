@@ -3,6 +3,7 @@
 namespace Windwalker\SystemPackage\Command;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Core\Console\CoreCommand;
 use Windwalker\SystemPackage\Command\System\{
     ClearCacheCommand,
     DownCommand,
@@ -18,7 +19,7 @@ use Windwalker\SystemPackage\Command\System\{
  *
  * @since 1.0
  */
-class SystemCommand extends Command
+class SystemCommand extends CoreCommand
 {
     /**
      * An enabled flag.

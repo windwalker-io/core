@@ -88,7 +88,7 @@ class MigrateCommand extends CoreCommand
     {
         if ($this->console->getMode() !== 'dev') {
             throw new \RuntimeException(
-                '<error>STOP!</error> <comment>please set env WINDWALKER_MODE=dev</comment>.'
+                '<error>STOP!</error> please run <info>' . $this->getEnvCmd() . '</info>.'
             );
         }
 

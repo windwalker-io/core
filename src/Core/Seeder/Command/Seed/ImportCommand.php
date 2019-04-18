@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Seeder\Command\Seed;
 
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 
 /**
@@ -16,6 +17,8 @@ use Windwalker\Core\Migration\Repository\BackupRepository;
  */
 class ImportCommand extends CoreCommand
 {
+    use MigrationCommandTrait;
+
     /**
      * An enabled flag.
      *
@@ -68,7 +71,7 @@ class ImportCommand extends CoreCommand
     {
         if ($this->console->getMode() !== 'dev') {
             throw new \RuntimeException(
-                '<error>STOP!</error> <comment>please set env WINDWALKER_MODE=dev</comment>.'
+                '<error>STOP!</error> please run <info>' . $this->getEnvCmd() . '</info>.'
             );
         }
 

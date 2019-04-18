@@ -10,6 +10,8 @@ namespace Windwalker\SystemPackage\Command\System;
 
 use Windwalker\Console\Exception\WrongArgumentException;
 use Windwalker\Core\Console\CoreCommand;
+use Windwalker\DI\Annotation\Inject;
+use Windwalker\Environment\Environment;
 
 /**
  * The ModeCommand class.
@@ -40,6 +42,15 @@ class ModeCommand extends CoreCommand
     protected $usage = '%s <mode> [options]';
 
     /**
+     * Property environment.
+     *
+     * @Inject()
+     *
+     * @var Environment
+     */
+    protected $environment;
+
+    /**
      * Execute this command.
      *
      * @return int
@@ -54,7 +65,11 @@ class ModeCommand extends CoreCommand
             throw new WrongArgumentException('Please provide mode name.');
         }
 
-        putenv("WINDWALKER_MODE=$mode");
+        if ($this->environment->getPlatform()->isWin()) {
+            system('setenv WINDWALKER_MODE=' . $mode);
+        } else {
+            system('export WINDWALKER_MODE=' . $mode);
+        }
 
         $this->out('Set <comment>WINDWALKER_MODE</comment> to <info>' . $mode . '</info>');
 
