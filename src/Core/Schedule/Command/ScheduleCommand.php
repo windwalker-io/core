@@ -15,7 +15,7 @@ use Windwalker\Core\Schedule\ScheduleConsoleInterface;
 /**
  * The ScheduleCommand class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 class ScheduleCommand extends CoreCommand
 {

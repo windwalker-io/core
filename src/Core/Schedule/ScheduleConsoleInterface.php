@@ -11,7 +11,7 @@ namespace Windwalker\Core\Schedule;
 /**
  * Interface ScheduleConsoleInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 interface ScheduleConsoleInterface
 {
@@ -22,7 +22,7 @@ interface ScheduleConsoleInterface
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function schedule(Schedule $schedule): void;
 }

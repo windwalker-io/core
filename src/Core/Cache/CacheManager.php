@@ -277,7 +277,7 @@ class CacheManager
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     protected function createFileStorage(string $name, string $class, array $options): CacheItemPoolInterface
     {

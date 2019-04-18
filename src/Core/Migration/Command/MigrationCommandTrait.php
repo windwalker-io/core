@@ -112,7 +112,7 @@ trait MigrationCommandTrait
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getEnvCmd(string $env = 'WINDWALKER_MODE', string $value = 'dev'): string
     {

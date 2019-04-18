@@ -23,7 +23,7 @@ use Windwalker\Queue\Job\JobInterface;
  * @method ScheduleEvent hourly($task)
  * @method ScheduleEvent minutely($task)
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 class Schedule
 {
@@ -62,7 +62,7 @@ class Schedule
      *
      * @return  ScheduleEvent[]
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getDueEvents(array $tags = []): array
     {
@@ -82,7 +82,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function cron(string $expression, $task): ScheduleEvent
     {
@@ -100,7 +100,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function perMinutes(int $minutes, $task): ScheduleEvent
     {
@@ -118,7 +118,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function hourlyAt(int $offset, $task): ScheduleEvent
     {
@@ -136,7 +136,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function createEvent(string $expr, $task): ScheduleEvent
     {
@@ -166,7 +166,7 @@ class Schedule
      *
      * @return  ScheduleEvent[]
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getEvents(array $tags = []): array
     {
@@ -186,7 +186,7 @@ class Schedule
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function setEvents(array $events)
     {
@@ -202,7 +202,7 @@ class Schedule
      *
      * @return  CronExpression
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     protected function createCronExpression(string $expr): CronExpression
     {
@@ -219,7 +219,7 @@ class Schedule
      *
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function __call($name, $args)
     {

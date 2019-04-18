@@ -13,7 +13,7 @@ use Windwalker\Core\Ioc;
 /**
  * The MigrationHelper class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 class MigrationHelper
 {
@@ -25,7 +25,7 @@ class MigrationHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public static function getEnvCmd(string $env = 'WINDWALKER_MODE', string $value = 'dev'): string
     {

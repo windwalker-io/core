@@ -15,7 +15,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The ScheduleProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 class ScheduleProvider implements ServiceProviderInterface
 {

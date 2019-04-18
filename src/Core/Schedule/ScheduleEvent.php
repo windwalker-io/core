@@ -13,7 +13,7 @@ use Cron\CronExpression;
 /**
  * The ScheduleEvent class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.3
  */
 class ScheduleEvent
 {
@@ -55,7 +55,7 @@ class ScheduleEvent
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function execute()
     {
@@ -72,7 +72,7 @@ class ScheduleEvent
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function isDue($currentTime = 'now', $timeZone = null): bool
     {
@@ -86,7 +86,7 @@ class ScheduleEvent
      *
      * @return  ScheduleEvent
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function tags($tags): self
     {
@@ -104,7 +104,7 @@ class ScheduleEvent
      *
      * @return  callable
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getHandler(): callable
     {
@@ -118,7 +118,7 @@ class ScheduleEvent
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function setHandler(callable $handler)
     {
@@ -132,7 +132,7 @@ class ScheduleEvent
      *
      * @return  CronExpression
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getExpression(): CronExpression
     {
@@ -146,7 +146,7 @@ class ScheduleEvent
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function setExpression($expression)
     {
@@ -164,7 +164,7 @@ class ScheduleEvent
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function getTags(): array
     {
@@ -178,7 +178,7 @@ class ScheduleEvent
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.3
      */
     public function setTags(array $tags)
     {
