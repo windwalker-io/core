@@ -28,7 +28,8 @@ return Arr::mergeRecursive(
             'mailer'   => \Windwalker\Core\Mailer\MailerProvider::class,
             'mailer_adapter' => \Windwalker\Core\Mailer\SwiftMailerProvider::class,
             'queue'    => \Windwalker\Core\Queue\QueueProvider::class,
-            'faker'  => \Windwalker\Core\Provider\FakerProvider::class,
+            'faker'    => \Windwalker\Core\Provider\FakerProvider::class,
+            'schedule' => \Windwalker\Core\Provider\ScheduleProvider::class
         ],
 
         'console' => [
@@ -38,6 +39,7 @@ return Arr::mergeRecursive(
                 'seed'      => \Windwalker\Core\Seeder\Command\SeedCommand::class,
                 'package'   => \Windwalker\Core\Package\Command\PackageCommand::class,
                 'queue'     => \Windwalker\Core\Queue\Command\QueueCommand::class,
+                'schedule'  => \Windwalker\Core\Schedule\Command\ScheduleCommand::class,
                 'legacy'    => \Windwalker\SystemPackage\Command\LegacyCommand::class
             ],
         ],
