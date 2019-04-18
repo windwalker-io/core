@@ -12,6 +12,8 @@ use Psr\Cache\CacheItemPoolInterface;
 use Windwalker\Cache\Cache;
 use Windwalker\Cache\CacheInterface;
 use Windwalker\Cache\Serializer\SerializerInterface;
+use Windwalker\Cache\Storage\CacheStorageInterface;
+use Windwalker\Cache\Storage\FileStorage;
 use Windwalker\Core\Config\Config;
 use Windwalker\Core\Ioc;
 use Windwalker\DI\Container;
@@ -239,24 +241,7 @@ class CacheManager
             case 'file':
             case 'php_file':
             case 'forever_file':
-                $path       = $options['cache_dir'];
-                $denyAccess = $options['deny_access'];
-
-                if (!is_dir($path)) {
-                    // Try add root
-                    $path = $this->config->get('path.root') . '/' . $path;
-                }
-
-                if (is_dir($path)) {
-                    $path = realpath($path);
-                }
-
-                $group = ($name === 'windwalker') ? null : $name;
-
-                return $this->container->newInstance(
-                    $class,
-                    [$path, $group, $denyAccess, $options['cache_time'], $options]
-                );
+                return $this->createFileStorage($name, $class, $options);
                 break;
 
             case 'redis':
@@ -268,12 +253,52 @@ class CacheManager
                 break;
 
             default:
+                if ($storage === FileStorage::class || is_subclass_of($storage, FileStorage::class)) {
+                    return $this->createFileStorage($name, $class, $options);
+                }
+
                 return $this->container->newInstance(
                     $class,
                     [$options['cache_time'], $options]
                 );
                 break;
         }
+    }
+
+    /**
+     * createFileStorage
+     *
+     * @param string $name
+     * @param string $class
+     * @param array  $options
+     *
+     * @return  CacheItemPoolInterface
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function createFileStorage(string $name, string $class, array $options): CacheItemPoolInterface
+    {
+        $path       = $options['cache_dir'];
+        $denyAccess = $options['deny_access'];
+
+        if (!is_dir($path)) {
+            // Try add root
+            $path = $this->config->get('path.root') . '/' . $path;
+        }
+
+        if (is_dir($path)) {
+            $path = realpath($path);
+        }
+
+        $group = ($name === 'windwalker') ? null : $name;
+
+        return $this->container->newInstance(
+            $class,
+            [$path, $group, $denyAccess, $options['cache_time'], $options]
+        );
     }
 
     /**
