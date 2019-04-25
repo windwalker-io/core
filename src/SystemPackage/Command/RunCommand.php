@@ -140,34 +140,10 @@ class RunCommand extends CoreCommand
      * @param   string $input
      *
      * @return int
-     *
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\Process\Exception\LogicException
      */
     protected function executeScript($script, $input = null)
     {
-        $this->out()->out();
-        $this->console->addMessage('>>> ' . $script, 'info');
-
-        if (class_exists(Process::class)) {
-            $process = new Process($script);
-
-            if ($input !== null) {
-                $process->setInput($input);
-            }
-
-            return $process->run(function ($type, $buffer) {
-                if (Process::ERR === $type) {
-                    $this->err($buffer, false);
-                } else {
-                    $this->out($buffer, false);
-                }
-            });
-        }
-
-        system($script, $return);
-
-        return $return;
+        return $this->console->runProcess($script, $input);
     }
 
     /**

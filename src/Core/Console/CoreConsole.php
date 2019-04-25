@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Console;
 
+use Symfony\Component\Process\Process;
 use Windwalker\Console\Command\RootCommand;
 use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOFactory;
@@ -121,6 +122,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      */
     protected function init()
     {
+
     }
 
     /**
@@ -268,6 +270,42 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         }
 
         return null;
+    }
+
+    /**
+     * runProcess
+     *
+     * @param string      $script
+     * @param string|null $input
+     *
+     * @return  int
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function runProcess(string $script, ?string $input = null): int
+    {
+        $this->out()->out();
+        $this->addMessage('>>> ' . $script, 'info');
+
+        if (class_exists(Process::class)) {
+            $process = new Process([$script]);
+
+            if ($input !== null) {
+                $process->setInput($input);
+            }
+
+            return $process->run(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    $this->io->err($buffer, false);
+                } else {
+                    $this->io->out($buffer, false);
+                }
+            });
+        }
+
+        system($script, $return);
+
+        return (int) $return;
     }
 
     /**
