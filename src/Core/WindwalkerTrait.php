@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core;
 
+use Windwalker\Core\Application\ServiceAwareTrait;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Config\Config;
@@ -33,6 +34,8 @@ use Windwalker\Structure\Structure;
  */
 trait WindwalkerTrait
 {
+    use ServiceAwareTrait;
+
     /**
      * Property booted.
      *
@@ -353,43 +356,5 @@ trait WindwalkerTrait
         $file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
 
         return is_file($file);
-    }
-
-    /**
-     * make
-     *
-     * @param string $class
-     * @param array  $args
-     * @param bool   $protected
-     *
-     * @return  mixed
-     *
-     * @since  3.5
-     */
-    public function make(string $class, array $args = [], bool $protected = false)
-    {
-        /** @var Container $container */
-        $container = $this->getContainer();
-
-        if ($container->has($class)) {
-            return $container->get($class);
-        }
-
-        return $container->createSharedObject($class, $args, $protected);
-    }
-
-    /**
-     * service
-     *
-     * @param string $class
-     * @param bool   $forceNew
-     *
-     * @return  mixed
-     *
-     * @since  3.5
-     */
-    public function service(string $class, bool $forceNew = false)
-    {
-        return $this->getContainer()->get($class, $forceNew);
     }
 }

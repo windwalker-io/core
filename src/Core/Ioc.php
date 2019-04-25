@@ -354,14 +354,37 @@ abstract class Ioc
      *
      * @param string $key
      * @param array  $args
+     * @param bool   $protected
      *
      * @return  mixed
      *
      * @since  3.4.2
      */
-    public static function make($key, array $args = [])
+    public static function make(string $key, array $args = [], bool $protected = false)
     {
-        return static::getContainer()->createSharedObject($key, $args);
+        return static::getContainer()->createSharedObject($key, $args, $protected);
+    }
+
+    /**
+     * service
+     *
+     * @param string $class
+     * @param bool   $forceNew
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function service(string $class, bool $forceNew = false)
+    {
+        /** @var Container $container */
+        $container = static::getContainer();
+
+        if (!$forceNew && $container->has($class)) {
+            return $container->get($class);
+        }
+
+        return $container->createSharedObject($class);
     }
 
     /**

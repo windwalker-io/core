@@ -13,9 +13,12 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Console\Command\Command;
 use Windwalker\Console\Console;
 use Windwalker\Core\Application\Middleware\AbstractWebMiddleware;
+use Windwalker\Core\Application\ServiceAwareInterface;
+use Windwalker\Core\Application\ServiceAwareTrait;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Provider\BootableDeferredProviderInterface;
 use Windwalker\Core\Provider\BootableProviderInterface;
@@ -30,6 +33,8 @@ use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
+use Windwalker\Event\EventInterface;
+use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\File;
 use Windwalker\IO\Input;
@@ -52,12 +57,16 @@ use Windwalker\Utilities\Reflection\ReflectionHelper;
  * @property-read  string                     $name
  * @property-read  Container                  $container
  * @property-read  CsrfGuard                  $csrf
+ * @property-read  EventDispatcher            $dispatcher
  *
  * @since  2.0
  */
-class AbstractPackage implements DispatcherAwareInterface
+class AbstractPackage implements DispatcherAwareInterface,
+    DispatcherInterface,
+    ServiceAwareInterface
 {
     use ContainerAwareTrait;
+    use ServiceAwareTrait;
 
     /**
      * Bundle name.
@@ -818,6 +827,61 @@ class AbstractPackage implements DispatcherAwareInterface
     public function setDispatcher(DispatcherInterface $dispatcher)
     {
         $this->getContainer()->set('dispatcher', $dispatcher);
+
+        return $this;
+    }
+
+    /**
+     * Trigger an event.
+     *
+     * @param EventInterface|string $event The event object or name.
+     * @param array                 $args  The arguments to set in event.
+     *
+     * @return  EventInterface  The event after being passed through all listeners.
+     *
+     * @since   2.0
+     */
+    public function triggerEvent($event, $args = [])
+    {
+        return $this->getDispatcher()->triggerEvent($event, $args);
+    }
+
+    /**
+     * Add a listener to this dispatcher, only if not already registered to these events.
+     * If no events are specified, it will be registered to all events matching it's methods name.
+     * In the case of a closure, you must specify at least one event name.
+     *
+     * @param object|\Closure $listener       The listener
+     * @param array|integer   $priorities     An associative array of event names as keys
+     *                                        and the corresponding listener priority as values.
+     *
+     * @return  static  This method is chainable.
+     *
+     * @throws  \InvalidArgumentException
+     *
+     * @since   2.0
+     */
+    public function addListener($listener, $priorities = [])
+    {
+        $this->getDispatcher()->addListener($listener, $priorities);
+
+        return $this;
+    }
+
+    /**
+     * Add single listener.
+     *
+     * @param string   $event
+     * @param callable $callable
+     * @param int      $priority
+     *
+     * @return  static
+     *
+     * @since   3.0
+     */
+    public function listen($event, $callable, $priority = ListenerPriority::NORMAL)
+    {
+        $this->getDispatcher()->listen($event, $callable, $priority);
 
         return $this;
     }

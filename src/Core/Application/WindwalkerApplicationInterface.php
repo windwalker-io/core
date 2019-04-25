@@ -11,14 +11,14 @@ namespace Windwalker\Core\Application;
 use Windwalker\Core\Frontend\Bootstrap;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Container;
-use Windwalker\Event\EventInterface;
+use Windwalker\Event\EventTriggerableInterface;
 
 /**
  * Interface WindwalkerApplicationInterface
  *
  * @since  2.0
  */
-interface WindwalkerApplicationInterface
+interface WindwalkerApplicationInterface extends ServiceAwareInterface, EventTriggerableInterface
 {
     /**
      * getPackage
@@ -38,18 +38,6 @@ interface WindwalkerApplicationInterface
      * @return  static
      */
     public function addPackage($name, AbstractPackage $package);
-
-    /**
-     * Trigger an event.
-     *
-     * @param   EventInterface|string $event The event object or name.
-     * @param   array                 $args  The arguments.
-     *
-     * @return  EventInterface  The event after being passed through all listeners.
-     *
-     * @since   2.0
-     */
-    public function triggerEvent($event, $args = []);
 
     /**
      * Method to get property Container
@@ -102,29 +90,4 @@ interface WindwalkerApplicationInterface
      * @return  bool
      */
     public function isOffline();
-
-    /**
-     * make
-     *
-     * @param string $class
-     * @param array  $args
-     * @param bool   $protected
-     *
-     * @return  mixed
-     *
-     * @since  3.5
-     */
-    public function make(string $class, array $args = [], bool $protected = false);
-
-    /**
-     * service
-     *
-     * @param string $class
-     * @param bool   $forceNew
-     *
-     * @return  mixed
-     *
-     * @since  3.5
-     */
-    public function service(string $class, bool $forceNew = false);
 }
