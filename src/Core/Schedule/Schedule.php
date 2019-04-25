@@ -108,9 +108,27 @@ class Schedule
     }
 
     /**
+     * perHours
+     *
+     * @param int   $hours
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function perHours(int $hours, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 */%d * * *', $hours), $task);
+    }
+
+    /**
      * hourlyAt
      *
-     * @param int   $offset
+     * @param int   $minute
      * @param mixed $task
      *
      * @return  static
@@ -120,9 +138,99 @@ class Schedule
      *
      * @since  3.5.3
      */
-    public function hourlyAt(int $offset, $task): ScheduleEvent
+    public function hourlyAt(int $minute, $task): ScheduleEvent
     {
-        return $this->cron(sprintf('%d * * * *', $offset), $task);
+        return $this->cron(sprintf('%d * * * *', $minute), $task);
+    }
+
+    /**
+     * perDays
+     *
+     * @param int   $days
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function perDays(int $days, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 0 */%d * *', $days), $task);
+    }
+
+    /**
+     * dailyAt
+     *
+     * @param int   $hour
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function dailyAt(int $hour, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 %d * * *', $hour), $task);
+    }
+
+    /**
+     * perMonths
+     *
+     * @param int   $months
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function perMonths(int $months, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 0 1 */%d *', $months), $task);
+    }
+
+    /**
+     * monthlyAt
+     *
+     * @param int   $day
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function monthlyAt(int $day, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 0 %d * *', $day), $task);
+    }
+
+    /**
+     * yearlyAt
+     *
+     * @param int   $month
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function yearlyAt(int $month, $task): ScheduleEvent
+    {
+        return $this->cron(sprintf('0 0 1 %d *', $month), $task);
     }
 
     /**
