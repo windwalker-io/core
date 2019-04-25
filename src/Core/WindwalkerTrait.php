@@ -368,7 +368,14 @@ trait WindwalkerTrait
      */
     public function make(string $class, array $args = [], bool $protected = false)
     {
-        return $this->getContainer()->createSharedObject($class, $args, $protected);
+        /** @var Container $container */
+        $container = $this->getContainer();
+
+        if ($container->has($class)) {
+            return $container->get($class);
+        }
+
+        return $container->createSharedObject($class, $args, $protected);
     }
 
     /**
