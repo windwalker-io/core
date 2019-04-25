@@ -5,10 +5,10 @@
     "license": "LGPL-2.0-or-later",
     "minimum-stability": "beta",
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.1",
         "windwalker/framework": "~3.0",
         "symfony/dotenv": "^4.2",
-        "symfony/yaml": "~3.0",
+        "symfony/yaml": "~3.0|~4.0",
         "monolog/monolog": "~1.0",
         "filp/whoops": "~2.0",
         "symfony/polyfill": "^1.8",
@@ -22,8 +22,7 @@
     },
     "suggest": {
         "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts.",
-        "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner.",
-        "symfony/var-dumper": "Install ^4.1 if you need ver-dumper server and use ds() to dump data."
+        "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
     "autoload" : {
         "psr-4" : {
