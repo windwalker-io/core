@@ -53,7 +53,7 @@ class AssetManager implements DispatcherAwareInterface
     /**
      * Property aliases.
      *
-     * @var  array
+     * @var  array[]
      */
     protected $aliases = [];
 
@@ -156,10 +156,12 @@ class AssetManager implements DispatcherAwareInterface
             'version' => null,
         ], $options);
 
+        $alias = $this->resolveRawAlias($url);
+
         $file = [
             'url' => $this->handleUri($url),
-            'attribs' => $attribs,
-            'options' => $options,
+            'attribs' => array_merge($attribs, $alias['attrs'] ?? []),
+            'options' => array_merge($options, $alias['options'] ?? []),
         ];
 
         $this->styles[$url] = $file;
@@ -187,10 +189,12 @@ class AssetManager implements DispatcherAwareInterface
             'version' => null,
         ], $options);
 
+        $alias = $this->resolveRawAlias($url);
+
         $file = [
             'url' => $this->handleUri($url),
-            'attribs' => $attribs,
-            'options' => $options,
+            'attribs' => array_merge($attribs, $alias['attrs'] ?? []),
+            'options' => array_merge($options, $alias['options'] ?? []),
         ];
 
         $this->scripts[$url] = $file;
@@ -683,14 +687,20 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @param string $target
      * @param string $alias
+     * @param array  $options
+     * @param array  $attrs
      *
      * @return  static
      */
-    public function alias($target, $alias)
+    public function alias($target, $alias, array $options = [], array $attrs = [])
     {
         $this->normalizeUri($target, $name);
 
-        $this->aliases[$name] = $alias;
+        $this->aliases[$name] = [
+            'alias' => $alias,
+            'options' => $options,
+            'attrs' => $attrs
+        ];
 
         return $this;
     }
@@ -706,11 +716,28 @@ class AssetManager implements DispatcherAwareInterface
     {
         $this->normalizeUri($uri, $name);
 
+        return $this->resolveRawAlias($uri)['alias'] ?? $uri;
+    }
+
+    /**
+     * resolveRawAlias
+     *
+     * @param string $uri
+     *
+     * @return  array|null
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function resolveRawAlias(string $uri): ?array
+    {
+        $this->normalizeUri($uri, $name);
+
         while (isset($this->aliases[$name])) {
-            $name = $this->aliases[$name];
+            $alias = $this->aliases[$name];
+            $name = $alias['alias'];
         }
 
-        return $name;
+        return $alias ?? null;
     }
 
     /**
