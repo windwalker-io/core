@@ -117,7 +117,7 @@ trait MigrationCommandTrait
     public function getEnvCmd(string $env = 'WINDWALKER_MODE', string $value = 'dev'): string
     {
         $prefix = $this->environment->getPlatform()->isWin()
-            ? 'setenv'
+            ? 'set'
             : 'export';
 
         return sprintf('%s %s=%s', $prefix, $env, $value);
