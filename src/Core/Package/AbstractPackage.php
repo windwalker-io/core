@@ -85,9 +85,16 @@ class AbstractPackage implements DispatcherAwareInterface,
     /**
      * Property currentController.
      *
-     * @var  AbstractController
+     * @var  AbstractController|string
      */
     protected $currentController;
+
+    /**
+     * Property isHmvc.
+     *
+     * @var  bool
+     */
+    protected $isHmvc = false;
 
     /**
      * Property task.
@@ -201,15 +208,8 @@ class AbstractPackage implements DispatcherAwareInterface,
      */
     public function execute($controller, Request $request, Response $response, $hmvc = false)
     {
-        if (!$controller instanceof AbstractController) {
-            $controller = $this->getController($controller);
-        }
-
-        if ($hmvc) {
-            $controller->isHmvc($hmvc);
-        }
-
         $this->currentController = $controller;
+        $this->isHmvc = $hmvc;
 
         $this->getDispatcher()->triggerEvent('onPackagePreprocess', [
             'package' => $this,
@@ -235,6 +235,14 @@ class AbstractPackage implements DispatcherAwareInterface,
      */
     public function dispatch(Request $request, Response $response, $next = null)
     {
+        if (!$this->currentController instanceof AbstractController) {
+            $this->currentController = $this->getController($this->currentController);
+        }
+
+        if ($this->isHmvc) {
+            $this->currentController->isHmvc(true);
+        }
+
         $controller = $this->currentController;
 
         $controller->setRequest($request)->setResponse($response);
