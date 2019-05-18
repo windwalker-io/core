@@ -128,6 +128,7 @@ class RendererProvider implements ServiceProviderInterface, BootableDeferredProv
      *
      * @return  RendererManager
      * @throws \ReflectionException
+     * @throws \Exception
      */
     protected function prepareGlobals(Container $container, RendererManager $manager)
     {

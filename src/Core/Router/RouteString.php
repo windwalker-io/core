@@ -178,7 +178,36 @@ class RouteString implements StringableInterface
      */
     public function addVar($name, $value)
     {
+        return $this->var($name, $value);
+    }
+
+    /**
+     * addVar
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return  $this
+     */
+    public function var($name, $value)
+    {
         $this->queries[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * delVar
+     *
+     * @param string $name
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function delVar(string $name)
+    {
+        unset($this->queries[$name]);
 
         return $this;
     }
@@ -226,7 +255,9 @@ class RouteString implements StringableInterface
         try {
             return $this->toString();
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_ERROR);
+            trigger_error((string) $e, E_USER_ERROR);
+
+            return (string) $e;
         }
     }
 

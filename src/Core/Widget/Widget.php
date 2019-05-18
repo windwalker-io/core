@@ -218,7 +218,7 @@ class Widget implements \ArrayAccess
         $data->renderer = get_class($this->renderer);
 
         $data->package = $this->getPackage();
-        $data->router  = $data->router ?: $this->getPackage()->router;
+        $data->router  = $data->router ?: (clone $this->getPackage()->router)->mute(true);
 
         $global = new Data($this->getData());
 

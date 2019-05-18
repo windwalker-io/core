@@ -16,6 +16,13 @@ namespace Windwalker\Core\Router;
 trait RouteBuilderTrait
 {
     /**
+     * Property mute.
+     *
+     * @var bool
+     */
+    protected $mute;
+
+    /**
      * build
      *
      * @param string $route
@@ -40,7 +47,7 @@ trait RouteBuilderTrait
      */
     public function to($route, $queries = [])
     {
-        return new RouteString($this, $route, $queries);
+        return (new RouteString($this, $route, $queries))->mute($this->mute);
     }
 
     /**
@@ -101,5 +108,33 @@ trait RouteBuilderTrait
     public function escape($text)
     {
         return htmlspecialchars($text);
+    }
+
+    /**
+     * Method to get property Mute
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getMute(): bool
+    {
+        return $this->mute;
+    }
+
+    /**
+     * Method to set property mute
+     *
+     * @param bool $mute
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function mute(bool $mute)
+    {
+        $this->mute = $mute;
+
+        return $this;
     }
 }
