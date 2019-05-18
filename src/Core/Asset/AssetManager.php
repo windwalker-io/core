@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Config\Config;
+use Windwalker\DI\RawWrapper;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
@@ -928,6 +929,10 @@ class AssetManager implements DispatcherAwareInterface
     {
         if ($data === null) {
             return 'null';
+        }
+
+        if ($data instanceof RawWrapper) {
+            return $data->get();
         }
 
         $output = '';

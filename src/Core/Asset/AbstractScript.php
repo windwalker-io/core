@@ -9,6 +9,8 @@
 namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\DI\RawWrapper;
+use function Windwalker\raw;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -204,13 +206,29 @@ abstract class AbstractScript
      *
      * @since  3.4
      */
-    public static function wrapFunction($body, $interface = '')
+    protected static function wrapFunction($body, $interface = '')
     {
-        return <<<JS
-\\function ($interface) {
+        return raw(
+            <<<JS
+function ($interface) {
     $body
 }
-JS;
+JS
+        );
+    }
+
+    /**
+     * raw
+     *
+     * @param mixed $value
+     *
+     * @return  RawWrapper
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected static function raw($value): RawWrapper
+    {
+        return raw($value);
     }
 
     /**

@@ -174,6 +174,7 @@ namespace Windwalker {
     use Windwalker\Data\Collection;
     use Windwalker\DI\ClassMeta;
     use Windwalker\DI\Container;
+    use Windwalker\DI\RawWrapper;
     use Windwalker\Dom\HtmlElement;
     use Windwalker\Dom\HtmlElements;
     use Windwalker\Filesystem\Filesystem;
@@ -276,5 +277,19 @@ namespace Windwalker {
     function create_obj($class, array $args = []): ClassMeta
     {
         return Container::meta($class, $args);
+    }
+
+    /**
+     * raw
+     *
+     * @param mixed $value
+     *
+     * @return  RawWrapper
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function raw($value): RawWrapper
+    {
+        return new RawWrapper($value);
     }
 }
