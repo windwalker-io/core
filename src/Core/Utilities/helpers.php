@@ -172,6 +172,8 @@ namespace {
 namespace Windwalker {
 
     use Windwalker\Data\Collection;
+    use Windwalker\DI\ClassMeta;
+    use Windwalker\DI\Container;
     use Windwalker\Dom\HtmlElement;
     use Windwalker\Dom\HtmlElements;
     use Windwalker\Filesystem\Filesystem;
@@ -259,5 +261,20 @@ namespace Windwalker {
     function hs($elements = [], $strict = false): HtmlElements
     {
         return new HtmlElements($elements, $strict);
+    }
+
+    /**
+     * create_obj
+     *
+     * @param string|callable $class
+     * @param array           $args
+     *
+     * @return  DI\ClassMeta
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function create_obj($class, array $args = []): ClassMeta
+    {
+        return Container::meta($class, $args);
     }
 }
