@@ -203,7 +203,7 @@ class RouteString implements StringableInterface
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function delVar(string $name)
     {

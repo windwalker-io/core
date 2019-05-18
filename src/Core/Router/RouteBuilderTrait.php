@@ -115,7 +115,7 @@ trait RouteBuilderTrait
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function getMute(): bool
     {
@@ -129,7 +129,7 @@ trait RouteBuilderTrait
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function mute(bool $mute)
     {

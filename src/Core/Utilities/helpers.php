@@ -272,7 +272,7 @@ namespace Windwalker {
      *
      * @return  DI\ClassMeta
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     function create_obj($class, array $args = []): ClassMeta
     {
@@ -286,7 +286,7 @@ namespace Windwalker {
      *
      * @return  RawWrapper
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     function raw($value): RawWrapper
     {

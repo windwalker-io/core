@@ -13,7 +13,7 @@ use Windwalker\DI\Container;
 /**
  * The ServiceAwareTrait class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.5
  */
 trait ServiceAwareTrait
 {

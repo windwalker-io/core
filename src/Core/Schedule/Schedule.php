@@ -118,7 +118,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function perHours(int $hours, $task): ScheduleEvent
     {
@@ -154,7 +154,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function perDays(int $days, $task): ScheduleEvent
     {
@@ -172,7 +172,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function dailyAt(int $hour, $task): ScheduleEvent
     {
@@ -190,7 +190,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function perMonths(int $months, $task): ScheduleEvent
     {
@@ -208,7 +208,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function monthlyAt(int $day, $task): ScheduleEvent
     {
@@ -226,7 +226,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function yearlyAt(int $month, $task): ScheduleEvent
     {

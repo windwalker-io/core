@@ -11,7 +11,7 @@ namespace Windwalker\Core\Application;
 /**
  * Interface ServiceAwareInterface
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.5
  */
 interface ServiceAwareInterface
 {

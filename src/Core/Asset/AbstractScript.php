@@ -224,7 +224,7 @@ JS
      *
      * @return  RawWrapper
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     protected static function raw($value): RawWrapper
     {

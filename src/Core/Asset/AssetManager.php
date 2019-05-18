@@ -727,7 +727,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  array|null
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function resolveRawAlias(string $uri): ?array
     {

@@ -373,7 +373,7 @@ abstract class Ioc
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public static function service(string $class, bool $forceNew = false)
     {

@@ -280,7 +280,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      *
      * @return  int
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.5
      */
     public function runProcess(string $script, ?string $input = null): int
     {
