@@ -12,9 +12,9 @@ namespace PHPSTORM_META {
     use Windwalker\Core\Ioc;
     use Windwalker\Core\WindwalkerTrait;
     use Windwalker\Core\Application\ServiceAwareTrait;
+    use Windwalker\Data\Traits\CollectionTrait;
     use Windwalker\DI\Container;
     use Windwalker\Form\Form;
-    use function Windwalker\tap;
 
     // Container
     override(
@@ -81,41 +81,16 @@ namespace PHPSTORM_META {
         ])
     );
 
-    // Helpers
     override(
-        tap(0),
-        elementType(0)
-    );
-}
+        Form::add(0),
         map([
             '' => '@'
         ])
     );
 
+    // Data
     override(
-        Ioc::make(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        Ioc::get(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    // Field
-    override(
-        AbstractFieldDefinition::addField(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        Form::addField(0),
+        CollectionTrait::as(0),
         map([
             '' => '@'
         ])
@@ -123,7 +98,7 @@ namespace PHPSTORM_META {
 
     // Helpers
     override(
-        tap(0),
+        \Windwalker\tap(0),
         elementType(0)
     );
 }
