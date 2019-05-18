@@ -66,6 +66,13 @@ namespace PHPSTORM_META {
         ])
     );
 
+    override(
+        Ioc::service(0),
+        map([
+            '' => '@'
+        ])
+    );
+
     // Field
     override(
         AbstractFieldDefinition::addField(0),
