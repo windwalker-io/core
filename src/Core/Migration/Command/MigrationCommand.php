@@ -81,6 +81,8 @@ class MigrationCommand extends CoreCommand
      */
     protected function prepareExecute()
     {
+        ini_set('max_execution_time', 0);
+
         // Prepare migration path
         $packageName = $this->getOption('p');
 

@@ -65,6 +65,8 @@ class RunCommand extends CoreCommand
      */
     protected function doExecute()
     {
+        ini_set('max_execution_time', 0);
+
         $resolver = ConsoleHelper::getAllPackagesResolver();
 
         $scripts = (array) $this->console->get('console.scripts');
