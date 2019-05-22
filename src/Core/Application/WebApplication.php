@@ -498,7 +498,7 @@ class WebApplication extends AbstractWebApplication implements
             'code' => &$code,
         ]);
 
-        parent::redirect($url, $code);
+        parent::redirect((string) $url, $code);
     }
 
     /**
