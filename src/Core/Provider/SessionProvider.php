@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Console\Console;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -50,12 +51,15 @@ class SessionProvider implements ServiceProviderInterface
         $closure = function (Container $container) {
             /** @var \Windwalker\Structure\Structure $config */
             $config = $container->get('config');
-            $uri    = $container->get('uri');
 
             $options = (array) $config->get('session', []);
 
-            $options['cookie_path']   = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->path;
-            $options['cookie_domain'] = parse_url($uri->host, PHP_URL_HOST);
+            if (!$container->get('app') instanceof Console) {
+                $uri = $container->get('uri');
+
+                $options['cookie_path']   = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->path;
+                $options['cookie_domain'] = parse_url($uri->host, PHP_URL_HOST);
+            }
 
             return $container->newInstance(Session::class, ['options' => $options]);
         };
@@ -76,6 +80,10 @@ class SessionProvider implements ServiceProviderInterface
     {
         $config  = $container->get('config');
         $handler = $config->get('session.handler', 'native');
+
+        if ($container->get('app') instanceof Console) {
+            $handler = 'array';
+        }
 
         return $container->newInstance(sprintf('Windwalker\Session\Handler\%sHandler', ucfirst($handler)));
     }
