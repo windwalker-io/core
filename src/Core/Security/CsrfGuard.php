@@ -24,7 +24,7 @@ use Windwalker\Session\Session;
  */
 class CsrfGuard
 {
-    const TOKEN_KEY = 'form.token';
+    public const TOKEN_KEY = 'form.token';
 
     /**
      * Property config.
@@ -55,6 +55,13 @@ class CsrfGuard
     private $userManager;
 
     /**
+     * Property message.
+     *
+     * @var  string
+     */
+    protected $message = 'Invalid Token';
+
+    /**
      * CsrfGuard constructor.
      *
      * @param Config      $config
@@ -73,13 +80,16 @@ class CsrfGuard
     /**
      * Validate token or die.
      *
-     * @param   bool   $justDie
-     * @param   string $message
+     * @param bool   $justDie
+     * @param string $message
      *
      * @return  bool
+     * @throws \Exception
      */
-    public function validate($justDie = false, $message = 'Invalid Token')
+    public function validate($justDie = false, $message = null)
     {
+        $message = $message ?: $this->getMessage();
+
         if (!$this->checkToken()) {
             if ($justDie) {
                 exit($message);
@@ -210,5 +220,33 @@ class CsrfGuard
         }
 
         return false;
+    }
+
+    /**
+     * Method to get property Message
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * Method to set property message
+     *
+     * @param string $message
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function setMessage(string $message)
+    {
+        $this->message = $message;
+
+        return $this;
     }
 }

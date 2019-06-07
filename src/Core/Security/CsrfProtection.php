@@ -24,12 +24,14 @@ use Windwalker\Dom\HtmlElement;
  * @method  static string       createToken($length = 12)
  * @method  static string       getToken($forceNew = false)
  * @method  static string       getFormToken($userId = null, $forceNew = false)
+ * @method  static string       getMessage()
+ * @method  static CsrfGuard    setMessage(string $message)
  *
  * @since  2.0.9
  */
 abstract class CsrfProtection extends AbstractProxyFacade
 {
-    const TOKEN_KEY = 'form.token';
+    public const TOKEN_KEY = 'form.token';
 
     /**
      * Property _key.
