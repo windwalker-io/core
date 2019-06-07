@@ -50,6 +50,8 @@ class ScheduleCommand extends CoreCommand
      *
      * @return int
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  2.0
      */
     protected function doExecute()
@@ -67,6 +69,7 @@ class ScheduleCommand extends CoreCommand
         $this->console->schedule($schedule);
 
         foreach ($schedule->getDueEvents() as $event) {
+            $event->setContainer($this->console->getContainer());
             $event->execute();
         }
 

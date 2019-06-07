@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
+use Windwalker\DI\ContainerAwareTrait;
 
 /**
  * The ScheduleEvent class.
@@ -17,6 +18,8 @@ use Cron\CronExpression;
  */
 class ScheduleEvent
 {
+    use ContainerAwareTrait;
+
     /**
      * Property handler.
      *
@@ -55,11 +58,17 @@ class ScheduleEvent
      *
      * @return  mixed
      *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  3.5.3
      */
     public function execute()
     {
         $handler = $this->handler;
+
+        if ($this->container) {
+            return $this->container->call($handler);
+        }
 
         return $handler();
     }
