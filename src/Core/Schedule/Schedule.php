@@ -90,6 +90,23 @@ class Schedule
     }
 
     /**
+     * always
+     *
+     * @param mixed $task
+     *
+     * @return  ScheduleEvent
+     *
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function always($task): ScheduleEvent
+    {
+        return $this->cron('@always', $task);
+    }
+
+    /**
      * perMinutes
      *
      * @param int   $minutes
