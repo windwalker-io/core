@@ -34,6 +34,13 @@ class ScheduleCommand extends CoreCommand
     protected $description = 'Run schedule';
 
     /**
+     * Property usage.
+     *
+     * @var  string
+     */
+    protected $usage = '%s <cmd>[<...names>]</cmd> <option>[--test]</option>';
+
+    /**
      * Initialise command.
      *
      * @return void
@@ -43,6 +50,10 @@ class ScheduleCommand extends CoreCommand
     protected function init()
     {
         parent::init();
+
+        $this->addOption('test')
+            ->description('Test schedule tasks')
+            ->defaultValue(0);
     }
 
     /**
@@ -50,13 +61,11 @@ class ScheduleCommand extends CoreCommand
      *
      * @return int
      *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  2.0
      */
     protected function doExecute()
     {
-        $args = $this->io->getArguments();
+        $names = $this->io->getArguments();
 
         if (!$this->console instanceof ScheduleConsoleInterface) {
             $this->out('Console Application should be ' . ScheduleConsoleInterface::class);
@@ -68,8 +77,17 @@ class ScheduleCommand extends CoreCommand
 
         $this->console->schedule($schedule);
 
-        foreach ($schedule->getDueEvents() as $event) {
-            $event->setContainer($this->console->getContainer());
+        if ($this->getOption('test')) {
+            $events = $schedule->getEvents();
+        } else {
+            $events = $schedule->getDueEvents();
+        }
+
+        foreach ($events as $event) {
+            if ($names !== [] && !in_array($event->getName(), $names, true)) {
+                continue;
+            }
+
             $event->execute();
         }
 

@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Session\Bag\FlashBag;
@@ -38,6 +39,7 @@ class SessionProvider implements ServiceProviderInterface
      */
     public function register(Container $container)
     {
+
         $container->share(HandlerInterface::class, [$this, 'handler']);
         $container->share(AbstractDatabaseAdapter::class, [$this, 'dbAdapter']);
 

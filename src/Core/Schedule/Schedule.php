@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
+use Windwalker\DI\Annotation\Inject;
 use Windwalker\DI\Container;
 use Windwalker\Queue\Job\JobInterface;
 
@@ -36,6 +37,8 @@ class Schedule
 
     /**
      * Property container.
+     *
+     * @Inject()
      *
      * @var Container
      */
@@ -274,6 +277,10 @@ class Schedule
         if ($task instanceof JobInterface) {
             $handler = function () use ($task) {
                 return $this->container->call([$task, 'execute']);
+            };
+        } elseif ($task instanceof \Closure) {
+            $handler = function () use ($task) {
+                return $this->container->call($task);
             };
         } elseif (is_object($task)) {
             $handler = function () use ($task) {

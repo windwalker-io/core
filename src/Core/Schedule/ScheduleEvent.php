@@ -9,7 +9,6 @@
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
-use Windwalker\DI\ContainerAwareTrait;
 
 /**
  * The ScheduleEvent class.
@@ -18,8 +17,6 @@ use Windwalker\DI\ContainerAwareTrait;
  */
 class ScheduleEvent
 {
-    use ContainerAwareTrait;
-
     /**
      * Property handler.
      *
@@ -42,6 +39,13 @@ class ScheduleEvent
     protected $tags = [];
 
     /**
+     * Property name.
+     *
+     * @var string
+     */
+    protected $name = '';
+
+    /**
      * ScheduleEvent constructor.
      *
      * @param CronExpression|string $expression
@@ -58,17 +62,11 @@ class ScheduleEvent
      *
      * @return  mixed
      *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  3.5.3
      */
     public function execute()
     {
         $handler = $this->handler;
-
-        if ($this->container) {
-            return $this->container->call($handler);
-        }
 
         return $handler();
     }
@@ -159,7 +157,9 @@ class ScheduleEvent
      */
     public function setExpression($expression)
     {
-        if (is_string($expression)) {
+        if ($expression === '@always') {
+            $expression = new AlwaysExpression($expression);
+        } elseif (is_string($expression)) {
             $expression = CronExpression::factory($expression);
         }
 
@@ -192,6 +192,34 @@ class ScheduleEvent
     public function setTags(array $tags)
     {
         $this->tags = $tags;
+
+        return $this;
+    }
+
+    /**
+     * Method to get property Name
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Method to set property name
+     *
+     * @param string $name
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function name(string $name)
+    {
+        $this->name = $name;
 
         return $this;
     }
