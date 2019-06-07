@@ -13,7 +13,7 @@ use Cron\CronExpression;
 /**
  * The AlwaysExpression class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.6
  */
 class AlwaysExpression extends CronExpression
 {

@@ -227,7 +227,7 @@ class CsrfGuard
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.6
      */
     public function getMessage(): string
     {
@@ -241,7 +241,7 @@ class CsrfGuard
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.6
      */
     public function setMessage(string $message)
     {

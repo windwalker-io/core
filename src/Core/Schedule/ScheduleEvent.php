@@ -201,7 +201,7 @@ class ScheduleEvent
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.6
      */
     public function getName(): string
     {
@@ -215,7 +215,7 @@ class ScheduleEvent
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.6
      */
     public function name(string $name)
     {

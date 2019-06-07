@@ -102,7 +102,7 @@ class Schedule
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.6
      */
     public function always($task): ScheduleEvent
     {
