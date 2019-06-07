@@ -12,6 +12,7 @@ use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Form\Field;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\FieldHelper;
+use Windwalker\Form\Filter\MaxLengthFilter;
 use Windwalker\Form\Form;
 use Windwalker\Utilities\Queue\PriorityQueue;
 
@@ -52,10 +53,10 @@ abstract class AbstractFieldDefinition implements FieldDefinitionInterface
     /*
      * MySQL text length. @see https://stackoverflow.com/a/23169977
      */
-    public const TEXT_MAX_ASCII     = 65535;
-    public const TEXT_MAX_UTF8      = 21844;
-    public const LONGTEXT_MAX_ASCII = 4294967295;
-    public const LONGTEXT_MAX_UTF8  = 1431655765;
+    public const TEXT_MAX_ASCII     = MaxLengthFilter::TEXT_MAX_ASCII;
+    public const TEXT_MAX_UTF8      = MaxLengthFilter::TEXT_MAX_UTF8;
+    public const LONGTEXT_MAX_ASCII = MaxLengthFilter::LONGTEXT_MAX_ASCII;
+    public const LONGTEXT_MAX_UTF8  = MaxLengthFilter::LONGTEXT_MAX_UTF8;
 
     /*
      * Integer length. @see https://yd514.iteye.com/blog/1909097
