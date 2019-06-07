@@ -77,6 +77,11 @@ class ScheduleCommand extends CoreCommand
 
         $this->console->schedule($schedule);
 
+        $this->console->triggerEvent('onScheduleRegister', [
+            'names' => $names,
+            'schedule' => $schedule,
+        ]);
+
         if ($this->getOption('test')) {
             $events = $schedule->getEvents();
         } else {
