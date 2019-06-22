@@ -85,14 +85,10 @@ trait DateTimeTrait
         $tz = self::getTimezoneObject($tz);
 
         // If the date is numeric assume a unix timestamp and convert it.
-        date_default_timezone_set('UTC');
         $date = is_numeric($date) ? date('c', $date) : $date;
 
         // Call the DateTime constructor.
         parent::__construct($date, $tz);
-
-        // Reset the timezone for 3rd party libraries
-        date_default_timezone_set(self::$stz->getName());
 
         // Set the timezone object for access later.
         $this->tz = $tz;
@@ -100,6 +96,8 @@ trait DateTimeTrait
 
     /**
      * setDefaultGMT
+     *
+     * @param string $tz
      *
      * @return  void
      */
@@ -172,11 +170,9 @@ trait DateTimeTrait
      */
     public static function toLocalTime($date, $format = null, $to = null)
     {
-        self::backupTimezone();
-
         $to = $to ?: Ioc::getConfig()->get('system.timezone');
 
-        return static::convert($date, self::$stz->getName(), $to, $format);
+        return static::convert($date, self::getServerDefaultTimezone(), $to, $format);
     }
 
     /**
@@ -191,11 +187,9 @@ trait DateTimeTrait
      */
     public static function toServerTime($date, $format = null, $from = null)
     {
-        self::backupTimezone();
-
         $from = $from ?: Ioc::getConfig()->get('system.timezone');
-
-        return static::convert($date, $from, self::$stz->getName(), $format);
+show($from, self::getServerDefaultTimezone());
+        return static::convert($date, $from, self::getServerDefaultTimezone(), $format);
     }
 
     /**
@@ -331,6 +325,18 @@ trait DateTimeTrait
         }
 
         return self::$useStz;
+    }
+
+    /**
+     * getServerDefaultTimezone
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function getServerDefaultTimezone(): string
+    {
+        return date_default_timezone_get();
     }
 
     /**

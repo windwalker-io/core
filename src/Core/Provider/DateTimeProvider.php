@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Config\Config;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -28,7 +29,9 @@ class DateTimeProvider implements ServiceProviderInterface, BootableProviderInte
      */
     public function boot(Container $container)
     {
-        date_default_timezone_set('UTC');
+        $config = $container->get(Config::class);
+
+        date_default_timezone_set($config->get('system.server_timezone') ?: 'UTC');
     }
 
     /**
