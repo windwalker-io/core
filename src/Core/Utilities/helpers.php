@@ -207,7 +207,7 @@ namespace Windwalker {
      * @since  3.5
      */
     function arr(
-        array $data = [],
+        ?array $data = [],
         int $flags = ArrayObject::STD_PROP_LIST,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
@@ -226,7 +226,7 @@ namespace Windwalker {
      * @since  3.5.2
      */
     function collect(
-        array $data = [],
+        ?array $data = [],
         int $flags = ArrayObject::STD_PROP_LIST,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
