@@ -62,7 +62,7 @@ class DropAllCommand extends CoreCommand
     {
         if ($this->console->getMode() !== 'dev') {
             throw new \RuntimeException(
-                '<error>STOP!</error> please run <info>' . $this->getEnvCmd() . '</info>.'
+                '<error>STOP!</error> please run: <info>' . $this->getEnvCmd() . '</info>.'
             );
         }
 

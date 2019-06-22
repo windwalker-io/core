@@ -343,7 +343,7 @@ trait WindwalkerTrait
      */
     protected function loadMode()
     {
-        return env('WINDWALKER_MODE');
+        return env('APP_ENV') ?: env('WINDWALKER_MODE');
     }
 
     /**

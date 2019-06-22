@@ -114,7 +114,7 @@ trait MigrationCommandTrait
      *
      * @since  3.5.3
      */
-    public function getEnvCmd(string $env = 'WINDWALKER_MODE', string $value = 'dev'): string
+    public function getEnvCmd(string $env = 'APP_ENV', string $value = 'dev'): string
     {
         $prefix = $this->environment->getPlatform()->isWin()
             ? 'set'
