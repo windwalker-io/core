@@ -11,6 +11,7 @@ namespace Windwalker\Core\Repository;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Repository\Traits\DatabaseRepositoryTrait;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
+use Windwalker\Record\Record;
 use Windwalker\Structure\Structure;
 
 /**
@@ -35,5 +36,19 @@ class DatabaseRepository extends Repository implements DatabaseRepositoryInterfa
         parent::__construct($config);
 
         $this->db = $db ?: Ioc::getDatabase();
+    }
+
+    /**
+     * registerRecordEvents
+     *
+     * @param Record $record
+     *
+     * @return  Record
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerRecordEvents(Record $record): Record
+    {
+        return $record;
     }
 }

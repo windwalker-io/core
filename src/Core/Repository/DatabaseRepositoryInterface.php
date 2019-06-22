@@ -79,4 +79,15 @@ interface DatabaseRepositoryInterface
      * @return  static
      */
     public function transactionRollback($nested = true);
+
+    /**
+     * registerRecordEvents
+     *
+     * @param Record $record
+     *
+     * @return  Record
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function registerRecordEvents(Record $record): Record;
 }
