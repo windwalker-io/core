@@ -122,7 +122,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      */
     protected function init()
     {
-
+        //
     }
 
     /**

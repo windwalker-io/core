@@ -25,23 +25,25 @@ class BacktraceHelper
     /**
      * whoCallMe
      *
-     * @param int $backwards
+     * @param int  $backwards
+     * @param bool $replaceRoot
      *
      * @return  array
      */
-    public static function whoCallMe($backwards = 2)
+    public static function whoCallMe($backwards = 2, bool $replaceRoot = true)
     {
-        return static::normalizeBacktrace(debug_backtrace()[$backwards]);
+        return static::normalizeBacktrace(debug_backtrace()[$backwards], $replaceRoot);
     }
 
     /**
      * normalizeBacktrace
      *
-     * @param   array $trace
+     * @param array $trace
+     * @param bool  $replaceRoot
      *
      * @return  array
      */
-    public static function normalizeBacktrace(array $trace)
+    public static function normalizeBacktrace(array $trace, bool $replaceRoot = true)
     {
         $trace = new Data($trace);
 
@@ -67,8 +69,15 @@ class BacktraceHelper
             $args[] = $arg;
         }
 
+        $file = $trace['file'] ?? '';
+
+        if ($file) {
+            $file = $replaceRoot ? static::replaceRoot($file) : $file;
+            $file .= ':' . $trace['line'];
+        }
+
         return [
-            'file' => !empty($trace['file']) ? static::replaceRoot($trace['file']) . ' (' . $trace['line'] . ')' : null,
+            'file' => $file,
             'function' => ($trace['class'] ? $trace['class'] . $trace['type'] : null) . $trace['function'] .
                 sprintf('(%s)', implode(', ', $args)),
             'pathname' => $trace['file'],
@@ -79,11 +88,12 @@ class BacktraceHelper
     /**
      * normalizeBacktraces
      *
-     * @param   array $traces
+     * @param array $traces
+     * @param bool  $replaceRoot
      *
      * @return  array
      */
-    public static function normalizeBacktraces(array $traces)
+    public static function normalizeBacktraces(array $traces, bool $replaceRoot = true)
     {
         $return = [];
 
@@ -92,6 +102,29 @@ class BacktraceHelper
         }
 
         return $return;
+    }
+
+    /**
+     * traceAsString
+     *
+     * @param int   $i
+     * @param array $trace
+     * @param bool  $replaceRoot
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function traceAsString(int $i, array $trace, bool $replaceRoot = true): string
+    {
+        $frameData = static::normalizeBacktrace($trace, $replaceRoot);
+
+        return sprintf(
+            '%3d. %s %s',
+            $i,
+            $frameData['function'],
+            $frameData['file']
+        );
     }
 
     /**
