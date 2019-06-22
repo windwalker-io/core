@@ -128,6 +128,28 @@ class NullDataMapper extends DataMapper
     }
 
     /**
+     * Find column as an array.
+     *
+     * @param mixed $conditions   Where conditions, you can use array or Compare object.
+     *                            Example:
+     *                            - `array('id' => 5)` => id = 5
+     *                            - `new GteCompare('id', 20)` => 'id >= 20'
+     *                            - `new Compare('id', '%Flower%', 'LIKE')` => 'id LIKE "%Flower%"'
+     * @param mixed $order        Order sort, can ba string, array or object.
+     *                            Example:
+     *                            - `id ASC` => ORDER BY id ASC
+     *                            - `array('catid DESC', 'id')` => ORDER BY catid DESC, id
+     *
+     * @return  mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function findResult($conditions = [], $order = null)
+    {
+        return null;
+    }
+
+    /**
      * Create records by data set.
      *
      * @param mixed $dataset The data set contains data we want to store.
