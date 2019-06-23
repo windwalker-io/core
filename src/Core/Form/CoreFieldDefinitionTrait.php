@@ -95,7 +95,7 @@ trait CoreFieldDefinitionTrait
      *
      * @return  void
      */
-    abstract public function doDefine(Form $form);
+    abstract protected function doDefine(Form $form);
 
     /**
      * __call

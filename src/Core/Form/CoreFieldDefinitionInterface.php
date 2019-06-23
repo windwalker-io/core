@@ -41,17 +41,6 @@ interface CoreFieldDefinitionInterface extends FieldDefinitionInterface
     public const TINYINT_UNSIGNED_MAX = 255;
 
     /**
-     * doDefine
-     *
-     * @param Form $form
-     *
-     * @return  void
-     *
-     * @since  __DEPLOY_VERSION__
-     */
-    public function doDefine(Form $form);
-
-    /**
      * add
      *
      * @param string                     $name
