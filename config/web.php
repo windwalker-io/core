@@ -42,8 +42,8 @@ return Arr::mergeRecursive(
         ],
 
         'middlewares' => [
-            900  => \Windwalker\Core\Application\Middleware\SessionRaiseMiddleware::class,
-            800  => \Windwalker\Core\Application\Middleware\RoutingMiddleware::class,
+            800  => \Windwalker\Core\Application\Middleware\SessionRaiseMiddleware::class,
+            900  => \Windwalker\Core\Application\Middleware\RoutingMiddleware::class,
         ],
 
         'configs' => [

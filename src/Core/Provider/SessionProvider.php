@@ -40,7 +40,6 @@ class SessionProvider implements ServiceProviderInterface
      */
     public function register(Container $container)
     {
-
         $container->share(HandlerInterface::class, [$this, 'handler']);
         $container->share(AbstractDatabaseAdapter::class, [$this, 'dbAdapter']);
 
@@ -48,7 +47,7 @@ class SessionProvider implements ServiceProviderInterface
         $container->bind(FlashBagInterface::class, FlashBag::class);
         $container->bind(SessionBridgeInterface::class, NativeBridge::class);
 
-        $closure = function (Container $container) {
+        $closure = static function (Container $container) {
             /** @var \Windwalker\Structure\Structure $config */
             $config = $container->get('config');
 

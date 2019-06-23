@@ -11,6 +11,7 @@ namespace Windwalker\Core\Application\Middleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Windwalker\Middleware\MiddlewareInterface;
+use Windwalker\Session\Session;
 
 /**
  * The SessionRaiseMiddleware class.
@@ -30,7 +31,7 @@ class SessionRaiseMiddleware extends AbstractWebMiddleware
      */
     public function __invoke(Request $request, Response $response, $next = null)
     {
-        $session = $this->app->container->get('session');
+        $session = $this->app->container->get(Session::class);
 
         $session->start();
 
