@@ -87,7 +87,7 @@ interface DatabaseRepositoryInterface
      *
      * @return  Record
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.7
      */
     public function registerRecordEvents(Record $record): Record;
 }

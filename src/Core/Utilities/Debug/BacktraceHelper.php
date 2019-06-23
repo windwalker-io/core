@@ -113,7 +113,7 @@ class BacktraceHelper
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.7
      */
     public static function traceAsString(int $i, array $trace, bool $replaceRoot = true): string
     {

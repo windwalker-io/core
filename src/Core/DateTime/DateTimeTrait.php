@@ -332,7 +332,7 @@ show($from, self::getServerDefaultTimezone());
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.7
      */
     public static function getServerDefaultTimezone(): string
     {

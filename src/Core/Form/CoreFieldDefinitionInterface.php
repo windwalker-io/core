@@ -17,7 +17,7 @@ use Windwalker\Form\Field;
 /**
  * The CoreFieldDefinitionInterface class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.7
  */
 interface CoreFieldDefinitionInterface extends FieldDefinitionInterface
 {
