@@ -145,15 +145,20 @@ abstract class AbstractView implements \ArrayAccess
      */
     public function handleData()
     {
+        $dispatcher = $this->getPackage()->getDispatcher();
+
         $data = $this->getData();
+
+        $dispatcher->triggerEvent('onViewBeforeHandleData', [
+            'data' => &$data,
+            'view' => $this
+        ]);
 
         $this->prepareRender($data);
 
         $this->prepareData($data);
 
         $this->prepareGlobals($data);
-
-        $dispatcher = $this->getPackage()->getDispatcher();
 
         $dispatcher->triggerEvent('onViewAfterHandleData', [
             'data' => &$data,
