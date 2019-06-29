@@ -148,7 +148,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
                 ));
             }
 
-            call_user_func($extra['hook']['build'], $this, $route, $queries, $type);
+            $extra['hook']['build']($this, $route, $queries, $type);
         }
 
         $this->triggerEvent('onRouterBeforeRouteBuild', [
@@ -245,8 +245,6 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             $extra['controller'] = $this->controller = $controller;
         }
 
-        $route->setExtraValues($extra);
-
         // Hooks
         if (isset($extra['hook']['match'])) {
             if (!is_callable($extra['hook']['match'])) {
@@ -257,8 +255,14 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
                 ));
             }
 
-            call_user_func($extra['hook']['match'], $this, $route, $method, $options);
+            $result = $extra['hook']['match']($this, $route, $method, $options);
+
+            if ($result) {
+                $route = $result;
+            }
         }
+
+        $route->setExtraValues($extra);
 
         $this->matched = $route;
 
@@ -277,6 +281,10 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     {
         if (strpos($uri, 'http') !== 0 && strpos($uri, '/') !== 0) {
             $uri = $this->uri->$path . $uri;
+        } elseif (strpos($uri, '/') === 0 && strpos($uri, '//') !== 0) {
+            if ($path === 'root') {
+                $uri = $this->uri->host . $uri;
+            }
         }
 
         return $uri;
