@@ -8,7 +8,10 @@
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Router\CoreRouter;
+use Windwalker\Core\Router\RouteBuilderInterface;
 use Windwalker\DI\RawWrapper;
 use function Windwalker\raw;
 use Windwalker\Utilities\Arr;
@@ -282,5 +285,25 @@ JS
         }
 
         return static::$instance;
+    }
+
+    /**
+     * getRouter
+     *
+     * @param string|AbstractPackage|null $package
+     *
+     * @return  RouteBuilderInterface
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected static function getRouter($package = null): RouteBuilderInterface
+    {
+        $package = PackageHelper::getPackage($package);
+
+        if ($package) {
+            return $package->router;
+        }
+
+        return CoreRouter::getInstance();
     }
 }
