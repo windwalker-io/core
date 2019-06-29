@@ -557,6 +557,32 @@ show($from, self::getServerDefaultTimezone());
     }
 
     /**
+     * isNullDate
+     *
+     * @param string $dateString
+     * @param bool   $includeEmpty
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function isNullDate(string $dateString, $includeEmpty = false): bool
+    {
+        $nullDates = [
+            static::getNullDate(),
+            '0000-00-00 00:00:00'
+        ];
+
+        if ($includeEmpty) {
+            $nullDates = array_merge($nullDates, [
+                ''
+            ]);
+        }
+
+        return in_array((string) $dateString, $nullDates, true);
+    }
+
+    /**
      * getTimezoneObject
      *
      * @param mixed $tz
