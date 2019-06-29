@@ -109,12 +109,35 @@ trait StaticRuntimeCacheTrait
      *
      * @param string   $id
      * @param callable $closure
+     * @param bool     $refresh
      *
      * @return  mixed
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected static function fetch($id, $closure)
+    protected static function fetch($id, $closure, $refresh = false)
     {
-        return static::getCacheInstance()->call(static::getCacheId($id), $closure);
+        return self::once($id, $closure, $refresh);
+    }
+
+    /**
+     * fetch
+     *
+     * @param string   $id
+     * @param callable $closure
+     * @param bool     $refresh
+     *
+     * @return  mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected static function once($id, $closure, $refresh = false)
+    {
+        $key = static::getCacheId($id);
+        $cache = static::getCacheInstance();
+
+        if ($refresh) {
+            $cache->remove($key);
+        }
+
+        return $cache->call($key, $closure);
     }
 }
