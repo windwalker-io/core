@@ -137,7 +137,7 @@ class RouteString implements StringableInterface
      *
      * @param int $id
      *
-     * @return  RouteString
+     * @return  static
      */
     public function id($id)
     {
@@ -149,7 +149,7 @@ class RouteString implements StringableInterface
      *
      * @param string $alias
      *
-     * @return  RouteString
+     * @return  static
      */
     public function alias($alias)
     {
@@ -161,11 +161,39 @@ class RouteString implements StringableInterface
      *
      * @param int $page
      *
-     * @return  RouteString
+     * @return  static
      */
     public function page($page)
     {
         return $this->addVar('page', $page);
+    }
+
+    /**
+     * layout
+     *
+     * @param string $layout
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function layout($layout)
+    {
+        return $this->addVar('page', $layout);
+    }
+
+    /**
+     * task
+     *
+     * @param string $task
+     *
+     * @return  RouteString
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function task($task)
+    {
+        return $this->addVar('task', $task);
     }
 
     /**
