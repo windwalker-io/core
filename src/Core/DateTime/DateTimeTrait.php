@@ -564,7 +564,7 @@ show($from, self::getServerDefaultTimezone());
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.8
      */
     public static function isNullDate(string $dateString, $includeEmpty = false): bool
     {

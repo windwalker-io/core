@@ -175,7 +175,7 @@ class RouteString implements StringableInterface
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.8
      */
     public function layout($layout)
     {
@@ -189,7 +189,7 @@ class RouteString implements StringableInterface
      *
      * @return  RouteString
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.8
      */
     public function task($task)
     {

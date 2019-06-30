@@ -294,7 +294,7 @@ JS
      *
      * @return  RouteBuilderInterface
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.8
      */
     protected static function getRouter($package = null): RouteBuilderInterface
     {
