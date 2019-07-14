@@ -293,14 +293,21 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
             if ($input !== null) {
                 $process->setInput($input);
             }
+            
+            $path = WINDWALKER_ROOT . '/vendor/bin:'
+                . WINDWALKER_ROOT . '/bin:'
+                . env('PATH');
 
-            return $process->run(function ($type, $buffer) {
-                if (Process::ERR === $type) {
-                    $this->io->err($buffer, false);
-                } else {
-                    $this->io->out($buffer, false);
-                }
-            });
+            return $process->run(
+                function ($type, $buffer) {
+                    if (Process::ERR === $type) {
+                        $this->io->err($buffer, false);
+                    } else {
+                        $this->io->out($buffer, false);
+                    }
+                },
+                ['PATH' => $path]
+            );
         }
 
         system($script, $return);
