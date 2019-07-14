@@ -288,7 +288,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         $this->addMessage('>>> ' . $script, 'info');
 
         if (class_exists(Process::class)) {
-            $process = new Process([$script]);
+            $process = Process::fromShellCommandline($script);
 
             if ($input !== null) {
                 $process->setInput($input);
