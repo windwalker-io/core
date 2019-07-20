@@ -17,7 +17,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
 /**
  * The SefWebMiddleware class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.8.13
  */
 class SefWebMiddleware extends AbstractWebMiddleware
 {
@@ -68,7 +68,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     protected function replaceRoutes(string $buffer): string
     {
@@ -170,7 +170,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.8.13
      */
     private function checkBuffer(string $buffer): void
     {
