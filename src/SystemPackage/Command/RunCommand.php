@@ -8,7 +8,6 @@
 
 namespace Windwalker\SystemPackage\Command;
 
-use Symfony\Component\Process\Process;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Utilities\Arr;
@@ -108,29 +107,26 @@ class RunCommand extends CoreCommand
     /**
      * executeScriptProfile
      *
-     * @param   array $scripts
+     * @param array $scripts
      *
      * @return  void
      * @throws \RuntimeException
      */
     protected function executeScriptProfile($scripts)
     {
-        if (array_column($scripts, 'in')) {
-            $msg = "We noticed you entered input data for auto answer the prompt. \nPlease install symfony/process ~3.0 to support auto answer by custom input.";
-
-            $this->out('<fg=black;bg=yellow>' . $msg . '</fg=black;bg=yellow>');
-        }
-
         foreach ($scripts as $script) {
             if (!is_array($script)) {
-                $script = ['cmd' => $script, 'in' => null];
+                $script = ['cmd' => $script, 'in' => null, 'ignore_error' => false];
             }
 
             $command = Arr::get($script, 'cmd');
             $input   = Arr::get($script, 'in');
+            $ignore  = Arr::get($script, 'ignore_error');
 
-            if ($this->executeScript($command, $input) === 64) {
-                throw new \RuntimeException('Previous command return code 64, script stopped...');
+            $code = $this->executeScript($command, $input);
+
+            if (!$ignore && $code !== 0) {
+                throw new \UnexpectedValueException('Script Stop with exit code: ' . $code);
             }
         }
     }
@@ -138,8 +134,8 @@ class RunCommand extends CoreCommand
     /**
      * executeScript
      *
-     * @param   string $script
-     * @param   string $input
+     * @param string $script
+     * @param string $input
      *
      * @return int
      */
@@ -151,7 +147,7 @@ class RunCommand extends CoreCommand
     /**
      * listScripts
      *
-     * @param   array $scripts
+     * @param array $scripts
      *
      * @return  void
      */
