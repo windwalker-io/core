@@ -8,6 +8,9 @@
 
 namespace Windwalker\Core\Mailer;
 
+use Windwalker\Core\Config\Config;
+use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
+use Windwalker\Core\Mailer\Adapter\SwiftMailerAdapter;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
@@ -27,6 +30,12 @@ class MailerProvider implements ServiceProviderInterface
      */
     public function register(Container $container)
     {
+        $container->share(MailerAdapterInterface::class, static function (Container $container) {
+            $config = $container->get(Config::class);
+
+            return $container->createSharedObject($config->get('mail.adapter', SwiftMailerAdapter::class));
+        });
+
         $container->prepareSharedObject(MailerManager::class);
     }
 }

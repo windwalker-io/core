@@ -86,6 +86,7 @@ class MailTestCommand extends CoreCommand
 
                 $message->subject($title)
                     ->to($to)
+                    ->replyTo($to)
                     ->body($body);
             }, ['force' => true]);
         } catch (\Exception $e) {

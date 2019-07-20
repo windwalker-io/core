@@ -33,7 +33,7 @@ class SwiftMailerProvider implements ServiceProviderInterface
         $container->share(\Swift_Mailer::class, [$this, 'swiftmailer'])
             ->alias('swiftmailer', \Swift_Mailer::class);
 
-        $container->bindShared(MailerAdapterInterface::class, SwiftMailerAdapter::class)
+        $container->prepareSharedObject(SwiftMailerAdapter::class)
             ->alias('mailer.adapter.swiftmailer', SwiftMailerAdapter::class);
     }
 
