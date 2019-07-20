@@ -190,6 +190,10 @@ class WorkerCommand extends CoreCommand
                 /** @var Worker $worker */
                 $worker = $event['worker'];
 
+                if ($this->console->database->isConnected() && !$this->console->database->ping()) {
+                    $this->console->database->disconnect();
+                }
+
                 switch ($worker->getState()) {
                     case $worker::STATE_ACTIVE:
                         if ($this->console->isOffline()) {

@@ -359,7 +359,12 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
 
         if (!$handler) {
             $handlers = [];
-            $handlerProfiles = (array) $config->get('handlers', [StreamHandler::class]);
+            $handlerProfiles = (array) $config->get(
+                'handlers',
+                [
+                    $this->config->get('logs.handlers.default', StreamHandler::class)
+                ]
+            );
 
             foreach ($handlerProfiles as $class) {
                 $args = [];

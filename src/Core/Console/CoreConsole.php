@@ -9,6 +9,9 @@
 namespace Windwalker\Core\Console;
 
 use Symfony\Component\Process\Process;
+use Whoops\Exception\Frame;
+use Whoops\Exception\Inspector;
+use Whoops\Handler\CallbackHandler;
 use Windwalker\Console\Command\RootCommand;
 use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOFactory;
@@ -318,39 +321,61 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     /**
      * handleException
      *
-     * @param \Throwable $e
+     * @param \Throwable $exception
      *
      * @return  void
      *
      * @since  3.5.2
      * @throws \Exception
      */
-    public function handleException(\Throwable $e): void
+    public function handleException(\Throwable $exception): void
     {
         if (!$this->get('error.log', false)) {
             return;
         }
 
         // Do not log 4xx errors
-        $code = $e->getCode();
+        $code = $exception->getCode();
 
         if ($code < 400 || $code >= 500) {
-            $message = sprintf(
-                'Code: %s - %s - File: %s (%d)',
-                $e->getCode(),
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            );
+            $verbose = $this->get('verbose', 0);
 
-            $traces = '';
+            if (!$verbose) {
+                $this->out()->err($exception->getMessage());
 
-            foreach (BacktraceHelper::normalizeBacktraces($e->getTrace()) as $i => $trace) {
-                $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
+                return;
             }
 
-            $this->logger->createRotatingLogger('console-error', Core\Logger\Logger::DEBUG)
-                ->error($message . "\n" . $traces, ['exception' => $e]);
+            $handler = new CallbackHandler(function (\Throwable $e, Inspector $inspector) {
+                /** @var $exception \Exception */
+                $class = $inspector->getExceptionName();
+
+                $trace = [];
+
+                /** @var Frame $frame */
+                foreach ($inspector->getFrames() as $i => $frame) {
+                    $trace[] = BacktraceHelper::traceAsString($i + 1, $frame->getRawFrame(), false);
+                }
+
+                $trace = implode("\n", $trace);
+
+                // @codingStandardsIgnoreStart
+                $output = <<<EOF
+<error>Exception '{$class}' with message:</error> <fg=cyan;options=bold>{$inspector->getExceptionMessage()}</fg=cyan;options=bold>
+<info>in {$inspector->getException()->getFile()}:{$inspector->getException()->getLine()}</info>
+
+<error>Stack trace:</error>
+{$trace}
+EOF;
+                // @codingStandardsIgnoreEnd
+
+                $this->out('');
+                $this->err($output);
+            });
+
+            $handler->setException($exception);
+            $handler->setInspector(new Inspector($exception));
+            $handler->handle();
         }
     }
 
