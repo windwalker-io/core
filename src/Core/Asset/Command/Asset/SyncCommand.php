@@ -110,7 +110,11 @@ class SyncCommand extends Command
 
             $this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
 
-            File::delete($target);
+            if (PlatformHelper::isWindows()) {
+                rmdir($target);
+            } else {
+                File::delete($target);
+            }
         }
 
         if ($hard) {

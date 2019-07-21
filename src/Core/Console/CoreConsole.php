@@ -26,6 +26,7 @@ use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Debugger\Helper\ComposerInformation;
 use Windwalker\DI\Container;
 use Windwalker\Environment\Environment;
+use Windwalker\Environment\PlatformHelper;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherInterface;
 use Windwalker\Event\EventInterface;
@@ -99,6 +100,13 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      * @var  string
      */
     protected $mode;
+
+    /**
+     * Property autoExit.
+     *
+     * @var  bool
+     */
+    protected $autoExit = true;
 
     /**
      * Class init.
@@ -296,10 +304,17 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
             if ($input !== null) {
                 $process->setInput($input);
             }
-            
-            $path = WINDWALKER_ROOT . '/vendor/bin:'
-                . WINDWALKER_ROOT . '/bin:'
-                . env('PATH');
+
+            $pathName = PlatformHelper::isWindows() ? 'Path' : 'PATH';
+
+            $path = implode(
+                PlatformHelper::isWindows() ? ';' : ':',
+                [
+                    WINDWALKER_ROOT . '/vendor/bin',
+                    WINDWALKER_ROOT . '/bin',
+                    env($pathName)
+                ]
+            );
 
             return $process->run(
                 function ($type, $buffer) {
@@ -309,7 +324,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
                         $this->io->out($buffer, false);
                     }
                 },
-                ['PATH' => $path]
+                [$pathName => $path]
             );
         }
 

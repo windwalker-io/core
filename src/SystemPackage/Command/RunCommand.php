@@ -126,7 +126,7 @@ class RunCommand extends CoreCommand
             $code = $this->executeScript($command, $input);
 
             if (!$ignore && $code !== 0) {
-                throw new \UnexpectedValueException('Script Stop with exit code: ' . $code);
+                throw new \UnexpectedValueException('Script Stop with exit code: ' . $code, $code);
             }
         }
     }
