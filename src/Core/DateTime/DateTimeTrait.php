@@ -188,7 +188,7 @@ trait DateTimeTrait
     public static function toServerTime($date, $format = null, $from = null)
     {
         $from = $from ?: Ioc::getConfig()->get('system.timezone');
-show($from, self::getServerDefaultTimezone());
+
         return static::convert($date, $from, self::getServerDefaultTimezone(), $format);
     }
 
