@@ -61,9 +61,9 @@ class DropAllCommand extends CoreCommand
     protected function doExecute()
     {
         if ($this->console->getMode() !== 'dev') {
-            throw new \RuntimeException(
+            $this->console->out(
                 '<error>STOP!</error> please run: <info>' . $this->getEnvCmd() . '</info>.'
-            );
+            )->close();
         }
 
         if (!(new BooleanPrompter())

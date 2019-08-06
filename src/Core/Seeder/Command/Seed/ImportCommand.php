@@ -70,13 +70,13 @@ class ImportCommand extends CoreCommand
     protected function doExecute()
     {
         if ($this->console->getMode() !== 'dev') {
-            throw new \RuntimeException(
+            $this->console->out(
                 '<error>STOP!</error> please run: <info>' . $this->getEnvCmd() . '</info>.'
-            );
+            )->close();
         }
 
+        // backup
         if (!$this->getOption('no-backup')) {
-            // backup
             BackupRepository::getInstance()->setCommand($this)->backup();
         }
 
