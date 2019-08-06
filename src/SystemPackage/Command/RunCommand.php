@@ -53,6 +53,11 @@ class RunCommand extends CoreCommand
             ->alias('list')
             ->description('List available scripts.')
             ->defaultValue(false);
+
+        $this->addOption('e')
+            ->alias('ignore-error')
+            ->description('Ignore error script and still run next.')
+            ->defaultValue(false);
     }
 
     /**
@@ -68,15 +73,17 @@ class RunCommand extends CoreCommand
 
         $resolver = ConsoleHelper::getAllPackagesResolver();
 
-        $scripts = (array) $this->console->get('console.scripts');
+        $scripts[] = (array) $this->console->get('console.scripts');
 
         foreach ((array) ConsoleHelper::loadPackages() as $name => $package) {
             if (!$package = $resolver->getPackage($name)) {
                 continue;
             }
 
-            $scripts = array_merge($scripts, (array) $package->get('console.scripts'));
+            $scripts[] = (array) $package->get('console.scripts');
         }
+
+        $scripts = array_merge(...$scripts);
 
         if ($this->getOption('l')) {
             $this->listScripts($scripts);
@@ -121,7 +128,7 @@ class RunCommand extends CoreCommand
 
             $command = Arr::get($script, 'cmd');
             $input   = Arr::get($script, 'in');
-            $ignore  = Arr::get($script, 'ignore_error');
+            $ignore  = $this->getOption('e', Arr::get($script, 'ignore_error'));
 
             $code = $this->executeScript($command, $input);
 
