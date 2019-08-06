@@ -15,7 +15,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * @see    WidgetManager
  *
- * @method  static string  render($layout, $data = [], $engine = WidgetManager::ENGINE_PHP, $package = null)
+ * @method  static string  render($layout, $data = [], $engine = WidgetManager::PHP, $package = null)
  * @method  static Widget  createWidget($layout, $engine = null, $package = null)
  *
  * @since  3.0

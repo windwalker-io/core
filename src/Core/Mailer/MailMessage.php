@@ -9,8 +9,11 @@
 namespace Windwalker\Core\Mailer;
 
 use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageHelper;
+use Windwalker\Core\Widget\Widget;
 use Windwalker\Core\Widget\WidgetHelper;
 use Windwalker\Renderer\RendererInterface;
+use Windwalker\Utilities\Queue\PriorityQueue;
 
 /**
  * The MailMessage class.
@@ -109,7 +112,7 @@ class MailMessage
     /**
      * subject
      *
-     * @param   string $subject
+     * @param string $subject
      *
      * @return  static
      */
@@ -217,7 +220,7 @@ class MailMessage
     /**
      * html
      *
-     * @param   bool $bool
+     * @param bool $bool
      *
      * @return  static
      */
@@ -231,9 +234,9 @@ class MailMessage
     /**
      * from
      *
-     * @param string $file
-     * @param string $name
-     * @param string $type
+     * @param string|MailAttachment $file
+     * @param string                $name
+     * @param string                $type
      *
      * @return static
      */
@@ -270,12 +273,48 @@ class MailMessage
      */
     public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
     {
-        $widget = WidgetHelper::createWidget($layout, $engine, $package);
-        $widget->setPathPrefix($prefix)->registerPaths(true);
-
-        $this->body($widget->render($data), true);
+        $this->body(
+            $this->getBodyRenderer($layout, $engine, $package, $prefix)
+                ->render($data),
+            true
+        );
 
         return $this;
+    }
+
+    /**
+     * getBodyRenderer
+     *
+     * @param string                 $layout
+     * @param string                 $engine
+     * @param string|AbstractPackage $package
+     * @param string|null            $prefix
+     *
+     * @return  Widget
+     *
+     * @throws \ReflectionException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getBodyRenderer(string $layout, $engine = null, $package = null, ?string $prefix = 'mail'): Widget
+    {
+        $bcPath = null;
+
+        if ($prefix !== 'mail') {
+            $package = PackageHelper::getPackage($package);
+
+            $bcPath = $package->getDir() . '/Templates/mail';
+        }
+
+        $widget = WidgetHelper::createWidget($layout, $engine, $package);
+        $widget->setPathPrefix($prefix)
+            ->registerPaths(true);
+
+        if ($bcPath) {
+            $widget->addPath($bcPath, PriorityQueue::BELOW_NORMAL);
+        }
+
+        return $widget;
     }
 
     /**
