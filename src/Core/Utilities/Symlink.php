@@ -34,9 +34,13 @@ class Symlink
         $dest = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $dest);
 
         if ($windows) {
-            return exec("mklink /D {$dest} {$src}");
-        } else {
-            return exec("ln -s {$src} {$dest}");
+            if (is_file($src)) {
+                return exec("mklink /D {$dest} {$src}");
+            }
+
+            return exec("mklink /j {$dest} {$src}");
         }
+
+        return exec("ln -s {$src} {$dest}");
     }
 }
