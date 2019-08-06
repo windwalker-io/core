@@ -118,7 +118,7 @@ class ProfilerProvider implements ServiceProviderInterface
         $db->setMonitor($monitor = new CompositeMonitor());
 
         $monitor->addMonitor(new CallbackMonitor(
-            function ($sql) use ($db, $collector, &$queryData, &$isExplain) {
+            static function ($sql) use ($db, $collector, &$queryData, &$isExplain) {
                 if (stripos(trim($sql), 'EXPLAIN') === 0) {
                     $isExplain = true;
 
@@ -136,10 +136,10 @@ class ProfilerProvider implements ServiceProviderInterface
                 $query = $db->getQuery();
 
                 $queryData['bounded'] = $query instanceof PreparableInterface
-                    ? (new \ArrayObject($query->getBounded()))->getArrayCopy()
+                    ? json_decode(json_encode($query->getBounded()), true)
                     : [];
             },
-            function () use ($db, $collector, &$queryData, &$isExplain) {
+            static function () use ($db, $collector, &$queryData, &$isExplain) {
                 if ($isExplain) {
                     $isExplain = false;
 
