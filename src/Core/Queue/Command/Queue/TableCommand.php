@@ -54,6 +54,8 @@ class TableCommand extends CoreCommand
      * doExecute
      *
      * @return  bool
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
     protected function doExecute()
     {

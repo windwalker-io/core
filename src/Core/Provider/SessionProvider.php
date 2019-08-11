@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Console\Console;
+use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -99,6 +100,6 @@ class SessionProvider implements ServiceProviderInterface
         $config  = $container->get('config');
         $options = $config->get('session', []);
 
-        return new WindwalkerAdapter($container->get('database'), Arr::get($options, 'database', []));
+        return new WindwalkerAdapter($container->get(DatabaseAdapter::class), Arr::get($options, 'database', []));
     }
 }
