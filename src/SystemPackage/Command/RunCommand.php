@@ -56,8 +56,7 @@ class RunCommand extends CoreCommand
 
         $this->addOption('e')
             ->alias('ignore-error')
-            ->description('Ignore error script and still run next.')
-            ->defaultValue(false);
+            ->description('Ignore error script and still run next.');
     }
 
     /**
