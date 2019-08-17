@@ -6,6 +6,7 @@
  * @license    GNU General Public License version 2 or later;
  */
 
+use Windwalker\Debugger\Helper\TimelineHelper;
 use Windwalker\Debugger\Html\BootstrapKeyValueGrid;
 use Windwalker\Dom\HtmlElement;
 use Windwalker\Profiler\Profiler;
@@ -55,6 +56,20 @@ echo BootstrapKeyValueGrid::create()
 
     <div id="queries" style="position: relative; top: -50px;"></div>
     <h2>Queries</h2>
+
+    <p>
+       <span>Queries: <span class="badge badge-info"><?php echo $queryTimes; ?></span>
+       <span></span>
+           Query Time: <span class="badge badge-<?php echo TimelineHelper::getStateColor($queryTotalTime, 15 * $queryTimes) ?>">
+               <?php echo round($queryTotalTime, 2); ?>ms
+           </span>
+       </span>
+       <span>
+           Memory: <span class="badge badge-<?php echo TimelineHelper::getStateColor($queryTotalMemory, 0.01 * $queryTimes) ?>">
+               <?php echo round($queryTotalMemory, 3); ?>MB
+           </span>
+       </span>
+    </p>
 
 <?php foreach ((array) $queryProcess as $name => $timeline) : ?>
     <br/>

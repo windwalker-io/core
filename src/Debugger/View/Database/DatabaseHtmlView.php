@@ -38,6 +38,9 @@ class DatabaseHtmlView extends AbstractDebuggerHtmlView
         $queries = $data->collector['database.queries'];
 
         $data->queryProcess = TimelineHelper::prepareQueryTimeline($queries);
+        $data->queryTimes       = $collector['database.query.times'] ?: 0;
+        $data->queryTotalTime   = $collector['database.query.total.time'] * 1000;
+        $data->queryTotalMemory = $collector['database.query.total.memory'] / 1048576;
     }
 
     /**
