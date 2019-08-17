@@ -15,6 +15,7 @@ use Windwalker\Database\Middleware\DbProfilerMiddleware;
 use Windwalker\Database\Monitor\CallbackMonitor;
 use Windwalker\Database\Monitor\CompositeMonitor;
 use Windwalker\Database\Monitor\DebugMonitor;
+use Windwalker\Database\Query\QueryHelper;
 use Windwalker\Debugger\Listener\ProfilerListener;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -22,6 +23,7 @@ use Windwalker\Event\ListenerPriority;
 use Windwalker\Profiler\NullProfiler;
 use Windwalker\Profiler\Point\Point;
 use Windwalker\Profiler\Profiler;
+use Windwalker\Query\Query;
 use Windwalker\Query\Query\PreparableInterface;
 use Windwalker\Structure\Structure;
 
@@ -72,9 +74,9 @@ class ProfilerProvider implements ServiceProviderInterface
 
             if ($config->get('system.debug')) {
                 return new Structure();
-            } else {
-                return new NullObject();
             }
+
+            return new NullObject();
         };
 
         $container->share('debugger.collector', $closure);
@@ -150,10 +152,16 @@ class ProfilerProvider implements ServiceProviderInterface
                 $queryData['time']['duration']   = abs($queryData['time']['end'] - $queryData['time']['start']);
                 $queryData['memory']['end']      = memory_get_usage(false);
                 $queryData['memory']['duration'] = abs($queryData['memory']['end'] - $queryData['memory']['start']);
-                $queryData['query']              = $db->getLastQuery();
                 $queryData['rows']               = $db->getReader()->countAffected();
                 $queryData['backtrace']          = BacktraceHelper::normalizeBacktraces(
                     array_slice(debug_backtrace(), 6)
+                );
+
+                $queryData['raw_query'] = (string) $db->getLastQuery();
+                $queryData['query'] = QueryHelper::replaceQueryParams(
+                    $db,
+                    $queryData['raw_query'],
+                    $queryData['bounded']
                 );
 
                 $collector->push('database.queries', $queryData);

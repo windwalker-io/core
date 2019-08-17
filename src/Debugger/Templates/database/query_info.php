@@ -59,6 +59,14 @@ $editor = $package->get('editor');
                 Return Rows: <span class="badge badge-info"><?php echo $timeline['data']['rows'] ?></span>
             </div>
             <div class="ml-auto">
+                <?php if (!empty($timeline['data']['bounded'])) : ?>
+                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                        data-target="#raw-query-modal-<?php echo $timeline['data']['serial']; ?>">
+                        <span class="fa fa-database"></span>
+                        Raw Query
+                    </button>
+                <?php endif; ?>
+
                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                     data-target="#backtrace-modal-<?php echo $timeline['data']['serial']; ?>">
                     <span class="fa fa-list"></span>
@@ -179,4 +187,27 @@ $editor = $package->get('editor');
         </div>
     <?php endif; ?>
     <!-- Backtrace -->
+
+    <?php if (!empty($timeline['data']['bounded']) && !empty($timeline['data']['raw_query'])): ?>
+        <div class="modal fade" id="raw-query-modal-<?php echo $timeline['data']['serial']; ?>"
+            tabindex="-1" role="dialog"
+            aria-labelledby="raw-query-modal-label-<?php echo $timeline['data']['serial']; ?>"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="raw-query-modal-label">
+                            Raw Query <?php echo $timeline['data']['serial']; ?>
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <pre class="bg-light p-4"><?php echo $view->highlightQuery($timeline['data']['raw_query']); ?></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
