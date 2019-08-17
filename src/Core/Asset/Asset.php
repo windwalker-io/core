@@ -17,6 +17,7 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  *
  * phpcs:disable
  *
+ * @method  static AssetManager  getInstance()
  * @method  static AssetManager  addStyle()                addStyle($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  addScript()               addScript($url, array $options = [], array $attribs = [])
  * @method  static AssetManager  internalStyle()           internalStyle($content)
