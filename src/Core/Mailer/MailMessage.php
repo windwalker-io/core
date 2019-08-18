@@ -294,7 +294,7 @@ class MailMessage
      *
      * @throws \ReflectionException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.12
      */
     public function getBodyRenderer(string $layout, $engine = null, $package = null, ?string $prefix = 'mail'): Widget
     {
