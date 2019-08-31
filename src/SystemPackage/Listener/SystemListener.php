@@ -54,9 +54,9 @@ class SystemListener
         /** @var WebApplication $app */
         $app = $event['app'];
 
-        if ($app->get('system.offline', false) && !$app->get('system.debug')) {
+        if ($app->isOffline() && !$app->get('system.debug')) {
             $app->server->setHandler(
-                function (RequestInterface $request, ResponseInterface $response, callable $next = null) {
+                static function (RequestInterface $request, ResponseInterface $response, callable $next = null) {
                     $view = new HtmlView();
                     $view->setLayout('windwalker.offline.offline');
 
