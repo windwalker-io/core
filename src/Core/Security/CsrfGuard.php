@@ -115,6 +115,7 @@ class CsrfGuard
         $attribs['type']  = 'hidden';
         $attribs['name']  = $this->getFormToken($userId);
         $attribs['value'] = 1;
+        $attribs['class'] = $attribs['class'] ?? 'anticsrf';
 
         return h('input', $attribs, null);
     }
