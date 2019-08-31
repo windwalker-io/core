@@ -205,6 +205,7 @@ class AbstractPackage implements DispatcherAwareInterface,
      * @return Response
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     * @throws \Throwable
      */
     public function execute($controller, Request $request, Response $response, $hmvc = false)
     {
@@ -216,6 +217,10 @@ class AbstractPackage implements DispatcherAwareInterface,
             'controller' => &$controller,
             'task' => $controller,
         ]);
+
+        if ($hmvc) {
+            return $this->dispatch($request, $response);
+        }
 
         $chain = $this->getMiddlewareChain()->setEndMiddleware([$this, 'dispatch']);
 
