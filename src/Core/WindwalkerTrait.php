@@ -355,6 +355,6 @@ trait WindwalkerTrait
     {
         $file = $this->get('path.temp', $this->rootPath . '/tmp') . '/offline';
 
-        return is_file($file);
+        return is_file($file) ?: (bool) $this->get('system.offline');
     }
 }

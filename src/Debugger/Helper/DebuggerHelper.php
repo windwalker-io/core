@@ -151,4 +151,64 @@ abstract class DebuggerHelper extends AbstractFacade
 
         $package->disableConsole();
     }
+
+    /**
+     * getAllowIps
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function getAllowIps(): array
+    {
+        $config = Ioc::getConfig()->extract('dev');
+
+        $allowIps = array_merge(
+            ['127.0.0.1', 'fe80::1', '::1'],
+            array_map('trim', explode(',', (string) $config['allow_ips']))
+        );
+
+        return $allowIps;
+    }
+
+    /**
+     * getCurrentIp
+     *
+     * @see https://www.opencli.com/php/php-get-real-ip
+     *
+     * @return  string
+     *
+     * @TODO: Use ServerHelper::getCurrentIp() if available.
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function getCurrentIp(): string
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return (string) $ip;
+    }
+
+    /**
+     * ipIsAllow
+     *
+     * @param string|null $ip
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function ipIsAllow(?string $ip = null): bool
+    {
+        $ip = $ip ?? static::getCurrentIp();
+        $allowIps = static::getAllowIps();
+
+        return in_array($ip, $allowIps, true);
+    }
 }

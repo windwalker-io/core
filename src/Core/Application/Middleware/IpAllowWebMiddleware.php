@@ -62,14 +62,7 @@ class IpAllowWebMiddleware extends AbstractWebMiddleware
     public function __invoke(Request $request, Response $response, $next = null)
     {
         if ($this->getOption('enabled', true)) {
-            // @see https://www.opencli.com/php/php-get-real-ip
-            if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-                $ip = $_SERVER['HTTP_CLIENT_IP'];
-            } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            } else {
-                $ip = $_SERVER['REMOTE_ADDR'];
-            }
+            $ip = DebuggerHelper::getCurrentIp();
 
             $ips = arr($this->ips)
                 ->map('trim')
