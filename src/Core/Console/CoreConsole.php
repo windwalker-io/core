@@ -236,6 +236,8 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      */
     protected function prepareExecute()
     {
+        ini_set('max_execution_time', '0');
+
         if (class_exists(ComposerInformation::class)) {
             $this->version = ComposerInformation::getInstalledVersion('windwalker/core');
         }
