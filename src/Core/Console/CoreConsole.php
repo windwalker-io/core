@@ -300,6 +300,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
         if (class_exists(Process::class)) {
             $process = Process::fromShellCommandline($script);
+            $process->setTimeout(0);
 
             if ($input !== null) {
                 $process->setInput($input);
