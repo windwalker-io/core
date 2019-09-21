@@ -17,7 +17,7 @@ use function Windwalker\tap;
 /**
  * The SecurityHeaderMiddleware class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.12
  */
 class SecurityHeaderMiddleware extends AbstractWebMiddleware
 {

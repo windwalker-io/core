@@ -87,7 +87,7 @@ class SystemListener
      *
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.13
      */
     public function onViewBeforeRender(Event $event): void
     {
@@ -111,7 +111,7 @@ class SystemListener
      *
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.13
      */
     protected function offline(WebApplication $app, Structure $options): void
     {
@@ -157,7 +157,7 @@ class SystemListener
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.13
      */
     protected function matchTester(WebApplication $app, Structure $options): bool
     {
