@@ -157,7 +157,7 @@ abstract class DebuggerHelper extends AbstractFacade
      *
      * @return  array
      *
-     * @since  3.5.13
+     * @since  3.5.12.1
      */
     public static function getAllowIps(): array
     {
@@ -180,7 +180,7 @@ abstract class DebuggerHelper extends AbstractFacade
      *
      * @TODO: Use ServerHelper::getCurrentIp() if available.
      *
-     * @since  3.5.13
+     * @since  3.5.12.1
      */
     public static function getCurrentIp(): string
     {
@@ -202,7 +202,7 @@ abstract class DebuggerHelper extends AbstractFacade
      *
      * @return  bool
      *
-     * @since  3.5.13
+     * @since  3.5.12.1
      */
     public static function ipIsAllow(?string $ip = null): bool
     {
