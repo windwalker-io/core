@@ -132,6 +132,10 @@ class DatabaseService
             $this->strictMode($db);
         }
 
+        if ($db instanceof MysqlDriver && $names = $config->get('set_names', 'utf8mb4')) {
+            $db->connect()->getConnection()->exec('SET NAMES ' . $names);
+        }
+
         return $db;
     }
 
