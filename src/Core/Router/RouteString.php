@@ -179,7 +179,7 @@ class RouteString implements StringableInterface
      */
     public function layout($layout)
     {
-        return $this->addVar('page', $layout);
+        return $this->addVar('layout', $layout);
     }
 
     /**
