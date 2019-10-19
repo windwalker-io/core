@@ -286,6 +286,7 @@ class MailMessage
     public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
     {
         $data['asset'] = $this->asset;
+        $data['message'] = $this;
 
         $this->body(
             $this->getBodyRenderer($layout, $engine, $package, $prefix)
