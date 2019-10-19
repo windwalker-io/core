@@ -86,23 +86,25 @@ class CoreLanguage extends Language
     /**
      * load
      *
-     * @param string $file
-     * @param string $format
-     * @param string $package
+     * @param string      $file
+     * @param string      $format
+     * @param string      $package
+     * @param string|null $locale
      *
      * @return static
      * @throws \ReflectionException
+     * @throws \ErrorException
      */
-    public function loadFile($file, $format = 'ini', $package = null)
+    public function loadFile($file, $format = 'ini', $package = null, ?string $locale = null)
     {
         $config = $this->config;
 
         $format = $format ?: $config->get('language.format', 'ini');
 
         $default = $config['language.default'] ?: 'en-GB';
-        $locale  = $config['language.locale'] ?: 'en-GB';
+        $locale  = $locale ?: $config['language.locale'] ?: 'en-GB';
 
-        $ext = $format == 'yaml' ? 'yml' : $format;
+        $ext = $format === 'yaml' ? 'yml' : $format;
 
         $default = LanguageNormalize::toLanguageTag($default);
         $locale  = LanguageNormalize::toLanguageTag($locale);
@@ -148,6 +150,7 @@ class CoreLanguage extends Language
      * @param string $format
      *
      * @return  static
+     * @throws \ErrorException
      */
     protected function loadLanguageFile($file, $format)
     {
