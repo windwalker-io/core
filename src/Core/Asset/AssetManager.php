@@ -1087,4 +1087,21 @@ class AssetManager implements DispatcherAwareInterface
 
         throw new \OutOfRangeException(sprintf('Property %s not exists.', $name));
     }
+
+    /**
+     * reset
+     *
+     * @return  static
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function reset(): self
+    {
+        $this->styles = [];
+        $this->scripts = [];
+        $this->internalStyles = [];
+        $this->internalScripts = [];
+
+        return $this;
+    }
 }
