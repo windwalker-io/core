@@ -54,13 +54,17 @@ trait MigrationCommandTrait
     /**
      * getModel
      *
+     * @param DatabaseAdapter $db
+     *
      * @return  BackupRepository
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getBackupRepository()
+    public function getBackupRepository(DatabaseAdapter $db = null)
     {
-        return BackupRepository::getInstance()->setCommand($this);
+        $db = $db ?: Ioc::getDatabase();
+
+        return BackupRepository::getInstance()->setCommand($this)->setDb($db);
     }
 
     /**

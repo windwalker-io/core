@@ -50,6 +50,20 @@ class DatabaseService
     }
 
     /**
+     * getDefaultConnectionName
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getDefaultConnectionName(): string
+    {
+        $config = $this->config->extract('database');
+
+        return $config->get('default', 'local');
+    }
+
+    /**
      * getDbConfig
      *
      * @param string|null $connection
@@ -64,7 +78,7 @@ class DatabaseService
 
         // Check is new or legacy
         if ($config->get('connections')) {
-            $connection = $connection ?: $config->get('default', 'local');
+            $connection = $connection ?: $this->getDefaultConnectionName();
             $config     = $config->extract('connections.' . $connection);
         }
 
