@@ -2,8 +2,8 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2019 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Database;
@@ -54,7 +54,7 @@ class DatabaseService
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.13
      */
     public function getDefaultConnectionName(): string
     {
