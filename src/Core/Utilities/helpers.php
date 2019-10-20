@@ -208,7 +208,7 @@ namespace Windwalker {
      */
     function arr(
         $data = [],
-        int $flags = ArrayObject::STD_PROP_LIST,
+        int $flags = ArrayObject::ARRAY_AS_PROPS,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
         return new Collection($data, $flags, $iteratorClass);
@@ -227,7 +227,7 @@ namespace Windwalker {
      */
     function collect(
         $data = [],
-        int $flags = ArrayObject::STD_PROP_LIST,
+        int $flags = ArrayObject::ARRAY_AS_PROPS,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
         return arr($data, $flags, $iteratorClass);
