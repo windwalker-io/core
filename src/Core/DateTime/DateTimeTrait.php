@@ -225,8 +225,8 @@ trait DateTimeTrait
      */
     public static function compare($date1, $date2, $operator = null)
     {
-        $date1 = $date1 instanceof \DateTimeInterface ? $date1 : new \DateTime($date1);
-        $date2 = $date2 instanceof \DateTimeInterface ? $date2 : new \DateTime($date2);
+        $date1 = $date1 instanceof \DateTimeInterface ? $date1 : new static($date1, true);
+        $date2 = $date2 instanceof \DateTimeInterface ? $date2 : new static($date2, true);
 
         if ($operator === null) {
             if ($date1 == $date2) {
