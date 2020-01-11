@@ -66,6 +66,8 @@ class StatusCommand extends CoreCommand
     {
         $this->createDatabase();
 
+        $this->prepareLogger();
+
         parent::prepareExecute();
     }
 

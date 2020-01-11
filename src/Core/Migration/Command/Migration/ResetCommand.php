@@ -72,6 +72,8 @@ class ResetCommand extends CoreCommand
     {
         $this->createDatabase();
 
+        $this->prepareLogger();
+
         parent::prepareExecute();
     }
 

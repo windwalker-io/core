@@ -13,6 +13,7 @@ use Windwalker\Core\Database\DatabaseService;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 use Windwalker\Core\Migration\Repository\MigrationsRepository;
+use Windwalker\Database\Monitor\CallbackMonitor;
 use Windwalker\DI\Annotation\Inject;
 use Windwalker\DI\Container;
 use Windwalker\Environment\Environment;
@@ -106,6 +107,25 @@ trait MigrationCommandTrait
         $db->select($name);
 
         $config['name'] = $name;
+    }
+
+    /**
+     * prepareLogger
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareLogger(): void
+    {
+        // DB log
+        $this->console->database->setDebug(true);
+
+        $this->console->database->setMonitor(
+            new CallbackMonitor(function ($query) {
+                $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $query]);
+            })
+        );
     }
 
     /**
