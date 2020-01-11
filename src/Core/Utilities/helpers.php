@@ -108,6 +108,25 @@ namespace {
         }
     }
 
+    if (!function_exists('date_compare_tz')) {
+        /**
+         * date_compare
+         *
+         * @param string|\DateTimeInterface $date1
+         * @param string|\DateTimeInterface $date2
+         * @param string                    $operator
+         *
+         * @return  bool|int
+         *
+         * @since  3.3
+         * @throws Exception
+         */
+        function date_compare_tz($date1, $date2, $operator = null)
+        {
+            return Chronos::compareWithTz($date1, $date2, $operator);
+        }
+    }
+
     if (!function_exists('html_escape')) {
         /**
          * html_escape
