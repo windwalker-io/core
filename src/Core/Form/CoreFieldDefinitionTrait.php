@@ -21,6 +21,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @method  Field\NumberField    number($name = null, $label = null)
  * @method  Field\RangeField     range($name = null, $label = null)
  * @method  Field\DatetimeLocalField  datetimeLocal($name = null, $label = null)
+ * @method  Field\DateField      date($name = null, $label = null)
  * @method  Field\MonthField     month($name = null, $label = null)
  * @method  Field\TelField       tel($name = null, $label = null)
  * @method  Field\TimeField      time($name = null, $label = null)
