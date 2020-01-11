@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Seeder;
 
 use Windwalker\Console\Command\Command;
+use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Environment\PlatformHelper;
 
 /**
@@ -32,6 +33,10 @@ trait CountingOutputTrait
      */
     public function outCounting()
     {
+        if ($this instanceof AbstractMigration && $this->count === 0) {
+            $this->command->out();
+        }
+
         // @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
         if (PlatformHelper::isWindows()) {
             $loading = ['|', '/', '-', '\\'];
