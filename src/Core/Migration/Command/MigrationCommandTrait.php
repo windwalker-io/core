@@ -114,7 +114,7 @@ trait MigrationCommandTrait
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.16
      */
     protected function prepareLogger(): void
     {
