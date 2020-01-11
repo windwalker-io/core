@@ -21,15 +21,15 @@ use Windwalker\Renderer\RendererInterface;
  */
 class WidgetManager
 {
-    const PHP = 'php';
+    public const PHP = 'php';
 
-    const BLADE = 'blade';
+    public const BLADE = 'blade';
 
-    const EDGE = 'edge';
+    public const EDGE = 'edge';
 
-    const TWIG = 'twig';
+    public const TWIG = 'twig';
 
-    const MUSTACHE = 'mustache';
+    public const MUSTACHE = 'mustache';
 
     /**
      * Property widgetClass.

@@ -2,8 +2,8 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2018 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Cache;
@@ -15,7 +15,7 @@ use Windwalker\Cache\Storage\ArrayStorage;
 /**
  * RuntimeCacheTrait
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.5.13
  */
 trait StaticRuntimeCacheTrait
 {

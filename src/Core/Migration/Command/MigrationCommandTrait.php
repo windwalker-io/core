@@ -2,8 +2,8 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2017 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2017 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Migration\Command;
@@ -13,6 +13,7 @@ use Windwalker\Core\Database\DatabaseService;
 use Windwalker\Core\Ioc;
 use Windwalker\Core\Migration\Repository\BackupRepository;
 use Windwalker\Core\Migration\Repository\MigrationsRepository;
+use Windwalker\Database\Monitor\CallbackMonitor;
 use Windwalker\DI\Annotation\Inject;
 use Windwalker\DI\Container;
 use Windwalker\Environment\Environment;
@@ -54,13 +55,17 @@ trait MigrationCommandTrait
     /**
      * getModel
      *
+     * @param DatabaseAdapter $db
+     *
      * @return  BackupRepository
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      */
-    public function getBackupRepository()
+    public function getBackupRepository(DatabaseAdapter $db = null)
     {
-        return BackupRepository::getInstance()->setCommand($this);
+        $db = $db ?: Ioc::getDatabase();
+
+        return BackupRepository::getInstance()->setCommand($this)->setDb($db);
     }
 
     /**
@@ -102,6 +107,25 @@ trait MigrationCommandTrait
         $db->select($name);
 
         $config['name'] = $name;
+    }
+
+    /**
+     * prepareLogger
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function prepareLogger(): void
+    {
+        // DB log
+        $this->console->database->setDebug(true);
+
+        $this->console->database->setMonitor(
+            new CallbackMonitor(function ($query) {
+                $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $query]);
+            })
+        );
     }
 
     /**

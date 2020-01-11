@@ -2,8 +2,8 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2019 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Database;
@@ -50,6 +50,20 @@ class DatabaseService
     }
 
     /**
+     * getDefaultConnectionName
+     *
+     * @return  string
+     *
+     * @since  3.5.13
+     */
+    public function getDefaultConnectionName(): string
+    {
+        $config = $this->config->extract('database');
+
+        return $config->get('default', 'local');
+    }
+
+    /**
      * getDbConfig
      *
      * @param string|null $connection
@@ -64,7 +78,7 @@ class DatabaseService
 
         // Check is new or legacy
         if ($config->get('connections')) {
-            $connection = $connection ?: $config->get('default', 'local');
+            $connection = $connection ?: $this->getDefaultConnectionName();
             $config     = $config->extract('connections.' . $connection);
         }
 

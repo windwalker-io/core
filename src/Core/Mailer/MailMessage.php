@@ -8,6 +8,9 @@
 
 namespace Windwalker\Core\Mailer;
 
+use Windwalker\Core\Asset\Asset;
+use Windwalker\Core\Asset\AssetManager;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
@@ -86,6 +89,13 @@ class MailMessage
     protected $files = [];
 
     /**
+     * Property asset.
+     *
+     * @var AssetManager
+     */
+    protected $asset;
+
+    /**
      * create
      *
      * @return  MailMessage
@@ -107,6 +117,11 @@ class MailMessage
         $this->subject = $subject;
         $this->body    = $content;
         $this->html    = $html;
+        $this->asset   = Ioc::getContainer()->has('asset') ? clone Asset::getInstance() : null;
+
+        if ($this->asset) {
+            $this->asset->reset();
+        }
     }
 
     /**
@@ -273,6 +288,9 @@ class MailMessage
      */
     public function renderBody($layout, $data = [], $engine = null, $package = null, $prefix = 'mail')
     {
+        $data['asset'] = $this->asset;
+        $data['message'] = $this;
+
         $this->body(
             $this->getBodyRenderer($layout, $engine, $package, $prefix)
                 ->render($data),
@@ -452,5 +470,17 @@ class MailMessage
     public function dump(): array
     {
         return get_object_vars($this);
+    }
+
+    /**
+     * Method to get property Asset
+     *
+     * @return  AssetManager
+     *
+     * @since  3.5.13
+     */
+    public function getAsset(): AssetManager
+    {
+        return $this->asset;
     }
 }

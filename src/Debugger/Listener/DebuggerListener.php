@@ -338,7 +338,9 @@ class DebuggerListener
                 continue;
             }
 
-            File::delete($file->getPathname());
+            if (is_file($file->getPathname())) {
+                File::delete($file->getPathname());
+            }
         }
     }
 }

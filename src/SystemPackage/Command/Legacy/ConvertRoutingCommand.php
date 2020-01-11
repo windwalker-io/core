@@ -2,8 +2,8 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2019 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\SystemPackage\Command\Legacy;
@@ -121,7 +121,7 @@ class ConvertRoutingCommand extends CoreCommand
  * Part of Windwalker project.
  *
  * @copyright  Copyright (C) $year __ORGANIZATION__.
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 use Windwalker\Core\Router\RouteCreator;

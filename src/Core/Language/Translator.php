@@ -38,7 +38,7 @@ use Windwalker\Structure\StructureHelper;
  * @method  static string    getLocale()
  * @method  static CoreLanguage  setLocale(string $locale)
  * @method  static string    getDefaultLocale()
- * @method  static CoreLanguage  loadFile($file, $format = 'ini', $package = null)
+ * @method  static CoreLanguage  loadFile($file, $format = 'ini', $package = null, ?string $locale = null)
  * @method  static CoreLanguage  getInstance($forceNew = false)
  * @method  static array         getStrings()
  * @method  static CoreLanguage  setStrings(array $strings)
@@ -62,14 +62,15 @@ abstract class Translator extends AbstractProxyFacade
      *
      * @param string|AbstractPackage $package
      * @param string                 $format
+     * @param string|null            $locale
      *
      * @return  void
      * @throws \ReflectionException
      */
-    public static function loadAll($package = null, $format = 'ini')
+    public static function loadAll($package = null, $format = 'ini', ?string $locale = null)
     {
         if (!$package) {
-            static::loadAllFromPath(WINDWALKER_RESOURCES . '/languages', $format);
+            static::loadAllFromPath(WINDWALKER_RESOURCES . '/languages', $format, $locale);
 
             return;
         }
@@ -80,21 +81,22 @@ abstract class Translator extends AbstractProxyFacade
 
         $path = $package->getDir() . '/Resources/language';
 
-        static::loadAllFromPath($path, $format, $package);
+        static::loadAllFromPath($path, $format, $package, $locale);
     }
 
     /**
      * loadAllFromPath
      *
-     * @param   string $path
-     * @param   string $format
-     * @param   string $package
+     * @param string      $path
+     * @param string      $format
+     * @param string      $package
+     * @param string|null $locale
      */
-    public static function loadAllFromPath($path, $format, $package = null)
+    public static function loadAllFromPath($path, $format, $package = null, ?string $locale = null)
     {
         $config = Ioc::getConfig();
 
-        $locale  = $config['language.locale'] ?: 'en-GB';
+        $locale  = $locale ?: $config['language.locale'] ?: 'en-GB';
         $default = $config['language.default'] ?: 'en-GB';
         $locale  = LanguageNormalize::toLanguageTag($locale);
         $default = LanguageNormalize::toLanguageTag($default);

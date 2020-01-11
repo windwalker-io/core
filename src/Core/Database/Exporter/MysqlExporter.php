@@ -10,7 +10,6 @@ namespace Windwalker\Core\Database\Exporter;
 
 use Windwalker\Core\Database\TableHelper;
 use Windwalker\Query\Mysql\MysqlGrammar;
-use Windwalker\Query\Mysql\MysqlQueryBuilder;
 
 /**
  * The Exporter class.

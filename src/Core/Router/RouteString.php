@@ -2,8 +2,8 @@
 /**
  * Part of phoenix project.
  *
- * @copyright  Copyright (C) 2017 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2017 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Router;
@@ -179,7 +179,7 @@ class RouteString implements StringableInterface
      */
     public function layout($layout)
     {
-        return $this->addVar('page', $layout);
+        return $this->addVar('layout', $layout);
     }
 
     /**

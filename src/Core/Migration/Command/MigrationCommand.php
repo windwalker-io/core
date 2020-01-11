@@ -63,6 +63,7 @@ class MigrationCommand extends CoreCommand
         $this->addCommand(Migration\MigrateCommand::class);
         $this->addCommand(Migration\ResetCommand::class);
         $this->addCommand(Migration\DropAllCommand::class);
+        $this->addCommand(Migration\ExportCommand::class);
 
         $this->addGlobalOption('d')
             ->alias('dir')
@@ -98,15 +99,6 @@ class MigrationCommand extends CoreCommand
         $dir = $dir ?: $this->console->get('path.migrations');
 
         $this->console->set('migration.dir', $dir);
-
-        // DB log
-        $this->console->database->setDebug(true);
-
-        $this->console->database->setMonitor(
-            new CallbackMonitor(function ($query) {
-                $this->console->triggerEvent('onMigrationAfterQuery', ['query' => $query]);
-            })
-        );
     }
 
     /**

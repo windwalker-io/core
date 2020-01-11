@@ -3,7 +3,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2019 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Form;
@@ -43,7 +43,7 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @method  Field\FileField      file($name = null, $label = null)
  * @method  Field\SearchField    search($name = null, $label = null)
  *
- * @since  {DEPLOY_VERSION}
+ * @since  3.5.13
  */
 trait CoreFieldDefinitionTrait
 {

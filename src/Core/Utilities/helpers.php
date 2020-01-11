@@ -2,8 +2,8 @@
 /**
  * Part of earth project.
  *
- * @copyright  Copyright (C) 2018 ${ORGANIZATION}.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2018 LYRASOFT.
+ * @license    LGPL-2.0-or-later
  */
 
 namespace {
@@ -108,6 +108,25 @@ namespace {
         }
     }
 
+    if (!function_exists('date_compare_tz')) {
+        /**
+         * date_compare
+         *
+         * @param string|\DateTimeInterface $date1
+         * @param string|\DateTimeInterface $date2
+         * @param string                    $operator
+         *
+         * @return  bool|int
+         *
+         * @since  3.3
+         * @throws Exception
+         */
+        function date_compare_tz($date1, $date2, $operator = null)
+        {
+            return Chronos::compareWithTz($date1, $date2, $operator);
+        }
+    }
+
     if (!function_exists('html_escape')) {
         /**
          * html_escape
@@ -207,8 +226,8 @@ namespace Windwalker {
      * @since  3.5
      */
     function arr(
-        ?array $data = [],
-        int $flags = ArrayObject::STD_PROP_LIST,
+        $data = [],
+        int $flags = ArrayObject::ARRAY_AS_PROPS,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
         return new Collection($data, $flags, $iteratorClass);
@@ -226,8 +245,8 @@ namespace Windwalker {
      * @since  3.5.2
      */
     function collect(
-        ?array $data = [],
-        int $flags = ArrayObject::STD_PROP_LIST,
+        $data = [],
+        int $flags = ArrayObject::ARRAY_AS_PROPS,
         string $iteratorClass = \ArrayIterator::class
     ): Collection {
         return arr($data, $flags, $iteratorClass);
