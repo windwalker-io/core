@@ -53,16 +53,16 @@ class MailInlinerListener
         $css = '';
 
         try {
-            $asset = $message->getAsset();
+            if ($asset = $message->getAsset()) {
+                // Loop outside styles
+                foreach ($asset->getStyles() as $style) {
+                    [$path, $minPath] = $asset->normalizeUri($asset->addSysPath($style['url']));
 
-            // Loop outside styles
-            foreach ($asset->getStyles() as $style) {
-                [$path, $minPath] = $asset->normalizeUri($asset->addSysPath($style['url']));
-
-                if (is_file($minPath)) {
-                    $css .= file_get_contents($minPath) . "\n";
-                } elseif (is_file($path)) {
-                    $css .= file_get_contents($path) . "\n";
+                    if (is_file($minPath)) {
+                        $css .= file_get_contents($minPath) . "\n";
+                    } elseif (is_file($path)) {
+                        $css .= file_get_contents($path) . "\n";
+                    }
                 }
             }
         } catch (\UnexpectedValueException $e) {

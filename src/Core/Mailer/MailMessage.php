@@ -10,6 +10,7 @@ namespace Windwalker\Core\Mailer;
 
 use Windwalker\Core\Asset\Asset;
 use Windwalker\Core\Asset\AssetManager;
+use Windwalker\Core\Ioc;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Widget\Widget;
@@ -116,9 +117,11 @@ class MailMessage
         $this->subject = $subject;
         $this->body    = $content;
         $this->html    = $html;
-        $this->asset   = clone Asset::getInstance();
+        $this->asset   = Ioc::getContainer()->has('asset') ? clone Asset::getInstance() : null;
 
-        $this->asset->reset();
+        if ($this->asset) {
+            $this->asset->reset();
+        }
     }
 
     /**
