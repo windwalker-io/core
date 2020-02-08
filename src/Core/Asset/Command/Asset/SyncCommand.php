@@ -13,6 +13,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Utilities\Symlink;
 use Windwalker\Environment\PlatformHelper;
+use Windwalker\Filesystem\Exception\FilesystemException;
 use Windwalker\Filesystem\File;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
@@ -104,26 +105,34 @@ class SyncCommand extends Command
         $symlink = new Symlink();
         $force   = $this->getOption('force');
 
-        if (is_link($target) || file_exists($target)) {
-            if (!$force) {
-                throw new \RuntimeException('Link ' . $target . ' already created.');
-            }
+        if (PlatformHelper::isWindows()) {
+            if (is_link($target) || file_exists($target)) {
+                if (!$force) {
+                    throw new \RuntimeException('Link ' . $target . ' already created.');
+                }
 
-            $this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
+                $this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
 
-            if (PlatformHelper::isWindows()) {
                 rmdir($target);
-            } else {
+            }
+        } else {
+            if (is_link($target)) {
+                if (!$force) {
+                    throw new \RuntimeException('Link ' . $target . ' already created.');
+                }
+
+                $this->out('Link file: <comment>' . $target . '</comment> exists, force replace it.');
+
                 File::delete($target);
-            }
-        } elseif (file_exists($target)) {
-            if (!$force) {
-                throw new \RuntimeException('Destination folder ' . $target . ' already exists.');
-            }
+            } elseif (is_dir($target)) {
+                if (!$force) {
+                    throw new \RuntimeException('Destination folder ' . $target . ' already exists.');
+                }
 
-            $this->out('Folder: <comment>' . $target . '</comment> exists, force replace it.');
+                $this->out('Folder: <comment>' . $target . '</comment> exists, force replace it.');
 
-            Filesystem::delete($target);
+                Folder::delete($target);
+            }
         }
 
         if ($hard) {
