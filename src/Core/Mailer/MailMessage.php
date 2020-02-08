@@ -475,11 +475,11 @@ class MailMessage
     /**
      * Method to get property Asset
      *
-     * @return  AssetManager
+     * @return  AssetManager|null
      *
      * @since  3.5.13
      */
-    public function getAsset(): AssetManager
+    public function getAsset(): ?AssetManager
     {
         return $this->asset;
     }
