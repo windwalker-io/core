@@ -9,6 +9,7 @@
 namespace {
 
     use Windwalker\Core\DateTime\Chronos;
+    use Windwalker\Core\DateTime\ChronosImmutable;
     use Windwalker\Core\Language\Translator;
     use Windwalker\Core\Utilities\Debug\Dumper;
 
@@ -124,6 +125,25 @@ namespace {
         function date_compare_tz($date1, $date2, $operator = null)
         {
             return Chronos::compareWithTz($date1, $date2, $operator);
+        }
+    }
+
+    if (!function_exists('chronos')) {
+        /**
+         * date
+         *
+         * @param string $datetime
+         * @param null   $tz
+         *
+         * @return  ChronosImmutable
+         *
+         * @throws \Exception
+         *
+         * @since  __DEPLOY_VERSION__
+         */
+        function chronos($datetime = 'now', $tz = null): ChronosImmutable
+        {
+            return new ChronosImmutable($datetime, $tz);
         }
     }
 
