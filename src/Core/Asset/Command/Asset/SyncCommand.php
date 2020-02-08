@@ -104,7 +104,7 @@ class SyncCommand extends Command
         $symlink = new Symlink();
         $force   = $this->getOption('force');
 
-        if (is_link($target)) {
+        if (is_link($target) || file_exists($target)) {
             if (!$force) {
                 throw new \RuntimeException('Link ' . $target . ' already created.');
             }
