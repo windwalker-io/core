@@ -14,6 +14,7 @@ use Windwalker\Core\Console\ConsoleHelper;
 use Windwalker\Core\Utilities\Symlink;
 use Windwalker\Environment\PlatformHelper;
 use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
 
 /**
@@ -115,12 +116,20 @@ class SyncCommand extends Command
             } else {
                 File::delete($target);
             }
+        } elseif (file_exists($target)) {
+            if (!$force) {
+                throw new \RuntimeException('Destination folder ' . $target . ' already exists.');
+            }
+
+            $this->out('Folder: <comment>' . $target . '</comment> exists, force replace it.');
+
+            Filesystem::delete($target);
         }
 
         if ($hard) {
             $this->hardCopy($dir, $target);
 
-            $this->out('Copy folder ' . $dir . ' to ' . $target);
+            $this->out('Copy folder <info>' . $dir . '</info> to <info>' . $target . '</info>');
         } else {
             $this->out($symlink->make($dir, $target));
 
