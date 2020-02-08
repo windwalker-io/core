@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Assert;
@@ -15,7 +15,7 @@ use Windwalker\Utilities\Assert\TypeAssert;
 /**
  * The RequestAssert class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.17
  */
 class RequestAssert extends TypeAssert
 {

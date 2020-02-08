@@ -139,7 +139,7 @@ namespace {
          *
          * @throws \Exception
          *
-         * @since  __DEPLOY_VERSION__
+         * @since  3.5.17
          */
         function chronos($datetime = 'now', $tz = null): ChronosImmutable
         {
