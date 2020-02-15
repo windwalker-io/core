@@ -15,6 +15,18 @@
                     "method": "add",
                     "index": 1,
                     "type": "type"
+                },
+                {
+                    "class": "Windwalker\\Core\\Application\\ServiceAwareTrait",
+                    "method": "service",
+                    "index": 0,
+                    "type": "type"
+                },
+                {
+                    "class": "Windwalker\\Core\\Application\\ServiceAwareTrait",
+                    "method": "make",
+                    "index": 0,
+                    "type": "type"
                 }
             ]
         }
