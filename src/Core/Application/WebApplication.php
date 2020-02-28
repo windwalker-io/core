@@ -59,6 +59,9 @@ use Windwalker\Utilities\Queue\PriorityQueue;
  * @property-read  Core\Package\PackageResolver  packageResolver
  * @property-read  Queue                         queue
  *
+ * @method mixed service(string $class, bool $forceNew = false)
+ * @method mixed make(string $class, array $args = [], bool $protected = false)
+ *
  * @since  2.0
  */
 class WebApplication extends AbstractWebApplication implements
