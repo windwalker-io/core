@@ -339,7 +339,11 @@ class DebuggerListener
             }
 
             if (is_file($file->getPathname())) {
-                File::delete($file->getPathname());
+                try {
+                    File::delete($file->getPathname());
+                } catch (FilesystemException $e) {
+                    // Ignore error
+                }
             }
         }
     }
