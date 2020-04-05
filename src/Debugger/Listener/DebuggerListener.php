@@ -340,8 +340,8 @@ class DebuggerListener
 
             if (is_file($file->getPathname())) {
                 try {
-                    File::delete($file->getPathname());
-                } catch (FilesystemException $e) {
+                    @File::delete($file->getPathname());
+                } catch (\Throwable $e) {
                     // Ignore error
                 }
             }
