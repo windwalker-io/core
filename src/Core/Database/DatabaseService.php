@@ -133,6 +133,7 @@ class DatabaseService
                 'user' => $config->get('user', 'root'),
                 'password' => $config->get('password', ''),
                 'database' => $config->get('name'),
+                'charset' => $config->get('charset'),
                 'prefix' => $config->get('prefix', 'wind_'),
             ],
             $options
