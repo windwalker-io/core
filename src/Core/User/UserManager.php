@@ -86,7 +86,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
     public function authorise($policy, ?UserDataInterface $user = null, ...$data)
     {
         $user = $user ?? $this->getUser();
-        
+
         return $this->getAuthorisation()->authorise($policy, $user, ...$data);
     }
 
