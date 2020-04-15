@@ -483,4 +483,36 @@ class MailMessage
     {
         return $this->asset;
     }
+
+    /**
+     * __sleep
+     *
+     * @return  array
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function __sleep()
+    {
+        $values = get_object_vars($this);
+
+        unset($values['asset']);
+
+        return array_keys($values);
+    }
+
+    /**
+     * __wakeup
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function __wakeup()
+    {
+        $this->asset = Ioc::getContainer()->has('asset') ? clone Asset::getInstance() : null;
+
+        if ($this->asset) {
+            $this->asset->reset();
+        }
+    }
 }
