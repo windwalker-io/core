@@ -489,7 +489,7 @@ class MailMessage
      *
      * @return  array
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.2
      */
     public function __sleep()
     {
@@ -505,7 +505,7 @@ class MailMessage
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.2
      */
     public function __wakeup()
     {
