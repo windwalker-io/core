@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Application;
@@ -19,7 +19,7 @@ use Windwalker\Structure\Structure;
 /**
  * The OfflineService class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.18.3
  */
 class OfflineService
 {
@@ -39,7 +39,7 @@ class OfflineService
      *
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.3
      */
     public function offlineIfEnabled(array $options): void
     {
@@ -80,7 +80,7 @@ class OfflineService
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.3
      */
     public function offline(WebApplication $app, Structure $options): void
     {
@@ -114,7 +114,7 @@ class OfflineService
      * @return string
      * @throws \ReflectionException
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.3
      */
     public function renderOfflinePage(Structure $options): string
     {
