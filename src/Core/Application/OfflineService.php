@@ -111,10 +111,19 @@ class OfflineService
      *
      * @param Structure $options
      *
+     * @return string
+     * @throws \ReflectionException
+     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  __DEPLOY_VERSION__
      */
     public function renderOfflinePage(Structure $options): string
     {
+        $renderer = $options['renderer'] ?? null;
+
+        if (is_callable($renderer)) {
+            return $this->app->getContainer()->call($renderer);
+        }
+
         return WidgetHelper::render(
             $options['template'] ?? 'windwalker.offline.offline',
             $options['data'] ?? [],
