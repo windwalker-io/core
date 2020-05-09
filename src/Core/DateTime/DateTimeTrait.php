@@ -130,7 +130,7 @@ trait DateTimeTrait
         // Create the base GMT and server time zone objects.
         if (empty(self::$gmt) || empty(self::$stz)) {
             self::$gmt = new \DateTimeZone('GMT');
-            self::$stz = new \DateTimeZone(ini_get('date.timezone') ?: 'UTC');
+            self::$stz = new \DateTimeZone(date_default_timezone_get() ?: 'UTC');
         }
     }
 
