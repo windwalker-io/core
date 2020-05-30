@@ -10,7 +10,6 @@ namespace Windwalker\Core\Asset;
 
 use Windwalker\Core\Config\Config;
 use Windwalker\DI\RawWrapper;
-use Windwalker\Dom\HtmlElement;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 use Windwalker\Event\DispatcherInterface;
@@ -401,7 +400,15 @@ class AssetManager implements DispatcherAwareInterface
                 unset($attribs['src']);
                 $html[] = (string) h('link', $attribs, null);
             } else {
-                $html[] = (string) h('script', $attribs, null);
+                if ($script['options']['body'] ?? null) {
+                    $content = $script['options']['body'];
+
+                    unset($attribs['src']);
+                } else {
+                    $content = null;
+                }
+
+                $html[] = (string) h('script', $attribs, $content);
             }
 
             if (isset($script['options']['conditional'])) {
@@ -616,7 +623,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  array
      */
-    public function getScripts()
+    public function &getScripts()
     {
         return $this->scripts;
     }
