@@ -401,7 +401,7 @@ class RouteString implements StringableInterface
      *
      * @return  PsrUri
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.4
      */
     public function asUri(): PsrUri
     {

@@ -150,7 +150,7 @@ trait RouteBuilderTrait
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.18.4
      */
     public static function hasMiddleware(Route $route, $middleware): bool
     {
