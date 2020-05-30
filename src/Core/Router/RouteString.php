@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Uri\PsrUri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Classes\StringableInterface;
 
@@ -393,5 +394,17 @@ class RouteString implements StringableInterface
         $this->mute = (bool) $mute;
 
         return $this;
+    }
+
+    /**
+     * asUri
+     *
+     * @return  PsrUri
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function asUri(): PsrUri
+    {
+        return new PsrUri((string) $this);
     }
 }

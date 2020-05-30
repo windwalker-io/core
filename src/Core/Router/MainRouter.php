@@ -24,9 +24,9 @@ use Windwalker\Router\Matcher\MatcherInterface;
 use Windwalker\Router\Route;
 use Windwalker\Router\Router;
 use Windwalker\Structure\Structure;
-use function Windwalker\tap;
 use Windwalker\Uri\UriData;
 use Windwalker\Utilities\Arr;
+use function Windwalker\tap;
 
 /**
  * The Router class.
@@ -111,8 +111,8 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     ) {
         $this->cache = new Cache(new ArrayStorage(), new RawSerializer());
 
-        $this->uri        = $uri;
-        $this->dispatcher = $dispatcher;
+        $this->uri          = $uri;
+        $this->dispatcher   = $dispatcher;
         $this->routeCreator = $routeCreator;
 
         parent::__construct([], $matcher);
@@ -296,9 +296,9 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      * @param string $method
      * @param array  $customSuffix
      *
-     * @throws RouteNotFoundException
      * @return  string
      *
+     * @throws RouteNotFoundException
      * @since   2.0
      */
     public function fetchControllerSuffix($method = 'GET', $customSuffix = [])
@@ -416,7 +416,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * loadRoutingFromFile
      *
-     * @param   string $file
+     * @param string $file
      *
      * @return  array
      */
@@ -565,8 +565,8 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * Set a controller class suffix for a given HTTP method.
      *
-     * @param   string $method The HTTP method for which to set the class suffix.
-     * @param   string $suffix The class suffix to use when fetching the controller name for a given request.
+     * @param string $method The HTTP method for which to set the class suffix.
+     * @param string $suffix The class suffix to use when fetching the controller name for a given request.
      *
      * @return  static  Returns itself to support chaining.
      */
@@ -590,7 +590,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * Method to set property suffixMap
      *
-     * @param   array $suffixMap
+     * @param array $suffixMap
      *
      * @return  static  Return self to support chaining.
      */
@@ -628,7 +628,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * Method to set property uri
      *
-     * @param   UriData $uri
+     * @param UriData $uri
      *
      * @return  static  Return self to support chaining.
      */
@@ -642,7 +642,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * getCacheKey
      *
-     * @param   mixed $data
+     * @param mixed $data
      *
      * @return  string
      */
@@ -680,7 +680,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * Method to set property matched
      *
-     * @param   Route $matched
+     * @param Route $matched
      *
      * @return  static  Return self to support chaining.
      */
@@ -696,8 +696,8 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      * If no events are specified, it will be registered to all events matching it's methods name.
      * In the case of a closure, you must specify at least one event name.
      *
-     * @param   object|\Closure $listener     The listener
-     * @param   array|integer   $priorities   An associative array of event names as keys
+     * @param object|\Closure $listener       The listener
+     * @param array|integer   $priorities     An associative array of event names as keys
      *                                        and the corresponding listener priority as values.
      *
      * @return  static
@@ -744,7 +744,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
     /**
      * Method to set property packageResolver
      *
-     * @param   PackageResolver $packageResolver
+     * @param PackageResolver $packageResolver
      *
      * @return  static  Return self to support chaining.
      *

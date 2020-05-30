@@ -8,6 +8,10 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\DI\ClassMeta;
+use Windwalker\Router\Route;
+use Windwalker\Test\TestHelper;
+
 /**
  * The RouteBuilderTrait class.
  *
@@ -136,5 +140,48 @@ trait RouteBuilderTrait
         $this->mute = $mute;
 
         return $this;
+    }
+
+    /**
+     * hasMiddleware
+     *
+     * @param Route                   $route
+     * @param object|string|ClassMeta $middleware
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function hasMiddleware(Route $route, $middleware): bool
+    {
+        $getClassName = static function ($instance) {
+            if ($instance instanceof ClassMeta) {
+                return (string) TestHelper::getValue($instance, 'class');
+            }
+
+            if ($instance instanceof \Closure) {
+                return spl_object_hash($instance);
+            }
+
+            if (is_string($instance) || is_callable($instance)) {
+                return $instance;
+            }
+
+            if (is_object($instance)) {
+                return get_class($instance);
+            }
+
+            throw new \InvalidArgumentException('Middleware instance is wrong type.');
+        };
+
+        $middlewareClass = trim($getClassName($middleware), '\\');
+
+        foreach ($route->getExtra('middlewares') as $item) {
+            if (trim($getClassName($item), '\\') === $middlewareClass) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
