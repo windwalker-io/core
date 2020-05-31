@@ -176,7 +176,7 @@ trait RouteBuilderTrait
 
         $middlewareClass = trim($getClassName($middleware), '\\');
 
-        foreach ($route->getExtra('middlewares') as $item) {
+        foreach ((array) $route->getExtra('middlewares') as $item) {
             if (trim($getClassName($item), '\\') === $middlewareClass) {
                 return true;
             }
