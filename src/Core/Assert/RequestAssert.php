@@ -23,4 +23,9 @@ class RequestAssert extends TypeAssert
      * @var  string
      */
     protected static $exceptionClass = HttpRequestException::class;
+
+    /**
+     * @var int
+     */
+    protected static $exceptionCode = 400;
 }
