@@ -25,6 +25,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Repository\Exception\ValidateFailException;
 use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Router\PackageRouter;
+use Windwalker\Core\Router\RouteString;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\Core\View\HtmlView;
@@ -624,6 +625,42 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
         }
 
         $this->app->redirect($url, $code);
+    }
+
+    /**
+     * to
+     *
+     * @param string $route
+     * @param array  $queries
+     * @param array  $config
+     *
+     * @return  RouteString
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function to(string $route, array $queries = [], array $config = []): RouteString
+    {
+        return $this->router->to($route, $queries, $config);
+    }
+
+    /**
+     * redirectTo
+     *
+     * @param string $route
+     * @param array  $queries
+     * @param array  $config
+     * @param int    $code
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function redirectTo(string $route, array $queries = [], array $config = [], int $code = 303): void
+    {
+        $this->redirect(
+            $this->router->to($route, $queries, $config),
+            $code
+        );
     }
 
     /**
