@@ -93,7 +93,7 @@ class ErrorManager
     {
         $error = error_get_last();
 
-        if ($error['type'] === E_ERROR) {
+        if ($error && $error['type'] === E_ERROR) {
             $this->error(...array_values($error));
         }
     }
