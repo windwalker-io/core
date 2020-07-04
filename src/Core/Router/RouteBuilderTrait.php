@@ -154,30 +154,8 @@ trait RouteBuilderTrait
      */
     public static function hasMiddleware(Route $route, $middleware): bool
     {
-        $getClassName = static function ($instance) {
-            if ($instance instanceof ClassMeta) {
-                return (string) TestHelper::getValue($instance, 'class');
-            }
-
-            if ($instance instanceof \Closure) {
-                return spl_object_hash($instance);
-            }
-
-            if (is_string($instance) || is_callable($instance)) {
-                return $instance;
-            }
-
-            if (is_object($instance)) {
-                return get_class($instance);
-            }
-
-            throw new \InvalidArgumentException('Middleware instance is wrong type.');
-        };
-
-        $middlewareClass = trim($getClassName($middleware), '\\');
-
         foreach ((array) $route->getExtra('middlewares') as $item) {
-            if (trim($getClassName($item), '\\') === $middlewareClass) {
+            if (ClassMeta::isSameClass($middleware, $item)) {
                 return true;
             }
         }
