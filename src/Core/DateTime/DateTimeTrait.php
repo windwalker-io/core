@@ -70,6 +70,30 @@ trait DateTimeTrait
     protected static $useStz = true;
 
     /**
+     * wrap
+     *
+     * @param mixed $date
+     * @param mixed $tz
+     *
+     * @return  static
+     *
+     * @throws \Exception
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function wrap($date = 'now', $tz = null)
+    {
+        if ($date instanceof static) {
+            return $date;
+        }
+
+        if ($date instanceof \DateTimeInterface) {
+            return static::createFromFormat('U.u', $date->format('U.u'), $date->getTimezone());
+        }
+
+        return static::create($date, $tz);
+    }
+
+    /**
      * Constructor.
      *
      * @param   string $date String in a format accepted by strtotime(), defaults to "now".
@@ -351,7 +375,15 @@ trait DateTimeTrait
             return false;
         }
 
-        return new static($datetime->getTimestamp(), $datetime->getTimezone());
+        $chronos = new static($datetime->getTimestamp(), $datetime->getTimezone());
+        $chronos = $chronos->setTime(
+            $datetime->format('H'),
+            $datetime->format('i'),
+            $datetime->format('s'),
+            $datetime->format('u')
+        );
+
+        return $chronos;
     }
 
     /**

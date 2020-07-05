@@ -143,7 +143,7 @@ namespace {
          */
         function chronos($datetime = 'now', $tz = null): ChronosImmutable
         {
-            return new ChronosImmutable($datetime, $tz);
+            return ChronosImmutable::wrap($datetime, $tz);
         }
     }
 
