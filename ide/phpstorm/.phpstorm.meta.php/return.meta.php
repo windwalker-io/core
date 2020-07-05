@@ -32,6 +32,13 @@ namespace PHPSTORM_META {
     );
 
     override(
+        Container::get(0),
+        map([
+            '' => '@'
+        ])
+    );
+
+    override(
         Container::newInstance(0),
         map([
             '' => '@'
