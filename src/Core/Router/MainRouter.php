@@ -123,16 +123,24 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return  string
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function build($route, $queries = [], $type = MainRouter::TYPE_RAW)
+    public function build($route, $queries = [], $config = [])
     {
         if (!$this->hasRoute($route)) {
             throw new \OutOfRangeException('Route: ' . $route . ' not found.');
         }
+
+        if (is_string($config)) {
+            $config = [
+                'type' => $config
+            ];
+        }
+
+        $type = $config['type'] ?? static::TYPE_PATH;
 
         $queries = is_scalar($queries) ? ['id' => $queries] : $queries;
 
@@ -148,17 +156,18 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
                 ));
             }
 
-            $extra['hook']['build']($this, $route, $queries, $type);
+            $extra['hook']['build']($this, $route, $queries, $type, $config);
         }
 
         $this->triggerEvent('onRouterBeforeRouteBuild', [
             'route' => &$route,
             'queries' => &$queries,
             'type' => &$type,
+            'config' => &$config,
             'router' => $this,
         ]);
 
-        $key = $this->getCacheKey([$route, $queries, $type]);
+        $key = $this->getCacheKey([$route, $queries, $type, $config]);
 
         if ($this->cache->exists($key)) {
             return $this->cache->get($key);
@@ -172,6 +181,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             'route' => &$route,
             'queries' => &$queries,
             'type' => &$type,
+            'config' => &$config,
             'router' => $this,
         ]);
 

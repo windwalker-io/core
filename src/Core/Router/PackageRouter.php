@@ -52,19 +52,19 @@ class PackageRouter implements RouteBuilderInterface
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return string
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
+    public function route($route, $queries = [], $config = [])
     {
         try {
             if ($this->router->hasRoute($this->package->getName() . '@' . $route)) {
-                return $this->router->build($this->package->getName() . '@' . $route, $queries, $type);
+                return $this->router->build($this->package->getName() . '@' . $route, $queries, $config);
             }
 
-            return $this->router->build($route, $queries, $type);
+            return $this->router->build($route, $queries, $config);
         } catch (\OutOfRangeException $e) {
             if ($this->package->app->get('routing.debug', true)) {
                 throw new \OutOfRangeException($e->getMessage(), $e->getCode(), $e);

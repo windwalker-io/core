@@ -15,63 +15,66 @@ namespace Windwalker\Core\Router;
  */
 interface RouteBuilderInterface
 {
-    const TYPE_RAW = 'raw';
+    public const TYPE_RAW = 'raw';
 
-    const TYPE_PATH = 'path';
+    public const TYPE_PATH = 'path';
 
-    const TYPE_FULL = 'full';
+    public const TYPE_FULL = 'full';
 
     /**
      * build
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return string
      */
-    public function route($route, $queries = [], $type = MainRouter::TYPE_PATH);
+    public function route($route, $queries = [], $config = []);
 
     /**
      * to
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  RouteString
      */
-    public function to($route, $queries = []);
+    public function to($route, $queries = [], $config = []);
 
     /**
      * generate
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return  string
      */
-    public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH);
+    public function generate($route, $queries = [], $config = []);
 
     /**
      * fullRoute
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  string
      */
-    public function fullRoute($route, $queries = []);
+    public function fullRoute($route, $queries = [], $config = []);
 
     /**
      * rawRoute
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  string
      */
-    public function rawRoute($route, $queries = []);
+    public function rawRoute($route, $queries = [], $config = []);
 
     /**
      * escape

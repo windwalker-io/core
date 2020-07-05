@@ -31,14 +31,21 @@ trait RouteBuilderTrait
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return string
-     * @throws \OutOfRangeException
      */
-    public function route($route, $queries = [], $type = MainRouter::TYPE_PATH)
+    public function route($route, $queries = [], $config = [])
     {
-        return $this->build($route, $queries, $type);
+        if (is_string($config)) {
+            $config = [
+                'type' => $config
+            ];
+        }
+
+        $config['type'] = $config['type'] ?? MainRouter::TYPE_PATH;
+
+        return $this->build($route, $queries, $config);
     }
 
     /**
@@ -46,12 +53,13 @@ trait RouteBuilderTrait
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  RouteString
      */
-    public function to($route, $queries = [])
+    public function to($route, $queries = [], $config = [])
     {
-        return (new RouteString($this, $route, $queries))->mute($this->mute);
+        return (new RouteString($this, $route, $queries, $config))->mute($this->mute);
     }
 
     /**
@@ -59,14 +67,14 @@ trait RouteBuilderTrait
      *
      * @param string $route
      * @param array  $queries
-     * @param string $type
+     * @param array  $config
      *
      * @return  string
      */
-    public function generate($route, $queries = [], $type = MainRouter::TYPE_PATH)
+    public function generate($route, $queries = [], $config = [])
     {
         try {
-            return $this->route($route, $queries, $type);
+            return $this->route($route, $queries, $config);
         } catch (\OutOfRangeException $e) {
             if ($this->package->app->get('system.debug', false)) {
                 return sprintf('javascript:alert(\'%s\')', htmlentities($e->getMessage(), ENT_QUOTES, 'UTF-8'));
@@ -81,12 +89,15 @@ trait RouteBuilderTrait
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  string
      */
-    public function fullRoute($route, $queries = [])
+    public function fullRoute($route, $queries = [], $config = [])
     {
-        return $this->route($route, $queries, static::TYPE_FULL);
+        $config['type'] = static::TYPE_FULL;
+
+        return $this->route($route, $queries, $config);
     }
 
     /**
@@ -94,12 +105,15 @@ trait RouteBuilderTrait
      *
      * @param string $route
      * @param array  $queries
+     * @param array  $config
      *
      * @return  string
      */
-    public function rawRoute($route, $queries = [])
+    public function rawRoute($route, $queries = [], $config = [])
     {
-        return $this->route($route, $queries, static::TYPE_RAW);
+        $config['type'] = static::TYPE_RAW;
+
+        return $this->route($route, $queries, $config);
     }
 
     /**

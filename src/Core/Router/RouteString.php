@@ -41,13 +41,6 @@ class RouteString implements StringableInterface
     protected $queries = [];
 
     /**
-     * Property type.
-     *
-     * @var  string
-     */
-    protected $type = MainRouter::TYPE_PATH;
-
-    /**
      * Property escape.
      *
      * @var  bool
@@ -62,17 +55,31 @@ class RouteString implements StringableInterface
     protected $mute = false;
 
     /**
+     * @var array
+     */
+    protected $config;
+
+    /**
      * RouteString constructor.
      *
      * @param RouteBuilderInterface $router
      * @param string                $route
      * @param array                 $queries
+     * @param array                 $config
      */
-    public function __construct(RouteBuilderInterface $router, $route, $queries = [])
+    public function __construct(RouteBuilderInterface $router, $route, $queries = [], array $config = [])
     {
         $this->route   = $route;
         $this->router  = $router;
         $this->queries = (array) $queries;
+
+        if (is_string($config)) {
+            $config = [
+                'type' => $config
+            ];
+        }
+
+        $this->config = $config;
     }
 
     /**
@@ -84,7 +91,7 @@ class RouteString implements StringableInterface
      */
     public function type($type)
     {
-        $this->type = $type;
+        $this->config['type'] = $type;
 
         return $this;
     }
@@ -255,16 +262,43 @@ class RouteString implements StringableInterface
     }
 
     /**
+     * Set config value.
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return  $this
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function c(string $name, $value)
+    {
+        $this->config[$name] = $value;
+
+        return $this;
+    }
+
+    /**
      * toString
      *
      * @return  string
      */
     public function toString()
     {
+        $config = $this->config;
+
+        if (is_string($config)) {
+            $config = [
+                'type' => $config
+            ];
+        }
+
+        $config['type'] = $config['type'] ?? MainRouter::TYPE_PATH;
+
         if ($this->mute) {
-            $uri = $this->router->generate($this->route, $this->queries, $this->type);
+            $uri = $this->router->generate($this->route, $this->queries, $config);
         } else {
-            $uri = $this->router->route($this->route, $this->queries, $this->type);
+            $uri = $this->router->route($this->route, $this->queries, $config);
         }
 
         if ($this->escape) {

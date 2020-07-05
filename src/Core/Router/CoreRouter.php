@@ -16,11 +16,11 @@ use Windwalker\Router\Route;
  *
  * @since  2.0.
  *
- * @method  static string  build($route, $queries = [], $type = MainRouter::TYPE_RAW)
- * @method  static string  route($route, $queries = [], $type = MainRouter::TYPE_RAW)
- * @method  static RouteString  to($route, $queries = [])
- * @method  static string  fullRoute($route, $queries = [])
- * @method  static string  rawRoute($route, $queries = [])
+ * @method  static string  build($route, $queries = [], $config = [])
+ * @method  static string  route($route, $queries = [], $config = [])
+ * @method  static RouteString  to($route, $queries = [], $config = [])
+ * @method  static string  fullRoute($route, $queries = [], $config = [])
+ * @method  static string  rawRoute($route, $queries = [], $config = [])
  * @method  static Route   match($rawRoute, $method = 'GET', $options = [])
  * @method  static Route   addRouteByConfig($name, $route, $package = null)
  * @method  static MainRouter  addRouteByConfigs($routes, $package = null)

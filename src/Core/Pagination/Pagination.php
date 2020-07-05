@@ -149,7 +149,7 @@ class Pagination
     protected $route = [
         'route' => null,
         'query' => [],
-        'type' => MainRouter::TYPE_PATH,
+        'config' => [],
     ];
 
     /**
@@ -379,11 +379,11 @@ class Pagination
      */
     public function render()
     {
-        list($layout, $engine) = array_values($this->getTemplate());
+        [$layout, $engine] = array_values($this->getTemplate());
 
         $widget = WidgetHelper::createWidget($layout, $engine);
 
-        list($route, $query, $type) = array_values($this->route);
+        [$route, $query, $config] = array_values($this->route);
 
         $result = $this->getResult();
 
@@ -393,7 +393,7 @@ class Pagination
 
         // If not route provided, use current route.
         if ($route === null) {
-            $route = function ($queries) use ($query, $type) {
+            $route = function ($queries) use ($query, $config) {
                 $queries = array_merge((array) $queries, (array) $query);
 
                 $uri = new Uri(Ioc::getUriData()->full);
@@ -408,24 +408,24 @@ class Pagination
 
                 $route = Ioc::getConfig()->get('route.matched');
 
-                return $this->getRouter()->route($route, $uri->getQuery(true), $type);
+                return $this->getRouter()->route($route, $uri->getQuery(true), $config);
             };
         }
 
         // If route is string, wrap it as a callback
         if (!$route instanceof \Closure) {
-            $route = function ($queries) use ($route, $query, $type) {
+            $route = function ($queries) use ($route, $query, $config) {
                 $queries = array_merge((array) $queries, (array) $query);
 
                 if (!$this->getRouter()) {
                     $package = PackageHelper::getPackage();
 
                     // CoreRoute object not exists, we use global Route object.
-                    return $package->router->route($route, $queries, $type);
+                    return $package->router->route($route, $queries, $config);
                 }
 
                 // Use custom Route object.
-                return $this->getRouter()->route($route, $queries, $type);
+                return $this->getRouter()->route($route, $queries, $config);
             };
         }
 
@@ -461,16 +461,16 @@ class Pagination
      *
      * @param string $route
      * @param array  $query
-     * @param string $type
+     * @param array  $config
      *
      * @return  static
      */
-    public function route($route, $query = [], $type = MainRouter::TYPE_PATH)
+    public function route($route, $query = [], $config = [])
     {
         $this->route = [
             'route' => $route,
             'query' => (array) $query,
-            'type' => $type,
+            'config' => $config,
         ];
 
         return $this;
