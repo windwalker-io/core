@@ -13,6 +13,7 @@ use Windwalker\Core\Package\PackageHelper;
 use Windwalker\Core\Router\CoreRouter;
 use Windwalker\Core\Router\RouteBuilderInterface;
 use Windwalker\DI\RawWrapper;
+use Windwalker\Utilities\Assert\TypeAssert;
 use function Windwalker\raw;
 use Windwalker\Utilities\Arr;
 
@@ -50,6 +51,25 @@ abstract class AbstractScript
     protected static function inited($name, ...$data)
     {
         return static::getInstance()->inited($name, ...$data);
+    }
+
+    /**
+     * available
+     *
+     * @param mixed ...$data
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected static function available(...$data): bool
+    {
+        $debug = debug_backtrace();
+        $stack = $debug[1];
+
+        $method = $stack['class'] . '::' . $stack['function'];
+
+        return static::inited($method, ...$data);
     }
 
     /**
