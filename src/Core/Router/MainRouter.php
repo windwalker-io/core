@@ -236,6 +236,10 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
         $controller = Arr::get($extra, 'controller');
 
+        if ($controller === false) {
+            throw new RouteNotFoundException('This route disabled.');
+        }
+
         // Suffix
         $suffix = $this->fetchControllerSuffix($method, Arr::get($extra, 'action', []));
 
@@ -343,7 +347,7 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
 
         $suffix = array_merge($this->suffixMap, $customSuffix);
 
-        if (!isset($suffix[$method])) {
+        if (!isset($suffix[$method]) || $suffix[$method] === false) {
             throw new RouteNotFoundException(sprintf('Unable to support the HTTP method `%s`.', $method), 404);
         }
 

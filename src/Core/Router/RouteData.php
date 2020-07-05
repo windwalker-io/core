@@ -11,13 +11,13 @@ namespace Windwalker\Core\Router;
 /**
  * The RouteData class.
  *
- * @method $this getAction(string $controller)
- * @method $this postAction(string $controller)
- * @method $this putAction(string $controller)
- * @method $this patchAction(string $controller)
- * @method $this deleteAction(string $controller)
- * @method $this headAction(string $controller)
- * @method $this optionsAction(string $controller)
+ * @method $this getAction(string|bool $controller)
+ * @method $this postAction(string|bool $controller)
+ * @method $this putAction(string|bool $controller)
+ * @method $this patchAction(string|bool $controller)
+ * @method $this deleteAction(string|bool $controller)
+ * @method $this headAction(string|bool $controller)
+ * @method $this optionsAction(string|bool $controller)
  *
  * @since  3.5
  */
@@ -86,13 +86,13 @@ class RouteData
     /**
      * pattern
      *
-     * @param string $value
+     * @param string|bool $value
      *
      * @return  static
      *
      * @since  3.5
      */
-    public function controller(string $value): self
+    public function controller($value): self
     {
         $this->options['controller'] = $value;
 

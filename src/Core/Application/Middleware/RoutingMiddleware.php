@@ -218,7 +218,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
     {
         $name = $route->getName();
 
-        list($packageName, $routeName) = StringHelper::explode('@', $name, 2, 'array_unshift');
+        [$packageName, $routeName] = StringHelper::explode('@', $name, 2, 'array_unshift');
 
         $variables = $route->getVariables();
         $extra     = $route->getExtraValues();

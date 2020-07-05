@@ -20,7 +20,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
 trait RouteConfigureTrait
 {
     use OptionAccessTrait;
-    
+
     /**
      * methods
      *
@@ -58,14 +58,14 @@ trait RouteConfigureTrait
     /**
      * action
      *
-     * @param string $action
-     * @param string $controller
+     * @param string      $action
+     * @param string|bool $controller
      *
      * @return  static
      *
      * @since  3.5
      */
-    public function action(string $action, string $controller)
+    public function action(string $action, $controller)
     {
         $this->options['actions'][strtolower($action)] = $controller;
 
@@ -75,13 +75,13 @@ trait RouteConfigureTrait
     /**
      * allActions
      *
-     * @param string $controller
+     * @param string|bool $controller
      *
      * @return  static
      *
      * @since  3.5
      */
-    public function allActions(string $controller)
+    public function allActions($controller)
     {
         $this->options['actions']['*'] = $controller;
 
@@ -91,13 +91,13 @@ trait RouteConfigureTrait
     /**
      * Save actions: post, patch, put
      *
-     * @param string $controller
+     * @param string|bool $controller
      *
      * @return  static
      *
      * @since  3.5
      */
-    public function saveAction(string $controller)
+    public function saveAction($controller)
     {
         $this->postAction($controller);
         $this->putAction($controller);
@@ -379,8 +379,8 @@ trait RouteConfigureTrait
     /**
      * __call
      *
-     * @param string  $name
-     * @param array   $args
+     * @param string $name
+     * @param array  $args
      *
      * @return  mixed
      *
