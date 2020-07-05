@@ -78,7 +78,7 @@ trait DateTimeTrait
      * @return  static
      *
      * @throws \Exception
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.19
      */
     public static function wrap($date = 'now', $tz = null)
     {

@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Annotations;
@@ -24,7 +24,7 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
  *
  * @Target({"METHOD", "CLASS"})
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.19
  */
 class Methods implements AnnotationInterface
 {

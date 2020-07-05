@@ -269,7 +269,7 @@ class RouteString implements StringableInterface
      *
      * @return  $this
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.19
      */
     public function c(string $name, $value)
     {

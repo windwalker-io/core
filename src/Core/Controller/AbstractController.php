@@ -636,7 +636,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @return  RouteString
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.19
      */
     public function to(string $route, array $queries = [], array $config = []): RouteString
     {
@@ -653,7 +653,7 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.19
      */
     public function redirectTo(string $route, array $queries = [], array $config = [], int $code = 303): void
     {

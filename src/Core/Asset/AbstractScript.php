@@ -60,7 +60,7 @@ abstract class AbstractScript
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.19
      */
     protected static function available(...$data): bool
     {
