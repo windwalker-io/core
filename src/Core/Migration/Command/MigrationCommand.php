@@ -64,6 +64,7 @@ class MigrationCommand extends CoreCommand
         $this->addCommand(Migration\ResetCommand::class);
         $this->addCommand(Migration\DropAllCommand::class);
         $this->addCommand(Migration\ExportCommand::class);
+        $this->addCommand(Migration\EnableIndexesCommand::class);
 
         $this->addGlobalOption('d')
             ->alias('dir')

@@ -11,6 +11,7 @@ namespace Windwalker\Core\Seeder\Command\Seed;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Migration\Command\MigrationCommandTrait;
 use Windwalker\Core\Migration\Repository\BackupRepository;
+use Windwalker\Database\Driver\Mysql\MysqlDriver;
 
 /**
  * Class Seed
@@ -85,7 +86,18 @@ class ImportCommand extends CoreCommand
         /** @var \Windwalker\Core\Seeder\AbstractSeeder $seeder */
         $seeder = $this->console->container->newInstance($class, ['command' => $this]);
 
+        $db = $this->console->database;
+        $tables = $db->getDatabase()->getTables(true);
+
         try {
+            if ($db instanceof MysqlDriver) {
+                $this->out('Disable all indexes.');
+
+                foreach ($tables as $table) {
+                    $db->execute("ALTER TABLE `{$table}` DISABLE KEYS;");
+                }
+            }
+
             $this->console->container->call([$seeder, 'doExecute']);
         } catch (\PDOException $e) {
             if ($this->getOption('v')) {
@@ -93,6 +105,14 @@ class ImportCommand extends CoreCommand
             }
 
             throw $e;
+        } finally {
+            if ($db instanceof MysqlDriver) {
+                $this->out('Re-enable all indexes.');
+
+                foreach ($tables as $table) {
+                    $db->execute("ALTER TABLE `{$table}` ENABLE KEYS;");
+                }
+            }
         }
 
         return true;
