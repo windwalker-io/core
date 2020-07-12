@@ -24,7 +24,7 @@ namespace {
          *
          * @since  3.3
          */
-        function env(string $name, $default = null):? string
+        function env(string $name, $default = null): ?string
         {
             return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
         }
@@ -237,9 +237,8 @@ namespace Windwalker {
     /**
      * collect
      *
-     * @param array  $data
-     * @param int    $flags
-     * @param string $iteratorClass
+     * @param mixed $data
+     * @param bool  $includeChildren
      *
      * @return  Collection
      *
@@ -247,18 +246,16 @@ namespace Windwalker {
      */
     function arr(
         $data = [],
-        int $flags = ArrayObject::ARRAY_AS_PROPS,
-        string $iteratorClass = \ArrayIterator::class
+        bool $includeChildren = false
     ): Collection {
-        return new Collection($data, $flags, $iteratorClass);
+        return Collection::wrap($data, $includeChildren);
     }
 
     /**
      * collect
      *
-     * @param array  $data
-     * @param int    $flags
-     * @param string $iteratorClass
+     * @param mixed $data
+     * @param bool  $includeChildren
      *
      * @return  Collection
      *
@@ -266,10 +263,9 @@ namespace Windwalker {
      */
     function collect(
         $data = [],
-        int $flags = ArrayObject::ARRAY_AS_PROPS,
-        string $iteratorClass = \ArrayIterator::class
+        bool $includeChildren = false
     ): Collection {
-        return arr($data, $flags, $iteratorClass);
+        return arr($data, $includeChildren);
     }
 
     /**
