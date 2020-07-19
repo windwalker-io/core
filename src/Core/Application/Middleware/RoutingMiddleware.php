@@ -148,7 +148,7 @@ class RoutingMiddleware extends AbstractWebMiddleware
         $class      = StringNormalise::toClassNamespace(
             sprintf(
                 '%s\Controller\%s\%s',
-                implode($route, '\\'),
+                implode('\\', $route),
                 ucfirst($controller),
                 $router->fetchControllerSuffix($method)
             )
