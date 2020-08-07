@@ -636,14 +636,14 @@ trait DateTimeTrait
     /**
      * isNullDate
      *
-     * @param string $dateString
-     * @param bool   $includeEmpty
+     * @param string|null $dateString
+     * @param bool        $includeEmpty
      *
      * @return  bool
      *
      * @since  3.5.8
      */
-    public static function isNullDate(string $dateString, $includeEmpty = false): bool
+    public static function isNullDate(?string $dateString, bool $includeEmpty = false): bool
     {
         $nullDates = [
             static::getNullDate(),
