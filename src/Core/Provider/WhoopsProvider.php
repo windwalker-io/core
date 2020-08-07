@@ -72,6 +72,12 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
             $handler = new PrettyPageHandler();
             $handler->setEditor($config->get('whoops.editor', 'phpstorm'));
 
+            foreach ((array) $config->get('whoops.blacklist', []) as $type => $keys) {
+                foreach ((array) $keys as $key) {
+                    $handler->blacklist($type, $key);
+                }
+            }
+
             $whoops->pushHandler($handler);
 
             $container->share(Whoops::class, $whoops)
