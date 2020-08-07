@@ -336,7 +336,7 @@ namespace Windwalker {
      *
      * @return  ClassMeta
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.21
      */
     function di_create($class, array $args): ClassMeta
     {
