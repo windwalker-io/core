@@ -20,6 +20,8 @@ use Windwalker\Renderer\AbstractRenderer;
  * The AbstractHtmlView class.
  *
  * @property-read  HtmlHeaderManager head
+ * @property-read  string name
+ * @property-read  string layout
  *
  * @since  3.0
  */
@@ -189,6 +191,14 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
     {
         if ($name === 'head') {
             return $this->package->container->get('html.header');
+        }
+
+        if ($name === 'name') {
+            return $this->name;
+        }
+
+        if ($name === 'layout') {
+            return $this->layout;
         }
 
         return parent::__get($name);
