@@ -11,6 +11,7 @@ namespace Windwalker\Core\Application\Middleware;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\DI\Annotation\Inject;
+use Windwalker\DI\DICreateTrait;
 use Windwalker\Middleware\Psr7InvokableInterface;
 
 /**
@@ -20,6 +21,8 @@ use Windwalker\Middleware\Psr7InvokableInterface;
  */
 abstract class AbstractWebMiddleware implements Psr7InvokableInterface
 {
+    use DICreateTrait;
+
     /**
      * Property app.
      *

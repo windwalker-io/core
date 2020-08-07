@@ -327,4 +327,19 @@ namespace Windwalker {
     {
         return new RawWrapper($value);
     }
+
+    /**
+     * di_create
+     *
+     * @param string|callable $class
+     * @param array           $args
+     *
+     * @return  ClassMeta
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    function di_create($class, array $args): ClassMeta
+    {
+        return Container::meta($class, $args);
+    }
 }
