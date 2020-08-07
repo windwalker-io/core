@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\View;
 
+use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Mvc\MvcHelper;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\NullPackage;
@@ -16,6 +17,7 @@ use Windwalker\Core\Repository\Repository;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Utilities\Classes\BootableTrait;
 use Windwalker\Data\Data;
+use Windwalker\IO\Input;
 use Windwalker\String\StringNormalise;
 use Windwalker\Structure\Structure;
 
@@ -26,6 +28,8 @@ use Windwalker\Structure\Structure;
  * @property-read  ViewModel|mixed $model        The ViewModel object.
  * @property-read  Structure       $config       Config object.
  * @property-read  PackageRouter   $router       Router object.
+ * @property-read  WebApplication  $app          The application object.
+ * @property-read  Input           $input        The input object.
  *
  * @since  2.1.5.3
  */
@@ -507,6 +511,14 @@ abstract class AbstractView implements \ArrayAccess
 
         if ($name === 'router') {
             return $this->getRouter();
+        }
+
+        if ($name === 'app') {
+            return $this->getPackage()->app;
+        }
+
+        if ($name === 'input') {
+            return $this->getPackage()->app->input;
         }
 
         return null;
