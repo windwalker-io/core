@@ -116,7 +116,7 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.21.1
      */
     public function isSSL(Container $container): bool
     {
