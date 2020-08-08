@@ -13,6 +13,7 @@ use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Utilities\Debug\BacktraceHelper;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\IO\Input;
 use Windwalker\Session\Bag\FlashBag;
 use Windwalker\Session\Bag\FlashBagInterface;
 use Windwalker\Session\Bag\SessionBag;
@@ -23,6 +24,7 @@ use Windwalker\Session\Database\AbstractDatabaseAdapter;
 use Windwalker\Session\Database\WindwalkerAdapter;
 use Windwalker\Session\Handler\HandlerInterface;
 use Windwalker\Session\Session;
+use Windwalker\Uri\PsrUri;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -30,7 +32,7 @@ use Windwalker\Utilities\Arr;
  *
  * @since  2.0
  */
-class SessionProvider implements ServiceProviderInterface
+class SessionProvider implements ServiceProviderInterface, BootableDeferredProviderInterface
 {
     /**
      * Registers the service provider with a DI container.
@@ -48,7 +50,7 @@ class SessionProvider implements ServiceProviderInterface
         $container->bind(FlashBagInterface::class, FlashBag::class);
         $container->bind(SessionBridgeInterface::class, NativeBridge::class);
 
-        $closure = static function (Container $container) {
+        $closure = function (Container $container) {
             /** @var \Windwalker\Structure\Structure $config */
             $config = $container->get('config');
 
@@ -59,6 +61,10 @@ class SessionProvider implements ServiceProviderInterface
 
                 $options['cookie_path']   = !empty($options['cookie_path']) ? $options['cookie_path'] : $uri->path;
                 $options['cookie_domain'] = parse_url($uri->host, PHP_URL_HOST);
+            }
+
+            if ($this->isSSL($container)) {
+                $options['force_ssl'] = true;
             }
 
             return $container->newInstance(Session::class, ['options' => $options]);
@@ -101,5 +107,44 @@ class SessionProvider implements ServiceProviderInterface
         $options = $config->get('session', []);
 
         return new WindwalkerAdapter($container->get(DatabaseAdapter::class), Arr::get($options, 'database', []));
+    }
+
+    /**
+     * isSSL
+     *
+     * @param Container $container
+     *
+     * @return  bool
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function isSSL(Container $container): bool
+    {
+        /** @var Input $input */
+        $input = $container->get('input');
+        $https = $input->server->get('https');
+
+        if ($https === 'on' || (string) $https === '1') {
+            return true;
+        }
+
+        $uri = new PsrUri($container->get('uri')->full);
+        $scheme = $uri->getScheme();
+
+        return $scheme === 'https';
+    }
+
+    /**
+     * boot
+     *
+     * @param Container $container
+     *
+     * @return  void
+     */
+    public function bootDeferred(Container $container)
+    {
+        if (!headers_sent()) {
+            ini_set('session.cookie_samesite', 'None');
+        }
     }
 }
