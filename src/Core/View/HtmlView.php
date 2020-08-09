@@ -194,7 +194,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
         }
 
         if ($name === 'name') {
-            return $this->name;
+            return strtolower($this->name);
         }
 
         if ($name === 'layout') {
