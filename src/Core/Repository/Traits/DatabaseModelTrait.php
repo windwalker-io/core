@@ -112,7 +112,7 @@ trait DatabaseModelTrait
      */
     public function transactionRollback($nested = true)
     {
-        $this->getDb()->getTransaction($nested)->start();
+        $this->getDb()->getTransaction($nested)->rollback();
 
         return $this;
     }
