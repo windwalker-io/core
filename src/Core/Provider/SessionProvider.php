@@ -53,8 +53,7 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
         $closure = function (Container $container) {
             /** @var \Windwalker\Structure\Structure $config */
             $config = $container->get('config');
-
-            $options = (array) $config->get('session', []);
+            $options = $config->extract('session');
 
             if (!$container->get('app') instanceof Console) {
                 $uri = $container->get('uri');
@@ -63,11 +62,11 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
                 $options['cookie_domain'] = parse_url($uri->host, PHP_URL_HOST);
             }
 
-            if ($this->isSSL($container)) {
+            if (static::isSSL($container) && strtolower($options['samesite']) === 'none') {
                 $options['force_ssl'] = true;
             }
 
-            return $container->newInstance(Session::class, ['options' => $options]);
+            return $container->newInstance(Session::class, ['options' => $options->toArray()]);
         };
 
         $container->share(Session::class, $closure);
@@ -118,7 +117,7 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
      *
      * @since  3.5.21.1
      */
-    public function isSSL(Container $container): bool
+    public static function isSSL(Container $container): bool
     {
         /** @var Input $input */
         $input = $container->get('input');
@@ -143,8 +142,10 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
      */
     public function bootDeferred(Container $container)
     {
-        if (!headers_sent()) {
-            ini_set('session.cookie_samesite', 'None');
+        $config = $container->get('config');
+
+        if (!headers_sent() && (string) $config->get('session.samesite') !== '') {
+            ini_set('session.cookie_samesite', $config->get('session.samesite'));
         }
     }
 }
