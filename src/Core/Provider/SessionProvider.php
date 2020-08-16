@@ -66,7 +66,7 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
                 $options['force_ssl'] = true;
             }
 
-            return $container->newInstance(Session::class, ['options'c => $options->toArray()]);
+            return $container->newInstance(Session::class, ['options' => $options->toArray()]);
         };
 
         $container->share(Session::class, $closure);
