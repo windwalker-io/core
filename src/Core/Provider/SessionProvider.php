@@ -119,6 +119,12 @@ class SessionProvider implements ServiceProviderInterface, BootableDeferredProvi
      */
     public static function isSSL(Container $container): bool
     {
+        $app = $container->get('app');
+
+        if (!$app->isWeb()) {
+            return false;
+        }
+
         /** @var Input $input */
         $input = $container->get('input');
         $https = $input->server->get('https');
