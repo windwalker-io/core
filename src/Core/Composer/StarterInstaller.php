@@ -111,6 +111,8 @@ class StarterInstaller
             }
         }
 
+        $env .= "\nAPP_ENV=dev\n";
+
         file_put_contents($dest, $env);
 
         $io->write('');
