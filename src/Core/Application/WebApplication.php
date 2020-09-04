@@ -9,7 +9,12 @@
 
 namespace Windwalker\Core\Application;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Relay\Relay;
 use Windwalker\DI\Container;
+use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 /**
@@ -48,5 +53,19 @@ class WebApplication
         $this->getContainer()->loadParameters($source, $format, $options);
     }
 
+    public function execute(ServerRequestInterface $request)
+    {
+        $queue = [
+            \Closure::fromCallable([$this, 'doExecute'])
+        ];
 
+        $relay = new Relay($queue);
+
+        return $relay->handle($request);
+    }
+
+    protected function doExecute(): ResponseInterface
+    {
+        return Response::fromString('Hello');
+    }
 }
