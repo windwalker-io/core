@@ -6,7 +6,14 @@
     "minimum-stability": "beta",
     "require": {
         "php": ">=8.0.0",
-        "windwalker/framework": "4.x-dev"
+        "windwalker/cache": "4.x-dev",
+        "windwalker/crypt": "4.x-dev",
+        "windwalker/data": "4.x-dev",
+        "windwalker/di": "4.x-dev",
+        "windwalker/environment": "4.x-dev",
+        "windwalker/event": "4.x-dev",
+        "windwalker/filesystem": "4.x-dev",
+        "windwalker/test": "4.x-dev"
     },
     "require-dev" : {
     },

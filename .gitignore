@@ -1,17 +1,28 @@
-# System
-.*
-!.gitignore
-!.gitkeep
-!.circleci
-!ide/*
-!.phpstorm.meta.php
-!.ide-toolbox.metadata.json
+# OS generated files #
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
 
-# Composer
-/vendor
+# IDE Ignores #
+.idea/
+
+# System #
+/tmp/*
+
+# Composer #
+vendor/*
 composer.lock
 
-#Windwalker
+/coverage
 
-#Test
-/phpunit.xml
+# JS #
+/node_modules
+
+# Test #
+phpunit.xml
+.phpunit.result.cache
+
+# Extra #
+!.gitkeep
