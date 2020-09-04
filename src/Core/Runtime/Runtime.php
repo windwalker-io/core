@@ -51,17 +51,11 @@ class Runtime
         return static::$container->getParameters();
     }
 
-    public static function loadConfig(string $file): Collection
+    public static function loadConfig($source, ?string $format = null, array $options = []): Collection
     {
-        $config = require $file;
-
         $container = self::getContainer();
 
-        $container->setParameters(
-            $params = $container->getParameters()->mergeRecursive($config)
-        );
-
-        return $params;
+        return $container->loadParameters($source, $format, $options);
     }
 
     /**
@@ -72,7 +66,7 @@ class Runtime
      *
      * @return  mixed
      */
-    public static function &get(string $name, string $delimiter = '.')
+    public static function &config(string $name, string $delimiter = '.')
     {
         return static::$container->getParameters()->getDeep($name, $delimiter);
     }

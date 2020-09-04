@@ -19,23 +19,34 @@ use Windwalker\Utilities\Classes\OptionAccessTrait;
  */
 class WebApplication
 {
-    use OptionAccessTrait;
-
     protected Container $container;
 
     /**
      * WebApplication constructor.
      *
      * @param Container $container
-     * @param array     $options
      */
-    public function __construct(Container $container, array $options = [])
+    public function __construct(Container $container)
     {
         $this->container = $container;
-
-        $this->prepareOptions(
-            [],
-            $options
-        );
     }
+
+    /**
+     * Method to get property Container
+     *
+     * @return  Container
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getContainer(): Container
+    {
+        return $this->container;
+    }
+
+    public function loadConfig($source, ?string $format = null, array $options = []): void
+    {
+        $this->getContainer()->loadParameters($source, $format, $options);
+    }
+
+
 }

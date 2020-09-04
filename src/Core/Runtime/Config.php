@@ -57,4 +57,14 @@ class Config extends Collection
 
         return $value;
     }
+
+    public function hasDeep(string $path, ?string $delimiter = '.'): bool
+    {
+        return $this->getDeep($path, $delimiter) !== null;
+    }
+
+    public function has($key): bool
+    {
+        return $this->get($key) !== null;
+    }
 }
