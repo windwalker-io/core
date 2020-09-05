@@ -3,27 +3,45 @@
 /**
  * Part of starter project.
  *
- * @copyright  Copyright (C) 2020 __ORGANIZATION__.
+ * @copyright  Copyright (C) 2020 .
  * @license    __LICENSE__
  */
 
-declare(strict_types=1);
-
-namespace Windwalker\Core\Factory;
+namespace Windwalker\Core\Provider;
 
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
+use Windwalker\DI\ServiceProviderInterface;
 
 use function Windwalker\DI\create;
 
 /**
- * The MonologFactory class.
+ * The MonologProvider class.
+ *
+ * @since  __DEPLOY_VERSION__
  */
-class MonologFactory
+class MonologProvider implements ServiceProviderInterface
 {
+    /**
+     * @inheritDoc
+     */
+    public function register(Container $container): void
+    {
+        //
+    }
+
+    public static function rotatingFileHandler(string $channel, ...$args): ObjectBuilderDefinition
+    {
+        return create(
+            RotatingFileHandler::class,
+            Runtime::getRootDir() . '/logs/' . $channel . '.log',
+            ...$args
+        );
+    }
+
     public static function logger(
         ?string $name = null,
         array $handlers = [],
@@ -40,12 +58,5 @@ class MonologFactory
         );
     }
 
-    public static function rotatingFileHandler(string $channel, ...$args): ObjectBuilderDefinition
-    {
-        return create(
-            RotatingFileHandler::class,
-            Runtime::getRootDir() . '/logs/' . $channel . '.log',
-            ...$args
-        );
-    }
+
 }

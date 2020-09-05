@@ -9,7 +9,6 @@
 
 namespace Windwalker\Core\Application;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,7 +20,6 @@ use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\Assert\Assert;
-use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 use function Windwalker\DI\share;
 
@@ -32,6 +30,8 @@ use function Windwalker\DI\share;
  */
 class WebApplication
 {
+    use DIPrepareTrait;
+
     protected bool $booted = false;
 
     protected Container $container;
@@ -63,7 +63,11 @@ class WebApplication
         $container->share(Container::class, $container);
         $container->share(static::class, $this);
 
-        $this->prepareDependencyInjection();
+        static::prepareDependencyInjection($this->config->get('di') ?? [], $this->getContainer());
+
+        foreach ($this->config as $service => $config) {
+            static::prepareDependencyInjection($config ?: [], $this->getContainer());
+        }
 
         $this->booted = true;
     }
@@ -126,66 +130,7 @@ class WebApplication
         return Response::fromString('Hello');
     }
 
-    protected function prepareDependencyInjection(): void
-    {
-        $container = $this->getContainer();
 
-        $this->prepareBindings($container);
-        $this->prepareProviders($container);
-        $this->prepareDIAliases($container);
-    }
-
-    protected function prepareBindings(Container $container): void
-    {
-        foreach ($this->config('di.binding') ?? [] as $key => $value) {
-            if (is_numeric($key)) {
-                if (!is_string($value)) {
-                    throw new DefinitionException(
-                        sprintf(
-                            'Binding classes must with a string key, %s given.',
-                            Assert::describeValue($value)
-                        )
-                    );
-                }
-
-                $container->set($value, share($value));
-            } else {
-                $container->set($key, $value);
-            }
-        }
-    }
-
-    protected function prepareProviders(Container $container): void
-    {
-        $bootDeferred = [];
-
-        foreach ($this->config('di.providers') ?? [] as $provider) {
-            if (is_string($provider)) {
-                $provider = $container->newInstance($provider);
-            }
-
-            $container->registerServiceProvider($provider);
-
-            if ($provider instanceof BootableProviderInterface) {
-                $provider->boot($container);
-            }
-
-            if ($provider instanceof BootableDeferredProviderInterface) {
-                $bootDeferred[] = $provider;
-            }
-        }
-
-        foreach ($bootDeferred as $provider) {
-            $provider->bootDeferred($container);
-        }
-    }
-
-    protected function prepareDIAliases(Container $container): void
-    {
-        foreach ($this->config('di.aliases') ?? [] as $alias => $id) {
-            $container->alias($alias, $id);
-        }
-    }
 
     /**
      * config

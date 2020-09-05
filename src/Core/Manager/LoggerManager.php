@@ -18,13 +18,8 @@ use Windwalker\DI\Definition\DefinitionInterface;
  */
 class LoggerManager extends AbstractManager
 {
-    public function getConfiguration(string $name)
+    public function getConfigPrefix(): string
     {
-        return $this->config->getDeep('logs.' . $name);
-    }
-
-    public function getDefinition(string $name): string|callable|DefinitionInterface
-    {
-        return $this->config->getDeep('logs.channels.' . $name);
+        return 'logs';
     }
 }

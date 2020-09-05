@@ -11,22 +11,19 @@ declare(strict_types=1);
 
 namespace Windwalker {
 
-    if (!function_exists('load_configs')) {
-        function load_configs(string $path, bool $groupWithFilename = false): array
+    if (!function_exists('include_files')) {
+        function include_files(string $path, array $contextData = []): array
         {
-            $config = [];
+            $resultBag = [];
+
+            extract($contextData, EXTR_OVERWRITE);
+            unset($contextData);
 
             foreach (glob($path) as $file) {
-                if ($groupWithFilename) {
-                    $name = pathinfo($file, PATHINFO_FILENAME);
-
-                    $config[][$name] = include $file;
-                } else {
-                    $config[] = include $file;
-                }
+                $resultBag[] = include $file;
             }
 
-            return array_merge(...$config);
+            return array_merge(...$resultBag);
         }
     }
 }

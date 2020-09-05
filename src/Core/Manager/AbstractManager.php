@@ -44,31 +44,35 @@ abstract class AbstractManager
         $this->container = $container;
     }
 
-    public function create(?string $name = null)
+    public function create(?string $name = null, ...$args)
     {
-        $name ??= $this->getConfiguration('default') ?? null;
+        $prefix = $this->getConfigPrefix();
+
+        $name ??= $this->config->getDeep($prefix . '.default');
 
         if ($name === null) {
             throw new \InvalidArgumentException('Empty definition name.');
         }
 
-        $define = $this->getDefinition($name);
+        $define = $this->config->getDeep($this->getFactoryPath($name));
 
         if (!$define) {
-            throw new \InvalidArgumentException('Definition: ' . $name . ' not found.');
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Definition: %s not found, the factory key is: %s',
+                    $name,
+                    $this->getFactoryPath($name)
+                )
+            );
         }
 
-        return $this->container->newInstance($define);
+        return $this->container->newInstance($define, $args);
     }
 
-    abstract public function getConfiguration(string $name);
+    abstract  public function getConfigPrefix(): string;
 
-    /**
-     * getDefinition
-     *
-     * @param  string  $name
-     *
-     * @return  string|callable|DefinitionInterface
-     */
-    abstract public function getDefinition(string $name): string|callable|DefinitionInterface;
+    protected function getFactoryPath(string $name): string
+    {
+        return $this->getConfigPrefix() . '.factories.instances.' . $name;
+    }
 }
