@@ -39,6 +39,11 @@ class Runtime
     public static function boot(string $rootDir, string $workDir): void
     {
         if (static::isBooted()) {
+            $container = static::getContainer();
+            $config = $container->getParameters();
+            $container->share(Config::class, $config);
+            $container->share(Container::class, $container);
+
             return;
         }
 

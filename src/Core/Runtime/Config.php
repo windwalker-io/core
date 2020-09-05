@@ -33,8 +33,12 @@ class Config extends Collection
     {
         $value = parent::getDeep($path, $delimiter);
 
+        if ($value === null && $this->parent) {
+            $value = $this->parent->getDeep($path, $delimiter);
+        }
+
         while ($value instanceof ValueReference) {
-            $value = $value($this->storage, null, $delimiter);
+            $value = $value($this, $value->getDelimiter() ?? $delimiter);
         }
 
         return $value;
@@ -49,10 +53,14 @@ class Config extends Collection
      */
     public function &get($key)
     {
-        $value = parent::getDeep($key);
+        $value = parent::get($key);
+
+        if ($value === null && $this->parent) {
+            $value = $this->parent->get($key);
+        }
 
         while ($value instanceof ValueReference) {
-            $value = $value($this->storage);
+            $value = $value($this);
         }
 
         return $value;
