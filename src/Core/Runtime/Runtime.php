@@ -12,8 +12,6 @@ namespace Windwalker\Core\Runtime;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 
-use function Windwalker\value;
-
 /**
  * The Runtime class.
  *
@@ -40,7 +38,7 @@ class Runtime
     {
         if (static::isBooted()) {
             $container = static::getContainer();
-            $config = $container->getParameters();
+            $config    = $container->getParameters();
             $container->share(Config::class, $config);
             $container->share(Container::class, $container);
 
@@ -121,5 +119,21 @@ class Runtime
     public static function getWorkDir(): string
     {
         return self::$workDir;
+    }
+
+    /**
+     * dev
+     *
+     * @return  void
+     *
+     * @deprecated Remove this after services prepared.
+     */
+    public static function dev(): void
+    {
+        $whoops = new \Whoops\Run();
+        $handler = new \Whoops\Handler\PrettyPageHandler();
+        $handler->setEditor('phpstorm');
+        $whoops->pushHandler($handler);
+        $whoops->register();
     }
 }

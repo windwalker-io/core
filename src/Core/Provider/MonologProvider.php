@@ -57,6 +57,4 @@ class MonologProvider implements ServiceProviderInterface
             }
         );
     }
-
-
 }

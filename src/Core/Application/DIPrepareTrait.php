@@ -31,6 +31,16 @@ trait DIPrepareTrait
         static::prepareDIAliases($config['aliases'] ?? [], $container);
     }
 
+    /**
+     * prepareBindings
+     *
+     * @param  array      $config
+     * @param  Container  $container
+     *
+     * @return  void
+     *
+     * @throws DefinitionException
+     */
     protected static function prepareBindings(array $config, Container $container): void
     {
         foreach ($config as $key => $value) {
@@ -44,10 +54,14 @@ trait DIPrepareTrait
                     );
                 }
 
-                $container->set($value, share($value));
-            } else {
-                $container->set($key, $value);
+                $key = $value;
             }
+
+            if (is_string($value)) {
+                $value = share($value);
+            }
+
+            $container->set($key, $value);
         }
     }
 

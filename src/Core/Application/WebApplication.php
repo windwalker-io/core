@@ -18,6 +18,7 @@ use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\ServiceAwareTrait;
 use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\Assert\Assert;
 
@@ -31,10 +32,11 @@ use function Windwalker\DI\share;
 class WebApplication
 {
     use DIPrepareTrait;
+    use ServiceAwareTrait {
+        resolve as diResolve;
+    }
 
     protected bool $booted = false;
-
-    protected Container $container;
 
     /**
      * @var MiddlewareInterface[]|callable[]
@@ -51,6 +53,13 @@ class WebApplication
         $this->container = $container;
     }
 
+    /**
+     * boot
+     *
+     * @return  void
+     *
+     * @throws DefinitionException
+     */
     public function boot(): void
     {
         if ($this->booted) {
