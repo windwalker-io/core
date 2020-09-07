@@ -14,11 +14,34 @@ namespace Windwalker\Core\Runtime;
 use Windwalker\Data\Collection;
 use Windwalker\Utilities\Wrapper\ValueReference;
 
+use function Windwalker\tap;
+
 /**
  * The Config class.
  */
 class Config extends Collection
 {
+    /**
+     * Make sure storage is first.
+     *
+     * @var array
+     */
+    protected $storage = [];
+
+    protected ?Config $parent = null;
+
+    /**
+     * @inheritDoc
+     */
+    public function extract(?string $path = null, bool $reference = false)
+    {
+        return tap(parent::extract($path, $reference), function ($new) use ($reference) {
+            if ($reference) {
+                $new->parent = $this;
+            }
+        });
+    }
+
     /**
      * getDeep
      *
@@ -74,5 +97,17 @@ class Config extends Collection
     public function has($key): bool
     {
         return $this->get($key) !== null;
+    }
+
+    /**
+     * Method to get property Parent
+     *
+     * @return  Config|null
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getParent(): ?Config
+    {
+        return $this->parent;
     }
 }

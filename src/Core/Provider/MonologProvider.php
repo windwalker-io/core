@@ -37,7 +37,7 @@ class MonologProvider implements ServiceProviderInterface
     {
         return create(
             RotatingFileHandler::class,
-            Runtime::getRootDir() . '/logs/' . $channel . '.log',
+            Runtime::config('@logs') . '/' . $channel . '.log',
             ...$args
         );
     }
@@ -51,8 +51,8 @@ class MonologProvider implements ServiceProviderInterface
             function (Container $container) use ($processors, $handlers, $name) {
                 return new Logger(
                     $name,
-                    array_map(fn($handler) => $container->resolve($handler), $handlers),
-                    array_map(fn($processor) => $container->resolve($processor), $processors)
+                    array_map(fn($handler) => $container->resolve($handler, ['_name' => $name]), $handlers),
+                    array_map(fn($processor) => $container->resolve($processor, ['_name' => $name]), $processors)
                 );
             }
         );
