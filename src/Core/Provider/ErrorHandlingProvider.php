@@ -10,6 +10,7 @@
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -46,6 +47,9 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
         $iniValues = $this->config->get('ini') ?? [];
 
         $this->setINIValues($iniValues, $container);
+
+        $error = $container->get(ErrorService::class);
+        $error->register(true, $this->config->get('report_level', E_ALL | E_STRICT), true);
     }
 
     /**
@@ -53,5 +57,16 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
      */
     public function register(Container $container): void
     {
+        $container->prepareSharedObject(ErrorService::class, function (ErrorService $error, Container $container) {
+            foreach ($this->config->getDeep('factories.handlers') ?? [] as $key => $handler) {
+                if (is_string($handler)) {
+                    $handler = $container->resolve($handler);
+                }
+
+                $error->addHandler($handler, is_numeric($key) ? null : $key);
+            }
+
+            return $error;
+        });
     }
 }
