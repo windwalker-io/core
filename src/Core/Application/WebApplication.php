@@ -19,6 +19,10 @@ use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceAwareTrait;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventEmitterInterface;
+use Windwalker\Event\EventListenableInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\Assert\Assert;
 
@@ -27,14 +31,13 @@ use function Windwalker\DI\share;
 /**
  * The WebApplication class.
  *
+ * @property-read Config $config
+ *
  * @since  __DEPLOY_VERSION__
  */
-class WebApplication
+class WebApplication implements ApplicationInterface
 {
-    use DIPrepareTrait;
-    use ServiceAwareTrait {
-        resolve as diResolve;
-    }
+    use ApplicationTrait;
 
     protected bool $booted = false;
 
@@ -71,8 +74,9 @@ class WebApplication
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
         $container->share(static::class, $this);
+        $container->share(ApplicationInterface::class, $this);
 
-        static::prepareDependencyInjection($this->config->get('di') ?? [], $this->getContainer());
+        static::prepareDependencyInjection($this->config('di') ?? [], $this->getContainer());
 
         foreach ($this->config as $service => $config) {
             if (!is_array($config)) {

@@ -13,6 +13,7 @@ use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Utilities\Assert\Assert;
 
 use function Windwalker\DI\share;
@@ -70,11 +71,11 @@ trait DIPrepareTrait
         $bootDeferred = [];
 
         foreach ($config ?? [] as $provider) {
-            if (is_string($provider)) {
-                $provider = $container->newInstance($provider);
-            }
+            $provider = $container->resolve($provider);
 
-            $container->registerServiceProvider($provider);
+            if ($provider instanceof ServiceProviderInterface) {
+                $container->registerServiceProvider($provider);
+            }
 
             if ($provider instanceof BootableProviderInterface) {
                 $provider->boot($container);
