@@ -53,6 +53,14 @@ abstract class AbstractManager
         return $this->config->getDeep('default');
     }
 
+    /**
+     * create
+     *
+     * @param  string|null  $name
+     * @param  mixed        ...$args
+     *
+     * @return  object
+     */
     public function create(?string $name = null, ...$args)
     {
         $name ??= $this->getDefaultName();

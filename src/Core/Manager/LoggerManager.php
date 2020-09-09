@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * The LoggerManager class.
+ *
+ * @method LoggerInterface create(?string $name = null, ...$args)
+ * @method LoggerInterface get(?string $name = null, ...$args)
  */
 class LoggerManager extends AbstractManager
 {

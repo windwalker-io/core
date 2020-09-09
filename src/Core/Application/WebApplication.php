@@ -75,6 +75,10 @@ class WebApplication
         static::prepareDependencyInjection($this->config->get('di') ?? [], $this->getContainer());
 
         foreach ($this->config as $service => $config) {
+            if (!is_array($config)) {
+                throw new \LogicException("Config: '{$service}' must be array");
+            }
+
             static::prepareDependencyInjection($config ?: [], $this->getContainer());
         }
 
