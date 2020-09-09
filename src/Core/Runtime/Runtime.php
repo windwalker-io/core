@@ -120,20 +120,4 @@ class Runtime
     {
         return self::$workDir;
     }
-
-    /**
-     * dev
-     *
-     * @return  void
-     *
-     * @deprecated Remove this after services prepared.
-     */
-    public static function dev(): void
-    {
-        $whoops = new \Whoops\Run();
-        $handler = new \Whoops\Handler\PrettyPageHandler();
-        $handler->setEditor('phpstorm');
-        $whoops->pushHandler($handler);
-        $whoops->register();
-    }
 }
