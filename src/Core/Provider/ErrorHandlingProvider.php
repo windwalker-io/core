@@ -49,7 +49,11 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
         $this->setINIValues($iniValues, $container);
 
         $error = $container->get(ErrorService::class);
-        $error->register(true, $this->config->get('report_level', E_ALL | E_STRICT), true);
+        $error->register(
+            $this->config->get('restore') ?? true,
+            $this->config->get('report_level') ?? E_ALL | E_STRICT,
+            $this->config->get('register_shutdown') ?? true
+        );
     }
 
     /**

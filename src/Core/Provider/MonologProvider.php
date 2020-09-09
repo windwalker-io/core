@@ -9,6 +9,7 @@
 
 namespace Windwalker\Core\Provider;
 
+use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 use Windwalker\Core\Runtime\Runtime;
@@ -48,12 +49,34 @@ class MonologProvider implements ServiceProviderInterface
         array $processors = []
     ): ObjectBuilderDefinition {
         return create(
-            function (Container $container) use ($processors, $handlers, $name) {
-                return new Logger(
+            static function (Container $container) use ($processors, $handlers, $name) {
+                $logger = new Logger(
                     $name,
-                    array_map(fn($handler) => $container->resolve($handler, ['_name' => $name]), $handlers),
+                    array_map(
+                        function ($handler) use ($container, $name) {
+                            /** @var HandlerInterface $handler */
+                            $handler = $container->resolve($handler, ['_name' => $name]);
+
+                            return $handler->setFormatter(
+                                $container->resolve(
+                                    $container->getParam('logs.factories.formatters.line_formatter')
+                                )
+                            );
+                        },
+                        $handlers
+                    ),
                     array_map(fn($processor) => $container->resolve($processor, ['_name' => $name]), $processors)
                 );
+
+                foreach ($container->getParam('logs.global_handlers') as $handler) {
+                    $logger->pushHandler($container->resolve($handler));
+                }
+
+                foreach ($container->getParam('logs.global_processors') as $processor) {
+                    $logger->pushProcessor($container->resolve($processor));
+                }
+
+                return $logger;
             }
         );
     }

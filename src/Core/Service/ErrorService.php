@@ -77,6 +77,8 @@ class ErrorService
     public function __construct(Config $config)
     {
         $this->config = $config->proxy('error');
+
+        $this->addHandler([$this, 'simpleHandler'], 'default');
     }
 
     /**
@@ -155,9 +157,13 @@ class ErrorService
      * @return  void
      * @throws \InvalidArgumentException
      */
-    protected function respond($exception): void
+    protected function simpleHandler(\Throwable $exception): void
     {
-        echo $exception;
+        if ($this->config->getDeep('app.debug')) {
+            echo $exception;
+        } else {
+            echo $exception->getMessage();
+        }
 
         // $renderer = $this->app->renderer->getRenderer($this->engine);
         //
