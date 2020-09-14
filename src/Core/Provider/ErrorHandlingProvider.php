@@ -63,9 +63,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     {
         $container->prepareSharedObject(ErrorService::class, function (ErrorService $error, Container $container) {
             foreach ($this->config->getDeep('factories.handlers') ?? [] as $key => $handler) {
-                if (is_string($handler)) {
-                    $handler = $container->resolve($handler);
-                }
+                $handler = $container->resolve($handler);
 
                 $error->addHandler($handler, is_numeric($key) ? null : $key);
             }

@@ -30,6 +30,7 @@ trait DIPrepareTrait
         static::prepareBindings($config['bindings'] ?? [], $container);
         static::prepareProviders($config['providers'] ?? [], $container);
         static::prepareDIAliases($config['aliases'] ?? [], $container);
+        static::prepareExtends($config['extends'] ?? [], $container);
     }
 
     /**
@@ -95,6 +96,13 @@ trait DIPrepareTrait
     {
         foreach ($config as $alias => $id) {
             $container->alias($alias, $id);
+        }
+    }
+
+    protected static function prepareExtends(array $config, Container $container): void
+    {
+        foreach ($config as $class => $extend) {
+            $container->extend($class, $extend);
         }
     }
 }

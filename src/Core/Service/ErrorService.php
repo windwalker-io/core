@@ -77,8 +77,6 @@ class ErrorService
     public function __construct(Config $config)
     {
         $this->config = $config->proxy('error');
-
-        $this->addHandler([$this, 'simpleHandler'], 'default');
     }
 
     /**

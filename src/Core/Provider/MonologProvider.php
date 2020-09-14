@@ -55,7 +55,7 @@ class MonologProvider implements ServiceProviderInterface
                     array_map(
                         function ($handler) use ($container, $name) {
                             /** @var HandlerInterface $handler */
-                            $handler = $container->resolve($handler, ['_name' => $name]);
+                            $handler = $container->resolve($handler, ['instanceName' => $name]);
 
                             return $handler->setFormatter(
                                 $container->resolve(

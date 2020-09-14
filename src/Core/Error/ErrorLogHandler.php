@@ -8,8 +8,10 @@
 
 namespace Windwalker\Core\Error;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\LoggerService;
+use Windwalker\Utilities\Options\OptionsResolverTrait;
 use Windwalker\Utilities\Reflection\BacktraceHelper;
 
 /**
@@ -19,6 +21,8 @@ use Windwalker\Utilities\Reflection\BacktraceHelper;
  */
 class ErrorLogHandler implements ErrorHandlerInterface
 {
+    use OptionsResolverTrait;
+
     /**
      * @var LoggerService
      */
@@ -34,11 +38,24 @@ class ErrorLogHandler implements ErrorHandlerInterface
      *
      * @param  LoggerService  $logger
      * @param  Config         $config
+     * @param  array          $options
      */
-    public function __construct(LoggerService $logger, Config $config)
+    public function __construct(LoggerService $logger, Config $config, array $options = [])
     {
         $this->logger = $logger;
         $this->config = $config;
+
+        $this->resolveOptions($options, [$this, 'configureOptions']);
+    }
+
+    protected function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'enabled' => false,
+                'channel' => 'error',
+            ]
+        );
     }
 
     /**

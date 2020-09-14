@@ -13,14 +13,10 @@ namespace Windwalker\Core\Manager;
 
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
-use Windwalker\DI\Definition\DefinitionInterface;
-use Windwalker\Utilities\Assert\ArgumentsAssert;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-use Windwalker\Utilities\Classes\ObjectBuilderAwareTrait;
-use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 /**
- * The AnstractManager class.
+ * The AbstractManager class.
  */
 abstract class AbstractManager
 {
@@ -44,7 +40,7 @@ abstract class AbstractManager
      */
     public function __construct(Config $config, Container $container)
     {
-        $this->config = $config->proxy($this->getConfigPrefix());
+        $this->config    = $config->proxy($this->getConfigPrefix());
         $this->container = $container;
     }
 
@@ -92,7 +88,7 @@ abstract class AbstractManager
 
     protected function prepareArguments(string $name, array $args): array
     {
-        $args['_name'] = $name;
+        $args['instanceName'] = $name;
 
         return $args;
     }
@@ -116,10 +112,10 @@ abstract class AbstractManager
     {
         $name ??= $this->getDefaultName();
 
-        return $this->once('instance.' . $name, fn () => $this->create($name, ...$args));
+        return $this->once('instance.' . $name, fn() => $this->create($name, ...$args));
     }
 
-    abstract  public function getConfigPrefix(): string;
+    abstract public function getConfigPrefix(): string;
 
     protected function getFactoryPath(string $name): string
     {
