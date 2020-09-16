@@ -94,10 +94,10 @@ class SefWebMiddleware extends AbstractWebMiddleware
             'poster=' => $baseSrc
         ];
 
-        foreach ($attributes as $attribute) {
+        foreach ($attributes as $attribute => $base) {
             if (strpos($buffer, $attribute) !== false) {
                 $regex  = '#\s' . $attribute . '"(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
-                $buffer = preg_replace($regex, ' ' . $attribute . '"' . $baseHref . '$1"', $buffer);
+                $buffer = preg_replace($regex, ' ' . $attribute . '"' . $base . '$1"', $buffer);
                 $this->checkBuffer($buffer);
             }
         }
