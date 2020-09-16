@@ -79,7 +79,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
         );
 
         $baseSrc = $this->getOption(
-            'base',
+            'base_src',
             $this->app->uri->path . '/'
         );
 
