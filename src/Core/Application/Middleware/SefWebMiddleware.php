@@ -73,9 +73,14 @@ class SefWebMiddleware extends AbstractWebMiddleware
     protected function replaceRoutes(string $buffer): string
     {
         // Replace src links.
-        $base = $this->getOption(
+        $baseHref = $this->getOption(
             'base',
             rtrim($this->app->uri->path . '/' . $this->app->uri->script, '/') . '/'
+        );
+
+        $baseSrc = $this->getOption(
+            'base',
+            $this->app->uri->path . '/'
         );
 
         // For feeds we need to search for the URL with domain.
@@ -83,12 +88,16 @@ class SefWebMiddleware extends AbstractWebMiddleware
         // Check for all unknown protocals
         // (a protocol must contain at least one alpahnumeric character followed by a ":").
         $protocols  = '[a-zA-Z0-9\-]+:';
-        $attributes = ['href=', 'src=', 'poster='];
+        $attributes = [
+            'href=' => $baseHref,
+            'src=' => $baseSrc,
+            'poster=' => $baseSrc
+        ];
 
         foreach ($attributes as $attribute) {
             if (strpos($buffer, $attribute) !== false) {
                 $regex  = '#\s' . $attribute . '"(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
-                $buffer = preg_replace($regex, ' ' . $attribute . '"' . $base . '$1"', $buffer);
+                $buffer = preg_replace($regex, ' ' . $attribute . '"' . $baseHref . '$1"', $buffer);
                 $this->checkBuffer($buffer);
             }
         }
@@ -97,11 +106,11 @@ class SefWebMiddleware extends AbstractWebMiddleware
             $regex  = '#\s+srcset="([^"]+)"#m';
             $buffer = (string) preg_replace_callback(
                 $regex,
-                static function ($match) use ($base, $protocols) {
+                static function ($match) use ($baseSrc, $protocols) {
                     preg_match_all('#(?:[^\s]+)\s*(?:[\d\.]+[wx])?(?:\,\s*)?#i', $match[1], $matches);
 
                     foreach ($matches[0] as &$src) {
-                        $src = preg_replace('#^(?!/|' . $protocols . '|\#|\')(.+)#', $base . '$1', $src);
+                        $src = preg_replace('#^(?!/|' . $protocols . '|\#|\')(.+)#', $baseSrc . '$1', $src);
                     }
 
                     return ' srcset="' . implode($matches[0]) . '"';
@@ -115,7 +124,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
         // Replace all unknown protocals in javascript window open events.
         if (strpos($buffer, 'window.open(') !== false) {
             $regex  = '#onclick="window.open\(\'(?!/|' . $protocols . '|\#)([^/]+[^\']*?\')#m';
-            $buffer = (string) preg_replace($regex, 'onclick="window.open(\'' . $base . '$1', $buffer);
+            $buffer = (string) preg_replace($regex, 'onclick="window.open(\'' . $baseHref . '$1', $buffer);
             $this->checkBuffer($buffer);
         }
         // Replace all unknown protocols in onmouseover and onmouseout attributes.
@@ -124,7 +133,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
         foreach ($attributes as $attribute) {
             if (strpos($buffer, $attribute) !== false) {
                 $regex  = '#' . $attribute . '"this.src=([\']+)(?!/|' . $protocols . '|\#|\')([^"]+)"#m';
-                $buffer = (string) preg_replace($regex, $attribute . '"this.src=$1' . $base . '$2"', $buffer);
+                $buffer = (string) preg_replace($regex, $attribute . '"this.src=$1' . $baseSrc . '$2"', $buffer);
                 $this->checkBuffer($buffer);
             }
         }
@@ -134,7 +143,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
             $regex_url = '\s*url\s*\(([\'\"]|\&\#0?3[49];)?(?!/|\&\#0?3[49];|'
                 . $protocols . '|\#)([^\)\'\"]+)([\'\"]|\&\#0?3[49];)?\)';
             $regex     = '#style=\s*([\'\"])(.*):' . $regex_url . '#m';
-            $buffer    = (string) preg_replace($regex, 'style=$1$2: url($3' . $base . '$4$5)', $buffer);
+            $buffer    = (string) preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
             $this->checkBuffer($buffer);
         }
 
@@ -143,20 +152,20 @@ class SefWebMiddleware extends AbstractWebMiddleware
             // OBJECT <param name="xx", value="yy"> -- fix it only inside the <param> tag.
             $regex  = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|' .
                 $protocols . '|\#|\')([^"]*)"#m';
-            $buffer = (string) preg_replace($regex, '$1name="$2" value="' . $base . '$3"', $buffer);
+            $buffer = (string) preg_replace($regex, '$1name="$2" value="' . $baseSrc . '$3"', $buffer);
             $this->checkBuffer($buffer);
 
             // OBJECT <param value="xx", name="yy"> -- fix it only inside the <param> tag.
             $regex  = '#(<param\s+[^>]*)value\s*=\s*"(?!/|' . $protocols
                 . '|\#|\')([^"]*)"\s*name\s*=\s*"(movie|src|url)"#m';
-            $buffer = (string) preg_replace($regex, '<param value="' . $base . '$2" name="$3"', $buffer);
+            $buffer = (string) preg_replace($regex, '<param value="' . $baseSrc . '$2" name="$3"', $buffer);
             $this->checkBuffer($buffer);
         }
 
         // Replace all unknown protocols in OBJECT tag.
         if (strpos($buffer, '<object') !== false) {
             $regex  = '#(<object\s+[^>]*)data\s*=\s*"(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
-            $buffer = preg_replace($regex, '$1data="' . $base . '$2"', $buffer);
+            $buffer = preg_replace($regex, '$1data="' . $baseSrc . '$2"', $buffer);
             $this->checkBuffer($buffer);
         }
 
