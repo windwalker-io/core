@@ -138,12 +138,20 @@ class SefWebMiddleware extends AbstractWebMiddleware
             }
         }
 
+        $regexUrl = 'url\s*\(([\'\"]|\&\#0?3[49];)?(?!\/|\&\#0?3[49];|'
+            . $protocols . '|\#)([^\)\'\"]+)([\'\"]|\&\#0?3[49];)?\)';
+
         // Replace all unknown protocols in CSS background image.
         if (strpos($buffer, 'style=') !== false) {
-            $regex_url = '\s*url\s*\(([\'\"]|\&\#0?3[49];)?(?!/|\&\#0?3[49];|'
-                . $protocols . '|\#)([^\)\'\"]+)([\'\"]|\&\#0?3[49];)?\)';
-            $regex     = '#style=\s*([\'\"])(.*):' . $regex_url . '#m';
+            $regex     = '#style=\s*([\'\"])(.*):' . $regexUrl . '#m';
             $buffer    = (string) preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
+            $this->checkBuffer($buffer);
+        }
+
+        // Replace style tags
+        if (strpos($buffer, '<style') !== false) {
+            $regex     = '#<style(.*?)>(.*?)' . $regexUrl . '(.*?)</style>#is';
+            $buffer    = (string) preg_replace($regex, '<style$1>$2 url($3' . $baseSrc . '$4$5)$6</style>', $buffer);
             $this->checkBuffer($buffer);
         }
 
