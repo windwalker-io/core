@@ -104,7 +104,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
 
         if (strpos($buffer, 'srcset=') !== false) {
             $regex  = '#\s+srcset="([^"]+)"#m';
-            $buffer = (string) preg_replace_callback(
+            $buffer = preg_replace_callback(
                 $regex,
                 static function ($match) use ($baseSrc, $protocols) {
                     preg_match_all('#(?:[^\s]+)\s*(?:[\d\.]+[wx])?(?:\,\s*)?#i', $match[1], $matches);
@@ -124,7 +124,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
         // Replace all unknown protocals in javascript window open events.
         if (strpos($buffer, 'window.open(') !== false) {
             $regex  = '#onclick="window.open\(\'(?!/|' . $protocols . '|\#)([^/]+[^\']*?\')#m';
-            $buffer = (string) preg_replace($regex, 'onclick="window.open(\'' . $baseHref . '$1', $buffer);
+            $buffer = preg_replace($regex, 'onclick="window.open(\'' . $baseHref . '$1', $buffer);
             $this->checkBuffer($buffer);
         }
         // Replace all unknown protocols in onmouseover and onmouseout attributes.
@@ -133,7 +133,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
         foreach ($attributes as $attribute) {
             if (strpos($buffer, $attribute) !== false) {
                 $regex  = '#' . $attribute . '"this.src=([\']+)(?!/|' . $protocols . '|\#|\')([^"]+)"#m';
-                $buffer = (string) preg_replace($regex, $attribute . '"this.src=$1' . $baseSrc . '$2"', $buffer);
+                $buffer = preg_replace($regex, $attribute . '"this.src=$1' . $baseSrc . '$2"', $buffer);
                 $this->checkBuffer($buffer);
             }
         }
@@ -144,14 +144,27 @@ class SefWebMiddleware extends AbstractWebMiddleware
         // Replace all unknown protocols in CSS background image.
         if (strpos($buffer, 'style=') !== false) {
             $regex     = '#style=\s*([\'\"])(.*):' . $regexUrl . '#m';
-            $buffer    = (string) preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
+            $buffer    = preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
             $this->checkBuffer($buffer);
         }
 
         // Replace style tags
         if (strpos($buffer, '<style') !== false) {
-            $regex     = '#<style(.*?)>(.*?)' . $regexUrl . '(.*?)</style>#is';
-            $buffer    = (string) preg_replace($regex, '<style$1>$2 url($3' . $baseSrc . '$4$5)$6</style>', $buffer);
+            /** @var null|string $buffer */
+            $buffer = preg_replace_callback(
+                "'<style(.*?)>(.*?)</style>'is",
+                function ($matches) use ($baseSrc, $regexUrl) {
+                    $css = $matches[2];
+
+                    if (strpos($css, 'url') !== false) {
+                        $css = preg_replace('#' . $regexUrl . '#is', 'url($1' . $baseSrc . '$2$3)', $css);
+                    }
+
+                    return '<style' . $matches[1] . '>' . $css . '</style>';
+                },
+                $buffer
+            );
+
             $this->checkBuffer($buffer);
         }
 
@@ -160,13 +173,13 @@ class SefWebMiddleware extends AbstractWebMiddleware
             // OBJECT <param name="xx", value="yy"> -- fix it only inside the <param> tag.
             $regex  = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|' .
                 $protocols . '|\#|\')([^"]*)"#m';
-            $buffer = (string) preg_replace($regex, '$1name="$2" value="' . $baseSrc . '$3"', $buffer);
+            $buffer = preg_replace($regex, '$1name="$2" value="' . $baseSrc . '$3"', $buffer);
             $this->checkBuffer($buffer);
 
             // OBJECT <param value="xx", name="yy"> -- fix it only inside the <param> tag.
             $regex  = '#(<param\s+[^>]*)value\s*=\s*"(?!/|' . $protocols
                 . '|\#|\')([^"]*)"\s*name\s*=\s*"(movie|src|url)"#m';
-            $buffer = (string) preg_replace($regex, '<param value="' . $baseSrc . '$2" name="$3"', $buffer);
+            $buffer = preg_replace($regex, '<param value="' . $baseSrc . '$2" name="$3"', $buffer);
             $this->checkBuffer($buffer);
         }
 
@@ -189,7 +202,7 @@ class SefWebMiddleware extends AbstractWebMiddleware
      *
      * @since  1.8.13
      */
-    private function checkBuffer(string $buffer): void
+    private function checkBuffer(?string $buffer): void
     {
         if ($buffer === null) {
             switch (preg_last_error()) {
