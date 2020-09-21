@@ -12,21 +12,12 @@ namespace Windwalker\Core\Application;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\Core\Runtime\Config;
-use Windwalker\DI\BootableDeferredProviderInterface;
-use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\DI\ServiceAwareTrait;
-use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventEmitterInterface;
-use Windwalker\Event\EventListenableInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Http\Response\Response;
-use Windwalker\Utilities\Assert\Assert;
-
-use function Windwalker\DI\share;
 
 /**
  * The WebApplication class.
@@ -49,7 +40,7 @@ class WebApplication implements ApplicationInterface
     /**
      * WebApplication constructor.
      *
-     * @param Container $container
+     * @param  Container  $container
      */
     public function __construct(Container $container)
     {
@@ -133,6 +124,8 @@ class WebApplication implements ApplicationInterface
     {
         $this->boot();
 
+        $this->getContainer()->share(ServerRequestInterface::class, $request);
+
         $queue = $this->middlewares;
 
         $queue[] = \Closure::fromCallable([$this, 'doExecute']);
@@ -142,12 +135,23 @@ class WebApplication implements ApplicationInterface
         return $relay->handle($request);
     }
 
-    protected function doExecute(): ResponseInterface
+    protected function doExecute(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return Response::fromString('Hello');
+        $controller = $request->getAttribute('controller');
+        $request    = $request->withoutAttribute('controller');
+
+        if (isset($controller[0]) && class_exists($controller[0])) {
+            $controller[0] = $this->make($controller[0]);
+        }
+
+        $res = $controller($request);
+
+        if (!$res instanceof ResponseInterface) {
+            $res = Response::fromString((string) $res);
+        }
+
+        return $res;
     }
-
-
 
     /**
      * config
