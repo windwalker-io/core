@@ -6,6 +6,7 @@
     "minimum-stability": "beta",
     "require": {
         "php": ">=8.0.0",
+        "ext-json": "*",
         "windwalker/cache": "4.x-dev",
         "windwalker/crypt": "4.x-dev",
         "windwalker/data": "4.x-dev",
@@ -18,7 +19,9 @@
         "webmozart/glob": "^4.0",
         "monolog/monolog": "^2.0",
         "relay/relay": "^2.0",
-        "filp/whoops": "^2.1"
+        "filp/whoops": "^2.1",
+        "symfony/dotenv": "^5.0",
+        "symfony/options-resolver": "^5.0"
     },
     "require-dev" : {
     },

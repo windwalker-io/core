@@ -9,6 +9,7 @@
 
 namespace Windwalker\Core\Application;
 
+use Windwalker\Core\Provider\AppProvider;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;

@@ -14,6 +14,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
+use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -62,10 +64,7 @@ class WebApplication implements ApplicationInterface
 
         // Prepare child
         $container = $this->getContainer();
-        $container->share(Config::class, $container->getParameters());
-        $container->share(Container::class, $container);
-        $container->share(static::class, $this);
-        $container->share(ApplicationInterface::class, $this);
+        $container->registerServiceProvider(new AppProvider($this));
 
         static::prepareDependencyInjection($this->config('di') ?? [], $this->getContainer());
 
@@ -128,7 +127,8 @@ class WebApplication implements ApplicationInterface
 
         $queue = $this->middlewares;
 
-        $queue[] = \Closure::fromCallable([$this, 'doExecute']);
+        $queue[] = fn (ServerRequestInterface $request) => $this->service(ControllerDispatcher::class)
+            ->dispatch($request);
 
         $relay = new Relay($queue);
 
@@ -137,20 +137,7 @@ class WebApplication implements ApplicationInterface
 
     protected function doExecute(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $controller = $request->getAttribute('controller');
-        $request    = $request->withoutAttribute('controller');
-
-        if (isset($controller[0]) && class_exists($controller[0])) {
-            $controller[0] = $this->make($controller[0]);
-        }
-
-        $res = $controller($request);
-
-        if (!$res instanceof ResponseInterface) {
-            $res = Response::fromString((string) $res);
-        }
-
-        return $res;
+        return $this->service(ControllerDispatcher::class)->dispatch($request);
     }
 
     /**

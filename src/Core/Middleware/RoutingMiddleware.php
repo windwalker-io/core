@@ -50,7 +50,7 @@ class RoutingMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $router = $this->app->getContainer()->get(Router::class);
+        $router = $this->app->service(Router::class);
         $dispatcher = $router->getRouteDispatcher();
         $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
 
