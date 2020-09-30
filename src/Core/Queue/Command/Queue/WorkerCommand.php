@@ -93,6 +93,9 @@ class WorkerCommand extends CoreCommand
         $this->addOption('timeout')
             ->defaultValue(60)
             ->description('Number of seconds that a job can run.');
+
+        $this->addOption('file')
+            ->description('The job file to run once.');
     }
 
     /**
@@ -125,7 +128,15 @@ class WorkerCommand extends CoreCommand
         $this->listenToWorker($worker);
 
         if ($this->getOption('once')) {
-            $worker->runNextJob($queues, $options);
+            $file = $this->getOption('file');
+
+            if ($file) {
+                /** @var QueueMessage $message */
+                $message = unserialize(file_get_contents($file));
+                $worker->process($message, $options);
+            } else {
+                $worker->runNextJob($queues, $options);
+            }
         } else {
             $worker->loop($queues, $options);
         }

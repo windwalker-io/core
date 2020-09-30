@@ -39,6 +39,7 @@ class QueueProvider implements ServiceProviderInterface
         $container->prepareSharedObject(QueueManager::class);
 
         $container->share(Queue::class, function (Container $container) {
+            /** @var QueueManager $manager */
             $manager = $container->get('queue.manager');
             $queue   = $manager->create(false);
 

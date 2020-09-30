@@ -9,8 +9,11 @@
 namespace Windwalker\Core\Queue;
 
 use Pheanstalk\Pheanstalk;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 use Windwalker\Core\Config\Config;
 use Windwalker\DI\Container;
+use Windwalker\Filesystem\File;
 use Windwalker\Queue\Driver\BeanstalkdQueueDriver;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Driver\IronmqQueueDriver;
@@ -26,6 +29,7 @@ use Windwalker\Queue\Failer\NullQueueFailer;
 use Windwalker\Queue\Failer\PdoQueueFailer;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Queue;
+use Windwalker\Queue\QueueMessage;
 use Windwalker\Structure\Structure;
 
 /**
@@ -178,7 +182,33 @@ class QueueManager
                 );
 
             case 'sync':
-                return new SyncQueueDriver();
+                $handler = null;
+
+                if (class_exists(Process::class)) {
+                    $handler = function (QueueMessage $message) {
+                        $tmp = File::createTemp(WINDWALKER_TEMP);
+                        file_put_contents($tmp, serialize($message));
+
+                        register_shutdown_function(function () use ($tmp) {
+                            File::delete($tmp);
+                        });
+
+                        (new Process(
+                            [
+                                (new PhpExecutableFinder())->find(),
+                                'windwalker',
+                                'queue',
+                                'worker',
+                                '--once',
+                                '--file=' . $tmp . ''
+                            ]
+                        ))
+                            ->setWorkingDirectory(WINDWALKER_ROOT)
+                            ->mustRun();
+                    };
+                }
+
+                return new SyncQueueDriver($handler);
 
             case 'database':
                 return new DatabaseQueueDriver(
