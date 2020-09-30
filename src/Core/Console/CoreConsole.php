@@ -286,6 +286,64 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     }
 
     /**
+     * createProcess
+     *
+     * @param string $script
+     *
+     * @return  Process
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function createProcess(string $script): Process
+    {
+        if (!class_exists(Process::class)) {
+            throw new \DomainException('Please install symfony/process first.');
+        }
+
+        $process = Process::fromShellCommandline($script);
+        $process->setTimeout(0);
+
+        $pathName = PlatformHelper::isWindows() ? 'Path' : 'PATH';
+
+        $path = implode(
+            PlatformHelper::isWindows() ? ';' : ':',
+            [
+                WINDWALKER_ROOT . '/vendor/bin',
+                WINDWALKER_ROOT . '/bin',
+                env($pathName)
+            ]
+        );
+
+        $env = $process->getEnv();
+        $env[$pathName] = $path;
+
+        $process->setEnv($env);
+
+        $process->setWorkingDirectory(WINDWALKER_ROOT);
+
+        return $process;
+    }
+
+    /**
+     * processOutputCallback
+     *
+     * @param string $type
+     * @param string $buffer
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function processOutputCallback($type, $buffer): void
+    {
+        if (Process::ERR === $type) {
+            $this->io->err($buffer, false);
+        } else {
+            $this->io->out($buffer, false);
+        }
+    }
+
+    /**
      * runProcess
      *
      * @param string      $script
@@ -301,34 +359,13 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         $this->addMessage('>>> ' . $script, 'info');
 
         if (class_exists(Process::class)) {
-            $process = Process::fromShellCommandline($script);
-            $process->setTimeout(0);
+            $process = $this->createProcess($script);
 
             if ($input !== null) {
                 $process->setInput($input);
             }
 
-            $pathName = PlatformHelper::isWindows() ? 'Path' : 'PATH';
-
-            $path = implode(
-                PlatformHelper::isWindows() ? ';' : ':',
-                [
-                    WINDWALKER_ROOT . '/vendor/bin',
-                    WINDWALKER_ROOT . '/bin',
-                    env($pathName)
-                ]
-            );
-
-            return $process->run(
-                function ($type, $buffer) {
-                    if (Process::ERR === $type) {
-                        $this->io->err($buffer, false);
-                    } else {
-                        $this->io->out($buffer, false);
-                    }
-                },
-                [$pathName => $path]
-            );
+            return $process->run([$this, 'processOutputCallback']);
         }
 
         system($script, $return);
