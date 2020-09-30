@@ -71,8 +71,6 @@ class BackupRepository extends Repository
     {
         $this->command->out()->out('Backing up SQL...');
 
-        $this->lastBackup = $sql = $this->getSQLExport();
-
         $config = Ioc::getConfig();
         $dir = $config->get('path.temp') . '/migration/sql-backup';
 
@@ -82,7 +80,9 @@ class BackupRepository extends Repository
 
         $file = $dir . '/sql-backup-' . gmdate('Y-m-d-H-i-s-') . uniqid() . '.sql';
 
-        file_put_contents($file, $sql);
+        $this->exportTo($file);
+
+        $this->lastBackup = $file;
 
         $this->command->out()->out('SQL backup to: <info>' . $file . '</info>')->out();
 
@@ -112,11 +112,15 @@ class BackupRepository extends Repository
     /**
      * getSQLExport
      *
-     * @return  string
+     * @param  string  $file
+     *
+     * @return  void
      */
-    public function getSQLExport()
+    public function exportTo(string $file)
     {
-        return $this->exporter->export();
+        Folder::create(dirname($file));
+
+        $this->exporter->export($file);
     }
 
     /**

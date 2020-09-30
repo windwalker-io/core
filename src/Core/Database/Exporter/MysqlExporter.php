@@ -8,7 +8,10 @@
 
 namespace Windwalker\Core\Database\Exporter;
 
+use Symfony\Component\Process\Process;
 use Windwalker\Core\Database\TableHelper;
+use Windwalker\Environment\PlatformHelper;
+use Windwalker\Http\Stream\Stream;
 use Windwalker\Query\Mysql\MysqlGrammar;
 
 /**
@@ -21,28 +24,98 @@ class MysqlExporter extends AbstractExporter
     /**
      * export
      *
-     * @return mixed|string
+     * @param  string  $file
+     *
+     * @return void
      */
-    public function export()
+    public function export(string $file)
     {
+        $md = $this->findMysqldump();
+
+        if ($md && class_exists(Process::class)) {
+            $options = $this->db->getOptions();
+
+            $process = Process::fromShellCommandline(
+                sprintf(
+                    '%s -u %s -p %s > %s',
+                    $md,
+                    $options['user'],
+                    $options['database'],
+                    $file
+                )
+            );
+            $process->setTimeout(600);
+            $process->mustRun();
+
+            return;
+        }
+
+        $stream = new Stream($file, Stream::MODE_WRITE_ONLY_RESET);
+
         $tables = $this->db->getDatabase()->getTables(true);
 
-        $sql = [];
-
         foreach ($tables as $table) {
+            $sql = [];
+
             // Table
             $sql[] = MysqlGrammar::dropTable($table, true);
             $sql[] = $this->getCreateTable($table);
+
+            $stream->write((string) implode(";\n", $sql));
 
             // Data
             $inserts = $this->getInserts($table);
 
             if ($inserts) {
-                $sql[] = $inserts;
+                $stream->write((string) $inserts);
             }
         }
 
-        return implode(";\n\n", $sql);
+        $stream->close();
+    }
+
+    /**
+     * findMysqldump
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function findMysqldump(): ?string
+    {
+        if ($md = env('MYSQLDUMP_BINARY')) {
+            return $md;
+        }
+
+        if (class_exists(Process::class)) {
+            $process = Process::fromShellCommandline('which mysqldump');
+            $code = $process->run();
+
+            if ($code === 0) {
+                return $process->getOutput();
+            }
+        }
+
+        $pos = [];
+
+        if (PlatformHelper::isWindows()) {
+            $pos = [
+                'C:\xampp\mysql\bin\mysqldump.exe',
+            ];
+        } elseif (PlatformHelper::isUnix()) {
+            $pos = [
+                '/Applications/XAMPP/xamppfiles/bin/mysqldump',
+                '/Applications/AMPPS/bin/mysqldump',
+            ];
+        }
+
+        foreach ($pos as $md) {
+            if (is_file($md) && is_executable($md)) {
+                return $md;
+            }
+        }
+        
+        return null;
     }
 
     /**

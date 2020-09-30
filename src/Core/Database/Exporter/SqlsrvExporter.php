@@ -18,9 +18,11 @@ class SqlsrvExporter extends AbstractExporter
     /**
      * export
      *
+     * @param  string  $file
+     *
      * @return mixed|string
      */
-    public function export()
+    public function export(string $file)
     {
         echo 'Sqlsrv exporter not yet prepared.';
 

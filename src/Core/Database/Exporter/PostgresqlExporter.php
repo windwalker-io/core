@@ -18,9 +18,11 @@ class PostgresqlExporter extends AbstractExporter
     /**
      * export
      *
+     * @param  string  $file
+     *
      * @return mixed|string
      */
-    public function export()
+    public function export(string $file)
     {
         echo 'Postgresql exporter not yet prepared.';
 

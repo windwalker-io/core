@@ -105,13 +105,12 @@ class ExportCommand extends CoreCommand
             Chronos::create()->format('Y-m-d-H-i-s')
         );
 
+        Folder::create(dirname($dest));
+
         $repository = $this->getBackupRepository(
             Ioc::service(DatabaseService::class)->getConnection($conn)
         );
-        $sql = $repository->getSQLExport();
-
-        Folder::create(dirname($dest));
-        File::write($dest, $sql);
+        $repository->exportTo($dest);
 
         $this->out(sprintf('Export SQL to: <info>%s</info>', $dest));
 

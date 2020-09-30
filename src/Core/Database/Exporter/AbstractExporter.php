@@ -23,9 +23,11 @@ abstract class AbstractExporter extends Repository
     /**
      * export
      *
-     * @return mixed|string
+     * @param  string  $file
+     *
+     * @return void
      */
-    abstract public function export();
+    abstract public function export(string $file);
 
     /**
      * getCreateTable
