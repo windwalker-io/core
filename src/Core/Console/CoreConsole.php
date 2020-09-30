@@ -8,6 +8,7 @@
 
 namespace Windwalker\Core\Console;
 
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Whoops\Exception\Frame;
 use Whoops\Exception\Inspector;
@@ -303,19 +304,24 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         $process = Process::fromShellCommandline($script);
         $process->setTimeout(0);
 
-        $pathName = PlatformHelper::isWindows() ? 'Path' : 'PATH';
+        $phpPath = dirname((new PhpExecutableFinder())->find());
 
         $path = implode(
             PlatformHelper::isWindows() ? ';' : ':',
             [
+                $phpPath,
                 WINDWALKER_ROOT . '/vendor/bin',
                 WINDWALKER_ROOT . '/bin',
-                env($pathName)
+                env('PATH') ?? env('Path')
             ]
         );
 
         $env = $process->getEnv();
-        $env[$pathName] = $path;
+        $env['PATH'] = $path;
+
+        if (PlatformHelper::isWindows()) {
+            $env['Path'] = $path;
+        }
 
         $process->setEnv($env);
 
