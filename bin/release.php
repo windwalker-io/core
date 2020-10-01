@@ -100,7 +100,7 @@ HELP;
     {
         [$version] = explode('-', $version, 2);
 
-        $numbers = array_pad(explode('.', $version), 3, 0);
+        $numbers = array_pad(explode('.', $version), 4, 0);
 
         $numbers = array_combine(
             [
@@ -118,11 +118,13 @@ HELP;
 
         $num =& $numbers[$element];
         $num++;
-
+        
         $i = array_search($element, array_keys($numbers), true);
 
-        foreach (range($i + 1, count($numbers) - 1) as $k) {
-            $numbers[array_keys($numbers)[$k]] = 0;
+        if ($i < 3) {
+            foreach (range($i + 1, count($numbers) - 1) as $k) {
+                $numbers[array_keys($numbers)[$k]] = 0;
+            }
         }
 
         if ($numbers['variant'] === 0) {
