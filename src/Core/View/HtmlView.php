@@ -167,7 +167,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
         $name = strtolower($this->name);
         $data->view   = $this;
         $data->helper = $this->getHelperSet();
-        $data->bodyClass = "package-{$this->getPackage()->name} view-{$name} layout-{$this->getLayout()}";
+        $data->bodyClass = $this->getBodyClass();
 
         foreach ($this->getRendererManager()->getHelpers() as $name => $helper) {
             $data->helper->addHelper($name, $helper);
@@ -178,6 +178,22 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
         $globals['router']  = (clone $this->getPackage()->router)->mute(true);
 
         $data->bind($globals);
+    }
+
+    /**
+     * getBodyClass
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getBodyClass(): string
+    {
+        $name = strtolower($this->name);
+        $layout = $this->getLayout();
+        $layout = str_replace('.', '_', $layout);
+
+        return "package-{$this->getPackage()->name} view-{$name} layout-{$layout}";
     }
 
     /**
