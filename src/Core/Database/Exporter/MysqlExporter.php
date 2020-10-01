@@ -30,20 +30,22 @@ class MysqlExporter extends AbstractExporter
      */
     public function export(string $file)
     {
-        $md = $this->findMysqldump();
+        $md = trim($this->findMysqldump());
 
         if ($md && class_exists(Process::class)) {
             $options = $this->db->getOptions();
 
             $process = Process::fromShellCommandline(
                 sprintf(
-                    '%s -u %s -p %s > %s',
+                    '%s -u %s -p%s %s > %s',
                     $md,
                     $options['user'],
+                    $options['password'],
                     $options['database'],
                     $file
                 )
             );
+
             $process->setTimeout(600);
             $process->mustRun();
 
@@ -114,7 +116,7 @@ class MysqlExporter extends AbstractExporter
                 return $md;
             }
         }
-        
+
         return null;
     }
 
