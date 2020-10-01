@@ -185,7 +185,7 @@ class HtmlView extends AbstractView implements LayoutRenderableInterface
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22
      */
     public function getBodyClass(): string
     {

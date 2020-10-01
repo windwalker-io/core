@@ -79,7 +79,7 @@ class MysqlExporter extends AbstractExporter
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22
      */
     protected function findMysqldump(): ?string
     {

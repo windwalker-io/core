@@ -293,7 +293,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      *
      * @return  Process
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22
      */
     public function createProcess(string $script): Process
     {
@@ -338,7 +338,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22
      */
     public function processOutputCallback($type, $buffer): void
     {
