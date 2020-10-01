@@ -32,24 +32,29 @@ class MysqlExporter extends AbstractExporter
     {
         $md = trim($this->findMysqldump());
 
-        if ($md && class_exists(Process::class)) {
-            $options = $this->db->getOptions();
+        try {
+            if ($md && class_exists(Process::class)) {
+                $options = $this->db->getOptions();
 
-            $process = Process::fromShellCommandline(
-                sprintf(
-                    '%s -u %s -p%s %s > %s',
-                    $md,
-                    $options['user'],
-                    $options['password'],
-                    $options['database'],
-                    $file
-                )
-            );
+                $process = Process::fromShellCommandline(
+                    sprintf(
+                        '%s -u %s -p%s %s > %s',
+                        $md,
+                        $options['user'],
+                        $options['password'],
+                        $options['database'],
+                        $file
+                    )
+                );
 
-            $process->setTimeout(600);
-            $process->mustRun();
+                $process->setTimeout(600);
+                $process->mustRun();
 
-            return;
+                return;
+            }
+        } catch (\Throwable $e) {
+            echo 'Error: ' . $e->getMessage() . "\n";
+            echo "Fallback to php backup script.\n";
         }
 
         $stream = new Stream($file, Stream::MODE_WRITE_ONLY_RESET);
