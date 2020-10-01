@@ -20,10 +20,11 @@ class Build extends Console
      * @var  string
      */
     protected $help = <<<HELP
-[Usage] php release.php <version> <next_version>
+[Usage] php release.php <version> [--options]
 
 [Options]
     h | help   Show help information
+    type       Version plus type, major, minor, patch, variant.
     v          Show more debug information.
     --dry-run  Dry run without git push or commit.
 HELP;
@@ -41,7 +42,7 @@ HELP;
         $targetVersion = $this->getArgument(0);
 
         if (!$targetVersion) {
-            $targetVersion = static::versionPlus($currentVersion, 1);
+            $targetVersion = static::versionPlus($currentVersion, $this->getOption('type', 'patch'));
         }
 
         $this->out('Release version: ' . $targetVersion);
@@ -88,27 +89,48 @@ HELP;
      * versionPlus
      *
      * @param string $version
-     * @param int    $offset
+     * @param string $element
      * @param string $suffix
      *
      * @return  string
      *
      * @since  __DEPLOY_VERSION__
      */
-    protected static function versionPlus(string $version, int $offset, string $suffix = ''): string
+    protected static function versionPlus(string $version, string $element = 'patch', string $suffix = ''): string
     {
         [$version] = explode('-', $version, 2);
 
-        $numbers = explode('.', $version);
+        $numbers = array_pad(explode('.', $version), 3, 0);
 
-        if (!isset($numbers[2])) {
-            $numbers[2] = 0;
+        $numbers = array_combine(
+            [
+                'major',
+                'minor',
+                'patch',
+                'variant'
+            ],
+            $numbers
+        );
+
+        if (!isset($numbers[$element])) {
+            throw new \RuntimeException('Version type: ' . $element . ' not allow.');
         }
 
-        $numbers[2] += $offset;
+        $num =& $numbers[$element];
+        $num++;
 
-        if ($numbers[2] === 0) {
-            unset($numbers[2]);
+        $i = array_search($element, array_keys($numbers), true);
+
+        foreach (range($i + 1, count($numbers) - 1) as $k) {
+            $numbers[array_keys($numbers)[$k]] = 0;
+        }
+
+        if ($numbers['variant'] === 0) {
+            unset($numbers['variant']);
+            
+            if ($numbers['patch'] === 0) {
+                unset($numbers['patch']);
+            }
         }
 
         $version = implode('.', $numbers);
