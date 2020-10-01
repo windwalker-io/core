@@ -323,7 +323,9 @@ class DebuggerListener
 
         /** @var \SplFileInfo $file */
         foreach ($files as $file) {
-            $items[$file->getMTime()] = $file;
+            if (is_file($file->getPathname())) {
+                @$items[$file->getMTime()] = $file;
+            }
         }
 
         krsort($items);
