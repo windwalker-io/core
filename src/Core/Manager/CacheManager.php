@@ -11,23 +11,30 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
-use Psr\Log\LoggerInterface;
+use Windwalker\Cache\CachePool;
 
 /**
- * The LoggerManager class.
+ * The CacheManager class.
  *
- * @method LoggerInterface create(?string $name = null, ...$args)
- * @method LoggerInterface get(?string $name = null, ...$args)
+ * @method CachePool get(?string $name = null, ...$args)
+ * @method CachePool create(?string $name = null, ...$args)
  */
-class LoggerManager extends AbstractManager
+class CacheManager extends AbstractManager
 {
     public function getConfigPrefix(): string
     {
-        return 'logs';
+        return 'cache';
     }
 
     /**
-     * @inheritDoc
+     * getDefaultFactory
+     *
+     * @param  string  $name
+     * @param  mixed   ...$args
+     *
+     * @return  mixed
+     *
+     * @since  __DEPLOY_VERSION__
      */
     protected function getDefaultFactory(string $name, ...$args): mixed
     {

@@ -57,7 +57,7 @@ abstract class AbstractManager
      *
      * @return  object
      */
-    public function create(?string $name = null, ...$args)
+    public function create(?string $name = null, ...$args): object
     {
         $name ??= $this->getDefaultName();
 
@@ -103,7 +103,7 @@ abstract class AbstractManager
      *
      * @since  __DEPLOY_VERSION__
      */
-    protected function getDefaultFactory(string $name, ...$args)
+    protected function getDefaultFactory(string $name, ...$args): mixed
     {
         return null;
     }

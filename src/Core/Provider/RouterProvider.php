@@ -35,7 +35,7 @@ class RouterProvider implements ServiceProviderInterface
     protected function registerRouter(Container $container): void
     {
         $container->prepareSharedObject(Router::class, function (Router $router, Container $container) {
-            foreach ((array) $container->getParam('router.routes') as $file) {
+            foreach ((array) $container->getParam('routing.routes') as $file) {
                 $router->registerFile($file);
             }
 

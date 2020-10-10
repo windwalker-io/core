@@ -26,11 +26,11 @@ class DatabaseManager extends AbstractManager
         return 'database';
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function getDefaultFactory(string $name, ...$args)
-    {
-        return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
-    }
+    // /**
+    //  * @inheritDoc
+    //  */
+    // protected function getDefaultFactory(string $name, ...$args): mixed
+    // {
+    //     return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
+    // }
 }
