@@ -18,22 +18,21 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Router\Router;
+use Windwalker\DI\Exception\DefinitionException;
 
 /**
  * The RoutingMiddleware class.
  */
 class RoutingMiddleware implements MiddlewareInterface
 {
-    protected WebApplication $app;
-
     /**
      * RoutingMiddleware constructor.
      *
      * @param  WebApplication  $app
      */
-    public function __construct(WebApplication $app)
+    public function __construct(protected WebApplication $app)
     {
-        $this->app = $app;
+        //
     }
 
     /**
@@ -47,6 +46,7 @@ class RoutingMiddleware implements MiddlewareInterface
      * @param  RequestHandlerInterface  $handler
      *
      * @return ResponseInterface
+     * @throws DefinitionException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -25,6 +25,21 @@ class Router
     protected array $routeDefinitions = [];
 
     /**
+     * @var Route[]
+     */
+    protected array $routes = [];
+
+    public function add(Route $route): Route
+    {
+        return $this->routes[$route->getName()] = $route;
+    }
+
+    public function addRoute(string $name, string $pattern, array $options = []): Route
+    {
+        return $this->add(new Route($name, $pattern, $options));
+    }
+
+    /**
      * registerFile
      *
      * @param  string  $file
@@ -33,9 +48,8 @@ class Router
      */
     public function registerFile(string $file)
     {
-        $this->routeDefinitions[] = function (RouteCollector $router) use ($file) {
-            include $file;
-        };
+        $router = $this;
+        include $file;
 
         return $this;
     }
@@ -75,5 +89,14 @@ class Router
     protected function createRouteDispatcher(callable $define, array $options = []): Dispatcher
     {
         return simpleDispatcher($define, $options);
+    }
+
+    public function __call(string $name, array $args)
+    {
+        $methods = [
+            'get',
+            'post',
+            ''
+        ];
     }
 }
