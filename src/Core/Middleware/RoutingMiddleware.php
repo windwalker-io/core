@@ -17,6 +17,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Router\Exception\RouteNotFoundException;
+use Windwalker\Core\Router\Exception\UnAllowedMethodException;
+use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\Exception\DefinitionException;
 
@@ -51,25 +54,47 @@ class RoutingMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $router = $this->app->service(Router::class);
-        $dispatcher = $router->getRouteDispatcher();
-        $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
 
-        switch ($routeInfo[0]) {
-            case Dispatcher::NOT_FOUND:
-                throw new \RuntimeException('Page not found', 404);
-                break;
-            case Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
-                throw new \RuntimeException('Method not allowed', 405);
-                break;
-            case Dispatcher::FOUND:
-                [, $controller, $vars] = $routeInfo;
-                $request = $request->withAttribute('controller', $controller);
-                $request = $request->withAttribute('vars', $vars);
-
-                break;
+        foreach ((array) $this->app->config('routing.routes') as $file) {
+            $router->registerFile($file);
         }
 
+        $route = $router->match($request);
+
+        $action = $this->findController($request, $route);
+
+        $request = $request->withAttribute('controller', $action);
+        $request = $request->withAttribute('vars', $route->getVars());
+
         return $handler->handle($request);
+    }
+
+    /**
+     * findAction
+     *
+     * @param  ServerRequestInterface         $request
+     * @param  Route  $route
+     *
+     * @return  mixed
+     */
+    protected function findController(ServerRequestInterface $request, Route $route): mixed
+    {
+        $method = strtolower($request->getMethod());
+
+        $handlers = $route->getHandlers();
+
+        $handler = $handlers[$method] ?? $handlers['*'] ?? null;
+
+        if (!$handler) {
+            throw new UnAllowedMethodException(
+                sprintf(
+                    'Handler for method: "%s" not found in route: "%s".',
+                    $method,
+                    $route->getName()
+                )
+            );
+        }
+
+        return $handler;
     }
 }

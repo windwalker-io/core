@@ -15,29 +15,26 @@ use FastRoute\Dispatcher;
 
 use FastRoute\RouteCollector;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Windwalker\Core\Router\Exception\RouteNotFoundException;
+use Windwalker\Core\Router\Exception\UnAllowedMethodException;
+use Windwalker\Event\EventAwareInterface;
+
+use Windwalker\Event\EventAwareTrait;
+
 use function FastRoute\simpleDispatcher;
 
 /**
  * The Router class.
  */
-class Router
+class Router implements EventAwareInterface
 {
-    protected array $routeDefinitions = [];
+    use EventAwareTrait;
 
     /**
      * @var Route[]
      */
     protected array $routes = [];
-
-    public function add(Route $route): Route
-    {
-        return $this->routes[$route->getName()] = $route;
-    }
-
-    public function addRoute(string $name, string $pattern, array $options = []): Route
-    {
-        return $this->add(new Route($name, $pattern, $options));
-    }
 
     /**
      * registerFile
@@ -46,40 +43,36 @@ class Router
      *
      * @return  $this
      */
-    public function registerFile(string $file)
+    public function registerFile(string $file): static
     {
-        $router = $this;
-        include $file;
+        $creator = static::createRouteCreator()->load($file);
+        
+        $this->routes = array_merge($this->routes, $creator->compileRoutes());
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getRouteDefinitions(): array
+    public static function createRouteCreator(): RouteCreator
     {
-        return $this->routeDefinitions;
+        return new RouteCreator();
     }
 
-    /**
-     * @param  array  $routeDefinitions
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRouteDefinitions(array $routeDefinitions)
-    {
-        $this->routeDefinitions = $routeDefinitions;
-
-        return $this;
-    }
-
-    public function getRouteDispatcher(array $options = []): Dispatcher
+    public function getRouteDispatcher(ServerRequestInterface $request, array $options = []): Dispatcher
     {
         return $this->createRouteDispatcher(
-            function (RouteCollector $router) {
-                foreach ($this->routeDefinitions as $routeDefinition) {
-                    $routeDefinition($router);
+            function (RouteCollector $router) use ($request) {
+                foreach ($this->routes as $name => $route) {
+                    if (!$this->checkRoute($request, $route)) {
+                        continue;
+                    }
+
+                    // Always use GET since we'll check methods after route matched.
+                    // This should speed up the matcher.
+                    $router->addRoute(
+                        'GET',
+                        $route->getPattern(),
+                        $route
+                    );
                 }
             },
             $options
@@ -91,12 +84,46 @@ class Router
         return simpleDispatcher($define, $options);
     }
 
-    public function __call(string $name, array $args)
+    public function match(ServerRequestInterface $request): Route
     {
-        $methods = [
-            'get',
-            'post',
-            ''
-        ];
+        $dispatcher = $this->getRouteDispatcher($request);
+        $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
+
+        switch ($routeInfo[0]) {
+            case Dispatcher::NOT_FOUND:
+                throw new RouteNotFoundException('Page not found');
+            case Dispatcher::METHOD_NOT_ALLOWED:
+                $allowedMethods = $routeInfo[1];
+                throw new UnAllowedMethodException('Method not allowed');
+            default:
+            case Dispatcher::FOUND:
+                [, $route, $vars] = $routeInfo;
+
+                /** @var Route $route */
+                $route = clone $route;
+                $vars = array_merge($vars, $route->getVars());
+                $route->vars($vars);
+
+                return $route;
+        }
+    }
+
+    public function checkRoute(ServerRequestInterface $request, Route $route): bool
+    {
+        $uri = $request->getUri();
+
+        // Match methods
+        $methods = $route->getMethods();
+
+        if ($methods && !in_array(strtolower($request->getMethod()), $methods, true)) {
+            return false;
+        }
+
+        // TODO: Match Host
+
+        // Match schemes
+        $scheme = $route->getScheme();
+
+        return !($scheme && $scheme !== $uri->getScheme());
     }
 }
