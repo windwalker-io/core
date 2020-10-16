@@ -22,11 +22,11 @@ interface ControllerInterface
     /**
      * execute
      *
-     * @param  ServerRequestInterface  $request
-     * @param  string                  $task
+     * @param  string  $task
+     * @param  array   $args
      *
-     * @return  mixed|ResponseInterface
+     * @return mixed
      * @throws \ReflectionException
      */
-    public function execute(ServerRequestInterface $request, string $task);
+    public function execute(string $task, array $args = []): mixed;
 }

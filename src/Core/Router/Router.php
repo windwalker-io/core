@@ -22,6 +22,8 @@ use Windwalker\Event\EventAwareInterface;
 
 use Windwalker\Event\EventAwareTrait;
 
+use Windwalker\Utilities\TypeCast;
+
 use function FastRoute\simpleDispatcher;
 
 /**
@@ -36,17 +38,10 @@ class Router implements EventAwareInterface
      */
     protected array $routes = [];
 
-    /**
-     * registerFile
-     *
-     * @param  string  $file
-     *
-     * @return  $this
-     */
-    public function registerFile(string $file): static
+    public function register(string|iterable $paths): static
     {
-        $creator = static::createRouteCreator()->load($file);
-        
+        $creator = static::createRouteCreator()->load($paths);
+
         $this->routes = array_merge($this->routes, $creator->compileRoutes());
 
         return $this;
@@ -86,12 +81,13 @@ class Router implements EventAwareInterface
 
     public function match(ServerRequestInterface $request): Route
     {
+        $path = $request->getUri()->getPath();
         $dispatcher = $this->getRouteDispatcher($request);
-        $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getUri()->getPath());
+        $routeInfo = $dispatcher->dispatch($request->getMethod(), $path);
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                throw new RouteNotFoundException('Page not found');
+                throw new RouteNotFoundException('Unable to find this route: ' . $path);
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
                 throw new UnAllowedMethodException('Method not allowed');
@@ -115,7 +111,7 @@ class Router implements EventAwareInterface
         // Match methods
         $methods = $route->getMethods();
 
-        if ($methods && !in_array(strtolower($request->getMethod()), $methods, true)) {
+        if ($methods && !in_array(strtoupper($request->getMethod()), $methods, true)) {
             return false;
         }
 

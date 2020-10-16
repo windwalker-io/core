@@ -21,35 +21,28 @@ use Windwalker\DI\ContainerAwareTrait;
  */
 class DelegatingController implements ControllerInterface
 {
-    use ContainerAwareTrait;
-
-    protected object $controller;
-
     /**
      * DelegatingController constructor.
      *
      * @param  Container  $container
      * @param  object     $controller
      */
-    public function __construct(Container $container, object $controller)
+    public function __construct(protected Container $container, protected object $controller)
     {
-        $this->controller = $controller;
-        $this->container = $container;
+        //
     }
 
     /**
      * execute
      *
-     * @param  ServerRequestInterface  $request
-     * @param  string                  $task
+     * @param  string  $task
+     * @param  array   $args
      *
-     * @return  mixed|ResponseInterface
+     * @return mixed
      * @throws \ReflectionException
      */
-    public function execute(ServerRequestInterface $request, string $task)
+    public function execute(string $task, array $args = []): mixed
     {
-        $attributes = $request->getAttributes();
-
-        return $this->getContainer()->call([$this, $task], $attributes);
+        return $this->container->call([$this->controller, $task], $args);
     }
 }

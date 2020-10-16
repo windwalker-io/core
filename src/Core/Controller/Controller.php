@@ -23,8 +23,6 @@ class Controller implements ControllerInterface
 {
     use ContainerAwareTrait;
 
-    protected ServerRequestInterface $request;
-
     /**
      * Controller constructor.
      *
@@ -38,18 +36,14 @@ class Controller implements ControllerInterface
     /**
      * execute
      *
-     * @param  ServerRequestInterface  $request
+     * @param  string  $task
+     * @param  array   $args
      *
-     * @param  string                  $task
-     *
-     * @return  mixed|ResponseInterface
+     * @return mixed
      * @throws \ReflectionException
      */
-    public function execute(ServerRequestInterface $request, string $task)
+    public function execute(string $task, array $args = []): mixed
     {
-        $this->request = $request;
-        $attributes = $request->getAttributes();
-
-        return $this->getContainer()->call([$this, $task], $attributes);
+        return $this->getContainer()->call([$this, $task], $args);
     }
 }

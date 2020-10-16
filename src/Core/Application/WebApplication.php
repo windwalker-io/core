@@ -66,14 +66,14 @@ class WebApplication implements ApplicationInterface
         $container = $this->getContainer();
         $container->registerServiceProvider(new AppProvider($this));
 
-        static::prepareDependencyInjection($this->config('di') ?? [], $this->getContainer());
+        $container->registerByConfig($this->config('di') ?? []);
 
         foreach ($this->config as $service => $config) {
             if (!is_array($config)) {
                 throw new \LogicException("Config: '{$service}' must be array");
             }
 
-            static::prepareDependencyInjection($config ?: [], $this->getContainer());
+            $container->registerByConfig($config ?: []);
         }
 
         $this->booted = true;

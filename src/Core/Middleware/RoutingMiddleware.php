@@ -11,13 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
-use FastRoute\Dispatcher;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
@@ -55,15 +53,13 @@ class RoutingMiddleware implements MiddlewareInterface
     {
         $router = $this->app->service(Router::class);
 
-        foreach ((array) $this->app->config('routing.routes') as $file) {
-            $router->registerFile($file);
-        }
+        $router->register($this->app->config('routing.routes') ?? []);
 
         $route = $router->match($request);
 
-        $action = $this->findController($request, $route);
+        $controller = $this->findController($request, $route);
 
-        $request = $request->withAttribute('controller', $action);
+        $request = $request->withAttribute('controller', $controller);
         $request = $request->withAttribute('vars', $route->getVars());
 
         return $handler->handle($request);
@@ -72,8 +68,8 @@ class RoutingMiddleware implements MiddlewareInterface
     /**
      * findAction
      *
-     * @param  ServerRequestInterface         $request
-     * @param  Route  $route
+     * @param  ServerRequestInterface  $request
+     * @param  Route                   $route
      *
      * @return  mixed
      */

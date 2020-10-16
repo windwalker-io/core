@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Windwalker\DI\Container;
 use Windwalker\DI\ServiceAwareTrait;
 use Windwalker\Event\EventAwareTrait;
 
@@ -19,7 +20,6 @@ use Windwalker\Event\EventAwareTrait;
  */
 trait ApplicationTrait
 {
-    use DIPrepareTrait;
     use ServiceAwareTrait {
         resolve as diResolve;
     }

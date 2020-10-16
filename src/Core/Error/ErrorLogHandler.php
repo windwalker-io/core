@@ -87,7 +87,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
             }
 
             $this->logger->error(
-                $this->config->getDeep('error.log_channel'),
+                $this->config->getDeep('error.log_channel') ?? 'error',
                 $message . "\n" . $traces,
                 ['exception' => $e]
             );

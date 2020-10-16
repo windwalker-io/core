@@ -295,15 +295,15 @@ class RouteCreator
     /**
      * load
      *
-     * @param  string|array  $paths
+     * @param  string|iterable  $paths
      *
      * @return  RouteCreator
      *
      * @since  3.5
      */
-    public function load(string|array $paths): static
+    public function load(string|iterable $paths): static
     {
-        $paths = TypeCast::toArray($paths);
+        $paths = TypeCast::toIterable($paths);
 
         $router = $this;
 
