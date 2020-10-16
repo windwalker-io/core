@@ -67,6 +67,15 @@ class ControllerDispatcher
     {
         $task = strtolower($request->getMethod());
 
+        $map = [
+            'get' => 'index',
+            'post' => 'save',
+            'put' => 'save',
+            'patch' => 'save',
+        ];
+
+        $task = $map[$task] ?? $task;
+
         if (str_contains($task, '_')) {
             $task = StrNormalise::toCamelCase($task);
         }

@@ -83,7 +83,10 @@ class Router implements EventAwareInterface
     {
         $path = $request->getUri()->getPath();
         $dispatcher = $this->getRouteDispatcher($request);
-        $routeInfo = $dispatcher->dispatch($request->getMethod(), $path);
+
+        // Always use GET to match route since FastRoute dose not supports match all methods.
+        // The method check has did before this method.
+        $routeInfo = $dispatcher->dispatch('GET', $path);
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:

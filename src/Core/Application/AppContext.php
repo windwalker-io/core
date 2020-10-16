@@ -23,6 +23,8 @@ use Windwalker\Http\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Assert\ArgumentsAssert;
 
+use function Windwalker\collect;
+
 /**
  * The Context class.
  */
@@ -44,7 +46,7 @@ class AppContext implements ApplicationInterface
 
     protected ?ServerRequestInterface $request = null;
 
-    protected array $input = [];
+    protected ?array $input = null;
 
     protected bool $isDebug = false;
 
@@ -229,6 +231,7 @@ class AppContext implements ApplicationInterface
     {
         $new = clone $this;
         $new->request = $new->request->withUri($uri);
+        $this->input = null;
 
         return $new;
     }
@@ -292,6 +295,7 @@ class AppContext implements ApplicationInterface
     {
         $new = clone $this;
         $new->request = $request;
+        $this->input = null;
 
         return $new;
     }
@@ -313,6 +317,7 @@ class AppContext implements ApplicationInterface
     {
         $new = clone $this;
         $new->matchedRoute = $matchedRoute;
+        $this->input = null;
 
         return $new;
     }
@@ -338,6 +343,13 @@ class AppContext implements ApplicationInterface
         return $new;
     }
 
+    /**
+     * input
+     *
+     * @param  mixed  ...$fields
+     *
+     * @return  mixed|Collection
+     */
     public function input(...$fields): mixed
     {
         ArgumentsAssert::assert(
@@ -346,19 +358,30 @@ class AppContext implements ApplicationInterface
         );
 
         $input = $this->compileInput();
+        $data = [];
 
         if (!Arr::isAssociative($fields)) {
-            $data = Arr::only($input, $fields);
+            foreach ($fields as $field) {
+                $data[$fields] = $input[$field] ?? null;
+            }
         } else {
-            $data = $this->getFilterFactory()->createNested($fields)->test($input);
+            foreach (array_keys($fields) as $field) {
+                $data[$field] = $input[$field] ?? null;
+            }
+
+            $this->getFilterFactory()->createNested($fields)->test($data);
         }
 
-        return $data;
+        if (\Windwalker\count($fields) === 1) {
+            return array_shift($data);
+        }
+
+        return collect($data);
     }
 
     protected function compileInput(): array
     {
-        return array_merge(
+        return $this->input ??= array_merge(
             $this->getQueryValues(),
             $this->getRequest()->getParsedBody()
         );

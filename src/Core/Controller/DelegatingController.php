@@ -43,6 +43,16 @@ class DelegatingController implements ControllerInterface
      */
     public function execute(string $task, array $args = []): mixed
     {
+        if (!method_exists($this->controller, $task)) {
+            throw new \LogicException(
+                sprintf(
+                    'Method: %s::%s() not found.',
+                    $this->controller::class,
+                    $task
+                )
+            );
+        }
+
         return $this->container->call([$this->controller, $task], $args);
     }
 }
