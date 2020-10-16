@@ -16,10 +16,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Provider\AppProvider;
+use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\Http\Response\Response;
 
 /**
  * The WebApplication class.
@@ -76,6 +76,13 @@ class WebApplication implements ApplicationInterface
             $container->registerByConfig($config ?: []);
         }
 
+        // Middlewares
+        $middlewares = $this->config('middlewares') ?? [];
+
+        foreach ($middlewares as $middleware) {
+            $this->addMiddleware($middleware);
+        }
+
         $this->booted = true;
     }
 
@@ -108,36 +115,62 @@ class WebApplication implements ApplicationInterface
     /**
      * addMiddleware
      *
-     * @param  callable|MiddlewareInterface  $middleware
+     * @param  mixed  $middleware
      *
      * @return  $this
      */
-    public function addMiddleware(MiddlewareInterface|callable $middleware)
+    public function addMiddleware(mixed $middleware)
     {
         $this->middlewares[] = $middleware;
 
         return $this;
     }
 
-    public function execute(ServerRequestInterface $request): ResponseInterface
+    /**
+     * compileMiddlewares
+     *
+     * @param  Container  $container
+     *
+     * @return array
+     *
+     * @throws \ReflectionException
+     */
+    protected function compileMiddlewares(Container $container): array
+    {
+        $queue = [];
+
+        foreach ($this->middlewares as $middleware) {
+            $queue[] = $container->resolve($middleware);
+        }
+
+        return $queue;
+    }
+
+    public function execute(ServerRequestInterface $request, ?callable $handler = null): ResponseInterface
     {
         $this->boot();
 
-        $this->getContainer()->share(ServerRequestInterface::class, $request);
+        $subContainer = $this->getContainer()->createChild();
+        $subContainer->registerServiceProvider(new RequestProvider($request));
 
-        $queue = $this->middlewares;
+        if ($handler) {
+            $subContainer->modify(
+                AppContext::class,
+                fn(AppContext $context): AppContext => $context->withController($handler)
+            );
+        }
 
-        $queue[] = fn (ServerRequestInterface $request) => $this->service(ControllerDispatcher::class)
-            ->dispatch($request);
+        $queue   = $this->compileMiddlewares($subContainer);
+        $queue[] = fn(ServerRequestInterface $request) => $subContainer->get(ControllerDispatcher::class)
+            ->dispatch($subContainer->get(AppContext::class));
 
-        $relay = new Relay($queue);
-
-        return $relay->handle($request);
+        return static::createRequestHandler($queue)
+            ->handle($request);
     }
 
-    protected function doExecute(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public static function createRequestHandler(iterable $queue): RequestHandlerInterface
     {
-        return $this->service(ControllerDispatcher::class)->dispatch($request);
+        return new Relay($queue);
     }
 
     /**

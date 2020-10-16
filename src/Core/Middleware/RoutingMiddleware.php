@@ -15,10 +15,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
+use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 
 /**
@@ -29,9 +30,9 @@ class RoutingMiddleware implements MiddlewareInterface
     /**
      * RoutingMiddleware constructor.
      *
-     * @param  WebApplication  $app
+     * @param  Container  $container
      */
-    public function __construct(protected WebApplication $app)
+    public function __construct(protected Container $container)
     {
         //
     }
@@ -51,16 +52,19 @@ class RoutingMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $router = $this->app->service(Router::class);
+        $router = $this->container->get(Router::class);
 
-        $router->register($this->app->config('routing.routes') ?? []);
+        $router->register($this->container->getParam('routing.routes') ?? []);
 
         $route = $router->match($request);
 
         $controller = $this->findController($request, $route);
 
-        $request = $request->withAttribute('controller', $controller);
-        $request = $request->withAttribute('vars', $route->getVars());
+        $this->container->modify(
+            AppContext::class,
+            fn(AppContext $context) => $context->withController($controller)
+                ->withMatchedRoute($route)
+        );
 
         return $handler->handle($request);
     }

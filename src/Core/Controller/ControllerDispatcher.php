@@ -11,6 +11,7 @@ namespace Windwalker\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\Response;
@@ -33,25 +34,33 @@ class ControllerDispatcher
         //
     }
 
-    public function dispatch(ServerRequestInterface $request): ResponseInterface
+    public function dispatch(AppContext $app): ResponseInterface
     {
-        $controller = $request->getAttribute('controller');
+        $controller = $app->getController();
+
+        if ($controller === null) {
+            throw new \LogicException(
+                sprintf(
+                    'Controller not found, please set "controller" as a callable to ServerRequest::$attributes'
+                )
+            );
+        }
 
         if (is_string($controller)) {
             if (str_contains($controller, '::')) {
                 $controller = explode('::', $controller, 2);
             } elseif (class_exists($controller)) {
-                $controller = [$controller, $this->getDefaultTask($request)];
+                $controller = [$controller, $this->getDefaultTask($app->getRequest())];
             }
         }
 
         if (is_array($controller)) {
             $controller = $this->prepareArrayCallable($controller);
         } else {
-            $controller = fn(): mixed => $this->container->call($controller, $this->getVarsFromRequest($request));
+            $controller = fn(AppContext $app): mixed => $this->container->call($controller, $app->getUrlVars());
         }
 
-        return $this->handleResponse($controller($request));
+        return $this->handleResponse($controller($app));
     }
 
     protected function getDefaultTask(ServerRequestInterface $request): string
@@ -76,11 +85,11 @@ class ControllerDispatcher
         $handler[0] = $this->container->createSharedObject($handler[0]);
 
         if ($handler[0] instanceof ControllerInterface) {
-            return function (ServerRequestInterface $request) use ($handler): mixed {
+            return function (AppContext $app) use ($handler): mixed {
                 [$object, $task] = $handler;
                 return $this->container->call(
                     [$object, 'execute'],
-                    [$task, $this->getVarsFromRequest($request)]
+                    [$task, $app->getUrlVars()]
                 );
             };
         }
@@ -89,14 +98,9 @@ class ControllerDispatcher
             throw new ControllerDispatchException('Controller is not callable.');
         }
 
-        return function (ServerRequestInterface $request) use ($handler) {
-            $this->container->call($handler, $this->getVarsFromRequest($request));
+        return function (AppContext $app) use ($handler) {
+            $this->container->call($handler, $app->getUrlVars());
         };
-    }
-
-    protected function getVarsFromRequest(ServerRequestInterface $request): array
-    {
-        return $request->getAttribute('vars') ?? [];
     }
 
     /**

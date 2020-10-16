@@ -46,6 +46,5 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Container::class, $container);
         $container->share(get_class($this->app), $this->app);
         $container->share(ApplicationInterface::class, $this->app);
-        $container->prepareSharedObject(ControllerDispatcher::class);
     }
 }

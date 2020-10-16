@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
