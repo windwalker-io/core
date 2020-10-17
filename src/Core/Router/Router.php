@@ -12,17 +12,14 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router;
 
 use FastRoute\Dispatcher;
-
 use FastRoute\RouteCollector;
-
+use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
-
 use Windwalker\Event\EventAwareTrait;
-
-use Windwalker\Utilities\TypeCast;
 
 use function FastRoute\simpleDispatcher;
 
@@ -37,6 +34,15 @@ class Router implements EventAwareInterface
      * @var Route[]
      */
     protected array $routes = [];
+
+    /**
+     * Router constructor.
+     *
+     * @param  Route[]            $routes
+     */
+    public function __construct(array $routes = []) {
+        $this->routes = $routes;
+    }
 
     public function register(string|iterable $paths): static
     {
@@ -79,9 +85,9 @@ class Router implements EventAwareInterface
         return simpleDispatcher($define, $options);
     }
 
-    public function match(ServerRequestInterface $request): Route
+    public function match(ServerRequestInterface $request, ?string $route = null): Route
     {
-        $path = $request->getUri()->getPath();
+        $path       = rtrim($route ?? $request->getUri()->getPath(), '/');
         $dispatcher = $this->getRouteDispatcher($request);
 
         // Always use GET to match route since FastRoute dose not supports match all methods.
@@ -100,7 +106,7 @@ class Router implements EventAwareInterface
 
                 /** @var Route $route */
                 $route = clone $route;
-                $vars = array_merge($vars, $route->getVars());
+                $vars  = array_merge($vars, $route->getVars());
                 $route->vars($vars);
 
                 return $route;
@@ -124,5 +130,30 @@ class Router implements EventAwareInterface
         $scheme = $route->getScheme();
 
         return !($scheme && $scheme !== $uri->getScheme());
+    }
+
+    public function getRoute(string $name): ?Route
+    {
+        return $this->routes[$name] ?? null;
+    }
+
+    /**
+     * @return Route[]
+     */
+    public function getRoutes(): array
+    {
+        return $this->routes;
+    }
+
+    /**
+     * @param  Route[]  $routes
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRoutes(array $routes): static
+    {
+        $this->routes = $routes;
+
+        return $this;
     }
 }

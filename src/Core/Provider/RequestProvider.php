@@ -15,6 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
@@ -43,16 +45,26 @@ class RequestProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
+        // Request
         $container->share(ServerRequest::class, $this->request)
             ->alias(ServerRequestInterface::class, ServerRequest::class);
 
+        // Controller Dispatcher
         $container->prepareSharedObject(ControllerDispatcher::class);
 
+        // System Uri
+        $container->share(SystemUri::class, fn() => SystemUri::parseFromRequest($this->request));
+
+        // App Context
         $container->prepareSharedObject(AppContext::class, function (AppContext $app, Container $container) {
             return $app->withIsDebug($container->getParam('app.debug'))
                 ->withMode($container->getParam('app.mode'))
-                ->withRequest($this->request);
+                ->withRequest($this->request)
+                ->withSystemUri($container->get(SystemUri::class));
         })
             ->alias(ApplicationInterface::class, AppContext::class);
+
+        // Navigator
+        $container->prepareSharedObject(Navigator::class);
     }
 }

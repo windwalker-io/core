@@ -9,6 +9,7 @@
 
 namespace Windwalker\Core\Application;
 
+use JetBrains\PhpStorm\ExitPoint;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -20,6 +21,9 @@ use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Http\Output\Output;
+use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Http\Response\RedirectResponse;
 
 /**
  * The WebApplication class.
@@ -28,9 +32,9 @@ use Windwalker\DI\Exception\DefinitionException;
  *
  * @since  __DEPLOY_VERSION__
  */
-class WebApplication implements ApplicationInterface
+class WebApplication implements WebApplicationInterface
 {
-    use ApplicationTrait;
+    use WebApplicationTrait;
 
     protected bool $booted = false;
 
@@ -197,5 +201,48 @@ class WebApplication implements ApplicationInterface
         }
 
         throw new \OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
+    }
+
+    /**
+     * Redirect to another URL.
+     *
+     * @param  string|\Stringable  $url
+     * @param  int                 $code
+     * @param  bool                $instant
+     *
+     * @return  ResponseInterface
+     */
+    public function redirect(string|\Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
+    {
+        // Perform a basic sanity check to make sure we don't have any CRLF garbage.
+        $url = preg_split("/[\r\n]/", (string) $url)[0];
+
+        // If the headers have already been sent we need to send the redirect statement via JavaScript.
+        if ($this->checkHeadersSent()) {
+            $res = HtmlResponse::fromString("<script>document.location.href='$url';</script>\n");
+        } else {
+            $res = RedirectResponse::fromString($url, $code);
+        }
+
+        if ($instant) {
+            $this->container->newInstance(Output::class)->respond($res);
+            // Close the application after the redirect.
+            $this->close();
+        }
+
+        return $res;
+    }
+
+    /**
+     * Close this request.
+     *
+     * @param  mixed  $return
+     *
+     * @return  void
+     */
+    #[ExitPoint]
+    public function close(mixed $return = ''): void
+    {
+        die($return);
     }
 }

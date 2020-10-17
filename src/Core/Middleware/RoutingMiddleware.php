@@ -19,6 +19,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 
@@ -30,9 +31,10 @@ class RoutingMiddleware implements MiddlewareInterface
     /**
      * RoutingMiddleware constructor.
      *
-     * @param  Container  $container
+     * @param  Container   $container
+     * @param  AppContext  $app
      */
-    public function __construct(protected Container $container)
+    public function __construct(protected Container $container, protected AppContext $app)
     {
         //
     }
@@ -56,7 +58,7 @@ class RoutingMiddleware implements MiddlewareInterface
 
         $router->register($this->container->getParam('routing.routes') ?? []);
 
-        $route = $router->match($request);
+        $route = $router->match($request, $this->app->getSystemUri()->route);
 
         $controller = $this->findController($request, $route);
 

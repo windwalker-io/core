@@ -11,14 +11,21 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use JetBrains\PhpStorm\ExitPoint;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
-use Windwalker\Core\Http\BodyParser;
+use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
+use Windwalker\Http\Output\Output;
+use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Assert\ArgumentsAssert;
@@ -28,9 +35,9 @@ use function Windwalker\collect;
 /**
  * The Context class.
  */
-class AppContext implements ApplicationInterface
+class AppContext implements WebApplicationInterface
 {
-    use ApplicationTrait;
+    use WebApplicationTrait;
     use FilterAwareTrait;
 
     /**
@@ -38,7 +45,7 @@ class AppContext implements ApplicationInterface
      */
     protected mixed $controller = null;
 
-    protected ?UriInterface $routedUri = null;
+    protected ?SystemUri $systemUri = null;
 
     protected ?Route $matchedRoute = null;
 
@@ -237,22 +244,22 @@ class AppContext implements ApplicationInterface
     }
 
     /**
-     * @return UriInterface|null
+     * @return SystemUri|null
      */
-    public function getRoutedUri(): ?UriInterface
+    public function getSystemUri(): ?SystemUri
     {
-        return $this->routedUri;
+        return $this->systemUri;
     }
 
     /**
-     * @param  UriInterface|null  $routedUri
+     * @param  SystemUri  $uri
      *
      * @return  static  Return self to support chaining.
      */
-    public function withRoutedUri(?UriInterface $routedUri): static
+    public function withSystemUri(SystemUri $uri): static
     {
-        $new = clone $this;
-        $new->routedUri = $routedUri;
+        $new            = clone $this;
+        $new->systemUri = $uri;
 
         return $new;
     }
@@ -362,7 +369,7 @@ class AppContext implements ApplicationInterface
 
         if (!Arr::isAssociative($fields)) {
             foreach ($fields as $field) {
-                $data[$fields] = $input[$field] ?? null;
+                $data[$field] = $input[$field] ?? null;
             }
         } else {
             foreach (array_keys($fields) as $field) {
@@ -379,11 +386,72 @@ class AppContext implements ApplicationInterface
         return collect($data);
     }
 
+    /**
+     * file
+     *
+     * @param  mixed  ...$fields
+     *
+     * @return  UploadedFileInterface[]|UploadedFileInterface|array
+     */
+    public function file(...$fields): mixed
+    {
+        ArgumentsAssert::assert(
+            $fields !== [],
+            'Please provide at least 1 field.'
+        );
+
+        $files = $this->getRequest()->getUploadedFiles();
+        $data = [];
+
+        foreach ($fields as $field) {
+            $data[$field] = $files[$field] ?? null;
+        }
+
+        if (\Windwalker\count($fields) === 1) {
+            return array_shift($data);
+        }
+
+        return collect($data);
+    }
+
     protected function compileInput(): array
     {
         return $this->input ??= array_merge(
             $this->getQueryValues(),
             $this->getRequest()->getParsedBody()
         );
+    }
+
+    /**
+     * Redirect to another URL.
+     *
+     * @param  string|\Stringable  $url
+     * @param  int                 $code
+     * @param  bool                $instant
+     *
+     * @return  ResponseInterface
+     */
+    public function redirect(string|\Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
+    {
+        $systemUri = $this->getSystemUri();
+
+        if ($systemUri) {
+            $url = $systemUri->absolute((string) $url);
+        }
+
+        return $this->getRootApp()->redirect($url, $code, $instant);
+    }
+
+    /**
+     * Close this request.
+     *
+     * @param  mixed  $return
+     *
+     * @return  void
+     */
+    #[ExitPoint]
+    public function close(mixed $return = ''): void
+    {
+        $this->getRootApp()->close($return);
     }
 }
