@@ -194,7 +194,7 @@ class SystemUri extends Uri implements \JsonSerializable
                 return $this->scriptName;
 
             case 'root':
-                return $this->cacheStorage['root'] ??= (string) $this;
+                return $this->cacheStorage['root'] ??= $this->toString(static::FULL_HOST | static::PATH);
 
             case 'host':
                 return $this->cacheStorage['host'] ??= $this->toString(static::FULL_HOST);

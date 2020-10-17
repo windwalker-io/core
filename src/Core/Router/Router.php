@@ -21,6 +21,8 @@ use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 
+use Windwalker\Utilities\Str;
+
 use function FastRoute\simpleDispatcher;
 
 /**
@@ -44,7 +46,7 @@ class Router implements EventAwareInterface
         $this->routes = $routes;
     }
 
-    public function register(string|iterable $paths): static
+    public function register(string|iterable|callable $paths): static
     {
         $creator = static::createRouteCreator()->load($paths);
 
@@ -87,16 +89,16 @@ class Router implements EventAwareInterface
 
     public function match(ServerRequestInterface $request, ?string $route = null): Route
     {
-        $path       = rtrim($route ?? $request->getUri()->getPath(), '/');
+        $route      = Str::ensureLeft(rtrim($route ?? $request->getUri()->getPath(), '/'), '/');
         $dispatcher = $this->getRouteDispatcher($request);
 
         // Always use GET to match route since FastRoute dose not supports match all methods.
         // The method check has did before this method.
-        $routeInfo = $dispatcher->dispatch('GET', $path);
+        $routeInfo = $dispatcher->dispatch('GET', $route);
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                throw new RouteNotFoundException('Unable to find this route: ' . $path);
+                throw new RouteNotFoundException('Unable to find this route: ' . $route);
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
                 throw new UnAllowedMethodException('Method not allowed');

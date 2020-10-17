@@ -301,8 +301,13 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function load(string|iterable $paths): static
+    public function load(string|iterable|callable $paths): static
     {
+        if (is_callable($paths)) {
+            $paths($this);
+            return $this;
+        }
+
         $paths = TypeCast::toIterable($paths);
 
         $router = $this;

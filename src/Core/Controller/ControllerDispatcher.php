@@ -43,7 +43,7 @@ class ControllerDispatcher
         if ($controller === null) {
             throw new \LogicException(
                 sprintf(
-                    'Controller not found, please set "controller" as a callable to ServerRequest::$attributes'
+                    'Controller not found, please set "controller" as a callable to :' . $app::class
                 )
             );
         }

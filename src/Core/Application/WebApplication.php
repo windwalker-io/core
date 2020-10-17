@@ -150,7 +150,7 @@ class WebApplication implements WebApplicationInterface
         return $queue;
     }
 
-    public function execute(ServerRequestInterface $request, ?callable $handler = null): ResponseInterface
+    public function execute(?ServerRequestInterface $request, ?callable $handler = null): ResponseInterface
     {
         $this->boot();
 
@@ -170,6 +170,11 @@ class WebApplication implements WebApplicationInterface
 
         return static::createRequestHandler($queue)
             ->handle($request);
+    }
+
+    public function dispatch(ServerRequestInterface $request)
+    {
+
     }
 
     public static function createRequestHandler(iterable $queue): RequestHandlerInterface

@@ -34,7 +34,7 @@ class RoutingMiddleware implements MiddlewareInterface
      * @param  Container   $container
      * @param  AppContext  $app
      */
-    public function __construct(protected Container $container, protected AppContext $app)
+    public function __construct(protected AppContext $app)
     {
         //
     }
@@ -54,15 +54,13 @@ class RoutingMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $router = $this->container->get(Router::class);
-
-        $router->register($this->container->getParam('routing.routes') ?? []);
+        $router = $this->app->resolve(Router::class);
 
         $route = $router->match($request, $this->app->getSystemUri()->route);
 
         $controller = $this->findController($request, $route);
 
-        $this->container->modify(
+        $this->app->getContainer()->modify(
             AppContext::class,
             fn(AppContext $context) => $context->withController($controller)
                 ->withMatchedRoute($route)

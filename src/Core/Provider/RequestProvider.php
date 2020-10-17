@@ -57,8 +57,8 @@ class RequestProvider implements ServiceProviderInterface
 
         // App Context
         $container->prepareSharedObject(AppContext::class, function (AppContext $app, Container $container) {
-            return $app->withIsDebug($container->getParam('app.debug'))
-                ->withMode($container->getParam('app.mode'))
+            return $app->withIsDebug((bool) $container->getParam('app.debug'))
+                ->withMode((string) $container->getParam('app.mode'))
                 ->withRequest($this->request)
                 ->withSystemUri($container->get(SystemUri::class));
         })
