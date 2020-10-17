@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Http\Uri;
 
@@ -261,6 +262,11 @@ class RouteUri extends Uri implements NavConstantInterface
     public function getOptions(): int
     {
         return $this->options;
+    }
+
+    public function go(int $code = 303, int $options = 0): ?ResponseInterface
+    {
+        return $this->navigator->redirect($this, $code, $options);
     }
 
     /**

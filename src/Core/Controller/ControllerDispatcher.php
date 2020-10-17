@@ -11,9 +11,11 @@ namespace Windwalker\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\DI\Container;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\StrNormalise;
 
@@ -124,6 +126,10 @@ class ControllerDispatcher
      */
     protected function handleResponse(mixed $res): ResponseInterface
     {
+        if ($res instanceof UriInterface) {
+            return new RedirectResponse($res);
+        }
+
         if (!$res instanceof ResponseInterface) {
             if (is_array($res) && is_object($res)) {
                 return Response::fromString(json_encode($res, JSON_THROW_ON_ERROR));

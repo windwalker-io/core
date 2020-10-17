@@ -27,4 +27,8 @@ interface NavConstantInterface
     public const MODE_MUTE = 1 << 4;
 
     public const MODE_ESCAPE = 1 << 5;
+
+    public const REDIRECT_ALLOW_OUTSIDE = 1 << 6;
+
+    public const REDIRECT_INSTANT = 1 << 7;
 }

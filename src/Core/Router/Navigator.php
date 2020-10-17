@@ -49,22 +49,18 @@ class Navigator implements NavConstantInterface
         return new RouteUri($handler, $this, $options);
     }
 
-    public function redirectInstant(\Stringable|string $uri, int $code = 303, bool $allowOutside = false): void
+    public function redirectInstant(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
     {
-        if ($allowOutside) {
-            $uri = $this->validateRedirectUrl($uri);
-        }
-
-        $this->app->redirect($uri, $code, true);
+        return $this->redirect($uri, $code, $options | static::REDIRECT_INSTANT);
     }
 
-    public function redirect(\Stringable|string $uri, int $code = 303, bool $allowOutside = false): ResponseInterface
+    public function redirect(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
     {
-        if ($allowOutside) {
+        if ($options & static::REDIRECT_ALLOW_OUTSIDE) {
             $uri = $this->validateRedirectUrl($uri);
         }
 
-        return $this->app->redirect($uri, $code);
+        return $this->app->redirect($uri, $code, (bool) ($options & static::REDIRECT_INSTANT));
     }
 
     public function validateRedirectUrl(\Stringable|string $uri): string
