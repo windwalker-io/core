@@ -17,6 +17,7 @@ use Windwalker\Core\Middleware\RoutingMiddleware;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
+use Windwalker\Http\Output\Output;
 use Windwalker\Http\Request\ServerRequestFactory;
 
 /**
@@ -60,6 +61,10 @@ class MicroApplication extends WebApplication
     {
         $request ??= ServerRequestFactory::createFromGlobals();
 
-        return parent::execute($request, $handler);
+        $res = parent::execute($request, $handler);
+
+        $this->service(Output::class)->respond($res);
+
+        return $res;
     }
 }

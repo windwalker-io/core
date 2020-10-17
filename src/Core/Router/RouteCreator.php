@@ -147,9 +147,16 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function any(string $name, string $pattern = null, array $options = []): Route
+    public function any(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         $groups = $this->groups;
+        $handler = null;
+
+        if ($pattern === null || is_callable($pattern)) {
+            $handler = $pattern;
+            $pattern = $name;
+            $name = md5($pattern);
+        }
 
         $route = new Route($name, $pattern);
 
@@ -177,6 +184,10 @@ class RouteCreator
 
         $route->groups($this->groups);
 
+        if ($handler) {
+            $route->handler($handler);
+        }
+
         return $route;
     }
 
@@ -191,7 +202,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function get(string $name, ?string $pattern = null, array $options = []): Route
+    public function get(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('GET');
     }
@@ -207,7 +218,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function post(string $name, ?string $pattern = null, array $options = []): Route
+    public function post(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('POST');
     }
@@ -223,7 +234,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function put(string $name, ?string $pattern = null, array $options = []): Route
+    public function put(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('PUT');
     }
@@ -239,7 +250,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function patch(string $name, ?string $pattern = null, array $options = []): Route
+    public function patch(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('PATCH');
     }
@@ -255,7 +266,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function save(string $name, ?string $pattern = null, array $options = []): Route
+    public function save(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods(['PUT', 'PATCH', 'POST']);
     }
@@ -271,7 +282,7 @@ class RouteCreator
      *
      * @since  3.5
      */
-    public function delete(string $name, ?string $pattern = null, array $options = []): Route
+    public function delete(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('DELETE');
     }
