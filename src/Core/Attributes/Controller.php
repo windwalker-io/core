@@ -25,10 +25,13 @@ class Controller implements ContainerAttributeInterface
     /**
      * Controller constructor.
      *
-     * @param  string  $config
+     * @param  string|null  $config
+     * @param  array        $views
      */
-    public function __construct(protected ?string $config = null)
-    {
+    public function __construct(
+        protected ?string $config = null,
+        protected array $views = [],
+    ) {
     }
 
     /**

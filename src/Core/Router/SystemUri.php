@@ -169,7 +169,7 @@ class SystemUri extends Uri implements \JsonSerializable
         $all = [];
 
         foreach (static::getFields() as $field) {
-            $all[$field] = $this->$field;
+            $all[$field] = $this->__get($field);
         }
 
         return $all;
@@ -182,7 +182,7 @@ class SystemUri extends Uri implements \JsonSerializable
                 return $this->cacheStorage['full'] ??= Str::ensureRight($this->original, '/');
 
             case 'current':
-                return $this->cacheStorage['full'] ??= Str::ensureRight(
+                return $this->cacheStorage['current'] ??= Str::ensureRight(
                     Uri::wrap($this->original)
                         ->toString(
                             static::FULL_HOST | static::PATH
@@ -194,13 +194,16 @@ class SystemUri extends Uri implements \JsonSerializable
                 return $this->scriptName;
 
             case 'root':
-                return $this->cacheStorage['root'] ??= $this->toString(static::FULL_HOST | static::PATH);
+                return $this->cacheStorage['root'] ??= Str::ensureRight(
+                    $this->toString(static::FULL_HOST | static::PATH),
+                    '/'
+                );
 
             case 'host':
                 return $this->cacheStorage['host'] ??= $this->toString(static::FULL_HOST);
 
             case 'path':
-                return $this->cacheStorage['path'] ??= $this->toString(static::PATH);
+                return $this->cacheStorage['path'] ??= Str::ensureRight($this->toString(static::PATH), '/');
 
             case 'route':
                 return $this->cacheStorage['route'] ??= (function () {
@@ -214,7 +217,7 @@ class SystemUri extends Uri implements \JsonSerializable
                         $route = trim(substr($route, strlen($file)), '/');
                     }
 
-                    return Str::ensureLeft($route, '/');
+                    return Str::ensureLeft(rtrim($route,'/'), '/');
                 })();
         }
 

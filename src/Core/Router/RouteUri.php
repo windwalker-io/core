@@ -33,10 +33,11 @@ class RouteUri extends Uri implements NavConstantInterface
      * RouteUri constructor.
      *
      * @param  mixed      $uri
+     * @param  array      $vars
      * @param  Navigator  $navigator
      * @param  int        $options
      */
-    public function __construct(mixed $uri, protected Navigator $navigator, int $options = 0)
+    public function __construct(mixed $uri, array $vars, protected Navigator $navigator, int $options = 0)
     {
         $this->uri = new Uri();
 
@@ -47,6 +48,7 @@ class RouteUri extends Uri implements NavConstantInterface
 
         parent::__construct($uri);
 
+        $this->vars = $vars;
         $this->options = $options;
     }
 
@@ -279,8 +281,12 @@ class RouteUri extends Uri implements NavConstantInterface
     public function __toString(): string
     {
         if ($this->handler instanceof \Closure) {
+            $vars = [];
+
             try {
-                $uri = new Uri(($this->handler)());
+                [$uri, $vars] = ($this->handler)($this->vars);
+
+                $uri = new Uri($uri);
             } catch (RouteNotFoundException $e) {
                 return $this->handleError($e);
             }
@@ -305,8 +311,8 @@ class RouteUri extends Uri implements NavConstantInterface
                 $uri->port = $this->port;
             }
 
-            if ($this->vars !== []) {
-                foreach ($this->vars as $key => $var) {
+            if ($vars !== []) {
+                foreach ($vars as $key => $var) {
                     $uri = $uri->withVar($key, $var);
                 }
             }

@@ -31,15 +31,12 @@ class RouteBuilder
         $this->parser = $parser;
     }
 
-    public function build(string $pattern, array $vars): string
+    public function build(string $pattern, array $vars): array
     {
         $variants = $this->parser->parse($pattern);
         $variant  = $this->findVariant($variants, $vars);
 
-        $uri = $this->compileUri($variant, $vars);
-
-        // Remove start slash to make this uri relative.
-        return ltrim($uri, '/');
+        return $this->compileUri($variant, $vars);
     }
 
     /**
@@ -73,9 +70,9 @@ class RouteBuilder
      * @param  array   $variant
      * @param  array   $vars
      *
-     * @return  string
+     * @return  array
      */
-    protected function compileUri(array $variant, array $vars): string
+    protected function compileUri(array $variant, array $vars): array
     {
         $segments = [];
         $pattern  = array_shift($variant);
@@ -87,7 +84,7 @@ class RouteBuilder
 
             [$name] = $segment;
 
-            $var = TypeCast::forceString($vars[$name] ?? null);
+            $var = TypeCast::forceString($vars[$name] ?? '{' . $name . '}');
 
             $segments[] = $var;
 
@@ -100,6 +97,7 @@ class RouteBuilder
             $pattern .= '?' . http_build_query($vars);
         }
 
-        return $pattern;
+        // Remove start slash to make this uri relative.
+        return [ltrim($pattern, '/'), $vars];
     }
 }

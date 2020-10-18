@@ -17,9 +17,12 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Service\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
+use Windwalker\Renderer\CompositeRenderer;
+use Windwalker\Renderer\RendererInterface;
 
 /**
  * The RequestProvider class.
@@ -66,5 +69,12 @@ class RequestProvider implements ServiceProviderInterface
 
         // Navigator
         $container->prepareSharedObject(Navigator::class);
+
+        // Renderer
+        $container->extend(RendererService::class, function (RendererService $service, Container $container) {
+            return $service->addGlobal('app', $app = $container->get(AppContext::class))
+                ->addGlobal('uri', $app->getSystemUri())
+                ->addGlobal('nav', $container->get(Navigator::class));
+        });
     }
 }

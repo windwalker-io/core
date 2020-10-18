@@ -36,7 +36,7 @@ class Navigator implements NavConstantInterface
 
     public function to(string $name, array $args = [], int $options = self::TYPE_PATH): RouteUri
     {
-        $handler = function () use ($name, $args) {
+        $handler = function (array $args) use ($name) {
             $route = $this->router->getRoute($name);
 
             if (!$route) {
@@ -46,7 +46,7 @@ class Navigator implements NavConstantInterface
             return $this->routeBuilder->build($route->getPattern(), $args);
         };
 
-        return new RouteUri($handler, $this, $options);
+        return new RouteUri($handler, $args, $this, $options);
     }
 
     public function redirectInstant(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface

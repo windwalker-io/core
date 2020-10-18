@@ -18,6 +18,7 @@ use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
+use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
@@ -80,6 +81,15 @@ class AppContext implements WebApplicationInterface
     public function config(string $name, string $delimiter = '.'): mixed
     {
         return $this->getContainer()->getParam($name, $delimiter);
+    }
+
+    public function to(string $name, array $args = [], int $options = Navigator::TYPE_PATH): RouteUri
+    {
+        return $this->container->get(Navigator::class)->to(
+            $name,
+            $args,
+            $options
+        );
     }
 
     /**
@@ -222,9 +232,9 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
-     * @return Uri|null
+     * @return Uri
      */
-    public function getUri(): ?Uri
+    public function getUri(): Uri
     {
         return $this->request->getUri();
     }
