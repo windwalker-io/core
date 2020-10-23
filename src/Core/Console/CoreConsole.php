@@ -13,6 +13,7 @@ use Symfony\Component\Process\Process;
 use Whoops\Exception\Frame;
 use Whoops\Exception\Inspector;
 use Whoops\Handler\CallbackHandler;
+use Windwalker\Console\Command\AbstractCommand;
 use Windwalker\Console\Command\RootCommand;
 use Windwalker\Console\Console;
 use Windwalker\Console\IO\IOFactory;
@@ -160,8 +161,32 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     {
         $commands = (array) $this->get('console.commands');
 
-        foreach ($commands as $command) {
+        foreach ($commands as $name => $command) {
             if ($command === false) {
+                continue;
+            }
+
+            if (is_string($command) && is_file($command)) {
+                $command = include $command;
+            }
+
+            if (is_callable($command)) {
+                $parentCommand = $this->getRootCommand();
+
+                if (str_contains($name, '/')) {
+                    $path = explode('/', $name);
+
+                    $name = array_pop($path);
+
+                    $parentCommand = $this->registerCommandRecursively($path);
+                }
+
+                $cmd = $command;
+                $command = function (...$args) use ($cmd) {
+                    return $this->container->call($cmd, $args);
+                };
+
+                $parentCommand->addCommand($name, null, [], $command);
                 continue;
             }
 
@@ -171,6 +196,32 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
 
             $this->addCommand($command);
         }
+    }
+
+    /**
+     * getAndRegisterCommandRecursively
+     *
+     * @param array $paths
+     *
+     * @return  AbstractCommand
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function registerCommandRecursively(array $paths): AbstractCommand
+    {
+        $parent = $this->getRootCommand();
+
+        foreach ($paths as $path) {
+            $child = $parent->getChild($path);
+
+            if (!$child) {
+                $child = $parent->addCommand($path);
+            }
+
+            $parent = $child;
+        }
+
+        return $parent;
     }
 
     /**
