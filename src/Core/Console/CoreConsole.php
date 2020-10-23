@@ -205,7 +205,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
      *
      * @return  AbstractCommand
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22.3
      */
     protected function registerCommandRecursively(array $paths): AbstractCommand
     {
