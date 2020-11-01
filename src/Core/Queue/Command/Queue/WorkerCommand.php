@@ -11,6 +11,8 @@ namespace Windwalker\Core\Queue\Command\Queue;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Database\DatabaseAdapter;
 use Windwalker\Core\Logger\Logger;
+use Windwalker\Core\Mailer\Adapter\SwiftMailerAdapter;
+use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Database\Driver\AbstractDatabaseDriver;
 use Windwalker\Event\Event;
@@ -235,9 +237,7 @@ class WorkerCommand extends CoreCommand
 
                 $this->console->handleException($e);
 
-                if ($this->console->database instanceof AbstractDatabaseDriver) {
-                    $this->console->database->disconnect();
-                }
+                $this->stopConnections();
             })
             ->listen('onWorkerLoopCycleEnd', function (Event $event) {
                 /** @var QueueManager $manager */
@@ -249,9 +249,7 @@ class WorkerCommand extends CoreCommand
                     $driver->disconnect();
                 }
 
-                if ($this->console->database instanceof AbstractDatabaseDriver) {
-                    $this->console->database->disconnect();
-                }
+                $this->stopConnections();
             });
     }
 
@@ -274,5 +272,31 @@ class WorkerCommand extends CoreCommand
                 'restart_signal' => $file = $this->console->get('path.temp') . '/queue/restart',
             ]
         );
+    }
+
+    /**
+     * stopConnections
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function stopConnections(): void
+    {
+        if ($this->console->database instanceof AbstractDatabaseDriver) {
+            $this->console->database->disconnect();
+        }
+
+        $mailerAdapter = Mailer::getAdapter();
+
+        if ($mailerAdapter instanceof SwiftMailerAdapter) {
+            $mailerAdapter->getMailer()->getTransport()->stop();
+        }
+
+        foreach ((array) $this->console->get('queue.stop_connections') as $handler) {
+            if (is_callable($handler)) {
+                $this->console->getContainer()->call($handler, [static::class => $this]);
+            }
+        }
     }
 }
