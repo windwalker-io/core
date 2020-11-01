@@ -197,6 +197,10 @@ class WorkerCommand extends CoreCommand
                     );
                 }
 
+                if ($this->getOption('once')) {
+                    throw $e;
+                }
+
                 $this->console->handleException($e);
             })
             ->listen('onWorkerLoopCycleStart', function (Event $event) {
