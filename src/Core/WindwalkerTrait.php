@@ -177,7 +177,8 @@ trait WindwalkerTrait
             $container->alias($alias, $target);
         }
 
-        $container->registerServiceProvider(new SystemProvider($this, $this->config));
+        $container->registerServiceProvider($systemProvider = new SystemProvider($this, $this->config));
+        $systemProvider->boot($container);
 
         $providers = (array) $this->config->get('providers');
 

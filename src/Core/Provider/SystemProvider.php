@@ -8,6 +8,9 @@
 
 namespace Windwalker\Core\Provider;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\CachedReader;
+use Doctrine\Common\Annotations\FileCacheReader;
 use Symfony\Component\Dotenv\Dotenv;
 use Windwalker\Core\Application\WindwalkerApplicationInterface;
 use Windwalker\Core\Config\Config;
@@ -22,7 +25,7 @@ use Windwalker\Structure\Structure;
  *
  * @since  2.0
  */
-class SystemProvider implements ServiceProviderInterface
+class SystemProvider implements ServiceProviderInterface, BootableProviderInterface
 {
     /**
      * Property app.
@@ -48,6 +51,38 @@ class SystemProvider implements ServiceProviderInterface
     {
         $this->app    = $app;
         $this->config = $config;
+    }
+
+    /**
+     * boot
+     *
+     * @param Container $container
+     *
+     * @return  void
+     *
+     * @throws \Doctrine\Common\Annotations\AnnotationException
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function boot(Container $container)
+    {
+        $config = $container->get(Config::class);
+
+        $cachePath = $config->get('path.cache');
+
+        $registry = $container->getAnnotationRegistry();
+
+        $reader = $registry->getAnnotationReader();
+
+        if ($reader instanceof AnnotationReader && !($config->get('system.debug') || $this->app->getMode() === 'dev')) {
+            $registry->setAnnotationReader(
+                new FileCacheReader(
+                    $reader,
+                    $cachePath . '/annotations',
+                    true
+                )
+            );
+        }
     }
 
     /**
