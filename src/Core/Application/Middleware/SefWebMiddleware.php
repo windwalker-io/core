@@ -10,8 +10,10 @@ namespace Windwalker\Core\Application\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Windwalker\Event\Event;
 use Windwalker\Http\Stream\Stream;
 use Windwalker\Middleware\MiddlewareInterface;
+use Windwalker\String\Str;
 use Windwalker\Utilities\Classes\OptionAccessTrait;
 
 /**
@@ -44,6 +46,21 @@ class SefWebMiddleware extends AbstractWebMiddleware
      */
     public function __invoke(Request $request, Response $response, $next = null)
     {
+        if ($this->getOption('enabled', true)) {
+            $this->app->listen(
+                'onSingleDragImageUploaded',
+                function (Event $event) {
+                    $url = $event['url'];
+                    
+                    $root = $this->app->uri->root;
+
+                    $url = ltrim(Str::removeLeft($url, $root), '/');
+
+                    $event['url'] = $url;
+                }
+            );
+        }
+
         /** @var Response $response */
         $response = $next($request, $response);
 
