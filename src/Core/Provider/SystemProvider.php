@@ -62,7 +62,7 @@ class SystemProvider implements ServiceProviderInterface, BootableProviderInterf
      *
      * @throws \Doctrine\Common\Annotations\AnnotationException
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22.4
      */
     public function boot(Container $container)
     {

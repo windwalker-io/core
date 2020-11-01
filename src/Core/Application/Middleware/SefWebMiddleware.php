@@ -48,10 +48,10 @@ class SefWebMiddleware extends AbstractWebMiddleware
     {
         if ($this->getOption('enabled', true)) {
             $this->app->listen(
-                'onSingleDragImageUploaded',
+                'onImageUploaded',
                 function (Event $event) {
                     $url = $event['url'];
-                    
+
                     $root = $this->app->uri->root;
 
                     $url = ltrim(Str::removeLeft($url, $root), '/');

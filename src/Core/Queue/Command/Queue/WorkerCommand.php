@@ -283,7 +283,7 @@ class WorkerCommand extends CoreCommand
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22.4
      */
     protected function stopConnections(): void
     {
