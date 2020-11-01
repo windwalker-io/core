@@ -452,6 +452,8 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
         if ($code < 400 || $code >= 500) {
             $verbose = $this->get('verbose', 0);
 
+            Core\Logger\Logger::error('console-error', (string) $exception);
+
             if (!$verbose) {
                 $this->out()->err($exception->getMessage());
 
