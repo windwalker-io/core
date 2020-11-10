@@ -247,11 +247,16 @@ abstract class AbstractView implements \ArrayAccess
      */
     public function render()
     {
+        $dispatcher = $this->getPackage()->getDispatcher();
+
+        $dispatcher->triggerEvent('onViewPrepareData', [
+            'data' => $this->getData(),
+            'view' => $this
+        ]);
+
         $this->handleData();
 
         $data = $this->getData();
-
-        $dispatcher = $this->getPackage()->getDispatcher();
 
         $dispatcher->triggerEvent('onViewBeforeRender', [
             'data' => $this->data,
