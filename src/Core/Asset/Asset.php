@@ -43,6 +43,8 @@ use Windwalker\Core\Facade\AbstractProxyFacade;
  * @method  static string        getJSObject()             getJSObject(array $array)
  * @method  static string        path()                    path($uri = null, $version = false)
  * @method  static string        root()                    root($uri = null, $version = false)
+ * @method  static string        addBase()                 addBase($uri = null, $path = 'path')
+ * @method  static string        addUriBase()              addUriBase($uri = null, $path = 'path')
  *
  * phpcs:enable
  *

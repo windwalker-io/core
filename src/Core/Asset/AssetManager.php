@@ -866,6 +866,25 @@ class AssetManager implements DispatcherAwareInterface
     }
 
     /**
+     * addUriBase
+     *
+     * @param string $uri
+     * @param string $path
+     *
+     * @return  mixed|string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function addUriBase($uri, $path = 'path')
+    {
+        if (!static::isAbsoluteUrl($uri)) {
+            $uri = $this->uri->$path . '/' . $uri;
+        }
+
+        return $uri;
+    }
+
+    /**
      * Method to get property Template
      *
      * @return  AssetTemplate
