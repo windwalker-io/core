@@ -38,10 +38,10 @@ class MysqlExporter extends AbstractExporter
 
                 $process = Process::fromShellCommandline(
                     sprintf(
-                        '%s -u %s -p%s %s > %s',
+                        '%s -u %s -p\'%s\' %s > %s',
                         $md,
                         $options['user'],
-                        $options['password'],
+                        addslashes($options['password']),
                         $options['database'],
                         $file
                     )
