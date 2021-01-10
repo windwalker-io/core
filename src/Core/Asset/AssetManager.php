@@ -873,7 +873,7 @@ class AssetManager implements DispatcherAwareInterface
      *
      * @return  mixed|string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.22.6
      */
     public function addUriBase($uri, $path = 'path')
     {
