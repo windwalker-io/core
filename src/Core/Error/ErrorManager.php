@@ -12,6 +12,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\String\Mbstring;
+use Windwalker\String\Str;
 
 /**
  * The ErrorManager class.
@@ -367,6 +368,12 @@ class ErrorManager
      */
     public static function normalizeCode($code)
     {
+        $stringCode = (string) $code;
+
+        if (strlen($stringCode) > 3) {
+            $code = substr($stringCode, 0, 3);
+        }
+
         return ResponseHelper::validateStatus($code) ? $code : 500;
     }
 
