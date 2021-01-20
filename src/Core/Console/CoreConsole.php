@@ -182,6 +182,12 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
                 }
 
                 $cmd = $command;
+
+                // Workaround for Container not suppports object::__invoke() now.
+                if (is_object($cmd) && !$cmd instanceof \Closure) {
+                    $cmd = [$cmd, '__invoke'];
+                }
+
                 $command = function (...$args) use ($cmd) {
                     return $this->container->call($cmd, $args);
                 };
