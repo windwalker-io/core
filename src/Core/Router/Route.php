@@ -171,7 +171,7 @@ class Route
             static fn($v): int => strlen(trim($v, '/'))
         );
 
-        $options['pattern'] = rtrim(implode('/', $prefixes) . $options['pattern'], '/');
+        $options['pattern'] = static::sanitize(implode('/', $prefixes) . $options['pattern']);
 
         $options['extra']['action']      = $options['actions'] ?? [];
         $options['extra']['hook']        = $options['hooks'] ?? [];

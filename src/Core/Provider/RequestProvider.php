@@ -21,8 +21,6 @@ use Windwalker\Core\Service\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
-use Windwalker\Renderer\CompositeRenderer;
-use Windwalker\Renderer\RendererInterface;
 
 /**
  * The RequestProvider class.
@@ -59,22 +57,28 @@ class RequestProvider implements ServiceProviderInterface
         $container->share(SystemUri::class, fn() => SystemUri::parseFromRequest($this->request));
 
         // App Context
-        $container->prepareSharedObject(AppContext::class, function (AppContext $app, Container $container) {
-            return $app->withIsDebug((bool) $container->getParam('app.debug'))
-                ->withMode((string) $container->getParam('app.mode'))
-                ->withRequest($this->request)
-                ->withSystemUri($container->get(SystemUri::class));
-        })
-            ->alias(ApplicationInterface::class, AppContext::class);
+        $container->prepareSharedObject(
+            AppContext::class,
+            function (AppContext $app, Container $container) {
+                return $app->withIsDebug((bool) $container->getParam('app.debug'))
+                    ->withMode((string) $container->getParam('app.mode'))
+                    ->withRequest($this->request)
+                    ->withSystemUri($container->get(SystemUri::class));
+            }
+        )
+            ->alias( ApplicationInterface::class, AppContext::class);
 
         // Navigator
         $container->prepareSharedObject(Navigator::class);
 
         // Renderer
-        $container->extend(RendererService::class, function (RendererService $service, Container $container) {
-            return $service->addGlobal('app', $app = $container->get(AppContext::class))
-                ->addGlobal('uri', $app->getSystemUri())
-                ->addGlobal('nav', $container->get(Navigator::class));
-        });
+        $container->extend(
+            RendererService::class,
+            function (RendererService $service, Container $container) {
+                return $service->addGlobal('app', $app = $container->get(AppContext::class))
+                    ->addGlobal('uri', $app->getSystemUri())
+                    ->addGlobal('nav', $container->get(Navigator::class));
+            }
+        );
     }
 }
