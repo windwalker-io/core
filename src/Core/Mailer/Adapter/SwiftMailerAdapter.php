@@ -129,13 +129,18 @@ class SwiftMailerAdapter implements MailerAdapterInterface
     public static function createTransport($transport, array $config)
     {
         $config = new Structure($config);
+        $sec = $config->get('smtp.security', 'tls');
+
+        if ($sec === 'none') {
+            $sec = null;
+        }
 
         switch ($transport) {
             case 'smtp':
                 $instance = \Swift_SmtpTransport::newInstance(
                     $config->get('smtp.host'),
                     $config->get('smtp.port', 2525),
-                    $config->get('smtp.security', 'tls')
+                    $sec
                 )->setUsername($config->get('smtp.username'))
                     ->setPassword($config->get('smtp.password'));
 
