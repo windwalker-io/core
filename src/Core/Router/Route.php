@@ -72,6 +72,11 @@ class Route
         return $this->handler($handler, $task);
     }
 
+    public function view(string $view): static
+    {
+        return $this->var('view', $view);
+    }
+
     /**
      * group
      *

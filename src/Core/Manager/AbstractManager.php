@@ -100,8 +100,6 @@ abstract class AbstractManager
      * @param  mixed   ...$args
      *
      * @return  mixed
-     *
-     * @since  __DEPLOY_VERSION__
      */
     protected function getDefaultFactory(string $name, ...$args): mixed
     {
@@ -112,7 +110,7 @@ abstract class AbstractManager
     {
         $name ??= $this->getDefaultName();
 
-        return $this->once('instance.' . $name, fn() => $this->create($name, ...$args));
+        return $this->cacheStorage['instance.' . $name] ??= $this->create($name, ...$args);
     }
 
     abstract public function getConfigPrefix(): string;

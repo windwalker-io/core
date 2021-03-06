@@ -13,7 +13,7 @@ namespace Windwalker\Core\Router;
 
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
-use Windwalker\Http\Uri;
+use Windwalker\Uri\Uri;
 
 /**
  * The RouteUri class.

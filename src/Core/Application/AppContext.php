@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
-use JetBrains\PhpStorm\ExitPoint;
+use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
@@ -24,10 +24,7 @@ use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
-use Windwalker\Http\Output\Output;
-use Windwalker\Http\Response\HtmlResponse;
-use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Http\Uri;
+use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Assert\ArgumentsAssert;
 
@@ -459,7 +456,7 @@ class AppContext implements WebApplicationInterface
      *
      * @return  void
      */
-    #[ExitPoint]
+    #[NoReturn]
     public function close(mixed $return = ''): void
     {
         $this->getRootApp()->close($return);

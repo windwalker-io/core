@@ -13,8 +13,10 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\DatabaseFactory;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\ORM\ORM;
 
 /**
  * The DatabaseProvider class.
@@ -31,6 +33,8 @@ class DatabaseProvider implements ServiceProviderInterface
     public function register(Container $container): void
     {
         $container->prepareSharedObject(DatabaseManager::class);
+        $container->prepareSharedObject(DatabaseFactory::class);
         $container->bind(DatabaseAdapter::class, fn (DatabaseManager $manager) => $manager->get());
+        $container->bind(ORM::class, fn (DatabaseManager $manager) => $manager->get()->orm());
     }
 }

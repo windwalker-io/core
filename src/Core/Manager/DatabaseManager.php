@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\ORM\ORM;
 
 /**
  * The DatabaseManager class.
@@ -26,11 +27,13 @@ class DatabaseManager extends AbstractManager
         return 'database';
     }
 
-    // /**
-    //  * @inheritDoc
-    //  */
-    // protected function getDefaultFactory(string $name, ...$args): mixed
-    // {
-    //     return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
-    // }
+    protected function getFactoryPath(string $name): string
+    {
+        return 'connections.' . $name;
+    }
+
+    public function getORM(?string $name = null): ORM
+    {
+        return $this->get($name)->orm();
+    }
 }

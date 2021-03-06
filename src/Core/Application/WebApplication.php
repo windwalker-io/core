@@ -155,7 +155,7 @@ class WebApplication implements WebApplicationInterface
         $this->boot();
 
         $subContainer = $this->getContainer()->createChild();
-        $subContainer->registerServiceProvider(new RequestProvider($request));
+        $subContainer->registerServiceProvider(new RequestProvider($request, $this));
 
         if ($handler) {
             $subContainer->modify(
