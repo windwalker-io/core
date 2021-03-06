@@ -13,18 +13,13 @@ namespace Windwalker\Core\Provider;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Manager\SessionManager;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Event\ResponseEvent;
-use Windwalker\Http\Server\ServerInterface;
-use Windwalker\Http\Server\WebHttpServer;
-use Windwalker\Session\Bridge\BridgeInterface;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
-use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 
 /**
@@ -57,15 +52,18 @@ class SessionProvider implements ServiceProviderInterface
             $cookies = new ArrayCookies($request->getCookieParams());
             $cookies->setOptions($params);
 
-            $app->getRootApp()->on('response', function (ResponseEvent $event) use ($cookies) {
-                $res = $event->getResponse();
+            $app->getRootApp()->on(
+                'response',
+                function (ResponseEvent $event) use ($cookies) {
+                    $res = $event->getResponse();
 
-                foreach ($cookies->getCookieHeaders() as $header) {
-                    $res = $res->withAddedHeader('Set-Cookie', $header);
+                    foreach ($cookies->getCookieHeaders() as $header) {
+                        $res = $res->withAddedHeader('Set-Cookie', $header);
+                    }
+
+                    $event->setResponse($res);
                 }
-
-                $event->setResponse($res);
-            });
+            );
 
             return $cookies;
         };
