@@ -11,6 +11,7 @@ namespace Windwalker\Core\Database\Exporter;
 use Symfony\Component\Process\Process;
 use Windwalker\Core\Database\TableHelper;
 use Windwalker\Environment\PlatformHelper;
+use Windwalker\Filesystem\File;
 use Windwalker\Http\Stream\Stream;
 use Windwalker\Query\Mysql\MysqlGrammar;
 
@@ -38,10 +39,12 @@ class MysqlExporter extends AbstractExporter
 
                 $process = Process::fromShellCommandline(
                     sprintf(
-                        '%s -u %s -p\'%s\' %s > %s',
+                        '%s --defaults-extra-file=%s %s > %s',
                         $md,
-                        $options['user'],
-                        addslashes($options['password']),
+                        $this->createPasswordCnfFile(
+                            $options['user'],
+                            $options['password'],
+                        ),
                         $options['database'],
                         $file
                     )
@@ -79,6 +82,28 @@ class MysqlExporter extends AbstractExporter
         }
 
         $stream->close();
+    }
+
+    protected function createPasswordCnfFile(string $user, string $password): string
+    {
+        $tmpFile = WINDWALKER_TEMP . '/.md.cnf';
+
+        $user = addslashes($user);
+        $password = addslashes($password);
+
+        $content = <<<CNF
+[mysqldump]
+user='$user'
+password='$password'
+CNF;
+
+        File::write($tmpFile, $content);
+
+        register_shutdown_function(function () use ($tmpFile) {
+            File::delete($tmpFile);
+        });
+
+        return $tmpFile;
     }
 
     /**

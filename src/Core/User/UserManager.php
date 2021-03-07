@@ -113,6 +113,29 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
     }
 
     /**
+     * validate
+     *
+     * @param array|object $user
+     * @param array        $options
+     *
+     * @return  bool|Credential
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function validate($user, $options = [])
+    {
+        if (!is_array($user) && !is_object($user)) {
+            throw new \InvalidArgumentException('Credential should be array or object.');
+        }
+
+        if (!$user instanceof Credential) {
+            $user = new Credential($user);
+        }
+
+        return $this->authentication->authenticate($user);
+    }
+
+    /**
      * login
      *
      * @param array|object $user
@@ -142,7 +165,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
 
         // Do login
         try {
-            if ($result = $this->authentication->authenticate($user)) {
+            if ($result = $this->validate($user)) {
                 $user = $this->authentication->getCredential();
 
                 // Authorise event
