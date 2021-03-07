@@ -52,7 +52,7 @@ class ControllerDispatcher
             if (str_contains($controller, '::')) {
                 $controller = explode('::', $controller, 2);
             } elseif (class_exists($controller)) {
-                $controller = [$controller, $this->getDefaultTask($app->getRequest())];
+                $controller = [$controller, $this->getDefaultTask($app->getServerRequest())];
             }
         }
 

@@ -16,6 +16,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Manager\SessionManager;
+use Windwalker\Core\Security\CsrfService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Event\ResponseEvent;
@@ -49,6 +50,7 @@ class SessionProvider implements ServiceProviderInterface
         $container->prepareObject(ArrayCookies::class);
 
         $container->bind(Session::class, fn(SessionManager $manager) => $manager->get());
+        $container->prepareSharedObject(CsrfService::class);
     }
 
     public static function psrCookies(): callable

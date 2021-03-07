@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use JetBrains\PhpStorm\Immutable;
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
+use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\RouteUri;
@@ -25,14 +27,11 @@ use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;
-use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\Assert\ArgumentsAssert;
-
-use function Windwalker\collect;
 
 /**
  * The Context class.
  */
+#[Immutable]
 class AppContext implements WebApplicationInterface
 {
     use WebApplicationTrait;
@@ -43,15 +42,9 @@ class AppContext implements WebApplicationInterface
      */
     protected mixed $controller = null;
 
-    protected ?SystemUri $systemUri = null;
-
-    protected ?Route $matchedRoute = null;
-
     protected ?Collection $state = null;
 
-    protected ?ServerRequestInterface $request = null;
-
-    protected ?array $input = null;
+    protected ?AppRequest $appRequest = null;
 
     protected bool $isDebug = false;
 
@@ -66,7 +59,7 @@ class AppContext implements WebApplicationInterface
      */
     public function __construct(Container $container)
     {
-        $this->state = new Collection();
+        $this->state     = new Collection();
         $this->container = $container;
     }
 
@@ -104,18 +97,25 @@ class AppContext implements WebApplicationInterface
      */
     public function withController(mixed $controller): static
     {
-        $new = clone $this;
+        $new             = clone $this;
         $new->controller = $controller;
 
         return $new;
     }
 
+    public function getRequestMethod(): string
+    {
+        return $this->appRequest->getMethod();
+    }
+
     public function getQueryValues(): array
     {
-        return array_merge(
-            $this->getUrlVars(),
-            $this->getUri()->getQueryValues()
-        );
+        return $this->appRequest->getQueryValues();
+    }
+
+    public function getBodyValues(): array
+    {
+        return $this->appRequest->getBodyValues();
     }
 
     /**
@@ -123,11 +123,7 @@ class AppContext implements WebApplicationInterface
      */
     public function getUrlVars(): array
     {
-        if (!$this->matchedRoute) {
-            return [];
-        }
-
-        return $this->matchedRoute->getVars();
+        return $this->appRequest->getUrlVars();
     }
 
     /**
@@ -137,30 +133,8 @@ class AppContext implements WebApplicationInterface
      */
     public function withUrlVars(array $vars): static
     {
-        $new = clone $this;
-        $new->matchedRoute = clone $new->matchedRoute;
-        $new->matchedRoute->vars($vars);
-
-        return $new;
-    }
-
-    /**
-     * @return array
-     */
-    public function getInput(): array
-    {
-        return $this->input;
-    }
-
-    /**
-     * @param  array  $input
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function withInput(array $input): static
-    {
-        $new = clone $this;
-        $new->input = $input;
+        $new             = clone $this;
+        $new->appRequest = $this->appRequest->withUrlVars($vars);
 
         return $new;
     }
@@ -180,7 +154,7 @@ class AppContext implements WebApplicationInterface
      */
     public function withIsDebug(bool $isDebug): static
     {
-        $new = clone $this;
+        $new          = clone $this;
         $new->isDebug = $isDebug;
 
         return $new;
@@ -201,7 +175,7 @@ class AppContext implements WebApplicationInterface
      */
     public function withParams(?Parameters $params): static
     {
-        $new = clone $this;
+        $new         = clone $this;
         $new->params = $params;
 
         return $new;
@@ -222,7 +196,7 @@ class AppContext implements WebApplicationInterface
      */
     public function withContainer(Container $container): static
     {
-        $new = clone $this;
+        $new            = clone $this;
         $new->container = $container;
 
         return $new;
@@ -233,7 +207,7 @@ class AppContext implements WebApplicationInterface
      */
     public function getUri(): Uri
     {
-        return $this->request->getUri();
+        return $this->appRequest->getUri();
     }
 
     /**
@@ -243,9 +217,8 @@ class AppContext implements WebApplicationInterface
      */
     public function withUri(UriInterface $uri): static
     {
-        $new = clone $this;
-        $new->request = $new->request->withUri($uri);
-        $this->input = null;
+        $new             = clone $this;
+        $new->appRequest = $new->appRequest->withUri($uri);
 
         return $new;
     }
@@ -255,7 +228,7 @@ class AppContext implements WebApplicationInterface
      */
     public function getSystemUri(): ?SystemUri
     {
-        return $this->systemUri;
+        return $this->appRequest->getSystemUri();
     }
 
     /**
@@ -265,8 +238,8 @@ class AppContext implements WebApplicationInterface
      */
     public function withSystemUri(SystemUri $uri): static
     {
-        $new            = clone $this;
-        $new->systemUri = $uri;
+        $new             = clone $this;
+        $new->appRequest = $this->appRequest->withSystemUri($uri);
 
         return $new;
     }
@@ -286,32 +259,36 @@ class AppContext implements WebApplicationInterface
      */
     public function withState(?Collection $state): static
     {
-        $new = clone $this;
+        $new        = clone $this;
         $new->state = $state;
 
         return $new;
     }
 
     /**
-     * @return ServerRequestInterface
+     * @return AppRequest
      */
-    public function getRequest(): ServerRequestInterface
+    public function getAppRequest(): AppRequest
     {
-        return $this->request;
+        return $this->appRequest;
     }
 
     /**
-     * @param  ServerRequestInterface  $request
+     * @param  AppRequest  $request
      *
      * @return  static  Return self to support chaining.
      */
-    public function withRequest(ServerRequestInterface $request): static
+    public function withAppRequest(AppRequest $request): static
     {
-        $new = clone $this;
-        $new->request = $request;
-        $this->input = null;
+        $new             = clone $this;
+        $new->appRequest = $request;
 
         return $new;
+    }
+
+    public function getServerRequest(): ServerRequestInterface
+    {
+        return $this->appRequest->getRequest();
     }
 
     /**
@@ -319,7 +296,7 @@ class AppContext implements WebApplicationInterface
      */
     public function getMatchedRoute(): ?Route
     {
-        return $this->matchedRoute;
+        return $this->appRequest->getMatchedRoute();
     }
 
     /**
@@ -329,9 +306,8 @@ class AppContext implements WebApplicationInterface
      */
     public function withMatchedRoute(?Route $matchedRoute): static
     {
-        $new = clone $this;
-        $new->matchedRoute = $matchedRoute;
-        $this->input = null;
+        $new             = clone $this;
+        $new->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
 
         return $new;
     }
@@ -351,10 +327,15 @@ class AppContext implements WebApplicationInterface
      */
     public function withMode(string $mode): static
     {
-        $new = clone $this;
+        $new       = clone $this;
         $new->mode = $mode;
 
         return $new;
+    }
+
+    public function getHeader(string $name): string
+    {
+        return $this->appRequest->getHeader($name);
     }
 
     /**
@@ -366,31 +347,20 @@ class AppContext implements WebApplicationInterface
      */
     public function input(...$fields): mixed
     {
-        ArgumentsAssert::assert(
-            $fields !== [],
-            'Please provide at least 1 field.'
-        );
+        return $this->appRequest->input(...$fields);
+    }
 
-        $input = $this->compileInput();
-        $data = [];
-
-        if (!Arr::isAssociative($fields)) {
-            foreach ($fields as $field) {
-                $data[$field] = $input[$field] ?? null;
-            }
-        } else {
-            foreach (array_keys($fields) as $field) {
-                $data[$field] = $input[$field] ?? null;
-            }
-
-            $this->getFilterFactory()->createNested($fields)->test($data);
-        }
-
-        if (\Windwalker\count($fields) === 1) {
-            return array_shift($data);
-        }
-
-        return collect($data);
+    /**
+     * inputWithMethod
+     *
+     * @param  string  $method
+     * @param  mixed   ...$fields
+     *
+     * @return  mixed|Collection
+     */
+    public function inputWithMethod(string $method = 'REQUEST', ...$fields): mixed
+    {
+        return $this->appRequest->inputWithMethod($method, ...$fields);
     }
 
     /**
@@ -402,31 +372,7 @@ class AppContext implements WebApplicationInterface
      */
     public function file(...$fields): mixed
     {
-        ArgumentsAssert::assert(
-            $fields !== [],
-            'Please provide at least 1 field.'
-        );
-
-        $files = $this->getRequest()->getUploadedFiles();
-        $data = [];
-
-        foreach ($fields as $field) {
-            $data[$field] = $files[$field] ?? null;
-        }
-
-        if (\Windwalker\count($fields) === 1) {
-            return array_shift($data);
-        }
-
-        return collect($data);
-    }
-
-    protected function compileInput(): array
-    {
-        return $this->input ??= array_merge(
-            $this->getQueryValues(),
-            $this->getRequest()->getParsedBody()
-        );
+        return $this->appRequest->file(...$fields);
     }
 
     /**
@@ -457,8 +403,9 @@ class AppContext implements WebApplicationInterface
      * @return  void
      */
     #[NoReturn]
-    public function close(mixed $return = ''): void
-    {
+    public function close(
+        mixed $return = ''
+    ): void {
         $this->getRootApp()->close($return);
     }
 }
