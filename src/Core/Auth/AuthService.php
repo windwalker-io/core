@@ -48,7 +48,7 @@ class AuthService
 
     public function authorise(string $policy, mixed $user, ...$args): bool
     {
-        return $this->authorisation->authorise($policy, $user, $args);
+        return $this->authorisation->authorise($policy, $user, ...$args);
     }
 
     /**
