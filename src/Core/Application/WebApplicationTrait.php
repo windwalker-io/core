@@ -11,12 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
-use Psr\Http\Message\ResponseInterface;
-use Windwalker\Http\Output\Output;
-use Windwalker\Http\Response\HtmlResponse;
-use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Http\Uri;
-
 /**
  * Trait WebApplicationTrait
  */

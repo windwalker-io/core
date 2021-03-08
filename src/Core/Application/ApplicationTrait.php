@@ -24,4 +24,41 @@ trait ApplicationTrait
         resolve as diResolve;
     }
     use EventAwareTrait;
+
+    /**
+     * config
+     *
+     * @param  string       $name
+     * @param  string|null  $delimiter
+     *
+     * @return  mixed
+     */
+    public function config(string $name, ?string $delimiter = '.'): mixed
+    {
+        return $this->getContainer()->getParameters()->getDeep($name, $delimiter);
+    }
+
+    /**
+     * Method to get property Container
+     *
+     * @return  Container
+     */
+    public function getContainer(): Container
+    {
+        return $this->container;
+    }
+
+    /**
+     * loadConfig
+     *
+     * @param  mixed        $source
+     * @param  string|null  $format
+     * @param  array        $options
+     *
+     * @return  void
+     */
+    public function loadConfig(mixed $source, ?string $format = null, array $options = []): void
+    {
+        $this->getContainer()->loadParameters($source, $format, $options);
+    }
 }

@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
-use JetBrains\PhpStorm\ExitPoint;
+use JetBrains\PhpStorm\NoReturn;
 use ReflectionException;
+use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventAwareInterface;
@@ -20,71 +21,35 @@ use Windwalker\Event\EventAwareInterface;
 /**
  * Interface ApplicationInterface
  */
-interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInterface
+interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInterface, ServiceAwareInterface
 {
     /**
-     * make
+     * config
      *
-     * @param  string $class
-     * @param  array  $args
-     * @param  int    $options
-     *
-     * @return  object
-     */
-    public function make(string $class, array $args = [], int $options = 0): object;
-
-    /**
-     * service
-     *
-     * @param  mixed  $class
-     * @param  array  $args
-     * @param  int    $options
-     *
-     * @return  object
-     *
-     * @throws DefinitionException
-     */
-    public function service(string $class, array $args = [], int $options = 0): object;
-
-    /**
-     * call
-     *
-     * @param  callable     $callable
-     * @param  array        $args
-     * @param  object|null  $context
-     * @param  int          $options
+     * @param  string       $name
+     * @param  string|null  $delimiter
      *
      * @return  mixed
-     *
-     * @throws ReflectionException
      */
-    public function call(callable $callable, array $args, ?object $context, int $options = 0): mixed;
+    public function config(string $name, ?string $delimiter = '.'): mixed;
 
     /**
-     * bind
+     * Method to get property Container
      *
-     * @param  string  $id
-     * @param  mixed   $value
-     * @param  int     $options
-     *
-     * @return  static
-     *
-     * @throws DefinitionException
+     * @return  Container
      */
-    public function bind(string $id, mixed $value, int $options = 0): mixed;
+    public function getContainer(): Container;
 
     /**
-     * resolve
+     * loadConfig
      *
-     * @param  mixed  $source
-     * @param  array  $args
-     * @param  int    $options
+     * @param  mixed        $source
+     * @param  string|null  $format
+     * @param  array        $options
      *
-     * @return  mixed
-     *
-     * @throws ReflectionException
+     * @return  void
      */
-    public function resolve(mixed $source, array $args = [], int $options = 0): mixed;
+    public function loadConfig(mixed $source, ?string $format = null, array $options = []): void;
 
     /**
      * Close this request.
@@ -93,6 +58,6 @@ interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInter
      *
      * @return  void
      */
-    #[ExitPoint]
+    #[NoReturn]
     public function close(mixed $return = ''): void;
 }

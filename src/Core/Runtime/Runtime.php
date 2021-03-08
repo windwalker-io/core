@@ -54,7 +54,7 @@ class Runtime
         return static::$container->getParameters();
     }
 
-    public static function loadConfig($source, ?string $format = null, array $options = []): Collection
+    public static function loadConfig(mixed $source, ?string $format = null, array $options = []): Collection
     {
         $container = self::getContainer();
 
@@ -83,7 +83,7 @@ class Runtime
      *
      * @return  void
      */
-    public static function set(string $name, $value, string $delimiter = '.'): void
+    public static function set(string $name, mixed $value, string $delimiter = '.'): void
     {
         static::$container->getParameters()->setDeep($name, $value, $delimiter);
     }

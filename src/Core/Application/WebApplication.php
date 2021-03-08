@@ -10,6 +10,7 @@
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\ExitPoint;
+use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -91,32 +92,6 @@ class WebApplication implements WebApplicationInterface
     }
 
     /**
-     * Method to get property Container
-     *
-     * @return  Container
-     *
-     * @since  __DEPLOY_VERSION__
-     */
-    public function getContainer(): Container
-    {
-        return $this->container;
-    }
-
-    /**
-     * loadConfig
-     *
-     * @param  mixed        $source
-     * @param  string|null  $format
-     * @param  array        $options
-     *
-     * @return  void
-     */
-    public function loadConfig($source, ?string $format = null, array $options = []): void
-    {
-        $this->getContainer()->loadParameters($source, $format, $options);
-    }
-
-    /**
      * addMiddleware
      *
      * @param  mixed  $middleware
@@ -182,19 +157,6 @@ class WebApplication implements WebApplicationInterface
         return new Relay($queue);
     }
 
-    /**
-     * config
-     *
-     * @param  string       $name
-     * @param  string|null  $delimiter
-     *
-     * @return  mixed
-     */
-    public function config(string $name, ?string $delimiter = '.')
-    {
-        return $this->getContainer()->getParameters()->getDeep($name, $delimiter);
-    }
-
     public function __get(string $name)
     {
         if ($name === 'config') {
@@ -245,7 +207,7 @@ class WebApplication implements WebApplicationInterface
      *
      * @return  void
      */
-    #[ExitPoint]
+    #[NoReturn]
     public function close(mixed $return = ''): void
     {
         die($return);
