@@ -161,6 +161,8 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
     {
         $commands = (array) $this->get('console.commands');
 
+        $reader = $this->container->getAnnotationRegistry()->getAnnotationReader();
+
         foreach ($commands as $name => $command) {
             if ($command === false) {
                 continue;
@@ -184,15 +186,25 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
                 $cmd = $command;
 
                 // Workaround for Container not suppports object::__invoke() now.
-                if (is_object($cmd) && !$cmd instanceof \Closure) {
+                if (is_object($cmd)) {
+                    /** @var CommandMeta $meta */
+                    $meta = $reader->getClassAnnotation(new \ReflectionClass($cmd), CommandMeta::class);
+
                     $cmd = [$cmd, '__invoke'];
+                } elseif (is_array($cmd)) {
+                    $meta = $reader->getMethodAnnotation(new \ReflectionMethod($cmd[0], $cmd[1]), CommandMeta::class);
                 }
 
                 $command = function (...$args) use ($cmd) {
                     return $this->container->call($cmd, $args);
                 };
 
-                $parentCommand->addCommand($name, null, [], $command);
+                $command = $parentCommand->addCommand($name, null, [], $command);
+
+                if (isset($meta)) {
+                    $meta($this, $command);
+                }
+
                 continue;
             }
 
