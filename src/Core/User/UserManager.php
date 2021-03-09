@@ -120,7 +120,7 @@ class UserManager implements EventTriggerableInterface, DispatcherAwareInterface
      *
      * @return  bool|Credential
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.23.2
      */
     public function validate($user, $options = [])
     {
