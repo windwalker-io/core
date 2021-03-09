@@ -10,6 +10,7 @@ namespace Windwalker\Core\Application\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Middleware\MiddlewareInterface;
 use Windwalker\Utilities\Classes\OptionAccessTrait;
 
@@ -46,30 +47,52 @@ class ForceSslWebMiddleware extends AbstractWebMiddleware
         if ($this->getOption('enabled')) {
             $uri = $request->getUri();
 
-            $hstsOptions = (array) $this->getOption('hsts');
-
-            if ($hstsOptions['enabled'] ?? false) {
-                $header = 'max-age=' . ($hstsOptions['max_age'] ?? 31536000);
-
-                if ($hstsOptions['include_subdomain'] ?? false) {
-                    $header .= '; includeSubDomains';
-                }
-
-                if ($hstsOptions['preload'] ?? false) {
-                    $header .= '; preload';
-                }
-
-                header('Strict-Transport-Security: ' . $header);
-            }
-
             if ($uri->getScheme() === 'http') {
                 $uri = $uri->withScheme('https');
 
-                $this->app->redirect($uri, $this->getOption('redirect_code', 303));
-                die;
+                $res = new RedirectResponse(
+                    $uri,
+                    $this->normalizeCode($this->getOption('redirect_code', 303))
+                );
+
+                $hstsOptions = (array) $this->getOption('hsts');
+
+                if ($hstsOptions['enabled'] ?? false) {
+                    $header = 'max-age=' . ($hstsOptions['max_age'] ?? 31536000);
+
+                    if ($hstsOptions['include_subdomain'] ?? false) {
+                        $header .= '; includeSubDomains';
+                    }
+
+                    if ($hstsOptions['preload'] ?? false) {
+                        $header .= '; preload';
+                    }
+
+                    $res = $res->withHeader('Strict-Transport-Security', $header);
+                }
+
+                return $res;
             }
         }
 
         return $next($request, $response);
+    }
+
+    /**
+     * normalizeCode
+     *
+     * @param int $code
+     *
+     * @return  int
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected function normalizeCode(int $code): int
+    {
+        if ($code < 300 && $code >= 400) {
+            $code = 303;
+        }
+
+        return $code;
     }
 }
