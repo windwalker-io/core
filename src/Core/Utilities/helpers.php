@@ -342,4 +342,29 @@ namespace Windwalker {
     {
         return Container::meta($class, $args);
     }
+
+    if (!function_exists('\Windwalker\uid')) {
+        /**
+         * uid
+         *
+         * @param  string  $prefix
+         * @param  bool    $timebase
+         *
+         * @return  string
+         *
+         * @throws \Exception
+         */
+        function uid(string $prefix = '', bool $timebase = false): string
+        {
+            if ($timebase) {
+                [$b, $a] = explode(' ', $c = microtime(), 2);
+
+                $c = $a . substr($b, 2);
+
+                return $prefix . base_convert($c, 10, 12) . bin2hex(random_bytes(4));
+            }
+
+            return $prefix . bin2hex(random_bytes(12));
+        }
+    }
 }
