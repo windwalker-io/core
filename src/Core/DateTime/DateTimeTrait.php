@@ -501,7 +501,7 @@ trait DateTimeTrait
         // Format the date.
         $return = parent::format($format);
 
-        if ($local === false) {
+        if ($local === false && $this->tz) {
             parent::setTimezone($this->tz);
         }
 
