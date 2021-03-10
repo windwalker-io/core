@@ -122,7 +122,7 @@ class ErrorService
     /**
      * The exception handler.
      *
-     * @param \Throwable|\Exception $exception The exception object.
+     * @param \Throwable $exception The exception object.
      *
      * @return  void
      *
@@ -252,20 +252,35 @@ class ErrorService
      */
     public function register(bool $restore = true, int $type = E_ALL | E_STRICT, bool $shutdown = false): void
     {
-        if ($type === null) {
-            $type = E_ALL | E_STRICT;
-        }
+        $this->registerErrors($restore, $type);
+        $this->registerExceptions($restore);
 
+        if ($shutdown) {
+            $this->registerShutdown();
+        }
+    }
+
+    public function registerErrors(bool $restore = true, int $type = E_ALL | E_STRICT): void
+    {
         if ($restore) {
-            $this->restore();
+            restore_error_handler();
         }
 
         set_error_handler([$this, 'error'], $type);
-        set_exception_handler([$this, 'exception']);
+    }
 
-        if ($shutdown) {
-            register_shutdown_function([$this, 'down']);
+    public function registerExceptions(bool $restore = true): void
+    {
+        if ($restore) {
+            restore_exception_handler();
         }
+
+        set_exception_handler([$this, 'exception']);
+    }
+
+    public function registerShutdown(): void
+    {
+        register_shutdown_function([$this, 'down']);
     }
 
     /**

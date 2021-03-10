@@ -12,9 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
-use ReflectionException;
 use Windwalker\DI\Container;
-use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventAwareInterface;
 
@@ -23,6 +21,9 @@ use Windwalker\Event\EventAwareInterface;
  */
 interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInterface, ServiceAwareInterface
 {
+    public const CLIENT_WEB = 'web';
+    public const CLIENT_CONSOLE = 'console';
+
     /**
      * config
      *
@@ -60,4 +61,11 @@ interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInter
      */
     #[NoReturn]
     public function close(mixed $return = ''): void;
+
+    /**
+     * Get App client.
+     *
+     * @return  string
+     */
+    public function getClient(): string;
 }

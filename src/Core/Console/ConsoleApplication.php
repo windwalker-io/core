@@ -98,4 +98,12 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     {
         exit((int) $return);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getClient(): string
+    {
+        return static::CLIENT_CONSOLE;
+    }
 }

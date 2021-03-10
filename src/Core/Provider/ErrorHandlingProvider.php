@@ -9,6 +9,8 @@
 
 namespace Windwalker\Core\Provider;
 
+use Symfony\Component\Console\Application;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
@@ -32,9 +34,10 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     /**
      * ErrorHandlingProvider constructor.
      *
-     * @param  Config  $config
+     * @param  Config                $config
+     * @param  ApplicationInterface  $app
      */
-    public function __construct(Config $config)
+    public function __construct(Config $config, protected ApplicationInterface $app)
     {
         $this->config = $config->extract('error');
     }
@@ -49,11 +52,23 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
         $this->setINIValues($iniValues, $container);
 
         $error = $container->get(ErrorService::class);
-        $error->register(
-            $this->config->get('restore') ?? true,
-            $this->config->get('report_level') ?? E_ALL | E_STRICT,
-            $this->config->get('register_shutdown') ?? true
-        );
+
+        switch ($this->app->getClient()) {
+            case ApplicationInterface::CLIENT_WEB:
+            default:
+                $error->register(
+                    $this->config->get('restore') ?? true,
+                    $this->config->get('report_level') ?? E_ALL | E_STRICT,
+                    $this->config->get('register_shutdown') ?? true
+                );
+                break;
+
+            case ApplicationInterface::CLIENT_CONSOLE:
+                // Console do not restore exception handler, let console app handle it.
+                $error->registerErrors($this->config->get('restore') ?? true);
+                $error->registerShutdown();
+                break;
+        }
     }
 
     /**
@@ -62,7 +77,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     public function register(Container $container): void
     {
         $container->prepareSharedObject(ErrorService::class, function (ErrorService $error, Container $container) {
-            foreach ($this->config->getDeep('factories.handlers') ?? [] as $key => $handler) {
+            foreach ($this->config->getDeep('handlers.' . $this->app->getClient()) ?? [] as $key => $handler) {
                 $handler = $container->resolve($handler);
 
                 $error->addHandler($handler, is_numeric($key) ? null : $key);

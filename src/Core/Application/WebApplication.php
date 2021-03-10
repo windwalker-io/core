@@ -9,7 +9,6 @@
 
 namespace Windwalker\Core\Application;
 
-use JetBrains\PhpStorm\ExitPoint;
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +18,6 @@ use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
-use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Output\Output;

@@ -18,8 +18,11 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * The IO class.
@@ -410,5 +413,21 @@ class IO implements IOInterface
     public function getFormatter(): OutputFormatterInterface
     {
         return $this->output->getFormatter();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function style(): SymfonyStyle
+    {
+        return new SymfonyStyle($this->input, $this->output);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function errorStyle(): SymfonyStyle
+    {
+        return $this->style()->getErrorStyle();
     }
 }

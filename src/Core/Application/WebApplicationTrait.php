@@ -32,4 +32,9 @@ trait WebApplicationTrait
     {
         return headers_sent();
     }
+
+    public function getClient(): string
+    {
+        return ApplicationInterface::CLIENT_WEB;
+    }
 }

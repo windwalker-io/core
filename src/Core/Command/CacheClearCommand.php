@@ -9,10 +9,11 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Cache\Command;
+namespace Windwalker\Core\Command;
 
-use Symfony\Component\Console\Attribute\ConsoleCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Windwalker\Core\Console\CommandWrapperInterface;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Console\IOInterface;
 use Windwalker\Filesystem\Filesystem;
@@ -20,18 +21,18 @@ use Windwalker\Filesystem\Filesystem;
 /**
  * The ClearCommand class.
  */
-#[ConsoleCommand(
+#[CoreCommand(
     name: 'cache:clear',
     description: 'Clear cache'
 )]
-class ClearCommand extends CoreCommand
+class CacheClearCommand implements CommandWrapperInterface
 {
     /**
-     * Configures the current command.
+     * @inheritDoc
      */
-    protected function init(): void
+    public function configure(Command $command): void
     {
-        $this->addArgument(
+        $command->addArgument(
             'folders',
             InputArgument::IS_ARRAY,
             'Clear this folders, if not provided, will clear all cache folder.'
@@ -39,21 +40,17 @@ class ClearCommand extends CoreCommand
     }
 
     /**
-     * Executes the current command.
-     *
-     * @param  IOInterface  $io
-     *
-     * @return  mixed
+     * @inheritDoc
      */
-    protected function doExecute(IOInterface $io): mixed
+    public function execute(IOInterface $io): mixed
     {
         $folders = $io->getArgument('folders');
 
         if (!count($folders)) {
-            $this->clearCacheRoot();
+            $this->clearCacheRoot($io);
         } else {
             foreach ($folders as $folder) {
-                $this->clearCacheFolder($folder);
+                $this->clearCacheFolder($folder, $io);
             }
         }
 
@@ -65,11 +62,13 @@ class ClearCommand extends CoreCommand
     /**
      * clearCacheRoot
      *
+     * @param  IOInterface  $io
+     *
      * @return  void
      *
      * @since  3.4.6
      */
-    protected function clearCacheRoot(): void
+    protected function clearCacheRoot(IOInterface $io): void
     {
         /** @var \SplFileInfo $file */
         foreach (Filesystem::items(WINDWALKER_CACHE, false) as $file) {
@@ -79,23 +78,24 @@ class ClearCommand extends CoreCommand
 
             Filesystem::delete($file->getPathname());
 
-            $this->io->writeln(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
+            $io->writeln(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
         }
     }
 
     /**
      * clearCacheFolder
      *
-     * @param  string  $folder
+     * @param  string       $folder
+     * @param  IOInterface  $io
      *
      * @return  void
      */
-    protected function clearCacheFolder(string $folder): void
+    protected function clearCacheFolder(string $folder, IOInterface $io): void
     {
         $path = WINDWALKER_CACHE . '/' . $folder;
 
         Filesystem::delete($path);
 
-        $this->io->writeln(sprintf('[Deleted] <info>%s</info>', $path));
+        $io->writeln(sprintf('[Deleted] <info>%s</info>', $path));
     }
 }
