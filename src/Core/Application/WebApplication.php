@@ -29,8 +29,6 @@ use Windwalker\Http\Response\RedirectResponse;
 /**
  * The WebApplication class.
  *
- * @property-read Config $config
- *
  * @since  __DEPLOY_VERSION__
  */
 class WebApplication implements WebApplicationInterface
@@ -155,19 +153,6 @@ class WebApplication implements WebApplicationInterface
     public static function createRequestHandler(iterable $queue): RequestHandlerInterface
     {
         return new Relay($queue);
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === 'config') {
-            return $this->getContainer()->getParameters();
-        }
-
-        if ($name === 'container') {
-            return $this->getContainer();
-        }
-
-        throw new \OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
     }
 
     /**
