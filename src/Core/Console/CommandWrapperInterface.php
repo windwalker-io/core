@@ -34,5 +34,5 @@ interface CommandWrapperInterface
      *
      * @return  mixed
      */
-    public function execute(IOInterface $io): mixed;
+    public function execute(IOInterface $io);
 }

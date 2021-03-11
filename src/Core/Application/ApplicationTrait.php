@@ -38,7 +38,7 @@ trait ApplicationTrait
      */
     public function config(string $name, ?string $delimiter = '.'): mixed
     {
-        return $this->getContainer()->getParameters()->getDeep($name, $delimiter);
+        return $this->getContainer()->getParam($name, $delimiter);
     }
 
     /**

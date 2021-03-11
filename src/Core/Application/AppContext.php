@@ -68,7 +68,7 @@ class AppContext implements WebApplicationInterface
         return $this->container->get(WebApplication::class);
     }
 
-    public function config(string $name, string $delimiter = '.'): mixed
+    public function config(string $name, ?string $delimiter = '.'): mixed
     {
         return $this->getContainer()->getParam($name, $delimiter);
     }

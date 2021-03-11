@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Core\Console\CommandWrapperInterface;
 use Windwalker\Core\Console\IOInterface;
 
@@ -34,7 +35,19 @@ class MigrationWrapper implements CommandWrapperInterface
      */
     public function configure(Command $command): void
     {
+        $command->addOption(
+            'dir',
+            'd',
+            InputOption::VALUE_OPTIONAL,
+            'The migration files directory.'
+        );
 
+        $command->addOption(
+            'package',
+            'p',
+            InputOption::VALUE_OPTIONAL,
+            'The target package migrations.'
+        );
 
         $this->child->configure($command);
     }

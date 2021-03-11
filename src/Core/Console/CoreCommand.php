@@ -62,7 +62,7 @@ class CoreCommand extends Command implements ContainerAttributeInterface
             return $result ? 0 : 255;
         }
 
-        return $result;
+        return $result ?? 0;
     }
 
     public function __invoke(AttributeHandler $handler): callable

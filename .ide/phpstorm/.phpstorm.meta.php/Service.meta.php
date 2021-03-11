@@ -7,74 +7,65 @@
  */
 
 namespace PHPSTORM_META {
-
-    use Windwalker\Core\Form\AbstractFieldDefinition;
-    use Windwalker\Core\Ioc;
-    use Windwalker\Core\WindwalkerTrait;
-    use Windwalker\Core\Application\ServiceAwareTrait;
-    use Windwalker\Data\Traits\CollectionTrait;
-    use Windwalker\DI\Container;
-    use Windwalker\Form\Form;
-
     // Container
     override(
-        ServiceAwareTrait::make(0),
+        \Windwalker\Core\Application\ServiceAwareTrait::make(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        ServiceAwareTrait::service(0),
+        \Windwalker\Core\Application\ServiceAwareTrait::service(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Container::get(0),
+        \Windwalker\DI\Container::get(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Container::newInstance(0),
+        \Windwalker\DI\Container::newInstance(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Container::createSharedObject(0),
+        \Windwalker\DI\Container::createSharedObject(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Container::createObject(0),
+        \Windwalker\DI\Container::createObject(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Ioc::make(0),
+        \Windwalker\Core\Ioc::make(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Ioc::get(0),
+        \Windwalker\Core\Ioc::get(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Ioc::service(0),
+        \Windwalker\Core\Ioc::service(0),
         map([
             '' => '@'
         ])
@@ -82,21 +73,21 @@ namespace PHPSTORM_META {
 
     // Field
     override(
-        AbstractFieldDefinition::addField(0),
+        \Windwalker\Core\Form\AbstractFieldDefinition::addField(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Form::addField(0),
+        \Windwalker\Form\Form::addField(0),
         map([
             '' => '@'
         ])
     );
 
     override(
-        Form::add(0),
+        \Windwalker\Form\Form::add(0),
         map([
             '' => '@'
         ])
@@ -104,7 +95,7 @@ namespace PHPSTORM_META {
 
     // Data
     override(
-        CollectionTrait::as(0),
+        \Windwalker\Data\Traits\CollectionTrait::as(0),
         map([
             '' => '@'
         ])

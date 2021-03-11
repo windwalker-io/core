@@ -18,10 +18,8 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -306,7 +304,8 @@ class IO implements IOInterface
      *
      * @param  string|iterable  $messages  The message as an iterable of strings or a single string
      * @param  bool             $newline   Whether to add a newline
-     * @param  int              $options   A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     * @param  int              $options   A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is
+     *                                     considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
      */
     public function write($messages, bool $newline = false, int $options = 0): void
     {
@@ -317,7 +316,8 @@ class IO implements IOInterface
      * Writes a message to the output and adds a newline at the end.
      *
      * @param  string|iterable  $messages  The message as an iterable of strings or a single string
-     * @param  int              $options   A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
+     * @param  int              $options   A bitmask of options (one of the OUTPUT or VERBOSITY constants), 0 is
+     *                                     considered the same as self::OUTPUT_NORMAL | self::VERBOSITY_NORMAL
      */
     public function writeln($messages, int $options = 0): void
     {
