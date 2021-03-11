@@ -13,7 +13,8 @@ namespace Windwalker\Core\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Windwalker\Core\Console\CommandWrapperInterface;
+use Windwalker\Core\Console\CommandInterface;
+use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Console\IOInterface;
 use Windwalker\Filesystem\Filesystem;
@@ -21,11 +22,10 @@ use Windwalker\Filesystem\Filesystem;
 /**
  * The ClearCommand class.
  */
-#[CoreCommand(
-    name: 'cache:clear',
+#[CommandWrapper(
     description: 'Clear cache'
 )]
-class CacheClearCommand implements CommandWrapperInterface
+class CacheClearCommand implements CommandInterface
 {
     /**
      * @inheritDoc

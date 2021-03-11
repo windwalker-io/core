@@ -21,6 +21,13 @@ namespace PHPSTORM_META {
         1,
         argumentsSet('argument_options')
     );
+
+    expectedArguments(
+        \Windwalker\Core\Console\Input\InputArgument::__construct(),
+        1,
+        argumentsSet('argument_options')
+    );
+
     registerArgumentsSet(
         'option_options',
         \Symfony\Component\Console\Input\InputOption::VALUE_NONE,
@@ -32,6 +39,12 @@ namespace PHPSTORM_META {
 
     expectedArguments(
         \Symfony\Component\Console\Command\Command::addOption(),
+        2,
+        argumentsSet('option_options')
+    );
+
+    expectedArguments(
+        \Windwalker\Core\Console\Input\InputOption::__construct(),
         2,
         argumentsSet('option_options')
     );

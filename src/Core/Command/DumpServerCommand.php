@@ -21,19 +21,19 @@ use Symfony\Component\VarDumper\Command\Descriptor\HtmlDescriptor;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Server\DumpServer;
-use Windwalker\Core\Console\CommandWrapperInterface;
+use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\CoreCommand;
 use Windwalker\Core\Console\IOInterface;
 
 /**
  * The DumpServerCommand class.
  */
-#[CoreCommand(
-    name: 'debug:dump-server',
+#[CommandWrapper(
     description: 'Start the dump server to collect dump information.'
 )]
-class DumpServerCommand implements CommandWrapperInterface
+class DumpServerCommand implements CommandInterface
 {
     /**
      * DumpServerCommand constructor.

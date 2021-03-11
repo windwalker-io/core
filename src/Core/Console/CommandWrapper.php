@@ -13,29 +13,31 @@ namespace Windwalker\Core\Console;
 
 use LogicException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Windwalker\Attributes\AttributesAccessor;
+use Windwalker\Core\Console\Input\InputArgument;
+use Windwalker\Core\Console\Input\InputOption;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
+use Windwalker\DI\Container;
 
 /**
- * The CoreCommand class.
+ * The CommandWrapper class.
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_FUNCTION | \Attribute::TARGET_METHOD)]
-class CoreCommand extends Command implements ContainerAttributeInterface
+class CommandWrapper extends Command implements ContainerAttributeInterface
 {
-    public ?IOInterface $io = null;
+    protected mixed $handler;
 
-    protected mixed $handler = null;
+    protected Container $container;
 
     public function __construct(
-        string $name,
         ?string $description = null,
         array $aliases = [],
-        bool $hidden = false,
+        bool $hidden = false
     ) {
-        parent::__construct($name);
+        parent::__construct('temp-name');
 
         if ($description !== null) {
             $this->setDescription($description);
@@ -52,10 +54,10 @@ class CoreCommand extends Command implements ContainerAttributeInterface
     {
         $io = new IO($input, $output, $this);
 
-        if ($this->handler instanceof CommandWrapperInterface) {
+        if ($this->handler instanceof CommandInterface) {
             $result = $this->handler->execute($io);
         } else {
-            $result = 0;
+            $result = $this->container->call($this->handler, ['io' => $io]);
         }
 
         if (is_bool($result)) {
@@ -67,10 +69,30 @@ class CoreCommand extends Command implements ContainerAttributeInterface
 
     public function __invoke(AttributeHandler $handler): callable
     {
+        $this->container = $handler->getContainer();
+
         return function (...$args) use ($handler) {
+            if (isset($args['name'])) {
+                $this->setName($args['name']);
+            }
+
             $this->handler = $handler(...$args);
 
-            $this->handler->configure($this);
+            if ($this->handler instanceof CommandInterface) {
+                $this->handler->configure($this);
+            }
+
+            AttributesAccessor::runAttributeIfExists(
+                $this->handler,
+                InputArgument::class,
+                fn (InputArgument $arg) => $this->getDefinition()->addArgument($arg)
+            );
+
+            AttributesAccessor::runAttributeIfExists(
+                $this->handler,
+                InputOption::class,
+                fn (InputOption $option) => $this->getDefinition()->addOption($option)
+            );
 
             return $this;
         };

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Command\Command;
 /**
  * Interface CommandInterface
  */
-interface CommandWrapperInterface
+interface CommandInterface
 {
     /**
      * configure

@@ -13,20 +13,20 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandWrapperInterface;
+use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\IOInterface;
 
 /**
  * The MigrationWrapper class.
  */
-class MigrationWrapper implements CommandWrapperInterface
+class MigrationWrapper implements CommandInterface
 {
     /**
      * MigrationWrapper constructor.
      *
-     * @param  CommandWrapperInterface  $child
+     * @param  CommandInterface  $child
      */
-    public function __construct(protected CommandWrapperInterface $child)
+    public function __construct(protected CommandInterface $child)
     {
     }
 

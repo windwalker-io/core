@@ -20,11 +20,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Event\MessageEvent;
-use Windwalker\Core\Migration\Command\MigrationToCommand;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Utilities\Arr;
+
+use function Windwalker\DI\create;
 
 /**
  * The ConsoleApplication class.
@@ -77,21 +78,54 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
             $container->registerByConfig($config ?: []);
         }
 
+        // Commands
         $commands = Arr::flatten($commands = (array) $this->config('commands'), ':');
 
-        // Commands
+        $this->registerCommands($commands);
+
+        $this->booted = true;
+    }
+
+    public function registerCommands(array $commands): void
+    {
+        $container = $this->getContainer();
+
+        foreach ($commands as $name => &$command) {
+            if (is_string($command)) {
+                // Handle class command
+                if (class_exists($command)) {
+                    $container->bind($command, create($command, name: $name));
+                    continue;
+                }
+
+                if (is_file($command)) {
+                    $command = include $command;
+                }
+            }
+
+            // Object and closure
+            if (is_object($command)) {
+                $container->share(
+                    $id = 'command:' . $name,
+                    function (Container $container) use ($name, $command) {
+                        /** @var CommandWrapper $cmd */
+                        $cmd = $container->getAttributesResolver()->decorateObject($command);
+                        return $cmd->setName($name);
+                    }
+                );
+
+                $command = $id;
+            }
+        }
+
+        unset($command);
+
         $this->setCommandLoader(
             new ContainerCommandLoader(
                 $container,
                 $commands
             )
         );
-
-        foreach ($commands as $name => $command) {
-            $container->prepareSharedObject($command);
-        }
-
-        $this->booted = true;
     }
 
     /**
@@ -104,21 +138,24 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     {
         parent::configureIO($input, $output);
 
-        $this->on(MessageEvent::class, function (MessageEvent $event) use ($input, $output) {
-            $tag = match ($event->getType()) {
-                'success', 'green'       => '<info>%s</info>',
-                'warning', 'yellow'      => '<comment>%s</comment>',
-                'info', 'blue'           => '<option>%s</option>',
-                'error', 'danger', 'red' => '<error>%s</error>',
-                default => '%s',
-            };
+        $this->on(
+            MessageEvent::class,
+            function (MessageEvent $event) use ($input, $output) {
+                $tag = match ($event->getType()) {
+                    'success', 'green' => '<info>%s</info>',
+                    'warning', 'yellow' => '<comment>%s</comment>',
+                    'info', 'blue' => '<option>%s</option>',
+                    'error', 'danger', 'red' => '<error>%s</error>',
+                    default => '%s',
+                };
 
-            foreach ($event->getMessages() as $message) {
-                $time = gmdate('Y-m-d H:i:s');
+                foreach ($event->getMessages() as $message) {
+                    $time = gmdate('Y-m-d H:i:s');
 
-                $output->writeln(sprintf('[%s] ' . $tag, $time, $message));
+                    $output->writeln(sprintf('[%s] ' . $tag, $time, $message));
+                }
             }
-        });
+        );
     }
 
     public function addMessage(string|array $messages, ?string $type = null): static
@@ -132,8 +169,9 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
      * @inheritDoc
      */
     #[NoReturn]
-    public function close(mixed $return = 0): void
-    {
+    public function close(
+        mixed $return = 0
+    ): void {
         exit((int) $return);
     }
 

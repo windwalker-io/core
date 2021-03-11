@@ -14,12 +14,10 @@ namespace Windwalker\Core\Migration\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandWrapperInterface;
-use Windwalker\Core\Console\CoreCommand;
+use Windwalker\Core\Console\CommandInterface;
+use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\IOInterface;
-use Windwalker\Core\Event\MessageEvent;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\Database\Exception\DatabaseQueryException;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Attributes\Decorator;
 
@@ -27,11 +25,10 @@ use Windwalker\DI\Attributes\Decorator;
  * The MigrationToCommand class.
  */
 #[Decorator(MigrationWrapper::class)]
-#[CoreCommand(
-    name: 'migration:to',
-    description: 'Migrate to specific version.'
+#[CommandWrapper(
+    description: 'Migrate to specific version or latest.'
 )]
-class MigrationToCommand implements CommandWrapperInterface
+class MigrateCommand implements CommandInterface
 {
     use MigrationTrait;
 
@@ -42,7 +39,7 @@ class MigrationToCommand implements CommandWrapperInterface
      */
     public function __construct(#[Autowire] protected MigrationService $migrationService)
     {
-
+        //
     }
 
     /**
