@@ -17,6 +17,7 @@ use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\IO\IOSocketInterface;
 use Windwalker\Core\IO\IOSocketTrait;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\Driver\ConnectionInterface;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;

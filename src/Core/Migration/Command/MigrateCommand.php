@@ -18,8 +18,6 @@ use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\Decorator;
 
 /**
  * The MigrationToCommand class.
@@ -34,7 +32,7 @@ class MigrateCommand extends AbstractMigrationCommand
      *
      * @param  MigrationService  $migrationService
      */
-    public function __construct(#[Autowire] protected MigrationService $migrationService)
+    public function __construct(protected MigrationService $migrationService)
     {
         //
     }
@@ -56,7 +54,8 @@ class MigrateCommand extends AbstractMigrationCommand
             'seed',
             's',
             InputOption::VALUE_OPTIONAL,
-            'Also import seeds.'
+            'Also import seeds.',
+            false
         );
         $command->addOption(
             'log',
@@ -68,45 +67,50 @@ class MigrateCommand extends AbstractMigrationCommand
         $command->addOption(
             'no-backup',
             null,
-            InputOption::VALUE_REQUIRED,
-            'Do not backup database.'
+            InputOption::VALUE_OPTIONAL,
+            'Do not backup database.',
+            false
         );
         $command->addOption(
             'no-create-db',
             null,
-            InputOption::VALUE_REQUIRED,
-            'Do not auto create database or schema.'
+            InputOption::VALUE_OPTIONAL,
+            'Do not auto create database or schema.',
+            false
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function execute(IOInterface $io)
+    public function execute(IOInterface $io): int
     {
         // Dev check
         if (!$this->checkEnv($io)) {
             return 255;
         }
 
+        if ($io->getOption('no-create-db') === false) {
+            $this->createDatabase($io);
+        }
+
+        set_time_limit(0);
+
         // Backup
         $this->backup($io);
 
         // Change dir or package
 
+        $style = $io->style();
+        $style->title('Migration start...');
+
         $this->migrationService->setIO($io);
 
-        try {
-            $this->migrationService->migrate(
-                $this->getMigrationFolder($io),
-                $io->getArgument('version'),
-                $this->getLogFile($io)
-            );
-        } catch (\Throwable $e) {
-            $io->writeln('<error>An error occurred: ' . $e->getMessage() . '</error>');
-
-            throw $e;
-        }
+        $this->migrationService->migrate(
+            $this->getMigrationFolder($io),
+            $io->getArgument('version'),
+            $this->getLogFile($io)
+        );
 
         $io->style()->newLine();
 

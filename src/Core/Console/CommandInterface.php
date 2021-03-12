@@ -32,7 +32,7 @@ interface CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  mixed
+     * @return  int Return 0 is success, 1-255 is failure.
      */
-    public function execute(IOInterface $io);
+    public function execute(IOInterface $io): int;
 }

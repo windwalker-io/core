@@ -13,12 +13,9 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Autowire;
 
 /**
  * The CreateCommand class.
@@ -29,12 +26,10 @@ class CreateCommand extends AbstractMigrationCommand
     /**
      * CreateCommand constructor.
      *
-     * @param  MigrationService      $migrationService
-     * @param  ApplicationInterface  $app
+     * @param  MigrationService  $migrationService
      */
-    public function __construct(
-        #[Autowire] protected MigrationService $migrationService,
-    ) {
+    public function __construct(protected MigrationService $migrationService)
+    {
     }
 
     /**
@@ -62,7 +57,7 @@ class CreateCommand extends AbstractMigrationCommand
      *
      * @return  mixed
      */
-    public function execute(IOInterface $io)
+    public function execute(IOInterface $io): int
     {
         $name = $io->getArgument('name');
 

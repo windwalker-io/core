@@ -15,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\IOInterface;
+use Windwalker\Core\Migration\MigrationService;
 
 /**
  * The ResetCommand class.
@@ -22,6 +23,15 @@ use Windwalker\Core\Console\IOInterface;
 #[CommandWrapper('Reset migration versions.')]
 class ResetCommand extends AbstractMigrationCommand
 {
+    /**
+     * ResetCommand constructor.
+     *
+     * @param  MigrationService  $migrationService
+     */
+    public function __construct(protected MigrationService $migrationService)
+    {
+    }
+
     /**
      * configure
      *
@@ -49,13 +59,13 @@ class ResetCommand extends AbstractMigrationCommand
         $command->addOption(
             'no-backup',
             null,
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Do not backup database.'
         );
         $command->addOption(
             'no-create-db',
             null,
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_OPTIONAL,
             'Do not auto create database or schema.'
         );
     }
@@ -68,31 +78,40 @@ class ResetCommand extends AbstractMigrationCommand
      * @return  mixed
      * @throws \Exception
      */
-    public function execute(IOInterface $io)
+    public function execute(IOInterface $io): int
     {
         // Dev check
         if (!$this->checkEnv($io)) {
             return 255;
         }
 
-        $this->preprocessMigrations($io);
+        if ($io->getOption('no-create-db') === false) {
+            $this->createDatabase($io);
+        }
+
+        set_time_limit(0);
+
+        // Backup
         $this->backup($io);
+
+        $this->migrationService->setIO($io);
 
         $style = $io->style();
         $style->title('Rollback to 0 version...');
 
-        $args                   = $io->getInput()->getArguments();
-        $args['version']        = '0';
-        $args['--no-backup']    = '1';
-        $args['--no-create-db'] = '1';
+        $this->migrationService->migrate(
+            $this->getMigrationFolder($io),
+            '0'
+        );
 
-        $this->app->runCommand('mig:go', $io->extract($args));
-
+        $style->newLine(2);
         $style->title('Migrating to latest version...');
 
-        unset($args['version']);
-
-        $this->app->runCommand('mig:go', $io->extract($args));
+        $this->migrationService->migrate(
+            $this->getMigrationFolder($io),
+            null,
+            $this->getLogFile($io)
+        );
 
         return 0;
     }

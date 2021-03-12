@@ -42,7 +42,7 @@ class CacheClearCommand implements CommandInterface
     /**
      * @inheritDoc
      */
-    public function execute(IOInterface $io): mixed
+    public function execute(IOInterface $io): int
     {
         $folders = $io->getArgument('folders');
 

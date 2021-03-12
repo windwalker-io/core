@@ -17,6 +17,9 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\Database\DatabaseExportService;
+use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\PlatformHelper;
 
@@ -30,6 +33,9 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
     #[Inject]
     protected ?DatabaseExportService $databaseExportService = null;
+
+    #[Inject]
+    protected ?DatabaseManager $databaseManager = null;
 
     /**
      * @inheritDoc
@@ -58,9 +64,33 @@ abstract class AbstractMigrationCommand implements CommandInterface
         );
     }
 
-    protected function preprocessMigrations(IOInterface $io): void
+    protected function createDatabase(IOInterface $io): void
     {
-        //
+        $conn = $io->getOption('connection');
+        $factory = $this->databaseManager->getDatabaseFactory();
+
+        $db = $this->databaseManager->get($conn);
+        $db->disconnect();
+
+        $options = $db->getOptions();
+
+        $dbname = $options['dbname'];
+        $options['dbname'] = null;
+
+        $dbPreset = $factory->create(
+            $options['driver'],
+            $options
+        );
+
+        $schema = $dbPreset->getSchema($dbname);
+
+        if (!$schema->exists()) {
+            $schema->create();
+            $io->writeln('');
+            $io->writeln("Database (Schema) <info>{$dbname}</info> auto created.");
+        }
+
+        $dbPreset->disconnect();
     }
 
     public function getDefaultMigrationFolder(): string
@@ -94,8 +124,13 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
     protected function backup(IOInterface $io): void
     {
-        if (!$io->getOption('no-backup')) {
-            $this->databaseExportService->export($io->getOption('connection'), $io);
+        if ($io->getOption('no-backup') === false) {
+            $io->writeln('');
+            $io->writeln('<fg=gray>Backing up SQL...</>');
+
+            $dest = $this->databaseExportService->export($io->getOption('connection'), $io);
+
+            $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
             $io->style()->newLine();
         }
     }

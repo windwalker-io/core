@@ -106,7 +106,7 @@ abstract class AbstractManager
         return null;
     }
 
-    public function get(?string $name = null, ...$args)
+    public function get(?string $name = null, ...$args): object
     {
         $name ??= $this->getDefaultName();
 

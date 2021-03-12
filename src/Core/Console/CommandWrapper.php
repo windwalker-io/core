@@ -84,10 +84,16 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
     {
         $io = $this->getIO($input, $output);
 
-        if ($this->handler instanceof CommandInterface) {
-            $result = $this->handler->execute($io);
-        } else {
-            $result = $this->container->call($this->handler, ['io' => $io]);
+        try {
+            if ($this->handler instanceof CommandInterface) {
+                $result = $this->handler->execute($io);
+            } else {
+                $result = $this->container->call($this->handler, ['io' => $io]);
+            }
+        } catch (\Throwable $e) {
+            $io->writeln('<error>An error occurred: ' . $e->getMessage() . '</error>');
+
+            throw $e;
         }
 
         if (is_bool($result)) {

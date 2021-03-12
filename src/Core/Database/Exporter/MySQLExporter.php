@@ -37,10 +37,10 @@ class MySQLExporter extends AbstractExporter
             '%s --defaults-extra-file=%s %s',
             $md,
             $this->createPasswordCnfFile(
-                $options['username'],
+                $options['user'],
                 $options['password'],
             ),
-            $options['database'],
+            $options['dbname'],
         );
 
         $process = $this->app->createProcess($cmd);

@@ -17,11 +17,9 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
-
 use Windwalker\DI\Attributes\Autowire;
-use Windwalker\Filesystem\File;
+use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Filesystem\Folder;
 use Windwalker\Stream\Stream;
 
 use function Windwalker\uid;
@@ -52,18 +50,14 @@ class DatabaseExportService
      * @param  string|DatabaseAdapter|null  $db
      * @param  OutputInterface|null         $output
      *
-     * @return  StreamInterface
+     * @return FileObject
      *
      * @throws \Exception
      */
-    public function export(string|DatabaseAdapter|null $db = null, ?OutputInterface $output = null): StreamInterface
+    public function export(string|DatabaseAdapter|null $db = null, ?OutputInterface $output = null): FileObject
     {
-        if ($output) {
-            $output->writeln('Backing up SQL...');
-        }
-
-        $dir = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
-        $dir = $this->app->path($dir);
+        $dir  = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
+        $dir  = $this->app->path($dir);
         $dest = sprintf(
             '%s/ww-sql-backup-%s-%s.sql',
             $dir,
@@ -71,9 +65,18 @@ class DatabaseExportService
             uid()
         );
 
-        Filesystem::mkdir(dirname($dest));
+        return $this->exportTo($dest, $db, $output);
+    }
 
-        $this->rotate($dir);
+    public function exportTo(
+        string|\SplFileInfo $dest,
+        string|DatabaseAdapter|null $db = null,
+        ?OutputInterface $output = null
+    ): FileObject {
+        $dest = FileObject::wrap($dest);
+        $dest->getParent()->mkdir();
+
+        $this->rotate($dest->getPath());
 
         if (!$db instanceof DatabaseAdapter) {
             $db = $this->databaseManager->get($db);
@@ -83,21 +86,15 @@ class DatabaseExportService
 
         $exporter->setIO($output);
 
-        $exporter->exportToPsrStream(
-            $stream = new Stream($dest, Stream::MODE_READ_WRITE_RESET)
-        );
+        $exporter->exportToPsrStream($dest->getStream(Stream::MODE_READ_WRITE_RESET));
 
-        if ($output) {
-            $output->writeln('SQL backup to: <info>' . $dest . '</info>');
-        }
-
-        return $stream;
+        return $dest;
     }
 
     /**
      * rotate
      *
-     * @param string $dir
+     * @param  string  $dir
      *
      * @since  3.4.2
      */

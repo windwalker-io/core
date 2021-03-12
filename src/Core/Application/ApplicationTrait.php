@@ -67,7 +67,7 @@ trait ApplicationTrait
             return $this->config($path);
         }
 
-        [$base, $path] = explode('/', $path);
+        [$base, $path] = explode('/', $path, 2);
 
         $base = $this->config($base);
 

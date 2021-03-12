@@ -62,9 +62,11 @@ class StatusCommand extends AbstractMigrationCommand
      *
      * @return  mixed
      */
-    public function execute(IOInterface $io)
+    public function execute(IOInterface $io): int
     {
-        $this->preprocessMigrations($io);
+        if (!$io->getOption('no-create-db')) {
+            $this->createDatabase($io);
+        }
 
         $migrations = $this->migrationService->getMigrations($this->getMigrationFolder($io));
 

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\DatabaseFactory;
 use Windwalker\ORM\ORM;
 
 /**
@@ -35,5 +36,10 @@ class DatabaseManager extends AbstractManager
     public function getORM(?string $name = null): ORM
     {
         return $this->get($name)->orm();
+    }
+
+    public function getDatabaseFactory(): DatabaseFactory
+    {
+        return $this->container->resolve(DatabaseFactory::class);
     }
 }
