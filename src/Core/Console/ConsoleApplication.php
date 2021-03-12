@@ -14,9 +14,13 @@ namespace Windwalker\Core\Console;
 use Composer\InstalledVersions;
 use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Application as SymfonyApp;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Event\MessageEvent;
@@ -105,11 +109,12 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
             // Object and closure
             if (is_object($command)) {
-                $container->share(
+                $container->set(
                     $id = 'command:' . $name,
                     function (Container $container) use ($name, $command) {
                         /** @var CommandWrapper $cmd */
                         $cmd = $container->getAttributesResolver()->decorateObject($command);
+
                         return $cmd->setName($name);
                     }
                 );
@@ -166,6 +171,41 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     }
 
     /**
+     * runCommand
+     *
+     * @param  string|Command  $command
+     * @param  IOInterface     $io
+     *
+     * @return  int
+     *
+     * @throws \Exception
+     */
+    public function runCommand(string|Command $command, IOInterface $io): int
+    {
+        if (is_string($command)) {
+            if (str_contains($command, '\\')) {
+                $commands = (array) $this->config('console.commands');
+
+                $i = array_search(
+                    $command,
+                    array_keys($commands),
+                    true
+                );
+
+                $command = array_values($commands)[$i];
+            }
+
+            $command = $this->find($command);
+        }
+
+        // $io->getInput()->bind($command->getDefinition());
+
+        // show($io->getInput());
+
+        return $command->run($io->getInput(), $io->getOutput());
+    }
+
+    /**
      * @inheritDoc
      */
     #[NoReturn]
@@ -181,5 +221,19 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     public function getClient(): string
     {
         return static::CLIENT_CONSOLE;
+    }
+
+    protected function getProcessOutputCallback(): callable
+    {
+        $output = new ConsoleOutput();
+        $err    = $output->getErrorOutput();
+
+        return static function ($type, $buffer) use ($err, $output) {
+            if (Process::ERR === $type) {
+                $err->write($buffer, false);
+            } else {
+                $output->write($buffer);
+            }
+        };
     }
 }

@@ -15,6 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
+use Symfony\Component\Process\Process;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;

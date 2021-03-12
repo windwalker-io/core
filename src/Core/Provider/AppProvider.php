@@ -11,6 +11,7 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;

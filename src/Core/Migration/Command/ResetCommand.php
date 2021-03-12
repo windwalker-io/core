@@ -12,46 +12,27 @@ declare(strict_types=1);
 namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandInterface;
 use Windwalker\Core\Console\CommandWrapper;
 use Windwalker\Core\Console\IOInterface;
-use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\Decorator;
 
 /**
- * The MigrationToCommand class.
+ * The ResetCommand class.
  */
-#[CommandWrapper(
-    description: 'Migrate to specific version or latest.'
-)]
-class MigrateCommand extends AbstractMigrationCommand
+#[CommandWrapper('Reset migration versions.')]
+class ResetCommand extends AbstractMigrationCommand
 {
     /**
-     * MigrationToCommand constructor.
+     * configure
      *
-     * @param  MigrationService  $migrationService
-     */
-    public function __construct(#[Autowire] protected MigrationService $migrationService)
-    {
-        //
-    }
-
-    /**
-     * @inheritDoc
+     * @param  Command  $command
+     *
+     * @return  void
      */
     public function configure(Command $command): void
     {
         parent::configure($command);
 
-        $command->addArgument(
-            'version',
-            InputArgument::OPTIONAL,
-            'The target version, leave empty to migrate to last.',
-            null
-        );
         $command->addOption(
             'seed',
             's',
@@ -80,7 +61,12 @@ class MigrateCommand extends AbstractMigrationCommand
     }
 
     /**
-     * @inheritDoc
+     * Executes the current command.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  mixed
+     * @throws \Exception
      */
     public function execute(IOInterface $io)
     {
@@ -89,26 +75,24 @@ class MigrateCommand extends AbstractMigrationCommand
             return 255;
         }
 
-        // Backup
+        $this->preprocessMigrations($io);
         $this->backup($io);
 
-        // Change dir or package
+        $style = $io->style();
+        $style->title('Rollback to 0 version...');
 
-        $this->migrationService->setIO($io);
+        $args                   = $io->getInput()->getArguments();
+        $args['version']        = '0';
+        $args['--no-backup']    = '1';
+        $args['--no-create-db'] = '1';
 
-        try {
-            $this->migrationService->migrate(
-                $this->getMigrationFolder($io),
-                $io->getArgument('version'),
-                $this->getLogFile($io)
-            );
-        } catch (\Throwable $e) {
-            $io->writeln('<error>An error occurred: ' . $e->getMessage() . '</error>');
+        $this->app->runCommand('mig:go', $io->extract($args));
 
-            throw $e;
-        }
+        $style->title('Migrating to latest version...');
 
-        $io->style()->newLine();
+        unset($args['version']);
+
+        $this->app->runCommand('mig:go', $io->extract($args));
 
         return 0;
     }

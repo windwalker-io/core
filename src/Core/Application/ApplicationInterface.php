@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
+use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventAwareInterface;
@@ -19,9 +20,14 @@ use Windwalker\Event\EventAwareInterface;
 /**
  * Interface ApplicationInterface
  */
-interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInterface, ServiceAwareInterface
+interface ApplicationInterface extends
+    EventAwareInterface,
+    DispatcherAwareInterface,
+    ServiceAwareInterface,
+    ProcessRunnerInterface
 {
     public const CLIENT_WEB = 'web';
+
     public const CLIENT_CONSOLE = 'console';
 
     /**
@@ -33,6 +39,17 @@ interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInter
      * @return  mixed
      */
     public function config(string $name, ?string $delimiter = '.'): mixed;
+
+    /**
+     * Get system path.
+     *
+     * Example: $app->path(`@root/path/to/file`);
+     *
+     * @param  string  $path
+     *
+     * @return  string
+     */
+    public function path(string $path): string;
 
     /**
      * Method to get property Container
@@ -60,7 +77,9 @@ interface ApplicationInterface extends EventAwareInterface, DispatcherAwareInter
      * @return  void
      */
     #[NoReturn]
-    public function close(mixed $return = ''): void;
+    public function close(
+        mixed $return = ''
+    ): void;
 
     /**
      * Get App client.

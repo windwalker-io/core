@@ -28,7 +28,7 @@ use Windwalker\DI\Container;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_FUNCTION | \Attribute::TARGET_METHOD)]
 class CommandWrapper extends Command implements ContainerAttributeInterface
 {
-    protected mixed $handler;
+    protected mixed $handler = null;
 
     protected Container $container;
 
@@ -48,11 +48,41 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
     }
 
     /**
+     * getIO
+     *
+     * @param  InputInterface   $input
+     * @param  OutputInterface  $output
+     *
+     * @return  IOInterface
+     */
+    protected function getIO(InputInterface $input, OutputInterface $output): IOInterface
+    {
+        return new IO($input, $output, $this);
+    }
+
+    /**
+     * Interacts with the user.
+     *
+     * This method is executed before the InputDefinition is validated.
+     * This means that this is the only place where the command can
+     * interactively ask for values of missing required arguments.
+     *
+     * @param  InputInterface   $input
+     * @param  OutputInterface  $output
+     */
+    protected function interact(InputInterface $input, OutputInterface $output): void
+    {
+        if ($this->handler instanceof InteractInterface) {
+            $this->handler->interact($this->getIO($input, $output));
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new IO($input, $output, $this);
+        $io = $this->getIO($input, $output);
 
         if ($this->handler instanceof CommandInterface) {
             $result = $this->handler->execute($io);
@@ -67,6 +97,13 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
         return $result ?? 0;
     }
 
+    /**
+     * Invoke handler.
+     *
+     * @param  AttributeHandler  $handler
+     *
+     * @return  callable
+     */
     public function __invoke(AttributeHandler $handler): callable
     {
         $this->container = $handler->getContainer();
@@ -74,27 +111,43 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
         return function (...$args) use ($handler) {
             if (isset($args['name'])) {
                 $this->setName($args['name']);
+
+                unset($args['name']);
             }
 
-            $this->handler = $handler(...$args);
-
-            if ($this->handler instanceof CommandInterface) {
-                $this->handler->configure($this);
-            }
-
-            AttributesAccessor::runAttributeIfExists(
-                $this->handler,
-                InputArgument::class,
-                fn (InputArgument $arg) => $this->getDefinition()->addArgument($arg)
-            );
-
-            AttributesAccessor::runAttributeIfExists(
-                $this->handler,
-                InputOption::class,
-                fn (InputOption $option) => $this->getDefinition()->addOption($option)
-            );
+            $this->handler = $this->configureHandler($handler(...$args));
 
             return $this;
         };
+    }
+
+    /**
+     * configureInnerCommand
+     *
+     * @param  callable|CommandInterface  $handler
+     *
+     * @return callable|CommandInterface
+     */
+    protected function configureHandler(callable|CommandInterface $handler): callable|CommandInterface
+    {
+        if ($handler instanceof CommandInterface) {
+            $handler->configure($this);
+        }
+
+        // Register arguments
+        AttributesAccessor::runAttributeIfExists(
+            $handler,
+            InputArgument::class,
+            fn(InputArgument $arg) => $this->getDefinition()->addArgument($arg)
+        );
+
+        // Register options
+        AttributesAccessor::runAttributeIfExists(
+            $handler,
+            InputOption::class,
+            fn(InputOption $option) => $this->getDefinition()->addOption($option)
+        );
+
+        return $handler;
     }
 }

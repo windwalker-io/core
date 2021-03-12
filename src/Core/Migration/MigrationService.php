@@ -11,25 +11,28 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
+use Monolog\DateTimeImmutable;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Console\IOInterface;
-use Windwalker\Core\Event\MessageEventTrait;
+use Windwalker\Core\IO\IOSocketInterface;
+use Windwalker\Core\IO\IOSocketTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;
-use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
+use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Stream\Stream;
+use Windwalker\Utilities\SimpleTemplate;
 
 /**
  * The MigrationService class.
  */
-class MigrationService implements EventAwareInterface
+class MigrationService implements IOSocketInterface
 {
-    use MessageEventTrait;
-
-    protected ?IOInterface $io = null;
+    use EventAwareTrait;
+    use IOSocketTrait;
 
     /**
      * MigrationService constructor.
@@ -128,7 +131,7 @@ class MigrationService implements EventAwareInterface
         }
 
         if (!$count) {
-            $this->addMessage('No changes.');
+            $this->useIO(fn (IOInterface $io) => $io->writeln('No changes.'));
         }
     }
 
@@ -149,9 +152,12 @@ class MigrationService implements EventAwareInterface
         $this->useIO(function (IOInterface $io) use ($direction, $migration) {
             $io->write(
                 sprintf(
-                    '<fg=gray>%s</> <info>%s</info> <comment>%s</comment>... ',
+                    '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
                     $migration->version,
                     $migration->name,
+                    $direction === Migration::UP
+                        ? 'bright-cyan'
+                        : 'magenta',
                     strtoupper($direction)
                 )
             );
@@ -240,6 +246,7 @@ class MigrationService implements EventAwareInterface
     ): void {
         if ($direction === Migration::UP) {
             $data['version']    = $migration->version;
+            $data['name']       = $migration->name;
             $data['start_time'] = $start->format($this->db->getDateFormat());
             $data['end_time']   = $end->format($this->db->getDateFormat());
 
@@ -261,16 +268,27 @@ class MigrationService implements EventAwareInterface
         $table = $this->db->getTable($this->getLogTable());
 
         if ($table->exists()) {
+            if (!$table->hasColumn('name')) {
+                $table->update(
+                    function (Schema $schema) {
+                        $schema->varchar('name');
+                    }
+                );
+            }
+
             return;
         }
 
         $table->create(
             function (Schema $schema) {
                 $schema->varchar('version');
+                $schema->varchar('name');
 
                 // Use exists time as timestamp before framework supports CURRENT_TIMESTAMP
                 $schema->timestamp('start_time')->defaultCurrent();
                 $schema->timestamp('end_time')->defaultCurrent();
+
+                $schema->addPrimaryKey(['version', 'name']);
             }
         );
     }
@@ -281,21 +299,47 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * @param  IOInterface|null  $io
+     * copyMigrationFile
      *
-     * @return  static  Return self to support chaining.
+     * @param  string  $dir
+     * @param  string  $name
+     * @param  string  $source
+     *
+     * @return  FileObject
      */
-    public function setIO(?IOInterface $io): static
+    public function copyMigrationFile(string $dir, string $name, string $source): FileObject
     {
-        $this->io = $io;
+        $migrations = $this->getMigrations($dir);
 
-        return $this;
-    }
-
-    protected function useIO(callable $callback): void
-    {
-        if ($this->io) {
-            $callback($this->io);
+        // Check name not exists
+        foreach ($migrations as $migration) {
+            if (strtolower($name) === strtolower($migration->name)) {
+                throw new \RuntimeException(
+                    'Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" .
+                    $migration->file->getPathname() . '</info>'
+                );
+            }
         }
+
+        $date = new \DateTimeImmutable('now');
+
+        $version = $date->format('YmdHis');
+        $year = $date->format('Y');
+
+        $file = $version . '_' . ucfirst($name) . '.php';
+
+        $tmpl = file_get_contents($source);
+
+        $tmpl = SimpleTemplate::create($tmpl)(
+            compact('year', 'version', 'name')
+        );
+
+        $filePath = $dir . '/' . $file;
+
+        if (is_file($filePath)) {
+            throw new \RuntimeException(sprintf('File already exists: %s', $filePath));
+        }
+
+        return Filesystem::write($filePath, $tmpl);
     }
 }

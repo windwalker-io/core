@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,6 +28,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class IO implements IOInterface
 {
+    protected SymfonyStyle|null $style = null;
+
     /**
      * IO constructor.
      *
@@ -95,9 +98,11 @@ class IO implements IOInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setInput(InputInterface $input)
+    public function setInput(InputInterface $input): static
     {
         $this->input = $input;
+
+        $this->style = null;
 
         return $this;
     }
@@ -115,9 +120,11 @@ class IO implements IOInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): static
     {
         $this->output = $output;
+
+        $this->style = null;
 
         return $this;
     }
@@ -420,7 +427,7 @@ class IO implements IOInterface
      */
     public function style(): SymfonyStyle
     {
-        return new SymfonyStyle($this->input, $this->output);
+        return $this->style ??= new SymfonyStyle($this->input, $this->output);
     }
 
     /**
@@ -429,5 +436,54 @@ class IO implements IOInterface
     public function errorStyle(): SymfonyStyle
     {
         return $this->style()->getErrorStyle();
+    }
+
+    /**
+     * Get wrapper command.
+     *
+     * @return  Command
+     */
+    public function getWrapperCommand(): Command
+    {
+        return $this->command;
+    }
+
+    /**
+     * extract
+     *
+     * @param  array|InputInterface|null  $input
+     * @param  OutputInterface|null       $output
+     *
+     * @return  mixed
+     */
+    public function extract(array|InputInterface $input = null, ?OutputInterface $output = null): static
+    {
+        $newIO = clone $this;
+
+        if (is_array($input)) {
+            unset($input['command']);
+            $input = new ArrayInput($input);
+        }
+
+        if ($input === null) {
+            $input = $this->input;
+        }
+
+        $newIO->input = $input ?? $this->input;
+        $newIO->output = $output ?? $this->output;
+
+        return $newIO;
+    }
+
+    /**
+     * New line.
+     *
+     * @param  int  $count
+     *
+     * @return  void
+     */
+    public function newLine(int $count = 1): void
+    {
+        $this->style()->newLine($count);
     }
 }
