@@ -16,14 +16,17 @@ use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
-use Windwalker\Core\Event\MessageEvent;
+use Windwalker\Core\Event\MessageOutputEvent;
+use Windwalker\Core\Event\ErrorMessageOutputEvent;
+use Windwalker\Core\Event\ConsoleLogEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -39,6 +42,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     use ApplicationTrait;
 
     protected bool $booted = false;
+
+    protected ?OutputInterface $output = null;
 
     /**
      * ConsoleApplication constructor.
@@ -87,65 +92,26 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $this->registerCommands($commands);
 
+        $this->registerEvents();
+
         $this->booted = true;
     }
 
-    public function registerCommands(array $commands): void
+    /**
+     * @return OutputInterface
+     */
+    public function getOutput(): OutputInterface
     {
-        $container = $this->getContainer();
-
-        foreach ($commands as $name => &$command) {
-            if (is_string($command)) {
-                // Handle class command
-                if (class_exists($command)) {
-                    $container->bind($command, create($command, name: $name));
-                    continue;
-                }
-
-                if (is_file($command)) {
-                    $command = include $command;
-                }
-            }
-
-            // Object and closure
-            if (is_object($command)) {
-                $container->set(
-                    $id = 'command:' . $name,
-                    function (Container $container) use ($name, $command) {
-                        /** @var CommandWrapper $cmd */
-                        $cmd = $container->getAttributesResolver()->decorateObject($command);
-
-                        return $cmd->setName($name);
-                    }
-                );
-
-                $command = $id;
-            }
-        }
-
-        unset($command);
-
-        $this->setCommandLoader(
-            new ContainerCommandLoader(
-                $container,
-                $commands
-            )
-        );
+        return $this->output ?? new ConsoleOutput();
     }
 
-    /**
-     * Configures the input and output instances based on the user arguments and options.
-     *
-     * @param  InputInterface   $input
-     * @param  OutputInterface  $output
-     */
-    protected function configureIO(InputInterface $input, OutputInterface $output): void
+    protected function registerEvents(): void
     {
-        parent::configureIO($input, $output);
+        $output = $this->getOutput();
 
         $this->on(
-            MessageEvent::class,
-            function (MessageEvent $event) use ($input, $output) {
+            ConsoleLogEvent::class,
+            function (ConsoleLogEvent $event) use ($output) {
                 $tag = match ($event->getType()) {
                     'success', 'green' => '<info>%s</info>',
                     'warning', 'yellow' => '<comment>%s</comment>',
@@ -161,11 +127,77 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
                 }
             }
         );
+
+        $this->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
+        $this->on(ErrorMessageOutputEvent::class, fn (ErrorMessageOutputEvent $event) => $event->writeWith($output));
+    }
+
+    public function registerCommands(array $commands): void
+    {
+        $commandsMap = [];
+
+        $container = $this->getContainer();
+
+        foreach ($commands as $name => $command) {
+            if (is_string($command)) {
+                // Handle class command
+                if (class_exists($command)) {
+                    $container->bind($command, create($command, name: $name));
+                    $commandsMap[$name] = $command;
+                    continue;
+                }
+
+                if (is_file($command)) {
+                    $command = include $command;
+                }
+            }
+
+            // Object and closure
+            if (is_object($command)) {
+                $container->set(
+                    $id = 'command:' . $name,
+                    function (Container $container) use (&$name, $command) {
+                        /** @var CommandWrapper $cmd */
+                        $cmd = $container->getAttributesResolver()->decorateObject($command);
+
+                        if ($cmd->getName() !== CommandWrapper::TEMP_NAME) {
+                            // If CommandWrapper name set, use command name
+                            $name = $cmd->getName();
+                        } else {
+                            // Otherwise use key as name.
+                            $cmd->setName($name);
+                        }
+
+                        return $cmd;
+                    }
+                );
+
+                $commandsMap[$name] = $id;
+            }
+        }
+
+        $this->setCommandLoader(
+            new ContainerCommandLoader(
+                $container,
+                $commandsMap
+            )
+        );
+    }
+
+    /**
+     * Configures the input and output instances based on the user arguments and options.
+     *
+     * @param  InputInterface   $input
+     * @param  OutputInterface  $output
+     */
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
+    {
+        parent::configureIO($input, $output);
     }
 
     public function addMessage(string|array $messages, ?string $type = null): static
     {
-        $this->emit(new MessageEvent($messages, $type));
+        $this->emit(new ConsoleLogEvent($messages, $type));
 
         return $this;
     }

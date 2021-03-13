@@ -72,7 +72,7 @@ class RequestProvider implements ServiceProviderInterface
         $container->prepareSharedObject(
             AppContext::class,
             function (AppContext $app, Container $container) {
-                $this->parentApp->getDispatcher()->registerDealer($app->getDispatcher());
+                $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
                 return $app->withIsDebug((bool) $container->getParam('app.debug'))
                     ->withMode((string) $container->getParam('app.mode'))

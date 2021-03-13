@@ -48,14 +48,14 @@ class EventProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
-        $container->share('main.dispatcher', fn() => $this->app->getDispatcher());
+        $container->share('main.dispatcher', fn() => $this->app->getEventDispatcher());
         $container->prepareObject(
             EventEmitter::class,
             static function (EventEmitter $dispatcher, Container $container) {
                 /** @var EventEmitter $mainDispatcher */
                 $mainDispatcher = $container->get('main.dispatcher');
 
-                $dispatcher->registerDealer($mainDispatcher);
+                $dispatcher->addDealer($mainDispatcher);
 
                 return $dispatcher;
             }

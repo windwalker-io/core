@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Migration\MigrationService;
@@ -37,8 +38,8 @@ class DatabaseProvider implements ServiceProviderInterface
     {
         $container->prepareSharedObject(DatabaseManager::class);
         $container->prepareSharedObject(DatabaseFactory::class);
-        $container->bind(DatabaseAdapter::class, fn (DatabaseManager $manager) => $manager->get());
-        $container->bind(ORM::class, fn (DatabaseManager $manager) => $manager->get()->orm());
+        $container->bind(DatabaseAdapter::class, fn(DatabaseManager $manager) => $manager->get());
+        $container->bind(ORM::class, fn(DatabaseManager $manager) => $manager->get()->orm());
 
         // Services
         $container->prepareSharedObject(DatabaseExportService::class);

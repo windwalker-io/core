@@ -13,14 +13,14 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
  * The CreateCommand class.
  */
-#[CommandWrapper('Create a migration version.')]
+#[CommandWrapper(description: 'Create a migration version.')]
 class CreateCommand extends AbstractMigrationCommand
 {
     /**

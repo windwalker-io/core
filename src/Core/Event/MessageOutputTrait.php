@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Part of starter project.
+ *
+ * @copyright  Copyright (C) 2021 __ORGANIZATION__.
+ * @license    __LICENSE__
+ */
+
+declare(strict_types=1);
+
+namespace Windwalker\Core\Event;
+
+use Windwalker\Event\EventAwareTrait;
+
+/**
+ * Trait MessageOutputTrait
+ */
+trait MessageOutputTrait
+{
+    use EventAwareTrait;
+
+    public function emitMessage(string|array $messages, bool $newLine = true, int $options = 0): MessageOutputEvent
+    {
+        return $this->emit(new MessageOutputEvent($messages, $newLine, $options));
+    }
+
+    public function emitErrorMessage(
+        string|array $messages,
+        bool $newLine = true,
+        int $options = 0
+    ): ErrorMessageOutputEvent {
+        return $this->emit(new ErrorMessageOutputEvent($messages, $newLine, $options));
+    }
+}

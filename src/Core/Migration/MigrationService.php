@@ -11,17 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
-use Monolog\DateTimeImmutable;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Core\Event\MessageOutputTrait;
 use Windwalker\Core\IO\IOSocketInterface;
-use Windwalker\Core\IO\IOSocketTrait;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Database\Driver\ConnectionInterface;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Stream\Stream;
@@ -30,10 +26,9 @@ use Windwalker\Utilities\SimpleTemplate;
 /**
  * The MigrationService class.
  */
-class MigrationService implements IOSocketInterface
+class MigrationService
 {
-    use EventAwareTrait;
-    use IOSocketTrait;
+    use MessageOutputTrait;
 
     /**
      * MigrationService constructor.
@@ -43,7 +38,7 @@ class MigrationService implements IOSocketInterface
      */
     public function __construct(protected ApplicationInterface $app, protected DatabaseAdapter $db)
     {
-        $this->db->getDispatcher()->registerDealer($this->getDispatcher());
+        $this->db->addEventDealer($this->getEventDispatcher());
     }
 
     /**
@@ -53,9 +48,9 @@ class MigrationService implements IOSocketInterface
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
-     * @return  void
+     * @return  int
      */
-    public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): void
+    public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): int
     {
         $migrations     = $this->getMigrations($path);
         $versions       = $this->getVersions();
@@ -132,8 +127,10 @@ class MigrationService implements IOSocketInterface
         }
 
         if (!$count) {
-            $this->useIO(fn (IOInterface $io) => $io->writeln('No changes.'));
+            $this->emitMessage('No changes.');
         }
+
+        return $count;
     }
 
     public function executeMigration(Migration $migration, string $direction = Migration::UP): void
@@ -150,27 +147,22 @@ class MigrationService implements IOSocketInterface
 
         $start = new \DateTimeImmutable();
 
-        $this->useIO(function (IOInterface $io) use ($direction, $migration) {
-            $io->write(
-                sprintf(
-                    '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
-                    $migration->version,
-                    $migration->name,
-                    $direction === Migration::UP
-                        ? 'bright-cyan'
-                        : 'magenta',
-                    strtoupper($direction)
-                )
-            );
-        });
+        $this->emitMessage(
+            sprintf(
+                '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
+                $migration->version,
+                $migration->name,
+                $direction === Migration::UP
+                    ? 'bright-cyan'
+                    : 'magenta',
+                strtoupper($direction)
+            ),
+            false
+        );
 
         $this->app->call($handler);
 
-        $this->useIO(function (IOInterface $io) use ($direction, $migration) {
-            $io->writeln(
-                '<fg=bright-green>Success</>'
-            );
-        });
+        $this->emitMessage('<fg=bright-green>Success</>', true);
 
         $end = new \DateTimeImmutable();
 
@@ -325,7 +317,7 @@ class MigrationService implements IOSocketInterface
         $date = new \DateTimeImmutable('now');
 
         $version = $date->format('YmdHis');
-        $year = $date->format('Y');
+        $year    = $date->format('Y');
 
         $file = $version . '_' . ucfirst($name) . '.php';
 

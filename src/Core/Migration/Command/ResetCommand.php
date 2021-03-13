@@ -13,14 +13,14 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
  * The ResetCommand class.
  */
-#[CommandWrapper('Reset migration versions.')]
+#[CommandWrapper(description: 'Reset migration versions.')]
 class ResetCommand extends AbstractMigrationCommand
 {
     /**
@@ -30,6 +30,7 @@ class ResetCommand extends AbstractMigrationCommand
      */
     public function __construct(protected MigrationService $migrationService)
     {
+        //
     }
 
     /**
@@ -47,7 +48,8 @@ class ResetCommand extends AbstractMigrationCommand
             'seed',
             's',
             InputOption::VALUE_OPTIONAL,
-            'Also import seeds.'
+            'Also import seeds.',
+            false
         );
         $command->addOption(
             'log',
@@ -60,13 +62,15 @@ class ResetCommand extends AbstractMigrationCommand
             'no-backup',
             null,
             InputOption::VALUE_OPTIONAL,
-            'Do not backup database.'
+            'Do not backup database.',
+            false
         );
         $command->addOption(
             'no-create-db',
             null,
             InputOption::VALUE_OPTIONAL,
-            'Do not auto create database or schema.'
+            'Do not auto create database or schema.',
+            false
         );
     }
 
@@ -94,7 +98,7 @@ class ResetCommand extends AbstractMigrationCommand
         // Backup
         $this->backup($io);
 
-        $this->migrationService->setIO($io);
+        $this->migrationService->addEventDealer($this->app);
 
         $style = $io->style();
         $style->title('Rollback to 0 version...');
@@ -112,6 +116,9 @@ class ResetCommand extends AbstractMigrationCommand
             null,
             $this->getLogFile($io)
         );
+
+        $style->newLine();
+        $io->writeln('Completed.');
 
         return 0;
     }

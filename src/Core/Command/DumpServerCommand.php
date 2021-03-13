@@ -21,11 +21,11 @@ use Symfony\Component\VarDumper\Command\Descriptor\HtmlDescriptor;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Server\DumpServer;
-use Windwalker\Core\Console\CommandInterface;
+use Windwalker\Console\CommandInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\CoreCommand;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Console\IOInterface;
 
 /**
  * The DumpServerCommand class.

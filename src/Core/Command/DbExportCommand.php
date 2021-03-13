@@ -14,10 +14,10 @@ namespace Windwalker\Core\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Windwalker\Console\CommandInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\CommandInterface;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Manager\DatabaseManager;
@@ -26,7 +26,7 @@ use Windwalker\Filesystem\FileObject;
 /**
  * The DbExportCommand class.
  */
-#[CommandWrapper('Export database to file.')]
+#[CommandWrapper(description: 'Export database to file.')]
 class DbExportCommand implements CommandInterface
 {
     /**

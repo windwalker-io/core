@@ -15,6 +15,9 @@ use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
+use Windwalker\Core\Event\ErrorMessageOutputEvent;
+use Windwalker\Core\Event\MessageOutputEvent;
+use Windwalker\Core\Event\MessageOutputTrait;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
@@ -84,7 +87,7 @@ class DatabaseExportService
 
         $exporter = $this->exporterFactory->createExporter($db, $this->app);
 
-        $exporter->setIO($output);
+        $exporter->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
 
         $exporter->exportToPsrStream($dest->getStream(Stream::MODE_READ_WRITE_RESET));
 

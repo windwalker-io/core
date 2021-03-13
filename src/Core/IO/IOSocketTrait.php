@@ -13,7 +13,7 @@ namespace Windwalker\Core\IO;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\IOInterface;
 
 /**
  * The IOSocketTrait class.

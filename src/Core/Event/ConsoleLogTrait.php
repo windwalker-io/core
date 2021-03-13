@@ -16,12 +16,12 @@ use Windwalker\Event\EventAwareTrait;
 /**
  * Trait MessageEventTrait
  */
-trait MessageEventTrait
+trait ConsoleLogTrait
 {
     use EventAwareTrait;
 
-    public function addMessage(string|array $messages, ?string $type = null): MessageEvent
+    public function consoleLog(string|array $messages, ?string $type = null): ConsoleLogEvent
     {
-        return $this->emit(new MessageEvent($messages, $type));
+        return $this->emit(new ConsoleLogEvent($messages, $type));
     }
 }

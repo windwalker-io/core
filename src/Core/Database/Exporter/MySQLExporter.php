@@ -55,11 +55,11 @@ class MySQLExporter extends AbstractExporter
             return;
         }
 
-        $this->useIO(
-            function (OutputInterface $io) use ($process) {
-                $io->writeln('Error: ' . $process->getErrorOutput());
-                $io->writeln('Fallback to php backup script.');
-            }
+        $this->emitMessage(
+            [
+                'Error: ' . $process->getErrorOutput(),
+                'Fallback to php backup script.'
+            ]
         );
 
         $tableInfos = $this->db->getSchema()->getTables(true);

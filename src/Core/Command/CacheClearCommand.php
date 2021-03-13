@@ -13,10 +13,10 @@ namespace Windwalker\Core\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Windwalker\Core\Console\CommandInterface;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\CoreCommand;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\CommandInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\CoreCommand;
+use Windwalker\Console\IOInterface;
 use Windwalker\Filesystem\Filesystem;
 
 /**

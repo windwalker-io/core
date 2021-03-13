@@ -9,12 +9,11 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Console\Input;
+namespace Windwalker\Core\Event;
 
 /**
- * The InputOption class.
+ * The ErrorConsoleOutputEvent class.
  */
-#[\Attribute]
-class InputOption extends \Symfony\Component\Console\Input\InputOption
+class ErrorMessageOutputEvent extends MessageOutputEvent
 {
 }

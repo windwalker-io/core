@@ -15,9 +15,9 @@ use JetBrains\PhpStorm\ExpectedValues;
 use Windwalker\Event\EventInterface;
 
 /**
- * The MessageEvent class.
+ * The ConsoleLogEvent class.
  */
-class MessageEvent
+class ConsoleLogEvent
 {
     /**
      * MessageEvent constructor.

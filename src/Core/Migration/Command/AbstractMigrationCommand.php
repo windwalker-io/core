@@ -13,13 +13,11 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Windwalker\Console\CommandInterface;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\CommandInterface;
-use Windwalker\Core\Console\IOInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
-use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\PlatformHelper;
 
@@ -64,6 +62,13 @@ abstract class AbstractMigrationCommand implements CommandInterface
         );
     }
 
+    /**
+     * Create database if not exists before migration command start.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  void
+     */
     protected function createDatabase(IOInterface $io): void
     {
         $conn = $io->getOption('connection');
@@ -93,11 +98,23 @@ abstract class AbstractMigrationCommand implements CommandInterface
         $dbPreset->disconnect();
     }
 
+    /**
+     * The system default migration folder.
+     *
+     * @return  string
+     */
     public function getDefaultMigrationFolder(): string
     {
         return $this->app->config('@migrations');
     }
 
+    /**
+     * Get migration folder from options or return default.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  string
+     */
     public function getMigrationFolder(IOInterface $io): string
     {
         $dir = $io->getOption('dir');
@@ -107,6 +124,13 @@ abstract class AbstractMigrationCommand implements CommandInterface
         return $dir ?: $this->getDefaultMigrationFolder();
     }
 
+    /**
+     * Get log file from options or return default.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  string|null
+     */
     protected function getLogFile(IOInterface $io): ?string
     {
         $log = $io->getOption('log');
@@ -122,6 +146,15 @@ abstract class AbstractMigrationCommand implements CommandInterface
         return $log;
     }
 
+    /**
+     * Do auto backup if allowed.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  void
+     *
+     * @throws \Exception
+     */
     protected function backup(IOInterface $io): void
     {
         if ($io->getOption('no-backup') === false) {
@@ -135,6 +168,13 @@ abstract class AbstractMigrationCommand implements CommandInterface
         }
     }
 
+    /**
+     * Check APP_ENV is dev or stop.
+     *
+     * @param  IOInterface  $io
+     *
+     * @return  bool
+     */
     protected function checkEnv(IOInterface $io): bool
     {
         if (env('APP_ENV') !== 'dev') {
@@ -146,7 +186,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
     }
 
     /**
-     * getEnvCmd
+     * Get the ENV suggestion depend on platform.
      *
      * @param string $env
      * @param string $value

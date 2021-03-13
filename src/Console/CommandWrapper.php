@@ -9,18 +9,18 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Console;
+namespace Windwalker\Console;
 
-use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Attributes\AttributesAccessor;
-use Windwalker\Core\Console\Input\InputArgument;
-use Windwalker\Core\Console\Input\InputOption;
+use Windwalker\Console\Input\InputArgument;
+use Windwalker\Console\Input\InputOption;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
+use Windwalker\Utilities\Assert\Assert;
 
 /**
  * The CommandWrapper class.
@@ -28,16 +28,24 @@ use Windwalker\DI\Container;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_FUNCTION | \Attribute::TARGET_METHOD)]
 class CommandWrapper extends Command implements ContainerAttributeInterface
 {
+    public const TEMP_NAME = 'windwalker-command-temp-name';
+
+    /**
+     * Use another property to store callback that can support extra process flow for this class.
+     *
+     * @var object|callable
+     */
     protected mixed $handler = null;
 
     protected Container $container;
 
     public function __construct(
+        ?string $name = null,
         ?string $description = null,
         array $aliases = [],
         bool $hidden = false
     ) {
-        parent::__construct('temp-name');
+        parent::__construct($name ?? self::TEMP_NAME);
 
         if ($description !== null) {
             $this->setDescription($description);
@@ -87,20 +95,29 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
         try {
             if ($this->handler instanceof CommandInterface) {
                 $result = $this->handler->execute($io);
+            } elseif (is_callable($this->handler)) {
+                $result = ($this->handler)(io: $io);
+            } elseif ($this->handler instanceof Command) {
+                $result = $this->handler->run($input, $output);
             } else {
-                $result = $this->container->call($this->handler, ['io' => $io]);
+                throw new \LogicException(
+                    sprintf(
+                        'CommandWrapper::$handler should be callable or Command object, %s given',
+                        Assert::describeValue($this->handler)
+                    )
+                );
             }
+
+            if (is_bool($result)) {
+                return $result ? 0 : 255;
+            }
+
+            return $result ?? 0;
         } catch (\Throwable $e) {
             $io->writeln('<error>An error occurred: ' . $e->getMessage() . '</error>');
 
             throw $e;
         }
-
-        if (is_bool($result)) {
-            return $result ? 0 : 255;
-        }
-
-        return $result ?? 0;
     }
 
     /**
@@ -112,16 +129,20 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
      */
     public function __invoke(AttributeHandler $handler): callable
     {
-        $this->container = $handler->getContainer();
+        $container = $handler->getContainer();
 
-        return function (...$args) use ($handler) {
+        return function (array $args, int $options) use ($handler, $container) {
             if (isset($args['name'])) {
                 $this->setName($args['name']);
 
                 unset($args['name']);
             }
 
-            $this->handler = $this->configureHandler($handler(...$args));
+            $this->handler = $this->configureHandler($handler($args, $options));
+
+            if ($this->handler instanceof \Closure) {
+                $this->handler = fn (...$args) => $container->call($this->handler, $args);
+            }
 
             return $this;
         };

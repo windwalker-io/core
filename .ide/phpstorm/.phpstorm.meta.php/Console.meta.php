@@ -23,7 +23,7 @@ namespace PHPSTORM_META {
     );
 
     expectedArguments(
-        \Windwalker\Core\Console\Input\InputArgument::__construct(),
+        \Windwalker\Console\Input\InputArgument::__construct(),
         1,
         argumentsSet('argument_options')
     );
@@ -44,7 +44,7 @@ namespace PHPSTORM_META {
     );
 
     expectedArguments(
-        \Windwalker\Core\Console\Input\InputOption::__construct(),
+        \Windwalker\Console\Input\InputOption::__construct(),
         2,
         argumentsSet('option_options')
     );

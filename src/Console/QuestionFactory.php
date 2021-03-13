@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Console;
+namespace Windwalker\Console;
 
 use Windwalker\DI\Container;
 

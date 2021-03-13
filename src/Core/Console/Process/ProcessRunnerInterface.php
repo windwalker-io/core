@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Console\Process;
 
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Windwalker\Environment\PlatformHelper;
 
 /**
  * Interface ProcessRunnerInterface

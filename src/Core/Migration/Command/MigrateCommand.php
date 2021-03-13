@@ -14,9 +14,8 @@ namespace Windwalker\Core\Migration\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandInterface;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
@@ -104,15 +103,20 @@ class MigrateCommand extends AbstractMigrationCommand
         $style = $io->style();
         $style->title('Migration start...');
 
-        $this->migrationService->setIO($io);
+        $this->migrationService->addEventDealer($this->app);
 
-        $this->migrationService->migrate(
+        $count = $this->migrationService->migrate(
             $this->getMigrationFolder($io),
             $io->getArgument('version'),
             $this->getLogFile($io)
         );
 
-        $io->style()->newLine();
+        if ($count) {
+            $io->newLine();
+            $io->writeln('Completed.');
+        }
+
+        $io->newLine();
 
         return 0;
     }

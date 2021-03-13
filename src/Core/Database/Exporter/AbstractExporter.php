@@ -9,12 +9,10 @@
 namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\IO\IOSocketTrait;
+use Windwalker\Core\Event\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Stream\Stream;
-use Windwalker\Stream\StringStream;
 
 /**
  * The AbstractExporter class.
@@ -23,7 +21,7 @@ use Windwalker\Stream\StringStream;
  */
 abstract class AbstractExporter implements ExporterInterface
 {
-    use IOSocketTrait;
+    use MessageOutputTrait;
 
     /**
      * AbstractExporter constructor.
@@ -88,7 +86,7 @@ abstract class AbstractExporter implements ExporterInterface
     /**
      * getCreateTable
      *
-     * @param string $table
+     * @param  string  $table
      *
      * @return array|mixed|string
      */
@@ -97,7 +95,7 @@ abstract class AbstractExporter implements ExporterInterface
     /**
      * getInserts
      *
-     * @param string $table
+     * @param  string  $table
      *
      * @return mixed|null|string
      */

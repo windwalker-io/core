@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Console\Input;
+namespace Windwalker\Console\Input;
 
 /**
  * The InputArgument class.

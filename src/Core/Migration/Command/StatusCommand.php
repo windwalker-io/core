@@ -14,12 +14,10 @@ namespace Windwalker\Core\Migration\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Core\Console\CommandInterface;
-use Windwalker\Core\Console\CommandWrapper;
-use Windwalker\Core\Console\IOInterface;
+use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\Decorator;
 
 /**
  * The StatusCommand class.
