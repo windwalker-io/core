@@ -26,7 +26,8 @@
     "require-dev" : {
     },
     "suggest": {
-        "symfony/process": "Install ~3.0 if you require auto-answer when running custom scripts.",
+        "dragonmantank/cron-expression": "Install ^3.1 to support schedule runner.",
+        "symfony/mailer": "Install ^5.2 to send mail.",
         "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
     "autoload" : {

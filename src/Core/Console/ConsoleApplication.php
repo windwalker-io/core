@@ -29,6 +29,7 @@ use Windwalker\Core\Event\MessageOutputEvent;
 use Windwalker\Core\Event\ErrorMessageOutputEvent;
 use Windwalker\Core\Event\ConsoleLogEvent;
 use Windwalker\Core\Provider\AppProvider;
+use Windwalker\Core\Provider\ConsoleProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Utilities\Arr;
@@ -87,6 +88,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
             $container->registerByConfig($config ?: []);
         }
+
+        $container->registerServiceProvider(new ConsoleProvider($this));
 
         // Commands
         $commands = Arr::flatten($commands = (array) $this->config('commands'), ':');

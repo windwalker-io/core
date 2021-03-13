@@ -169,11 +169,13 @@ class ScheduleCommand implements CommandInterface
 
         $table = new Table($io);
         $table->setHeaderTitle('Schedule Events');
-        $table->setHeaders(['Event', 'Expression', 'Tags']);
+        $table->setHeaders(['Event', 'Expression', 'Due', 'Next Due', 'Tags']);
 
         $events = $schedule->getEvents($tags);
 
         $count = 0;
+        $tz = $io->getOption('tz');
+        $time = $io->getOption('time') ?: 'now';
 
         foreach ($events as $event) {
             if ($names !== [] && !in_array($event->getName(), $names, true)) {
@@ -184,11 +186,16 @@ class ScheduleCommand implements CommandInterface
             $tags = $event->getTags();
             sort($tags);
 
+            $expr    = $event->getExpression();
+            $nextDue = $expr->getNextRunDate($time, 0, false, $tz);
+
             $table->addRow(
                 [
                     '<fg=cyan>' . $event->getName() . '</>',
                     (string) $event,
-                    '<fg=yellow>' . implode(' ', $tags) . '</>'
+                    $expr->isDue($time, $tz) ? '<info>v</info>' : '',
+                    $nextDue->format('Y-m-d H:i:s'),
+                    '<fg=gray>' . implode(' ', $tags) . '</>'
                 ]
             );
         }

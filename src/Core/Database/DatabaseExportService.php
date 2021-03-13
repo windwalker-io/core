@@ -11,14 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database;
 
-use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
-use Windwalker\Core\Event\ErrorMessageOutputEvent;
 use Windwalker\Core\Event\MessageOutputEvent;
-use Windwalker\Core\Event\MessageOutputTrait;
-use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\FileObject;
@@ -50,7 +46,7 @@ class DatabaseExportService
     /**
      * export
      *
-     * @param  OutputInterface|null         $output
+     * @param  OutputInterface|null  $output
      *
      * @return FileObject
      *
@@ -81,7 +77,7 @@ class DatabaseExportService
 
         $exporter = $this->exporterFactory->createExporter($this->db, $this->app);
 
-        $exporter->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
+        $exporter->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output));
 
         $exporter->exportToPsrStream($dest->getStream(Stream::MODE_READ_WRITE_RESET));
 
