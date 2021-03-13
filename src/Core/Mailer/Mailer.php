@@ -12,34 +12,28 @@ declare(strict_types=1);
 namespace Windwalker\Core\Mailer;
 
 use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Windwalker\DI\Container;
 
 /**
  * The Mailer class.
  */
 class Mailer implements MailerInterface
 {
-    protected SymfonyMailer $mailer;
-
     /**
      * Mailer constructor.
      *
-     * @param  TransportInterface             $transport
-     * @param  MessageBusInterface|null       $bus
-     * @param  EventDispatcherInterface|null  $dispatcher
+     * @param  TransportInterface  $transport
+     * @param  Container           $container
      */
     public function __construct(
-        TransportInterface $transport,
-        MessageBusInterface $bus = null,
-        EventDispatcherInterface $dispatcher = null
+        protected TransportInterface $transport,
+        protected Container $container,
     ) {
-        $this->mailer = new SymfonyMailer($transport, $bus, $dispatcher);
+        //
     }
 
     /**
@@ -47,7 +41,7 @@ class Mailer implements MailerInterface
      */
     public function send(RawMessage $message, Envelope $envelope = null): void
     {
-        $this->mailer->send($message, $envelope);
+        $this->transport->send($message, $envelope);
     }
 
     public function createMessage(
