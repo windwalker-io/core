@@ -16,6 +16,7 @@ use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -193,6 +194,16 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
+
+        static::addColors($output);
+    }
+
+    public static function addColors(OutputInterface $output): void
+    {
+        // $formatter = $output->getFormatter();
+        //
+        // $outputStyle = new OutputFormatterStyle(null, '#666', ['bold', 'blink']);
+        // $formatter->setStyle('gray', $outputStyle);
     }
 
     public function addMessage(string|array $messages, ?string $type = null): static

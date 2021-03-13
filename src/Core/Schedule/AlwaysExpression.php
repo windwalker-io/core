@@ -25,7 +25,7 @@ class AlwaysExpression extends CronExpression
      * @return bool True if a valid CRON expression was passed. False if not.
      * @see \Cron\CronExpression::factory
      */
-    public static function isValidExpression($expression)
+    public static function isValidExpression(string $expression): bool
     {
         return $expression === '@always';
     }
@@ -40,7 +40,7 @@ class AlwaysExpression extends CronExpression
      *
      * @return bool Returns TRUE if the cron is due to run or FALSE if not
      */
-    public function isDue($currentTime = 'now', $timeZone = null)
+    public function isDue($currentTime = 'now', $timeZone = null): bool
     {
         return true;
     }
@@ -53,7 +53,7 @@ class AlwaysExpression extends CronExpression
      * @return static
      * @throws \InvalidArgumentException if not a valid CRON expression
      */
-    public function setExpression($value)
+    public function setExpression(string $value): CronExpression
     {
         return $this;
     }

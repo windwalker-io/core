@@ -9,20 +9,17 @@
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
-use Windwalker\DI\Annotation\Inject;
-use Windwalker\DI\Container;
-use Windwalker\Queue\Job\JobInterface;
 
 /**
  * The Schedule class.
  *
- * @method ScheduleEvent yearly($task)
- * @method ScheduleEvent annually($task)
- * @method ScheduleEvent monthly($task)
- * @method ScheduleEvent weekly($task)
- * @method ScheduleEvent daily($task)
- * @method ScheduleEvent hourly($task)
- * @method ScheduleEvent minutely($task)
+ * @method ScheduleEvent yearly(string $name)
+ * @method ScheduleEvent annually(string $name)
+ * @method ScheduleEvent monthly(string $name)
+ * @method ScheduleEvent weekly(string $name)
+ * @method ScheduleEvent daily(string $name)
+ * @method ScheduleEvent hourly(string $name)
+ * @method ScheduleEvent minutely(string $name)
  *
  * @since  3.5.3
  */
@@ -37,10 +34,8 @@ class Schedule
 
     /**
      * Schedule constructor.
-     *
-     * @param Container $container
      */
-    public function __construct(protected Container $container)
+    public function __construct()
     {
         if (!class_exists(CronExpression::class)) {
             throw new \DomainException('Please install `dragonmantank/cron-expression ^3.1` first.');
@@ -48,234 +43,63 @@ class Schedule
     }
 
     /**
-     * getDueEvents
-     *
-     * @param array $tags
-     *
-     * @return  ScheduleEvent[]
-     *
-     * @since  3.5.3
-     */
-    public function getDueEvents(array $tags = []): array
-    {
-        return array_filter($this->getEvents($tags), fn(ScheduleEvent $event) => $event->isDue());
-    }
-
-    /**
      * cron
      *
-     * @param string $expression
-     * @param mixed  $task
+     * @param  string  $name
+     * @param  string  $expression
+     * @param  mixed   $handler
      *
      * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
      *
      * @since  3.5.3
      */
-    public function cron(string $expression, $task): ScheduleEvent
+    public function cron(string $name, string $expression, mixed $handler): ScheduleEvent
     {
-        return $this->events[] = $this->createEvent($expression, $task);
+        return $this->events[$name] = $this->createEvent($name, $expression, $handler);
+    }
+
+    public function task(string $name, string $expr = '* * * * *', mixed $handler = null): ScheduleEvent
+    {
+        return $this->cron($name, $expr, $handler);
     }
 
     /**
-     * always
+     * getDueEvents
      *
-     * @param mixed $task
+     * @param  array                      $tags
+     * @param  string|\DateTimeInterface  $currentTime
+     * @param  \DateTimeZone|string|null  $timezone
      *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.6
-     */
-    public function always($task): ScheduleEvent
-    {
-        return $this->cron('@always', $task);
-    }
-
-    /**
-     * perMinutes
-     *
-     * @param int   $minutes
-     * @param mixed $task
-     *
-     * @return  static
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     * @return  ScheduleEvent[]|\Generator
      *
      * @since  3.5.3
      */
-    public function perMinutes(int $minutes, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('*/%d * * * *', $minutes), $task);
-    }
-
-    /**
-     * perHours
-     *
-     * @param int   $hours
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function perHours(int $hours, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 */%d * * *', $hours), $task);
-    }
-
-    /**
-     * hourlyAt
-     *
-     * @param int   $minute
-     * @param mixed $task
-     *
-     * @return  static
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.3
-     */
-    public function hourlyAt(int $minute, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('%d * * * *', $minute), $task);
-    }
-
-    /**
-     * perDays
-     *
-     * @param int   $days
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function perDays(int $days, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 0 */%d * *', $days), $task);
-    }
-
-    /**
-     * dailyAt
-     *
-     * @param int   $hour
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function dailyAt(int $hour, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 %d * * *', $hour), $task);
-    }
-
-    /**
-     * perMonths
-     *
-     * @param int   $months
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function perMonths(int $months, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 0 1 */%d *', $months), $task);
-    }
-
-    /**
-     * monthlyAt
-     *
-     * @param int   $day
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function monthlyAt(int $day, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 0 %d * *', $day), $task);
-    }
-
-    /**
-     * yearlyAt
-     *
-     * @param int   $month
-     * @param mixed $task
-     *
-     * @return  ScheduleEvent
-     *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
-     * @since  3.5.5
-     */
-    public function yearlyAt(int $month, $task): ScheduleEvent
-    {
-        return $this->cron(sprintf('0 0 1 %d *', $month), $task);
+    public function getDueEvents(
+        array $tags = [],
+        \DateTimeInterface|string $currentTime = 'now',
+        \DateTimeZone|string|null $timezone = null
+    ): \Generator {
+        foreach ($this->getEvents($tags) as $name => $event) {
+            if ($event->isDue($currentTime, $timezone)) {
+                yield $name => $event;
+            }
+        }
     }
 
     /**
      * createEvent
      *
-     * @param string $expr
-     * @param mixed  $task
+     * @param  string  $name
+     * @param  string  $expr
+     * @param  mixed   $handler
      *
      * @return  ScheduleEvent
      *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
-     *
      * @since  3.5.3
      */
-    public function createEvent(string $expr, $task): ScheduleEvent
+    public function createEvent(string $name, string $expr, mixed $handler = null): ScheduleEvent
     {
-        $handler = $task;
-
-        if (is_string($task) && class_exists($task)) {
-            $task = $this->container->newInstance($task);
-        }
-
-        if ($task instanceof JobInterface) {
-            $handler = function () use ($task) {
-                return $this->container->call([$task, 'execute']);
-            };
-        } elseif ($task instanceof \Closure) {
-            $handler = function () use ($task) {
-                return $this->container->call($task);
-            };
-        } elseif (is_object($task)) {
-            $handler = function () use ($task) {
-                return $this->container->call([$task, '__invoke']);
-            };
-        }
-
-        return new ScheduleEvent($expr, $handler);
+        return new ScheduleEvent($name, $expr, $handler);
     }
 
     /**
@@ -283,20 +107,17 @@ class Schedule
      *
      * @param array $tags
      *
-     * @return  ScheduleEvent[]
+     * @return  ScheduleEvent[]|\Generator
      *
      * @since  3.5.3
      */
-    public function getEvents(array $tags = []): array
+    public function getEvents(array $tags = []): \Generator
     {
-        if ($tags === []) {
-            return $this->events;
+        foreach ($this->events as $name => $event) {
+            if ($tags === [] || array_intersect($event->getTags(), $tags) === $tags) {
+                yield $name => $event;
+            }
         }
-
-        return array_filter(
-            $this->events,
-            fn(ScheduleEvent $event) => array_intersect($event->getTags(), $tags) === $tags
-        );
     }
 
     /**
@@ -326,7 +147,7 @@ class Schedule
      */
     protected function createCronExpression(string $expr): CronExpression
     {
-        return CronExpression::factory($expr);
+        return new CronExpression($expr);
     }
 
     /**
@@ -341,22 +162,20 @@ class Schedule
      * @throws \Windwalker\DI\Exception\DependencyResolutionException
      * @since  3.5.3
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args)
     {
         $exprs = [
-            'yearly' => '@yearly',
-            'annually' => '@annually',
-            'monthly' => '@monthly',
-            'weekly' => '@weekly',
-            'daily' => '@daily',
-            'hourly' => '@hourly',
-            'minutely' => '* * * * *',
+            'yearly',
+            'annually',
+            'monthly',
+            'weekly',
+            'daily',
+            'hourly',
+            'minutely',
         ];
 
-        if (isset($exprs[strtolower($name)])) {
-            $expr = $exprs[strtolower($name)];
-
-            return $this->cron($expr, ...$args);
+        if (in_array(strtolower($name), $exprs)) {
+            return $this->task($args[0])->$name();
         }
 
         throw new \BadMethodCallException(
