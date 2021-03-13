@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Console\Process;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -32,13 +33,17 @@ interface ProcessRunnerInterface
     /**
      * runProcess
      *
-     * @param  string|array  $script
-     * @param  string|null   $input
-     * @param  bool          $output
+     * @param  string|array                   $script
+     * @param  string|null                    $input
+     * @param  bool|callable|OutputInterface  $output
      *
      * @return Process
      *
      * @since  3.5.5
      */
-    public function runProcess(string|array $script, ?string $input = null, bool $output = true): Process;
+    public function runProcess(
+        string|array $script,
+        ?string $input = null,
+        bool|callable|OutputInterface $output = true
+    ): Process;
 }

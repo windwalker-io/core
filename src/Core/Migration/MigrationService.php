@@ -13,11 +13,11 @@ namespace Windwalker\Core\Migration;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Event\MessageOutputTrait;
-use Windwalker\Core\IO\IOSocketInterface;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;
+use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Stream\Stream;
@@ -26,7 +26,7 @@ use Windwalker\Utilities\SimpleTemplate;
 /**
  * The MigrationService class.
  */
-class MigrationService
+class MigrationService implements EventAwareInterface
 {
     use MessageOutputTrait;
 
@@ -159,6 +159,8 @@ class MigrationService
             ),
             false
         );
+
+        $migration->addEventDealer($this);
 
         $this->app->call($handler);
 

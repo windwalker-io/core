@@ -24,14 +24,12 @@ use Windwalker\Core\Migration\MigrationService;
 #[CommandWrapper(
     description: 'Migrate to specific version or latest.'
 )]
-class MigrateCommand extends AbstractMigrationCommand
+class MigrateGoCommand extends AbstractMigrationCommand
 {
     /**
      * MigrationToCommand constructor.
-     *
-     * @param  MigrationService  $migrationService
      */
-    public function __construct(protected MigrationService $migrationService)
+    public function __construct()
     {
         //
     }
@@ -89,23 +87,23 @@ class MigrateCommand extends AbstractMigrationCommand
             return 255;
         }
 
-        if ($io->getOption('no-create-db') === false) {
-            $this->createDatabase($io);
-        }
-
-        set_time_limit(0);
-
-        // Backup
-        $this->backup($io);
+        $this->preprocess(
+            $io,
+            static::NO_TIME_LIMIT
+            | static::TOGGLE_CONNECTION
+            | static::CREATE_DATABASE
+            | static::AUTO_BACKUP
+        );
 
         // Change dir or package
 
         $style = $io->style();
         $style->title('Migration start...');
 
-        $this->migrationService->addEventDealer($this->app);
+        $migrationService = $this->app->make(MigrationService::class);
+        $migrationService->addEventDealer($this->app);
 
-        $count = $this->migrationService->migrate(
+        $count = $migrationService->migrate(
             $this->getMigrationFolder($io),
             $io->getArgument('version'),
             $this->getLogFile($io)

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Console\Process;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Environment\PlatformHelper;
@@ -63,7 +64,7 @@ trait ProcessRunnerTrait
         return $process;
     }
 
-    protected function getProcessOutputCallback(): callable
+    protected function getProcessOutputCallback(?OutputInterface $output = null): callable
     {
         return static function () {
         };
@@ -72,17 +73,22 @@ trait ProcessRunnerTrait
     /**
      * runProcess
      *
-     * @param  string|array  $script
-     * @param  mixed         $input
-     * @param  bool          $output
+     * @param  string|array|Process           $process
+     * @param  mixed                          $input
+     * @param  bool|callable|OutputInterface  $output
      *
      * @return Process
      *
      * @since  3.5.5
      */
-    public function runProcess(string|array $script, mixed $input = null, bool|callable $output = false): Process
-    {
-        $process = $this->createProcess($script);
+    public function runProcess(
+        string|array|Process $process,
+        mixed $input = null,
+        bool|callable|OutputInterface $output = false
+    ): Process {
+        if (!$process instanceof Process) {
+            $process = $this->createProcess($process);
+        }
 
         if ($input !== null) {
             $process->setInput($input);
@@ -92,6 +98,8 @@ trait ProcessRunnerTrait
             $output = $this->getProcessOutputCallback();
         } elseif ($output === false) {
             $output = null;
+        } elseif ($output instanceof OutputInterface) {
+            $output = $this->getProcessOutputCallback($output);
         }
 
         $process->run($output);

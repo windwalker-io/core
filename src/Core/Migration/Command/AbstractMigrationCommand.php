@@ -18,19 +18,23 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\PlatformHelper;
+use Windwalker\ORM\ORM;
 
 /**
  * The AbstractMigrationCommand class.
  */
 abstract class AbstractMigrationCommand implements CommandInterface
 {
-    #[Inject]
-    protected ?ApplicationInterface $app = null;
+    public const AUTO_BACKUP = 1;
+    public const NO_TIME_LIMIT = 1 << 1;
+    public const CREATE_DATABASE = 1 << 2;
+    public const TOGGLE_CONNECTION = 1 << 3;
 
     #[Inject]
-    protected ?DatabaseExportService $databaseExportService = null;
+    protected ?ApplicationInterface $app = null;
 
     #[Inject]
     protected ?DatabaseManager $databaseManager = null;
@@ -62,6 +66,29 @@ abstract class AbstractMigrationCommand implements CommandInterface
         );
     }
 
+    protected function preprocess(IOInterface $io, int $options = 0): void
+    {
+        if ($options & static::NO_TIME_LIMIT) {
+            set_time_limit(0);
+        }
+
+        if ($options & static::TOGGLE_CONNECTION && $conn = $io->getOption('connection')) {
+            $container = $this->app->getContainer();
+            $container->getParameters()
+                ->setDeep('database.default', $conn);
+
+            $this->databaseManager->cacheReset();
+        }
+
+        if ($options & static::CREATE_DATABASE) {
+            $this->createDatabase($io);
+        }
+
+        if ($options & static::AUTO_BACKUP) {
+            $this->backup($io);
+        }
+    }
+
     /**
      * Create database if not exists before migration command start.
      *
@@ -71,6 +98,10 @@ abstract class AbstractMigrationCommand implements CommandInterface
      */
     protected function createDatabase(IOInterface $io): void
     {
+        if ($io->getOption('no-create-db') !== false) {
+            return;
+        }
+
         $conn = $io->getOption('connection');
         $factory = $this->databaseManager->getDatabaseFactory();
 
@@ -96,6 +127,11 @@ abstract class AbstractMigrationCommand implements CommandInterface
         }
 
         $dbPreset->disconnect();
+    }
+
+    public function getDatabaseConnection(IOInterface $io): DatabaseAdapter
+    {
+        return $this->databaseManager->get($io->getOption('connection'));
     }
 
     /**
@@ -161,7 +197,9 @@ abstract class AbstractMigrationCommand implements CommandInterface
             $io->writeln('');
             $io->writeln('<fg=gray>Backing up SQL...</>');
 
-            $dest = $this->databaseExportService->export($io->getOption('connection'), $io);
+            $dbExportService = $this->app->make(DatabaseExportService::class);
+
+            $dest = $dbExportService->export($io);
 
             $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
             $io->style()->newLine();

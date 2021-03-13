@@ -37,27 +37,26 @@ class DatabaseExportService
      *
      * @param  ExporterFactory       $exporterFactory
      * @param  ApplicationInterface  $app
-     * @param  DatabaseManager       $databaseManager
+     * @param  DatabaseAdapter       $db
      */
     public function __construct(
         #[Autowire]
         protected ExporterFactory $exporterFactory,
         protected ApplicationInterface $app,
-        protected DatabaseManager $databaseManager
+        protected DatabaseAdapter $db
     ) {
     }
 
     /**
      * export
      *
-     * @param  string|DatabaseAdapter|null  $db
      * @param  OutputInterface|null         $output
      *
      * @return FileObject
      *
      * @throws \Exception
      */
-    public function export(string|DatabaseAdapter|null $db = null, ?OutputInterface $output = null): FileObject
+    public function export(?OutputInterface $output = null): FileObject
     {
         $dir  = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
         $dir  = $this->app->path($dir);
@@ -68,12 +67,11 @@ class DatabaseExportService
             uid()
         );
 
-        return $this->exportTo($dest, $db, $output);
+        return $this->exportTo($dest, $output);
     }
 
     public function exportTo(
         string|\SplFileInfo $dest,
-        string|DatabaseAdapter|null $db = null,
         ?OutputInterface $output = null
     ): FileObject {
         $dest = FileObject::wrap($dest);
@@ -81,11 +79,7 @@ class DatabaseExportService
 
         $this->rotate($dest->getPath());
 
-        if (!$db instanceof DatabaseAdapter) {
-            $db = $this->databaseManager->get($db);
-        }
-
-        $exporter = $this->exporterFactory->createExporter($db, $this->app);
+        $exporter = $this->exporterFactory->createExporter($this->db, $this->app);
 
         $exporter->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
 

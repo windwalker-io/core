@@ -11,14 +11,18 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
+use Windwalker\Core\Seed\CountingOutputTrait;
+use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Filesystem\FileObject;
+use Windwalker\Database\Manager\TableManager;
 
 /**
  * The Migration class.
  */
 class Migration
 {
+    use CountingOutputTrait;
+
     public const UP = 'up';
 
     public const DOWN = 'down';
@@ -81,6 +85,75 @@ class Migration
     public function down(callable $down): static
     {
         $this->down = $down;
+
+        return $this;
+    }
+
+    /**
+     * Get DB table object.
+     *
+     * @param string $name
+     *
+     * @return  TableManager
+     */
+    public function getTable(string $name): TableManager
+    {
+        return $this->db->getTable($name, true);
+    }
+
+    /**
+     * createTable
+     *
+     * @param string   $name
+     * @param callable $callback
+     * @param array    $options
+     *
+     * @return TableManager
+     */
+    public function createTable(string $name, callable $callback, array $options = []): TableManager
+    {
+        return $this->getTable($name)->create($callback, true, $options);
+    }
+
+    /**
+     * updateTable
+     *
+     * @param string   $name
+     * @param callable $callback
+     *
+     * @return  TableManager
+     */
+    public function updateTable(string $name, callable $callback): TableManager
+    {
+        return $this->getTable($name)->update($callback);
+    }
+
+    /**
+     * saveTable
+     *
+     * @param string   $name
+     * @param callable $callback
+     * @param array    $options
+     *
+     * @return TableManager
+     */
+    public function saveTable(string $name, callable $callback, $options = []): TableManager
+    {
+        return $this->getTable($name)->save($callback, true, $options);
+    }
+
+    /**
+     * Drop a table.
+     *
+     * @param   string|array $names
+     *
+     * @return  static
+     */
+    public function dropTables(string ...$names): static
+    {
+        foreach ($names as $name) {
+            $this->getTable($name)->drop();
+        }
 
         return $this;
     }

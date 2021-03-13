@@ -255,9 +255,9 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         return static::CLIENT_CONSOLE;
     }
 
-    protected function getProcessOutputCallback(): callable
+    protected function getProcessOutputCallback(?OutputInterface $output = null): callable
     {
-        $output = new ConsoleOutput();
+        $output ??= new ConsoleOutput();
         $err    = $output->getErrorOutput();
 
         return static function ($type, $buffer) use ($err, $output) {

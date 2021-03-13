@@ -25,10 +25,8 @@ class ResetCommand extends AbstractMigrationCommand
 {
     /**
      * ResetCommand constructor.
-     *
-     * @param  MigrationService  $migrationService
      */
-    public function __construct(protected MigrationService $migrationService)
+    public function __construct()
     {
         //
     }
@@ -89,21 +87,21 @@ class ResetCommand extends AbstractMigrationCommand
             return 255;
         }
 
-        if ($io->getOption('no-create-db') === false) {
-            $this->createDatabase($io);
-        }
+        $this->preprocess(
+            $io,
+            static::NO_TIME_LIMIT
+            | static::TOGGLE_CONNECTION
+            | static::CREATE_DATABASE
+            | static::AUTO_BACKUP
+        );
 
-        set_time_limit(0);
-
-        // Backup
-        $this->backup($io);
-
-        $this->migrationService->addEventDealer($this->app);
+        $migrationService = $this->app->make(MigrationService::class);
+        $migrationService->addEventDealer($this->app);
 
         $style = $io->style();
         $style->title('Rollback to 0 version...');
 
-        $this->migrationService->migrate(
+        $migrationService->migrate(
             $this->getMigrationFolder($io),
             '0'
         );
@@ -111,7 +109,7 @@ class ResetCommand extends AbstractMigrationCommand
         $style->newLine(2);
         $style->title('Migrating to latest version...');
 
-        $this->migrationService->migrate(
+        $migrationService->migrate(
             $this->getMigrationFolder($io),
             null,
             $this->getLogFile($io)

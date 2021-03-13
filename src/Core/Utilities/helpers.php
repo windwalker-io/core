@@ -30,7 +30,9 @@ namespace {
 
 namespace Windwalker {
 
-    if (!function_exists('include_files')) {
+    use Windwalker\Core\Console\CmdWrapper;
+
+    if (!function_exists('\Windwalker\include_files')) {
         function include_files(string $path, array $contextData = []): array
         {
             $resultBag = [];
@@ -43,6 +45,13 @@ namespace Windwalker {
             }
 
             return array_merge(...$resultBag);
+        }
+    }
+
+    if (!function_exists('\Windwalker\cmd')) {
+        function cmd(string|\Closure $cmd, ?string $input = null, bool $ignoreError = false): CmdWrapper
+        {
+            return new CmdWrapper($cmd, $input, $ignoreError);
         }
     }
 }

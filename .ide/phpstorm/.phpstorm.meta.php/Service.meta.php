@@ -7,98 +7,57 @@
  */
 
 namespace PHPSTORM_META {
+
     // Container
     override(
-        \Windwalker\Core\Application\ServiceAwareTrait::make(0),
-        map([
-            '' => '@'
-        ])
+        \Windwalker\Core\Application\ApplicationInterface::make(0),
+        type(0)
     );
-
     override(
-        \Windwalker\Core\Application\ServiceAwareTrait::service(0),
-        map([
-            '' => '@'
-        ])
+        \Windwalker\Core\Application\ApplicationInterface::service(0),
+        type(0)
     );
-
     override(
-        \Windwalker\DI\Container::get(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\DI\Container::newInstance(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\DI\Container::createSharedObject(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\DI\Container::createObject(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\Core\Ioc::make(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\Core\Ioc::get(0),
-        map([
-            '' => '@'
-        ])
-    );
-
-    override(
-        \Windwalker\Core\Ioc::service(0),
-        map([
-            '' => '@'
-        ])
+        \Windwalker\Core\Application\ApplicationInterface::resolve(0),
+        type(0)
     );
 
     // Field
     override(
         \Windwalker\Core\Form\AbstractFieldDefinition::addField(0),
-        map([
-            '' => '@'
-        ])
+        map(
+            [
+                '' => '@',
+            ]
+        )
     );
 
     override(
         \Windwalker\Form\Form::addField(0),
-        map([
-            '' => '@'
-        ])
+        map(
+            [
+                '' => '@',
+            ]
+        )
     );
 
     override(
         \Windwalker\Form\Form::add(0),
-        map([
-            '' => '@'
-        ])
+        map(
+            [
+                '' => '@',
+            ]
+        )
     );
 
     // Data
     override(
         \Windwalker\Data\Traits\CollectionTrait::as(0),
-        map([
-            '' => '@'
-        ])
+        map(
+            [
+                '' => '@',
+            ]
+        )
     );
 
     // Helpers

@@ -34,12 +34,10 @@ class DbExportCommand implements CommandInterface
      *
      * @param  DatabaseManager        $databaseManager
      * @param  ApplicationInterface   $app
-     * @param  DatabaseExportService  $databaseExportService
      */
     public function __construct(
         protected DatabaseManager $databaseManager,
         protected ApplicationInterface $app,
-        protected DatabaseExportService $databaseExportService
     ) {
     }
 
@@ -72,6 +70,10 @@ class DbExportCommand implements CommandInterface
         $now  = new \DateTimeImmutable('now');
         $conn = $io->getOption('connection');
 
+        if ($conn) {
+            $this->app->getContainer()->getParameters()->setDeep('database.default', $conn);
+        }
+
         $dest = $io->getArgument('dest') ?: sprintf(
             $this->app->path('@temp/sql-export/sql-%s-%s.sql'),
             $conn ?? $this->databaseManager->getDefaultName(),
@@ -83,7 +85,9 @@ class DbExportCommand implements CommandInterface
 
         $io->writeln('Start exporting SQL...');
 
-        $dest = $this->databaseExportService->exportTo(
+        $databaseExportService = $this->app->make(DatabaseExportService::class);
+
+        $dest = $databaseExportService->exportTo(
             $file,
             $this->databaseManager->get($conn),
             $io
