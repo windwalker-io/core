@@ -12,27 +12,28 @@ declare(strict_types=1);
 namespace Windwalker\Core\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Mailer\Envelope;
-use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mime\Address;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Mailer\Mailer;
+use Windwalker\Core\Mailer\MailerInterface;
 
 /**
  * The MailTestCommand class.
  */
-#[CommandWrapper(description: 'Test send mail.')]
+#[CommandWrapper(description: 'This command will send a test mail by your mail settings.')]
 class MailTestCommand implements CommandInterface
 {
     /**
      * MailTestCommand constructor.
      *
      * @param  ApplicationInterface  $app
+     * @param  Mailer                $mailer
      */
-    public function __construct(protected ApplicationInterface $app)
+    public function __construct(protected ApplicationInterface $app, protected Mailer $mailer)
     {
     }
 
@@ -41,6 +42,23 @@ class MailTestCommand implements CommandInterface
      */
     public function configure(Command $command): void
     {
+        $command->addArgument(
+            'to',
+            InputArgument::IS_ARRAY,
+            'The recipients.'
+        );
+        $command->addOption(
+            'message',
+            'm',
+            InputOption::VALUE_REQUIRED,
+            'Message to add to mail body.',
+        );
+        $command->addOption(
+            'subject',
+            's',
+            InputOption::VALUE_REQUIRED,
+            'Mail subject title.'
+        );
     }
 
     /**
@@ -48,34 +66,59 @@ class MailTestCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        $dsn = 'smtp://:@smtp.mailtrap.io:2525';
+        $custom = $io->getOption('message');
+        $subject = $io->getOption('subject');
 
-        $transport = Transport::fromDsn($dsn);
+        if ($custom) {
+            $custom = '<p><strong>Custom message:</strong> ' . $custom . '</p>';
+        }
 
-        $mailer = new Mailer($transport, $this->app->getContainer());
-        $mailer->createMessage('YYY')
-            ->to(
-                'test@mail.com',
-                'asika@test.com'
-            )
-            ->from('noreply@yoo.com')
-            ->attachFromPath(
-                $this->app->path('@temp/cat.jpg'),
-                'cat'
-            )
-            // ->embed(fopen($this->app->path('@temp/cat.jpg'), 'r'), 'cat')
-            ->html(
-                '<p>Hi YOO</p> <img src="cid:cat">',
-            )
-            ->send(
-                new Envelope(
-                    new Address('sender@sender.co'),
-                    [
-                        new Address('re@re.com')
-                    ]
-                )
-            );
+        $body = sprintf($this->getBody(), $custom);
+        $from = $this->app->config('mail.from');
+
+        $recipients = $io->getArgument('to');
+
+        if ($recipients === []) {
+            $recipients = [$from];
+        }
+
+        $date = new \DateTime('now', new \DateTimeZone($this->app->config('app.server_timezone')));
+        $date->setTimezone(new \DateTimeZone($this->app->config('app.timezone')));
+
+        $io->writeln('Sending...');
+
+        $title = sprintf(
+            '[Windwalker] Test Message%s - %s',
+            $subject ? ': ' . $subject : '',
+            $date->format('Y-m-d H:i:s')
+        );
+
+        $this->mailer->createMessage($title)
+            ->to(...$recipients)
+            ->from($from)
+            ->html($body)
+            ->send(null, MailerInterface::FORCE_SEND);
+
+        $io->writeln(sprintf('Test mail sent to: <info>%s</info>.', implode(' ', $recipients)));
 
         return 0;
+    }
+
+    /**
+     * getBody
+     *
+     * @return  string
+     */
+    protected function getBody()
+    {
+        return <<<HTML
+<p>Hello</p>
+
+<p>This is a test mail from Windwalker. If you receive this mail, it means you have your mail settings correct.</p>
+
+%s
+
+<p>Have a good day.</p>
+HTML;
     }
 }

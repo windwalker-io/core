@@ -119,4 +119,9 @@ abstract class AbstractManager
     {
         return 'factories.instances.' . $name;
     }
+
+    public function config(string $name, ?string $delimiter = '.'): mixed
+    {
+        return $this->config->getDeep($name, $delimiter);
+    }
 }

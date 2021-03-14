@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Mailer;
 
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
@@ -36,7 +37,7 @@ class MailMessage extends Email
         parent::__construct($headers, $body);
     }
 
-    public function send(?Envelope $envelope = null): static
+    public function send(?Envelope $envelope = null, int $flags = 0): SentMessage
     {
         if ($this->mailer === null) {
             throw new \LogicException(
@@ -48,8 +49,6 @@ class MailMessage extends Email
             );
         }
 
-        $this->mailer->send($this, $envelope);
-
-        return $this;
+        return $this->mailer->send($this, $envelope, $flags);
     }
 }
