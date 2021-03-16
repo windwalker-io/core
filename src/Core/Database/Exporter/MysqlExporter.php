@@ -43,7 +43,7 @@ class MysqlExporter extends AbstractExporter
                         $md,
                         $this->createPasswordCnfFile(
                             $options['user'],
-                            $options['password'],
+                            $options['password']
                         ),
                         $options['database'],
                         $file
