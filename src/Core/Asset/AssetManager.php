@@ -8,11 +8,15 @@
 
 namespace Windwalker\Core\Asset;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
+use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Path;
+use Windwalker\Utilities\Str;
 
 /**
  * The AssetManager class.
@@ -26,21 +30,21 @@ class AssetManager implements EventAwareInterface
     /**
      * Property styles.
      *
-     * @var  array
+     * @var  AssetLink[]
      */
     protected array $styles = [];
 
     /**
      * Property scripts.
      *
-     * @var  array
+     * @var  AssetLink[]
      */
     protected array $scripts = [];
 
     /**
      * Property aliases.
      *
-     * @var  array[]
+     * @var  AssetLink[]
      */
     protected array $aliases = [];
 
@@ -118,48 +122,36 @@ class AssetManager implements EventAwareInterface
      */
     public function addCSS(string $url, array $options = [], array $attrs = []): static
     {
-        $alias = $this->resolveRawAlias($url);
-
-        $file = [
-            'url' => $this->handleUri($url),
-            'attribs' => array_merge($attrs, $alias['attrs'] ?? []),
-            'options' => array_merge($options, $alias['options'] ?? []),
-        ];
-
-        $this->styles[$url] = $file;
-
-        return $this;
+        return $this->addLink('styles', $url, $options, $attrs);
     }
 
     /**
      * addScript
      *
-     * @param string $url
-     * @param array  $options
-     * @param array  $attribs
+     * @param string  $url
+     * @param array   $options
+     * @param array   $attrs
      *
      * @return  static
      */
-    public function addScript($url, $options = [], $attribs = [])
+    public function addScript(string $url, array $options = [], array $attrs = []): static
     {
-        // B/C
-        if (!is_array($options)) {
-            $options = ['version' => $options];
-        }
+        return $this->addLink('scripts', $url, $options, $attrs);
+    }
 
-        $options = array_merge([
-            'version' => null,
-        ], $options);
-
+    public function addLink(string $type, string $url, array $options = [], array $attrs = []): static
+    {
         $alias = $this->resolveRawAlias($url);
 
-        $file = [
-            'url' => $this->handleUri($url),
-            'attribs' => array_merge($attribs, $alias['attrs'] ?? []),
-            'options' => array_merge($options, $alias['options'] ?? []),
-        ];
+        $link = $alias ?? new AssetLink('', $this->handleUri($url), $options);
 
-        $this->scripts[$url] = $file;
+        $link = $link->withOptions($options);
+
+        foreach ($attrs as $name => $value) {
+            $link = $link->withAttribute($name, $value);
+        }
+
+        $this->$type[$url] = $link;
 
         return $this;
     }
@@ -662,15 +654,14 @@ class AssetManager implements EventAwareInterface
      *
      * @return  static
      */
-    public function alias($target, $alias, array $options = [], array $attrs = [])
+    public function alias(string $target, string $alias, array $options = [], array $attrs = []): static
     {
         $this->normalizeUri($target, $name);
 
-        $this->aliases[$name] = [
-            'alias' => $alias,
-            'options' => $options,
-            'attrs' => $attrs
-        ];
+        $link = new AssetLink($alias, $options);
+        $link = $link->withAttributes($attrs);
+
+        $this->aliases[$name] = $link;
 
         return $this;
     }
@@ -682,7 +673,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function resolveAlias($uri)
+    public function resolveAlias(string $uri): string
     {
         $this->normalizeUri($uri, $name);
 
@@ -698,13 +689,13 @@ class AssetManager implements EventAwareInterface
      *
      * @since  3.5.5
      */
-    public function resolveRawAlias(string $uri): ?array
+    public function resolveRawAlias(string $uri): ?AssetLink
     {
         $this->normalizeUri($uri, $name);
 
         while (isset($this->aliases[$name])) {
             $alias = $this->aliases[$name];
-            $name = $alias['alias'];
+            $name = $alias->getHref();
         }
 
         return $alias ?? null;
@@ -717,7 +708,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setIndents($indents)
+    public function setIndents(string $indents): static
     {
         $this->indents = $indents;
 
@@ -789,15 +780,16 @@ class AssetManager implements EventAwareInterface
     /**
      * normalizeUri
      *
-     * @param   string $uri
-     * @param   string $assetFile
-     * @param   string $assetMinFile
+     * @param  string       $uri
+     * @param  string|null  $assetFile
+     * @param  string|null  $assetMinFile
      *
      * @return  array
      */
-    public function normalizeUri($uri, &$assetFile = null, &$assetMinFile = null)
+    #[ArrayShape(['string', 'string'])]
+    public function normalizeUri(string $uri, ?string &$assetFile = null, ?string &$assetMinFile = null): array
     {
-        $ext = File::getExtension($uri);
+        $ext = Path::getExtension($uri);
 
         if (Str::endsWith($uri, '.min.' . $ext)) {
             $assetFile    = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;

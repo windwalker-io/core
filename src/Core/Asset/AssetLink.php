@@ -11,181 +11,51 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
 
-use Psr\Http\Message\UriInterface;
-use Psr\Link\EvolvableLinkInterface;
-use Windwalker\Uri\Uri;
+use Fig\Link\Link;
+use Windwalker\Utilities\Contract\AccessibleInterface;
+use Windwalker\Utilities\Options\OptionAccessTrait;
 
 /**
  * The AssetLink class.
  */
-class AssetLink implements EvolvableLinkInterface
+class AssetLink extends Link
 {
-    protected Uri $uri;
-
-    protected array $rels = [];
-
-    protected array $attributes = [];
+    use OptionAccessTrait;
 
     /**
-     * AssetLink constructor.
-     *
-     * @param  UriInterface|string  $uri
+     * @inheritDoc
      */
-    public function __construct(UriInterface|string $uri)
+    public function __construct(string $href = '', array $options = [])
     {
-        if (!$uri instanceof Uri) {
-            $uri = Uri::wrap($uri);
-        }
+        parent::__construct('', $href);
 
-        $this->uri = $uri;
+        $this->prepareOptions([], $options);
     }
 
-    /**
-     * Returns the target of the link.
-     *
-     * The target link must be one of:
-     * - An absolute URI, as defined by RFC 5988.
-     * - A relative URI, as defined by RFC 5988. The base of the relative link
-     *     is assumed to be known based on context by the client.
-     * - A URI template as defined by RFC 6570.
-     *
-     * If a URI template is returned, isTemplated() MUST return True.
-     *
-     * @return string
-     */
-    public function getHref(): string
-    {
-        return (string) $this->uri;
-    }
-
-    /**
-     * Returns whether or not this is a templated link.
-     *
-     * @return bool
-     *   True if this link object is templated, False otherwise.
-     */
-    public function isTemplated(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Returns the relationship type(s) of the link.
-     *
-     * This method returns 0 or more relationship types for a link, expressed
-     * as an array of strings.
-     *
-     * @return string[]
-     */
-    public function getRels(): array
-    {
-        return $this->rels;
-    }
-
-    /**
-     * Returns a list of attributes that describe the target URI.
-     *
-     * @return array
-     *   A key-value list of attributes, where the key is a string and the value
-     *  is either a PHP primitive or an array of PHP strings. If no values are
-     *  found an empty array MUST be returned.
-     */
-    public function getAttributes(): array
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Returns an instance with the specified href.
-     *
-     * @param  string|\Stringable  $href
-     *       The href value to include.  It must be one of:
-     *       - An absolute URI, as defined by RFC 5988.
-     *       - A relative URI, as defined by RFC 5988. The base of the relative link
-     *       is assumed to be known based on context by the client.
-     *       - A URI template as defined by RFC 6570.
-     *       - An object implementing __toString() that produces one of the above
-     *       values.
-     *
-     * An implementing library SHOULD evaluate a passed object to a string
-     * immediately rather than waiting for it to be returned later.
-     *
-     * @return static
-     */
-    public function withHref(\Stringable|string $href)
-    {
-        $new = clone $this;
-        $new->uri = Uri::wrap((string) $href);
-
-        return $new;
-    }
-
-    /**
-     * Returns an instance with the specified relationship included.
-     *
-     * If the specified rel is already present, this method MUST return
-     * normally without errors, but without adding the rel a second time.
-     *
-     * @param  string  $rel
-     *   The relationship value to add.
-     *
-     * @return static
-     */
-    public function withRel(string $rel)
+    public function withAttributes(array $attrs): static
     {
         $new = clone $this;
 
-        if (!in_array($rel, $new->rels, true)) {
-            $new->rels[] = $rel;
+        foreach ($attrs as $name => $value) {
+            $new = $new->withAttribute($name, $value);
         }
 
         return $new;
     }
 
-    /**
-     * Returns an instance with the specified relationship excluded.
-     *
-     * If the specified rel is already not present, this method MUST return
-     * normally without errors.
-     *
-     * @param  string  $rel
-     *   The relationship value to exclude.
-     *
-     * @return static
-     */
-    public function withoutRel(string $rel)
+    public function withOption(string $name, mixed $value): static
     {
+        $new = clone $this;
+        $new->options[$name] = $value;
+
+        return $new;
     }
 
-    /**
-     * Returns an instance with the specified attribute added.
-     *
-     * If the specified attribute is already present, it will be overwritten
-     * with the new value.
-     *
-     * @param  string                                   $attribute
-     *   The attribute to include.
-     * @param  string|\Stringable|int|float|bool|array  $value
-     *   The value of the attribute to set.
-     *
-     * @return static
-     */
-    public function withAttribute(string $attribute, float|int|\Stringable|bool|array|string $value)
+    public function withOptions(array|\ArrayAccess|AccessibleInterface $options): static
     {
-    }
+        $new = clone $this;
+        $new->options = $options;
 
-    /**
-     * Returns an instance with the specified attribute excluded.
-     *
-     * If the specified attribute is not present, this method MUST return
-     * normally without errors.
-     *
-     * @param  string  $attribute
-     *   The attribute to remove.
-     *
-     * @return static
-     */
-    public function withoutAttribute(string $attribute)
-    {
+        return $new;
     }
 }
