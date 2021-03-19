@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Asset;
 
 use JetBrains\PhpStorm\ArrayShape;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Event\EventAwareInterface;
@@ -16,7 +17,10 @@ use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
+use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\Utilities\Str;
+
+use function Windwalker\uid;
 
 /**
  * The AssetManager class.
@@ -90,17 +94,15 @@ class AssetManager implements EventAwareInterface
      */
     public string $root = '';
 
-    protected array $options;
-
     /**
      * AssetManager constructor.
      *
-     * @param  array         $options
-     * @param  SystemUri     $systemUri
-     * @param  EventEmitter  $dispatcher
+     * @param  ApplicationInterface  $app
+     * @param  SystemUri             $systemUri
+     * @param  EventEmitter          $dispatcher
      */
     public function __construct(
-        #[Ref('asset')] array $options,
+        protected ApplicationInterface $app,
         protected SystemUri $systemUri,
         EventEmitter $dispatcher
     ) {
@@ -108,7 +110,6 @@ class AssetManager implements EventAwareInterface
         $this->root = $options['uri'] ?? $this->systemUri->root($options['folder'] ?? 'asset');
 
         $this->dispatcher = $dispatcher;
-        $this->options = $options;
     }
 
     /**
@@ -143,7 +144,7 @@ class AssetManager implements EventAwareInterface
     {
         $alias = $this->resolveRawAlias($url);
 
-        $link = $alias ?? new AssetLink('', $this->handleUri($url), $options);
+        $link = $alias ?? new AssetLink($this->handleUri($url), $options);
 
         $link = $link->withOptions($options);
 
@@ -154,32 +155,6 @@ class AssetManager implements EventAwareInterface
         $this->$type[$url] = $link;
 
         return $this;
-    }
-
-    /**
-     * import
-     *
-     * @param string $url
-     * @param array  $options
-     * @param array  $attribs
-     *
-     * @return  AssetManager
-     *
-     * @since       3.3
-     *
-     * @deprecated  HTML imports has been deprecated.
-     */
-    public function import($url, array $options = [], array $attribs = [])
-    {
-        if (Arr::get($options, 'as') === 'style') {
-            $attribs['rel'] = 'import';
-
-            return $this->addStyle($url, $options, $attribs);
-        }
-
-        $options['import'] = true;
-
-        return $this->addScript($url, $options, $attribs);
     }
 
     /**
@@ -214,13 +189,13 @@ class AssetManager implements EventAwareInterface
      * Check asset uri exists in system and return actual path.
      *
      * @param string $uri    The file uri to check.
-     * @param bool   $strict Check .min file or un-min file exists again if input file not exists.
+     * @param bool   $strict Check .min file or un-compress file exists again if input file not exists.
      *
      * @return  bool|string
      *
      * @since  3.3
      */
-    public function exists($uri, $strict = false)
+    public function has(string $uri, bool $strict = false): bool|string
     {
         if (static::isAbsoluteUrl($uri)) {
             return $uri;
@@ -386,7 +361,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalStyles()
+    public function renderInternalStyles(): string
     {
         return implode("\n\n", $this->internalStyles);
     }
@@ -396,7 +371,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalScripts()
+    public function renderInternalScripts(): string
     {
         return implode(";\n", $this->internalScripts);
     }
@@ -405,18 +380,19 @@ class AssetManager implements EventAwareInterface
      * getVersion
      *
      * @return  string
+     * @throws \Exception
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         if ($this->version) {
             return $this->version;
         }
 
-        if ($this->config->get('system.debug')) {
-            return $this->version = md5(uniqid('Windwalker-Asset-Version', true));
+        if ($this->app->config('app.debug')) {
+            return $this->version = uid();
         }
 
-        $sumFile = $this->config->get('path.cache') . '/asset/MD5SUM';
+        $sumFile = $this->app->path('@cache/asset/MD5SUM');
 
         if (!is_file($sumFile)) {
             return $this->version = $this->detectVersion();
@@ -453,7 +429,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    protected function detectVersion()
+    protected function detectVersion(): string
     {
         static $version;
 
@@ -464,7 +440,7 @@ class AssetManager implements EventAwareInterface
         $assetUri = $this->path;
 
         if (static::isAbsoluteUrl($assetUri)) {
-            return $version = md5($assetUri . $this->config->get('system.secret', 'Windwalker-Asset'));
+            return $version = md5($assetUri . $this->app->config('app.secret'));
         }
 
         $time  = '';
@@ -484,7 +460,7 @@ class AssetManager implements EventAwareInterface
             $time .= $file->getMTime();
         }
 
-        return $version = md5($this->config->get('system.secret', 'Windwalker-Asset') . $time);
+        return $version = md5($this->app->config('app.secret') . $time);
     }
 
     /**
@@ -494,14 +470,14 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function addSysPath($assetUri)
+    public function addSysPath(string $assetUri): string
     {
         if (static::isAbsoluteUrl($assetUri)) {
             return $assetUri;
         }
 
         $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-        $base     = rtrim($this->config->get('path.public'), '/\\');
+        $base     = rtrim($this->app->path('@public'), '/\\');
 
         if (!$base) {
             return '/';
@@ -514,7 +490,7 @@ class AssetManager implements EventAwareInterface
             $chunk = substr($base, $i);
             $len   = strlen($chunk);
 
-            if (substr($assetUri, 0, $len) == $chunk && $len > strlen($match)) {
+            if (str_starts_with($assetUri, $chunk) && $len > strlen($match)) {
                 $match = $chunk;
             }
         }
@@ -529,9 +505,9 @@ class AssetManager implements EventAwareInterface
      *
      * @return  boolean
      */
-    public static function isAbsoluteUrl($uri)
+    public static function isAbsoluteUrl(string $uri): bool
     {
-        return stripos($uri, 'http') === 0 || strpos($uri, '//') === 0;
+        return stripos($uri, 'http') === 0 || str_starts_with($uri, '//');
     }
 
     /**
@@ -541,7 +517,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setVersion($version)
+    public function setVersion(string $version): string
     {
         $this->version = $version;
 
@@ -551,9 +527,9 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to get property Styles
      *
-     * @return  array
+     * @return  AssetLink[]
      */
-    public function getStyles()
+    public function getStyles(): array
     {
         return $this->styles;
     }
@@ -720,7 +696,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function getIndents()
+    public function getIndents(): string
     {
         return $this->indents;
     }
@@ -732,7 +708,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function handleUri($uri)
+    public function handleUri(string $uri): string
     {
         $uri = $this->resolveAlias($uri);
 
@@ -754,7 +730,7 @@ class AssetManager implements EventAwareInterface
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
         // Use uncompressed file first
-        if ($this->config->get('system.debug')) {
+        if ($this->getOption('debug')) {
             if (is_file($root . '/' . $assetFile)) {
                 return $this->addBase($assetFile, 'path');
             }
@@ -810,7 +786,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function addBase($uri, $path = 'path')
+    public function addBase(string $uri, string $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
             $uri = $this->$path . '/' . $uri;
