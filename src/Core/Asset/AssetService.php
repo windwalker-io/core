@@ -9,17 +9,17 @@
 namespace Windwalker\Core\Asset;
 
 use JetBrains\PhpStorm\ArrayShape;
-use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Attributes\Ref;
+use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Runtime\Config;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
-use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\Wrapper\RawWrapper;
 
+use function Windwalker\DOM\h;
 use function Windwalker\uid;
 
 /**
@@ -27,7 +27,7 @@ use function Windwalker\uid;
  *
  * @since   3.0
  */
-class AssetManager implements EventAwareInterface
+class AssetService implements EventAwareInterface
 {
     use EventAwareTrait;
 
@@ -94,15 +94,17 @@ class AssetManager implements EventAwareInterface
      */
     public string $root = '';
 
+    protected ?Teleport $teleport = null;
+
     /**
      * AssetManager constructor.
      *
-     * @param  ApplicationInterface  $app
-     * @param  SystemUri             $systemUri
-     * @param  EventEmitter          $dispatcher
+     * @param  Config        $config
+     * @param  SystemUri     $systemUri
+     * @param  EventEmitter  $dispatcher
      */
     public function __construct(
-        protected ApplicationInterface $app,
+        protected Config $config,
         protected SystemUri $systemUri,
         EventEmitter $dispatcher
     ) {
@@ -115,9 +117,9 @@ class AssetManager implements EventAwareInterface
     /**
      * addStyle
      *
-     * @param string  $url
-     * @param array   $options
-     * @param array   $attrs
+     * @param  string  $url
+     * @param  array   $options
+     * @param  array   $attrs
      *
      * @return  static
      */
@@ -129,14 +131,30 @@ class AssetManager implements EventAwareInterface
     /**
      * addScript
      *
-     * @param string  $url
-     * @param array   $options
-     * @param array   $attrs
+     * @param  string  $url
+     * @param  array   $options
+     * @param  array   $attrs
      *
      * @return  static
      */
-    public function addScript(string $url, array $options = [], array $attrs = []): static
+    public function addJS(string $url, array $options = [], array $attrs = []): static
     {
+        return $this->addLink('scripts', $url, $options, $attrs);
+    }
+
+    /**
+     * addScript
+     *
+     * @param  string  $url
+     * @param  array   $options
+     * @param  array   $attrs
+     *
+     * @return  static
+     */
+    public function addModule(string $url, array $options = [], array $attrs = []): static
+    {
+        $attrs['type'] = 'module';
+
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
@@ -160,13 +178,13 @@ class AssetManager implements EventAwareInterface
     /**
      * internalStyle
      *
-     * @param string $content
+     * @param  string  $content
      *
      * @return  static
      */
-    public function internalStyle($content)
+    public function internalCSS(string $content): static
     {
-        $this->internalStyles[] = (string) $content;
+        $this->internalStyles[] = $content;
 
         return $this;
     }
@@ -174,13 +192,13 @@ class AssetManager implements EventAwareInterface
     /**
      * internalStyle
      *
-     * @param string $content
+     * @param  string  $content
      *
      * @return  static
      */
-    public function internalScript($content)
+    public function internalJS(string $content): static
     {
-        $this->internalScripts[] = (string) $content;
+        $this->internalScripts[] = $content;
 
         return $this;
     }
@@ -188,8 +206,8 @@ class AssetManager implements EventAwareInterface
     /**
      * Check asset uri exists in system and return actual path.
      *
-     * @param string $uri    The file uri to check.
-     * @param bool   $strict Check .min file or un-compress file exists again if input file not exists.
+     * @param  string  $uri     The file uri to check.
+     * @param  bool    $strict  Check .min file or un-compress file exists again if input file not exists.
      *
      * @return  bool|string
      *
@@ -231,54 +249,54 @@ class AssetManager implements EventAwareInterface
     /**
      * renderStyles
      *
-     * @param bool  $withInternal
-     * @param array $internalAttrs
+     * @param  bool   $withInternal
+     * @param  array  $internalAttrs
      *
      * @return string
+     * @throws \Exception
      */
-    public function renderStyles($withInternal = false, array $internalAttrs = [])
+    public function renderCSS(bool $withInternal = false, array $internalAttrs = []): string
     {
         $html = [];
 
-        Ioc::getApplication()->triggerEvent('onAssetRenderStyles', [
-            'asset' => $this,
-            'withInternal' => &$withInternal,
-            'html' => &$html,
-        ]);
+        $event = $this->emit(
+            AssetBeforeRender::class,
+            [
+                'asset' => $this,
+                'withInternal' => $withInternal,
+                'html' => $html,
+                'type' => AssetBeforeRender::TYPE_JS,
+            ]
+        );
+
+        $withInternal = $event->isWithInternal();
+        $html         = $event->getHtml();
 
         foreach ($this->styles as $url => $style) {
-            $defaultAttribs = [
-                'href' => $style['url'],
+            $defaultAttrs = [
+                'href' => $style->getHref(),
                 'rel' => 'stylesheet',
             ];
 
-            $attribs = array_merge($defaultAttribs, $style['attribs']);
+            $attrs = array_merge($defaultAttrs, $style->getAttributes());
 
-            if ($style['options']['version'] !== false) {
-                $attribs['href'] = $this->appendVersion($attribs['href']);
+            if ($style->getOption('version') !== false) {
+                $attrs['href'] = $this->appendVersion($attrs['href']);
             }
 
-            if (isset($style['options']['sri'])) {
-                $attribs['integrity']   = $style['options']['sri'];
-                $attribs['crossorigin'] = 'anonymous';
+            if ($style->getOption('sri')) {
+                $attrs['integrity']   = $style->getOption('sri');
+                $attrs['crossorigin'] = 'anonymous';
             }
 
-            if (isset($style['options']['conditional'])) {
-                $html[] = '<!--[if ' . $style['options']['conditional'] . ']>';
-            }
-
-            $html[] = (string) h('link', $attribs, null);
-
-            if (isset($style['options']['conditional'])) {
-                $html[] = '<![endif]-->';
-            }
+            $html[] = (string) h('link', $attrs, null);
         }
 
         if ($withInternal && $this->internalStyles) {
             $html[] = (string) h(
                 'style',
                 $internalAttrs,
-                "\n" . $this->renderInternalStyles() . "\n" . $this->indents
+                "\n" . $this->renderInternalJS() . "\n" . $this->indents
             );
         }
 
@@ -288,68 +306,59 @@ class AssetManager implements EventAwareInterface
     /**
      * renderStyles
      *
-     * @param bool  $withInternal
-     * @param array $internalAttrs
+     * @param  bool   $withInternal
+     * @param  array  $internalAttrs
      *
      * @return string
      */
-    public function renderScripts($withInternal = false, array $internalAttrs = [])
+    public function renderJS(bool $withInternal = false, array $internalAttrs = []): string
     {
         $html = [];
 
-        $this->triggerEvent('onAssetRenderScripts', [
-            'asset' => $this,
-            'withInternal' => &$withInternal,
-            'html' => &$html,
-        ]);
+        $event = $this->emit(
+            AssetBeforeRender::class,
+            [
+                'asset' => $this,
+                'withInternal' => $withInternal,
+                'html' => $html,
+                'type' => AssetBeforeRender::TYPE_JS,
+            ]
+        );
+
+        $withInternal = $event->isWithInternal();
+        $html         = $event->getHtml();
 
         foreach ($this->scripts as $url => $script) {
-            $defaultAttribs = [
+            $defaultAttrs = [
                 'src' => $script['url'],
             ];
 
-            $attribs = array_merge($defaultAttribs, $script['attribs']);
+            $attrs = array_merge($defaultAttrs, $script->getAttributes());
 
-            if ($script['options']['version'] !== false) {
-                $attribs['src'] = $this->appendVersion($attribs['src']);
+            if ($script->getOption('version') !== false) {
+                $attrs['src'] = $this->appendVersion($attrs['src']);
             }
 
             if (isset($script['options']['sri'])) {
-                $attribs['integrity']   = $script['options']['sri'];
-                $attribs['crossorigin'] = 'anonymous';
+                $attrs['integrity']   = $script['options']['sri'];
+                $attrs['crossorigin'] = 'anonymous';
             }
+            if ($script->getOption('body')) {
+                $content = $script->getOption('body');
 
-            if (isset($script['options']['conditional'])) {
-                $html[] = '<!--[if ' . $script['options']['conditional'] . ']>';
-            }
-
-            if (isset($script['options']['import'])) {
-                $attribs['href'] = $attribs['src'];
-                $attribs['rel']  = 'import';
-                unset($attribs['src']);
-                $html[] = (string) h('link', $attribs, null);
+                unset($attrs['src']);
             } else {
-                if ($script['options']['body'] ?? null) {
-                    $content = $script['options']['body'];
-
-                    unset($attribs['src']);
-                } else {
-                    $content = null;
-                }
-
-                $html[] = (string) h('script', $attribs, $content);
+                $content = null;
             }
 
-            if (isset($script['options']['conditional'])) {
-                $html[] = '<![endif]-->';
-            }
+            $html[] = (string) h('script', $attrs, $content);
         }
 
         if ($withInternal && $this->internalScripts) {
             $html[] = (string) h(
                 'script',
                 $internalAttrs,
-                "\n" . $this->renderInternalScripts() . "\n" . $this->indents
+                "\n" . $this->renderInternalCSS() . "\n" . $this->indents
             );
         }
 
@@ -361,7 +370,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalStyles(): string
+    public function renderInternalJS(): string
     {
         return implode("\n\n", $this->internalStyles);
     }
@@ -371,7 +380,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalScripts(): string
+    public function renderInternalCSS(): string
     {
         return implode(";\n", $this->internalScripts);
     }
@@ -388,11 +397,11 @@ class AssetManager implements EventAwareInterface
             return $this->version;
         }
 
-        if ($this->app->config('app.debug')) {
+        if ($this->config->getDeep('app.debug')) {
             return $this->version = uid();
         }
 
-        $sumFile = $this->app->path('@cache/asset/MD5SUM');
+        $sumFile = $this->config->path('@cache/asset/MD5SUM');
 
         if (!is_file($sumFile)) {
             return $this->version = $this->detectVersion();
@@ -404,14 +413,15 @@ class AssetManager implements EventAwareInterface
     /**
      * appendVersion
      *
-     * @param string $uri
-     * @param string $version
+     * @param  string       $uri
+     * @param  string|null  $version
      *
      * @return  string
      *
+     * @throws \Exception
      * @since  3.4.9.3
      */
-    public function appendVersion($uri, $version = null)
+    public function appendVersion(string $uri, ?string $version = null): string
     {
         $version = $version ?: $this->getVersion();
 
@@ -419,7 +429,7 @@ class AssetManager implements EventAwareInterface
             return $uri;
         }
 
-        $sep = strpos($uri, '?') !== false ? '&' : '?';
+        $sep = str_contains($uri, '?') ? '&' : '?';
 
         return $uri . $sep . $version;
     }
@@ -440,7 +450,7 @@ class AssetManager implements EventAwareInterface
         $assetUri = $this->path;
 
         if (static::isAbsoluteUrl($assetUri)) {
-            return $version = md5($assetUri . $this->app->config('app.secret'));
+            return $version = md5($assetUri . $this->config->getDeep('app.secret'));
         }
 
         $time  = '';
@@ -460,13 +470,13 @@ class AssetManager implements EventAwareInterface
             $time .= $file->getMTime();
         }
 
-        return $version = md5($this->app->config('app.secret') . $time);
+        return $version = md5($this->config->getDeep('app.secret') . $time);
     }
 
     /**
      * removeBase
      *
-     * @param   string $assetUri
+     * @param  string  $assetUri
      *
      * @return  string
      */
@@ -477,7 +487,7 @@ class AssetManager implements EventAwareInterface
         }
 
         $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-        $base     = rtrim($this->app->path('@public'), '/\\');
+        $base     = rtrim($this->config->path('@public'), '/\\');
 
         if (!$base) {
             return '/';
@@ -501,7 +511,7 @@ class AssetManager implements EventAwareInterface
     /**
      * isAbsoluteUrl
      *
-     * @param   string $uri
+     * @param  string  $uri
      *
      * @return  boolean
      */
@@ -513,7 +523,7 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property version
      *
-     * @param   string $version
+     * @param  string  $version
      *
      * @return  static  Return self to support chaining.
      */
@@ -537,11 +547,11 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property styles
      *
-     * @param   array $styles
+     * @param  array  $styles
      *
      * @return  static  Return self to support chaining.
      */
-    public function setStyles($styles)
+    public function setStyles(array $styles): static
     {
         $this->styles = $styles;
 
@@ -553,7 +563,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  array
      */
-    public function &getScripts()
+    public function &getScripts(): array
     {
         return $this->scripts;
     }
@@ -561,11 +571,11 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property scripts
      *
-     * @param   array $scripts
+     * @param  array  $scripts
      *
      * @return  static  Return self to support chaining.
      */
-    public function setScripts($scripts)
+    public function setScripts(array $scripts): static
     {
         $this->scripts = $scripts;
 
@@ -577,7 +587,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  array
      */
-    public function getInternalStyles()
+    public function getInternalStyles(): array
     {
         return $this->internalStyles;
     }
@@ -585,11 +595,11 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property internalStyles
      *
-     * @param   array $internalStyles
+     * @param  array  $internalStyles
      *
      * @return  static  Return self to support chaining.
      */
-    public function setInternalStyles($internalStyles)
+    public function setInternalStyles(array $internalStyles): static
     {
         $this->internalStyles = $internalStyles;
 
@@ -601,7 +611,7 @@ class AssetManager implements EventAwareInterface
      *
      * @return  array
      */
-    public function getInternalScripts()
+    public function getInternalScripts(): array
     {
         return $this->internalScripts;
     }
@@ -609,11 +619,11 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property internalScripts
      *
-     * @param   array $internalScripts
+     * @param  array  $internalScripts
      *
      * @return  static  Return self to support chaining.
      */
-    public function setInternalScripts($internalScripts)
+    public function setInternalScripts(array $internalScripts): static
     {
         $this->internalScripts = $internalScripts;
 
@@ -623,10 +633,10 @@ class AssetManager implements EventAwareInterface
     /**
      * alias
      *
-     * @param string $target
-     * @param string $alias
-     * @param array  $options
-     * @param array  $attrs
+     * @param  string  $target
+     * @param  string  $alias
+     * @param  array   $options
+     * @param  array   $attrs
      *
      * @return  static
      */
@@ -645,7 +655,7 @@ class AssetManager implements EventAwareInterface
     /**
      * resolveAlias
      *
-     * @param   string $uri
+     * @param  string  $uri
      *
      * @return  string
      */
@@ -659,7 +669,7 @@ class AssetManager implements EventAwareInterface
     /**
      * resolveRawAlias
      *
-     * @param string $uri
+     * @param  string  $uri
      *
      * @return  array|null
      *
@@ -671,7 +681,7 @@ class AssetManager implements EventAwareInterface
 
         while (isset($this->aliases[$name])) {
             $alias = $this->aliases[$name];
-            $name = $alias->getHref();
+            $name  = $alias->getHref();
         }
 
         return $alias ?? null;
@@ -680,7 +690,7 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to set property indents
      *
-     * @param   string $indents
+     * @param  string  $indents
      *
      * @return  static  Return self to support chaining.
      */
@@ -704,7 +714,7 @@ class AssetManager implements EventAwareInterface
     /**
      * handleUri
      *
-     * @param   string $uri
+     * @param  string  $uri
      *
      * @return  string
      */
@@ -730,7 +740,7 @@ class AssetManager implements EventAwareInterface
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
         // Use uncompressed file first
-        if ($this->getOption('debug')) {
+        if ($this->isDebug()) {
             if (is_file($root . '/' . $assetFile)) {
                 return $this->addBase($assetFile, 'path');
             }
@@ -763,8 +773,11 @@ class AssetManager implements EventAwareInterface
      * @return  array
      */
     #[ArrayShape(['string', 'string'])]
-    public function normalizeUri(string $uri, ?string &$assetFile = null, ?string &$assetMinFile = null): array
-    {
+    public function normalizeUri(
+        string $uri,
+        ?string &$assetFile = null,
+        ?string &$assetMinFile = null
+    ): array {
         $ext = Path::getExtension($uri);
 
         if (Str::endsWith($uri, '.min.' . $ext)) {
@@ -781,8 +794,8 @@ class AssetManager implements EventAwareInterface
     /**
      * addBase
      *
-     * @param string $uri
-     * @param string $path
+     * @param  string  $uri
+     * @param  string  $path
      *
      * @return  string
      */
@@ -798,8 +811,8 @@ class AssetManager implements EventAwareInterface
     /**
      * addUriBase
      *
-     * @param string $uri
-     * @param string $path
+     * @param  string  $uri
+     * @param  string  $path
      *
      * @return  mixed|string
      *
@@ -815,80 +828,21 @@ class AssetManager implements EventAwareInterface
     }
 
     /**
-     * Method to get property Template
-     *
-     * @return  AssetTemplate
-     */
-    public function getTemplate()
-    {
-        if (!$this->template) {
-            return $this->template = new AssetTemplate();
-        }
-
-        return $this->template;
-    }
-
-    /**
-     * Method to set property template
-     *
-     * @param   AssetTemplate $template
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setTemplate(AssetTemplate $template)
-    {
-        $this->template = $template;
-
-        return $this;
-    }
-
-    /**
-     * __call
-     *
-     * @param   string $name
-     * @param   array  $args
-     *
-     * @return  mixed
-     */
-    public function __call($name, $args)
-    {
-        switch ($name) {
-            case 'addCSS':
-                return $this->addStyle(...$args);
-                break;
-
-            case 'addJS':
-                return $this->addScript(...$args);
-                break;
-
-            case 'internalCSS':
-                return $this->internalStyle(...$args);
-                break;
-
-            case 'internalJS':
-                return $this->internalScript(...$args);
-                break;
-        }
-
-        throw new \BadMethodCallException(sprintf('Call to undefined method %s() of %s', $name, get_class($this)));
-    }
-
-    /**
      * Internal method to get a JavaScript object notation string from an array
      *
-     * @param mixed $data     The data to convert to JavaScript object notation
-     * @param bool  $quoteKey Quote json key or not.
+     * @param  mixed  $data      The data to convert to JavaScript object notation
+     * @param  bool   $quoteKey  Quote json key or not.
      *
      * @return string JavaScript object notation representation of the array
      */
-    public static function getJSObject($data, $quoteKey = false)
+    public static function getJSObject(mixed $data, bool $quoteKey = false): string
     {
         if ($data === null) {
             return 'null';
         }
 
         if ($data instanceof RawWrapper) {
-            return $data->get();
+            return $data();
         }
 
         $output = '';
@@ -905,7 +859,7 @@ class AssetManager implements EventAwareInterface
                 break;
 
             case 'array':
-                if (!Arr::isAssociative($data)) {
+                if (array_is_list($data)) {
                     $child = [];
 
                     foreach ($data as $value) {
@@ -915,7 +869,7 @@ class AssetManager implements EventAwareInterface
                     $output .= '[' . implode(',', $child) . ']';
                     break;
                 }
-                // No break
+            // No break
             case 'object':
                 $array = is_object($data) ? get_object_vars($data) : $data;
 
@@ -924,7 +878,7 @@ class AssetManager implements EventAwareInterface
                 foreach ($array as $key => $value) {
                     $encodedKey = json_encode((string) $key);
 
-                    if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', $key) == 0) {
+                    if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', $key) === 0) {
                         $encodedKey = substr(substr($encodedKey, 0, -1), 1);
                     }
 
@@ -935,7 +889,7 @@ class AssetManager implements EventAwareInterface
                 break;
 
             default:  // anything else is treated as a string
-                return strpos($data, '\\') === 0 ? substr($data, 1) : json_encode($data);
+                return str_starts_with($data, '\\') ? substr($data, 1) : json_encode($data);
                 break;
         }
 
@@ -945,19 +899,20 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to get property Path
      *
-     * @param string $uri
-     * @param bool   $version
+     * @param  string|null  $uri
+     * @param  bool         $version
      *
      * @return string
+     * @throws \Exception
      */
-    public function path($uri = null, $version = false)
+    public function path(?string $uri = null, string|bool $version = false)
     {
         if ($version === true) {
             $version = $this->getVersion();
         }
 
         if ($version) {
-            if (strpos($uri, '?') !== false) {
+            if (str_contains($uri, '?')) {
                 $uri .= '&' . $version;
             } else {
                 $uri .= '?' . $version;
@@ -974,19 +929,20 @@ class AssetManager implements EventAwareInterface
     /**
      * Method to get property Root
      *
-     * @param  string $uri
-     * @param  bool   $version
+     * @param  string|null  $uri
+     * @param  bool         $version
      *
      * @return string
+     * @throws \Exception
      */
-    public function root($uri = null, $version = false)
+    public function root(?string $uri = null, string|bool $version = false)
     {
         if ($version === true) {
             $version = $this->getVersion();
         }
 
         if ($version) {
-            if (strpos($uri, '?') !== false) {
+            if (str_contains($uri, '?')) {
                 $uri .= '&' . $version;
             } else {
                 $uri .= '?' . $version;
@@ -1005,29 +961,15 @@ class AssetManager implements EventAwareInterface
      *
      * @return  string
      */
-    public function getAssetFolder()
+    public function getAssetFolder(): string
     {
-        return $this->config->get('asset.folder', 'asset');
-    }
-
-    /**
-     * Method to set property uri
-     *
-     * @param   UriData $uri
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setUriData(UriData $uri)
-    {
-        $this->uri = $uri;
-
-        return $this;
+        return $this->config->getDeep('asset.folder', 'asset');
     }
 
     /**
      * __get
      *
-     * @param   string $name
+     * @param  string  $name
      *
      * @return  mixed
      */
@@ -1053,10 +995,38 @@ class AssetManager implements EventAwareInterface
      */
     public function reset(): self
     {
-        $this->styles = [];
-        $this->scripts = [];
-        $this->internalStyles = [];
+        $this->styles          = [];
+        $this->scripts         = [];
+        $this->internalStyles  = [];
         $this->internalScripts = [];
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug(): bool
+    {
+        return $this->config->getDeep('app.debug');
+    }
+
+    /**
+     * @return Teleport|null
+     */
+    public function getTeleport(): ?Teleport
+    {
+        return $this->teleport ??= new Teleport(['debug' => $this->isDebug()]);
+    }
+
+    /**
+     * @param  Teleport  $teleport
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setTeleport(Teleport $teleport): static
+    {
+        $this->teleport = $teleport;
 
         return $this;
     }

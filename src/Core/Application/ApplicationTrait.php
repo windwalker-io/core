@@ -55,32 +55,7 @@ trait ApplicationTrait
      */
     public function path(string $path): string
     {
-        if (str_contains($path, '\\')) {
-            $path = str_replace('\\', '/', $path);
-        }
-
-        if (!str_starts_with($path, '@')) {
-            return Path::normalize($path);
-        }
-
-        if (!str_contains($path, '/')) {
-            return $this->config($path);
-        }
-
-        [$base, $path] = explode('/', $path, 2);
-
-        $base = $this->config($base);
-
-        if (!$base) {
-            throw new \LogicException(
-                sprintf(
-                    'The system path: %s not exists in config.',
-                    $base
-                )
-            );
-        }
-
-        return Path::normalize($base . '/' . $path);
+        return $this->config->path($path);
     }
 
     /**
