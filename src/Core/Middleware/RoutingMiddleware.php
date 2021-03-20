@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;

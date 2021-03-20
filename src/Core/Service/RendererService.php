@@ -11,6 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Service;
 
+use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\DateTime\ChronosService;
+use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\SystemUri;
+use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 
 /**
@@ -21,18 +27,34 @@ class RendererService
     /**
      * RendererService constructor.
      *
-     * @param  RendererInterface  $renderer
-     * @param  array              $globals
+     * @param  ApplicationInterface  $app
+     * @param  array                 $globals
      */
-    public function __construct(protected RendererInterface $renderer, protected array $globals = [])
+    public function __construct(protected ApplicationInterface $app, protected array $globals = [])
     {
     }
 
     public function render(string $layout, array $data, array $options = []): string
     {
-        $data = array_merge($this->globals, $data);
+        return $this->renderWith($this->createRenderer(), $layout, $data, $options);
+    }
 
-        return $this->renderer->render($layout, $data, $options);
+    public function renderWith(RendererInterface $renderer, string $layout, array $data, array $options = []): string
+    {
+        $data = array_merge($this->getGlobals(), $data);
+
+        return $renderer->render($layout, $data, $options);
+    }
+
+    public function createRenderer(array $paths = []): RendererInterface
+    {
+        $renderer = $this->app->resolve(CompositeRenderer::class);
+
+        foreach ($paths as $path) {
+            $renderer->addPath($path);
+        }
+
+        return $renderer;
     }
 
     public function addGlobal(string $name, mixed $value): static
@@ -52,7 +74,20 @@ class RendererService
      */
     public function getGlobals(): array
     {
-        return $this->globals;
+        $globals = $this->globals;
+
+        return $this->prepareGlobals($globals);
+    }
+
+    protected function prepareGlobals(array $globals): array
+    {
+        $globals['app'] = $this->app;
+        $globals['uri'] = $this->app->resolve(SystemUri::class);
+        $globals['chronos'] = $this->app->resolve(ChronosService::class);
+        $globals['nav'] = $this->app->resolve(Navigator::class);
+        $globals['asset'] = $this->app->resolve(AssetService::class);
+
+        return $globals;
     }
 
     /**

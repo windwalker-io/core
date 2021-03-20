@@ -22,6 +22,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\Console;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
@@ -39,7 +40,7 @@ use function Windwalker\DI\create;
 /**
  * The ConsoleApplication class.
  */
-class ConsoleApplication extends SymfonyApp implements ApplicationInterface
+class ConsoleApplication extends Console implements ApplicationInterface
 {
     use ApplicationTrait;
 

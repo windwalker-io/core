@@ -13,9 +13,9 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\AuthenticationInterface;
-use Windwalker\Authorisation\Authorisation;
-use Windwalker\Authorisation\AuthorisationInterface;
-use Windwalker\Authorisation\PolicyProviderInterface;
+use Windwalker\Authorization\Authorization;
+use Windwalker\Authorization\AuthorizationInterface;
+use Windwalker\Authorization\PolicyProviderInterface;
 use Windwalker\Core\Auth\AuthService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -49,9 +49,9 @@ class AuthProvider implements ServiceProviderInterface
             ->alias(AuthenticationInterface::class, Authentication::class);
 
         $container->prepareSharedObject(
-            Authorisation::class,
-            function (Authorisation $auth, Container $container) {
-                foreach ($container->getParam('auth.authorisation.policies') as $name => $policy) {
+            Authorization::class,
+            function (Authorization $auth, Container $container) {
+                foreach ($container->getParam('auth.authorization.policies') as $name => $policy) {
                     $policy = $container->resolve($policy);
 
                     if ($policy instanceof PolicyProviderInterface) {
@@ -64,7 +64,7 @@ class AuthProvider implements ServiceProviderInterface
                 return $auth;
             }
         )
-            ->alias(AuthorisationInterface::class, Authorisation::class);
+            ->alias(AuthorizationInterface::class, Authorization::class);
 
         $container->prepareSharedObject(AuthService::class);
     }

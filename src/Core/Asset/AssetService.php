@@ -71,7 +71,7 @@ class AssetService implements EventAwareInterface
      *
      * @var string
      */
-    protected string $version;
+    protected ?string $version = null;
 
     /**
      * Property indents.

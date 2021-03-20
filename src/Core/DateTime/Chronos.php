@@ -84,30 +84,6 @@ class Chronos extends \DateTimeImmutable
     }
 
     /**
-     * Convert a date string to another timezone.
-     *
-     * @param  string  $date
-     * @param  string  $from
-     * @param  string  $to
-     * @param  string  $format
-     *
-     * @return  string
-     * @throws \Exception
-     */
-    public static function convert(mixed $date, string $from = 'UTC', string $to = 'UTC', ?string $format = null)
-    {
-        $format = $format ?: self::$format;
-
-        $from = new \DateTimeZone($from);
-        $to   = new \DateTimeZone($to);
-        $date = new static($date, $from);
-
-        $date = $date->setTimezone($to);
-
-        return $date->format($format);
-    }
-
-    /**
      * toFormat
      *
      * @param  string|\DateTimeInterface  $date
@@ -128,54 +104,6 @@ class Chronos extends \DateTimeImmutable
     }
 
     /**
-     * compare
-     *
-     * @param  string|\DateTimeInterface  $date1
-     * @param  string|\DateTimeInterface  $date2
-     * @param  string|null                $operator
-     *
-     * @return  bool|int
-     * @throws \Exception
-     */
-    public static function compare(
-        string|\DateTimeInterface $date1,
-        string|\DateTimeInterface $date2,
-        ?string $operator = null
-    ) {
-        $date1 = $date1 instanceof \DateTimeInterface ? $date1 : new \DateTime($date1);
-        $date2 = $date2 instanceof \DateTimeInterface ? $date2 : new \DateTime($date2);
-
-        if ($operator === null) {
-            if ($date1 == $date2) {
-                return 0;
-            }
-
-            return (int) ($date1 < $date2);
-        }
-
-        switch ($operator) {
-            case '=':
-                return $date1 == $date2;
-            case '!=':
-                return $date1 != $date2;
-            case '>':
-            case 'gt':
-                return $date1 > $date2;
-            case '>=':
-            case 'gte':
-                return $date1 >= $date2;
-            case '<':
-            case 'lt':
-                return $date1 < $date2;
-            case '<=':
-            case 'lte':
-                return $date1 <= $date2;
-        }
-
-        throw new \InvalidArgumentException('Invalid operator: ' . $operator);
-    }
-
-    /**
      * current
      *
      * @param  string                     $format
@@ -184,7 +112,7 @@ class Chronos extends \DateTimeImmutable
      * @return  string
      * @throws \Exception
      */
-    public static function current(string $format = self::FORMAT_YMD_HIS, string|\DateTimeZone $tz = null): string
+    public static function now(string $format = self::FORMAT_YMD_HIS, string|\DateTimeZone $tz = null): string
     {
         return (new static('now', $tz))->format($format, $tz);
     }
@@ -265,7 +193,7 @@ class Chronos extends \DateTimeImmutable
      *
      * @since   2.1
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         switch ($name) {
             case 'daysinmonth':

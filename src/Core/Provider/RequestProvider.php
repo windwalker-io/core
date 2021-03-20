@@ -59,15 +59,6 @@ class RequestProvider implements ServiceProviderInterface
         // System Uri
         $container->share(SystemUri::class, fn() => SystemUri::parseFromRequest($this->request));
 
-        // App Request
-        $container->prepareSharedObject(
-            AppRequest::class,
-            function (AppRequest $request, Container $container) {
-                return $request->withRequest($this->request)
-                    ->withSystemUri($container->get(SystemUri::class));
-            }
-        );
-
         // App Context
         $container->prepareSharedObject(
             AppContext::class,
@@ -76,10 +67,16 @@ class RequestProvider implements ServiceProviderInterface
 
                 return $app->withIsDebug((bool) $container->getParam('app.debug'))
                     ->withMode((string) $container->getParam('app.mode'))
-                    ->withAppRequest($container->get(AppRequest::class));
+                    ->withAppRequest($this->createAppRequest($container));
             }
         )
             ->alias(ApplicationInterface::class, AppContext::class);
+
+        // App Request
+        $container->share(
+            AppRequest::class,
+            fn (Container $container) => $container->get(AppContext::class)->getAppRequest())
+        ;
 
         // Navigator
         $container->prepareSharedObject(Navigator::class);
@@ -93,5 +90,19 @@ class RequestProvider implements ServiceProviderInterface
                     ->addGlobal('nav', $container->get(Navigator::class));
             }
         );
+    }
+
+    /**
+     * createAppRequest
+     *
+     * @param  Container  $container
+     *
+     * @return  AppRequest
+     */
+    protected function createAppRequest(Container $container): AppRequest
+    {
+        return $container->newInstance(AppRequest::class)
+            ->withRequest($this->request)
+            ->withSystemUri($container->get(SystemUri::class));
     }
 }

@@ -19,6 +19,7 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
+use Windwalker\Utilities\Iterator\PriorityQueue;
 
 /**
  * The ViewModel class.
@@ -27,17 +28,19 @@ class View
 {
     protected string $layout = '';
 
+    protected ?RendererInterface $renderer = null;
+
     /**
      * View constructor.
      *
      * @param  object           $viewModel
      * @param  AppContext       $app
-     * @param  RendererService  $renderer
+     * @param  RendererService  $rendererService
      */
     public function __construct(
         protected object $viewModel,
         protected AppContext $app,
-        protected RendererService $renderer,
+        protected RendererService $rendererService,
     ) {
         //
     }
@@ -58,15 +61,13 @@ class View
             );
         }
 
-        if ($vm instanceof ViewModelInterface) {
-            $state = $vm->prepare($this->app);
-        } else {
-            $state = $this->app->call([$vm, 'prepare']);
-        }
+        $state = $vm->prepare($this->app->getState(), $this->app);
 
-        $data = array_merge($data, $state);
-
-        return $this->renderer->render($layout, $data, ['context' => $vm]);
+        $data = array_merge($this->rendererService->getGlobals(), $data, $state);
+        
+        $this->preparePaths($vm);
+        
+        return $this->getRenderer()->render($layout, $data, ['context' => $vm]);
     }
 
     /**
@@ -107,5 +108,46 @@ class View
         $this->viewModel = $viewModel;
 
         return $this;
+    }
+
+    public function addPath(string $path, int $priority = 100): static
+    {
+        $renderer = $this->getRenderer();
+
+        if ($renderer instanceof CompositeRenderer) {
+            $renderer->addPath($path, $priority);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return RendererInterface
+     */
+    public function getRenderer(): RendererInterface
+    {
+        return $this->renderer ??= $this->rendererService->createRenderer();
+    }
+
+    /**
+     * @param  RendererInterface|null  $renderer
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setRenderer(RendererInterface|null $renderer): static
+    {
+        $this->renderer = $renderer;
+
+        return $this;
+    }
+
+    protected function preparePaths(object $vm): void
+    {
+        $ref = new \ReflectionClass($vm);
+        $dir = dirname($ref->getFileName()) . '/view';
+
+        if (is_dir($dir)) {
+            $this->addPath($dir, PriorityQueue::HIGH);
+        }
     }
 }

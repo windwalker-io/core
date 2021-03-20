@@ -68,6 +68,8 @@ class MailerManager extends AbstractManager
             $options
         );
 
+        $options['dsn'] = $options['dsn'] ?: 'null://null';
+
         if (!is_array($options['dsn'])) {
             $transport = Transport::fromDsn($options['dsn']);
         } else {

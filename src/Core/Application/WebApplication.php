@@ -144,11 +144,6 @@ class WebApplication implements WebApplicationInterface
             ->handle($request);
     }
 
-    public function dispatch(ServerRequestInterface $request)
-    {
-
-    }
-
     public static function createRequestHandler(iterable $queue): RequestHandlerInterface
     {
         return new Relay($queue);

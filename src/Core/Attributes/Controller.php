@@ -49,9 +49,10 @@ class Controller implements ContainerAttributeInterface
             $container->registerByConfig($this->config);
         }
 
-        return static fn(...$args): DelegatingController => new DelegatingController(
+        return fn(...$args): DelegatingController => (new DelegatingController(
             $container,
             $handler(...$args)
-        );
+        ))
+            ->setViewMap($this->views);
     }
 }

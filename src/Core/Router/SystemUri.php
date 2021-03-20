@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Windwalker\Uri\PsrUri;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Str;
@@ -173,6 +174,20 @@ class SystemUri extends Uri implements \JsonSerializable
         }
 
         return $all;
+    }
+
+    /**
+     * clear
+     *
+     * @param string $uri
+     *
+     * @return  string
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function clear(string $uri): string
+    {
+        return (new Uri($uri))->toString();
     }
 
     public function __get(string $name)

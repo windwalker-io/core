@@ -15,7 +15,7 @@ use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\AuthenticationInterface;
 use Windwalker\Authentication\AuthResult;
 use Windwalker\Authentication\ResultSet;
-use Windwalker\Authorisation\AuthorisationInterface;
+use Windwalker\Authorization\AuthorizationInterface;
 
 /**
  * The AuthService class.
@@ -26,11 +26,11 @@ class AuthService
      * AuthService constructor.
      *
      * @param  AuthenticationInterface  $authentication
-     * @param  AuthorisationInterface   $authorisation
+     * @param  AuthorizationInterface   $authorization
      */
     public function __construct(
         protected AuthenticationInterface $authentication,
-        protected AuthorisationInterface $authorisation
+        protected AuthorizationInterface $authorization
     ) {
         //
     }
@@ -48,7 +48,7 @@ class AuthService
 
     public function authorise(string $policy, mixed $user, ...$args): bool
     {
-        return $this->authorisation->authorise($policy, $user, ...$args);
+        return $this->authorization->authorise($policy, $user, ...$args);
     }
 
     /**
@@ -60,11 +60,11 @@ class AuthService
     }
 
     /**
-     * @return AuthorisationInterface
+     * @return AuthorizationInterface
      */
-    public function getAuthorisation(): AuthorisationInterface
+    public function getAuthorization(): AuthorizationInterface
     {
-        return $this->authorisation;
+        return $this->authorization;
     }
 
     /**
@@ -80,13 +80,13 @@ class AuthService
     }
 
     /**
-     * @param  AuthorisationInterface  $authorisation
+     * @param  AuthorizationInterface  $authorization
      *
      * @return  static  Return self to support chaining.
      */
-    public function setAuthorisation(AuthorisationInterface $authorisation): static
+    public function setAuthorization(AuthorizationInterface $authorization): static
     {
-        $this->authorisation = $authorisation;
+        $this->authorization = $authorization;
 
         return $this;
     }

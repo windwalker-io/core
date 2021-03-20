@@ -28,14 +28,16 @@ class RendererProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
+     * @throws \Windwalker\DI\Exception\DefinitionException
      */
     public function register(Container $container): void
     {
-        $container->prepareSharedObject(
+        $container->prepareObject(
             CompositeRenderer::class,
             function (CompositeRenderer $renderer) use ($container) {
                 $renderer->setPaths($container->getParam('renderer.paths') ?? []);
                 $renderer->setFactories($container->getParam('renderer.renderers') ?? []);
+                $renderer->setOptions($container->getParam('renderer.options') ?? []);
 
                 return $renderer;
             }

@@ -21,9 +21,10 @@ abstract class AbstractViewModel implements ViewModelInterface
     /**
      * Prepare
      *
-     * @param  AppContext  $app
+     * @param  \Windwalker\Data\Collection  $state
+     * @param  AppContext                   $app
      *
      * @return  array
      */
-    abstract public function prepare(AppContext $app): array;
+    abstract public function prepare(\Windwalker\Data\Collection $state, AppContext $app): array;
 }
