@@ -330,7 +330,7 @@ class AssetService implements EventAwareInterface
 
         foreach ($this->scripts as $url => $script) {
             $defaultAttrs = [
-                'src' => $script['url'],
+                'src' => $script->getHref(),
             ];
 
             $attrs = array_merge($defaultAttrs, $script->getAttributes());
@@ -339,8 +339,8 @@ class AssetService implements EventAwareInterface
                 $attrs['src'] = $this->appendVersion($attrs['src']);
             }
 
-            if (isset($script['options']['sri'])) {
-                $attrs['integrity']   = $script['options']['sri'];
+            if ($script->getOption('sri')) {
+                $attrs['integrity']   = $script->getOption('sri');
                 $attrs['crossorigin'] = 'anonymous';
             }
             if ($script->getOption('body')) {

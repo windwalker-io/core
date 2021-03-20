@@ -13,10 +13,14 @@ namespace Windwalker\Core\View;
 
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Service\RendererService;
+use Windwalker\Core\View\Event\AfterRenderEvent;
+use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Utilities\Iterator\PriorityQueue;
@@ -24,8 +28,10 @@ use Windwalker\Utilities\Iterator\PriorityQueue;
 /**
  * The ViewModel class.
  */
-class View
+class View implements EventAwareInterface
 {
+    use EventAwareTrait;
+
     protected string $layout = '';
 
     protected ?RendererInterface $renderer = null;
@@ -61,13 +67,35 @@ class View
             );
         }
 
-        $state = $vm->prepare($this->app->getState(), $this->app);
+        $event = $this->emit(
+            BeforeRenderEvent::class,
+            [
+                'view' => $this,
+                'viewModel' => $vm,
+                'data' => $data,
+                'state' => $this->app->getState()
+            ]
+        );
 
-        $data = array_merge($this->rendererService->getGlobals(), $data, $state);
+        $state = $vm->prepare($event->getState(), $this->app);
+
+        $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $state);
         
         $this->preparePaths($vm);
         
-        return $this->getRenderer()->render($layout, $data, ['context' => $vm]);
+        $content = $this->getRenderer()->render($layout, $data, ['context' => $event->getViewModel()]);
+
+        $event = $this->emit(
+            AfterRenderEvent::class,
+            [
+                'view' => $this,
+                'viewModel' => $vm,
+                'data' => $data,
+                'content' => $content
+            ]
+        );
+
+        return $event->getContent();
     }
 
     /**
