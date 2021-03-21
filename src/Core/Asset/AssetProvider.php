@@ -24,6 +24,13 @@ class AssetProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
-        $container->prepareSharedObject(AssetService::class);
+        $container->prepareSharedObject(
+            AssetService::class,
+            function (AssetService $asset, Container $container) {
+                $map = $container->getParam('asset.import_map');
+
+                return $asset->setImportMaps($map);
+            }
+        );
     }
 }

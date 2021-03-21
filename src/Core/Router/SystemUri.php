@@ -185,7 +185,7 @@ class SystemUri extends Uri implements \JsonSerializable
      *
      * @since  __DEPLOY_VERSION__
      */
-    public static function clear(string $uri): string
+    public static function normalize(string $uri): string
     {
         return (new Uri($uri))->toString();
     }

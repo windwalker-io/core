@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\NoReturn;
 use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\DI\Container;
@@ -22,7 +23,6 @@ use Windwalker\Event\EventAwareInterface;
  */
 interface ApplicationInterface extends
     EventAwareInterface,
-    DispatcherAwareInterface,
     ServiceAwareInterface,
     ProcessRunnerInterface
 {

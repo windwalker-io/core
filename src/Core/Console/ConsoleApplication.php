@@ -16,13 +16,11 @@ use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\Console;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
@@ -40,7 +38,7 @@ use function Windwalker\DI\create;
 /**
  * The ConsoleApplication class.
  */
-class ConsoleApplication extends Console implements ApplicationInterface
+class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 {
     use ApplicationTrait;
 

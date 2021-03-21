@@ -9,27 +9,5 @@
 namespace PHPSTORM_META {
 
     // Container
-    registerArgumentsSet(
-        'config_options',
-        '@root',
-        '@bin',
-        '@cache',
-        '@etc',
-        '@logs',
-        '@resources',
-        '@source',
-        '@temp',
-        '@views',
-        '@vendor',
-        '@public',
-        '@migrations',
-        '@seeders',
-        '@languages',
-    );
 
-    expectedArguments(
-        \Windwalker\Core\Application\ApplicationInterface::config(),
-        0,
-        argumentsSet('config_options')
-    );
 }

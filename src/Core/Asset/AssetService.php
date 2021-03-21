@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Asset;
 
 use JetBrains\PhpStorm\ArrayShape;
+use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
@@ -94,18 +95,28 @@ class AssetService implements EventAwareInterface
      */
     public string $root = '';
 
+    /**
+     * @var Teleport|null
+     */
     protected ?Teleport $teleport = null;
+
+    /**
+     * @var ImportMap
+     */
+    protected ?ImportMap $importMap = null;
 
     /**
      * AssetManager constructor.
      *
      * @param  Config        $config
      * @param  SystemUri     $systemUri
+     * @param  PathResolver  $pathResolver
      * @param  EventEmitter  $dispatcher
      */
     public function __construct(
         protected Config $config,
         protected SystemUri $systemUri,
+        protected PathResolver $pathResolver,
         EventEmitter $dispatcher
     ) {
         $this->path = $options['uri'] ?? $this->systemUri->path($options['folder'] ?? 'asset');
@@ -123,7 +134,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  static
      */
-    public function addCSS(string $url, array $options = [], array $attrs = []): static
+    public function css(string $url, array $options = [], array $attrs = []): static
     {
         return $this->addLink('styles', $url, $options, $attrs);
     }
@@ -137,7 +148,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  static
      */
-    public function addJS(string $url, array $options = [], array $attrs = []): static
+    public function js(string $url, array $options = [], array $attrs = []): static
     {
         return $this->addLink('scripts', $url, $options, $attrs);
     }
@@ -151,7 +162,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  static
      */
-    public function addModule(string $url, array $options = [], array $attrs = []): static
+    public function import(string $url, array $options = [], array $attrs = []): static
     {
         $attrs['type'] = 'module';
 
@@ -230,16 +241,16 @@ class AssetService implements EventAwareInterface
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
         if (is_file($root . '/' . $uri)) {
-            return $this->addBase($uri, 'path');
+            return $this->addUriBase($uri, 'path');
         }
 
         if (!$strict) {
             if (is_file($root . '/' . $assetFile)) {
-                return $this->addBase($assetFile, 'path');
+                return $this->addUriBase($assetFile, 'path');
             }
 
             if (is_file($root . '/' . $assetMinFile)) {
-                return $this->addBase($assetMinFile, 'path');
+                return $this->addUriBase($assetMinFile, 'path');
             }
         }
 
@@ -401,7 +412,9 @@ class AssetService implements EventAwareInterface
             return $this->version = uid();
         }
 
-        $sumFile = $this->config->path('@cache/asset/MD5SUM');
+        $sumFile = $this->pathResolver->resolve(
+            $this->config->getDeep('asset.version_file')
+        );
 
         if (!is_file($sumFile)) {
             return $this->version = $this->detectVersion();
@@ -487,7 +500,7 @@ class AssetService implements EventAwareInterface
         }
 
         $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-        $base     = rtrim($this->config->path('@public'), '/\\');
+        $base     = rtrim($this->pathResolver->resolve('@public'), '/\\');
 
         if (!$base) {
             return '/';
@@ -630,6 +643,36 @@ class AssetService implements EventAwareInterface
         return $this;
     }
 
+    public function importMap(string $name, string $uri): static
+    {
+        $this->getImportMap()->addImport($name, $uri);
+
+        return $this;
+    }
+
+    public function setImportMaps(array $map): static
+    {
+        $im = $this->getImportMap();
+        
+        foreach ($map['imports'] ?? [] as $name => $item) {
+            if ($item instanceof RawWrapper) {
+                $item = $item();
+            } else {
+                $item = $this->path($item);
+            }
+
+            $im->addImport($name, $item);
+        }
+
+        foreach ($map['scopes'] ?? [] as $scope => $items) {
+            foreach ($items as $name => $value) {
+                $im->addScopeItem($scope, $name, $value);
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * alias
      *
@@ -723,7 +766,7 @@ class AssetService implements EventAwareInterface
         $uri = $this->resolveAlias($uri);
 
         // Check has .min
-        // $uri = Uri::addBase($uri, 'path');
+        // $uri = Uri::addUriBase($uri, 'path');
 
         if (static::isAbsoluteUrl($uri)) {
             return $uri;
@@ -742,25 +785,25 @@ class AssetService implements EventAwareInterface
         // Use uncompressed file first
         if ($this->isDebug()) {
             if (is_file($root . '/' . $assetFile)) {
-                return $this->addBase($assetFile, 'path');
+                return $this->addUriBase($assetFile, 'path');
             }
 
             if (is_file($root . '/' . $assetMinFile)) {
-                return $this->addBase($assetMinFile, 'path');
+                return $this->addUriBase($assetMinFile, 'path');
             }
         } else {
             // Use min file first
             if (is_file($root . '/' . $assetMinFile)) {
-                return $this->addBase($assetMinFile, 'path');
+                return $this->addUriBase($assetMinFile, 'path');
             }
 
             if (is_file($root . '/' . $assetFile)) {
-                return $this->addBase($assetFile, 'path');
+                return $this->addUriBase($assetFile, 'path');
             }
         }
 
         // All file not found, fallback to default uri.
-        return $this->addBase($uri, 'path');
+        return $this->addUriBase($uri, 'path');
     }
 
     /**
@@ -792,36 +835,19 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * addBase
-     *
-     * @param  string  $uri
-     * @param  string  $path
-     *
-     * @return  string
-     */
-    public function addBase(string $uri, string $path = 'path'): string
-    {
-        if (!static::isAbsoluteUrl($uri)) {
-            $uri = $this->$path . '/' . $uri;
-        }
-
-        return $uri;
-    }
-
-    /**
      * addUriBase
      *
      * @param  string  $uri
      * @param  string  $path
      *
-     * @return  mixed|string
+     * @return string
      *
      * @since  3.5.22.6
      */
-    public function addUriBase($uri, $path = 'path')
+    public function addUriBase(string $uri, $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
-            $uri = $this->uri->$path . '/' . $uri;
+            $uri = $this->systemUri::normalize($this->systemUri->$path . $uri);
         }
 
         return $uri;
@@ -905,7 +931,7 @@ class AssetService implements EventAwareInterface
      * @return string
      * @throws \Exception
      */
-    public function path(?string $uri = null, string|bool $version = false)
+    public function path(?string $uri = null, string|bool $version = false): string
     {
         if ($version === true) {
             $version = $this->getVersion();
@@ -935,7 +961,7 @@ class AssetService implements EventAwareInterface
      * @return string
      * @throws \Exception
      */
-    public function root(?string $uri = null, string|bool $version = false)
+    public function root(?string $uri = null, string|bool $version = false): string
     {
         if ($version === true) {
             $version = $this->getVersion();
@@ -1027,6 +1053,26 @@ class AssetService implements EventAwareInterface
     public function setTeleport(Teleport $teleport): static
     {
         $this->teleport = $teleport;
+
+        return $this;
+    }
+
+    /**
+     * @return ImportMap
+     */
+    public function getImportMap(): ImportMap
+    {
+        return $this->importMap ??= new ImportMap();
+    }
+
+    /**
+     * @param  ImportMap|null  $importMap
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setImportMap(?ImportMap $importMap): static
+    {
+        $this->importMap = $importMap;
 
         return $this;
     }

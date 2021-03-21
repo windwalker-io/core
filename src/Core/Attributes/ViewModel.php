@@ -18,25 +18,37 @@ use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
 
+use function Windwalker\arr;
+
 /**
  * The ViewModel class.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class ViewModel implements ContainerAttributeInterface
 {
+    public array $css;
+
+    public array $js;
+
     /**
      * View constructor.
      *
-     * @param  string|null  $layout
-     * @param  array        $css
-     * @param  array        $js
+     * @param  string|null   $name
+     * @param  string|null   $layout
+     * @param  array|string  $css
+     * @param  array|string  $js
+     * @param  array         $modules
      */
     public function __construct(
-        protected ?string $layout = null,
-        protected array $css = [],
-        protected array $js = [],
+        protected ?string $name = null,
+        public ?string $layout = null,
+        array|string $css = [],
+        array|string $js = [],
+        public array $modules = []
     ) {
         //
+        $this->css = (array) $css;
+        $this->js = (array) $js;
     }
 
     public function __invoke(AttributeHandler $handler): callable
@@ -65,24 +77,33 @@ class ViewModel implements ContainerAttributeInterface
                 $asset = $container->resolve(AssetService::class);
 
                 foreach ($this->css as $name => $css) {
-                    $asset->addCSS($css);
+                    $path = '@view/' . $css;
+
+                    $asset->css($path);
                 }
 
                 foreach ($this->js as $name => $js) {
                     $path = '@view/' . $js;
 
-                    $asset->addModule($path);
+                    $asset->js($path);
+                }
 
-                    // $asset->internalJS(
-                    //     sprintf(
-                    //         "import('%s')",
-                    //         $asset->path($path)
-                    //     )
-                    // );
+                foreach ($this->modules as $name => $js) {
+                    $path = '@view/' . $js;
+
+                    $asset->import($path);
                 }
             }
         );
 
         return $view;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
     }
 }

@@ -55,7 +55,9 @@ trait ApplicationTrait
      */
     public function path(string $path): string
     {
-        return $this->config->path($path);
+        $pathResolver = $this->resolve(PathResolver::class);
+
+        return $pathResolver->resolve($path);
     }
 
     /**
