@@ -28,7 +28,7 @@ use function Windwalker\collect;
 /**
  * The AppRequest class.
  */
-#[Immutable]
+#[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
 class AppRequest
 {
     use FilterAwareTrait;

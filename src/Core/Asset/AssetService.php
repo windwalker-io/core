@@ -17,6 +17,7 @@ use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
+use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
@@ -86,14 +87,14 @@ class AssetService implements EventAwareInterface
      *
      * @var  string
      */
-    public string $path = '';
+    protected string $path = '';
 
     /**
      * Property root.
      *
      * @var  string
      */
-    public string $root = '';
+    protected string $root = '';
 
     /**
      * @var Teleport|null
@@ -645,7 +646,7 @@ class AssetService implements EventAwareInterface
 
     public function importMap(string $name, string $uri): static
     {
-        $this->getImportMap()->addImport($name, $uri);
+        $this->getImportMap()->addImport($name, $this->handleUri($uri));
 
         return $this;
     }
@@ -847,7 +848,7 @@ class AssetService implements EventAwareInterface
     public function addUriBase(string $uri, $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
-            $uri = $this->systemUri::normalize($this->systemUri->$path . $uri);
+            $uri = $this->systemUri::normalize($this->$path . '/' . $uri);
         }
 
         return $uri;
@@ -937,19 +938,19 @@ class AssetService implements EventAwareInterface
             $version = $this->getVersion();
         }
 
-        if ($version) {
-            if (str_contains($uri, '?')) {
-                $uri .= '&' . $version;
-            } else {
-                $uri .= '?' . $version;
-            }
-        }
-
         if ($uri !== null) {
+            if ($version) {
+                if (str_contains($uri, '?')) {
+                    $uri .= '&' . $version;
+                } else {
+                    $uri .= '?' . $version;
+                }
+            }
+
             return $this->path . '/' . $uri;
         }
 
-        return $this->path;
+        return UriNormalizer::ensureDir($this->path);
     }
 
     /**
@@ -967,19 +968,19 @@ class AssetService implements EventAwareInterface
             $version = $this->getVersion();
         }
 
-        if ($version) {
-            if (str_contains($uri, '?')) {
-                $uri .= '&' . $version;
-            } else {
-                $uri .= '?' . $version;
-            }
-        }
-
         if ($uri !== null) {
+            if ($version) {
+                if (str_contains($uri, '?')) {
+                    $uri .= '&' . $version;
+                } else {
+                    $uri .= '?' . $version;
+                }
+            }
+
             return $this->root . '/' . $uri;
         }
 
-        return $this->root;
+        return UriNormalizer::ensureDir($this->root);
     }
 
     /**
@@ -1007,6 +1008,15 @@ class AssetService implements EventAwareInterface
 
         if (in_array($name, $allow)) {
             return $this->$name;
+        }
+
+        $allow = [
+            'path',
+            'root'
+        ];
+
+        if (in_array($name, $allow)) {
+            return $this->$name();
         }
 
         throw new \OutOfRangeException(sprintf('Property %s not exists.', $name));
@@ -1062,7 +1072,7 @@ class AssetService implements EventAwareInterface
      */
     public function getImportMap(): ImportMap
     {
-        return $this->importMap ??= new ImportMap();
+        return $this->importMap ??= new ImportMap($this->config->getDeep('app.debug'));
     }
 
     /**

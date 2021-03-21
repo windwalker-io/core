@@ -30,11 +30,15 @@ use Windwalker\Uri\Uri;
 
 /**
  * The Context class.
+ *
+ * @property-read Collection $state
  */
-#[Immutable]
+#[Immutable(Immutable::PROTECTED_WRITE_SCOPE)]
 class AppContext implements WebApplicationInterface
 {
-    use WebApplicationTrait;
+    use WebApplicationTrait {
+        __get as magicGet;
+    }
     use FilterAwareTrait;
 
     /**
@@ -224,9 +228,9 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
-     * @return SystemUri|null
+     * @return SystemUri
      */
-    public function getSystemUri(): ?SystemUri
+    public function getSystemUri(): SystemUri
     {
         return $this->appRequest->getSystemUri();
     }
@@ -407,5 +411,17 @@ class AppContext implements WebApplicationInterface
         mixed $return = ''
     ): void {
         $this->getRootApp()->close($return);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __get(string $name)
+    {
+        if ($name === 'state') {
+            return $this->$name;
+        }
+
+        return $this->magicGet($name);
     }
 }
