@@ -5,4 +5,4 @@
  * @license    __LICENSE__
  */
 
-export * from './fusion/asset-sync.mjs';
+export * from './asset-sync.mjs';

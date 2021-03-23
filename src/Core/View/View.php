@@ -172,7 +172,7 @@ class View implements EventAwareInterface
     protected function preparePaths(object $vm): void
     {
         $ref = new \ReflectionClass($vm);
-        $dir = dirname($ref->getFileName()) . '/view';
+        $dir = dirname($ref->getFileName()) . '/views';
 
         if (is_dir($dir)) {
             $this->addPath($dir, PriorityQueue::HIGH);

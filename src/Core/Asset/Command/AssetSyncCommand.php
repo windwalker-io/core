@@ -33,14 +33,6 @@ use Windwalker\Utilities\StrNormalise;
 #[CommandWrapper(description: 'Asset sync helpers', hidden: true)]
 class AssetSyncCommand implements CommandInterface
 {
-    protected string $ns = '';
-
-    protected string $dest = '';
-
-    protected array $map = [];
-
-    protected string $type = '';
-
     /**
      * AssetSyncCommand constructor.
      *
@@ -74,15 +66,15 @@ class AssetSyncCommand implements CommandInterface
             null,
             InputOption::VALUE_REQUIRED,
             'The namespace start from this path.',
-            'App\\Component'
+            $this->app->config('asset.namespace_base')
         );
-        $command->addOption(
-            'type',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'css | js',
-            'js'
-        );
+        // $command->addOption(
+        //     'type',
+        //     null,
+        //     InputOption::VALUE_REQUIRED,
+        //     'css | js',
+        //     'js'
+        // );
     }
 
     /**
@@ -95,8 +87,9 @@ class AssetSyncCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        $dir = $io->getArgument('dir') ?? '@source/Component';
+        $dir = $io->getArgument('dir') ?? '@source/Module';
         $dir = $this->app->path($dir);
+        
         // $dest = $io->getArgument('dest');
 
         // if (!$dest) {
@@ -104,14 +97,18 @@ class AssetSyncCommand implements CommandInterface
         // }
 
         // $this->dest = $this->app->path($dest);
-        $this->ns = $ns = (string) $io->getOption('ns');
-        $this->type = (string) $io->getOption('type');
+        // $this->ns = $ns = (string) $io->getOption('ns');
+        // $this->type = (string) $io->getOption('type');
+
+        $map = [];
 
         AttributesAccessor::scanDirAndRunAttributes(
             ViewModel::class,
             $dir,
-            $ns,
-            handler: [$this, 'handleAssets'],
+            (string) $io->getOption('ns'),
+            handler: function (ViewModel $vm, string $className, FileObject $file) use ($io, &$map) {
+                $this->handleAssets($vm, $className, $file, $io, $map);
+            },
             options: \ReflectionAttribute::IS_INSTANCEOF
         );
 
@@ -122,28 +119,27 @@ class AssetSyncCommand implements CommandInterface
         return 0;
     }
 
-    public function handleAssets(ViewModel $vm, string $className, FileObject $file): void
+    public function handleAssets(ViewModel $vm, string $className, FileObject $file, IOInterface $io, array &$map): void
     {
         $dir = $file->getPath();
+        $ns = (string) $io->getOption('ns');
 
-        if ($this->type === 'js') {
-            $src = $dir . '/asset/**/*.{js,mjs}';
-            $src = Path::makeRelativeFrom($src, $this->app->path('@root') . '/');
-            $dest = Path::clean(
+        $src = $dir . '/assets/**/*.{js,mjs}';
+        $src = Path::relative($this->app->path('@root') . '/', $src);
+        $dest = Path::clean(
                 strtolower(ltrim($vm->getName() ?? $this->guessName($className), '/\\'))
             ) . '/';
-            // $dest = Path::makeRelativeFrom(
-            //     Path::clean($this->dest . '/' . $dest) . '/',
-            //     $this->app->path('@root') . '/'
-            // ) . '/';
+        // $dest = Path::makeRelativeFrom(
+        //     Path::clean($this->dest . '/' . $dest) . '/',
+        //     $this->app->path('@root') . '/'
+        // ) . '/';
 
-            $this->map[$src] = $dest;
-        }
+        $map['js'][$src] = $dest;
 
         if ($this->type === 'css') {
             foreach ($vm->css as $cssFile) {
                 $src = $dir . '/asset/' . $cssFile;
-                $src = Path::makeRelativeFrom($src, $this->app->path('@root') . '/');
+                $src = Path::relative($this->app->path('@root') . '/', $src);
 
                 $this->map[] = $src;
             }

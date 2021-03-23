@@ -11,7 +11,7 @@ import rename from 'gulp-rename';
  */
 
 export function assetSync(source = 'src/Component', dest) {
-  // const root = source + '/**/asset/';
+  // const root = source + '/**/assets/';
 
   // glob(root, {}, function (err, dirs) {
   //   for (let dir of dirs) {
@@ -27,7 +27,7 @@ export function assetSync(source = 'src/Component', dest) {
   //   }
   // });
 
-  source += '/**/asset/*.{js,mjs}';
+  source += '/**/assets/*.{js,mjs}';
 
   let stream = prepareStream(src(source));
   //
@@ -44,5 +44,5 @@ export function assetSync(source = 'src/Component', dest) {
   //
   stream = stream.pipe(toDest(jsDest.path).on('error', e => console.error(e)));
 
-  return postStream(stream);
+  stream = postStream(stream);
 }

@@ -80,7 +80,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $container->registerByConfig($this->config('di') ?? []);
 
-        foreach ($this->config as $service => $config) {
+        foreach ($this->config->getIterator(false) as $service => $config) {
             if (!is_array($config)) {
                 throw new \LogicException("Config: '{$service}' must be array");
             }

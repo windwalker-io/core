@@ -25,7 +25,7 @@ use function Windwalker\uid;
 /**
  * The AssetVersionCommand class.
  */
-#[CommandWrapper(description: 'Create asset version file.')]
+#[CommandWrapper(description: 'Create assets version file.')]
 class AssetVersionCommand implements CommandInterface
 {
     /**

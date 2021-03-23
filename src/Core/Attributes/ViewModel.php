@@ -86,7 +86,7 @@ class ViewModel implements ContainerAttributeInterface
                 // foreach ($this->css as $name => $css) {
                 //     $path = '@view/' . $css;
                 //
-                //     $asset->css($path);
+                //     $assets->css($path);
                 // }
 
                 foreach ($this->js as $name => $js) {
@@ -122,7 +122,7 @@ class ViewModel implements ContainerAttributeInterface
 
     public function guessName(ViewModelInterface $vm, Container $container): string
     {
-        $root = $container->getParam('asset.namespace_root');
+        $root = $container->getParam('asset.namespace_base');
 
         $ref = new \ReflectionClass($vm);
         $ns = $ref->getNamespaceName();
