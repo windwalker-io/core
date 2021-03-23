@@ -68,6 +68,13 @@ class AssetSyncCommand implements CommandInterface
             'The namespace start from this path.',
             $this->app->config('asset.namespace_base')
         );
+        $command->addOption(
+            'pretty',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'JSON pretty print.',
+            false
+        );
         // $command->addOption(
         //     'type',
         //     null,
@@ -112,9 +119,13 @@ class AssetSyncCommand implements CommandInterface
             options: \ReflectionAttribute::IS_INSTANCEOF
         );
 
-        $io->writeln(json_encode($this->map, JSON_THROW_ON_ERROR));
+        $flags = JSON_THROW_ON_ERROR;
 
-        $this->map = [];
+        if ($io->getOption('pretty') !== false) {
+            $flags |= JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+        }
+
+        $io->writeln(json_encode($map, $flags));
 
         return 0;
     }
@@ -127,48 +138,24 @@ class AssetSyncCommand implements CommandInterface
         $src = $dir . '/assets/**/*.{js,mjs}';
         $src = Path::relative($this->app->path('@root') . '/', $src);
         $dest = Path::clean(
-                strtolower(ltrim($vm->getName() ?? $this->guessName($className), '/\\'))
-            ) . '/';
-        // $dest = Path::makeRelativeFrom(
-        //     Path::clean($this->dest . '/' . $dest) . '/',
-        //     $this->app->path('@root') . '/'
-        // ) . '/';
+                strtolower(ltrim($vm->getName() ?? $this->guessName($className, $ns), '/\\'))
+            ) . DIRECTORY_SEPARATOR;
 
         $map['js'][$src] = $dest;
 
-        if ($this->type === 'css') {
-            foreach ($vm->css as $cssFile) {
-                $src = $dir . '/asset/' . $cssFile;
-                $src = Path::relative($this->app->path('@root') . '/', $src);
+        foreach ($vm->css as $cssFile) {
+            $src = $dir . '/asset/' . $cssFile;
+            $src = Path::relative($this->app->path('@root') . '/', $src);
 
-                $this->map[] = $src;
-            }
+            $map['css'][] = $src;
         }
-
-        // foreach ($vm->js as $jsFile) {
-        //     $src = $dir . '/view/' . $jsFile;
-        //     $dest = strtolower($vm->getName() ?? $this->guessName($className)) . '/' . $jsFile;
-        //
-        //     $dest = ltrim(Path::clean($dest), '/\\');
-        //
-        //     $this->map[$src] = $dest;
-        // }
-        //
-        // foreach ($vm->modules as $jsFile) {
-        //     $src = $dir . '/view/' . $jsFile;
-        //     $dest = strtolower($vm->getName() ?? $this->guessName($className)) . '/' . $jsFile;
-        //
-        //     $dest = ltrim(Path::clean($dest), '/\\');
-        //
-        //     $this->map[$src] = $dest;
-        // }
     }
 
-    protected function guessName(string $class): string
+    protected function guessName(string $class, string $nsBase): string
     {
         $ref = new \ReflectionClass($class);
         $ns = $ref->getNamespaceName();
 
-        return Str::removeLeft($ns, $this->ns);
+        return Str::removeLeft($ns, $nsBase);
     }
 }
