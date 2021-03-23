@@ -72,7 +72,8 @@ class WebApplication implements WebApplicationInterface
 
         foreach ($this->config as $service => $config) {
             if (!is_array($config)) {
-                throw new \LogicException("Config: '{$service}' must be array");
+                continue;
+                // throw new \LogicException("Config: '{$service}' must be array");
             }
 
             $container->registerByConfig($config ?: []);

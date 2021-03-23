@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Uri\PsrUri;
 use Windwalker\Uri\Uri;
+use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Str;
 
@@ -194,31 +195,29 @@ class SystemUri extends Uri implements \JsonSerializable
     {
         switch ($name) {
             case 'full':
-                return $this->cacheStorage['full'] ??= Str::ensureRight($this->original, '/');
+                return $this->cacheStorage['full'] ??= UriNormalizer::ensureDir($this->original);
 
             case 'current':
-                return $this->cacheStorage['current'] ??= Str::ensureRight(
+                return $this->cacheStorage['current'] ??= UriNormalizer::ensureDir(
                     Uri::wrap($this->original)
                         ->toString(
                             static::FULL_HOST | static::PATH
                         ),
-                    '/'
                 );
 
             case 'script':
                 return $this->scriptName;
 
             case 'root':
-                return $this->cacheStorage['root'] ??= Str::ensureRight(
+                return $this->cacheStorage['root'] ??= UriNormalizer::ensureDir(
                     $this->toString(static::FULL_HOST | static::PATH),
-                    '/'
                 );
 
             case 'host':
                 return $this->cacheStorage['host'] ??= $this->toString(static::FULL_HOST);
 
             case 'path':
-                return $this->cacheStorage['path'] ??= Str::ensureRight($this->toString(static::PATH), '/');
+                return $this->cacheStorage['path'] ??= UriNormalizer::ensureDir($this->toString(static::PATH));
 
             case 'route':
                 return $this->cacheStorage['route'] ??= (function () {
@@ -232,7 +231,7 @@ class SystemUri extends Uri implements \JsonSerializable
                         $route = trim(substr($route, strlen($file)), '/');
                     }
 
-                    return Str::ensureLeft(rtrim($route,'/'), '/');
+                    return UriNormalizer::ensureDir(rtrim($route,'/'));
                 })();
         }
 

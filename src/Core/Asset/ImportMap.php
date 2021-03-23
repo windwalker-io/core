@@ -21,6 +21,15 @@ class ImportMap
         'scopes' => []
     ];
 
+    /**
+     * ImportMap constructor.
+     *
+     * @param  bool  $isDebug
+     */
+    public function __construct(protected bool $isDebug = false)
+    {
+    }
+
     public function addImport(string $name, string $uri): static
     {
         $this->data['imports'][$name] = $uri;
@@ -174,6 +183,10 @@ class ImportMap
             return '';
         }
 
+        if ($this->isDebug) {
+            $jsonFlags |= JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+        }
+
         $data = json_encode($this->data, JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT | $jsonFlags);
 
         return <<<SCRIPT
@@ -181,5 +194,25 @@ class ImportMap
         $data
         </script>
         SCRIPT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug(): bool
+    {
+        return $this->isDebug;
+    }
+
+    /**
+     * @param  bool  $isDebug
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setIsDebug(bool $isDebug): static
+    {
+        $this->isDebug = $isDebug;
+
+        return $this;
     }
 }

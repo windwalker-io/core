@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Filesystem\Path;
 
 /**
@@ -26,6 +27,19 @@ class PathResolver
      */
     public function __construct(protected Config $config)
     {
+    }
+
+    public function all(): array
+    {
+        $paths = [];
+
+        foreach ($this->config as $key => $value) {
+            if (str_starts_with($key, '@')) {
+                $paths[$key] = $value;
+            }
+        }
+
+        return $paths;
     }
 
     /**
