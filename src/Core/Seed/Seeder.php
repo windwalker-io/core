@@ -13,7 +13,6 @@ namespace Windwalker\Core\Seed;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
-use Windwalker\Core\Event\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Utilities\StrNormalise;
 

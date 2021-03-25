@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Migration;
 
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Event\MessageOutputTrait;
+use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;

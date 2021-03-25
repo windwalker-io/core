@@ -52,6 +52,20 @@ interface ApplicationInterface extends
     public function path(string $path): string;
 
     /**
+     * isDebug
+     *
+     * @return  bool
+     */
+    public function isDebug(): bool;
+
+    /**
+     * getMode
+     *
+     * @return  string
+     */
+    public function getMode(): string;
+
+    /**
      * Method to get property Container
      *
      * @return  Container

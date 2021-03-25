@@ -9,10 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Event;
-
-use JetBrains\PhpStorm\ExpectedValues;
-use Windwalker\Event\EventInterface;
+namespace Windwalker\Core\Events\Console;
 
 /**
  * The ConsoleLogEvent class.

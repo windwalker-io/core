@@ -23,7 +23,6 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\Server\DumpServer;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\CoreCommand;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 

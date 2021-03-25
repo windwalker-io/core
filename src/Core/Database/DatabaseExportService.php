@@ -14,7 +14,7 @@ namespace Windwalker\Core\Database;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
-use Windwalker\Core\Event\MessageOutputEvent;
+use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\FileObject;

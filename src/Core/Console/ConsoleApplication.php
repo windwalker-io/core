@@ -16,6 +16,7 @@ use JetBrains\PhpStorm\NoReturn;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,9 +25,10 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
-use Windwalker\Core\Event\MessageOutputEvent;
-use Windwalker\Core\Event\ErrorMessageOutputEvent;
-use Windwalker\Core\Event\ConsoleLogEvent;
+use Windwalker\Core\Event\SymfonyDispatcherWrapper;
+use Windwalker\Core\Events\Console\ConsoleLogEvent;
+use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
+use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\ConsoleProvider;
 use Windwalker\DI\Container;
@@ -59,6 +61,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
             'Windwalker Console',
             InstalledVersions::getPrettyVersion('windwalker/core')
         );
+
+        $this->setDispatcher(new SymfonyDispatcherWrapper($this->getEventDispatcher()));
     }
 
     /**
@@ -97,7 +101,25 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $this->registerEvents();
 
+        $this->on(ConsoleTerminateEvent::class, fn ($event) => $this->terminating($container));
+
+        $this->booting($container->createChild());
+
+        $container->clearCache();
+
         $this->booted = true;
+    }
+
+    /**
+     * Your booting logic.
+     *
+     * @param  Container  $container
+     *
+     * @return  void
+     */
+    protected function booting(Container $container): void
+    {
+        //
     }
 
     public function registerCommands(array $commands): void
@@ -280,5 +302,10 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
                 $output->write($buffer);
             }
         };
+    }
+
+    protected function terminating(Container $container): void
+    {
+        //
     }
 }

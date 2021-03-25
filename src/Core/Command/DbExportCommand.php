@@ -87,11 +87,7 @@ class DbExportCommand implements CommandInterface
 
         $databaseExportService = $this->app->make(DatabaseExportService::class);
 
-        $dest = $databaseExportService->exportTo(
-            $file,
-            $this->databaseManager->get($conn),
-            $io
-        );
+        $dest = $databaseExportService->exportTo($file, $io);
 
         $io->writeln("Exported to <info>{$dest->getPathname()}</info>");
 

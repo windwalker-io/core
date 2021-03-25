@@ -15,13 +15,16 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
-use Symfony\Component\Process\Process;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Events\AfterBootEvent;
+use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Output\Output;
+use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 
@@ -55,7 +58,6 @@ class WebApplication implements WebApplicationInterface
      * boot
      *
      * @return  void
-     *
      * @throws DefinitionException
      */
     public function boot(): void
@@ -86,7 +88,23 @@ class WebApplication implements WebApplicationInterface
             $this->addMiddleware($middleware);
         }
 
+        $this->booting($container->createChild());
+
+        $container->clearCache();
+
         $this->booted = true;
+    }
+
+    /**
+     * Your booting logic.
+     *
+     * @param  Container  $container
+     *
+     * @return  void
+     */
+    protected function booting(Container $container): void
+    {
+        //
     }
 
     /**
@@ -127,22 +145,40 @@ class WebApplication implements WebApplicationInterface
     {
         $this->boot();
 
-        $subContainer = $this->getContainer()->createChild();
-        $subContainer->registerServiceProvider(new RequestProvider($request, $this));
+        $request ??= ServerRequestFactory::createFromGlobals();
+
+        $container = $this->getContainer()->createChild();
+        $container->registerServiceProvider(new RequestProvider($request, $this));
 
         if ($handler) {
-            $subContainer->modify(
+            $container->modify(
                 AppContext::class,
                 fn(AppContext $context): AppContext => $context->withController($handler)
             );
         }
 
-        $queue   = $this->compileMiddlewares($subContainer);
-        $queue[] = fn(ServerRequestInterface $request) => $subContainer->get(ControllerDispatcher::class)
-            ->dispatch($subContainer->get(AppContext::class));
+        $this->registerListeners($container);
 
-        return static::createRequestHandler($queue)
-            ->handle($request);
+        $middlewares   = $this->compileMiddlewares($container);
+        $middlewares[] = fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
+            ->dispatch($container->get(AppContext::class));
+
+        // @event
+        $event = $this->emit(
+            BeforeRequestEvent::class,
+            compact('container', 'middlewares', 'request')
+        );
+
+        $response = static::createRequestHandler($event->getMiddlewares())
+            ->handle($event->getRequest());
+
+        // @event
+        $event = $this->emit(
+            AfterRequestEvent::class,
+            compact('container', 'response')
+        );
+
+        return $event->getResponse();
     }
 
     public static function createRequestHandler(iterable $queue): RequestHandlerInterface
@@ -191,5 +227,15 @@ class WebApplication implements WebApplicationInterface
     public function close(mixed $return = ''): void
     {
         die($return);
+    }
+
+    public function terminate(): void
+    {
+        $this->terminating($this->getContainer());
+    }
+
+    protected function terminating(Container $container): void
+    {
+        //
     }
 }

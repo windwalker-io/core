@@ -74,20 +74,6 @@ class Runtime
         return static::$container->getParameters()->getDeep($name, $delimiter);
     }
 
-    /**
-     * set
-     *
-     * @param  string  $name
-     * @param  mixed   $value
-     * @param  string  $delimiter
-     *
-     * @return  void
-     */
-    public static function set(string $name, mixed $value, string $delimiter = '.'): void
-    {
-        static::$container->getParameters()->setDeep($name, $value, $delimiter);
-    }
-
     public static function getContainer(int $options = 0): Container
     {
         return static::$container ??= (new Container(null, $options))->setParameters(new Config());

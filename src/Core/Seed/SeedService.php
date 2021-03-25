@@ -11,9 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Seed;
 
-use Faker\Factory;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Event\MessageOutputTrait;
+use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;

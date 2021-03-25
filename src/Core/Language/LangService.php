@@ -52,26 +52,6 @@ class LangService extends Language
         return $this->trans($id, $args);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setLocale(string $locale): static
-    {
-        $this->config->setDeep('language.locale', $locale);
-
-        return parent::setLocale($locale);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setFallback(string $fallback): static
-    {
-        $this->config->setDeep('language.fallback', $fallback);
-
-        return parent::setFallback($fallback);
-    }
-
     public function loadFile(string $file, string $format = 'php', ?string $locale = null): static
     {
         $locale = $locale ?? $this->getLocale();

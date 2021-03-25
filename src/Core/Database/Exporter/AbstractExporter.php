@@ -10,7 +10,7 @@ namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Event\MessageOutputTrait;
+use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Stream\Stream;
 

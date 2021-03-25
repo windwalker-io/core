@@ -144,27 +144,6 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isDebug(): bool
-    {
-        return $this->isDebug;
-    }
-
-    /**
-     * @param  bool  $isDebug
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function withIsDebug(bool $isDebug): static
-    {
-        $new          = clone $this;
-        $new->isDebug = $isDebug;
-
-        return $new;
-    }
-
-    /**
      * @return Parameters|null
      */
     public function getParams(): ?Parameters
@@ -312,27 +291,6 @@ class AppContext implements WebApplicationInterface
     {
         $new             = clone $this;
         $new->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
-
-        return $new;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMode(): string
-    {
-        return $this->mode;
-    }
-
-    /**
-     * @param  string  $mode
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function withMode(string $mode): static
-    {
-        $new       = clone $this;
-        $new->mode = $mode;
 
         return $new;
     }

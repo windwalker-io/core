@@ -65,9 +65,7 @@ class RequestProvider implements ServiceProviderInterface
             function (AppContext $app, Container $container) {
                 $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
-                return $app->withIsDebug((bool) $container->getParam('app.debug'))
-                    ->withMode((string) $container->getParam('app.mode'))
-                    ->withAppRequest($this->createAppRequest($container));
+                return $app->withAppRequest($this->createAppRequest($container));
             }
         )
             ->alias(ApplicationInterface::class, AppContext::class);

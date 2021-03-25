@@ -14,6 +14,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
+use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
+use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
@@ -40,6 +42,13 @@ class ControllerDispatcher
     {
         $controller = $app->getController();
 
+        $event = $app->emit(
+            BeforeControllerDispatchEvent::class,
+            compact('app', 'controller')
+        );
+
+        $controller = $event->getController();
+
         if ($controller === null) {
             throw new \LogicException(
                 sprintf(
@@ -62,7 +71,14 @@ class ControllerDispatcher
             $controller = fn(AppContext $app): mixed => $this->container->call($controller, $app->getUrlVars());
         }
 
-        return $this->handleResponse($controller($app));
+        $response = $this->handleResponse($controller($app));
+
+        $event = $app->emit(
+            AfterControllerDispatchEvent::class,
+            compact('app', 'response')
+        );
+
+        return $event->getResponse();
     }
 
     protected function getDefaultTask(ServerRequestInterface $request): string

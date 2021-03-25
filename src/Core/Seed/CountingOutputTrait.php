@@ -8,7 +8,7 @@
 
 namespace Windwalker\Core\Seed;
 
-use Windwalker\Core\Event\MessageOutputTrait;
+use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Migration\Migration;
 use Windwalker\Environment\PlatformHelper;
 

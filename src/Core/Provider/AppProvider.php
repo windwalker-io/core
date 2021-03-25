@@ -11,13 +11,12 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
-use Windwalker\Core\Language\LangService;
+use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Language\Language;
-use Windwalker\Language\LanguageInterface;
+use Windwalker\Event\EventEmitter;
 
 /**
  * The AppProvider class.
@@ -47,22 +46,27 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
         $container->share(get_class($this->app), $this->app);
+        $container->share(get_parent_class($this->app), $this->app);
         $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
 
-        // Language
-        $this->prepareLanguage($container);
+        $this->prepareEvents($container);
     }
 
     /**
-     * prepareLanguage
+     * prepareEvents
      *
      * @param  Container  $container
      *
      * @return  void
+     *
+     * @throws DefinitionException
      */
-    public function prepareLanguage(Container $container): void
+    protected function prepareEvents(Container $container): void
     {
-
+        $container->bind(
+            EventEmitter::class,
+            fn () => $container->newInstance(CoreEventEmitter::class)
+        );
     }
 }
