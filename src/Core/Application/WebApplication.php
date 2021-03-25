@@ -70,7 +70,7 @@ class WebApplication implements WebApplicationInterface
 
         $container->registerByConfig($this->config('di') ?? []);
 
-        foreach ($this->config as $service => $config) {
+        foreach (iterator_to_array($this->config) as $service => $config) {
             if (!is_array($config)) {
                 continue;
                 // throw new \LogicException("Config: '{$service}' must be array");

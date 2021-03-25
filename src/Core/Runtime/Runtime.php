@@ -9,6 +9,7 @@
 
 namespace Windwalker\Core\Runtime;
 
+use Windwalker\Core\Provider\RuntimeProvider;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 
@@ -36,17 +37,16 @@ class Runtime
 
     public static function boot(string $rootDir, string $workDir): void
     {
-        if (static::isBooted()) {
+        if (!static::isBooted()) {
             $container = static::getContainer();
-            $config    = $container->getParameters();
-            $container->share(Config::class, $config);
-            $container->share(Container::class, $container);
 
-            return;
+            $container->registerServiceProvider(new RuntimeProvider());
+
+            static::$rootDir = $rootDir;
+            static::$workDir = $workDir;
         }
 
-        static::$rootDir = $rootDir;
-        static::$workDir = $workDir;
+        static::$booted = true;
     }
 
     public static function getConfig(): Config

@@ -14,6 +14,7 @@ namespace Windwalker\Core\Service;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\DateTime\ChronosService;
+use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Renderer\CompositeRenderer;
@@ -86,6 +87,7 @@ class RendererService
         $globals['chronos'] = $this->app->resolve(ChronosService::class);
         $globals['nav'] = $this->app->resolve(Navigator::class);
         $globals['asset'] = $this->app->resolve(AssetService::class);
+        $globals['lang'] = $this->app->resolve(LangService::class);
 
         return $globals;
     }

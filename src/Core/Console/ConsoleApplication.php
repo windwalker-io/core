@@ -100,41 +100,6 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         $this->booted = true;
     }
 
-    /**
-     * @return OutputInterface
-     */
-    public function getOutput(): OutputInterface
-    {
-        return $this->output ?? new ConsoleOutput();
-    }
-
-    protected function registerEvents(): void
-    {
-        $output = $this->getOutput();
-
-        $this->on(
-            ConsoleLogEvent::class,
-            function (ConsoleLogEvent $event) use ($output) {
-                $tag = match ($event->getType()) {
-                    'success', 'green' => '<info>%s</info>',
-                    'warning', 'yellow' => '<comment>%s</comment>',
-                    'info', 'blue' => '<option>%s</option>',
-                    'error', 'danger', 'red' => '<error>%s</error>',
-                    default => '%s',
-                };
-
-                foreach ($event->getMessages() as $message) {
-                    $time = gmdate('Y-m-d H:i:s');
-
-                    $output->writeln(sprintf('[%s] ' . $tag, $time, $message));
-                }
-            }
-        );
-
-        $this->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
-        $this->on(ErrorMessageOutputEvent::class, fn (ErrorMessageOutputEvent $event) => $event->writeWith($output));
-    }
-
     public function registerCommands(array $commands): void
     {
         $commandsMap = [];
@@ -185,6 +150,41 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
                 $commandsMap
             )
         );
+    }
+
+    /**
+     * @return OutputInterface
+     */
+    public function getOutput(): OutputInterface
+    {
+        return $this->output ?? new ConsoleOutput();
+    }
+
+    protected function registerEvents(): void
+    {
+        $output = $this->getOutput();
+
+        $this->on(
+            ConsoleLogEvent::class,
+            function (ConsoleLogEvent $event) use ($output) {
+                $tag = match ($event->getType()) {
+                    'success', 'green' => '<info>%s</info>',
+                    'warning', 'yellow' => '<comment>%s</comment>',
+                    'info', 'blue' => '<option>%s</option>',
+                    'error', 'danger', 'red' => '<error>%s</error>',
+                    default => '%s',
+                };
+
+                foreach ($event->getMessages() as $message) {
+                    $time = gmdate('Y-m-d H:i:s');
+
+                    $output->writeln(sprintf('[%s] ' . $tag, $time, $message));
+                }
+            }
+        );
+
+        $this->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
+        $this->on(ErrorMessageOutputEvent::class, fn (ErrorMessageOutputEvent $event) => $event->writeWith($output));
     }
 
     /**
