@@ -19,6 +19,7 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
+use Windwalker\Renderer\TemplateFactoryInterface;
 
 /**
  * The RendererService class.
@@ -47,7 +48,12 @@ class RendererService
         return $renderer->render($layout, $data, $options);
     }
 
-    public function createRenderer(array $paths = []): RendererInterface
+    public function make(string $layout, array $options = []): \Closure
+    {
+        return $this->createRenderer()->make($layout, $options);
+    }
+
+    public function createRenderer(array $paths = []): RendererInterface|TemplateFactoryInterface
     {
         $renderer = $this->app->resolve(CompositeRenderer::class);
 

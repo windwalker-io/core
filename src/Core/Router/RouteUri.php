@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Uri\Uri;
+use Windwalker\Uri\UriHelper;
 
 /**
  * The RouteUri class.
@@ -24,8 +25,6 @@ class RouteUri extends Uri implements NavConstantInterface
      * @var callable
      */
     protected $handler;
-
-    protected Uri $uri;
 
     protected int $options = 0;
 
@@ -39,8 +38,6 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function __construct(mixed $uri, array $vars, protected Navigator $navigator, int $options = 0)
     {
-        $this->uri = new Uri();
-
         if ($uri instanceof \Closure) {
             $this->handler = $uri;
             $uri = '';
@@ -49,6 +46,7 @@ class RouteUri extends Uri implements NavConstantInterface
         parent::__construct($uri);
 
         $this->vars = $vars;
+        $this->query = UriHelper::buildQuery($vars);
         $this->options = $options;
     }
 

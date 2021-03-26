@@ -82,9 +82,9 @@ class Navigator implements NavConstantInterface
     {
         $systemUri = $this->app->getSystemUri();
 
-        if (!$systemUri) {
-            return Str::ensureLeft($url, '/');
-        }
+        // if (!$systemUri) {
+        //     return Str::ensureLeft($url, '/');
+        // }
 
         return $systemUri->absolute(
             $url,

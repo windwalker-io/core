@@ -195,7 +195,7 @@ class SystemUri extends Uri implements \JsonSerializable
     {
         switch ($name) {
             case 'full':
-                return $this->cacheStorage['full'] ??= UriNormalizer::ensureDir($this->original);
+                return $this->cacheStorage['full'] ??= $this->original;
 
             case 'current':
                 return $this->cacheStorage['current'] ??= UriNormalizer::ensureDir(

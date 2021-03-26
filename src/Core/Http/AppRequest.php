@@ -191,9 +191,11 @@ class AppRequest
      *
      * @return  mixed|Collection
      */
-    private function fetchInputFields(array $data, array $fields): mixed
+    private function fetchInputFields(array $input, array $fields): mixed
     {
-        if (!Arr::isAssociative($fields)) {
+        $data = [];
+
+        if (array_is_list($fields)) {
             foreach ($fields as $field) {
                 $data[$field] = $input[$field] ?? null;
             }
@@ -205,7 +207,7 @@ class AppRequest
             $this->getFilterFactory()->createNested($fields)->test($data);
         }
 
-        if (\Windwalker\count($fields) === 1) {
+        if (count($fields) === 1) {
             return array_shift($data);
         }
 
