@@ -31,10 +31,12 @@ class MiddlewareRunner
     {
     }
 
-    public function run(ServerRequestInterface $request, array $middlewares, callable $handler): ResponseInterface
-    {
-        $middlewares = $this->compileMiddlewares($middlewares);
-        $middlewares[] = $handler;
+    public function run(
+        ServerRequestInterface $request,
+        iterable $middlewares,
+        ?callable $last = null
+    ): ResponseInterface {
+        $middlewares = $this->compileMiddlewares($middlewares, $last);
 
         return static::createRequestHandler($middlewares)->handle($request);
     }
@@ -42,21 +44,35 @@ class MiddlewareRunner
     /**
      * compileMiddlewares
      *
-     * @param  array      $middlewares
+     * @param  iterable  $middlewares
+     * @param  callable|null  $last
      *
-     * @return array
+     * @return \Generator
      *
      * @throws \ReflectionException
      */
-    public function compileMiddlewares(array $middlewares): array
+    public function compileMiddlewares(iterable $middlewares, ?callable $last = null): \Generator
     {
-        $queue = [];
-
-        foreach ($middlewares as $middleware) {
-            $queue[] = $this->container->resolve($middleware);
+        foreach ($middlewares as $i => $middleware) {
+            yield $this->container->resolve($middleware);
         }
 
-        return $queue;
+        if ($last) {
+            yield $last;
+        }
+    }
+
+    public function resolveMiddleware(mixed $middleware): mixed
+    {
+        if ($middleware === false || $middleware === null) {
+            return null;
+        }
+
+        if (is_callable($middleware)) {
+            return $middleware;
+        }
+
+        return $this->container->resolve($middleware);
     }
 
     public static function createRequestHandler(iterable $queue): RequestHandlerInterface

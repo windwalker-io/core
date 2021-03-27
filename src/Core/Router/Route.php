@@ -178,6 +178,14 @@ class Route
 
         $options['pattern'] = static::sanitize(implode('/', $prefixes) . $options['pattern']);
 
+        // Namespace
+        $namespaces = array_filter(
+            array_column($groups, 'namespace')
+        );
+        $namespaces[] = $this->name;
+
+        $new->name = implode('::', $namespaces);
+
         $options['extra']['action']      = $options['actions'] ?? [];
         $options['extra']['hook']        = $options['hooks'] ?? [];
         $options['extra']['middlewares'] = $options['middlewares'] ?? [];

@@ -198,12 +198,16 @@ class PackageInstallCommand implements CommandInterface
             $name = $package::getName();
 
             $options[] = $name . ' ALL';
-            $items[$name] = [$name, null];
+            $items[$name . ' ALL'] = [$name, null];
 
             foreach ($installer->getChild($name)->tags as $tag => $res) {
                 $options[] = $optName = "<fg=gray>{$name}</>: {$tag}";
                 $items[$optName] = [$name, $tag];
             }
+        }
+
+        if ($options === []) {
+            throw new \UnexpectedValueException('No packages found.');
         }
 
         $qn = new ChoiceQuestion(

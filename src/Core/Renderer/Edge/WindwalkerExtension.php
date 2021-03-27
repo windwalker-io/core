@@ -36,8 +36,8 @@ class WindwalkerExtension implements EdgeExtensionInterface, DirectivesExtension
     public function getDirectives(): array
     {
         return [
-            'lang' => [$this, 'translate'],
-            'translate' => [$this, 'translate'],
+            'lang' => [$this, 'lang'],
+            'translate' => [$this, 'lang'],
             'choice' => [$this, 'choice'],
             'messages' => [$this, 'messages'],
             // 'widget' => [$this, 'widget'],
@@ -51,8 +51,8 @@ class WindwalkerExtension implements EdgeExtensionInterface, DirectivesExtension
             // 'endcannot' => [$this, 'endcan'],
 
             // Asset
-            'css' => [$this, 'css'],
-            'js' => [$this, 'js'],
+            // 'css' => [$this, 'css'],
+            // 'js' => [$this, 'js'],
             'teleport' => [$this, 'teleport'],
             'endTeleport' => [$this, 'endTeleport'],
             'attr' => [$this, 'attr'],
@@ -63,7 +63,7 @@ class WindwalkerExtension implements EdgeExtensionInterface, DirectivesExtension
             'ds' => [$this, 'ds'],
             'die' => [$this, 'dead'],
             'debug' => [$this, 'debug'],
-            'enddebug' => [$this, 'endauth'],
+            'enddebug' => [$this, 'enddebug'],
         ];
     }
 

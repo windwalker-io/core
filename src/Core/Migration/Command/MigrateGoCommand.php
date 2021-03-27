@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
+use Windwalker\Core\Seed\SeedService;
+use Windwalker\Filesystem\FileObject;
 
 /**
  * The MigrationToCommand class.
@@ -112,6 +114,27 @@ class MigrateGoCommand extends AbstractMigrationCommand
         if ($count) {
             $io->newLine();
             $io->writeln('Completed.');
+        }
+
+        $seed = $io->getOption('seed');
+
+        if ($seed !== false) {
+            $style->newLine(2);
+            $style->title('Seeding...');
+
+            /** @var SeedService $seedService */
+            $seedService = $this->app->make(SeedService::class);
+            $seedService->addEventDealer($this->app);
+
+            if (!$seed) {
+                $seed = $this->app->path('@seeders/');
+            }
+
+            if (is_dir($seed)) {
+                $seed .= '/main.php';
+            }
+
+            $count = $seedService->import(new FileObject($seed));
         }
 
         $io->newLine();

@@ -72,7 +72,7 @@ class WebApplication implements WebApplicationInterface
         $container->registerByConfig($this->config('di') ?? []);
 
         foreach (iterator_to_array($this->config) as $service => $config) {
-            if (!is_array($config) || ($config['enabled'] ?? null) === false) {
+            if (!is_array($config)) {
                 continue;
                 // throw new \LogicException("Config: '{$service}' must be array");
             }
@@ -113,7 +113,7 @@ class WebApplication implements WebApplicationInterface
      *
      * @return  $this
      */
-    public function addMiddleware(mixed $middleware)
+    public function addMiddleware(mixed $middleware): static
     {
         $this->middlewares[] = $middleware;
 
@@ -140,9 +140,11 @@ class WebApplication implements WebApplicationInterface
 
         $runner = $container->newInstance(MiddlewareRunner::class);
 
-        $middlewares   = $runner->compileMiddlewares($this->middlewares);
-        $middlewares[] = fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
-            ->dispatch($container->get(AppContext::class));
+        $middlewares = $runner->compileMiddlewares(
+            $this->middlewares,
+            fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
+                ->dispatch($container->get(AppContext::class))
+        );
 
         // @event
         $event = $this->emit(

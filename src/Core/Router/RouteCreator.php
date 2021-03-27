@@ -274,9 +274,9 @@ class RouteCreator
     /**
      * delete
      *
-     * @param  string       $name
-     * @param  string|null  $pattern
-     * @param  array        $options
+     * @param  string                $name
+     * @param  string|callable|null  $pattern
+     * @param  array                 $options
      *
      * @return  Route
      *
@@ -299,6 +299,20 @@ class RouteCreator
     public function prefix(string $prefix): static
     {
         $this->setOption('prefix', $prefix);
+
+        return $this;
+    }
+
+    /**
+     * namespace
+     *
+     * @param  string  $namespace
+     *
+     * @return  $this
+     */
+    public function namespace(string $namespace): static
+    {
+        $this->setOption('namespace', $namespace);
 
         return $this;
     }

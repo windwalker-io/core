@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Windwalker\Core\Migration;
 
 use Windwalker\Core\Seed\CountingOutputTrait;
-use Windwalker\Database\Command\AbstractTable;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Manager\TableManager;
+use Windwalker\ORM\ORM;
 
 /**
  * The Migration class.

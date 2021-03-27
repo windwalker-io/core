@@ -22,7 +22,7 @@ class BeforeRequestEvent extends AbstractEvent
 {
     protected ServerRequestInterface $request;
 
-    protected array $middlewares = [];
+    protected iterable $middlewares = [];
 
     protected Container $container;
 
@@ -67,19 +67,19 @@ class BeforeRequestEvent extends AbstractEvent
     }
 
     /**
-     * @return array
+     * @return iterable
      */
-    public function getMiddlewares(): array
+    public function getMiddlewares(): iterable
     {
         return $this->middlewares;
     }
 
     /**
-     * @param  array  $middlewares
+     * @param  iterable  $middlewares
      *
      * @return  static  Return self to support chaining.
      */
-    public function setMiddlewares(array $middlewares): static
+    public function setMiddlewares(iterable $middlewares): static
     {
         $this->middlewares = $middlewares;
 

@@ -23,6 +23,8 @@ use Windwalker\Filesystem\Filesystem;
 use Windwalker\Stream\Stream;
 use Windwalker\Utilities\SimpleTemplate;
 
+use function Windwalker\chronos;
+
 /**
  * The MigrationService class.
  */
@@ -133,9 +135,21 @@ class MigrationService implements EventAwareInterface
         return $count;
     }
 
+    /**
+     * executeMigration
+     *
+     * @param  Migration  $migration
+     * @param  string     $direction
+     *
+     * @return  void
+     *
+     * @throws \Exception
+     */
     public function executeMigration(Migration $migration, string $direction = Migration::UP): void
     {
         $mig = $migration;
+        $db = $this->db;
+        $orm = $db->orm();
 
         include $migration->file->getPathname();
 
@@ -145,7 +159,7 @@ class MigrationService implements EventAwareInterface
             return;
         }
 
-        $start = new \DateTimeImmutable();
+        $start = chronos();
 
         $this->emitMessage(
             sprintf(
@@ -166,7 +180,7 @@ class MigrationService implements EventAwareInterface
 
         $this->emitMessage('<fg=bright-green>Success</>', true);
 
-        $end = new \DateTimeImmutable();
+        $end = chronos();
 
         // $this['log.' . $versionInfo['id']] = [
         //     'id' => $versionInfo['id'],
