@@ -12,6 +12,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Event\CoreEventEmitter;
+use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -49,6 +50,7 @@ class AppProvider implements ServiceProviderInterface
         $container->share(get_parent_class($this->app), $this->app);
         $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
+        $container->prepareSharedObject(PackageRegistry::class);
 
         $this->prepareEvents($container);
     }

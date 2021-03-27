@@ -14,6 +14,7 @@ namespace Windwalker\Console;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\StyleInterface;
 
 /**
@@ -70,4 +71,14 @@ interface IOInterface extends InputInterface, OutputInterface
      * @return  mixed
      */
     public function extract(array|InputInterface $input = null, ?OutputInterface $output = null): static;
+
+    /**
+     * ask
+     *
+     * @param  string|Question  $question
+     * @param  string|null      $default
+     *
+     * @return  mixed
+     */
+    public function ask(string|Question $question, ?string $default = null): mixed;
 }

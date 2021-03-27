@@ -8,11 +8,10 @@
 
 namespace Windwalker\Core\Pagination;
 
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Service\RendererService;
-use Windwalker\Uri\Uri;
 
 /**
  * The Pagination class.

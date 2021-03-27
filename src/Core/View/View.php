@@ -11,28 +11,27 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\View;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Service\RendererService;
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
-use Windwalker\DI\Attributes\AttributeHandler;
-use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\ContainerAttributeInterface;
-use Windwalker\DI\Container;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Utilities\Iterator\PriorityQueue;
+use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 /**
  * The ViewModel class.
  */
 class View implements EventAwareInterface
 {
+    use OptionsResolverTrait;
     use EventAwareTrait;
 
-    protected string $layout = '';
+    protected string|array|null $layout = null;
 
     protected ?RendererInterface $renderer = null;
 
@@ -42,19 +41,28 @@ class View implements EventAwareInterface
      * @param  object           $viewModel
      * @param  AppContext       $app
      * @param  RendererService  $rendererService
+     * @param  array            $options
      */
     public function __construct(
         protected object $viewModel,
         protected AppContext $app,
         protected RendererService $rendererService,
+        array $options = []
     ) {
-        //
+        $this->resolveOptions($options, [$this, 'configureOptions']);
+    }
+
+    protected function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'layout_var_name' => 'layout'
+            ]
+        );
     }
 
     public function render(array $data = []): string
     {
-        $layout = $this->getLayout();
-
         $vm = $this->getViewModel();
 
         if (!$vm instanceof ViewModelInterface && class_exists($vm, 'prepare')) {
@@ -66,6 +74,8 @@ class View implements EventAwareInterface
                 )
             );
         }
+
+        $layout = $this->resolveLayout();
 
         $event = $this->emit(
             BeforeRenderEvent::class,
@@ -98,20 +108,41 @@ class View implements EventAwareInterface
         return $event->getContent();
     }
 
+    public function resolveLayout(): string
+    {
+        $vm = $this->getViewModel();
+
+        $layouts = $this->app->config('di.layouts') ?? [];
+        $layout = $layouts[$vm::class] ?? $this->getLayout();
+
+        if (is_array($layout)) {
+            $varName = $this->options['layout_var_name'];
+            $layoutType = $this->app->input($varName) ?: 'default';
+
+            $layout = $layout[$layoutType] ?? $layout['default'] ?? null;
+        }
+
+        if ($layout === null) {
+            throw new \LogicException('View must provide at least 1 default layout name.');
+        }
+
+        return $layout;
+    }
+
     /**
-     * @return string
+     * @return string|array|null
      */
-    public function getLayout(): string
+    public function getLayout(): string|array|null
     {
         return $this->layout;
     }
 
     /**
-     * @param  string  $layout
+     * @param  string|array|null  $layout
      *
      * @return  static  Return self to support chaining.
      */
-    public function setLayout(string $layout)
+    public function setLayout(string|array|null $layout)
     {
         $this->layout = $layout;
 
@@ -119,9 +150,9 @@ class View implements EventAwareInterface
     }
 
     /**
-     * @return object|null
+     * @return object
      */
-    public function getViewModel(): ?object
+    public function getViewModel(): object
     {
         return $this->viewModel;
     }

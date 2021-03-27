@@ -37,18 +37,20 @@ class ViewModel implements ContainerAttributeInterface
     /**
      * View constructor.
      *
-     * @param  string|null   $name
-     * @param  string|null   $layout
-     * @param  array|string  $css
-     * @param  array|string  $js
-     * @param  array         $modules
+     * @param  string|null        $name
+     * @param  string|array|null  $layout
+     * @param  array|string       $css
+     * @param  array|string       $js
+     * @param  array              $modules
+     * @param  array              $options
      */
     public function __construct(
         protected ?string $name = null,
-        public ?string $layout = null,
+        public string|array|null $layout = null,
         array|string $css = [],
         array|string $js = [],
-        public array $modules = []
+        public array $modules = [],
+        public array $options = []
     ) {
         //
         $this->css = (array) $css;

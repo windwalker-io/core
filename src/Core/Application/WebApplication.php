@@ -16,7 +16,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
-use Windwalker\Core\Events\AfterBootEvent;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Provider\AppProvider;
@@ -73,7 +72,7 @@ class WebApplication implements WebApplicationInterface
         $container->registerByConfig($this->config('di') ?? []);
 
         foreach (iterator_to_array($this->config) as $service => $config) {
-            if (!is_array($config)) {
+            if (!is_array($config) || ($config['enabled'] ?? null) === false) {
                 continue;
                 // throw new \LogicException("Config: '{$service}' must be array");
             }
@@ -121,26 +120,6 @@ class WebApplication implements WebApplicationInterface
         return $this;
     }
 
-    /**
-     * compileMiddlewares
-     *
-     * @param  Container  $container
-     *
-     * @return array
-     *
-     * @throws \ReflectionException
-     */
-    protected function compileMiddlewares(Container $container): array
-    {
-        $queue = [];
-
-        foreach ($this->middlewares as $middleware) {
-            $queue[] = $container->resolve($middleware);
-        }
-
-        return $queue;
-    }
-
     public function execute(?ServerRequestInterface $request, ?callable $handler = null): ResponseInterface
     {
         $this->boot();
@@ -159,7 +138,9 @@ class WebApplication implements WebApplicationInterface
 
         $this->registerListeners($container);
 
-        $middlewares   = $this->compileMiddlewares($container);
+        $runner = $container->newInstance(MiddlewareRunner::class);
+
+        $middlewares   = $runner->compileMiddlewares($this->middlewares);
         $middlewares[] = fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
             ->dispatch($container->get(AppContext::class));
 
@@ -169,7 +150,7 @@ class WebApplication implements WebApplicationInterface
             compact('container', 'middlewares', 'request')
         );
 
-        $response = static::createRequestHandler($event->getMiddlewares())
+        $response = $runner::createRequestHandler($event->getMiddlewares())
             ->handle($event->getRequest());
 
         // @event
@@ -179,11 +160,6 @@ class WebApplication implements WebApplicationInterface
         );
 
         return $event->getResponse();
-    }
-
-    public static function createRequestHandler(iterable $queue): RequestHandlerInterface
-    {
-        return new Relay($queue);
     }
 
     /**

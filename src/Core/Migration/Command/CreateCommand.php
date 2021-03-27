@@ -70,5 +70,7 @@ class CreateCommand extends AbstractMigrationCommand
         $io->newLine();
         $io->writeln('Migration version: <info>' . $file->getBasename('.php') . '</info> created.');
         $io->writeln('File path: <info>' . $file->getPathname() . '</info>');
+
+        return 0;
     }
 }

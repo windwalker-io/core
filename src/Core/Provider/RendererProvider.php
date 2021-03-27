@@ -11,10 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Service\RendererService;
+use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Edge\Edge;
 use Windwalker\Renderer\CompositeRenderer;
+use Windwalker\Renderer\EdgeRenderer;
 use Windwalker\Renderer\RendererInterface;
 
 /**
@@ -39,11 +42,36 @@ class RendererProvider implements ServiceProviderInterface
                 $renderer->setFactories($container->getParam('renderer.renderers') ?? []);
                 $renderer->setOptions($container->getParam('renderer.options') ?? []);
 
+                $renderer->extend(
+                    function (RendererInterface $renderer, array $options) use ($container) {
+                        return $this->extendRenderer($container, $renderer, $options);
+                    }
+                );
+
                 return $renderer;
             }
         )
             ->alias(RendererInterface::class, CompositeRenderer::class);
 
         $container->prepareSharedObject(RendererService::class);
+    }
+
+    public function extendRenderer(
+        Container $container,
+        RendererInterface $renderer,
+        array $options
+    ): RendererInterface {
+        if ($renderer instanceof EdgeRenderer) {
+            $renderer->extend(
+                function (Edge $edge, array $options) use ($container) {
+                    $edge->addExtension(
+                        $container->newInstance(WindwalkerExtension::class)
+                    );
+                    return $edge;
+                }
+            );
+        }
+
+        return $renderer;
     }
 }

@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
@@ -67,7 +68,14 @@ class RoutingMiddleware implements MiddlewareInterface
                 ->withMatchedRoute($route)
         );
 
-        return $handler->handle($request);
+        $middlewares = $route->getMiddlewares();
+        $runner = $this->app->make(MiddlewareRunner::class);
+
+        return $runner->run(
+            $request,
+            $middlewares,
+            fn (ServerRequestInterface $request) => $handler->handle($request)
+        );
     }
 
     /**

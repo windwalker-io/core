@@ -50,8 +50,8 @@ namespace Windwalker {
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
 
-    if (!function_exists('\Windwalker\include_files')) {
-        function include_files(string $path, array $contextData = []): array
+    if (!function_exists('\Windwalker\include_arrays')) {
+        function include_arrays(string $path, array $contextData = []): array
         {
             $resultBag = [];
 
@@ -59,10 +59,10 @@ namespace Windwalker {
             unset($contextData);
 
             foreach (glob($path) as $file) {
-                $resultBag[] = include $file;
+                $resultBag += include $file;
             }
 
-            return array_merge(...$resultBag);
+            return $resultBag;
         }
     }
 

@@ -22,9 +22,7 @@ abstract class AbstractPackage
 
     protected static ?array $composer = null;
 
-    abstract public function boot(): void;
-
-    abstract public function install(): void;
+    abstract public function install(PackageInstaller $installer): void;
 
     public static function getName(): string
     {

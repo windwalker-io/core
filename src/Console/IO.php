@@ -66,17 +66,21 @@ class IO implements IOInterface
     /**
      * ask
      *
-     * @param  string       $question
-     * @param  string|null  $default
+     * @param  string|Question  $question
+     * @param  string|null      $default
      *
      * @return  mixed
      */
-    public function ask(string $question, ?string $default = null): mixed
+    public function ask(string|Question $question, ?string $default = null): mixed
     {
+        if (is_string($question)) {
+            $question = new Question($question, $default);
+        }
+
         return $this->getQuestionHelper()->ask(
             $this->input,
             $this->output,
-            new Question($question, $default)
+            $question
         );
     }
 
@@ -469,7 +473,7 @@ class IO implements IOInterface
             $input = $this->input;
         }
 
-        $newIO->input = $input ?? $this->input;
+        $newIO->input  = $input ?? $this->input;
         $newIO->output = $output ?? $this->output;
 
         return $newIO;

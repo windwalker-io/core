@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
 
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Service\RendererService;
 
 /**
  * The PaginationFactory class.

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Service;
+namespace Windwalker\Core\Renderer;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Asset\AssetService;
