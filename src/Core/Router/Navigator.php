@@ -46,6 +46,8 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     public function to(string $route, array $query = [], int $options = self::TYPE_PATH): RouteUri
     {
+        $options |= $this->options;
+
         $navigator = $this;
 
         $event = $this->emit(
@@ -128,7 +130,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      *
      * @return  $this
      */
-    public function options(int $options): static
+    public function withOptions(int $options): static
     {
         $new = clone $this;
         $new->options = $options;
