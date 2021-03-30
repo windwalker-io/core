@@ -49,6 +49,8 @@ namespace Windwalker {
 
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
+    use Windwalker\Core\Runtime\Runtime;
+    use Windwalker\Core\Service\FilterService;
 
     if (!function_exists('\Windwalker\include_arrays')) {
         function include_arrays(string $path, array $contextData = []): array
@@ -118,6 +120,36 @@ namespace Windwalker {
         function with(mixed $value): mixed
         {
             return $value;
+        }
+    }
+
+    if (!function_exists('\Windwalker\filter')) {
+        /**
+         * Nothing but just return self for some flow control use case.
+         *
+         * @param  mixed         $value
+         * @param  string|array  $command
+         *
+         * @return  mixed
+         */
+        function filter(mixed $value, string|array $command): mixed
+        {
+            return Runtime::getContainer()->get(FilterService::class)->filter($value, $command);
+        }
+    }
+
+    if (!function_exists('\Windwalker\validate')) {
+        /**
+         * Nothing but just return self for some flow control use case.
+         *
+         * @param  mixed         $value
+         * @param  string|array  $command
+         *
+         * @return  bool
+         */
+        function validate(mixed $value, string|array $command): bool
+        {
+            return Runtime::getContainer()->get(FilterService::class)->validate($value, $command);
         }
     }
 }

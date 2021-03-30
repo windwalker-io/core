@@ -73,9 +73,9 @@ class Pagination
     /**
      * Total Items
      *
-     * @var int
+     * @var int|callable|null
      */
-    protected int $total = 0;
+    protected $total = null;
 
     /**
      * Number of the current page
@@ -108,9 +108,9 @@ class Pagination
     /**
      * Property template.
      *
-     * @var  callable
+     * @var  callable|string
      */
-    protected mixed $template;
+    protected mixed $template = null;
 
     /**
      * Property route.
@@ -151,19 +151,23 @@ class Pagination
      */
     public function getTotal(): int
     {
+        if (!is_int($this->total)) {
+            $this->total = ($this->total)();
+        }
+
         return $this->total;
     }
 
     /**
      * Method to set property total
      *
-     * @param  int  $total
+     * @param  int|callable  $total
      *
      * @return  static  Return self to support chaining.
      */
-    public function total(int $total): static
+    public function total(int|callable $total): static
     {
-        $this->total = (int) $total;
+        $this->total = $total;
 
         return $this;
     }
@@ -210,14 +214,23 @@ class Pagination
      * render
      *
      * @param  PaginationResult|null  $result
-     * @param  callable|null          $template
+     * @param  callable|string|null   $template
+     * @param  array                  $options
      *
      * @return string
      */
-    public function render(?PaginationResult $result = null, callable $template = null): string
+    public function render(?PaginationResult $result = null, callable|string $template = null, array $options = []): string
     {
         $result ??= $this->compile();
         $template ??= $this->getTemplate();
+
+        if (is_string($template)) {
+            $template = $this->rendererService->make($template, $options);
+        }
+
+        if (!is_callable($template)) {
+            throw new \InvalidArgumentException('Template Should be string or callable.');
+        }
 
         return $template(
             [
@@ -300,9 +313,9 @@ class Pagination
     /**
      * Method to get property Template
      *
-     * @return  callable
+     * @return  callable|string|null
      */
-    public function getTemplate(): callable
+    public function getTemplate(): callable|string|null
     {
         return $this->template;
     }
@@ -310,11 +323,11 @@ class Pagination
     /**
      * Method to set property template
      *
-     * @param  callable  $template
+     * @param  callable|string|null  $template
      *
      * @return static Return self to support chaining.
      */
-    public function template(callable $template): static
+    public function template(callable|string|null $template): static
     {
         $this->template = $template;
 

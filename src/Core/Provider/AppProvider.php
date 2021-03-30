@@ -9,15 +9,19 @@
 
 namespace Windwalker\Core\Provider;
 
+use phpDocumentor\Reflection\ProjectFactory;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Package\PackageRegistry;
+use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventEmitter;
+use Windwalker\Filter\FilterFactory;
 
 /**
  * The AppProvider class.
@@ -53,6 +57,8 @@ class AppProvider implements ServiceProviderInterface
         $container->prepareSharedObject(PackageRegistry::class);
 
         $this->prepareEvents($container);
+
+        $this->prepareUtilities($container);
     }
 
     /**
@@ -70,5 +76,11 @@ class AppProvider implements ServiceProviderInterface
             EventEmitter::class,
             fn () => $container->newInstance(CoreEventEmitter::class)
         );
+    }
+
+    protected function prepareUtilities(Container $container): void
+    {
+        $container->prepareSharedObject(FilterFactory::class);
+        $container->prepareSharedObject(FilterService::class);
     }
 }

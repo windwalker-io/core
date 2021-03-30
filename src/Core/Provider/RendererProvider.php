@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
@@ -54,6 +55,8 @@ class RendererProvider implements ServiceProviderInterface
             ->alias(RendererInterface::class, CompositeRenderer::class);
 
         $container->prepareSharedObject(RendererService::class);
+
+        $this->registerPagination($container);
     }
 
     public function extendRenderer(
@@ -73,5 +76,31 @@ class RendererProvider implements ServiceProviderInterface
         }
 
         return $renderer;
+    }
+
+    /**
+     * registerPagination
+     *
+     * @param  Container  $container
+     *
+     * @return  void
+     *
+     * @throws \Windwalker\DI\Exception\DefinitionException
+     */
+    protected function registerPagination(Container $container): void
+    {
+        $container->prepareSharedObject(
+            PaginationFactory::class,
+            function (PaginationFactory $paginationFactory, Container $container) {
+                $paginationFactory->setDefaultTemplate(
+                    $container->getParam('renderer.pagination.template'),
+                );
+                $paginationFactory->setDefaultNeighbours(
+                    $container->getParam('renderer.pagination.neighbours') ?? 4,
+                );
+
+                return $paginationFactory;
+            }
+        );
     }
 }

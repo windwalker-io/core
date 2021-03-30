@@ -18,6 +18,7 @@ use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
+use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
@@ -204,7 +205,15 @@ class AppRequest
                 $data[$field] = $input[$field] ?? null;
             }
 
-            $this->getFilterFactory()->createNested($fields)->test($data);
+            try {
+                $this->getFilterFactory()->createNested($fields)->test($data);
+            } catch (ValidateException $e) {
+                throw new ValidateException(
+                    $e->getMessage(),
+                    400,
+                    $e
+                );
+            }
         }
 
         if (count($fields) === 1) {
