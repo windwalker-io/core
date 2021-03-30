@@ -19,7 +19,7 @@ use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Provider\AppProvider;
-use Windwalker\Core\Provider\RequestProvider;
+use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Output\Output;
@@ -87,6 +87,9 @@ class WebApplication implements WebApplicationInterface
             $this->addMiddleware($middleware);
         }
 
+        // Request provider
+        $container->registerServiceProvider(new WebProvider($this));
+
         $this->booting($container->createChild());
 
         $container->clearCache();
@@ -120,14 +123,17 @@ class WebApplication implements WebApplicationInterface
         return $this;
     }
 
-    public function execute(?ServerRequestInterface $request, ?callable $handler = null): ResponseInterface
+    public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
     {
         $this->boot();
 
-        $request ??= ServerRequestFactory::createFromGlobals();
-
         $container = $this->getContainer()->createChild();
-        $container->registerServiceProvider(new RequestProvider($request, $this));
+
+        if ($request !== null) {
+            $container->share(ServerRequestInterface::class, $request);
+        }
+
+        $request ??= $container->get(ServerRequestInterface::class);
 
         if ($handler) {
             $container->modify(
