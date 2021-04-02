@@ -18,6 +18,7 @@ use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TemplateFactoryInterface;
@@ -89,11 +90,12 @@ class RendererService
 
     protected function prepareGlobals(array $globals): array
     {
-        $globals['app'] = $this->app;
-        $globals['uri'] = $this->app->resolve(SystemUri::class);
+        $globals['app']     = $this->app;
+        $globals['uri']     = $this->app->resolve(SystemUri::class);
         $globals['chronos'] = $this->app->resolve(ChronosService::class);
-        $globals['asset'] = $this->app->resolve(AssetService::class);
-        $globals['lang'] = $this->app->resolve(LangService::class);
+        $globals['asset']   = $this->app->resolve(AssetService::class);
+        $globals['theme']   = $this->app->resolve(ThemeInterface::class);
+        $globals['lang']    = $this->app->resolve(LangService::class);
 
         $navOptions = RouteUri::MODE_MUTE;
 

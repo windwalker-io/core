@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Edge\CoreFileLoader;
 use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
 use Windwalker\Core\Renderer\RendererService;
@@ -64,11 +65,15 @@ class RendererProvider implements ServiceProviderInterface
         RendererInterface $renderer,
         array $options
     ): RendererInterface {
+        // Edge
         if ($renderer instanceof EdgeRenderer) {
             $renderer->extend(
                 function (Edge $edge, array $options) use ($container) {
                     $edge->addExtension(
                         $container->newInstance(WindwalkerExtension::class)
+                    );
+                    $edge->setLoader(
+                        $container->newInstance(CoreFileLoader::class, ['loader' => $edge->getLoader()])
                     );
                     return $edge;
                 }
