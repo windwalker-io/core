@@ -120,8 +120,10 @@ class AssetService implements EventAwareInterface
         protected PathResolver $pathResolver,
         EventEmitter $dispatcher
     ) {
-        $this->path = $options['uri'] ?? $this->systemUri->path($options['folder'] ?? 'asset');
-        $this->root = $options['uri'] ?? $this->systemUri->root($options['folder'] ?? 'asset');
+        $folder = $config->getDeep('asset.folder') ?? 'assets';
+
+        $this->path = $options['uri'] ?? $this->systemUri->path($folder);
+        $this->root = $options['uri'] ?? $this->systemUri->root($folder);
 
         $this->dispatcher = $dispatcher;
     }
