@@ -156,6 +156,13 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
+    public function jsAsync(string $url, array $options = [], array $attrs = []): static
+    {
+        $attrs['async'] = true;
+
+        return $this->addLink('scripts', $url, $options, $attrs);
+    }
+
     /**
      * addScript
      *
@@ -165,9 +172,17 @@ class AssetService implements EventAwareInterface
      *
      * @return  static
      */
-    public function import(string $url, array $options = [], array $attrs = []): static
+    public function module(string $url, array $options = [], array $attrs = []): static
     {
         $attrs['type'] = 'module';
+
+        return $this->addLink('scripts', $url, $options, $attrs);
+    }
+
+    public function moduleAsync(string $url, array $options = [], array $attrs = []): static
+    {
+        $attrs['type'] = 'module';
+        $attrs['async'] = true;
 
         return $this->addLink('scripts', $url, $options, $attrs);
     }
@@ -533,7 +548,7 @@ class AssetService implements EventAwareInterface
      */
     public static function isAbsoluteUrl(string $uri): bool
     {
-        return stripos($uri, 'http') === 0 || str_starts_with($uri, '//');
+        return stripos($uri, 'http') === 0 || str_starts_with($uri, '/');
     }
 
     /**
@@ -707,9 +722,29 @@ class AssetService implements EventAwareInterface
      */
     public function resolveAlias(string $uri): string
     {
+        $uri = $this->resolveMapAlias($uri);
+
         $this->normalizeUri($uri, $name);
 
         return $this->resolveRawAlias($uri)['alias'] ?? $uri;
+    }
+
+    protected function resolveMapAlias(string $uri): string
+    {
+        if (!str_starts_with($uri, '@')) {
+            return $uri;
+        }
+
+        if (!str_contains($uri, '/')) {
+            return $this->getImportMap()->getImport($uri) ?? $uri;
+        }
+
+        [$base, $path] = explode('/', $uri, 2);
+
+        $base = $this->getImportMap()->getImport($base . '/') ?? $base;
+        $base = rtrim($base, '/');
+
+        return $base . '/' . $path;
     }
 
     /**
