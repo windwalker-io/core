@@ -107,9 +107,14 @@ class AppContext implements WebApplicationInterface
         return $new;
     }
 
-    public function getRequestMethod(): string
+    public function getRequestRawMethod(): string
     {
         return $this->appRequest->getMethod();
+    }
+
+    public function getRequestMethod(): string
+    {
+        return $this->appRequest->getOverrideMethod();
     }
 
     public function getQueryValues(): array

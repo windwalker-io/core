@@ -30,7 +30,7 @@ class Controller implements ContainerAttributeInterface
      */
     public function __construct(
         protected ?string $config = null,
-        protected array $views = [],
+        protected array $views = []
     ) {
     }
 

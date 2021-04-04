@@ -54,6 +54,13 @@ class AppRequest
         return $this->request->getMethod();
     }
 
+    public function getOverrideMethod(): string
+    {
+        return $this->request->getHeaderLine('X-Http-Method-Override')
+            ?: $this->input('_method')
+            ?: $this->request->getMethod();
+    }
+
     /**
      * @return Uri
      */

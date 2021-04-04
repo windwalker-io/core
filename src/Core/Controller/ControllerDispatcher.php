@@ -12,7 +12,9 @@ namespace Windwalker\Core\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
@@ -66,7 +68,7 @@ class ControllerDispatcher
         }
 
         if (is_array($controller)) {
-            $controller = $this->prepareArrayCallable($controller);
+            $controller = $this->prepareArrayCallable($controller, $app);
         } else {
             $controller = fn(AppContext $app): mixed => $this->container->call($controller, $app->getUrlVars());
         }
@@ -101,7 +103,7 @@ class ControllerDispatcher
         return $task;
     }
 
-    protected function prepareArrayCallable(array $handler): \Closure
+    protected function prepareArrayCallable(array $handler, AppContext $app): \Closure
     {
         if (\Windwalker\count($handler) !== 2) {
             throw new \LogicException(
@@ -109,7 +111,11 @@ class ControllerDispatcher
             );
         }
 
-        $handler[0] = $this->container->createSharedObject($handler[0]);
+        $class = $handler[0];
+
+        $handler[1] = $this->processTaskMapping($class, $handler[1], $app);
+
+        $handler[0] = $this->container->createObject($class);
 
         if ($handler[0] instanceof ControllerInterface) {
             return function (AppContext $app) use ($handler): mixed {
@@ -128,6 +134,13 @@ class ControllerDispatcher
         return function (AppContext $app) use ($handler) {
             $this->container->call($handler, $app->getUrlVars());
         };
+    }
+
+    protected function processTaskMapping(string $class, ?string $task, AppContext $app): ?string
+    {
+        $mapping = AttributesAccessor::getFirstAttributeInstance($class, TaskMapping::class);
+
+        return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
     }
 
     /**
