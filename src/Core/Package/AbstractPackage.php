@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Package;
 
 use Composer\InstalledVersions;
+use Windwalker\DI\Container;
+use Windwalker\Utilities\Arr;
 
 /**
  * The AbstractPackage class.
@@ -99,5 +101,23 @@ abstract class AbstractPackage
     public static function namespace(): string
     {
         return (new \ReflectionClass(static::class))->getNamespaceName();
+    }
+
+    protected function mergeConfig(Container $container, $data, bool $override = false): void
+    {
+        $container->getParameters()->transform(
+            function ($storage) use ($override, $data) {
+                if ($override) {
+                    return Arr::mergeRecursive(
+                        $data,
+                        $storage,
+                    );
+                }
+                return Arr::mergeRecursive(
+                    $storage,
+                    $data
+                );
+            }
+        );
     }
 }

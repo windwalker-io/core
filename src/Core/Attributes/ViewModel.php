@@ -101,7 +101,7 @@ class ViewModel implements ContainerAttributeInterface
                     $path = '@view/' . $vmName . '/' . $js;
 
                     if (!str_ends_with($js, '/')) {
-                        $asset->import($path);
+                        $asset->module($path);
                     }
 
                     if (!is_numeric($name)) {
