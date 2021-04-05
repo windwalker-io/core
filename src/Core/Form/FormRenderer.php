@@ -26,9 +26,8 @@ class FormRenderer implements FormRendererInterface
      * FormRenderer constructor.
      *
      * @param  RendererService  $rendererService
-     * @param  ThemeInterface   $theme
      */
-    public function __construct(protected RendererService $rendererService, protected ThemeInterface $theme)
+    public function __construct(protected RendererService $rendererService)
     {
     }
 
@@ -46,7 +45,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            $this->theme->path('form.wrapper'),
+            '@theme.form.wrapper',
             compact('field', 'wrapper', 'options', 'renderer')
         );
     }
@@ -65,7 +64,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            $this->theme->path('form.label'),
+            '@theme.form.label',
             compact('field', 'label', 'options', 'renderer')
         );
     }
@@ -84,7 +83,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            $this->theme->path('form.input'),
+            '@theme.form.input',
             compact('field', 'input', 'options', 'renderer')
         );
     }

@@ -14,6 +14,7 @@ namespace Windwalker\Core\Provider;
 use Windwalker\Core\Edge\CoreFileLoader;
 use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
+use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -55,7 +56,19 @@ class RendererProvider implements ServiceProviderInterface
         )
             ->alias(RendererInterface::class, CompositeRenderer::class);
 
-        $container->prepareSharedObject(RendererService::class);
+        $container->prepareSharedObject(LayoutPathResolver::class);
+
+        $container->share(
+            RendererService::class,
+            function (Container $container) {
+                return $container->newInstance(
+                    RendererService::class,
+                    [
+                        'aliases' => $container->getParam('renderer.aliases'),
+                    ]
+                );
+            }
+        );
 
         $this->registerPagination($container);
     }

@@ -32,10 +32,14 @@ class RendererService
      * RendererService constructor.
      *
      * @param  ApplicationInterface  $app
+     * @param  LayoutPathResolver    $resolver
      * @param  array                 $globals
      */
-    public function __construct(protected ApplicationInterface $app, protected array $globals = [])
-    {
+    public function __construct(
+        protected ApplicationInterface $app,
+        protected LayoutPathResolver $resolver,
+        protected array $globals = []
+    ) {
     }
 
     public function render(string $layout, array $data, array $options = []): string
@@ -47,12 +51,12 @@ class RendererService
     {
         $data = array_merge($this->getGlobals(), $data);
 
-        return $renderer->render($layout, $data, $options);
+        return $renderer->render($this->resolveLayout($layout), $data, $options);
     }
 
     public function make(string $layout, array $options = []): \Closure
     {
-        return $this->createRenderer()->make($layout, $options);
+        return $this->createRenderer()->make($this->resolveLayout($layout), $options);
     }
 
     public function createRenderer(array $paths = []): RendererInterface|TemplateFactoryInterface
@@ -88,14 +92,19 @@ class RendererService
         return $this->prepareGlobals($globals);
     }
 
+    public function resolveLayout(string $layout): string
+    {
+        return $this->resolver->resolveLayout($layout);
+    }
+
     protected function prepareGlobals(array $globals): array
     {
-        $globals['app']     = $this->app;
-        $globals['uri']     = $this->app->resolve(SystemUri::class);
+        $globals['app'] = $this->app;
+        $globals['uri'] = $this->app->resolve(SystemUri::class);
         $globals['chronos'] = $this->app->resolve(ChronosService::class);
-        $globals['asset']   = $this->app->resolve(AssetService::class);
-        $globals['theme']   = $this->app->resolve(ThemeInterface::class);
-        $globals['lang']    = $this->app->resolve(LangService::class);
+        $globals['asset'] = $this->app->resolve(AssetService::class);
+        $globals['theme'] = $this->app->resolve(ThemeInterface::class);
+        $globals['lang'] = $this->app->resolve(LangService::class);
 
         $navOptions = RouteUri::MODE_MUTE;
 
