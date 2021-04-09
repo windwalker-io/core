@@ -526,7 +526,7 @@ class MailMessage
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.23.4
      */
     public function getCharset(): string
     {
@@ -540,7 +540,7 @@ class MailMessage
      *
      * @return  static  Return self to support chaining.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.23.4
      */
     public function setCharset(string $charset)
     {
