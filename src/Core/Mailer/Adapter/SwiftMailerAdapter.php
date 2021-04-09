@@ -71,7 +71,11 @@ class SwiftMailerAdapter implements MailerAdapterInterface
             ->setCc($message->getCc())
             ->setBcc($message->getBcc())
             ->setReplyTo($message->getReplyTo())
-            ->setBody($message->getBody(), $type, 'utf8');
+            ->setBody(
+                $message->getBody(),
+                $type,
+                $message->getCharset()
+            );
 
         $files = $message->getFiles();
 
