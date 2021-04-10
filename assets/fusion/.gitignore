@@ -1,0 +1,8 @@
+node_modules
+.idea
+yarn.lock
+!.gitkeep
+
+# Test
+#/fusionfile.js
+/test/dest/*
