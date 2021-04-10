@@ -9,8 +9,6 @@ import gulp from 'gulp';
 import { cliInput } from '../utilities/cli.js';
 import EventEmitter from 'events';
 
-const FUNC_REGEX = /at\s{1}(?<func>[\w\.]+)\s{1}\([\W\w]+?\)/g;
-
 export const watching = {
   tasks: [],
   start: false
@@ -44,6 +42,8 @@ export function watch(glob, opt, fn) {
  * @returns {string}
  */
 function findCurrentTask(e) {
+  const FUNC_REGEX = /at\s{1}(?<func>[\w\.]+)\s{1}\([\W\w]+?\)/g;
+
   // Drop first and second
   FUNC_REGEX.exec(e.stack);
   FUNC_REGEX.exec(e.stack);

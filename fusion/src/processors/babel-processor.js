@@ -18,7 +18,10 @@ try {
   const chalk = (await import('chalk')).default;
   console.error(chalk.red(e.message));
   console.error(
-    `\nPlease run ${chalk.yellow("yarn add gulp-babel @babel/core @babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators @babel/plugin-proposal-optional-chaining @babel/preset-env")} first.`
+    `\nPlease run ${chalk.yellow("yarn add gulp-babel @babel/core " +
+      "@babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators " +
+      "@babel/plugin-proposal-optional-chaining @babel/preset-env" +
+      "@babel/plugin-syntax-top-level-await")} first.`
   );
   process.exit(255);
 }
