@@ -16,6 +16,7 @@ import sourcemaps from 'gulp-sourcemaps';
 import { dest as toDest } from '../base/base.js';
 import { MinifyOption } from '../config.js';
 import { logError } from '../utilities/error.js';
+import { resetBaseToFirst } from '../utilities/stream.js';
 import { merge } from '../utilities/utilities.js';
 import Processor from './processor.js';
 
@@ -34,18 +35,19 @@ export default class CssPreProcessor extends Processor {
     );
   }
 
-  compile() {
+  compile(dest, options = {}) {
     throw new Error('Please implement this method.');
   }
 
   doProcess(dest, options = {}) {
     this.pipe(eol('\n', true))
       .pipeIf(options.sourcemap, () => sourcemaps.init())
+      .pipeIf(dest.merge, () => resetBaseToFirst(this))
       .pipeIf(dest.merge, () => concat(dest.file))
-      .compile()
+      .compile(dest, options)
       .pipeIf(
-      options.rebase && !dest.samePosition,
-      () => rewriteCSS({ destination: dest.path })
+        options.rebase && !dest.samePosition,
+        () => rewriteCSS({ destination: dest.path })
       )
       .pipeIf(
         options.autoprefixer,

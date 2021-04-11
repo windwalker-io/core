@@ -1,8 +1,3 @@
-import { dest as toDest, src } from '@windwalker-io/fusion';
-import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
-import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
-import rename from 'gulp-rename';
-
 /**
  * Part of funclass project.
  *
@@ -10,7 +5,12 @@ import rename from 'gulp-rename';
  * @license    __LICENSE__
  */
 
-export function assetSync(source = 'src/Component', dest) {
+import { dest as toDest, src } from '@windwalker-io/fusion';
+import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
+import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
+import rename from 'gulp-rename';
+
+export function jsSync(source = 'src/Module', dest) {
   // const root = source + '/**/assets/';
 
   // glob(root, {}, function (err, dirs) {
@@ -32,7 +32,7 @@ export function assetSync(source = 'src/Component', dest) {
   let stream = prepareStream(src(source));
   //
   stream = stream.pipe(rename((path) => {
-    path.dirname = path.dirname.replace(/asset$/, '').toLowerCase();
+    path.dirname = path.dirname.replace(/assets$/, '').toLowerCase();
   }));
 
   const jsDest = extractDest(dest);
@@ -44,5 +44,16 @@ export function assetSync(source = 'src/Component', dest) {
   //
   stream = stream.pipe(toDest(jsDest.path).on('error', e => console.error(e)));
 
-  stream = postStream(stream);
+  return new Promise((resolve) => {
+    postStream(stream).on('end', (event) => {
+      const data = {
+        event,
+        src,
+        dest: jsDest,
+        stream
+      };
+
+      resolve(data);
+    });
+  });
 }

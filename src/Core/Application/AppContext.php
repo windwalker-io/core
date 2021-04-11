@@ -22,10 +22,12 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Session\UserState;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
+use Windwalker\Session\Session;
 use Windwalker\Uri\Uri;
 
 /**
@@ -253,6 +255,15 @@ class AppContext implements WebApplicationInterface
         return $new;
     }
 
+    public function getUserState(string $prefix): UserState
+    {
+        return new UserState(
+            $prefix,
+            $this->container->get(Session::class),
+            $this->appRequest
+        );
+    }
+
     /**
      * @return AppRequest
      */
@@ -325,7 +336,7 @@ class AppContext implements WebApplicationInterface
      *
      * @return  mixed|Collection
      */
-    public function inputWithMethod(string $method = 'REQUEST', ...$fields): mixed
+    public function inputOfMethod(string $method = 'REQUEST', ...$fields): mixed
     {
         return $this->appRequest->inputWithMethod($method, ...$fields);
     }

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Attributes;
 
 use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
@@ -21,6 +22,8 @@ use Windwalker\DI\Container;
 
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Str;
+
+use Windwalker\Utilities\StrNormalise;
 
 use function Windwalker\arr;
 
@@ -82,7 +85,7 @@ class ViewModel implements ContainerAttributeInterface
             BeforeRenderEvent::class,
             function (BeforeRenderEvent $event) use ($vm, $container) {
                 $asset = $container->resolve(AssetService::class);
-                $name = $this->getName() ?? $this->guessName($vm, $container);
+                $name = $this->guessName($vm, $container);
                 $vmName = Path::clean(strtolower(ltrim($name, '\\/')), '/');
 
                 // foreach ($this->css as $name => $css) {
@@ -108,6 +111,12 @@ class ViewModel implements ContainerAttributeInterface
                         $asset->importMap($name, $path);
                     }
                 }
+
+                $layout = $event->getLayout();
+                $className = str_replace('/', '-', $vmName);
+
+                $htmlFrame = $container->get(HtmlFrame::class);
+                $htmlFrame->addBodyClass("view-$className layout-$layout");
             }
         );
 

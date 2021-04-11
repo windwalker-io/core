@@ -13,6 +13,7 @@ namespace Windwalker\Core\View;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
@@ -65,7 +66,7 @@ class View implements EventAwareInterface
     {
         $vm = $this->getViewModel();
 
-        if (!$vm instanceof ViewModelInterface && class_exists($vm, 'prepare')) {
+        if (!$vm instanceof ViewModelInterface && method_exists($vm, 'prepare')) {
             throw new \LogicException(
                 sprintf(
                     '%s must implement %s or has prepare() method.',
@@ -83,6 +84,7 @@ class View implements EventAwareInterface
                 'view' => $this,
                 'viewModel' => $vm,
                 'data' => $data,
+                'layout' => $layout,
                 'state' => $this->app->getState()
             ]
         );
@@ -93,7 +95,8 @@ class View implements EventAwareInterface
         
         $this->preparePaths($vm);
         
-        $content = $this->getRenderer()->render($layout, $data, ['context' => $event->getViewModel()]);
+        $content = $this->getRenderer()
+            ->render($layout = $event->getLayout(), $data, ['context' => $event->getViewModel()]);
 
         $event = $this->emit(
             AfterRenderEvent::class,
@@ -101,6 +104,7 @@ class View implements EventAwareInterface
                 'view' => $this,
                 'viewModel' => $vm,
                 'data' => $data,
+                'layout' => $layout,
                 'content' => $content
             ]
         );
@@ -142,7 +146,7 @@ class View implements EventAwareInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setLayout(string|array|null $layout)
+    public function setLayout(string|array|null $layout): static
     {
         $this->layout = $layout;
 

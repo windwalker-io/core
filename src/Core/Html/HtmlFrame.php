@@ -13,6 +13,10 @@ namespace Windwalker\Core\Html;
 
 use Windwalker\DOM\DOMElement;
 
+use Windwalker\DOM\DOMTokenList;
+
+use Windwalker\DOM\HTMLElement;
+
 use function Windwalker\DOM\h;
 
 /**
@@ -63,12 +67,21 @@ class HtmlFrame
     protected string $indents = '    ';
 
     /**
+     * @var DOMElement
+     */
+    protected DOMElement $body;
+
+    protected DOMElement $html;
+
+    /**
      * HtmlHeaderManager constructor.
      *
      * @param  Metadata|null  $metadata
      */
     public function __construct(Metadata $metadata = null)
     {
+        $this->body = HTMLElement::create('body');
+        $this->html = HTMLElement::create('html');
         $this->metadata = $metadata ?? new Metadata();
     }
 
@@ -359,5 +372,67 @@ class HtmlFrame
         $this->metadata = $metadata;
 
         return $this;
+    }
+
+    /**
+     * getBody
+     *
+     * @return  DOMElement
+     */
+    public function getBodyElement(): DOMElement
+    {
+        return $this->body;
+    }
+
+    /**
+     * @param  DOMElement  $body
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setBodyElement(DOMElement $body): static
+    {
+        $this->body = $body;
+
+        return $this;
+    }
+
+    public function addBodyClass(string $class): DOMElement
+    {
+        return $this->body->addClass($class);
+    }
+
+    public function bodyAttributes(): string
+    {
+        return HTMLElement::buildAttributes($this->body);
+    }
+
+    /**
+     * @return DOMElement
+     */
+    public function getHtmlElement(): DOMElement
+    {
+        return $this->html;
+    }
+
+    /**
+     * @param  DOMElement  $html
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setHtmlElement(DOMElement $html): static
+    {
+        $this->html = $html;
+
+        return $this;
+    }
+
+    public function addHtmlClass(string $class): DOMElement
+    {
+        return $this->html->addClass($class);
+    }
+
+    public function htmlAttributes(): string
+    {
+        return HTMLElement::buildAttributes($this->html);
     }
 }

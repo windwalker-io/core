@@ -23,6 +23,8 @@ class AbstractViewRenderEvent extends AbstractEvent
 {
     protected View $view;
 
+    protected string $layout;
+
     protected ViewModelInterface $viewModel;
 
     protected array $data = [];
@@ -105,6 +107,26 @@ class AbstractViewRenderEvent extends AbstractEvent
     public function setState(Collection $state)
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLayout(): string
+    {
+        return $this->layout;
+    }
+
+    /**
+     * @param  string  $layout
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setLayout(string $layout): static
+    {
+        $this->layout = $layout;
 
         return $this;
     }

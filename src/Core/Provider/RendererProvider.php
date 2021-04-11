@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Edge\CoreFileLoader;
+use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
 use Windwalker\Core\Renderer\LayoutPathResolver;
@@ -69,6 +70,8 @@ class RendererProvider implements ServiceProviderInterface
                 );
             }
         );
+
+        $container->prepareSharedObject(HtmlFrame::class);
 
         $this->registerPagination($container);
     }

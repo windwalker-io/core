@@ -43,16 +43,16 @@ export default class Processor {
     return this;
   }
 
-  prepareSourceToStream(source) {
+  prepareSourceToStream(source, options = {}) {
     if (typeof source === 'string') {
       source = [source];
     }
 
-    return prepareStream(this.createStream(source));
+    return prepareStream(this.createStream(source, options));
   }
 
-  createStream(source) {
-    return src(source, { follow: true });
+  createStream(source, options = {}) {
+    return src(source, { follow: true, base: options.base });
   }
 
   async process(dest) {
