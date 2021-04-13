@@ -32,9 +32,9 @@ class FormFactory
         //
     }
 
-    public function create(FieldDefinitionInterface|string|null $definition = null): Form
+    public function create(FieldDefinitionInterface|string|null $definition = null, ...$args): Form
     {
-        $form = $this->app->make(Form::class);
+        $form = $this->app->make(Form::class, $args);
 
         $form->getObjectBuilder()
             ->setBuilder(fn (string $class, ...$args) => $this->app->make($class, $args));

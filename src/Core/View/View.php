@@ -12,7 +12,10 @@ declare(strict_types=1);
 namespace Windwalker\Core\View;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Attributes\Prop;
+use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\View\Event\AfterRenderEvent;
@@ -35,6 +38,9 @@ class View implements EventAwareInterface
     protected string|array|null $layout = null;
 
     protected ?RendererInterface $renderer = null;
+
+    #[Prop]
+    public mixed $foo;
 
     /**
      * View constructor.
@@ -89,9 +95,17 @@ class View implements EventAwareInterface
             ]
         );
 
-        $state = $vm->prepare($event->getState(), $this->app);
+        $data = $event->getData();
 
-        $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $state);
+        if ($data !== []) {
+            $this->injectData($vm, $data);
+        }
+
+        $data = $vm->prepare($event->getState(), $this->app);
+
+        $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $data);
+
+        $data['vm'] = $vm;
         
         $this->preparePaths($vm);
         
@@ -131,6 +145,23 @@ class View implements EventAwareInterface
         }
 
         return $layout;
+    }
+
+    protected function injectData(object $vm, array $data): void
+    {
+        $ref = new \ReflectionClass($vm);
+
+        foreach ($ref->getProperties() as $property) {
+            AttributesAccessor::runAttributeIfExists(
+                $property,
+                Prop::class,
+                function ($attr) use ($data, $vm, $property) {
+                    if (array_key_exists($property->getName(), $data)) {
+                        $property->setValue($vm, $data[$property->getName()]);
+                    }
+                }
+            );
+        }
     }
 
     /**

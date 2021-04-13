@@ -63,11 +63,13 @@ class ViewModel implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         $container = $handler->getContainer();
+        $container->share(static::class, $this);
+        $container->share('self', $this);
 
         return function (...$args) use ($container, $handler) {
             $viewModel = $handler(...$args);
 
-            return $this->registerEvents(
+            $vm = $this->registerEvents(
                 $container->newInstance(
                     View::class,
                     compact('viewModel')
@@ -76,6 +78,11 @@ class ViewModel implements ContainerAttributeInterface
                 $viewModel,
                 $container
             );
+
+            $container->remove(static::class);
+            $container->remove('self');
+
+            return $vm;
         };
     }
 

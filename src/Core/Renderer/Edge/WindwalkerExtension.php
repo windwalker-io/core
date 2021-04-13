@@ -8,16 +8,37 @@
 
 namespace Windwalker\Core\Renderer\Edge;
 
+use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\DateTime\ChronosService;
+use Windwalker\Core\Language\LangService;
+use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\RouteUri;
+use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
+use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
 
 /**
  * The WindwalkerExtension class.
  *
  * @since  3.0
  */
-class WindwalkerExtension implements EdgeExtensionInterface, DirectivesExtensionInterface
+class WindwalkerExtension implements
+    EdgeExtensionInterface,
+    DirectivesExtensionInterface,
+    GlobalVariablesExtensionInterface
 {
+    /**
+     * WindwalkerExtension constructor.
+     *
+     * @param  ApplicationInterface  $app
+     */
+    public function __construct(protected ApplicationInterface $app)
+    {
+    }
+
     /**
      * getName
      *
@@ -261,5 +282,33 @@ class WindwalkerExtension implements EdgeExtensionInterface, DirectivesExtension
         }
 
         return $expression;
+    }
+
+    /**
+     * getGlobals
+     *
+     * @return  array
+     */
+    public function getGlobals(): array
+    {
+        $globals = [];
+
+        $globals['app'] = $this->app;
+        $globals['uri'] = $this->app->resolve(SystemUri::class);
+        $globals['chronos'] = $this->app->resolve(ChronosService::class);
+        $globals['asset'] = $this->app->resolve(AssetService::class);
+        $globals['theme'] = $this->app->resolve(ThemeInterface::class);
+        $globals['lang'] = $this->app->resolve(LangService::class);
+
+        $navOptions = RouteUri::MODE_MUTE;
+
+        if ($this->app->isDebug()) {
+            $navOptions |= RouteUri::DEBUG_ALERT;
+        }
+
+        $globals['nav'] = $this->app->resolve(Navigator::class)
+            ->withOptions($navOptions);
+
+        return $globals;
     }
 }

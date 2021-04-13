@@ -99,21 +99,21 @@ class RendererService
 
     protected function prepareGlobals(array $globals): array
     {
-        $globals['app'] = $this->app;
-        $globals['uri'] = $this->app->resolve(SystemUri::class);
-        $globals['chronos'] = $this->app->resolve(ChronosService::class);
-        $globals['asset'] = $this->app->resolve(AssetService::class);
-        $globals['theme'] = $this->app->resolve(ThemeInterface::class);
-        $globals['lang'] = $this->app->resolve(LangService::class);
-
-        $navOptions = RouteUri::MODE_MUTE;
-
-        if ($this->app->isDebug()) {
-            $navOptions |= RouteUri::DEBUG_ALERT;
-        }
-
-        $globals['nav'] = $this->app->resolve(Navigator::class)
-            ->withOptions($navOptions);
+        // $globals['app'] = $this->app;
+        // $globals['uri'] = $this->app->resolve(SystemUri::class);
+        // $globals['chronos'] = $this->app->resolve(ChronosService::class);
+        // $globals['asset'] = $this->app->resolve(AssetService::class);
+        // $globals['theme'] = $this->app->resolve(ThemeInterface::class);
+        // $globals['lang'] = $this->app->resolve(LangService::class);
+        //
+        // $navOptions = RouteUri::MODE_MUTE;
+        //
+        // if ($this->app->isDebug()) {
+        //     $navOptions |= RouteUri::DEBUG_ALERT;
+        // }
+        //
+        // $globals['nav'] = $this->app->resolve(Navigator::class)
+        //     ->withOptions($navOptions);
 
         return $globals;
     }

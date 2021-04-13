@@ -22,6 +22,7 @@ use Windwalker\Http\Event\ResponseEvent;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
+use Windwalker\Session\SessionInterface;
 
 /**
  * The SessionProvider class.
@@ -44,7 +45,8 @@ class SessionProvider implements ServiceProviderInterface
         $container->prepareSharedObject(Cookies::class);
         $container->prepareObject(ArrayCookies::class);
 
-        $container->bind(Session::class, fn(SessionManager $manager) => $manager->get());
+        $container->bind(Session::class, fn(SessionManager $manager) => $manager->get())
+            ->alias(SessionInterface::class, Session::class);
         $container->prepareSharedObject(CsrfService::class);
     }
 

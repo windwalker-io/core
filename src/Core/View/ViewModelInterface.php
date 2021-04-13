@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\View;
 
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Data\Collection;
+use Windwalker\Core\State\AppState;
 
 /**
  * Interface ViewModelInterface
@@ -22,10 +22,10 @@ interface ViewModelInterface
     /**
      * Prepare
      *
-     * @param  Collection  $state
+     * @param  AppState    $state
      * @param  AppContext  $app
      *
      * @return  array
      */
-    public function prepare(Collection $state, AppContext $app): array;
+    public function prepare(AppState $state, AppContext $app): array;
 }

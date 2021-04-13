@@ -19,6 +19,7 @@ use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Edge\Cache\EdgeFileCache;
 use Windwalker\Edge\Edge;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\EdgeRenderer;
@@ -91,6 +92,12 @@ class RendererProvider implements ServiceProviderInterface
                     $edge->setLoader(
                         $container->newInstance(CoreFileLoader::class, ['loader' => $edge->getLoader()])
                     );
+                    $cache = $edge->getCache();
+
+                    if ($cache instanceof EdgeFileCache) {
+                        $cache->setDebug($container->getParam('app.debug'));
+                    }
+
                     return $edge;
                 }
             );

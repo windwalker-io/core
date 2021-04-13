@@ -22,7 +22,7 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Session\UserState;
+use Windwalker\Core\State\AppState;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
@@ -33,7 +33,7 @@ use Windwalker\Uri\Uri;
 /**
  * The Context class.
  *
- * @property-read Collection $state
+ * @property-read AppState $state
  */
 #[Immutable(Immutable::PROTECTED_WRITE_SCOPE)]
 class AppContext implements WebApplicationInterface
@@ -48,7 +48,7 @@ class AppContext implements WebApplicationInterface
      */
     protected mixed $controller = null;
 
-    protected ?Collection $state = null;
+    protected AppState $state;
 
     protected ?AppRequest $appRequest = null;
 
@@ -62,10 +62,11 @@ class AppContext implements WebApplicationInterface
      * Context constructor.
      *
      * @param  Container  $container
+     *
+     * @throws \ReflectionException
      */
     public function __construct(Container $container)
     {
-        $this->state     = new Collection();
         $this->container = $container;
     }
 
@@ -201,7 +202,7 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
-     * @param  UriInterface|null  $uri
+     * @param  UriInterface  $uri
      *
      * @return  static  Return self to support chaining.
      */
@@ -235,19 +236,19 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
-     * @return Collection|null
+     * @return AppState
      */
-    public function getState(): ?Collection
+    public function getState(): AppState
     {
         return $this->state;
     }
 
     /**
-     * @param  Collection|null  $state
+     * @param  AppState  $state
      *
      * @return  static  Return self to support chaining.
      */
-    public function withState(?Collection $state): static
+    public function withState(AppState $state): static
     {
         $new        = clone $this;
         $new->state = $state;
@@ -255,13 +256,9 @@ class AppContext implements WebApplicationInterface
         return $new;
     }
 
-    public function getUserState(string $prefix): UserState
+    public function getSubState(string $prefix): AppState
     {
-        return new UserState(
-            $prefix,
-            $this->container->get(Session::class),
-            $this->appRequest
-        );
+        return $this->state->withPrefix($prefix);
     }
 
     /**

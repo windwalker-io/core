@@ -20,6 +20,7 @@ use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\State\AppState;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
@@ -94,7 +95,8 @@ class WebProvider implements ServiceProviderInterface
             function (AppContext $app, Container $container) {
                 $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
-                return $app->withAppRequest($this->createAppRequest($container));
+                return $app->withAppRequest($this->createAppRequest($container))
+                    ->withState($container->newInstance(AppState::class));
             }
         )
             ->alias(ApplicationInterface::class, AppContext::class);
@@ -137,13 +139,13 @@ class WebProvider implements ServiceProviderInterface
      */
     protected function extendRenderer(Container $container): void
     {
-        $container->extend(
-            RendererService::class,
-            function (RendererService $service, Container $container) {
-                return $service->addGlobal('app', $app = $container->get(AppContext::class))
-                    ->addGlobal('uri', $app->getSystemUri())
-                    ->addGlobal('nav', $container->get(Navigator::class));
-            }
-        );
+        // $container->extend(
+        //     RendererService::class,
+        //     function (RendererService $service, Container $container) {
+        //         return $service->addGlobal('app', $app = $container->get(AppContext::class))
+        //             ->addGlobal('uri', $app->getSystemUri())
+        //             ->addGlobal('nav', $container->get(Navigator::class));
+        //     }
+        // );
     }
 }

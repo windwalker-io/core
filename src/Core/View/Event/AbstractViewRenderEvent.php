@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\View\Event;
 
+use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\Data\Collection;
@@ -29,7 +30,7 @@ class AbstractViewRenderEvent extends AbstractEvent
 
     protected array $data = [];
 
-    protected Collection $state;
+    protected AppState $state;
 
     /**
      * @return View
@@ -92,26 +93,6 @@ class AbstractViewRenderEvent extends AbstractEvent
     }
 
     /**
-     * @return Collection
-     */
-    public function getState(): Collection
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param  Collection  $state
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setState(Collection $state)
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getLayout(): string
@@ -127,6 +108,26 @@ class AbstractViewRenderEvent extends AbstractEvent
     public function setLayout(string $layout): static
     {
         $this->layout = $layout;
+
+        return $this;
+    }
+
+    /**
+     * @return AppState
+     */
+    public function getState(): AppState
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param  AppState  $state
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setState(AppState $state): static
+    {
+        $this->state = $state;
 
         return $this;
     }
