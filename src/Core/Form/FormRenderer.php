@@ -45,7 +45,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            '@theme.form.wrapper',
+            '@theme.form.field-wrapper',
             compact('field', 'wrapper', 'options', 'renderer')
         );
     }

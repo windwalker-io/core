@@ -49,9 +49,9 @@ class PathResolver
      *
      * @param  string  $path
      *
-     * @return  string
+     * @return  ?string
      */
-    public function resolve(string $path): string
+    public function resolve(string $path): ?string
     {
         if (!str_starts_with($path, '@')) {
             return Path::normalize($this->addBase($path));

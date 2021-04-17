@@ -20,6 +20,7 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Edge\Cache\EdgeFileCache;
+use Windwalker\Edge\Component\ComponentExtension;
 use Windwalker\Edge\Edge;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\EdgeRenderer;
@@ -47,12 +48,6 @@ class RendererProvider implements ServiceProviderInterface
                 $renderer->setFactories($container->getParam('renderer.renderers') ?? []);
                 $renderer->setOptions($container->getParam('renderer.options') ?? []);
 
-                $renderer->extend(
-                    function (RendererInterface $renderer, array $options) use ($container) {
-                        return $this->extendRenderer($container, $renderer, $options);
-                    }
-                );
-
                 return $renderer;
             }
         )
@@ -75,35 +70,6 @@ class RendererProvider implements ServiceProviderInterface
         $container->prepareSharedObject(HtmlFrame::class);
 
         $this->registerPagination($container);
-    }
-
-    public function extendRenderer(
-        Container $container,
-        RendererInterface $renderer,
-        array $options
-    ): RendererInterface {
-        // Edge
-        if ($renderer instanceof EdgeRenderer) {
-            $renderer->extend(
-                function (Edge $edge, array $options) use ($container) {
-                    $edge->addExtension(
-                        $container->newInstance(WindwalkerExtension::class)
-                    );
-                    $edge->setLoader(
-                        $container->newInstance(CoreFileLoader::class, ['loader' => $edge->getLoader()])
-                    );
-                    $cache = $edge->getCache();
-
-                    if ($cache instanceof EdgeFileCache) {
-                        $cache->setDebug($container->getParam('app.debug'));
-                    }
-
-                    return $edge;
-                }
-            );
-        }
-
-        return $renderer;
     }
 
     /**

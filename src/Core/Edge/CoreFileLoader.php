@@ -69,4 +69,16 @@ class CoreFileLoader implements EdgeLoaderInterface
 
         return $this->loader->load($path);
     }
+
+    /**
+     * has
+     *
+     * @param  string  $key
+     *
+     * @return  bool
+     */
+    public function has(string $key): bool
+    {
+        return $this->find($key) !== null;
+    }
 }
