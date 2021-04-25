@@ -138,7 +138,7 @@ class AssetSyncCommand implements CommandInterface
         $src = $dir . '/assets/**/*.{js,mjs}';
         $src = Path::relative($this->app->path('@root') . '/', $src);
         $dest = Path::clean(
-                strtolower(ltrim($vm->getName() ?? $this->guessName($className, $ns), '/\\'))
+                strtolower(ltrim($vm->getModuleName() ?? $this->guessName($className, $ns), '/\\'))
             ) . DIRECTORY_SEPARATOR;
 
         $map['js'][$src] = $dest;

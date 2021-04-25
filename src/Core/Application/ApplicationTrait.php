@@ -115,6 +115,14 @@ trait ApplicationTrait
         foreach ($listeners as $name => $listener) {
             $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
         }
+
+        foreach (iterator_to_array($this->config) as $service => $config) {
+            $listeners = $config['listeners'] ?? [];
+
+            foreach ($listeners as $name => $listener) {
+                $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
+            }
+        }
     }
 
     private function handleListener(

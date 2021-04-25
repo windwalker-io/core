@@ -37,7 +37,7 @@ class FormFactory
         $form = $this->app->make(Form::class, $args);
 
         $form->getObjectBuilder()
-            ->setBuilder(fn (string $class, ...$args) => $this->app->make($class, $args));
+            ->setBuilder(fn(string $class, ...$args) => $this->app->make($class, $args));
 
         if ($definition !== null) {
             $form->defineFormFields($definition);
@@ -49,9 +49,29 @@ class FormFactory
     }
 
     /**
+     * createDefinition
+     *
+     * @param  FieldDefinitionInterface|string|null  $definition
+     * @param                                        ...$args
+     *
+     * @return  FieldDefinitionInterface
+     *
+     * @psalm-template T
+     * @psalm-param T $definition
+     *
+     * @psalm-return T
+     */
+    public function createDefinition(
+        FieldDefinitionInterface|string|null $definition = null,
+        ...$args
+    ): FieldDefinitionInterface {
+        return $this->app->make($definition, $args);
+    }
+
+    /**
      * createField
      *
-     * @param  string     $fieldClass
+     * @param  string  $fieldClass
      * @param  Form|null  $form
      *
      * @return  AbstractField

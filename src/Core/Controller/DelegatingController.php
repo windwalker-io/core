@@ -14,9 +14,13 @@ namespace Windwalker\Core\Controller;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Module\ModuleInterface;
+use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
+
+use function Windwalker\DI\create;
 
 /**
  * The DelegatingController class.
@@ -24,6 +28,8 @@ use Windwalker\DI\ContainerAwareTrait;
 class DelegatingController implements ControllerInterface
 {
     protected array $viewMap = [];
+
+    protected ?string $module = null;
 
     /**
      * DelegatingController constructor.
@@ -51,6 +57,19 @@ class DelegatingController implements ControllerInterface
             $args['view'] = $this->viewMap[$args['view']] ?? $args['view'];
         }
 
+        // Prepare Module
+        if ($this->module) {
+            /** @var ModuleInterface $module */
+            $module = $this->container->newInstance($this->module);
+
+            $this->container->share($this->module, $module)
+                ->alias(ModuleInterface::class, $this->module);
+
+            $args[AppState::class] = $module->getState();
+        }
+
+        $handler = [$this->controller, $task];
+
         if (!method_exists($this->controller, $task)) {
             if ($task !== 'index') {
                 throw new \LogicException(
@@ -62,13 +81,20 @@ class DelegatingController implements ControllerInterface
                 );
             }
 
-            return $this->container->call([$this, 'renderView'], $args);
+            $handler = [$this, 'renderView'];
         }
 
-        return $this->container->call([$this->controller, $task], $args);
+        $res = $this->container->call($handler, $args);
+
+        if ($this->module) {
+            $this->container->remove($this->module)
+                ->removeAlias(ModuleInterface::class);
+        }
+
+        return $res;
     }
 
-    public function renderView(string $view, AppContext $app): string
+    public function renderView(string $view, AppContext $app): mixed
     {
         /** @var View $vm */
         $vm = $app->make($view);
@@ -92,6 +118,26 @@ class DelegatingController implements ControllerInterface
     public function setViewMap(array $viewMap): static
     {
         $this->viewMap = $viewMap;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getModule(): ?string
+    {
+        return $this->module;
+    }
+
+    /**
+     * @param  string|null  $module
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setModule(?string $module): static
+    {
+        $this->module = $module;
 
         return $this;
     }

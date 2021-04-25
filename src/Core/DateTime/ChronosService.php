@@ -100,6 +100,11 @@ class ChronosService
     ): Chronos {
         $from = new \DateTimeZone($from);
         $to   = new \DateTimeZone($to);
+
+        if ($from->getName() === $to->getName()) {
+            return Chronos::wrap($date);
+        }
+
         $date = Chronos::wrap($date, $from);
 
         $date = $date->setTimezone($to);

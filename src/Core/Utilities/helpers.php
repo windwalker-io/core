@@ -49,8 +49,10 @@ namespace Windwalker {
 
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
+    use Windwalker\Core\Http\ResponseFactory;
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
+    use Windwalker\Http\HttpFactory;
 
     if (!function_exists('\Windwalker\include_arrays')) {
         function include_arrays(string $path, array $contextData = []): array
@@ -150,6 +152,13 @@ namespace Windwalker {
         function validate(mixed $value, string|array $command): bool
         {
             return Runtime::getContainer()->get(FilterService::class)->validate($value, $command);
+        }
+    }
+
+    if (!function_exists('\Windwalker\response')) {
+        function response(mixed $data = '', int $status = 200, array $headers = []): ResponseFactory
+        {
+            return new ResponseFactory($data, $status, $headers);
         }
     }
 }

@@ -44,6 +44,27 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $this->dispatcher   = $dispatcher;
     }
 
+    public function back(int $options = self::TYPE_PATH): RouteUri
+    {
+        $options |= $this->options;
+
+        $to = $this->app->getServerRequest()->getServerParams()['HTTP_REFERER']
+            ?? $this->app->getSystemUri()->root();
+
+        return new RouteUri($to, null, $this, $options);
+    }
+
+    public function self(int $options = self::TYPE_PATH): RouteUri
+    {
+        $route = $this->app->getMatchedRoute()?->getName() ?? $this->app->getSystemUri()->current();
+
+        return $this->to(
+            $route,
+            $this->app->getServerRequest()->getQueryParams(),
+            $options
+        );
+    }
+
     public function to(string $route, array $query = [], int $options = self::TYPE_PATH): RouteUri
     {
         $options |= $this->options;
@@ -84,6 +105,11 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         }
 
         return $this->app->redirect($uri, $code, (bool) ($options & static::REDIRECT_INSTANT));
+    }
+
+    public function redirectSelf(int $code = 303, int $options = 0): ResponseInterface
+    {
+        return $this->redirect($this->self(), $code, $options);
     }
 
     public function validateRedirectUrl(\Stringable|string $uri): string
@@ -144,5 +170,13 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function getRouter(): Router
     {
         return $this->router;
+    }
+
+    /**
+     * @return AppContext
+     */
+    public function getAppContext(): AppContext
+    {
+        return $this->app;
     }
 }

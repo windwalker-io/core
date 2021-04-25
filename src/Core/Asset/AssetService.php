@@ -291,10 +291,10 @@ class AssetService implements EventAwareInterface
         $event = $this->emit(
             AssetBeforeRender::class,
             [
-                'asset' => $this,
+                'assetService' => $this,
                 'withInternal' => $withInternal,
                 'html' => $html,
-                'type' => AssetBeforeRender::TYPE_JS,
+                'type' => AssetBeforeRender::TYPE_CSS,
             ]
         );
 
@@ -347,7 +347,7 @@ class AssetService implements EventAwareInterface
         $event = $this->emit(
             AssetBeforeRender::class,
             [
-                'asset' => $this,
+                'assetService' => $this,
                 'withInternal' => $withInternal,
                 'html' => $html,
                 'type' => AssetBeforeRender::TYPE_JS,

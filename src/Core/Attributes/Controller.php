@@ -26,11 +26,13 @@ class Controller implements ContainerAttributeInterface
      * Controller constructor.
      *
      * @param  string|null  $config
+     * @param  string|null  $module
      * @param  array        $views
      */
     public function __construct(
-        protected ?string $config = null,
-        protected array $views = []
+        public ?string $config = null,
+        public ?string $module = null,
+        public array $views = []
     ) {
     }
 
@@ -53,6 +55,7 @@ class Controller implements ContainerAttributeInterface
             $container,
             $handler(...$args)
         ))
+            ->setModule($this->module)
             ->setViewMap($this->views);
     }
 }

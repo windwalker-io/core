@@ -15,6 +15,7 @@ use JetBrains\PhpStorm\Immutable;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
+use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
@@ -215,7 +216,7 @@ class AppRequest
             try {
                 $this->getFilterFactory()->createNested($fields)->test($data);
             } catch (ValidateException $e) {
-                throw new ValidateException(
+                throw new ValidateFailException(
                     $e->getMessage(),
                     400,
                     $e

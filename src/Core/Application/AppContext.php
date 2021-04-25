@@ -238,9 +238,15 @@ class AppContext implements WebApplicationInterface
     /**
      * @return AppState
      */
-    public function getState(): AppState
+    public function getState(?string $prefix = null): AppState
     {
-        return $this->state;
+        $state = $this->state;
+
+        if ($prefix) {
+            $state = $state->withPrefix($prefix);
+        }
+
+        return $state;
     }
 
     /**
@@ -368,6 +374,13 @@ class AppContext implements WebApplicationInterface
         }
 
         return $this->getRootApp()->redirect($url, $code, $instant);
+    }
+
+    public function addMessage(string|array $messages, string $type = 'info'): static
+    {
+        $this->service(Session::class)->addFlash($messages, $type);
+
+        return $this;
     }
 
     /**

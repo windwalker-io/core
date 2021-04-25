@@ -13,6 +13,7 @@ namespace Windwalker\Core\Router;
 
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriHelper;
 
@@ -28,6 +29,8 @@ class RouteUri extends Uri implements NavConstantInterface
 
     protected int $options = 0;
 
+    protected int $status = 303;
+
     /**
      * RouteUri constructor.
      *
@@ -36,17 +39,20 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  Navigator  $navigator
      * @param  int        $options
      */
-    public function __construct(mixed $uri, array $vars, protected Navigator $navigator, int $options = 0)
+    public function __construct(mixed $uri, ?array $vars, protected Navigator $navigator, int $options = 0)
     {
         if ($uri instanceof \Closure) {
             $this->handler = $uri;
             $uri = '';
         }
 
-        parent::__construct($uri);
+        parent::__construct((string) $uri);
 
-        $this->vars = $vars;
-        $this->query = UriHelper::buildQuery($vars);
+        if ($vars !== null) {
+            $this->vars = $vars;
+            $this->query = UriHelper::buildQuery($vars);
+        }
+
         $this->options = $options;
     }
 
@@ -331,5 +337,38 @@ class RouteUri extends Uri implements NavConstantInterface
         }
 
         return $this->navigator->absolute($uri, static::TYPE_PATH);
+    }
+
+    public function withMessage(string|array $messages, string $type = 'info'): static
+    {
+        $this->navigator->getAppContext()->addMessage($messages, $type);
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param  int  $status
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function withStatus(int $status): static
+    {
+        $new = clone $this;
+        $new->status = $status;
+
+        return $new;
+    }
+
+    public function toResponse(?int $status = null, array $headers = []): RedirectResponse
+    {
+        return new RedirectResponse($this, $status ?? $this->status, $headers);
     }
 }

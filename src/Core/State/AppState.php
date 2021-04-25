@@ -103,7 +103,16 @@ class AppState implements \JsonSerializable
         return $value;
     }
 
-    public function persistFromRequest(
+    public function getAndForget(string $key, mixed $driver = null): mixed
+    {
+        $value = $this->get($key, $driver);
+
+        $this->forget($key);
+
+        return $value;
+    }
+
+    public function rememberFromRequest(
         string $key,
         ?string $inputField = null,
         mixed $driver = null
@@ -119,10 +128,10 @@ class AppState implements \JsonSerializable
             return $this->get($key, $driver);
         }
 
-        return $this->persist($key, $inputValue, $driver);
+        return $this->remember($key, $inputValue, $driver);
     }
 
-    public function persist(string $key, mixed $value, mixed $driver = null): mixed
+    public function remember(string $key, mixed $value, mixed $driver = null): mixed
     {
         $key    = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
@@ -156,6 +165,16 @@ class AppState implements \JsonSerializable
         }
 
         return $this->state->has($key);
+    }
+
+    public function forget(string $key, mixed $driver = null): static
+    {
+        $key    = $this->getKeyName($key);
+        $driver = $this->resolvePersistDriver($driver);
+
+        $driver->forget($key);
+
+        return $this;
     }
 
     /**

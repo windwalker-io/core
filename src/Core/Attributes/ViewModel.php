@@ -13,6 +13,9 @@ namespace Windwalker\Core\Attributes;
 
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Html\HtmlFrame;
+use Windwalker\Core\Module\AbstractModule;
+use Windwalker\Core\Module\ModuleInterface;
+use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
@@ -40,7 +43,7 @@ class ViewModel implements ContainerAttributeInterface
     /**
      * View constructor.
      *
-     * @param  string|null        $name
+     * @param  string|null        $module
      * @param  string|array|null  $layout
      * @param  array|string       $css
      * @param  array|string       $js
@@ -48,7 +51,7 @@ class ViewModel implements ContainerAttributeInterface
      * @param  array              $options
      */
     public function __construct(
-        protected ?string $name = null,
+        public ?string $module = null,
         public string|array|null $layout = null,
         array|string $css = [],
         array|string $js = [],
@@ -64,15 +67,25 @@ class ViewModel implements ContainerAttributeInterface
     {
         $container = $handler->getContainer();
         $container->share(static::class, $this);
-        $container->share('self', $this);
+        $container->share('vm.self', $this);
 
         return function (...$args) use ($container, $handler) {
+            $options = [];
+
+            if ($this->module) {
+                /** @var ModuleInterface $module */
+                $options['module'] = $module = $container->newInstance($this->module);
+
+                $container->share($this->module, $module)
+                    ->alias(ModuleInterface::class, $this->module);
+            }
+
             $viewModel = $handler(...$args);
 
             $vm = $this->registerEvents(
                 $container->newInstance(
                     View::class,
-                    compact('viewModel')
+                    compact('viewModel', 'options')
                 )
                     ->setLayout($this->layout),
                 $viewModel,
@@ -80,7 +93,12 @@ class ViewModel implements ContainerAttributeInterface
             );
 
             $container->remove(static::class);
-            $container->remove('self');
+            $container->remove('vm.self');
+
+            if ($this->module) {
+                $container->remove($this->module)
+                    ->removeAlias(ModuleInterface::class);
+            }
 
             return $vm;
         };
@@ -133,9 +151,9 @@ class ViewModel implements ContainerAttributeInterface
     /**
      * @return string|null
      */
-    public function getName(): ?string
+    public function getModule(): ?string
     {
-        return $this->name;
+        return $this->module;
     }
 
     public function guessName(ViewModelInterface $vm, Container $container): string

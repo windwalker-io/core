@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Service;
 
 use Windwalker\Core\Runtime\Runtime;
+use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\FilterFactory;
 use Windwalker\Filter\FilterInterface;
 use Windwalker\Filter\NestedFilter;
@@ -40,6 +41,16 @@ class FilterService
         return $this->createChain($command)->filter($value);
     }
 
+    /**
+     * validate
+     *
+     * @param  mixed         $value
+     * @param  string|array  $command
+     *
+     * @return  bool
+     *
+     * @throws ValidateException
+     */
     public function validate(mixed $value, string|array $command): bool
     {
         if (is_array($command)) {

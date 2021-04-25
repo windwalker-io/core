@@ -22,7 +22,7 @@ class AssetBeforeRender extends AbstractEvent
     public const TYPE_CSS = 'css';
     public const TYPE_JS = 'js';
 
-    protected AssetService $assetManager;
+    protected AssetService $assetService;
 
     protected bool $withInternal = false;
 
@@ -33,19 +33,19 @@ class AssetBeforeRender extends AbstractEvent
     /**0
      * @return AssetService
      */
-    public function getAssetManager(): AssetService
+    public function getAssetService(): AssetService
     {
-        return $this->assetManager;
+        return $this->assetService;
     }
 
     /**
-     * @param  AssetService  $assetManager
+     * @param  AssetService  $assetService
      *
      * @return  static  Return self to support chaining.
      */
-    public function setAssetManager(AssetService $assetManager)
+    public function setAssetService(AssetService $assetService)
     {
-        $this->assetManager = $assetManager;
+        $this->assetService = $assetService;
 
         return $this;
     }

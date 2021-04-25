@@ -18,6 +18,7 @@ use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
+use Windwalker\Core\Router\RouteUri;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
@@ -120,6 +121,7 @@ class ControllerDispatcher
         if ($handler[0] instanceof ControllerInterface) {
             return function (AppContext $app) use ($handler): mixed {
                 [$object, $task] = $handler;
+
                 return $this->container->call(
                     [$object, 'execute'],
                     [$task, $app->getUrlVars()]
@@ -155,6 +157,10 @@ class ControllerDispatcher
      */
     protected function handleResponse(mixed $res): ResponseInterface
     {
+        if ($res instanceof RouteUri) {
+            return $res->toResponse();
+        }
+
         if ($res instanceof UriInterface) {
             return new RedirectResponse($res);
         }

@@ -25,7 +25,7 @@ interface ViewModelInterface
      * @param  AppState    $state
      * @param  AppContext  $app
      *
-     * @return  array
+     * @return  mixed
      */
-    public function prepare(AppState $state, AppContext $app): array;
+    public function prepare(AppState $state, AppContext $app): mixed;
 }

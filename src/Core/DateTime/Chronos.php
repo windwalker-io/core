@@ -70,6 +70,10 @@ class Chronos extends \DateTimeImmutable
         // If the date is numeric assume a unix timestamp and convert it.
         $date = is_numeric($date) ? date('c', $date) : $date;
 
+        if ($date instanceof \DateTimeInterface) {
+            $date = $date->format('Y-m-d H:i:s.u');
+        }
+
         // Call the DateTime constructor.
         parent::__construct($date, $tz);
     }

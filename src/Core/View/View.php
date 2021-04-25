@@ -11,19 +11,27 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\View;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Attributes\Prop;
-use Windwalker\Core\Attributes\ViewModel;
-use Windwalker\Core\Html\HtmlFrame;
+use Windwalker\Core\Http\ViewResponse;
+use Windwalker\Core\Module\AbstractModule;
+use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Renderer\RendererService;
+use Windwalker\Core\Router\RouteUri;
+use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
+use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
+use Windwalker\Stream\Stream;
+use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
@@ -38,9 +46,6 @@ class View implements EventAwareInterface
     protected string|array|null $layout = null;
 
     protected ?RendererInterface $renderer = null;
-
-    #[Prop]
-    public mixed $foo;
 
     /**
      * View constructor.
@@ -61,14 +66,16 @@ class View implements EventAwareInterface
 
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            [
-                'layout_var_name' => 'layout'
-            ]
-        );
+        $resolver->define('layout_var_name')
+            ->default('layout')
+            ->allowedTypes('string');
+
+        $resolver->define('module')
+            ->allowedTypes(ModuleInterface::class, 'null')
+            ->default(null);
     }
 
-    public function render(array $data = []): string
+    public function render(array $data = []): mixed
     {
         $vm = $this->getViewModel();
 
@@ -91,7 +98,7 @@ class View implements EventAwareInterface
                 'viewModel' => $vm,
                 'data' => $data,
                 'layout' => $layout,
-                'state' => $this->app->getState()
+                'state' => $this->getState()
             ]
         );
 
@@ -102,6 +109,12 @@ class View implements EventAwareInterface
         }
 
         $data = $vm->prepare($event->getState(), $this->app);
+
+        $data = $this->handlerViewModelReturn($data, $response);
+
+        if ($response instanceof RedirectResponse) {
+            return $response;
+        }
 
         $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $data);
 
@@ -119,11 +132,67 @@ class View implements EventAwareInterface
                 'viewModel' => $vm,
                 'data' => $data,
                 'layout' => $layout,
-                'content' => $content
+                'content' => $content,
+                'response' => $response
             ]
         );
 
+        $response = $event->getResponse();
+
+        if ($response instanceof ResponseInterface) {
+            $response->getBody()->write($event->getContent());
+            return $response;
+        }
+
         return $event->getContent();
+    }
+
+    protected function handlerViewModelReturn(mixed $data, ?ResponseInterface &$response = null): array
+    {
+        if ($data instanceof ResponseInterface) {
+            $response = $data;
+
+            if ($data instanceof ViewResponse) {
+                $data = $response->getData();
+                $response = HtmlResponse::from($response);
+                return $data;
+            }
+
+            if ($data instanceof RedirectResponse) {
+                return [];
+            }
+        }
+
+        if ($data instanceof RouteUri) {
+            $response = $data->toResponse();
+            return [];
+        }
+
+        if ($data instanceof UriInterface) {
+            $response = new RedirectResponse($data);
+            return [];
+        }
+
+        if (!is_array($data)) {
+            throw new \UnexpectedValueException(
+                sprintf(
+                    'ViewModel return value not support for: %s',
+                    get_debug_type($data)
+                )
+            );
+        }
+
+        return $data;
+    }
+
+    protected function getState(): AppState
+    {
+        return $this->getModule()?->getState() ?? $this->app->getState();
+    }
+
+    protected function getModule(): ?ModuleInterface
+    {
+        return $this->options['module'];
     }
 
     public function resolveLayout(): string
