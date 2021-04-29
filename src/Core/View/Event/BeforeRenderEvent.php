@@ -14,6 +14,7 @@ namespace Windwalker\Core\View\Event;
 /**
  * The BeforeRenderEvent class.
  */
+#[\Attribute(\Attribute::TARGET_METHOD)]
 class BeforeRenderEvent extends AbstractViewRenderEvent
 {
     //

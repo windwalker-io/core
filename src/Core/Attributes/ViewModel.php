@@ -11,27 +11,22 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Html\HtmlFrame;
-use Windwalker\Core\Module\AbstractModule;
 use Windwalker\Core\Module\ModuleInterface;
-use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
-
 use Windwalker\Filesystem\Path;
+use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Utilities\Str;
 
-use Windwalker\Utilities\StrNormalise;
-
-use function Windwalker\arr;
-
 /**
- * The ViewModel class.
+ * The HtmlPage class.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class ViewModel implements ContainerAttributeInterface
@@ -39,6 +34,8 @@ class ViewModel implements ContainerAttributeInterface
     public array $css;
 
     public array $js;
+
+    protected ?ResponseInterface $response = null;
 
     /**
      * View constructor.
@@ -53,14 +50,14 @@ class ViewModel implements ContainerAttributeInterface
     public function __construct(
         public ?string $module = null,
         public string|array|null $layout = null,
+        public array $headers = [],
         array|string $css = [],
         array|string $js = [],
         public array $modules = [],
         public array $options = []
     ) {
-        //
         $this->css = (array) $css;
-        $this->js = (array) $js;
+        $this->js  = (array) $js;
     }
 
     public function __invoke(AttributeHandler $handler): callable
@@ -70,7 +67,9 @@ class ViewModel implements ContainerAttributeInterface
         $container->share('vm.self', $this);
 
         return function (...$args) use ($container, $handler) {
-            $options = [];
+            $options = [
+                'vmAttr' => $this,
+            ];
 
             if ($this->module) {
                 /** @var ModuleInterface $module */
@@ -109,15 +108,15 @@ class ViewModel implements ContainerAttributeInterface
         $view->on(
             BeforeRenderEvent::class,
             function (BeforeRenderEvent $event) use ($vm, $container) {
-                $asset = $container->resolve(AssetService::class);
-                $name = $this->guessName($vm, $container);
+                $asset  = $container->resolve(AssetService::class);
+                $name   = $this->guessName($vm, $container);
                 $vmName = Path::clean(strtolower(ltrim($name, '\\/')), '/');
 
-                // foreach ($this->css as $name => $css) {
-                //     $path = '@view/' . $css;
-                //
-                //     $assets->css($path);
-                // }
+                foreach ($this->css as $name => $css) {
+                    $path = '@view/' . $css;
+
+                    $asset->css($path);
+                }
 
                 foreach ($this->js as $name => $js) {
                     $path = '@view/' . $vmName . '/' . $js;
@@ -137,7 +136,7 @@ class ViewModel implements ContainerAttributeInterface
                     }
                 }
 
-                $layout = $event->getLayout();
+                $layout    = $event->getLayout();
                 $className = str_replace('/', '-', $vmName);
 
                 $htmlFrame = $container->get(HtmlFrame::class);
@@ -161,8 +160,40 @@ class ViewModel implements ContainerAttributeInterface
         $root = $container->getParam('asset.namespace_base');
 
         $ref = new \ReflectionClass($vm);
-        $ns = $ref->getNamespaceName();
+        $ns  = $ref->getNamespaceName();
 
         return Str::removeLeft($ns, $root);
+    }
+
+    public function header(string $name, string|array $value): static
+    {
+        // Init response
+        $this->getResponse();
+
+        foreach ((array) $value as $v) {
+            $this->response = $this->response->withAddedHeader($name, $v);
+        }
+
+        return $this;
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response ??= $this->createResponse();
+    }
+
+    public function createResponse(): ResponseInterface
+    {
+        $res = new HtmlResponse();
+
+        if ($this->headers !== []) {
+            foreach ($this->headers as $header) {
+                foreach ((array) $header as $value) {
+                    $res = $res->withAddedHeader($header, $value);
+                }
+            }
+        }
+
+        return $res;
     }
 }

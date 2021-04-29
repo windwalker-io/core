@@ -20,7 +20,7 @@ class AfterRenderEvent extends AbstractViewRenderEvent
 {
     protected string $content;
 
-    protected ?ResponseInterface $response = null;
+    protected ResponseInterface $response;
 
     /**
      * @return string
@@ -43,21 +43,31 @@ class AfterRenderEvent extends AbstractViewRenderEvent
     }
 
     /**
-     * @return ResponseInterface|null
+     * @return ResponseInterface
      */
-    public function getResponse(): ?ResponseInterface
+    public function getResponse(): ResponseInterface
     {
         return $this->response;
     }
 
     /**
-     * @param  ResponseInterface|null  $response
+     * @param  ResponseInterface  $response
      *
      * @return  static  Return self to support chaining.
      */
-    public function setResponse(?ResponseInterface $response): static
+    public function setResponse(ResponseInterface $response): static
     {
         $this->response = $response;
+
+        return $this;
+    }
+
+    public function addHeader(string $name, string|array $value): static
+    {
+        // Init response
+        foreach ((array) $value as $v) {
+            $this->response = $this->response->withAddedHeader($name, $v);
+        }
 
         return $this;
     }

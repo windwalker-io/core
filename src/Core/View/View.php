@@ -16,14 +16,14 @@ use Psr\Http\Message\UriInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Http\ViewResponse;
-use Windwalker\Core\Module\AbstractModule;
+use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
+use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Http\Response\HtmlResponse;
@@ -73,6 +73,10 @@ class View implements EventAwareInterface
         $resolver->define('module')
             ->allowedTypes(ModuleInterface::class, 'null')
             ->default(null);
+
+        $resolver->define('vmAttr')
+            ->allowedTypes(ViewModel::class, 'null')
+            ->default(null);
     }
 
     public function render(array $data = []): mixed
@@ -89,6 +93,10 @@ class View implements EventAwareInterface
             );
         }
 
+        if (AttributesAccessor::getFirstAttribute($vm, EventSubscriber::class)) {
+            $this->subscribe($vm);
+        }
+
         $layout = $this->resolveLayout();
 
         $event = $this->emit(
@@ -102,28 +110,39 @@ class View implements EventAwareInterface
             ]
         );
 
+        $vm = $event->getViewModel();
         $data = $event->getData();
+        $layout = $event->getLayout();
 
         if ($data !== []) {
             $this->injectData($vm, $data);
         }
 
-        $data = $vm->prepare($event->getState(), $this->app);
-
-        $data = $this->handlerViewModelReturn($data, $response);
+        $response = $this->handleVMResponse(
+            $vm->prepare($event->getState(), $this->app)
+        );
 
         if ($response instanceof RedirectResponse) {
             return $response;
         }
 
-        $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $data);
+        if (is_array($response)) {
+            $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $response);
 
-        $data['vm'] = $vm;
-        
-        $this->preparePaths($vm);
-        
-        $content = $this->getRenderer()
-            ->render($layout = $event->getLayout(), $data, ['context' => $event->getViewModel()]);
+            $data['vm'] = $vm;
+
+            $this->preparePaths($vm);
+
+            $content = $this->getRenderer()
+                ->render($layout, $data, ['context' => $vm]);
+
+            $response = $this->getResponse();
+            $response->getBody()->write($content);
+        } else {
+            $data['vm'] = $vm;
+
+            $content = $response->getBody()->getContents();
+        }
 
         $event = $this->emit(
             AfterRenderEvent::class,
@@ -137,40 +156,21 @@ class View implements EventAwareInterface
             ]
         );
 
-        $response = $event->getResponse();
-
-        if ($response instanceof ResponseInterface) {
-            $response->getBody()->write($event->getContent());
-            return $response;
-        }
-
-        return $event->getContent();
+        return $event->getResponse();
     }
 
-    protected function handlerViewModelReturn(mixed $data, ?ResponseInterface &$response = null): array
+    protected function handleVMResponse(mixed $data): array|ResponseInterface
     {
         if ($data instanceof ResponseInterface) {
-            $response = $data;
-
-            if ($data instanceof ViewResponse) {
-                $data = $response->getData();
-                $response = HtmlResponse::from($response);
-                return $data;
-            }
-
-            if ($data instanceof RedirectResponse) {
-                return [];
-            }
+            return $data;
         }
 
         if ($data instanceof RouteUri) {
-            $response = $data->toResponse();
-            return [];
+            return $data->toResponse();
         }
 
         if ($data instanceof UriInterface) {
-            $response = new RedirectResponse($data);
-            return [];
+            return new RedirectResponse($data);
         }
 
         if (!is_array($data)) {
@@ -312,5 +312,21 @@ class View implements EventAwareInterface
         if (is_dir($dir)) {
             $this->addPath($dir, PriorityQueue::HIGH);
         }
+    }
+
+    protected function getPageAttribute(): ?ViewModel
+    {
+        return $this->options['vmAttr'];
+    }
+
+    protected function getResponse(): ResponseInterface
+    {
+        $attr = $this->getPageAttribute();
+
+        if (!$attr) {
+            return new HtmlResponse();
+        }
+
+        return $attr->getResponse();
     }
 }

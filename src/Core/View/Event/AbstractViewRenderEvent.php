@@ -14,7 +14,6 @@ namespace Windwalker\Core\View\Event;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
-use Windwalker\Data\Collection;
 use Windwalker\Event\AbstractEvent;
 
 /**
