@@ -41,6 +41,12 @@ export async function ts(source, dest, options = {}) {
   return new TsProcessor(source, options).process(dest);
 }
 
+export async function rollup(source, dest, options = {}) {
+  const RollupProcessor = (await import('./processors/rollup-processor.js')).default;
+
+  return new RollupProcessor(source, options).process(dest);
+}
+
 export async function webpack(source, dest, options = {}) {
   const WebpackProcessor = (await import('./processors/webpack-processor.js')).default;
 

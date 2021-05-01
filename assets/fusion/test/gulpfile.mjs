@@ -57,6 +57,12 @@ export async function webpack() {
   fusion.webpack('./src/webpack/index.js', './dest/webpack/webpack-dest.js');
 }
 
+export async function rollup() {
+  fusion.watch(['./src/webpack/**/*.js']);
+
+  fusion.rollup('./src/webpack/index.js', './dest/rollup/rollup-dest.js');
+}
+
 export async function vue() {
   fusion.watch(['./src/vue/**/*.js']);
 
