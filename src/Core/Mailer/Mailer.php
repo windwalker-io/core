@@ -23,6 +23,7 @@ use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
  * @method  static MailerManager           setMessageClass($messageClass)
  * @method  static MailerAdapterInterface  getAdapter()
  * @method  static MailerManager           setAdapter(MailerAdapterInterface $adapter)
+ * @method  static void                    disconnect()
  *
  * @since  3.0
  */

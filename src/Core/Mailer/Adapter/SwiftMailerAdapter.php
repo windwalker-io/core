@@ -16,7 +16,7 @@ use Windwalker\Structure\Structure;
  *
  * @since  3.0
  */
-class SwiftMailerAdapter implements MailerAdapterInterface
+class SwiftMailerAdapter implements MailerAdapterInterface, LongConnectionInterface
 {
     /**
      * Property mailer.
@@ -168,5 +168,15 @@ class SwiftMailerAdapter implements MailerAdapterInterface
         }
 
         return $instance;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function disconnect(): void
+    {
+        $transport = $this->getMailer()->getTransport();
+
+        $transport->stop();
     }
 }

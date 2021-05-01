@@ -10,6 +10,7 @@ namespace Windwalker\Core\Mailer;
 
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Ioc;
+use Windwalker\Core\Mailer\Adapter\LongConnectionInterface;
 use Windwalker\Core\Mailer\Adapter\MailerAdapterInterface;
 use Windwalker\Event\DispatcherAwareTrait;
 
@@ -178,5 +179,12 @@ class MailerManager
         $this->adapter = $adapter;
 
         return $this;
+    }
+
+    public function disconnect(): void
+    {
+        if ($this->adapter instanceof LongConnectionInterface) {
+            $this->adapter->disconnect();
+        }
     }
 }
