@@ -62,6 +62,12 @@ declare namespace Fusion {
     merge?: WebpackOptionsNormalized;
   }
 
+  export interface RollupOptions extends JsOptions {
+    rollup?: WebpackOptionsNormalized;
+    override?: WebpackOptionsNormalized | Function;
+    merge?: WebpackOptionsNormalized;
+  }
+
   export interface VueOptions extends WebpackOptions {
     root?: string;
   }
@@ -90,6 +96,8 @@ declare namespace Fusion {
   export const TsProcessor: Processor<TsOptions>;
   export const webpack: taskProcessor<WebpackOptions>;
   export const WebpackProcessor: Processor<WebpackOptions>;
+  export const rollup: taskProcessor<RollupOptions>;
+  export const RollupProcessor: Processor<RollupOptions>;
   export const vue: taskProcessor<VueOptions>;
   export const VueProcessor: Processor<VueOptions>;
 }

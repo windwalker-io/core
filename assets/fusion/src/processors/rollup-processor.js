@@ -7,19 +7,23 @@
 
 import concat from 'gulp-concat';
 import eol from 'gulp-eol';
-import { dest as toDest } from '../base/base.js';
+import { dest as toDest, src } from '../base/base.js';
+import { prepareStream } from '../lifecycles.js';
 import { rollupBasicConfig } from '../utilities/rollup.js';
 import { merge } from '../utilities/utilities.js';
 import JsProcessor from './js-processor.js';
 
-let gulpRollup;
+let rollupStream;
+let source;
 
 try {
-  gulpRollup = (await import('gulp-rollup')).default;
+  rollupStream = (await import('@rollup/stream')).default;
+  source = (await import('vinyl-source-stream')).default;
 } catch (e) {
   const chalk = (await import('chalk')).default;
   console.error(chalk.red(e.message));
-  console.error(`\nPlease run "${chalk.yellow('yarn add rollup gulp-rollup @rollup/plugin-node-resolve @rollup/plugin-babel')}" first.\n`);
+  console.error(`\nPlease run "${chalk.yellow('yarn add @rollup/stream @rollup/plugin-node-resolve ' +
+    '@rollup/plugin-babel rollup-plugin-sourcemaps vinyl-source-stream')}" first.\n`);
   process.exit(255);
 }
 
@@ -46,18 +50,19 @@ export default class RollupProcessor extends JsProcessor {
       );
     }
 
-    return this.pipe(
-        gulpRollup({
-          rollup: options.rollup,
-          input: './src/webpack/index.js'
-        })
-      );
+    options.rollup.input = this.source;
+    options.rollup.output.file = dest.path + '/' + dest.file;
+
+    this.stream = prepareStream(rollupStream(options.rollup))
+      .pipe(source(dest.file));
+
+    return this;
   }
 
   doProcess(dest, options) {
     this.pipe(eol('\n'))
       .compile(dest, options)
-      .pipeIf(dest.merge, () => concat(dest.file))
+      // .pipeIf(dest.merge, () => concat(dest.file))
       .pipe(toDest(dest.path));
   }
 

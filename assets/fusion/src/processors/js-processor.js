@@ -62,7 +62,7 @@ export default class JsProcessor extends Processor {
       .pipe(terserTask())
       .pipe(rename({ suffix: '.min' }))
       .pipeIf(options.minify === MinifyOption.SEPARATE_FILE, () => {
-        this.pipe(toDest(dest.path));;
+        this.pipe(toDest(dest.path));
       });
   }
 
