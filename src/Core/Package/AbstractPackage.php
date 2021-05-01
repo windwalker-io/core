@@ -18,6 +18,7 @@ use Windwalker\Core\Application\ServiceAwareTrait;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Console\CoreConsole;
 use Windwalker\Core\Controller\AbstractController;
+use Windwalker\Core\Controller\CallbackController;
 use Windwalker\Core\Event\EventDispatcher;
 use Windwalker\Core\Mvc\MvcResolver;
 use Windwalker\Core\Provider\BootableDeferredProviderInterface;
@@ -25,6 +26,7 @@ use Windwalker\Core\Provider\BootableProviderInterface;
 use Windwalker\Core\Router\MainRouter;
 use Windwalker\Core\Router\PackageRouter;
 use Windwalker\Core\Router\RouteCreator;
+use Windwalker\Core\Router\RouteString;
 use Windwalker\Core\Security\CsrfGuard;
 use Windwalker\Core\View\AbstractView;
 use Windwalker\DI\ClassMeta;
@@ -37,6 +39,7 @@ use Windwalker\Event\EventInterface;
 use Windwalker\Event\EventTriggerableInterface;
 use Windwalker\Event\ListenerPriority;
 use Windwalker\Filesystem\File;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\IO\Input;
 use Windwalker\IO\PsrInput;
 use Windwalker\Middleware\Chain\Psr7ChainBuilder;
@@ -166,17 +169,26 @@ class AbstractPackage implements DispatcherAwareInterface,
     {
         $resolver = $this->getMvcResolver()->getControllerResolver();
 
-        $key = $resolver::getDIKey($task);
-
         $container = $this->getContainer();
 
+        if ($input !== null && !$input instanceof Input) {
+            $input = new Input($input);
+        }
+
+        $input = $input ?: $container->get('input');
+
+        if ($task instanceof \Closure) {
+            $controller = new CallbackController($task);
+
+            return $controller->setApplication($this->app)
+                ->setInput($input)
+                ->setPackage($this)
+                ->setContainer($container);
+        }
+
+        $key = $resolver::getDIKey($task);
+
         if (!$container->exists($key) || $forceNew) {
-            if ($input !== null && !$input instanceof Input) {
-                $input = new Input($input);
-            }
-
-            $input = $input ?: $container->get('input');
-
             try {
                 /** @var AbstractController $controller */
                 $controller = $resolver->create($task, $input, $this, $container);
@@ -275,6 +287,14 @@ class AbstractPackage implements DispatcherAwareInterface,
         $response = $controller->getResponse();
 
         if ($result !== null) {
+            if ($result instanceof RouteString) {
+                return new RedirectResponse(
+                    (string) $result,
+                    $response->getStatusCode(),
+                    $response->getHeaders()
+                );
+            }
+
             // Render view if return value is a view object,
             // don't use (string) keyword to make sure we can get Exception when error occurred.
             // @see  https://bugs.php.net/bug.php?id=53648

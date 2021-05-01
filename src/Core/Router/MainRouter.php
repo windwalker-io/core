@@ -249,10 +249,12 @@ class MainRouter extends Router implements RouteBuilderInterface, DispatcherAwar
             );
         }
 
-        if (!class_exists($controller) && !class_exists($suffix)) {
-            $controller = trim($controller, '\\') . '\\' . $suffix;
-        } elseif (class_exists($suffix)) {
-            $controller = $suffix;
+        if (!$controller instanceof \Closure) {
+            if (!class_exists($controller) && !class_exists($suffix)) {
+                $controller = trim($controller, '\\') . '\\' . $suffix;
+            } elseif (class_exists($suffix)) {
+                $controller = $suffix;
+            }
         }
 
         if ($controller) {
