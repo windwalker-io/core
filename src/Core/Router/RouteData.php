@@ -109,7 +109,7 @@ class RouteData
      *
      * @return  static
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.23.5
      */
     public function redirect($to, int $code = 303): self
     {

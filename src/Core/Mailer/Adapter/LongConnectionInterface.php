@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2021 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Mailer\Adapter;
@@ -12,7 +12,7 @@ namespace Windwalker\Core\Mailer\Adapter;
 /**
  * Interface LongConnectionAdapter
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.23.5
  */
 interface LongConnectionInterface
 {
@@ -21,7 +21,7 @@ interface LongConnectionInterface
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  3.5.23.5
      */
     public function disconnect(): void;
 }

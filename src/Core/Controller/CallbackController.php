@@ -4,7 +4,7 @@
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2021 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Controller;
@@ -12,7 +12,7 @@ namespace Windwalker\Core\Controller;
 /**
  * The CallbackController class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  3.5.23.5
  */
 class CallbackController extends AbstractController
 {
