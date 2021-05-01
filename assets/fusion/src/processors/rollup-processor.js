@@ -12,6 +12,7 @@ import { prepareStream } from '../lifecycles.js';
 import { rollupBasicConfig } from '../utilities/rollup.js';
 import { merge } from '../utilities/utilities.js';
 import JsProcessor from './js-processor.js';
+import path from 'path';
 
 let rollupStream;
 let source;
@@ -50,11 +51,15 @@ export default class RollupProcessor extends JsProcessor {
       );
     }
 
+    if (this.source.indexOf('*') !== -1) {
+      throw new Error('rollup processor currently not support wildcards.');
+    }
+
     options.rollup.input = this.source;
-    options.rollup.output.file = dest.path + '/' + dest.file;
+    options.rollup.output.file = dest.path + '/target.js';
 
     this.stream = prepareStream(rollupStream(options.rollup))
-      .pipe(source(dest.file));
+      .pipe(source(dest.file || path.basename(this.source)));
 
     return this;
   }

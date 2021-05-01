@@ -18,7 +18,7 @@ export async function rollupBasicConfig() {
 
   return {
     output: {
-      format: 'umd',
+      format: 'iife',
       sourcemap: true,
     },
     plugins: [
