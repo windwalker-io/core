@@ -49,7 +49,7 @@ class BacktraceHelper
 
         $args = [];
 
-        foreach ($trace['args'] as $arg) {
+        foreach ($trace['args'] ?? [] as $arg) {
             if (is_array($arg)) {
                 $arg = 'Array';
             } elseif (is_object($arg)) {
