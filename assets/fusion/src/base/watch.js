@@ -46,9 +46,14 @@ function findCurrentTask(e) {
 
   // Drop first and second
   FUNC_REGEX.exec(e.stack);
-  FUNC_REGEX.exec(e.stack);
+  let previous = FUNC_REGEX.exec(e.stack);
 
   // Get third
-  const match = FUNC_REGEX.exec(e.stack)
+  let match = FUNC_REGEX.exec(e.stack);
+
+  if ('bound' === match[1]) {
+    match = previous;
+  }
+
   return match[1];
 }

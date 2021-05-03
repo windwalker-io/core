@@ -135,9 +135,9 @@ class AssetService implements EventAwareInterface
      * @param  array   $options
      * @param  array   $attrs
      *
-     * @return  static
+     * @return  AssetLink
      */
-    public function css(string $url, array $options = [], array $attrs = []): static
+    public function css(string $url, array $options = [], array $attrs = []): AssetLink
     {
         return $this->addLink('styles', $url, $options, $attrs);
     }
@@ -149,14 +149,14 @@ class AssetService implements EventAwareInterface
      * @param  array   $options
      * @param  array   $attrs
      *
-     * @return  static
+     * @return  AssetLink
      */
-    public function js(string $url, array $options = [], array $attrs = []): static
+    public function js(string $url, array $options = [], array $attrs = []): AssetLink
     {
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
-    public function jsAsync(string $url, array $options = [], array $attrs = []): static
+    public function jsAsync(string $url, array $options = [], array $attrs = []): AssetLink
     {
         $attrs['async'] = true;
 
@@ -170,16 +170,16 @@ class AssetService implements EventAwareInterface
      * @param  array   $options
      * @param  array   $attrs
      *
-     * @return  static
+     * @return  AssetLink
      */
-    public function module(string $url, array $options = [], array $attrs = []): static
+    public function module(string $url, array $options = [], array $attrs = []): AssetLink
     {
         $attrs['type'] = 'module';
 
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
-    public function moduleAsync(string $url, array $options = [], array $attrs = []): static
+    public function moduleAsync(string $url, array $options = [], array $attrs = []): AssetLink
     {
         $attrs['type'] = 'module';
         $attrs['async'] = true;
@@ -187,7 +187,7 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
-    public function addLink(string $type, string $url, array $options = [], array $attrs = []): static
+    public function addLink(string $type, string $url, array $options = [], array $attrs = []): AssetLink
     {
         $alias = $this->resolveRawAlias($url);
 
@@ -201,7 +201,7 @@ class AssetService implements EventAwareInterface
 
         $this->$type[$url] = $link;
 
-        return $this;
+        return $link;
     }
 
     /**
@@ -325,7 +325,7 @@ class AssetService implements EventAwareInterface
             $html[] = (string) h(
                 'style',
                 $internalAttrs,
-                "\n" . $this->renderInternalJS() . "\n" . $this->indents
+                "\n" . $this->renderInternalCSS() . "\n" . $this->indents
             );
         }
 
@@ -387,7 +387,7 @@ class AssetService implements EventAwareInterface
             $html[] = (string) h(
                 'script',
                 $internalAttrs,
-                "\n" . $this->renderInternalCSS() . "\n" . $this->indents
+                "\n" . $this->renderInternalJS() . "\n" . $this->indents
             );
         }
 
@@ -399,7 +399,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalJS(): string
+    public function renderInternalCSS(): string
     {
         return implode("\n\n", $this->internalStyles);
     }
@@ -409,7 +409,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  string
      */
-    public function renderInternalCSS(): string
+    public function renderInternalJS(): string
     {
         return implode(";\n", $this->internalScripts);
     }

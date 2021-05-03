@@ -68,7 +68,7 @@ abstract class AbstractScript
 
         $method = $stack['class'] . '::' . $stack['function'];
 
-        return $this->inited($method, ...$data);
+        return !$this->inited($method, ...$data);
     }
 
     /**

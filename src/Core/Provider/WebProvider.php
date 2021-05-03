@@ -11,12 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Jenssegers\Agent\Agent;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
+use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
@@ -127,6 +129,12 @@ class WebProvider implements ServiceProviderInterface
         $container->share(
             AppRequest::class,
             fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
+        );
+
+        // Browser Agent Detect
+        $container->share(
+            Browser::class,
+            fn(Container $container) => Browser::fromRequest($container->get(ServerRequest::class))
         );
     }
 
