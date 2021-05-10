@@ -26,6 +26,14 @@ class CommandMeta extends AbstractAnnotation
     {
         $command->description($this->getOption('description'));
 
+        if ($this->getOption('help')) {
+            $command->help($this->getOption('help'));
+        }
+
+        if ($this->getOption('usage')) {
+            $command->usage($this->getOption('usage'));
+        }
+
         $options = (array) $this->getOption('options');
 
         /** @var CommandOption $option */

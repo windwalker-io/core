@@ -186,7 +186,7 @@ class CoreConsole extends Console implements Core\Application\WindwalkerApplicat
                 $cmd = $command;
 
                 // Workaround for Container not suppports object::__invoke() now.
-                if (is_object($cmd)) {
+                if (is_object($cmd) && !$cmd instanceof \Closure) {
                     /** @var CommandMeta $meta */
                     $meta = $reader->getClassAnnotation(new \ReflectionClass($cmd), CommandMeta::class);
 
