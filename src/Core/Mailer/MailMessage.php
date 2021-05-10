@@ -96,6 +96,11 @@ class MailMessage
     protected $asset;
 
     /**
+     * @var string
+     */
+    protected $charset = 'utf8';
+
+    /**
      * create
      *
      * @return  MailMessage
@@ -514,5 +519,33 @@ class MailMessage
         if ($this->asset) {
             $this->asset->reset();
         }
+    }
+
+    /**
+     * Method to get property Charset
+     *
+     * @return  string
+     *
+     * @since  3.5.23.4
+     */
+    public function getCharset(): string
+    {
+        return $this->charset;
+    }
+
+    /**
+     * Method to set property charset
+     *
+     * @param string $charset
+     *
+     * @return  static  Return self to support chaining.
+     *
+     * @since  3.5.23.4
+     */
+    public function setCharset(string $charset)
+    {
+        $this->charset = $charset;
+
+        return $this;
     }
 }

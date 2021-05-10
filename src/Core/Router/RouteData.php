@@ -8,6 +8,8 @@
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Core\Application\WebApplication;
+
 /**
  * The RouteData class.
  *
@@ -86,7 +88,7 @@ class RouteData
     /**
      * pattern
      *
-     * @param string|bool $value
+     * @param string|bool|callable $value
      *
      * @return  static
      *
@@ -95,6 +97,25 @@ class RouteData
     public function controller($value): self
     {
         $this->options['controller'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * redirect
+     *
+     * @param  string|RouteString  $to
+     * @param  int                 $code
+     *
+     * @return  static
+     *
+     * @since  3.5.23.5
+     */
+    public function redirect($to, int $code = 303): self
+    {
+        $this->controller(function (WebApplication $app) use ($to, $code) {
+            $app->redirect((string) $to, $code);
+        });
 
         return $this;
     }

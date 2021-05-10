@@ -16,7 +16,7 @@ use Windwalker\Structure\Structure;
  *
  * @since  3.0
  */
-class SwiftMailerAdapter implements MailerAdapterInterface
+class SwiftMailerAdapter implements MailerAdapterInterface, LongConnectionInterface
 {
     /**
      * Property mailer.
@@ -71,7 +71,11 @@ class SwiftMailerAdapter implements MailerAdapterInterface
             ->setCc($message->getCc())
             ->setBcc($message->getBcc())
             ->setReplyTo($message->getReplyTo())
-            ->setBody($message->getBody(), $type, 'utf8');
+            ->setBody(
+                $message->getBody(),
+                $type,
+                $message->getCharset()
+            );
 
         $files = $message->getFiles();
 
@@ -164,5 +168,15 @@ class SwiftMailerAdapter implements MailerAdapterInterface
         }
 
         return $instance;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function disconnect(): void
+    {
+        $transport = $this->getMailer()->getTransport();
+
+        $transport->stop();
     }
 }

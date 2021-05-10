@@ -134,6 +134,7 @@ class DatabaseService
                 'password' => $config->get('password', ''),
                 'database' => $config->get('name'),
                 'charset' => $config->get('charset'),
+                'port' => $config->get('port'),
                 'prefix' => $config->get('prefix', 'wind_'),
             ],
             $options
