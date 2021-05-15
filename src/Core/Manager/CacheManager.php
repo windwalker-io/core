@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Windwalker\Cache\CachePool;
+use Windwalker\DI\Container;
+use Windwalker\DI\Definition\ObjectBuilderDefinition;
 
 /**
  * The CacheManager class.
@@ -39,5 +41,18 @@ class CacheManager extends AbstractManager
     protected function getDefaultFactory(string $name, ...$args): mixed
     {
         return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
+    }
+
+    public static function cachePoolFactory(
+        string $storage,
+        string|ObjectBuilderDefinition $serializer,
+    ): \Closure {
+        return static function (Container $container, string $instanceName) use ($storage, $serializer): CachePool {
+            return new CachePool(
+                $container->resolve('cache.factories.storages.' . $storage, compact('instanceName')),
+                $container->resolve($serializer),
+                $container->get(LoggerManager::class)->get('error')
+            );
+        };
     }
 }
