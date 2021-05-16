@@ -120,7 +120,7 @@ class SystemUri extends Uri implements \JsonSerializable
      */
     public function suffix(string $name, string $url): string
     {
-        return $this->$name . '/' . $url;
+        return rtrim($this->$name, '/') . '/' . $url;
     }
 
     public function absolute(string $url, bool $full = false): string
