@@ -9,6 +9,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import { babel } from '@rollup/plugin-babel';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babelBasicOptions } from './babel.js';
+import { terser } from 'rollup-plugin-terser';
 
 export async function rollupBasicConfig() {
   const babelOptions = babelBasicOptions().get();
@@ -19,12 +20,22 @@ export async function rollupBasicConfig() {
   return {
     output: {
       format: 'iife',
-      sourcemap: true,
+      sourcemap: process.env.NODE_ENV !== 'production',
     },
     plugins: [
       resolve(),
       babel(babelOptions),
-      sourcemaps()
+      sourcemaps(),
+      process.env.NODE_ENV === 'production'
+        ? terser({
+          module: true,
+          mangle: true,
+          toplevel: true,
+          output: {
+            comments: false
+          }
+        })
+        : null
     ],
   };
 }

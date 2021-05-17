@@ -7,11 +7,12 @@
 
 import concat from 'gulp-concat';
 import eol from 'gulp-eol';
+import stripComment from 'gulp-strip-comments';
 import { dest as toDest, src } from '../base/base.js';
 import { prepareStream } from '../lifecycles.js';
 import { rollupBasicConfig } from '../utilities/rollup.js';
 import { merge } from '../utilities/utilities.js';
-import JsProcessor from './js-processor.js';
+import JsProcessor, { terserTask } from './js-processor.js';
 import path from 'path';
 
 let rollupStream;
@@ -24,7 +25,7 @@ try {
   const chalk = (await import('chalk')).default;
   console.error(chalk.red(e.message));
   console.error(`\nPlease run "${chalk.yellow('yarn add @rollup/stream @rollup/plugin-node-resolve ' +
-    '@rollup/plugin-babel rollup-plugin-sourcemaps vinyl-source-stream')}" first.\n`);
+    '@rollup/plugin-babel rollup-plugin-sourcemaps rollup-plugin-terser vinyl-source-stream')}" first.\n`);
   process.exit(255);
 }
 

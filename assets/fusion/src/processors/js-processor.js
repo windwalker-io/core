@@ -138,7 +138,7 @@ export function terserTask() {
   return gulpTerser({
     module: true,
     mangle: true,
-    toplevel: true
+    toplevel: true,
   }, terser.minify).on('error', function (e) {
     console.error(
       '[ES syntax validate fail]',
