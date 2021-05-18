@@ -166,7 +166,7 @@ class ControllerDispatcher
         }
 
         if (!$res instanceof ResponseInterface) {
-            if (is_array($res) && is_object($res)) {
+            if (is_array($res) || is_object($res)) {
                 return Response::fromString(json_encode($res, JSON_THROW_ON_ERROR));
             }
 

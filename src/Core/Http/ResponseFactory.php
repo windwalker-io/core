@@ -11,9 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http;
 
-use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
-use Windwalker\Http\Response\AbstractContentTypeResponse;
 use Windwalker\Http\Response\EmptyResponse;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\JsonResponse;
@@ -110,12 +107,5 @@ class ResponseFactory
         [$body, $status, $headers] = $this->prepare($body, $status, $headers);
 
         return new RedirectResponse($body, $status, $headers);
-    }
-
-    public function view(array $data, ?int $status = null, array $headers = []): ViewResponse
-    {
-        [, $status, $headers] = $this->prepare(null, $status, $headers);
-
-        return new ViewResponse($data, $status, $headers);
     }
 }

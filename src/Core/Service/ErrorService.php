@@ -382,8 +382,14 @@ class ErrorService
      *
      * @return  int
      */
-    public static function normalizeCode(int $code): int
+    public static function normalizeCode(mixed $code): int
     {
+        $stringCode = (string) $code;
+
+        if (strlen($stringCode) > 3) {
+            $code = substr($stringCode, 0, 3);
+        }
+
         return ResponseHelper::validateStatus($code) ? $code : 500;
     }
 
