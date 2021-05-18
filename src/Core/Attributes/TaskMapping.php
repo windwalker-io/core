@@ -33,6 +33,10 @@ class TaskMapping
 
     public function processTask(string $method, ?string $task): ?string
     {
+        if (isset($this->methods['*'])) {
+            return $this->methods['*'];
+        }
+
         $task = $this->tasks[$task] ?? $task;
         $task = $this->methods[strtoupper($method)] ?? $task;
 
