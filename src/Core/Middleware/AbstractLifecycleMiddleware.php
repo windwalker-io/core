@@ -28,7 +28,7 @@ abstract class AbstractLifecycleMiddleware implements MiddlewareInterface
      *
      * @return  mixed
      */
-    abstract protected function preprocess(ServerRequestInterface $request): mixed;
+    abstract protected function preprocess(ServerRequestInterface $request);
 
     /**
      * postExecute
@@ -37,7 +37,7 @@ abstract class AbstractLifecycleMiddleware implements MiddlewareInterface
      *
      * @return  mixed
      */
-    abstract protected function postProcess(ResponseInterface $response): mixed;
+    abstract protected function postProcess(ResponseInterface $response);
 
     /**
      * Process an incoming server request.
