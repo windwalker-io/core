@@ -796,10 +796,11 @@ class AssetService implements EventAwareInterface
      * handleUri
      *
      * @param  string  $uri
+     * @param  string  $path
      *
      * @return  string
      */
-    public function handleUri(string $uri): string
+    public function handleUri(string $uri, string $path = 'path'): string
     {
         $uri = $this->resolveAlias($uri);
 
@@ -823,25 +824,25 @@ class AssetService implements EventAwareInterface
         // Use uncompressed file first
         if ($this->isDebug()) {
             if (is_file($root . '/' . $assetFile)) {
-                return $this->addUriBase($assetFile, 'path');
+                return $this->addUriBase($assetFile, $path);
             }
 
             if (is_file($root . '/' . $assetMinFile)) {
-                return $this->addUriBase($assetMinFile, 'path');
+                return $this->addUriBase($assetMinFile, $path);
             }
         } else {
             // Use min file first
             if (is_file($root . '/' . $assetMinFile)) {
-                return $this->addUriBase($assetMinFile, 'path');
+                return $this->addUriBase($assetMinFile, $path);
             }
 
             if (is_file($root . '/' . $assetFile)) {
-                return $this->addUriBase($assetFile, 'path');
+                return $this->addUriBase($assetFile, $path);
             }
         }
 
         // All file not found, fallback to default uri.
-        return $this->addUriBase($uri, 'path');
+        return $this->addUriBase($uri, $path);
     }
 
     /**
