@@ -24,6 +24,21 @@ export async function webpackBasicConfig() {
     module: {
       rules: [
         {
+          test: /\.scss$/,
+          use: [
+            'style-loader',
+            'css-loader',
+            'sass-loader',
+          ],
+        },
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader'
+          ],
+        },
+        {
           test: /\.m?js$/,
           exclude: /(node_modules|bower_components)/,
           use: [{
@@ -112,7 +127,7 @@ export async function getVueLoader(version = 3) {
   } catch (e) {
     const chalk = (await import('chalk')).default;
     console.error(chalk.red(e.message));
-    console.error(`\nPlease run "${chalk.yellow('yarn add vue vue-loader vue-style-loader @vue/compiler-sfc css-loader sass-loader file-loader')}" first.\n`);
+    console.error(`\nPlease run "${chalk.yellow('yarn add vue vue-loader vue-style-loader @vue/compiler-sfc file-loader')}" first.\n`);
     process.exit(255);
   }
 }

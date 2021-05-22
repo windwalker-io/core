@@ -56,7 +56,7 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "rollup": "^2.46.0",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "sass-loader": "^11.0.1",
+    "sass-loader": "^10.0.0",
     "ts-loader": "^8.0.18",
     "typescript": "^4.2.3",
     "vinyl-named-with-path": "^1.0.0",

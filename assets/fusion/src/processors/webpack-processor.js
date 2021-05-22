@@ -21,7 +21,10 @@ try {
 } catch (e) {
   const chalk = (await import('chalk')).default;
   console.error(chalk.red(e.message));
-  console.error(`\nPlease run "${chalk.yellow('yarn add webpack-stream webpack-comment-remover-loader vinyl-named-with-path babel-loader')}" first.\n`);
+  console.error(
+    `\nPlease run "${chalk.yellow('yarn add webpack-stream webpack-comment-remover-loader ' +
+    'vinyl-named-with-path babel-loader css-loader sass-loader style-loader')}" first.\n`
+  );
   process.exit(255);
 }
 
