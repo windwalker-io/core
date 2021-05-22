@@ -6,3 +6,4 @@
  */
 
 export * from './asset-sync.mjs';
+export * from './install-vendors.mjs';

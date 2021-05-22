@@ -29,6 +29,8 @@ use Windwalker\Utilities\StrNormalise;
 
 /**
  * The AssetSyncCommand class.
+ *
+ * @deprecated No use now.
  */
 #[CommandWrapper(description: 'Asset sync helpers', hidden: true)]
 class AssetSyncCommand implements CommandInterface
