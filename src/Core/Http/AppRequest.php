@@ -161,7 +161,7 @@ class AppRequest
         $input = $this->compileInput();
 
         if ($fields === []) {
-            return $input;
+            return collect($input);
         }
 
         return $this->fetchInputFields($input, $fields);
