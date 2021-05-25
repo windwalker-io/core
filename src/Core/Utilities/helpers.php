@@ -52,7 +52,27 @@ namespace Windwalker {
     use Windwalker\Core\Http\ResponseFactory;
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
-    use Windwalker\Http\HttpFactory;
+    use Windwalker\Core\Utilities\Dumper;
+
+    if (!function_exists('ds')) {
+        /**
+         * Dump to server.
+         *
+         * If server not running, will dump to HTML.
+         *
+         * @param mixed ...$args
+         *
+         * @return  void
+         *
+         * @since  3.4.6
+         */
+        function ds(...$args)
+        {
+            $dumper = new Dumper();
+
+            $dumper->dump(...$args);
+        }
+    }
 
     if (!function_exists('\Windwalker\include_arrays')) {
         function include_arrays(string $path, array $contextData = []): array
