@@ -60,7 +60,7 @@ class RoutingMiddleware implements MiddlewareInterface
 
         $route = $router->match($request, $this->app->getSystemUri()->route);
 
-        $controller = $this->findController($request, $route);
+        $controller = $this->findController($this->app->getRequestMethod(), $route);
 
         $this->app->getContainer()->modify(
             AppContext::class,
@@ -86,13 +86,21 @@ class RoutingMiddleware implements MiddlewareInterface
      *
      * @return  mixed
      */
-    protected function findController(ServerRequestInterface $request, Route $route): mixed
+    protected function findController(string $method, Route $route): mixed
     {
-        $method = strtolower($request->getMethod());
+        $method = strtolower($method);
 
         $handlers = $route->getHandlers();
 
-        $handler = $handlers[$method] ?? $handlers['*'] ?? null;
+        if (isset($handlers[$method])) {
+            $handler = $handlers[$method];
+
+            if (is_string($handler)) {
+                $handler = [$handlers['*'], $handler];
+            }
+        } else {
+            $handler = $handlers['*'] ?? null;
+        }
 
         if (!$handler) {
             throw new UnAllowedMethodException(

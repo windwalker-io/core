@@ -93,6 +93,7 @@ class ControllerDispatcher
             'post' => 'save',
             'put' => 'save',
             'patch' => 'save',
+            'delete' => 'delete',
         ];
 
         $task = $map[$task] ?? $task;
