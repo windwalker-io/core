@@ -19,6 +19,7 @@ use Windwalker\Filesystem\Path;
 use Windwalker\Language\Language;
 use Windwalker\Language\LanguageNormalizer;
 use Windwalker\Utilities\Paths\PathsAwareTrait;
+use Windwalker\Utilities\Str;
 
 /**
  * The Lang class.
@@ -63,7 +64,7 @@ class LangService extends Language
         return $this;
     }
 
-    public function loadFileFromPath(string $path, string|array $file, string $format = 'php', ?string $locale = null): static
+    public function loadFileFromPath(string $path, string $file, string $format = 'php', ?string $locale = null): static
     {
         $locale = $locale ?? $this->getLocale();
         $fallback = $this->getFallback();
@@ -73,12 +74,16 @@ class LangService extends Language
 
         $path = $this->pathResolver->resolve($path);
 
+        if (Path::getExtension($file) === $format) {
+            $file = Str::removeRight($file, '.' . $format);
+        }
+
         if ($locale === $fallback || $this->isDebug()) {
-            $this->loadLanguageFile("$path/$fallback/$file.$format", $format);
+            $this->loadLanguageFile("$path/$fallback/$file.$format", $format, $fallback);
         }
 
         if ($locale !== $fallback) {
-            $this->loadLanguageFile("$path/$locale/$file.$format", $format);
+            $this->loadLanguageFile("$path/$locale/$file.$format", $format, $locale);
         }
 
         return $this;
@@ -131,10 +136,10 @@ class LangService extends Language
         return $this;
     }
 
-    protected function loadLanguageFile(string $file, string $format): static
+    protected function loadLanguageFile(string $file, string $format, ?string $locale = null): static
     {
         if (is_file($file)) {
-            $this->load($file, $format);
+            $this->load($file, $format, $locale);
 
             if (!in_array($file, $this->loadedFiles, true)) {
                 $this->loadedFiles[] = $file;

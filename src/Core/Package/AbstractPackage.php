@@ -103,7 +103,7 @@ abstract class AbstractPackage
         return (new \ReflectionClass(static::class))->getNamespaceName();
     }
 
-    protected function mergeConfig(Container $container, $data, bool $override = false): void
+    protected function mergeConfig(Container $container, array $data, bool $override = false): void
     {
         $container->getParameters()->transform(
             function ($storage) use ($override, $data) {

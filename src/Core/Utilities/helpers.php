@@ -26,23 +26,6 @@ namespace {
             return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
         }
     }
-
-    if (!function_exists('__')) {
-        /**
-         * Get ENV var.
-         *
-         * @param string $name
-         * @param mixed  $default
-         *
-         * @return  string
-         *
-         * @since  3.3
-         */
-        function __(string $name, $default = null): ?string
-        {
-            return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
-        }
-    }
 }
 
 namespace Windwalker {
