@@ -9,6 +9,7 @@
 namespace Windwalker\Core\Renderer\Edge;
 
 use Windwalker\Dom\Builder\HtmlBuilder;
+use Windwalker\DOM\DOMElement;
 
 /**
  * The EdgeHelper class.
@@ -27,12 +28,12 @@ class EdgeHelper
      *
      * @since  3.3
      */
-    public static function attr($name, $value = null)
+    public static function attr(string|array $name, mixed $value = null): string
     {
         if (is_string($name)) {
             $name = [$name => $value];
         }
 
-        return HtmlBuilder::buildAttributes($name);
+        return DOMElement::buildAttributes($name);
     }
 }

@@ -115,6 +115,8 @@ class AppRequest
         $new->matchedRoute = clone $new->matchedRoute;
         $new->matchedRoute->vars($vars);
 
+        $new->input = null;
+
         return $new;
     }
 
@@ -327,7 +329,7 @@ class AppRequest
     {
         $new = clone $this;
         $new->matchedRoute = $matchedRoute;
-        $this->input = null;
+        $new->input = null;
 
         return $new;
     }

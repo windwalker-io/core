@@ -19,7 +19,6 @@ use Windwalker\Utilities\Arr;
  *
  * @method AssetService css(string $url, array $options = [], array $attrs = [])
  * @method AssetService js(string $url, array $options = [], array $attrs = [])
- * @method AssetService import(string $url, array $options = [], array $attrs = [])
  * @method AssetService internalCSS(string $content)
  * @method AssetService internalJS(string $content)
  * @method bool|string has(string $uri, bool $strict = false)
