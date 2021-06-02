@@ -55,7 +55,18 @@ export async function webpackBasicConfig() {
 export async function webpackVue3Config() {
   const VueLoaderPlugin = await getVueLoader(3);
 
-  return merge(await webpackBasicConfig(), {
+  return {
+    mode: process.env.NODE_ENV || 'development',
+    output: {
+      filename: '[name].js',
+      sourceMapFilename: '[name].js.map'
+    },
+    stats: {
+      all: false,
+      errors: true,
+      warnings: true,
+      version: false,
+    },
     // devtool: 'eval-source-map',
     // ensure we are using the version of Vue that supports templates
     resolve: {
@@ -116,7 +127,7 @@ export async function webpackVue3Config() {
     plugins: [
       new VueLoaderPlugin()
     ]
-  });
+  };
 }
 
 export async function getVueLoader(version = 3) {

@@ -41,6 +41,11 @@
         ]
     },
     "extra": {
+        "windwalker": {
+            "packages": [
+                "Windwalker\\Debugger\\DebuggerPackage"
+            ]
+        },
         "branch-alias": {
             "dev-master": "4.x-dev"
         }
