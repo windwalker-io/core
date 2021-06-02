@@ -52,7 +52,7 @@ class Controller implements ContainerAttributeInterface
         }
 
         return fn(...$args): DelegatingController => (new DelegatingController(
-            $container,
+            $container->get(AppContext::class),
             $handler(...$args)
         ))
             ->setModule($this->module)

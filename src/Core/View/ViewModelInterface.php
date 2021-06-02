@@ -22,10 +22,10 @@ interface ViewModelInterface
     /**
      * Prepare
      *
-     * @param  AppState    $state
      * @param  AppContext  $app
+     * @param  View        $view
      *
      * @return  mixed
      */
-    public function prepare(AppState $state, AppContext $app): mixed;
+    public function prepare(AppContext $app, View $view): mixed;
 }

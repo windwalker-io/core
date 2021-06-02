@@ -11,16 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Controller;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
+use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\DI\Container;
-use Windwalker\DI\ContainerAwareTrait;
-
-use function Windwalker\DI\create;
 
 /**
  * The DelegatingController class.
@@ -34,11 +31,13 @@ class DelegatingController implements ControllerInterface
     /**
      * DelegatingController constructor.
      *
-     * @param  Container  $container
-     * @param  object     $controller
+     * @param  AppContext  $app
+     * @param  object      $controller
      */
-    public function __construct(protected Container $container, protected object $controller)
-    {
+    public function __construct(
+        protected AppContext $app,
+        protected object $controller
+    ) {
         //
     }
 
@@ -60,9 +59,10 @@ class DelegatingController implements ControllerInterface
         // Prepare Module
         if ($this->module) {
             /** @var ModuleInterface $module */
-            $module = $this->container->newInstance($this->module);
+            $module = $this->app->make($this->module);
 
-            $this->container->share($this->module, $module)
+            $this->app->getContainer()
+                ->share($this->module, $module)
                 ->alias(ModuleInterface::class, $this->module);
 
             $args[AppState::class] = $module->getState();
@@ -84,14 +84,28 @@ class DelegatingController implements ControllerInterface
             $handler = [$this, 'renderView'];
         }
 
-        $res = $this->container->call($handler, $args);
+        try {
+            $res = $this->app->call($handler, $args);
 
-        if ($this->module) {
-            $this->container->remove($this->module)
-                ->removeAlias(ModuleInterface::class);
+            if ($this->module) {
+                $this->app->getContainer()->remove($this->module)
+                    ->removeAlias(ModuleInterface::class);
+            }
+
+            return $res;
+        } catch (ValidateFailException $e) {
+            $this->app->addMessage($e->getMessage(), 'warning');
+            $nav = $this->app->service(Navigator::class);
+            return $nav->back();
+        } catch (\Throwable $e) {
+            if ($this->app->isDebug()) {
+                throw $e;
+            } else {
+                $this->app->addMessage($e->getMessage(), 'warning');
+                $nav = $this->app->service(Navigator::class);
+                return $nav->back();
+            }
         }
-
-        return $res;
     }
 
     public function renderView(string $view, AppContext $app): mixed

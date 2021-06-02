@@ -86,7 +86,7 @@ class ViewModel implements ContainerAttributeInterface
                     View::class,
                     compact('viewModel', 'options')
                 )
-                    ->setLayout($this->layout),
+                    ->setLayoutMap($this->layout),
                 $viewModel,
                 $container
             );

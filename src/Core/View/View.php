@@ -43,7 +43,9 @@ class View implements EventAwareInterface
     use OptionsResolverTrait;
     use EventAwareTrait;
 
-    protected string|array|null $layout = null;
+    protected string|array|null $layoutMap = null;
+
+    protected string $layout = '';
 
     protected ?RendererInterface $renderer = null;
 
@@ -62,6 +64,26 @@ class View implements EventAwareInterface
         array $options = []
     ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLayout(): string
+    {
+        return $this->layout;
+    }
+
+    /**
+     * @param  string  $layout
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setLayout(string $layout): static
+    {
+        $this->layout = $layout;
+
+        return $this;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
@@ -112,14 +134,14 @@ class View implements EventAwareInterface
 
         $vm = $event->getViewModel();
         $data = $event->getData();
-        $layout = $event->getLayout();
+        $this->layout = $layout = $event->getLayout();
 
         if ($data !== []) {
             $this->injectData($vm, $data);
         }
 
         $response = $this->handleVMResponse(
-            $vm->prepare($event->getState(), $this->app)
+            $vm->prepare($this->app, $this)
         );
 
         if ($response instanceof RedirectResponse) {
@@ -200,7 +222,7 @@ class View implements EventAwareInterface
         $vm = $this->getViewModel();
 
         $layouts = $this->app->config('di.layouts') ?? [];
-        $layout = $layouts[$vm::class] ?? $this->getLayout();
+        $layout = $layouts[$vm::class] ?? $this->getLayoutMap();
 
         if (is_array($layout)) {
             $varName = $this->options['layout_var_name'];
@@ -236,19 +258,19 @@ class View implements EventAwareInterface
     /**
      * @return string|array|null
      */
-    public function getLayout(): string|array|null
+    public function getLayoutMap(): string|array|null
     {
-        return $this->layout;
+        return $this->layoutMap;
     }
 
     /**
-     * @param  string|array|null  $layout
+     * @param  string|array|null  $layoutMap
      *
      * @return  static  Return self to support chaining.
      */
-    public function setLayout(string|array|null $layout): static
+    public function setLayoutMap(string|array|null $layoutMap): static
     {
-        $this->layout = $layout;
+        $this->layoutMap = $layoutMap;
 
         return $this;
     }

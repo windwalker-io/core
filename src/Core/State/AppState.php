@@ -119,7 +119,6 @@ class AppState implements \JsonSerializable
     ): mixed {
         $inputField ??= $key;
 
-        $key    = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
 
         $inputValue = $this->getRequest()->input($inputField);
