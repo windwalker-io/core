@@ -176,6 +176,27 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     }
 
     /**
+     * Runs the current command.
+     *
+     * If an event dispatcher has been attached to the application,
+     * events are also dispatched during the life-cycle of the command.
+     *
+     * @return int 0 if everything went fine, or an error code
+     */
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        if ($command instanceof CommandWrapper) {
+            $handler = $command->getHandler();
+
+            if ($handler instanceof SubCommandAwareInterface) {
+                $handler->configureSubCommand($command, $input);
+            }
+        }
+
+        return parent::doRunCommand($command, $input, $output);
+    }
+
+    /**
      * @return OutputInterface
      */
     public function getOutput(): OutputInterface

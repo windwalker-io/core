@@ -42,7 +42,7 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
     public function __construct(
         ?string $name = null,
         ?string $description = null,
-        array $aliases = [],
+        array|string $aliases = [],
         bool $hidden = false
     ) {
         parent::__construct($name ?? self::TEMP_NAME);
@@ -51,8 +51,16 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
             $this->setDescription($description);
         }
 
-        $this->setAliases($aliases);
+        $this->setAliases((array) $aliases);
         $this->setHidden($hidden);
+    }
+
+    /**
+     * @return callable|object
+     */
+    public function getHandler(): mixed
+    {
+        return $this->handler;
     }
 
     /**
