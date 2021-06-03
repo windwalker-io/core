@@ -24,7 +24,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\AllowAnyOptionsInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
 
@@ -152,6 +151,8 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
 
         unset($args['command']);
         $definition->setArguments($args);
+
+        include_once __DIR__ . '/../generator-helpers.php';
 
         return $subCommand->run(new ArgvInput($argv, $definition), $io->getOutput());
     }
