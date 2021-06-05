@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -19,9 +19,9 @@ use Windwalker\Utilities\Str;
  * The GenViewSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker view.'
+    description: 'Generate Windwalker form.'
 )]
-class ViewSubCommand extends AbstractGeneratorSubCommand
+class FormSubCommand extends AbstractGeneratorSubCommand
 {
     /**
      * Executes the current command.
@@ -36,17 +36,17 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No view name');
+            $io->errorStyle()->error('No form name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('view/**/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('form/**/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'className' => Str::ensureRight($name, 'View'),
-                    'name' => Str::removeRight($name, 'View'),
+                    'className' => Str::ensureRight($name, 'Form'),
+                    'name' => Str::removeRight($name, 'Form'),
                     'ns' => $this->getNamesapce($io),
                 ],
                 $force

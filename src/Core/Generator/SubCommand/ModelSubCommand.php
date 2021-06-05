@@ -9,33 +9,20 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
-use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Utilities\Str;
 
 /**
- * The GenControllerSubCommand class.
+ * The GenViewSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker controller.'
+    description: 'Generate Windwalker model/entity.'
 )]
-class ControllerSubCommand extends AbstractGeneratorSubCommand
+class ModelSubCommand extends AbstractGeneratorSubCommand
 {
-    /**
-     * configure
-     *
-     * @param  Command  $command
-     *
-     * @return  void
-     */
-    public function configure(Command $command): void
-    {
-        parent::configure($command);
-    }
-
     /**
      * Executes the current command.
      *
@@ -49,18 +36,27 @@ class ControllerSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No controller name');
+            $io->errorStyle()->error('No entity name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('controller/*'))
+        $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
+            ->replaceTo(
+                'src/Entity',
+                [
+                    'name' => $name,
+                    'ns' => $this->getNamesapce($io),
+                ],
+                $force
+            );
+
+        $this->codeGenerator->from($this->getViewPath('model/module/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'className' => Str::ensureRight($name, 'Controller'),
-                    'name' => Str::removeRight($name, 'Controller'),
-                    'ns' => $ns = $this->getNamesapce($io),
+                    'name' => $name,
+                    'ns' => $this->getNamesapce($io),
                 ],
                 $force
             );

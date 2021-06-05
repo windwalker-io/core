@@ -14,7 +14,7 @@ namespace Windwalker\Core\Seed;
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The Seeder class.
@@ -50,7 +50,7 @@ class Seeder
         protected FakerService $faker
     ) {
         $this->name = $this->file->getBasename('.php');
-        $this->prettyName = ucwords(StrNormalise::toSpaceSeparated($this->name));
+        $this->prettyName = ucwords(StrNormalize::toSpaceSeparated($this->name));
     }
 
     /**

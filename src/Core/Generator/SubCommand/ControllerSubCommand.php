@@ -9,20 +9,33 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
+use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Utilities\Str;
 
 /**
- * The GenViewSubCommand class.
+ * The GenControllerSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker form.'
+    description: 'Generate Windwalker controller.'
 )]
-class FormSubCommand extends AbstractGeneratorSubCommand
+class ControllerSubCommand extends AbstractGeneratorSubCommand
 {
+    /**
+     * configure
+     *
+     * @param  Command  $command
+     *
+     * @return  void
+     */
+    public function configure(Command $command): void
+    {
+        parent::configure($command);
+    }
+
     /**
      * Executes the current command.
      *
@@ -36,18 +49,18 @@ class FormSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No form name');
+            $io->errorStyle()->error('No controller name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('form/**/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('controller/*'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'className' => Str::ensureRight($name, 'Form'),
-                    'name' => Str::removeRight($name, 'Form'),
-                    'ns' => $this->getNamesapce($io),
+                    'className' => Str::ensureRight($name, 'Controller'),
+                    'name' => Str::removeRight($name, 'Controller'),
+                    'ns' => $ns = $this->getNamesapce($io),
                 ],
                 $force
             );

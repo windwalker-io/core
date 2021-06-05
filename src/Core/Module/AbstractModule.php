@@ -15,7 +15,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Utilities\Str;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The AbstractModule class.
@@ -59,7 +59,7 @@ abstract class AbstractModule implements ModuleInterface
         $ref = new \ReflectionClass($this);
         $ns = $ref->getNamespaceName();
 
-        return StrNormalise::toDotSeparated(Str::removeLeft($ns, $root));
+        return StrNormalize::toDotSeparated(Str::removeLeft($ns, $root));
     }
 
     /**

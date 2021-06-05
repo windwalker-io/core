@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;

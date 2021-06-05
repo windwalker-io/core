@@ -10,33 +10,33 @@
 declare(strict_types=1);
 
 use Windwalker\Utilities\StrInflector;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 
 if (!function_exists('kebab')) {
     function kebab(string $string): string
     {
-        return StrNormalise::toKebabCase($string);
+        return StrNormalize::toKebabCase($string);
     }
 }
 
 if (!function_exists('camel')) {
     function camel(string $string): string
     {
-        return StrNormalise::toCamelCase($string);
+        return StrNormalize::toCamelCase($string);
     }
 }
 
 if (!function_exists('pascal')) {
     function pascal(string $string): string
     {
-        return StrNormalise::toPascalCase($string);
+        return StrNormalize::toPascalCase($string);
     }
 }
 
 if (!function_exists('snake')) {
     function snake(string $string): string
     {
-        return StrNormalise::toUnderscoreSeparated($string);
+        return StrNormalize::toUnderscoreSeparated($string);
     }
 }
 

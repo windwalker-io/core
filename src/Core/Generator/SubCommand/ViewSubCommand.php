@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -19,9 +19,9 @@ use Windwalker\Utilities\Str;
  * The GenViewSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker model/entity.'
+    description: 'Generate Windwalker view.'
 )]
-class ModelSubCommand extends AbstractGeneratorSubCommand
+class ViewSubCommand extends AbstractGeneratorSubCommand
 {
     /**
      * Executes the current command.
@@ -36,26 +36,17 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No entity name');
+            $io->errorStyle()->error('No view name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
-            ->replaceTo(
-                'src/Entity',
-                [
-                    'name' => $name,
-                    'ns' => $this->getNamesapce($io),
-                ],
-                $force
-            );
-
-        $this->codeGenerator->from($this->getViewPath('model/module/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('view/**/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'name' => $name,
+                    'className' => Str::ensureRight($name, 'View'),
+                    'name' => Str::removeRight($name, 'View'),
                     'ns' => $this->getNamesapce($io),
                 ],
                 $force

@@ -16,7 +16,7 @@ use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\TypeCast;
 
 /**
@@ -121,7 +121,7 @@ class SeedService implements EventAwareInterface
 
     protected function getSeedPrettyName(string $name): string
     {
-        return ucwords(StrNormalise::toSpaceSeparated($name));
+        return ucwords(StrNormalize::toSpaceSeparated($name));
     }
 
     /**

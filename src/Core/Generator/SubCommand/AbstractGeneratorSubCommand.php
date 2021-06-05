@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,7 +21,7 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Filesystem\Path;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The AbstractGeneratorSubCommand class.
@@ -110,7 +110,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
         $ns .= '\\' . $dest;
 
-        return StrNormalise::toClassNamespace($ns);
+        return StrNormalize::toClassNamespace($ns);
     }
 
     protected function getDestPath(IOInterface $io): string

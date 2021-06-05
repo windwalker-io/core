@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\Command;
+namespace Windwalker\Core\Generator\SubCommand;
 
 use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandWrapper;

@@ -22,7 +22,7 @@ use Windwalker\Core\Router\RouteUri;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
-use Windwalker\Utilities\StrNormalise;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The ControllerDispatcher class.
@@ -99,7 +99,7 @@ class ControllerDispatcher
         $task = $map[$task] ?? $task;
 
         if (str_contains($task, '_')) {
-            $task = StrNormalise::toCamelCase($task);
+            $task = StrNormalize::toCamelCase($task);
         }
 
         return $task;
