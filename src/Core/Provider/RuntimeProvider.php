@@ -11,14 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Language\LangService;
+use Composer\Autoload\ClassLoader;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Filter\FilterFactory;
-use Windwalker\Language\Language;
-use Windwalker\Language\LanguageInterface;
 
 /**
  * The RuntimeProvider class.
@@ -33,6 +32,9 @@ class RuntimeProvider implements ServiceProviderInterface
         $config    = $container->getParameters();
         $container->share(Config::class, $config);
         $container->share(Container::class, $container);
+
+        $loader = include Runtime::getRootDir() . '/vendor/autoload.php';
+        $container->share(ClassLoader::class, $loader);
 
         $this->registerFilters($container);
     }

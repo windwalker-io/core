@@ -27,6 +27,8 @@ abstract class AbstractAstBuilder
 {
     private ?Parser $parser = null;
 
+    protected ?\Closure $handler = null;
+
     abstract public function process(array $options = []): string;
 
     protected static function getLastIndexOf(array $elements, callable $handler): string|int|null
@@ -62,17 +64,17 @@ abstract class AbstractAstBuilder
         );
     }
 
-    protected function createNodeFactory(): BuilderFactory
+    public function createNodeFactory(): BuilderFactory
     {
         return new BuilderFactory();
     }
 
-    protected function attributeGroup(...$attrs): Node\AttributeGroup
+    public function attributeGroup(...$attrs): Node\AttributeGroup
     {
         return new Node\AttributeGroup($attrs);
     }
 
-    protected function attribute(string $name, ...$args): Node\Attribute
+    public function attribute(string $name, ...$args): Node\Attribute
     {
         $args = array_map(fn ($arg) => new Node\Arg($arg), $args);
 
@@ -94,38 +96,41 @@ abstract class AbstractAstBuilder
         $oldAst    = $parser->parse($code);
         $oldTokens = $this->getLexer()->getTokens();
 
-        $traverser->addVisitor(
-            new class($enterNode, $leaveNode) extends NodeVisitorAbstract {
-                public function __construct(
-                    protected ?\Closure $enterNode = null,
-                    protected ?\Closure $leaveNode = null
-                ) {
-                    //
-                }
-
-                public function enterNode(Node $node)
-                {
-                    if (!$this->enterNode) {
-                        return null;
-                    }
-
-                    return ($this->enterNode)($node);
-                }
-
-                public function leaveNode(Node $node)
-                {
-                    if (!$this->leaveNode) {
-                        return null;
-                    }
-
-                    return ($this->leaveNode)($node);
-                }
-            }
-        );
+        $traverser->addVisitor($this->createVisitor($enterNode, $leaveNode));
         $newAst = $traverser->traverse($oldAst);
 
         $prettyPrinter = new \PhpParser\PrettyPrinter\Standard();
 
         return $prettyPrinter->printFormatPreserving($newAst, $oldAst, $oldTokens);
+    }
+
+    protected function createVisitor(?\Closure $enterNode, ?\Closure $leaveNode): NodeVisitorAbstract
+    {
+        return new class($enterNode, $leaveNode) extends NodeVisitorAbstract {
+            public function __construct(
+                protected ?\Closure $enterNode = null,
+                protected ?\Closure $leaveNode = null
+            ) {
+                //
+            }
+
+            public function enterNode(Node $node)
+            {
+                if (!$this->enterNode) {
+                    return null;
+                }
+
+                return ($this->enterNode)($node);
+            }
+
+            public function leaveNode(Node $node)
+            {
+                if (!$this->leaveNode) {
+                    return null;
+                }
+
+                return ($this->leaveNode)($node);
+            }
+        };
     }
 }

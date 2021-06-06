@@ -27,7 +27,7 @@ use Windwalker\Utilities\Str;
 /**
  * The BuildEntityCommand class.
  */
-#[CommandWrapper(description: 'Build entity getters/setters and sync with database.')]
+#[CommandWrapper(description: 'Build entity getters/setters and sync properties with database.')]
 class BuildEntityCommand implements CommandInterface
 {
     private IOInterface $io;
@@ -69,6 +69,13 @@ class BuildEntityCommand implements CommandInterface
             'Don\'t generate methods',
             false
         );
+
+        $command->addOption(
+            'dry-run',
+            'd',
+            InputOption::VALUE_NONE,
+            'Do not replace origin file.'
+        );
     }
 
     /**
@@ -96,7 +103,7 @@ class BuildEntityCommand implements CommandInterface
         return 0;
     }
 
-    protected function handleClasses(iterable $classes)
+    protected function handleClasses(iterable $classes): void
     {
         foreach ($classes as $class) {
             if (!class_exists($class)) {
@@ -115,10 +122,12 @@ class BuildEntityCommand implements CommandInterface
                 $added
             );
 
-            Filesystem::write(
-                $meta->getReflector()->getFileName() . '.dist.php',
-                $newCode
-            );
+            if (!$this->io->getOption('dry-run')) {
+                Filesystem::write(
+                    $meta->getReflector()->getFileName(),
+                    $newCode
+                );
+            }
 
             if ($added['properties']) {
                 $this->io->newLine();

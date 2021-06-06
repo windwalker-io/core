@@ -17,6 +17,7 @@ use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -262,14 +263,15 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     /**
      * runCommand
      *
-     * @param  string|Command  $command
-     * @param  IOInterface     $io
+     * @param  string|Command                    $command
+     * @param  array|InputInterface|IOInterface  $input
+     * @param  OutputInterface|null              $output
      *
      * @return  int
      *
      * @throws \Exception
      */
-    public function runCommand(string|Command $command, IOInterface $io): int
+    public function runCommand(string|Command $command, array|InputInterface|IOInterface $input, ?OutputInterface $output = null): int
     {
         if (is_string($command)) {
             if (str_contains($command, '\\')) {
@@ -291,7 +293,18 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         // show($io->getInput());
 
-        return $command->run($io->getInput(), $io->getOutput());
+        if ($input instanceof IOInterface) {
+            $output = $input->getOutput();
+            $input = $input->getInput();
+        } elseif (is_array($input)) {
+            $input = new ArrayInput($input);
+        }
+
+        if ($output === null) {
+            $output = $this->getOutput();
+        }
+
+        return $command->run($input, $output);
     }
 
     /**

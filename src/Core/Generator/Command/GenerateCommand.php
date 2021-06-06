@@ -9,21 +9,19 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Generator\SubCommand;
+namespace Windwalker\Core\Generator\Command;
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
 

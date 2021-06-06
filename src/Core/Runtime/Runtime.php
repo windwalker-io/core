@@ -38,12 +38,12 @@ class Runtime
     public static function boot(string $rootDir, string $workDir): void
     {
         if (!static::isBooted()) {
+            static::$rootDir = $rootDir;
+            static::$workDir = $workDir;
+
             $container = static::getContainer();
 
             $container->registerServiceProvider(new RuntimeProvider());
-
-            static::$rootDir = $rootDir;
-            static::$workDir = $workDir;
         }
 
         static::$booted = true;

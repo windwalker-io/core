@@ -26,18 +26,15 @@ class ClassFinder
     /**
      * ClassFinder constructor.
      */
-    public function __construct(protected PathResolver $pathResolver)
+    public function __construct(protected PathResolver $pathResolver, protected ClassLoader $loader)
     {
     }
 
     public function findDirsFromNamespace(string $ns): array
     {
-        /** @var ClassLoader $loader */
-        $loader = include $this->pathResolver->resolve('@root/vendor/autoload.php');
-
         $dirs = [];
 
-        foreach ($loader->getPrefixesPsr4() as $prefix => $paths) {
+        foreach ($this->loader->getPrefixesPsr4() as $prefix => $paths) {
             if (str_starts_with($ns, $prefix)) {
                 foreach ($paths as $path) {
                     $dir = Path::normalize($path);

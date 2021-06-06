@@ -32,7 +32,7 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        $name  = $io->getArgument('name');
+        [, $name] = $this->getNameParts($io);
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -41,15 +41,7 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
-            ->replaceTo(
-                'src/Entity',
-                [
-                    'name' => $name,
-                    'ns' => $this->getNamesapce($io),
-                ],
-                $force
-            );
+        $this->generateEntity($io);
 
         $this->codeGenerator->from($this->getViewPath('model/module/*.tpl'))
             ->replaceTo(
@@ -62,5 +54,21 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
             );
 
         return 0;
+    }
+
+    protected function generateEntity(IOInterface $io): void
+    {
+        [, $name] = $this->getNameParts($io);
+        $force = $io->getOption('force');
+
+        $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
+            ->replaceTo(
+                $this->app->path('src/Entity'),
+                [
+                    'name' => $name,
+                    'ns' => $this->getNamesapce($io),
+                ],
+                $force
+            );
     }
 }

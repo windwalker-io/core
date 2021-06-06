@@ -32,7 +32,7 @@ class FormSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        $name  = $io->getArgument('name');
+        [, $name] = $this->getNameParts($io);
         $force = $io->getOption('force');
 
         if (!$name) {

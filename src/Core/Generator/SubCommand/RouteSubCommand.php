@@ -50,7 +50,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        $name  = $io->getArgument('name');
+        [, $name] = $this->getNameParts($io);
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -59,13 +59,9 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
-        $name = Path::clean($name, '/');
-        [$path, $name] = explode('/', $name, 2) + ['', ''];
-        $dir = $this->app->path($io->getOption('dir'));
-
         $this->codeGenerator->from($this->getViewPath('route/*'))
             ->replaceTo(
-                $dir . '/' . $path,
+                $this->getDestPath($io),
                 [
                     'name' => $name,
                 ],

@@ -56,6 +56,7 @@ trait ApplicationTrait
      * @param  string  $path
      *
      * @return  string
+     * @throws \ReflectionException
      */
     public function path(string $path): string
     {

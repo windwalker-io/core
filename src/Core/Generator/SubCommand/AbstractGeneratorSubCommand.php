@@ -54,10 +54,10 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             InputArgument::OPTIONAL,
         );
 
-        $command->addArgument(
-            'dest',
-            InputArgument::OPTIONAL,
-        );
+        // $command->addArgument(
+        //     'dest',
+        //     InputArgument::OPTIONAL,
+        // );
 
         $command->addOption(
             'dir',
@@ -98,14 +98,14 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             $io->setArgument('name', $io->ask('Controller name (camel case): '));
         }
 
-        if (!$io->getArgument('dest') && $this->requireDest) {
-            $io->setArgument('dest', $io->ask("Dest path (<comment>from: $dir/</comment>): "));
-        }
+        // if (!$io->getArgument('dest') && $this->requireDest) {
+        //     $io->setArgument('dest', $io->ask("Dest path (<comment>from: $dir/</comment>): "));
+        // }
     }
 
     protected function getNamesapce(IOInterface $io): string
     {
-        $dest = $io->getArgument('dest');
+        [$dest] = $this->getNameParts($io);
         $ns  = $io->getOption('ns');
 
         $ns .= '\\' . $dest;
@@ -115,15 +115,25 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
     protected function getDestPath(IOInterface $io): string
     {
-        $dest = $io->getArgument('dest');
+        [$dest] = $this->getNameParts($io);
         $dir  = $io->getOption('dir');
 
-        return Path::normalize($dir . '/' . $dest);
+        return Path::normalize($this->app->path($dir . '/' . $dest));
+    }
+
+    protected function getNameParts(IOInterface $io): array
+    {
+        $name = $io->getArgument('name');
+        $names = preg_split('/\/|\\\\/', $name);
+        $name = array_pop($names);
+        $dest = implode('/', $names);
+
+        return [$dest, $name];
     }
 
     protected function getViewPath(string $suffix = ''): string
     {
-        $path = $this->getCoreDir() . '/views/code';
+        $path = $this->getBaseDir() . '/views/code';
 
         if ($suffix) {
             $path .= '/' . $suffix;
@@ -132,7 +142,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return Path::normalize($path);
     }
 
-    protected function getCoreDir(): string
+    protected function getBaseDir(): string
     {
         return __DIR__ . '/../../../..';
     }
