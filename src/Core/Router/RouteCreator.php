@@ -409,7 +409,8 @@ class RouteCreator
         $routes = [];
 
         foreach ($this->getRoutes() as $route) {
-            $routes[$route->getName()] = $route->compile();
+            $route = $route->compile();
+            $routes[$route->getName()] = $route;
         }
 
         return $routes;

@@ -56,7 +56,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     public function self(int $options = self::TYPE_PATH): RouteUri
     {
-        $route = $this->app->getMatchedRoute()?->getName() ?? $this->app->getSystemUri()->current();
+        $route = $this->getMatchedRoute()?->getName() ?? $this->app->getSystemUri()->current();
 
         return $this->to(
             $route,
@@ -83,8 +83,19 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $handler = function (array $query) use ($route) {
             $routeObject = $this->router->getRoute($route);
 
-            if (!$routeObject) {
-                throw new RouteNotFoundException('Route: ' . $route . ' not found.');
+            if (!$routeObject && !str_contains($route, '::')) {
+                // Find with namespace
+                if ($matched = $this->getMatchedRoute()) {
+                    $ns = $matched->getExtraValue('namespace');
+                    
+                    if ($ns) {
+                        $routeObject = $this->router->getRoute($ns . '::' . $route);
+                    }
+                }
+                
+                if (!$routeObject) {
+                    throw new RouteNotFoundException('Route: ' . $route . ' not found.');
+                }
             }
 
             return $this->routeBuilder->build($routeObject->getPattern(), $query);
@@ -178,5 +189,15 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function getAppContext(): AppContext
     {
         return $this->app;
+    }
+
+    /**
+     * getMatchedRoute
+     *
+     * @return  Route|null
+     */
+    public function getMatchedRoute(): ?Route
+    {
+        return $this->app->getMatchedRoute();
     }
 }

@@ -182,6 +182,7 @@ class Route
         $namespaces = array_filter(
             array_column($groups, 'namespace')
         );
+        $options['extra']['namespace'] = implode('::', $namespaces);
         $namespaces[] = $this->name;
 
         $new->name = implode('::', $namespaces);
@@ -189,7 +190,6 @@ class Route
         $options['extra']['action']      = $options['actions'] ?? [];
         $options['extra']['hook']        = $options['hooks'] ?? [];
         $options['extra']['middlewares'] = $options['middlewares'] ?? [];
-//        $options['extra']['package']     = $options['package'];
         $options['extra']['groups'] = $groups;
 
         $new->setOptions($options);
