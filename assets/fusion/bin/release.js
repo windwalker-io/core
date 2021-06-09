@@ -28,7 +28,7 @@ if (cliInput['help'] || cliInput['h']) {
 console.log('>>> Git commit all');
 exec(`git add .`);
 try {
-  exec(`git commit -am "Prepare release."`);
+  exec(`git commit -am "Prepare release @windwalker-io/fusion."`);
 } catch (e) {
   console.log(e.message);
 }
@@ -41,7 +41,6 @@ const branch = cliInput['b'] || 'master';
 console.log('>>> Push to git');
 
 exec(`git push origin ${branch}`);
-exec(`git push origin --tags -f`);
 exec(`git checkout master`);
 
 console.log('>> Publish to npm');
