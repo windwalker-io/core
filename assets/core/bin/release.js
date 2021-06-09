@@ -27,13 +27,16 @@ if (cliInput['help'] || cliInput['h']) {
   process.exit(0);
 }
 
+console.log(`>>> yarn build:prod`);
+exec(`yarn build:prod`, { stdio: 'inherit' });
+
 console.log(`>>> npm version ${args.join(' ')}`);
-exec(`npm version ${args.join(' ')}`);
+exec(`npm version ${args.join(' ')}`, { stdio: 'inherit' });
 
 console.log('>>> Git commit all');
-exec(`git add .`);
+exec(`git add .`, { stdio: 'inherit' });
 try {
-  exec(`git commit -am "Prepare release @windwalker-io/core."`);
+  exec(`git commit -am "Prepare release @windwalker-io/core."`, { stdio: 'inherit' });
 } catch (e) {
   console.log(e.message);
 }
@@ -42,9 +45,8 @@ const branch = cliInput['b'] || 'master';
 
 console.log('>>> Push to git');
 
-exec(`git push origin ${branch}`);
-exec(`git checkout master`);
+exec(`git push origin ${branch}`, { stdio: 'inherit' });
 
 console.log('>> Publish to npm');
 
-exec(`npm publish`);
+exec(`npm publish`, { stdio: 'inherit' });
