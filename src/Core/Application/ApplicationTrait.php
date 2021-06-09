@@ -21,6 +21,7 @@ use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
+use Windwalker\Event\EventListenableInterface;
 
 /**
  * Trait ApplicationTrait
@@ -118,6 +119,10 @@ trait ApplicationTrait
         }
 
         foreach (iterator_to_array($this->config) as $service => $config) {
+            if (!($config['enabled'] ?? true)) {
+                continue;
+            }
+
             $listeners = $config['listeners'] ?? [];
 
             foreach ($listeners as $name => $listener) {
@@ -133,13 +138,15 @@ trait ApplicationTrait
         mixed $listener
     ): void {
         if (is_numeric($name)) {
-            if ($listener instanceof \Closure) {
-                // Closure with ListenTo() attribute
-                $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
-                $event->listen($dispatcher->getProvider(), $listener);
-            } elseif ($dispatcher instanceof EventEmitter) {
-                // Simply listener class name.
-                $dispatcher->subscribe($container->resolve($listener));
+            if ($dispatcher instanceof EventListenableInterface) {
+                if ($listener instanceof \Closure) {
+                    // Closure with ListenTo() attribute
+                    $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
+                    $event->listen($dispatcher, $listener);
+                } else {
+                    // Simply listener class name.
+                    $dispatcher->subscribe($container->resolve($listener));
+                }
             }
         } elseif (is_callable($listener)) {
             // Events name => listener

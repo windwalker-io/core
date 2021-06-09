@@ -23,7 +23,7 @@ try {
   console.error(chalk.red(e.message));
   console.error(
     `\nPlease run "${chalk.yellow('yarn add webpack-stream webpack-comment-remover-loader ' +
-    'vinyl-named-with-path babel-loader css-loader sass-loader style-loader')}" first.\n`
+    'vinyl-named-with-path babel-loader css-loader sass-loader style-loader postcss-loader')}" first.\n`
   );
   process.exit(255);
 }

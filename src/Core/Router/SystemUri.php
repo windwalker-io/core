@@ -225,7 +225,7 @@ class SystemUri extends Uri implements \JsonSerializable
                     $route = substr_replace($this->current, '', 0, strlen($this->root));
 
                     $file = explode('/', $this->script);
-                    $file = '/' . array_pop($file);
+                    $file = array_pop($file);
 
                     if ($file === '' || str_starts_with($route, $file)) {
                         $route = trim(substr($route, strlen($file)), '/');

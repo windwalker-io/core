@@ -11,16 +11,20 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
  * The AbstractManager class.
  */
-abstract class AbstractManager
+abstract class AbstractManager implements EventAwareInterface
 {
     use InstanceCacheTrait;
+    use EventAwareTrait;
 
     /**
      * @var Config
@@ -83,7 +87,15 @@ abstract class AbstractManager
             );
         }
 
-        return $this->container->newInstance($define, $args);
+        $instance = $this->container->newInstance($define, $args);
+
+        $this->emit(InstanceCreatedEvent::class, [
+            'instance' => $instance,
+            'instanceName' => $name,
+            'args' => $args
+        ]);
+
+        return $instance;
     }
 
     protected function prepareArguments(string $name, array $args): array

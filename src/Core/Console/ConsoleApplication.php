@@ -86,7 +86,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         $container->registerByConfig($this->config('di') ?? []);
 
         foreach ($this->config->getIterator(false) as $service => $config) {
-            if (!is_array($config)) {
+            if (!is_array($config) || !($config['enabled'] ?? true)) {
                 continue;
                 // throw new \LogicException("Config: '{$service}' must be array");
             }

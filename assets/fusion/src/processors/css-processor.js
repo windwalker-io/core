@@ -10,6 +10,7 @@ import cleanCSS from 'gulp-clean-css';
 import concat from 'gulp-concat';
 import filter from 'gulp-filter';
 import rename from 'gulp-rename';
+import postcss from 'gulp-postcss';
 import rewriteCSS from 'gulp-rewrite-css';
 import { dest as toDest } from '../base/base.js';
 import { MinifyOption } from '../config.js';
@@ -23,6 +24,7 @@ export default class CssProcessor extends Processor {
       {},
       {
         autoprefixer: true,
+        postcss: null,
         minify: MinifyOption.DEFAULT,
         rebase: true
       },
@@ -33,6 +35,7 @@ export default class CssProcessor extends Processor {
   doProcess(dest, options = {}) {
     this.pipeIf(options.rebase, () => rewriteCSS({ destination: dest.path }))
       .pipeIf(dest.merge, () => concat(dest.file))
+      .pipe(postcss(options.postcss, options.postcss?.config || {}))
       .pipeIf(
         options.autoprefixer,
         () => autoprefixer(

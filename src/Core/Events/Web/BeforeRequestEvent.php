@@ -16,13 +16,11 @@ use Windwalker\DI\Container;
 use Windwalker\Event\AbstractEvent;
 
 /**
- * The AppBeforeExecute class.
+ * The BeforeRequestEvent class.
  */
 class BeforeRequestEvent extends AbstractEvent
 {
-    protected ServerRequestInterface $request;
-
-    protected iterable $middlewares = [];
+    protected ?ServerRequestInterface $request = null;
 
     protected Container $container;
 
@@ -62,26 +60,6 @@ class BeforeRequestEvent extends AbstractEvent
     public function setContainer(Container $container): static
     {
         $this->container = $container;
-
-        return $this;
-    }
-
-    /**
-     * @return iterable
-     */
-    public function getMiddlewares(): iterable
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * @param  iterable  $middlewares
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMiddlewares(iterable $middlewares): static
-    {
-        $this->middlewares = $middlewares;
 
         return $this;
     }

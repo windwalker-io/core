@@ -13,6 +13,7 @@ namespace Windwalker\Core\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Windwalker\Core\Response\Buffer\AbstractBuffer;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\Http\Response\JsonResponse;
@@ -33,7 +34,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 
             $message = $this->getMessage();
 
-            if (!$response instanceof JsonResponse) {
+            if ($response instanceof JsonResponse) {
                 $buffer = new JsonBuffer(
                     $message,
                     json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR)
@@ -45,6 +46,14 @@ class JsonApiMiddleware extends JsonResponseMiddleware
                     $buffer,
                     $response->getStatusCode(),
                     $response->getHeaders()
+                );
+            } else {
+                $response = new JsonResponse(
+                    new JsonBuffer(
+                        $message,
+                        $response
+                    ),
+                    200
                 );
             }
 

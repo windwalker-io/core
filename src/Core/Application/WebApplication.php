@@ -17,7 +17,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
+use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
@@ -72,7 +74,7 @@ class WebApplication implements WebApplicationInterface
         $container->registerByConfig($this->config('di') ?? []);
 
         foreach (iterator_to_array($this->config) as $service => $config) {
-            if (!is_array($config)) {
+            if (!is_array($config) || !($config['enabled'] ?? true)) {
                 continue;
                 // throw new \LogicException("Config: '{$service}' must be array");
             }
@@ -127,6 +129,7 @@ class WebApplication implements WebApplicationInterface
     {
         $this->boot();
 
+        // Level 3
         $container = $this->getContainer()->createChild();
 
         if ($request !== null) {
@@ -134,6 +137,14 @@ class WebApplication implements WebApplicationInterface
         }
 
         $request ??= $container->get(ServerRequestInterface::class);
+
+        // @event
+        $event = $this->emit(
+            BeforeRequestEvent::class,
+            compact('container', 'request')
+        );
+
+        $request = $event->getRequest();
 
         if ($handler) {
             $container->modify(
@@ -152,9 +163,11 @@ class WebApplication implements WebApplicationInterface
                 ->dispatch($container->get(AppContext::class))
         );
 
+        $appContext = $container->get(AppContext::class);
+
         // @event
-        $event = $this->emit(
-            BeforeRequestEvent::class,
+        $event = $appContext->emit(
+            BeforeAppDispatchEvent::class,
             compact('container', 'middlewares', 'request')
         );
 
@@ -216,6 +229,14 @@ class WebApplication implements WebApplicationInterface
     public function terminate(): void
     {
         $this->terminating($this->getContainer());
+
+        $this->emit(
+            TerminatingEvent::class,
+            [
+                'app' => $this,
+                'container' => $this->getContainer()
+            ]
+        );
     }
 
     protected function terminating(Container $container): void

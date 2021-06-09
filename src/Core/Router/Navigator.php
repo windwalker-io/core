@@ -80,7 +80,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $options = $event->getOptions();
         $query = $event->getQuery();
 
-        $handler = function (array $query) use ($route) {
+        $handler = function (array $query) use ($route): array {
             $routeObject = $this->router->getRoute($route);
 
             if (!$routeObject && !str_contains($route, '::')) {
@@ -98,7 +98,15 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                 }
             }
 
-            return $this->routeBuilder->build($routeObject->getPattern(), $query);
+            [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
+
+            $systemUri = $this->app->getSystemUri();
+
+            if ($systemUri->script && $systemUri->script !== 'index.php') {
+                $url = $systemUri->script . '/' . $url;
+            }
+
+            return [$url, $query];
         };
 
         return new RouteUri($handler, $query, $this, $options);

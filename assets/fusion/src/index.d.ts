@@ -30,6 +30,7 @@ declare namespace Fusion {
     autoprefixer?: boolean;
     minify?: MiniOptions;
     rebase?: true;
+    postcss: any;
   }
 
   export interface CssPreProcessorOptions extends CssOptions {

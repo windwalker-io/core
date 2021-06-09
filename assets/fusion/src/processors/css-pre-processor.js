@@ -10,6 +10,7 @@ import cleanCSS from 'gulp-clean-css';
 import concat from 'gulp-concat';
 import eol from 'gulp-eol';
 import filter from 'gulp-filter';
+import postcss from 'gulp-postcss';
 import rename from 'gulp-rename';
 import rewriteCSS from 'gulp-rewrite-css';
 import sourcemaps from 'gulp-sourcemaps';
@@ -49,6 +50,7 @@ export default class CssPreProcessor extends Processor {
         options.rebase && !dest.samePosition,
         () => rewriteCSS({ destination: dest.path })
       )
+      .pipe(postcss(options.postcss, options.postcss?.config || {}))
       .pipeIf(
         options.autoprefixer,
         () => autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9')

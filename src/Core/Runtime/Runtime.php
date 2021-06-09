@@ -12,6 +12,8 @@ namespace Windwalker\Core\Runtime;
 use Windwalker\Core\Provider\RuntimeProvider;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
+use Windwalker\Http\Helper\HttpHelper;
+use Windwalker\Utilities\Arr;
 
 /**
  * The Runtime class.
@@ -105,5 +107,32 @@ class Runtime
     public static function getWorkDir(): string
     {
         return self::$workDir;
+    }
+
+    public static function ipBlock(array|string|null $forEnv, string|array|null $allowIps): void
+    {
+        if (!$forEnv) {
+            return;
+        }
+
+        if (!in_array((string) env('APP_ENV'), (array) $forEnv, true)) {
+            return;
+        }
+
+        if (!is_array($allowIps)) {
+            $allowIps = Arr::explodeAndClear(',', (string) $allowIps);
+        }
+
+        $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
+
+        // Get allow remote ips from config.
+        if (isset($_SERVER['HTTP_CLIENT_IP'])
+            || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+            || !in_array(@$_SERVER['REMOTE_ADDR'], $allowIps, true)
+        ) {
+            header('HTTP/1.1 403 Forbidden');
+
+            exit('Forbidden');
+        }
     }
 }

@@ -5,18 +5,48 @@
  * @license    MIT
  */
 
-import fusion, { watch } from '@windwalker-io/fusion';
+import fusion, { watch, parallel, src, dest } from '@windwalker-io/fusion';
 import { babelBasicOptions } from '@windwalker-io/fusion/src/utilities/babel.js';
+import postcss from 'gulp-postcss';
+import tailwindcss from 'tailwindcss';
 
-export async function vue() {
+export async function debuggers() {
   // Watch start
-  watch('src/debugger/**/*.{js,vue}');
+  watch(['src/debugger/**/*.{js,vue}', 'scss/**/*.scss']);
   // Watch end
 
   fusion.vue('src/debugger/index.js', 'dist/debugger.js');
+  fusion.copy('images/**/*', 'dist/images/');
 }
 
-export default vue;
+export async function console() {
+  // Watch start
+  watch(['scss/**/*.scss', 'src/console/debugger-console.js', '../../views/debugger/**/*.blade.php']);
+  // Watch end
+
+  // fusion.sass('scss/debugger.scss', 'dist/debugger.css');
+  fusion.sass(
+    'scss/debugger-console.scss',
+    'dist/debugger-console.css',
+    {
+      postcss: [
+        tailwindcss({ config: './tailwind/console.tailwind.config.cjs' })
+      ]
+    }
+  );
+  fusion.babel(
+    'src/console/debugger-console.js',
+    'dist/debugger-console.js'
+  );
+
+  // src('scss/debugger-console.css')
+  //   .pipe(postcss([
+  //     tailwindcss()
+  //   ]))
+  //   .pipe(dest('dist/'));
+}
+
+export default parallel(debuggers, console);
 
 /*
  * APIs

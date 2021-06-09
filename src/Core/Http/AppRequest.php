@@ -19,11 +19,14 @@ use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
+use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Assert\ArgumentsAssert;
+
+use Windwalker\Utilities\TypeCast;
 
 use function Windwalker\collect;
 
@@ -31,7 +34,7 @@ use function Windwalker\collect;
  * The AppRequest class.
  */
 #[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
-class AppRequest
+class AppRequest implements \JsonSerializable
 {
     use FilterAwareTrait;
 
@@ -332,5 +335,25 @@ class AppRequest
         $new->input = null;
 
         return $new;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4
+     */
+    public function jsonSerialize()
+    {
+        $req = FormatRegistry::makeDumpable($this->getRequest());
+        $req['stream'] = null;
+
+        return array_merge(
+            $req,
+            [
+                'systemUri' => $this->getSystemUri()
+            ]
+        );
     }
 }

@@ -15,6 +15,7 @@ export async function webpackBasicConfig() {
       filename: '[name].js',
       sourceMapFilename: '[name].js.map'
     },
+    devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-eval-source-map',
     stats: {
       all: false,
       errors: true,
@@ -28,6 +29,7 @@ export async function webpackBasicConfig() {
           use: [
             'style-loader',
             'css-loader',
+            'postcss-loader',
             'sass-loader',
           ],
         },
@@ -35,7 +37,8 @@ export async function webpackBasicConfig() {
           test: /\.css$/,
           use: [
             'style-loader',
-            'css-loader'
+            'css-loader',
+            'postcss-loader'
           ],
         },
         {
@@ -67,7 +70,7 @@ export async function webpackVue3Config() {
       warnings: true,
       version: false,
     },
-    // devtool: 'eval-source-map',
+    devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-eval-source-map',
     // ensure we are using the version of Vue that supports templates
     resolve: {
       alias: {
@@ -84,14 +87,16 @@ export async function webpackVue3Config() {
           use: [
             'vue-style-loader',
             'css-loader',
-            'sass-loader'
+            'postcss-loader',
+            'sass-loader',
           ],
         },
         {
           test: /\.css$/,
           use: [
             'vue-style-loader',
-            'css-loader'
+            'css-loader',
+            'postcss-loader'
           ],
         },
         {

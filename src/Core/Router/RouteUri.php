@@ -17,6 +17,8 @@ use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriHelper;
 
+use function Windwalker\ds;
+
 /**
  * The RouteUri class.
  */

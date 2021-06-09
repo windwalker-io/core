@@ -24,6 +24,7 @@ use Windwalker\Core\Router\SystemUri;
 ?><!doctype html>
 <html lang="en">
 <head>
+    <base href="{{ $uri->root() }}" />
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -33,6 +34,6 @@ use Windwalker\Core\Router\SystemUri;
 <body>
     <app id="app"></app>
 
-    <script src="{{ $asset->handleUri('@core/debugger.js') }}"></script>
+    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger.js')) }}"></script>
 </body>
 </html>
