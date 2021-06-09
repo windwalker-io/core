@@ -38,11 +38,11 @@ exec(`npm version ${args.join(' ')}`);
 
 const branch = cliInput['b'] || 'master';
 
-console.log('>>> Push to git');
-
-exec(`git push origin ${branch}`);
-exec(`git push origin --tags -f`);
-exec(`git checkout master`);
+// console.log('>>> Push to git');
+//
+// exec(`git push origin ${branch}`);
+// exec(`git push origin --tags -f`);
+// exec(`git checkout master`);
 
 console.log('>> Publish to npm');
 

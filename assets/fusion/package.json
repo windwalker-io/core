@@ -1,6 +1,6 @@
 {
   "name": "@windwalker-io/fusion",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.8",
   "type": "module",
   "description": "Windwalker Fusion",
   "main": "src/index.js",
