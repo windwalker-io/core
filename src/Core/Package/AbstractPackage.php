@@ -14,6 +14,8 @@ namespace Windwalker\Core\Package;
 use Composer\InstalledVersions;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Str;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The AbstractPackage class.
@@ -28,7 +30,15 @@ abstract class AbstractPackage
 
     public static function getName(): string
     {
-        return static::$name ??= self::composerJson()['name'];
+        $name = static::$name ?? static::composerJson()['name'] ?? null;
+
+        if ($name !== null) {
+            return $name;
+        }
+
+        $ns = (new \ReflectionClass(static::class))->getShortName();
+
+        return StrNormalize::toKebabCase(Str::removeRight(static::class, 'Package'));
     }
 
     public static function version(): string
@@ -43,21 +53,25 @@ abstract class AbstractPackage
      *
      * @throws \JsonException
      */
-    public static function composerJson(): array
+    public static function composerJson(): ?array
     {
-        return static::$composer ??= self::loadComposerJson();
+        return static::$composer[static::class] ??= static::loadComposerJson();
     }
 
     /**
      * loadComposerJson
      *
-     * @return  array
+     * @return  array|null
      *
      * @throws \JsonException
      */
-    private static function loadComposerJson(): array
+    protected static function loadComposerJson(): ?array
     {
         $file = static::composerJsonFile();
+
+        if (!is_file($file)) {
+            return null;
+        }
 
         return json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
     }

@@ -66,14 +66,16 @@ class EntityMemberBuilder extends AbstractAstBuilder
         ];
         $addedMethods = [];
 
-        $leaveNode = function (Node $node) use (&$addedMethods, $create, $options, &$addedMembers) {
+        $enterNode = function (Node $node) {
             if ($node instanceof Node\Stmt\Namespace_) {
                 $this->nsStmt = $node;
             }
             if ($node instanceof Node\Stmt\UseUse) {
                 $this->uses[] = (string) $node->name;
             }
+        };
 
+        $leaveNode = function (Node $node) use (&$addedMethods, $create, $options, &$addedMembers) {
             // Handle existing properties
             if ($node instanceof Node\Stmt\Property) {
                 if ($options['methods'] ?? true) {
@@ -143,7 +145,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
         return $this->convertCode(
             file_get_contents($ref->getFileName()),
-            null,
+            $enterNode,
             $leaveNode
         );
     }
@@ -377,6 +379,10 @@ class EntityMemberBuilder extends AbstractAstBuilder
                     $constraints,
                     fn(Constraint $constraint) => $constraint->constraintType === Constraint::TYPE_PRIMARY_KEY
                 );
+
+                if (!$constraint) {
+                    return [];
+                }
 
                 return array_keys($constraint->getColumns());
             }

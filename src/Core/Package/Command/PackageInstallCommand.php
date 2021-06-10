@@ -194,7 +194,7 @@ class PackageInstallCommand implements CommandInterface
             }
         }
 
-        foreach ($packages as $package) {
+        foreach ($packages as $k => $package) {
             $name = $package::getName();
 
             $options[] = $name . ' ALL';

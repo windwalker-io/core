@@ -23,7 +23,7 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 /**
 * The {% pascal($name) %} class.
 */
-#[Table('{% plural(strtolower($name)) %}', '{% strtolower($name) %}')]
+#[Table('{% plural(snake($name)) %}', '{% snake($name) %}')]
 class {% pascal($name) %} implements EntityInterface
 {
     use EntityTrait;

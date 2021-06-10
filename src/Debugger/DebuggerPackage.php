@@ -160,4 +160,14 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
             }
         );
     }
+
+    public static function getName(): string
+    {
+        return 'debugger';
+    }
+
+    protected static function loadComposerJson(): array
+    {
+        return [];
+    }
 }

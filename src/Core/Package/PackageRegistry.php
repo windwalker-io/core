@@ -57,7 +57,10 @@ class PackageRegistry
             JSON_THROW_ON_ERROR
         );
 
-        foreach ($installed['packages'] ?? [] as $manifest) {
+        $jsons = $installed['packages'] ?? [];
+        array_unshift($jsons, $mainComposer);
+
+        foreach ($jsons as $manifest) {
             $options = $manifest['extra']['windwalker'] ?? null;
 
             if ($options === null) {
