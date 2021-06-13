@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Windwalker\Core\Response\Buffer\AbstractBuffer;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
+use Windwalker\DI\DICreateTrait;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Session\Session;
 use Windwalker\Utilities\Arr;
@@ -26,6 +27,8 @@ use Windwalker\Utilities\Reflection\BacktraceHelper;
  */
 class JsonApiMiddleware extends JsonResponseMiddleware
 {
+    use DICreateTrait;
+
     public function run(\Closure $callback): ResponseInterface
     {
         try {
@@ -48,6 +51,14 @@ class JsonApiMiddleware extends JsonResponseMiddleware
                     $response->getHeaders()
                 );
             } else {
+                if ($response instanceof ResponseInterface) {
+                    $response = (string) $response->getBody();
+
+                    if (is_json($response)) {
+                        $response = json_decode($response, true);
+                    }
+                }
+
                 $response = new JsonResponse(
                     new JsonBuffer(
                         $message,

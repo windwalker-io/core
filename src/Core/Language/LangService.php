@@ -50,7 +50,7 @@ class LangService extends Language
 
     public function __invoke(string $id, ...$args): string
     {
-        return $this->trans($id, $args);
+        return $this->trans($id, ...$args);
     }
 
     public function loadFile(string $file, string $format = 'php', ?string $locale = null): static

@@ -36,6 +36,7 @@ namespace Windwalker {
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
+    use Windwalker\Core\View\CollapseWrapper;
 
     if (!function_exists('ds')) {
         /**
@@ -162,6 +163,13 @@ namespace Windwalker {
         function response(mixed $data = '', int $status = 200, array $headers = []): ResponseFactory
         {
             return new ResponseFactory($data, $status, $headers);
+        }
+    }
+
+    if (!function_exists('\Windwalker\collapse')) {
+        function collapse(...$args): CollapseWrapper
+        {
+            return new CollapseWrapper($args);
         }
     }
 }

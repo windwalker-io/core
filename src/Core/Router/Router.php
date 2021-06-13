@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use FastRoute\BadRouteException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
@@ -69,13 +70,21 @@ class Router implements EventAwareInterface
                         continue;
                     }
 
-                    // Always use GET since we'll check methods after route matched.
-                    // This should speed up the matcher.
-                    $router->addRoute(
-                        'GET',
-                        $route->getPattern(),
-                        $route
-                    );
+                    try {
+                        // Always use GET since we'll check methods after route matched.
+                        // This should speed up the matcher.
+                        $router->addRoute(
+                            'GET',
+                            $route->getPattern(),
+                            $route
+                        );
+                    } catch (BadRouteException $e) {
+                        throw new BadRouteException(
+                            $e->getMessage() . ' - ' . $route->getPattern(),
+                            $e->getCode(),
+                            $e
+                        );
+                    }
                 }
             },
             $options

@@ -23,6 +23,7 @@ use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
+use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
 
 /**
@@ -30,6 +31,8 @@ use Windwalker\DI\Exception\DefinitionException;
  */
 class RoutingMiddleware implements MiddlewareInterface
 {
+    use DICreateTrait;
+
     /**
      * RoutingMiddleware constructor.
      *

@@ -245,12 +245,12 @@ class AppRequest implements \JsonSerializable
      */
     public function file(...$fields): mixed
     {
-        ArgumentsAssert::assert(
-            $fields !== [],
-            'Please provide at least 1 field.'
-        );
-
         $files = $this->getRequest()->getUploadedFiles();
+
+        if ($fields === []) {
+            return $files;
+        }
+
         $data = [];
 
         foreach ($fields as $field) {

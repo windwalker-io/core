@@ -34,6 +34,7 @@ use Windwalker\Stream\Stream;
 use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
+use Windwalker\Utilities\Wrapper\WrapperInterface;
 
 /**
  * The ViewModel class.
@@ -64,6 +65,8 @@ class View implements EventAwareInterface
         array $options = []
     ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
+
+        $this->addEventDealer($this->app);
     }
 
     /**
@@ -183,6 +186,10 @@ class View implements EventAwareInterface
 
     protected function handleVMResponse(mixed $data): array|ResponseInterface
     {
+        if ($data instanceof WrapperInterface) {
+            $data = $data($this);
+        }
+
         if ($data instanceof ResponseInterface) {
             return $data;
         }

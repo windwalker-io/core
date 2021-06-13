@@ -150,6 +150,7 @@ class MigrationService implements EventAwareInterface
         $mig = $migration;
         $db = $this->db;
         $orm = $db->orm();
+        $app = $this->app;
 
         include $migration->file->getPathname();
 

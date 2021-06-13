@@ -19,12 +19,14 @@ use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
+use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
  * The Navigator class.
  */
 class Navigator implements NavConstantInterface, EventAwareInterface
 {
+    use InstanceCacheTrait;
     use EventAwareTrait;
 
     /**
@@ -80,33 +82,26 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $options = $event->getOptions();
         $query = $event->getQuery();
 
-        $handler = function (array $query) use ($route): array {
-            $routeObject = $this->router->getRoute($route);
+        $id = $route . ':' . json_encode($query);
 
-            if (!$routeObject && !str_contains($route, '::')) {
-                // Find with namespace
-                if ($matched = $this->getMatchedRoute()) {
-                    $ns = $matched->getExtraValue('namespace');
-                    
-                    if ($ns) {
-                        $routeObject = $this->router->getRoute($ns . '::' . $route);
-                    }
-                }
-                
+        $handler = function (array $query) use ($id, $route): array {
+            return $this->once('route:' . $id, function () use ($query, $route) {
+                $routeObject = $this->findRoute($route);
+
                 if (!$routeObject) {
                     throw new RouteNotFoundException('Route: ' . $route . ' not found.');
                 }
-            }
 
-            [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
+                [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
 
-            $systemUri = $this->app->getSystemUri();
+                $systemUri = $this->app->getSystemUri();
 
-            if ($systemUri->script && $systemUri->script !== 'index.php') {
-                $url = $systemUri->script . '/' . $url;
-            }
+                if ($systemUri->script && $systemUri->script !== 'index.php') {
+                    $url = $systemUri->script . '/' . $url;
+                }
 
-            return [$url, $query];
+                return [$url, $query];
+            });
         };
 
         return new RouteUri($handler, $query, $this, $options);
@@ -207,5 +202,40 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function getMatchedRoute(): ?Route
     {
         return $this->app->getMatchedRoute();
+    }
+
+    /**
+     * findRoute
+     *
+     * @param  string  $route
+     *
+     * @return  Route|null
+     */
+    public function findRoute(string $route): ?Route
+    {
+        if (str_contains($route, '\\')) {
+            foreach ($this->router->getRoutes() as $routeObject) {
+                $view = $routeObject->getOption('vars')['view'] ?? null;
+
+                if ($view && $view === $route) {
+                    return $routeObject;
+                }
+            }
+        }
+
+        $routeObject = $this->router->getRoute($route);
+
+        if (!$routeObject && !str_contains($route, '::')) {
+            // Find with namespace
+            if ($matched = $this->getMatchedRoute()) {
+                $ns = $matched->getExtraValue('namespace');
+
+                if ($ns) {
+                    $routeObject = $this->router->getRoute($ns . '::' . $route);
+                }
+            }
+        }
+
+        return $routeObject;
     }
 }

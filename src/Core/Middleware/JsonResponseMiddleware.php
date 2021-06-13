@@ -17,6 +17,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Service\ErrorService;
+use Windwalker\DI\DICreateTrait;
 use Windwalker\Http\Response\JsonResponse;
 
 use function Windwalker\response;
@@ -26,6 +27,8 @@ use function Windwalker\response;
  */
 class JsonResponseMiddleware implements MiddlewareInterface
 {
+    use DICreateTrait;
+
     /**
      * JsonResponseMiddleware constructor.
      */

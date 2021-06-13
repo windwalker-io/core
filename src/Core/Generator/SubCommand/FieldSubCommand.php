@@ -25,6 +25,10 @@ class FieldSubCommand extends AbstractGeneratorSubCommand
 {
     protected bool $requireDest = false;
 
+    protected string $defaultNamespace = 'App\\Field';
+
+    protected string $defaultDir = 'src/Field';
+
     /**
      * Executes the current command.
      *

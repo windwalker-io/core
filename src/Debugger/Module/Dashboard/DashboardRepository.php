@@ -115,7 +115,7 @@ class DashboardRepository
     {
         $basicData = [
             'id' => $id,
-            'url' => $collector->getDeep('http.systemUri')->full,
+            'url' => $collector->getDeep('http.systemUri')?->full,
             'method' => $collector->getDeep('http.request.method'),
             'response' => $collector->getDeep('http.response'),
             'time' => microtime(true),

@@ -192,41 +192,45 @@ class DebuggerSubscriber
             return;
         }
 
-        /** @var ApplicationInterface $app */
-        $app = $this->container->get(ApplicationInterface::class);
+        try {
+            /** @var ApplicationInterface $app */
+            $app = $this->container->get(ApplicationInterface::class);
 
-        if ($app->getClient() === ApplicationInterface::CLIENT_CONSOLE) {
-            return;
+            if ($app->getClient() === ApplicationInterface::CLIENT_CONSOLE) {
+                return;
+            }
+
+            $this->collectOthers();
+
+            /** @var AppContext $app */
+            $app = $this->container->get(AppContext::class);
+
+            $matched = $app->getMatchedRoute();
+
+            if ($matched?->getExtraValue('namespace') === 'debugger') {
+                return;
+            }
+
+            // Delete old files
+            $this->dashboardRepository->deleteOldFiles(
+                $this->container->getParam('debugger.cache.max_files') ?? 100
+            );
+
+            /** @var Collection $collector */
+            $collector = $this->container->get('debugger.collector');
+
+            $id = uid('ww_', true);
+            $collector['id'] = $id;
+
+            // Debug console
+            $debugConsole = $this->container->newInstance(DebugConsole::class);
+            $debugConsole->pushToPage($collector, $response);
+
+            // Write new file
+            $this->dashboardRepository->writeFile($id, $collector);
+        } catch (\Throwable $e) {
+            echo $e;
         }
-
-        $this->collectOthers();
-
-        /** @var AppContext $app */
-        $app = $this->container->get(AppContext::class);
-
-        $matched = $app->getMatchedRoute();
-
-        if ($matched?->getExtraValue('namespace') === 'debugger') {
-            return;
-        }
-
-        // Delete old files
-        $this->dashboardRepository->deleteOldFiles(
-            $this->container->getParam('debugger.cache.max_files') ?? 100
-        );
-
-        /** @var Collection $collector */
-        $collector = $this->container->get('debugger.collector');
-
-        $id = uid('ww_', true);
-        $collector['id'] = $id;
-
-        // Debug console
-        $debugConsole = $this->container->newInstance(DebugConsole::class);
-        $debugConsole->pushToPage($collector, $response);
-
-        // Write new file
-        $this->dashboardRepository->writeFile($id, $collector);
 
         $this->finished = true;
     }

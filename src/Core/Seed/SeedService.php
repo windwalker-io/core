@@ -57,6 +57,7 @@ class SeedService implements EventAwareInterface
             );
             $db     = $seeder->db;
             $orm    = $db->orm();
+            $app    = $this->app;
 
             include $seederFile;
 
@@ -101,6 +102,7 @@ class SeedService implements EventAwareInterface
             );
             $db     = $seeder->db;
             $orm    = $db->orm();
+            $app    = $this->app;
 
             include $seederFile;
 

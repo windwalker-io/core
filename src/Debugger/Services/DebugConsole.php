@@ -40,27 +40,33 @@ class DebugConsole
             $ct = $response->getHeaderLine('content-type');
 
             if (str_contains($ct, 'text/html') || str_contains($ct, 'text/plain')) {
-                $css = $this->assetService->appendVersion(
-                    $this->assetService->handleUri('@core/debugger-console.css')
-                );
-                $js = $this->assetService->appendVersion(
-                    $this->assetService->handleUri('@core/debugger-console.js')
-                );
-
-                $console = $this->rendererService->render(
-                    $tmpl,
-                    [
-                        'collector' => $collector,
-                        'css' => $css,
-                        'js' => $js
-                    ]
-                );
+                $console = $this->renderConsole($tmpl, $collector);
 
                 $body = $response->getBody();
                 $body->write($console);
             }
-
             return;
         }
+
+        echo $this->renderConsole($tmpl, $collector);
+    }
+
+    public function renderConsole(string $tmpl, Collection $collector): string
+    {
+        $css = $this->assetService->appendVersion(
+            $this->assetService->handleUri('@core/debugger-console.css')
+        );
+        $js = $this->assetService->appendVersion(
+            $this->assetService->handleUri('@core/debugger-console.js')
+        );
+
+        return $this->rendererService->render(
+            $tmpl,
+            [
+                'collector' => $collector,
+                'css' => $css,
+                'js' => $js
+            ]
+        );
     }
 }

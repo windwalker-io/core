@@ -15,12 +15,15 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Windwalker\DI\DICreateTrait;
 
 /**
  * The AbstractLifecycleMiddleware class.
  */
 abstract class AbstractLifecycleMiddleware implements MiddlewareInterface
 {
+    use DICreateTrait;
+
     /**
      * prepareExecute
      *

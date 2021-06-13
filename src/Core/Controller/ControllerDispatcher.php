@@ -141,7 +141,11 @@ class ControllerDispatcher
 
     protected function processTaskMapping(string $class, ?string $task, AppContext $app): ?string
     {
-        $mapping = AttributesAccessor::getFirstAttributeInstance($class, TaskMapping::class);
+        $mapping = AttributesAccessor::getFirstAttributeInstance(
+            $class,
+            TaskMapping::class,
+            \ReflectionAttribute::IS_INSTANCEOF
+        );
 
         return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
     }

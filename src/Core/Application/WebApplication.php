@@ -28,6 +28,7 @@ use Windwalker\Http\Output\Output;
 use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
+use Windwalker\Session\Session;
 
 /**
  * The WebApplication class.
