@@ -97,7 +97,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             // }
         }
 
-        $message = $this->app->isDebug() ? $e->getMessage() : sprintf(
+        $message = !$this->app->isDebug() ? $e->getMessage() : sprintf(
             '#%d %s - File: %s (%d)',
             $e->getCode(),
             $e->getMessage(),
