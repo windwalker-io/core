@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Event\EventAwareInterface;
@@ -82,9 +83,9 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $options = $event->getOptions();
         $query = $event->getQuery();
 
-        $id = $route . ':' . json_encode($query);
+        $handler = function (array $query) use ($route): array {
+            $id = $route . ':' . json_encode($query);
 
-        $handler = function (array $query) use ($id, $route): array {
             return $this->once('route:' . $id, function () use ($query, $route) {
                 $routeObject = $this->findRoute($route);
 

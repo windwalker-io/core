@@ -150,7 +150,7 @@ class WebApplication implements WebApplicationInterface
         if ($handler) {
             $container->modify(
                 AppContext::class,
-                fn(AppContext $context): AppContext => $context->withController($handler)
+                fn(AppContext $context): AppContext => $context->setController($handler)
             );
         }
 

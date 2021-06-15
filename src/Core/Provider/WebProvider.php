@@ -92,13 +92,14 @@ class WebProvider implements ServiceProviderInterface
      */
     protected function registerAppContext(Container $container): void
     {
+        $container->prepareSharedObject(AppState::class);
         $container->prepareSharedObject(
             AppContext::class,
             function (AppContext $app, Container $container) {
                 $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
-                return $app->withAppRequest($this->createAppRequest($container))
-                    ->withState($container->newInstance(AppState::class));
+                return $app->setAppRequest($this->createAppRequest($container))
+                    ->setState($container->get(AppState::class));
             }
         )
             ->alias(ApplicationInterface::class, AppContext::class);

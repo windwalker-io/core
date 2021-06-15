@@ -102,12 +102,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withController(mixed $controller): static
+    public function setController(mixed $controller): static
     {
-        $new             = clone $this;
-        $new->controller = $controller;
+        $this->controller = $controller;
 
-        return $new;
+        return $this;
     }
 
     public function getRequestRawMethod(): string
@@ -143,12 +142,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withUrlVars(array $vars): static
+    public function setUrlVars(array $vars): static
     {
-        $new             = clone $this;
-        $new->appRequest = $this->appRequest->withUrlVars($vars);
+        $this->appRequest = $this->appRequest->withUrlVars($vars);
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -164,12 +162,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withParams(?Parameters $params): static
+    public function setParams(?Parameters $params): static
     {
-        $new         = clone $this;
-        $new->params = $params;
+        $this->params = $params;
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -185,12 +182,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withContainer(Container $container): static
+    public function setContainer(Container $container): static
     {
-        $new            = clone $this;
-        $new->container = $container;
+        $this->container = $container;
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -206,12 +202,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withUri(UriInterface $uri): static
+    public function sethUri(UriInterface $uri): static
     {
-        $new             = clone $this;
-        $new->appRequest = $new->appRequest->withUri($uri);
+        $this->appRequest = $this->appRequest->withUri($uri);
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -227,12 +222,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withSystemUri(SystemUri $uri): static
+    public function setSystemUri(SystemUri $uri): static
     {
-        $new             = clone $this;
-        $new->appRequest = $this->appRequest->withSystemUri($uri);
+        $this->appRequest = $this->appRequest->withSystemUri($uri);
 
-        return $new;
+        return $this;
     }
 
     /**
@@ -254,12 +248,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withState(AppState $state): static
+    public function setState(AppState $state): static
     {
-        $new        = clone $this;
-        $new->state = $state;
+        $this->state = $state;
 
-        return $new;
+        return $this;
     }
 
     public function getSubState(string $prefix): AppState
@@ -280,12 +273,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withAppRequest(AppRequest $request): static
+    public function setAppRequest(AppRequest $request): static
     {
-        $new             = clone $this;
-        $new->appRequest = $request;
+        $this->appRequest = $request;
 
-        return $new;
+        return $this;
     }
 
     public function getServerRequest(): ServerRequestInterface
@@ -306,12 +298,11 @@ class AppContext implements WebApplicationInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function withMatchedRoute(?Route $matchedRoute): static
+    public function setMatchedRoute(?Route $matchedRoute): static
     {
-        $new             = clone $this;
-        $new->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
+        $this->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
 
-        return $new;
+        return $this;
     }
 
     public function getHeader(string $name): string

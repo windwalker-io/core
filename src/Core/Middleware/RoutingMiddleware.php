@@ -17,6 +17,8 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\MiddlewareRunner;
+use Windwalker\Core\Events\Web\AfterRoutingEvent;
+use Windwalker\Core\Events\Web\BeforeRoutingEvent;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
@@ -25,12 +27,15 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 
 /**
  * The RoutingMiddleware class.
  */
-class RoutingMiddleware implements MiddlewareInterface
+class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
 {
+    use EventAwareTrait;
     use DICreateTrait;
 
     /**
@@ -41,7 +46,7 @@ class RoutingMiddleware implements MiddlewareInterface
      */
     public function __construct(protected AppContext $app, protected Router $router)
     {
-        //
+        $this->addEventDealer($app);
     }
 
     /**
@@ -61,17 +66,38 @@ class RoutingMiddleware implements MiddlewareInterface
     {
         $router = $this->router;
 
-        $route = $router->match($request, $this->app->getSystemUri()->route);
+        $route = $this->app->getSystemUri()->route;
 
-        $controller = $this->findController($this->app->getRequestMethod(), $route);
+        $event = $this->emit(
+            BeforeRoutingEvent::class,
+            [
+                'route' => $route,
+                'request' => $request,
+                'systemUri' => $this->app->getSystemUri()
+            ]
+        );
+
+        $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+
+        $event = $this->emit(
+            AfterRoutingEvent::class,
+            [
+                'route' => $route,
+                'request' => $request,
+                'systemUri' => $event->getSystemUri(),
+                'matched' => $matched
+            ]
+        );
+
+        $controller = $this->findController($this->app->getRequestMethod(), $matched = $event->getMatched());
 
         $this->app->getContainer()->modify(
             AppContext::class,
-            fn(AppContext $context) => $context->withController($controller)
-                ->withMatchedRoute($route)
+            fn(AppContext $context) => $context->setController($controller)
+                ->setMatchedRoute($matched)
         );
 
-        $middlewares = $route->getMiddlewares();
+        $middlewares = $matched->getMiddlewares();
         $runner = $this->app->make(MiddlewareRunner::class);
 
         return $runner->run(
