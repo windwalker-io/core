@@ -35,7 +35,7 @@ export default class CssProcessor extends Processor {
   doProcess(dest, options = {}) {
     this.pipeIf(options.rebase, () => rewriteCSS({ destination: dest.path }))
       .pipeIf(dest.merge, () => concat(dest.file))
-      .pipe(postcss(options.postcss, options.postcss?.config || {}))
+      .pipeIf(options.postcss, () => postcss(options.postcss, options.postcss?.config || {}))
       .pipeIf(
         options.autoprefixer,
         () => autoprefixer(

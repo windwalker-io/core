@@ -50,7 +50,7 @@ export default class CssPreProcessor extends Processor {
         options.rebase && !dest.samePosition,
         () => rewriteCSS({ destination: dest.path })
       )
-      .pipe(postcss(options.postcss, options.postcss?.config || {}))
+      .pipeIf(options.postcss, () => postcss(options.postcss, options.postcss?.config || {}))
       .pipeIf(
         options.autoprefixer,
         () => autoprefixer('last 3 version', 'safari 5', 'ie 8', 'ie 9')
