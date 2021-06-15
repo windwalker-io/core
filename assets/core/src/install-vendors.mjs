@@ -21,7 +21,7 @@ export async function installVendors(vendors) {
   });
 
   console.log('[Copy] resources/assets/vendor/**/* => www/assets/vendor/');
-  src('resources/assets/vendor/**/*').pipe(symlink('www/assets/vendor/'));
+  src('resources/assets/vendor/*').pipe(symlink('www/assets/vendor/'));
 }
 
 function findVendors() {
