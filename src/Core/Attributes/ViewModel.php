@@ -105,6 +105,7 @@ class ViewModel implements ContainerAttributeInterface
 
     protected function registerEvents(View $view, ViewModelInterface $vm, Container $container): View
     {
+        // Todo: move to View class, that can override programally in ViewModel
         $view->on(
             BeforeRenderEvent::class,
             function (BeforeRenderEvent $event) use ($vm, $container) {

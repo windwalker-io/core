@@ -17,6 +17,8 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\MiddlewareRunner;
+use Windwalker\Core\Controller\DefaultController;
+use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeRoutingEvent;
 use Windwalker\Core\Http\AppRequest;
@@ -129,6 +131,10 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             }
         } else {
             $handler = $handlers['*'] ?? null;
+        }
+
+        if (!$handler && $method === 'get') {
+            $handler = DefaultController::class;
         }
 
         if (!$handler) {

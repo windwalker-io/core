@@ -39,6 +39,7 @@ class MailerProvider implements ServiceProviderInterface
             fn (Container $container) => new Transport(
                 $container->call([Transport::class, 'getDefaultFactories'])
             )
-        );
+        )
+            ->alias(Transport\TransportInterface::class, Transport::class);
     }
 }

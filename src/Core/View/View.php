@@ -158,8 +158,12 @@ class View implements EventAwareInterface
 
             $this->preparePaths($vm);
 
+            if (!$this->layout) {
+                throw new \LogicException('View must provide at least 1 layout name.');
+            }
+
             $content = $this->getRenderer()
-                ->render($layout, $data, ['context' => $vm]);
+                ->render($this->layout, $data, ['context' => $vm]);
 
             $response = $this->getResponse();
             $response->getBody()->write($content);
@@ -235,14 +239,18 @@ class View implements EventAwareInterface
             $varName = $this->options['layout_var_name'];
             $layoutType = $this->app->input($varName) ?: 'default';
 
-            $layout = $layout[$layoutType] ?? $layout['default'] ?? null;
+            if (isset($layout[$layoutType])) {
+                return $layout[$layoutType];
+            }
+
+            if (in_array($layoutType, $layout, true)) {
+                return $layoutType;
+            }
+
+            return $layout['default'] ?? '';
         }
 
-        if ($layout === null) {
-            throw new \LogicException('View must provide at least 1 default layout name.');
-        }
-
-        return $layout;
+        return (string) $layout;
     }
 
     protected function injectData(object $vm, array $data): void

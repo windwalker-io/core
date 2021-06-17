@@ -94,6 +94,10 @@ class DelegatingController implements ControllerInterface
 
             return $res;
         } catch (ValidateFailException $e) {
+            if ($this->app->isDebug()) {
+                throw $e;
+            }
+
             $this->app->addMessage($e->getMessage(), 'warning');
             $nav = $this->app->service(Navigator::class);
             return $nav->back();

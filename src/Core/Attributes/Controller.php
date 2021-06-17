@@ -48,7 +48,11 @@ class Controller implements ContainerAttributeInterface
         $container = $handler->getContainer();
 
         if ($this->config) {
-            $container->registerByConfig($this->config);
+            $config = $this->config;
+
+            if (is_file($config)) {
+                $container->registerByConfig($this->config);
+            }
         }
 
         return fn(...$args): DelegatingController => (new DelegatingController(

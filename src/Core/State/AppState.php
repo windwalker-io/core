@@ -50,7 +50,7 @@ class AppState implements \JsonSerializable
 
     protected function getKeyName(string $key): string
     {
-        return $this->prefix . '.' . $key;
+        return trim($this->prefix . '.' . $key, '.');
     }
 
     protected function resolvePersistDriver(mixed $driverName): PersistenceInterface

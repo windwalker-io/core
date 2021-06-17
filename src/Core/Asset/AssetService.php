@@ -513,7 +513,7 @@ class AssetService implements EventAwareInterface
      */
     public function addSysPath(string $assetUri): string
     {
-        if (static::isAbsoluteUrl($assetUri)) {
+        if (static::isFullUrl($assetUri)) {
             return $assetUri;
         }
 
@@ -549,6 +549,11 @@ class AssetService implements EventAwareInterface
     public static function isAbsoluteUrl(string $uri): bool
     {
         return stripos($uri, 'http') === 0 || str_starts_with($uri, '/');
+    }
+
+    public static function isFullUrl(string $uri): bool
+    {
+        return stripos($uri, 'http') === 0;
     }
 
     /**
@@ -813,7 +818,7 @@ class AssetService implements EventAwareInterface
 
         $assetUri = $this->path;
 
-        if (static::isAbsoluteUrl($assetUri)) {
+        if (static::isFullUrl($assetUri)) {
             return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
         }
 
