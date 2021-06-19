@@ -17,16 +17,16 @@ use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
 
 /**
- * The {% $className %} class.
+ * The {% pascal($name) %}View class.
  */
 #[ViewModel(
     layout: '@kebab($name)',
     js: '@kebab($name).js'
 )]
-class {% $className %} implements ViewModelInterface
+class {% pascal($name) %}View implements ViewModelInterface
 {
     /**
-     * {% $className %} constructor.
+     * Constructor.
      */
     public function __construct()
     {

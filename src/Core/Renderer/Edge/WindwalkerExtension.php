@@ -121,11 +121,7 @@ class WindwalkerExtension implements
      */
     public function messages(string $expression): string
     {
-        $expression = trim(static::stripParentheses($expression));
-
-        $expression = $expression ? ', ' . $expression : '';
-
-        return "<?php echo \\Windwalker\\Core\\Message\\MessageHelper::render(\$widget{$expression}) ?>";
+        return "<?php echo \$__edge->render('@messages') ?>";
     }
 
     /**
@@ -159,11 +155,9 @@ class WindwalkerExtension implements
      *
      * @return  string
      */
-    public function formToken(string $expression): string
+    public function formToken(): string
     {
-        $expression = trim(static::stripParentheses($expression));
-
-        return /** @lang php */ "<?php echo \$app->service(\Windwalker\Core\Security\CsrfService::class)->input({$expression}); ?>";
+        return "<?php echo \$__edge->render('@csrf'); ?>";
     }
 
     /**

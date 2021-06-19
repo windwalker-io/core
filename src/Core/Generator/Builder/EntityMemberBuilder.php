@@ -34,9 +34,9 @@ class EntityMemberBuilder extends AbstractAstBuilder
 {
     use InstanceCacheTrait;
 
-    protected ?Node\Stmt\Namespace_ $nsStmt = null;
-
     protected array $uses = [];
+
+    protected array $addedUses = [];
 
     /**
      * EntityMemberBuilder constructor.
@@ -55,9 +55,9 @@ class EntityMemberBuilder extends AbstractAstBuilder
         // Get properties
         $ref   = $this->metadata->getReflector();
         $class = $this->metadata->getClassName();
-        $props = $this->metadata->getProperties();
+        // $props = $this->metadata->getProperties();
         /** @var \ReflectionProperty $lastProp */
-        $lastProp = $props[array_key_last($props)];
+        // $lastProp = $props[array_key_last($props)];
         [$create, $delete, $keep] = $this->getColumnsDiff($class);
 
         $addedMembers = [
@@ -66,16 +66,11 @@ class EntityMemberBuilder extends AbstractAstBuilder
         ];
         $addedMethods = [];
 
-        $enterNode = function (Node $node) {
-            if ($node instanceof Node\Stmt\Namespace_) {
-                $this->nsStmt = $node;
-            }
+        $leaveNode = function (Node $node) use (&$addedMethods, $create, $options, &$addedMembers) {
             if ($node instanceof Node\Stmt\UseUse) {
                 $this->uses[] = (string) $node->name;
             }
-        };
-
-        $leaveNode = function (Node $node) use (&$addedMethods, $create, $options, &$addedMembers) {
+            
             // Handle existing properties
             if ($node instanceof Node\Stmt\Property) {
                 if ($options['methods'] ?? true) {
@@ -99,7 +94,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
             // After class traversed, add properties and methods
             if ($node instanceof Node\Stmt\Class_) {
-                $last = $this->getLastOf($node->stmts, Node\Stmt\Property::class);
+                $last = $this->getLastOf($node->stmts, Node\Stmt\Property::class) ?? 0;
 
                 // Add methods for existing properties
                 array_push(
@@ -122,7 +117,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
                         $addedMembers['properties'][] = [(string) $prop->props[0]->name, $createColumn];
                     }
 
-                    if ($options['methods'] ?? true) {
+                    if (($options['methods'] ?? true) && isset($prop->props[0])) {
                         $methods = $this->createAccessorsIfNotExists(
                             (string) $prop->props[0]->name,
                             $prop->type,
@@ -141,11 +136,26 @@ class EntityMemberBuilder extends AbstractAstBuilder
                     }
                 }
             }
+
+            if ($node instanceof Node\Stmt\Namespace_) {
+                $last = $this->getLastOf($node->stmts, Node\Stmt\Use_::class) ?? 0;
+
+                foreach ($this->addedUses as $use) {
+                    array_splice(
+                        $node->stmts,
+                        ++$last,
+                        0,
+                        [$this->createNodeFactory()
+                            ->use($use)
+                            ->getNode()]
+                    );
+                }
+            }
         };
 
         return $this->convertCode(
             file_get_contents($ref->getFileName()),
-            $enterNode,
+            null,
             $leaveNode
         );
     }
@@ -189,6 +199,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
         $ref     = $this->metadata->getReflector();
 
         $isBool   = false;
+        $specialSetter = null;
         $typeNode = $type;
 
         if ($typeNode instanceof Node\NullableType) {
@@ -199,6 +210,8 @@ class EntityMemberBuilder extends AbstractAstBuilder
             $isBool = in_array('bool', $typeNode->types, true);
         } elseif ($typeNode instanceof Node\Identifier) {
             $isBool = $typeNode->name === 'bool';
+        } elseif ($typeNode instanceof Node\Name) {
+            $specialSetter = 'build' . $typeNode . 'Setter';
         }
 
         if (str_starts_with($propName, 'is')) {
@@ -234,31 +247,65 @@ class EntityMemberBuilder extends AbstractAstBuilder
         }
 
         if (!$ref->hasMethod($setter)) {
-            $added[]   = $setter;
-            $methods[] = $factory->method($setter)
-                ->makePublic()
-                ->addParam(
-                    $factory->param($propName)
-                        ->setType($type)
-                )
-                ->addStmt(
-                    new Node\Expr\Assign(
-                        $factory->propertyFetch(
-                            new Node\Expr\Variable('this'),
-                            $propName
-                        ),
-                        new Node\Expr\Variable($propName),
+            $added[] = $setter;
+
+            if ($specialSetter && method_exists($this, $specialSetter)) {
+                $methods[] = $this->$specialSetter($setter, $propName, $type);
+            } else {
+                $methods[] = $factory->method($setter)
+                    ->makePublic()
+                    ->addParam(
+                        $factory->param($propName)
+                            ->setType($type)
                     )
-                )
-                ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
-                ->setReturnType('static')
-                ->getNode();
+                    ->addStmt(
+                        new Node\Expr\Assign(
+                            $factory->propertyFetch(
+                                new Node\Expr\Variable('this'),
+                                $propName
+                            ),
+                            new Node\Expr\Variable($propName),
+                        )
+                    )
+                    ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
+                    ->setReturnType('static')
+                    ->getNode();
+            }
         }
 
         return $methods;
     }
 
-    public function getLastOf(array $stmts, string $class): int
+    protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
+    {
+        $factory = $this->createNodeFactory();
+        return $factory->method($setter)
+            ->makePublic()
+            ->addParam(
+                $factory->param($propName)
+                    ->setType('\DateTimeInterface|string|null')
+            )
+            ->addStmt(
+                new Node\Expr\Assign(
+                    $factory->propertyFetch(
+                        new Node\Expr\Variable('this'),
+                        $propName
+                    ),
+                    $factory->staticCall(
+                        new Node\Name('Chronos'),
+                        'wrap',
+                        [
+                            new Node\Expr\Variable($propName)
+                        ]
+                    ),
+                )
+            )
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
+            ->setReturnType('static')
+            ->getNode();
+    }
+
+    public function getLastOf(array $stmts, string $class): ?int
     {
         $stmts = array_filter(
             array_map(fn($stmt) => $stmt::class, $stmts),
@@ -271,10 +318,8 @@ class EntityMemberBuilder extends AbstractAstBuilder
     protected function addUse(string $ns): void
     {
         if (!in_array($ns, $this->uses, true)) {
-            $this->uses[]          = $ns;
-            $this->nsStmt->stmts[] = $this->createNodeFactory()
-                ->use($ns)
-                ->getNode();
+            $this->uses[]      = $ns;
+            $this->addedUses[] = $ns;
         }
     }
 

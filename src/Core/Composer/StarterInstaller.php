@@ -10,9 +10,13 @@ namespace Windwalker\Core\Composer;
 
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Yaml\Yaml;
-use Windwalker\Filesystem\File;
+
+use function Windwalker\uid;
 
 /**
  * The StarterInstaller class.
@@ -28,15 +32,15 @@ class StarterInstaller
      *
      * @return  void
      */
-    public static function rootInstall(Event $event)
+    public static function rootInstall(Event $event): void
     {
         include getcwd() . '/vendor/autoload.php';
 
         $io = $event->getIO();
 
-        static::genSecretCode($io);
+        static::genSecretCode($event);
 
-        static::genSecretConfig($io);
+        static::genEnv($event);
 
         // Complete
         $io->write('Install complete.');
@@ -49,17 +53,14 @@ class StarterInstaller
      *
      * @return  void
      */
-    protected static function genSecretCode(IOInterface $io)
+    public static function genSecretCode(Event $event): void
     {
-        $file = getcwd() . '/etc/conf/system.php';
+        $io = $event->getIO();
+        $file = getcwd() . '/etc/conf/app.php';
 
         $config = file_get_contents($file);
 
-        $hash = 'Windwalker-' . hrtime(true);
-
-        $salt = $io->ask("\nSalt to generate secret [{$hash}]: ", $hash);
-
-        $config = str_replace('This-token-is-not-safe', md5(hrtime(true) . $salt), $config);
+        $config = str_replace('{{ REPLACE THIS AS RANDOM SECRET CODE }}', uid(), $config);
 
         file_put_contents($file, $config);
 
@@ -73,10 +74,17 @@ class StarterInstaller
      *
      * @return  void
      */
-    protected static function genSecretConfig(IOInterface $io)
+    public static function genEnv(Event $event): void
     {
+        $io = $event->getIO();
+
         $dist = getcwd() . '/.env.dist';
         $dest = getcwd() . '/.env';
+
+        if (is_file($dest)) {
+            $io->write('.env file already exists.');
+            return;
+        }
 
         $env = file_get_contents($dist);
 
@@ -84,23 +92,28 @@ class StarterInstaller
             $vars = [];
 
             $supportedDrivers = [
-                1 => 'mysql',
-                2 => 'postgresql',
-                3 => 'sqlsrv'
+                'pdo_mysql',
+                'mysqli',
+                'pdo_pgsql',
+                'pdo_sqlsrv',
+                'pdo_sqlite',
+                'pgsql',
+                'pdo_sqlite',
             ];
 
-            $io->write('');
-            $io->write('Supported database drivers:');
+            $helper = new QuestionHelper();
 
-            foreach ($supportedDrivers as $k => $v) {
-                $io->write(sprintf('  - [%s] %s', $k, $v));
-            }
+            $qn = new ChoiceQuestion(
+                'Please select database drivers: ',
+                $supportedDrivers
+            );
+            $driver = $helper->ask(
+                new ArrayInput([]),
+                new ConsoleOutput(),
+                $qn
+            );
 
-            $io->write('');
-
-            $driver = $io->ask('Database driver [1]: ', '1');
-
-            $vars['DATABASE_DRIVER']   = $supportedDrivers[$driver] ?? 'mysql';
+            $vars['DATABASE_DRIVER']   = $driver ?? 'pdo_mysql';
             $vars['DATABASE_HOST']     = $io->ask('Database host [localhost]: ', 'localhost');
             $vars['DATABASE_NAME']     = $io->ask('Database name [acme]: ', 'acme');
             $vars['DATABASE_USER']     = $io->ask('Database user [root]: ', 'root');
@@ -110,8 +123,6 @@ class StarterInstaller
                 $env = preg_replace('/' . $key . '=(.*)/', $key . '=' . $value, $env);
             }
         }
-
-        $env .= "\nAPP_ENV=dev\n";
 
         file_put_contents($dest, $env);
 

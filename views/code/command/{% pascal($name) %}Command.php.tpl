@@ -17,12 +17,12 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 
 /**
- * The {% $className %} class.
+ * The {% pascal($name) %}Command class.
  */
 #[CommandWrapper(
     description: '{% $desc %}'
 )]
-class {% $className %} implements CommandInterface
+class {% pascal($name) %}Command implements CommandInterface
 {
     /**
      * configure

@@ -94,7 +94,9 @@ class CacheClearCommand implements CommandInterface
     {
         $path = WINDWALKER_CACHE . '/' . $folder;
 
-        Filesystem::delete($path);
+        if (file_exists($path)) {
+            Filesystem::delete($path);
+        }
 
         $io->writeln(sprintf('[Deleted] <info>%s</info>', $path));
     }

@@ -8,7 +8,7 @@ use Windwalker\Core\Router\RouteCreator;
 
 $router->group('{% strtolower($name) %}')
     ->register(function (RouteCreator $router) {
-        $router->any('hello', '/hello');
+        $router->any('{% snake($name) %}', '/{% kebab($name) %}');
             //->controller()
             //->view();
     });

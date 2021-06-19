@@ -14,12 +14,12 @@ namespace {% $ns %};
 use Windwalker\Core\Attributes\Controller;
 
 /**
- * The {% $className %} class.
+ * The {% pascal($name) %}Controller class.
  */
 #[Controller(
-    config: '{% kebab($name) %}.config.php'
+    config: __DIR__ . '/{% kebab($name) %}.config.php'
 )]
-class {% $className %}
+class {% pascal($name) %}Controller
 {
     //
 }

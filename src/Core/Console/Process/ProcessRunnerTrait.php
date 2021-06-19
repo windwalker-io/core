@@ -38,7 +38,7 @@ trait ProcessRunnerTrait
 
         $process->setTimeout(0);
 
-        $phpPath = dirname((new PhpExecutableFinder())->find());
+        $phpPath = dirname($this->getPhpBinary() ?: '/use/local/bin');
 
         $path = implode(
             PlatformHelper::isWindows() ? ';' : ':',
@@ -105,5 +105,10 @@ trait ProcessRunnerTrait
         $process->run($output);
 
         return $process;
+    }
+
+    private function getPhpBinary(): string|false
+    {
+        return (new PhpExecutableFinder())->find();
     }
 }

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Migration\Command;
+namespace Windwalker\Core\Seed\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,22 +17,25 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Migration\MigrationService;
+use Windwalker\Core\Seed\SeedService;
 use Windwalker\DI\Attributes\Autowire;
+use Windwalker\DI\Attributes\Service;
 use Windwalker\Utilities\Str;
 
 /**
  * The CreateCommand class.
  */
-#[CommandWrapper(description: 'Create a migration version.')]
-class CreateCommand extends AbstractMigrationCommand
+#[CommandWrapper(description: 'Create a seeder.')]
+class SeedCreateCommand extends AbstractSeedCommand
 {
     /**
      * CreateCommand constructor.
      *
-     * @param  MigrationService  $migrationService
+     * @param  SeedService    $seedService
      */
     public function __construct(
-        protected MigrationService $migrationService,
+        #[Service]
+        protected SeedService $seedService
     ) {
     }
 
@@ -65,10 +68,10 @@ class CreateCommand extends AbstractMigrationCommand
     {
         $name = $io->getArgument('name');
 
-        $this->migrationService->copyMigrationFile(
-            $this->getMigrationFolder($io),
+        $this->seedService->copySeedFile(
+            $this->getSeederFolder($io),
             $name,
-            __DIR__ . '/../../../../resources/templates/migration/*'
+            __DIR__ . '/../../../../resources/templates/seed/*'
         );
 
         return 0;

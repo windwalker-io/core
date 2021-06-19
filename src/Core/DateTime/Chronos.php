@@ -159,10 +159,10 @@ class Chronos extends \DateTimeImmutable
 
         $chronos = new static($datetime->getTimestamp(), $datetime->getTimezone());
         $chronos = $chronos->setTime(
-            $datetime->format('H'),
-            $datetime->format('i'),
-            $datetime->format('s'),
-            $datetime->format('u')
+            (int) $datetime->format('H'),
+            (int) $datetime->format('i'),
+            (int) $datetime->format('s'),
+            (int) $datetime->format('u')
         );
 
         return $chronos;

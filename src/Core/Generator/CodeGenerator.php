@@ -28,6 +28,7 @@ class CodeGenerator
      */
     public function __construct(protected ApplicationInterface $app)
     {
+        include_once __DIR__ . '/generator-helpers.php';
     }
 
     public function from(string $src): FileCollection

@@ -68,12 +68,12 @@ class GenReviseCommand implements CommandInterface
             'Pascal name of this file.',
         );
 
-        $command->addOption(
-            'class',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Pascal class name of this file.',
-        );
+        // $command->addOption(
+        //     'class',
+        //     null,
+        //     InputOption::VALUE_REQUIRED,
+        //     'Pascal class name of this file.',
+        // );
         
         $command->addOption(
             'ns',
@@ -164,7 +164,7 @@ class GenReviseCommand implements CommandInterface
 
         TypeAssert::assert((bool) $ns, 'Please provide --ns {Namespace}');
         TypeAssert::assert((bool) $name, 'Please provide --name {Name}');
-        TypeAssert::assert((bool) $className, 'Please provide --class {Class}');
+        // TypeAssert::assert((bool) $className, 'Please provide --class {Class}');
 
         return [
             $ns => '{% $ns %}',
@@ -175,7 +175,7 @@ class GenReviseCommand implements CommandInterface
             StrNormalize::toPascalCase($name) => '{% pascal($name) %}',
             StrNormalize::toCamelCase($name) => '{% camel($name) %}',
             StrNormalize::toKebabCase($name) => '{% kebab($name) %}',
-            $className => '{% $className %}',
+            // $className => '{% $className %}',
             '<?php' => '{% $phpOpen %}',
             '?>' => '{% $phpClose %}'
         ];

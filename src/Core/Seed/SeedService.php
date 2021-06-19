@@ -13,6 +13,8 @@ namespace Windwalker\Core\Seed;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
+use Windwalker\Core\Generator\CodeGenerator;
+use Windwalker\Core\Generator\FileCollection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
@@ -147,5 +149,29 @@ class SeedService implements EventAwareInterface
         }
 
         return $files;
+    }
+
+    /**
+     * copyMigrationFile
+     *
+     * @param  string  $dir
+     * @param  string  $name
+     * @param  string  $source
+     *
+     * @return  FileCollection
+     */
+    public function copySeedFile(string $dir, string $name, string $source): FileCollection
+    {
+        $codeGenerator = $this->app->make(CodeGenerator::class);
+
+        $date = new \DateTimeImmutable('now');
+
+        $year    = $date->format('Y');
+
+        return $codeGenerator->from($source)
+            ->replaceTo(
+                $dir,
+                compact('name', 'year'),
+            );
     }
 }

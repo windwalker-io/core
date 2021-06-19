@@ -35,6 +35,16 @@ class ConsoleProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
-        class_alias(Color::class, \Symfony\Component\Console\Color::class);
+        // class_alias(Color::class, \Symfony\Component\Console\Color::class);
+
+        $container->mergeParameters(
+            'commands',
+            require __DIR__ . '/../../../resources/registry/commands.php'
+        );
+
+        $container->mergeParameters(
+            'generator.commands',
+            require __DIR__ . '/../../../resources/registry/generator.php'
+        );
     }
 }

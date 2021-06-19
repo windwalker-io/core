@@ -55,19 +55,17 @@ class BuildEntityCommand implements CommandInterface
         );
 
         $command->addOption(
-            'no-props',
+            'props',
             null,
-            InputOption::VALUE_OPTIONAL,
-            'Dont\'t generate properties',
-            false
+            InputOption::VALUE_NONE,
+            'Generate properties'
         );
 
         $command->addOption(
-            'no-methods',
+            'methods',
             null,
-            InputOption::VALUE_OPTIONAL,
-            'Don\'t generate methods',
-            false
+            InputOption::VALUE_NONE,
+            'Generate methods'
         );
 
         $command->addOption(
@@ -75,6 +73,15 @@ class BuildEntityCommand implements CommandInterface
             'd',
             InputOption::VALUE_NONE,
             'Do not replace origin file.'
+        );
+
+        $command->setHelp(
+            <<<HELP
+            $ <info>php windwalker build:entity Foo</info> => Use short name, will auto build App\\Entity\\Foo class
+            $ <info>php windwalker build:entity App\\Entity\\Foo</info> => Use full name, will auto build App\\Entity\\Foo class
+            $ <info>php windwalker build:entity App\\Entity</info> => Not an exists class, will build all App\\Entity\\* classes
+            $ <info>php windwalker build:entity "App\\Entity\\*"</info> => Use wildcards, will build all App\\Entity\\* classes
+            HELP
         );
     }
 
@@ -91,12 +98,24 @@ class BuildEntityCommand implements CommandInterface
 
         $ns = $io->getArgument('ns');
 
-        if (!class_exists($ns) || str_contains($ns, '*')) {
+        if (str_contains($ns, '*')) {
             $ns      = Str::removeRight($ns, '\\*');
             $classes = $this->classFinder->findClasses($ns);
-        } else {
-            $classes = [$ns];
+            $this->handleClasses($classes);
+            return 0;
         }
+
+        if (!class_exists($ns)) {
+            $ns = 'App\\Entity\\' . $ns;
+        }
+
+        if (!class_exists($ns)) {
+            $classes = $this->classFinder->findClasses($io->getArgument('ns'));
+            $this->handleClasses($classes);
+            return 0;
+        }
+
+        $classes = [$ns];
 
         $this->handleClasses($classes);
 
@@ -112,13 +131,17 @@ class BuildEntityCommand implements CommandInterface
 
             $this->io->newLine();
             $this->io->writeln("Handling: <info>$class</info>");
+            
+            $props = $this->io->getOption('props');
+            $methods = $this->io->getOption('methods');
+
+            if ($props === false && $methods === false) {
+                $props = true;
+            }
 
             $builder = new EntityMemberBuilder($meta = $this->orm->getEntityMetadata($class));
             $newCode = $builder->process(
-                [
-                    'props' => $this->io->getOption('no-props') === false,
-                    'methods' => $this->io->getOption('no-methods') === false,
-                ],
+                compact('props', 'methods'),
                 $added
             );
 

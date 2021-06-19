@@ -30,7 +30,7 @@ abstract class AbstractSeedCommand extends AbstractMigrationCommand
 
         $command->addOption(
             'file',
-            'f',
+            null,
             InputOption::VALUE_REQUIRED,
         );
     }
@@ -53,5 +53,14 @@ abstract class AbstractSeedCommand extends AbstractMigrationCommand
         }
 
         return $file;
+    }
+
+    public function getSeederFolder(IOInterface $io): string
+    {
+        if ($dir = $io->getOption('dir')) {
+            return $dir;
+        }
+
+        return $this->app->path('@seeders');
     }
 }

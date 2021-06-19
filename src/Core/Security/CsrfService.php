@@ -111,7 +111,7 @@ class CsrfService
      *
      * @return  static  Return self to support chaining.
      */
-    public function setTokenKey(string $tokenKey)
+    public function setTokenKey(string $tokenKey): static
     {
         $this->tokenKey = $tokenKey;
 

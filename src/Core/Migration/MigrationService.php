@@ -13,6 +13,8 @@ namespace Windwalker\Core\Migration;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
+use Windwalker\Core\Generator\CodeGenerator;
+use Windwalker\Core\Generator\FileCollection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
@@ -315,10 +317,11 @@ class MigrationService implements EventAwareInterface
      * @param  string  $name
      * @param  string  $source
      *
-     * @return  FileObject
+     * @return  FileCollection
      */
-    public function copyMigrationFile(string $dir, string $name, string $source): FileObject
+    public function copyMigrationFile(string $dir, string $name, string $source): FileCollection
     {
+        $codeGenerator = $this->app->make(CodeGenerator::class);
         $migrations = $this->getMigrations($dir);
 
         // Check name not exists
@@ -336,20 +339,10 @@ class MigrationService implements EventAwareInterface
         $version = $date->format('YmdHis');
         $year    = $date->format('Y');
 
-        $file = $version . '_' . ucfirst($name) . '.php';
-
-        $tmpl = file_get_contents($source);
-
-        $tmpl = SimpleTemplate::create($tmpl)(
-            compact('year', 'version', 'name')
-        );
-
-        $filePath = $dir . '/' . $file;
-
-        if (is_file($filePath)) {
-            throw new \RuntimeException(sprintf('File already exists: %s', $filePath));
-        }
-
-        return Filesystem::write($filePath, $tmpl);
+        return $codeGenerator->from($source)
+            ->replaceTo(
+                $dir,
+                compact('name', 'version', 'year'),
+            );
     }
 }
