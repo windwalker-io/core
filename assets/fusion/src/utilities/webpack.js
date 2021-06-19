@@ -5,7 +5,6 @@
  * @license    __LICENSE__
  */
 
-import { merge } from 'lodash-es';
 import { babelBasicOptions } from './babel.js';
 
 export async function webpackBasicConfig() {
@@ -29,7 +28,7 @@ export async function webpackBasicConfig() {
           use: [
             'style-loader',
             'css-loader',
-            'postcss-loader',
+            postCSSLoader(),
             'sass-loader',
           ],
         },
@@ -38,7 +37,7 @@ export async function webpackBasicConfig() {
           use: [
             'style-loader',
             'css-loader',
-            'postcss-loader'
+            postCSSLoader()
           ],
         },
         {
@@ -87,7 +86,7 @@ export async function webpackVue3Config() {
           use: [
             'vue-style-loader',
             'css-loader',
-            'postcss-loader',
+            postCSSLoader(),
             'sass-loader',
           ],
         },
@@ -96,7 +95,7 @@ export async function webpackVue3Config() {
           use: [
             'vue-style-loader',
             'css-loader',
-            'postcss-loader'
+            postCSSLoader()
           ],
         },
         {
@@ -146,4 +145,16 @@ export async function getVueLoader(version = 3) {
     console.error(`\nPlease run "${chalk.yellow('yarn add vue vue-loader vue-style-loader @vue/compiler-sfc file-loader')}" first.\n`);
     process.exit(255);
   }
+}
+
+function postCSSLoader() {
+  return {
+    loader: "postcss-loader",
+    options: {
+      postcssOptions: {
+        // @see https://github.com/postcss/postcss/issues/1375#issuecomment-673865735
+        hideNothingWarning: true,
+      },
+    },
+  };
 }

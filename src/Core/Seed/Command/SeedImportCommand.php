@@ -54,7 +54,7 @@ class SeedImportCommand extends AbstractSeedCommand
      */
     public function execute(IOInterface $io): int
     {
-        if (!$this->checkEnv($io)) {
+        if (!$this->confirm($io)) {
             return 255;
         }
 

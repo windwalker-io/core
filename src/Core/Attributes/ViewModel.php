@@ -69,6 +69,10 @@ class ViewModel implements ContainerAttributeInterface
         return function (...$args) use ($container, $handler) {
             $options = [
                 'vmAttr' => $this,
+                'css' => $this->css,
+                'js' => $this->js,
+                'modules' => $this->modules,
+                'headers' => $this->headers
             ];
 
             if ($this->module) {
@@ -81,15 +85,11 @@ class ViewModel implements ContainerAttributeInterface
 
             $viewModel = $handler(...$args);
 
-            $vm = $this->registerEvents(
-                $container->newInstance(
-                    View::class,
-                    compact('viewModel', 'options')
-                )
-                    ->setLayoutMap($this->layout),
-                $viewModel,
-                $container
-            );
+            $vm = $container->newInstance(
+                View::class,
+                compact('viewModel', 'options')
+            )
+                ->setLayoutMap($this->layout);
 
             $container->remove(static::class);
             $container->remove('vm.self');
@@ -103,51 +103,6 @@ class ViewModel implements ContainerAttributeInterface
         };
     }
 
-    protected function registerEvents(View $view, ViewModelInterface $vm, Container $container): View
-    {
-        // Todo: move to View class, that can override programally in ViewModel
-        $view->on(
-            BeforeRenderEvent::class,
-            function (BeforeRenderEvent $event) use ($vm, $container) {
-                $asset  = $container->resolve(AssetService::class);
-                $name   = $this->guessName($vm, $container);
-                $vmName = Path::clean(strtolower(ltrim($name, '\\/')), '/');
-
-                foreach ($this->css as $name => $css) {
-                    $path = '@view/' . $css;
-
-                    $asset->css($path);
-                }
-
-                foreach ($this->js as $name => $js) {
-                    $path = '@view/' . $vmName . '/' . $js;
-
-                    $asset->js($path);
-                }
-
-                foreach ($this->modules as $name => $js) {
-                    $path = '@view/' . $vmName . '/' . $js;
-
-                    if (!str_ends_with($js, '/')) {
-                        $asset->module($path);
-                    }
-
-                    if (!is_numeric($name)) {
-                        $asset->importMap($name, $path);
-                    }
-                }
-
-                $layout    = $event->getLayout();
-                $className = str_replace('/', '-', $vmName);
-
-                $htmlFrame = $container->get(HtmlFrame::class);
-                $htmlFrame->addBodyClass("view-$className layout-$layout");
-            }
-        );
-
-        return $view;
-    }
-
     /**
      * @return string|null
      */
@@ -156,45 +111,45 @@ class ViewModel implements ContainerAttributeInterface
         return $this->module;
     }
 
-    public function guessName(ViewModelInterface $vm, Container $container): string
-    {
-        $root = $container->getParam('asset.namespace_base');
-
-        $ref = new \ReflectionClass($vm);
-        $ns  = $ref->getNamespaceName();
-
-        return Str::removeLeft($ns, $root);
-    }
-
-    public function header(string $name, string|array $value): static
-    {
-        // Init response
-        $this->getResponse();
-
-        foreach ((array) $value as $v) {
-            $this->response = $this->response->withAddedHeader($name, $v);
-        }
-
-        return $this;
-    }
-
-    public function getResponse(): ResponseInterface
-    {
-        return $this->response ??= $this->createResponse();
-    }
-
-    public function createResponse(): ResponseInterface
-    {
-        $res = new HtmlResponse();
-
-        if ($this->headers !== []) {
-            foreach ($this->headers as $header) {
-                foreach ((array) $header as $value) {
-                    $res = $res->withAddedHeader($header, $value);
-                }
-            }
-        }
-
-        return $res;
-    }
+    // public function guessName(ViewModelInterface $vm, Container $container): string
+    // {
+    //     $root = $container->getParam('asset.namespace_base');
+    //
+    //     $ref = new \ReflectionClass($vm);
+    //     $ns  = $ref->getNamespaceName();
+    //
+    //     return Str::removeLeft($ns, $root);
+    // }
+    //
+    // public function header(string $name, string|array $value): static
+    // {
+    //     // Init response
+    //     $this->getResponse();
+    //
+    //     foreach ((array) $value as $v) {
+    //         $this->response = $this->response->withAddedHeader($name, $v);
+    //     }
+    //
+    //     return $this;
+    // }
+    //
+    // public function getResponse(): ResponseInterface
+    // {
+    //     return $this->response ??= $this->createResponse();
+    // }
+    //
+    // public function createResponse(): ResponseInterface
+    // {
+    //     $res = new HtmlResponse();
+    //
+    //     if ($this->headers !== []) {
+    //         foreach ($this->headers as $header) {
+    //             foreach ((array) $header as $value) {
+    //                 $res = $res->withAddedHeader($header, $value);
+    //             }
+    //         }
+    //     }
+    //
+    //     return $res;
+    // }
 }

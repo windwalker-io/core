@@ -123,6 +123,10 @@ class Runtime
             $allowIps = Arr::explodeAndClear(',', (string) $allowIps);
         }
 
+        if (in_array('all', $allowIps, true)) {
+            return;
+        }
+
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
 
         // Get allow remote ips from config.

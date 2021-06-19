@@ -85,7 +85,7 @@ class MigrateGoCommand extends AbstractMigrationCommand
     public function execute(IOInterface $io): int
     {
         // Dev check
-        if (!$this->checkEnv($io)) {
+        if (!$this->confirm($io)) {
             return 255;
         }
 

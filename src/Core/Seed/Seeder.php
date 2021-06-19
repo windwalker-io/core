@@ -14,6 +14,7 @@ namespace Windwalker\Core\Seed;
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Utilities\Classes\MarcoableTrait;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -21,6 +22,7 @@ use Windwalker\Utilities\StrNormalize;
  */
 class Seeder
 {
+    use MarcoableTrait;
     use CountingOutputTrait;
 
     public string $name;

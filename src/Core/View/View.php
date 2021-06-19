@@ -16,16 +16,21 @@ use Psr\Http\Message\UriInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Attributes\ViewModel;
+use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
+use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
+use Windwalker\Filesystem\Path;
+use Windwalker\Http\Response\AbstractContentTypeResponse;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Renderer\CompositeRenderer;
@@ -34,6 +39,7 @@ use Windwalker\Stream\Stream;
 use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
+use Windwalker\Utilities\Str;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
 
 /**
@@ -50,6 +56,8 @@ class View implements EventAwareInterface
 
     protected ?RendererInterface $renderer = null;
 
+    protected ?ResponseInterface $response = null;
+
     /**
      * View constructor.
      *
@@ -62,6 +70,8 @@ class View implements EventAwareInterface
         protected object $viewModel,
         protected AppContext $app,
         protected RendererService $rendererService,
+        protected HtmlFrame $htmlFrame,
+        protected AssetService $asset,
         array $options = []
     ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
@@ -98,6 +108,22 @@ class View implements EventAwareInterface
         $resolver->define('module')
             ->allowedTypes(ModuleInterface::class, 'null')
             ->default(null);
+
+        $resolver->define('modules')
+            ->allowedTypes('null', 'array')
+            ->default([]);
+
+        $resolver->define('css')
+            ->allowedTypes('null', 'array')
+            ->default([]);
+
+        $resolver->define('js')
+            ->allowedTypes('null', 'array')
+            ->default([]);
+
+        $resolver->define('headers')
+            ->allowedTypes('null', 'array')
+            ->default([]);
 
         $resolver->define('vmAttr')
             ->allowedTypes(ViewModel::class, 'null')
@@ -161,6 +187,8 @@ class View implements EventAwareInterface
             if (!$this->layout) {
                 throw new \LogicException('View must provide at least 1 layout name.');
             }
+
+            $this->prepareHtmlFrame($vm);
 
             $content = $this->getRenderer()
                 ->render($this->layout, $data, ['context' => $vm]);
@@ -270,6 +298,65 @@ class View implements EventAwareInterface
         }
     }
 
+    protected function prepareHtmlFrame(ViewModelInterface $vm): void
+    {
+        $asset  = $this->asset;
+        $name   = $this->guessName($vm);
+        $vmName = Path::clean(strtolower(ltrim($name, '\\/')), '/');
+
+        $cssList = $this->getOption('css');
+        $jsList = $this->getOption('js');
+        $modules = $this->getOption('modules');
+
+        foreach ($cssList as $name => $css) {
+            if (is_numeric($name)) {
+                $asset->css("@view/{$vmName}/{$css}");
+            } elseif ($name === $this->layout) {
+                foreach ((array) $css as $c) {
+                    $asset->css("@view/{$vmName}/{$c}");
+                }
+            }
+        }
+
+        foreach ($jsList as $name => $js) {
+            if (is_numeric($name)) {
+                $asset->js("@view/{$vmName}/{$js}");
+            } elseif ($name === $this->layout) {
+                foreach ((array) $js as $j) {
+                    $asset->js("@view/{$vmName}/{$j}");
+                }
+            }
+        }
+
+        foreach ($modules as $name => $js) {
+            if (is_numeric($name)) {
+                $asset->module("@view/{$vmName}/{$js}");
+            } elseif ($name === $this->layout) {
+                foreach ((array) $js as $j) {
+                    $asset->module("@view/{$vmName}/{$j}");
+                }
+            }
+        }
+
+        $layout    = $this->layout;
+        $className = str_replace('/', '-', $vmName);
+
+        $this->htmlFrame->addBodyClass("view-$className layout-$layout");
+
+        $this->app->getState()->set(
+            'view',
+            [
+                'name' => $vmName,
+                'layout' => $this->layout,
+                'css' => $cssList,
+                'js' => $jsList,
+                'modules' => $modules,
+                'className' => $vm::class,
+
+            ]
+        );
+    }
+
     /**
      * @return string|array|null
      */
@@ -356,14 +443,67 @@ class View implements EventAwareInterface
         return $this->options['vmAttr'];
     }
 
-    protected function getResponse(): ResponseInterface
+    public function guessName(ViewModelInterface $vm): string
     {
-        $attr = $this->getPageAttribute();
+        $root = $this->app->config('asset.namespace_base');
 
-        if (!$attr) {
-            return new HtmlResponse();
+        $ref = new \ReflectionClass($vm);
+        $ns  = $ref->getNamespaceName();
+
+        return Str::removeLeft($ns, $root);
+    }
+
+    public function header(string $name, string|array $value): static
+    {
+        // Init response
+        $this->getResponse();
+
+        foreach ((array) $value as $v) {
+            $this->response = $this->response->withAddedHeader($name, $v);
         }
 
-        return $attr->getResponse();
+        return $this;
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response ??= $this->createResponse();
+    }
+
+    public function createResponse(): ResponseInterface
+    {
+        $res = new HtmlResponse();
+
+        if ($this->getOption('headers')) {
+            foreach ($this->getOption('headers') as $header => $values) {
+                foreach ((array) $values as $value) {
+                    $res = $res->withAddedHeader($header, $value);
+                }
+            }
+        }
+
+        return $res;
+    }
+
+    /**
+     * @return HtmlFrame
+     */
+    public function getHtmlFrame(): HtmlFrame
+    {
+        return $this->htmlFrame;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->htmlFrame->setTitle($title);
+
+        return $this;
+    }
+
+    public function configureHtmlFrame(callable $handler): static
+    {
+        $handler($this->htmlFrame);
+
+        return $this;
     }
 }

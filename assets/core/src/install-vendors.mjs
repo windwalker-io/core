@@ -11,16 +11,28 @@ import path from 'path';
 import fs from 'fs';
 
 export async function installVendors(vendors) {
+  const root = 'www/assets/vendor';
+
+  const dirs = fs.readdirSync(root, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(dir => path.join(root, dir.name));
+
+  dirs.unshift(root);
+
+  dirs.forEach((dir) => {
+    deleteLinks(dir);
+  });
+
   vendors = findVendors().concat(vendors);
 
   vendors.forEach((vendor) => {
     if (fs.existsSync(`node_modules/${vendor}/`)) {
-      console.log(`[Link] node_modules/${vendor}/**/* => www/assets/vendor/${vendor}/`);
+      console.log(`[Link] node_modules/${vendor}/ => www/assets/vendor/${vendor}/`);
       src(`node_modules/${vendor}/`).pipe(symlink(`www/assets/vendor/${vendor}`));
     }
   });
 
-  console.log('[Copy] resources/assets/vendor/**/* => www/assets/vendor/');
+  console.log('[Link] resources/assets/vendor/**/* => www/assets/vendor/');
   src('resources/assets/vendor/*').pipe(symlink('www/assets/vendor/'));
 }
 
@@ -46,4 +58,15 @@ function loadJson(file) {
   }
 
   return JSON.parse(fs.readFileSync(file));
+}
+
+function deleteLinks(dir) {
+  const links = fs.readdirSync(dir, { withFileTypes: true })
+    .filter(d => d.isSymbolicLink());
+
+  links.forEach((link) => {
+    fs.unlink(path.join(dir, link.name), () => {});
+  });
+
+  fs.rmdir(dir, () => {});
 }

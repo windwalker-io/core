@@ -13,6 +13,7 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
@@ -51,18 +52,25 @@ abstract class AbstractMigrationCommand implements CommandInterface
             'The migration files directory.'
         );
 
-        $command->addOption(
-            'package',
-            'p',
-            InputOption::VALUE_REQUIRED,
-            'The target package migrations.'
-        );
+        // $command->addOption(
+        //     'package',
+        //     'p',
+        //     InputOption::VALUE_REQUIRED,
+        //     'The target package migrations.'
+        // );
 
         $command->addOption(
             'connection',
             'c',
             InputOption::VALUE_REQUIRED,
             'The database connection name.'
+        );
+
+        $command->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force run.'
         );
     }
 
@@ -213,14 +221,24 @@ abstract class AbstractMigrationCommand implements CommandInterface
      *
      * @return  bool
      */
-    protected function checkEnv(IOInterface $io): bool
+    protected function confirm(IOInterface $io): bool
     {
-        if (env('APP_ENV') !== 'dev') {
-            $io->writeln('<error>STOP!</error> please run: <info>' . $this->getEnvCmd() . '</info>');
-            return false;
+        if ($io->getOption('force')) {
+            return true;
         }
 
-        return true;
+        $confirm = $io->ask(
+            new ConfirmationQuestion(
+                'Do you really want to run migration/seeding?: [N/y] ',
+                false
+            )
+        );
+
+        if (!$confirm) {
+            $io->writeln('User canceled.');
+        }
+
+        return $confirm;
     }
 
     /**
