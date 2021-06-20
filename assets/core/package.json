@@ -1,6 +1,6 @@
 {
   "name": "@windwalker-io/core",
-  "version": "4.0.1-0",
+  "version": "4.0.1",
   "type": "module",
   "description": "Windwalker Core JS package",
   "scripts": {
