@@ -12,6 +12,14 @@ declare(strict_types=1);
 namespace Windwalker\Core\Error;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Windwalker\Core\Renderer\RendererService;
+use Windwalker\Core\Service\ErrorService;
+use Windwalker\DI\Container;
+use Windwalker\Http\Output\OutputInterface;
+use Windwalker\Http\Output\StreamOutput;
+use Windwalker\Http\Response\HtmlResponse;
+use Windwalker\Http\Server\HttpServer;
+use Windwalker\Http\Server\ServerInterface;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 /**
@@ -26,8 +34,10 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      *
      * @param  array  $options
      */
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        protected Container $container,
+        array $options = []
+    ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
     }
 
@@ -50,27 +60,18 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      */
     public function __invoke(\Throwable $e): void
     {
-        if ($this->getOption('debug')) {
-            echo $e;
-        } else {
-            echo $e->getMessage();
-        }
+        $renderer = $this->container->get(RendererService::class);
 
-        // $renderer = $this->app->renderer->getRenderer($this->engine);
-        //
-        // $body = $renderer->render(
-        //     $this->app->get('error.template', 'windwalker.error.default'),
-        //     ['exception' => $exception]
-        // );
-        //
-        // $code = $exception->getCode();
-        //
-        // if ($code < 400 || $code >= 500) {
-        //     $code = 500;
-        // }
-        //
-        // $response = (new HtmlResponse($body))->withStatus($code);
-        //
-        // $this->app->server->getOutput()->respond($response);
+        $html = $renderer->render(
+            $this->options['layout'],
+            ['exception' => $e]
+        );
+
+        $code = $e->getCode();
+
+        $code = ErrorService::normalizeCode($code);
+
+        $output = new StreamOutput();
+        $output->respond(HtmlResponse::fromString($html, $code));
     }
 }

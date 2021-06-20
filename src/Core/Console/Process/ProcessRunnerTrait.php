@@ -37,6 +37,7 @@ trait ProcessRunnerTrait
             : Process::fromShellCommandline($script);
 
         $process->setTimeout(0);
+        $process->setIdleTimeout(0);
 
         $phpPath = dirname($this->getPhpBinary() ?: '/use/local/bin');
 
