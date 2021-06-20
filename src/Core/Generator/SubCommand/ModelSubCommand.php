@@ -32,7 +32,7 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        [, $name] = $this->getNameParts($io);
+        [, $name] = $this->getNameParts($io, 'Repository');
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -45,10 +45,10 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('model/module/*.tpl'))
             ->replaceTo(
-                $this->getDestPath($io),
+                $this->getDestPath($io, 'Repository'),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamesapce($io, 'Repository'),
                 ],
                 $force
             );

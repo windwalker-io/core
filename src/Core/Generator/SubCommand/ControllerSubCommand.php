@@ -45,7 +45,7 @@ class ControllerSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        [, $name] = $this->getNameParts($io);
+        [, $name] = $this->getNameParts($io, 'Controller');
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -56,11 +56,11 @@ class ControllerSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('controller/*'))
             ->replaceTo(
-                $this->getDestPath($io),
+                $this->getDestPath($io, 'Controller'),
                 [
                     'className' => Str::ensureRight($name, 'Controller'),
                     'name' => Str::removeRight($name, 'Controller'),
-                    'ns' => $ns = $this->getNamesapce($io),
+                    'ns' => $ns = $this->getNamesapce($io, 'Controller'),
                 ],
                 $force
             );

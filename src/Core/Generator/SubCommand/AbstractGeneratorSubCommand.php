@@ -103,9 +103,9 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         // }
     }
 
-    protected function getNamesapce(IOInterface $io): string
+    protected function getNamesapce(IOInterface $io, ?string $suffix = null): string
     {
-        [$dest] = $this->getNameParts($io);
+        [$dest] = $this->getNameParts($io, $suffix);
         $ns  = $io->getOption('ns');
 
         $ns .= '\\' . $dest;
@@ -113,19 +113,24 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return StrNormalize::toClassNamespace($ns);
     }
 
-    protected function getDestPath(IOInterface $io): string
+    protected function getDestPath(IOInterface $io, ?string $suffix = null): string
     {
-        [$dest] = $this->getNameParts($io);
+        [$dest] = $this->getNameParts($io, $suffix);
         $dir  = $io->getOption('dir');
 
         return Path::normalize($this->app->path($dir . '/' . $dest));
     }
 
-    protected function getNameParts(IOInterface $io): array
+    protected function getNameParts(IOInterface $io, ?string $suffix = null): array
     {
         $name = $io->getArgument('name');
         $names = preg_split('/\/|\\\\/', $name);
-        $name = array_pop($names);
+        $name = $names[array_key_last($names)];
+
+        if (($suffix && str_ends_with($name, $suffix)) || !$suffix) {
+            array_pop($names);
+        }
+
         $dest = implode('/', $names);
 
         return [$dest, $name];
@@ -145,5 +150,14 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     protected function getBaseDir(): string
     {
         return __DIR__ . '/../../../..';
+    }
+
+    protected static function pathPop(string $path): string
+    {
+        $paths = explode('/', $path);
+
+        array_pop($paths);
+
+        return implode('/', $paths);
     }
 }

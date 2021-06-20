@@ -32,7 +32,7 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        [, $name] = $this->getNameParts($io);
+        [, $name] = $this->getNameParts($io, 'View');
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -43,11 +43,11 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('view/**/*.tpl'))
             ->replaceTo(
-                $this->getDestPath($io),
+                $this->getDestPath($io, 'View'),
                 [
                     'className' => Str::ensureRight($name, 'View'),
                     'name' => Str::removeRight($name, 'View'),
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamesapce($io, 'View'),
                 ],
                 $force
             );
