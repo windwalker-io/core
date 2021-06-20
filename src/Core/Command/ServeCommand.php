@@ -48,7 +48,7 @@ class ServeCommand implements CommandInterface
             'host',
             InputArgument::OPTIONAL,
             'The server host.',
-            'localhost:8888'
+            'localhost:8000'
         );
 
         $command->addArgument(
