@@ -10,11 +10,6 @@ namespace Windwalker\Core\Composer;
 
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Dotenv\Dotenv;
 
 use function Windwalker\uid;
 
@@ -76,6 +71,8 @@ class StarterInstaller
      */
     public static function genEnv(Event $event): void
     {
+        include getcwd() . '/vendor/autoload.php';
+
         $io = $event->getIO();
 
         $dist = getcwd() . '/.env.dist';
@@ -95,25 +92,25 @@ class StarterInstaller
                 'pdo_mysql',
                 'mysqli',
                 'pdo_pgsql',
-                'pdo_sqlsrv',
-                'pdo_sqlite',
                 'pgsql',
+                'pdo_sqlsrv',
+                'sqlsrv',
                 'pdo_sqlite',
             ];
 
-            $helper = new QuestionHelper();
+            $io->write('Please select database drivers: ');
 
-            $qn = new ChoiceQuestion(
-                'Please select database drivers: ',
-                $supportedDrivers
-            );
-            $driver = $helper->ask(
-                new ArrayInput([]),
-                new ConsoleOutput(),
-                $qn
-            );
+            foreach ($supportedDrivers as $i => $driver) {
+                $io->write("  [$i] $driver");
+            }
 
-            $vars['DATABASE_DRIVER']   = $driver ?? 'pdo_mysql';
+            $k = $io->ask('> ');
+
+            $driver = $supportedDrivers[$k] ?? 'pdo_mysql';
+
+            $io->write('Selected driver: ' . $driver);
+
+            $vars['DATABASE_DRIVER']   = $driver;
             $vars['DATABASE_HOST']     = $io->ask('Database host [localhost]: ', 'localhost');
             $vars['DATABASE_NAME']     = $io->ask('Database name [acme]: ', 'acme');
             $vars['DATABASE_USER']     = $io->ask('Database user [root]: ', 'root');
@@ -123,8 +120,6 @@ class StarterInstaller
                 $env = preg_replace('/' . $key . '=(.*)/', $key . '=' . $value, $env);
             }
         }
-
-        file_put_contents($dest, $env);
 
         $io->write('');
         $io->write('Database config setting complete.');
