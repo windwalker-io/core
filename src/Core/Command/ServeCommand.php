@@ -63,6 +63,13 @@ class ServeCommand implements CommandInterface
             InputOption::VALUE_REQUIRED,
             'The docroot dir path.'
         );
+
+        $command->addOption(
+            'port',
+            'p',
+            InputOption::VALUE_REQUIRED,
+            'The server port.'
+        );
     }
 
     /**
@@ -78,7 +85,11 @@ class ServeCommand implements CommandInterface
 
         [$domain, $port] = explode(':', $host) + [null, null];
 
-        $port ??= '8888';
+        $port ??= '8000';
+
+        if ($io->hasOption('port')) {
+            $port = $io->getOption('port');
+        }
 
         $host = $domain . ':' . $port;
 

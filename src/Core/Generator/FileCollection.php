@@ -63,7 +63,7 @@ class FileCollection implements EventAwareInterface
                 $action = '<comment>EXISTS</comment>';
             }
 
-            $this->emitMessage("[$action] " . $dest->getPathname());
+            $this->emitMessage("[$action] " . $dest->getRelativePath(WINDWALKER_ROOT));
         });
     }
 
