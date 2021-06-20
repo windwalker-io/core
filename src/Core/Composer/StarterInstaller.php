@@ -80,6 +80,7 @@ class StarterInstaller
 
         if (is_file($dest)) {
             $io->write('.env file already exists.');
+
             return;
         }
 
@@ -120,6 +121,8 @@ class StarterInstaller
                 $env = preg_replace('/' . $key . '=(.*)/', $key . '=' . $value, $env);
             }
         }
+
+        file_put_contents($dest, $env);
 
         $io->write('');
         $io->write('Database config setting complete.');
