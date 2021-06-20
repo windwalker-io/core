@@ -87,7 +87,7 @@ class ServeCommand implements CommandInterface
 
         $port ??= '8000';
 
-        if ($io->hasOption('port')) {
+        if ($io->getOption('port')) {
             $port = $io->getOption('port');
         }
 
