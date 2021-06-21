@@ -303,7 +303,7 @@ class View implements EventAwareInterface
         $asset  = $this->asset;
         $name   = strtolower(ltrim($this->guessName($vm), '\\/'));
         $vmName = Path::clean($name, '/');
-        [$stage, $viewName] = explode("\\", $name, 2);
+        $this->addBodyClass($name);
 
         $cssList = $this->getOption('css');
         $jsList = $this->getOption('js');
@@ -339,11 +339,6 @@ class View implements EventAwareInterface
             }
         }
 
-        $layout    = $this->layout;
-        $className = str_replace('/', '-', $vmName);
-
-        $this->htmlFrame->addBodyClass("stage-$stage view-$viewName layout-$layout");
-
         $this->app->getState()->set(
             'view',
             [
@@ -356,6 +351,23 @@ class View implements EventAwareInterface
 
             ]
         );
+    }
+
+    protected function addBodyClass(string $name): void
+    {
+        $stage = null;
+        $names = explode("\\", $name);
+
+        if (\Windwalker\count($names) > 1) {
+            $stage = array_shift($names);
+        }
+
+        if ($stage) {
+            $this->htmlFrame->addBodyClass('stage-' . $stage);
+        }
+
+        $this->htmlFrame->addBodyClass('view-' . implode('-', $names));
+        $this->htmlFrame->addBodyClass('layout-' . $this->layout);
     }
 
     /**

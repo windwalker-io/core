@@ -40,15 +40,14 @@ class ViewModel implements ContainerAttributeInterface
     /**
      * View constructor.
      *
-     * @param  string|null        $module
      * @param  string|array|null  $layout
+     * @param  array              $headers
      * @param  array|string       $css
      * @param  array|string       $js
      * @param  array              $modules
      * @param  array              $options
      */
     public function __construct(
-        public ?string $module = null,
         public string|array|null $layout = null,
         public array $headers = [],
         array|string $css = [],
@@ -72,16 +71,8 @@ class ViewModel implements ContainerAttributeInterface
                 'css' => $this->css,
                 'js' => $this->js,
                 'modules' => $this->modules,
-                'headers' => $this->headers
+                'headers' => $this->headers,
             ];
-
-            if ($this->module) {
-                /** @var ModuleInterface $module */
-                $options['module'] = $module = $container->newInstance($this->module);
-
-                $container->share($this->module, $module)
-                    ->alias(ModuleInterface::class, $this->module);
-            }
 
             $viewModel = $handler(...$args);
 
@@ -93,11 +84,6 @@ class ViewModel implements ContainerAttributeInterface
 
             $container->remove(static::class);
             $container->remove('vm.self');
-
-            if ($this->module) {
-                $container->remove($this->module)
-                    ->removeAlias(ModuleInterface::class);
-            }
 
             return $vm;
         };
