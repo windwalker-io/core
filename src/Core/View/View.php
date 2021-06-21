@@ -301,8 +301,9 @@ class View implements EventAwareInterface
     protected function prepareHtmlFrame(ViewModelInterface $vm): void
     {
         $asset  = $this->asset;
-        $name   = $this->guessName($vm);
-        $vmName = Path::clean(strtolower(ltrim($name, '\\/')), '/');
+        $name   = strtolower(ltrim($this->guessName($vm), '\\/'));
+        $vmName = Path::clean($name, '/');
+        [$stage, $viewName] = explode("\\", $name, 2);
 
         $cssList = $this->getOption('css');
         $jsList = $this->getOption('js');
@@ -341,7 +342,7 @@ class View implements EventAwareInterface
         $layout    = $this->layout;
         $className = str_replace('/', '-', $vmName);
 
-        $this->htmlFrame->addBodyClass("view-$className layout-$layout");
+        $this->htmlFrame->addBodyClass("stage-$stage view-$viewName layout-$layout");
 
         $this->app->getState()->set(
             'view',
