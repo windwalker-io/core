@@ -26,7 +26,7 @@ export function merge(...args) {
   );
 }
 
-export function extractDest(dest) {
+export function extractDest(dest = null) {
   let merge = dest !== null
     && (dest.slice(-1) !== '/'
     || (fs.existsSync(dest) && !fs.lstatSync(dest).isDirectory()));
