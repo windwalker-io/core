@@ -39,4 +39,5 @@ return [
     'run' => \Windwalker\Core\Command\RunCommand::class,
 
     'build:entity' => \Windwalker\Core\Generator\Command\BuildEntityCommand::class,
+    'build:enum' => \Windwalker\Core\Generator\Command\BuildEnumCommand::class,
 ];
