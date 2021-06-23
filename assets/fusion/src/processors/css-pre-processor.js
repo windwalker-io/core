@@ -58,7 +58,7 @@ export default class CssPreProcessor extends Processor {
       )
       .pipeIf(
         options.minify === MinifyOption.SAME_FILE,
-        () => () => cleanCSS({ compatibility: 'ie11' })
+        () => cleanCSS({ compatibility: 'ie11' })
       )
       .pipeIf(
         options.sourcemap,
