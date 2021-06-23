@@ -9,13 +9,28 @@ import fusion, { watch, parallel, src, dest } from '@windwalker-io/fusion';
 import { babelBasicOptions } from '@windwalker-io/fusion/src/utilities/babel.js';
 import postcss from 'gulp-postcss';
 import tailwindcss from 'tailwindcss';
+import WebpackDynamicPublicPathPlugin from 'webpack-dynamic-public-path';
 
 export async function debuggers() {
   // Watch start
   watch(['src/debugger/**/*.{js,vue}', 'scss/**/*.scss']);
   // Watch end
 
-  fusion.vue('src/debugger/index.js', 'dist/debugger.js');
+  fusion.vue(
+    'src/debugger/debugger.js',
+    'dist/debugger/',
+    {
+      override: (config) => {
+        config.output.publicPath = "publicPathPlaceholder";
+
+          config.plugins.push(
+          new WebpackDynamicPublicPathPlugin({
+            externalPublicPath: "window.externalPublicPath"
+          })
+        );
+      }
+    }
+  );
   fusion.copy('images/**/*', 'dist/images/');
 }
 

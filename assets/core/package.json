@@ -1,6 +1,6 @@
 {
   "name": "@windwalker-io/core",
-  "version": "4.0.2-0",
+  "version": "4.0.2-1",
   "type": "module",
   "description": "Windwalker Core JS package",
   "scripts": {
@@ -16,7 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "@windwalker-io/fusion": "^1.0.0",
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "webpack-dynamic-public-path": "^1.0.7"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",

@@ -87,7 +87,7 @@ export async function webpackVue3Config() {
             'vue-style-loader',
             'css-loader',
             postCSSLoader(),
-            'sass-loader',
+            'sass-loader'
           ],
         },
         {

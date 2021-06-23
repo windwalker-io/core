@@ -34,6 +34,9 @@ use Windwalker\Core\Router\SystemUri;
 <body>
     <app id="app"></app>
 
-    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger.js')) }}"></script>
+    <script>
+        window.externalPublicPath = '{{ $asset->handleUri('@core/debugger/') }}'
+    </script>
+    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/debugger.js')) }}"></script>
 </body>
 </html>
