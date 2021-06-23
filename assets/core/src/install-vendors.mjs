@@ -13,6 +13,10 @@ import fs from 'fs';
 export async function installVendors(vendors) {
   const root = 'www/assets/vendor';
 
+  if (!fs.existsSync(root)) {
+    fs.mkdirSync(root);
+  }
+
   const dirs = fs.readdirSync(root, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(dir => path.join(root, dir.name));
@@ -24,6 +28,7 @@ export async function installVendors(vendors) {
   });
 
   vendors = findVendors().concat(vendors);
+  vendors = [...new Set(vendors)];
 
   vendors.forEach((vendor) => {
     if (fs.existsSync(`node_modules/${vendor}/`)) {

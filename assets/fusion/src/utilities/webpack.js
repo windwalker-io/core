@@ -14,7 +14,7 @@ export async function webpackBasicConfig() {
       filename: '[name].js',
       sourceMapFilename: '[name].js.map'
     },
-    devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-eval-source-map',
+    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map',
     stats: {
       all: false,
       errors: true,
@@ -69,7 +69,7 @@ export async function webpackVue3Config() {
       warnings: true,
       version: false,
     },
-    devtool: process.env.NODE_ENV === 'production' ? false : 'cheap-eval-source-map',
+    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map',
     // ensure we are using the version of Vue that supports templates
     resolve: {
       alias: {
