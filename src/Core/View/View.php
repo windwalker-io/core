@@ -40,6 +40,7 @@ use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
 
 /**
@@ -303,7 +304,7 @@ class View implements EventAwareInterface
         $asset  = $this->asset;
         $name   = strtolower(ltrim($this->guessName($vm), '\\/'));
         $vmName = Path::clean($name, '/');
-        $this->addBodyClass($name);
+        $this->addBodyClass($vm::class);
 
         $cssList = $this->getOption('css');
         $jsList = $this->getOption('js');
@@ -348,25 +349,33 @@ class View implements EventAwareInterface
                 'js' => $jsList,
                 'modules' => $modules,
                 'className' => $vm::class,
-
             ]
         );
     }
 
-    protected function addBodyClass(string $name): void
+    protected function addBodyClass(string $fullName): void
     {
+        $root = $this->app->config('asset.namespace_base');
+        $fullName = ltrim(Str::removeLeft($fullName, $root), '\\');
+
+        $names = explode('\\', $fullName);
+        $shortName = array_pop($names);
+        $viewName = Str::removeRight($shortName, 'View');
+
         $stage = null;
-        $names = explode("\\", $name);
 
         if (\Windwalker\count($names) > 1) {
-            $stage = array_shift($names);
+            $stage = $names[array_key_first($names)];
         }
 
         if ($stage) {
-            $this->htmlFrame->addBodyClass('stage-' . $stage);
+            $this->htmlFrame->addBodyClass('stage-' . StrNormalize::toKebabCase($stage));
         }
 
-        $this->htmlFrame->addBodyClass('view-' . implode('-', $names));
+        $module = StrNormalize::toKebabCase(implode('-', $names));
+
+        $this->htmlFrame->addBodyClass('module-' . $module);
+        $this->htmlFrame->addBodyClass('view-' . StrNormalize::toKebabCase($viewName));
         $this->htmlFrame->addBodyClass('layout-' . $this->layout);
     }
 
