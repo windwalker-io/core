@@ -75,10 +75,10 @@ class RouteBuilder
     protected function compileUri(array $variant, array $vars): array
     {
         $segments = [];
-        $pattern  = array_shift($variant);
 
         foreach ($variant as $segment) {
             if (!is_array($segment)) {
+                $segments[] = $segment;
                 continue;
             }
 
@@ -91,7 +91,7 @@ class RouteBuilder
             unset($vars[$name]);
         }
 
-        $pattern .= implode('/', $segments);
+        $pattern = implode('', $segments);
 
         if ($vars !== []) {
             $pattern .= '?' . http_build_query($vars);
