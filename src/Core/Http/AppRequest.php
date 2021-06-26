@@ -315,6 +315,19 @@ class AppRequest implements \JsonSerializable
         return $new;
     }
 
+    public function accept(string $type): bool
+    {
+        return str_contains(
+            $this->getRequest()->getHeaderLine('accept'),
+            $type
+        );
+    }
+
+    public function acceptJson(): bool
+    {
+        return $this->accept('application/json');
+    }
+
     /**
      * @return Route|null
      */

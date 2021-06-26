@@ -102,7 +102,10 @@ class DelegatingController implements ControllerInterface
             $nav = $this->app->service(Navigator::class);
             return $nav->back();
         } catch (\Throwable $e) {
-            if ($this->app->isDebug() || strtoupper($this->app->getRequestMethod()) === 'GET') {
+            if ($this->app->isDebug()
+                || strtoupper($this->app->getRequestMethod()) === 'GET'
+                || $this->app->getAppRequest()->acceptJson()
+            ) {
                 throw $e;
             } else {
                 $this->app->addMessage($e->getMessage(), 'warning');
