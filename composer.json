@@ -36,6 +36,13 @@
         "symfony/mailer": "Install ^5.2 to send mail.",
         "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
+    "archive": {
+        "exclude": [
+            ".github",
+            "assets",
+            "test"
+        ]
+    },
     "autoload" : {
         "psr-4" : {
             "Windwalker\\" : "src/",
