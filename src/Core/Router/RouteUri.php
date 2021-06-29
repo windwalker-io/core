@@ -17,8 +17,6 @@ use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriHelper;
 
-use function Windwalker\ds;
-
 /**
  * The RouteUri class.
  */
@@ -36,23 +34,23 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * RouteUri constructor.
      *
-     * @param  mixed      $uri
-     * @param  array      $vars
-     * @param  Navigator  $navigator
-     * @param  int        $options
+     * @param  \Closure|\Stringable|string  $uri
+     * @param  array|null                   $vars
+     * @param  Navigator                    $navigator
+     * @param  int                          $options
      */
     public function __construct(mixed $uri, ?array $vars, protected Navigator $navigator, int $options = 0)
     {
         if ($uri instanceof \Closure) {
             $this->handler = $uri;
-            $uri = '';
+            $uri           = '';
         }
 
         parent::__construct((string) $uri);
 
         if ($vars !== null) {
-            $this->vars = $vars;
-            $this->query = UriHelper::buildQuery($vars);
+            $this->vars  = array_merge($this->vars, $vars ?? []);
+            $this->query = UriHelper::buildQuery($this->vars);
         }
 
         $this->options = $options;
@@ -67,7 +65,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function options(int $options): static
     {
-        $new = clone $this;
+        $new          = clone $this;
         $new->options = $options;
 
         return $new;
@@ -106,7 +104,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * id
      *
-     * @param int $id
+     * @param  int  $id
      *
      * @return  static
      */
@@ -118,7 +116,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * alias
      *
-     * @param string $alias
+     * @param  string  $alias
      *
      * @return  static
      */
@@ -130,7 +128,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * page
      *
-     * @param int $page
+     * @param  int  $page
      *
      * @return  static
      */
@@ -142,7 +140,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * layout
      *
-     * @param string $layout
+     * @param  string  $layout
      *
      * @return  static
      *
@@ -156,7 +154,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * task
      *
-     * @param string $task
+     * @param  string  $task
      *
      * @return  static
      *
@@ -170,8 +168,8 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * addVar
      *
-     * @param string $name
-     * @param mixed  $value
+     * @param  string  $name
+     * @param  mixed   $value
      *
      * @return  $this
      */
@@ -183,7 +181,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * delVar
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return  static
      *
@@ -207,7 +205,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * escape
      *
-     * @param bool $bool
+     * @param  bool  $bool
      *
      * @return  $this
      */
@@ -233,7 +231,7 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * Method to set property mute
      *
-     * @param   bool $mute
+     * @param  bool  $mute
      *
      * @return  static  Return self to support chaining.
      */
@@ -363,7 +361,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function withStatus(int $status): static
     {
-        $new = clone $this;
+        $new         = clone $this;
         $new->status = $status;
 
         return $new;

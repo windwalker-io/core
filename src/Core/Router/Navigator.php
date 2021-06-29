@@ -14,7 +14,6 @@ namespace Windwalker\Core\Router;
 use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Event\EventAwareInterface;
@@ -79,33 +78,50 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             compact('navigator', 'query', 'route', 'options')
         );
 
-        $route = $event->getRoute();
+        $route   = $event->getRoute();
         $options = $event->getOptions();
-        $query = $event->getQuery();
+        $query   = $event->getQuery();
 
         $handler = function (array $query) use ($route): array {
             $id = $route . ':' . json_encode($query);
 
-            return $this->once('route:' . $id, function () use ($query, $route) {
-                $routeObject = $this->findRoute($route);
+            return $this->once(
+                'route:' . $id,
+                function () use ($query, $route) {
+                    $routeObject = $this->findRoute($route);
 
-                if (!$routeObject) {
-                    throw new RouteNotFoundException('Route: ' . $route . ' not found.');
+                    if (!$routeObject) {
+                        throw new RouteNotFoundException('Route: ' . $route . ' not found.');
+                    }
+
+                    [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
+
+                    $systemUri = $this->app->getSystemUri();
+
+                    if ($systemUri->script && $systemUri->script !== 'index.php') {
+                        $url = $systemUri->script . '/' . $url;
+                    }
+
+                    return [$url, $query];
                 }
-
-                [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
-
-                $systemUri = $this->app->getSystemUri();
-
-                if ($systemUri->script && $systemUri->script !== 'index.php') {
-                    $url = $systemUri->script . '/' . $url;
-                }
-
-                return [$url, $query];
-            });
+            );
         };
 
-        return new RouteUri($handler, $query, $this, $options);
+        return $this->createRouteUri($handler, $query, $options);
+    }
+
+    /**
+     * createRouteUri
+     *
+     * @param  \Closure|\Stringable|string  $uri
+     * @param  array|null                   $vars
+     * @param  int                          $options
+     *
+     * @return  RouteUri
+     */
+    public function createRouteUri(mixed $uri, ?array $vars, int $options = 0): RouteUri
+    {
+        return new RouteUri($uri, $vars, $this, $options);
     }
 
     public function redirectInstant(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
@@ -173,7 +189,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      */
     public function withOptions(int $options): static
     {
-        $new = clone $this;
+        $new          = clone $this;
         $new->options = $options;
 
         return $new;
