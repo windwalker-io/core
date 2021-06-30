@@ -16,6 +16,7 @@ use Windwalker\Edge\Compiler\EdgeCompiler;
 use Windwalker\Edge\Edge;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\Iterator\FilesIterator;
+use Windwalker\Utilities\Reflection\ReflectAccessor;
 
 /**
  * The FileCollection class.
@@ -45,26 +46,28 @@ class FileCollection implements EventAwareInterface
 
     public function replaceTo(string $destDir, callable|array $data, bool $force = false): static
     {
-        return $this->each(function (FileData $file) use ($force, $destDir, $data) {
-            if (is_callable($data)) {
-                $data($file);
-            } else {
-                $file->compileContent($data);
+        return $this->each(
+            function (FileData $file) use ($force, $destDir, $data) {
+                if (is_callable($data)) {
+                    $data($file);
+                } else {
+                    $file->compileContent($data);
+                }
+
+                $isExists = $file->exists($destDir, $data);
+
+                if ($force || !$isExists) {
+                    $dest = $file->writeTo($destDir, $data);
+
+                    $action = $isExists ? '<fg=cyan>OVERRIDE</>' : '<info>CREATE</info>';
+                } else {
+                    $dest   = $file->compileDestFile($destDir, $data);
+                    $action = '<comment>EXISTS</comment>';
+                }
+
+                $this->emitMessage("[$action] " . $dest->getRelativePath(WINDWALKER_ROOT));
             }
-
-            $isExists = $file->exists($destDir, $data);
-
-            if ($force || !$isExists) {
-                $dest = $file->writeTo($destDir, $data);
-
-                $action = $isExists ? '<fg=cyan>OVERRIDE</>' : '<info>CREATE</info>';
-            } else {
-                $dest = $file->compileDestFile($destDir, $data);
-                $action = '<comment>EXISTS</comment>';
-            }
-
-            $this->emitMessage("[$action] " . $dest->getRelativePath(WINDWALKER_ROOT));
-        });
+        );
     }
 
     protected function createEdge(): Edge
@@ -72,6 +75,16 @@ class FileCollection implements EventAwareInterface
         $compiler = new EdgeCompiler();
         $compiler->setContentTags('{%', '%}');
         $compiler->setRawTags('{%', '%}');
+
+        ReflectAccessor::setValue(
+            $compiler,
+            'compilers',
+            [
+                'Parsers',
+                'Comments',
+                'Echos',
+            ]
+        );
 
         $edge = new Edge(null, null, $compiler);
 

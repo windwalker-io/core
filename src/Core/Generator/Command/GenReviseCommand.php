@@ -160,14 +160,14 @@ class GenReviseCommand implements CommandInterface
     {
         $ns = $io->getOption('ns');
         $name = $io->getOption('name');
-        $className = $io->getOption('class');
+        // $className = $io->getOption('class');
 
         TypeAssert::assert((bool) $ns, 'Please provide --ns {Namespace}');
         TypeAssert::assert((bool) $name, 'Please provide --name {Name}');
         // TypeAssert::assert((bool) $className, 'Please provide --class {Class}');
 
         return [
-            $ns => '{% $ns %}',
+            StrNormalize::toClassNamespace($ns) => '{% $ns %}',
             StrInflector::toPlural($name) => '{% plural($name) %}',
             $name => '{% $name %}',
             strtolower($name) => '{% strtolower($name) %}',
@@ -175,9 +175,10 @@ class GenReviseCommand implements CommandInterface
             StrNormalize::toPascalCase($name) => '{% pascal($name) %}',
             StrNormalize::toCamelCase($name) => '{% camel($name) %}',
             StrNormalize::toKebabCase($name) => '{% kebab($name) %}',
+            StrNormalize::toSnakeCase($name) => '{% snake($name) %}',
             // $className => '{% $className %}',
             '<?php' => '{% $phpOpen %}',
-            '?>' => '{% $phpClose %}'
+            '?>' => '{% $phpClose %}',
         ];
     }
 }

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace {% $ns %};
+namespace App\Repository;
 
 use Windwalker\Database\DatabaseAdapter;
 

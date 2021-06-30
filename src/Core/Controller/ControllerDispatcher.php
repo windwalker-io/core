@@ -18,6 +18,7 @@ use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
+use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\RedirectResponse;
@@ -64,7 +65,7 @@ class ControllerDispatcher
             if (str_contains($controller, '::')) {
                 $controller = explode('::', $controller, 2);
             } elseif (class_exists($controller)) {
-                $controller = [$controller, $this->getDefaultTask($app->getServerRequest())];
+                $controller = [$controller, $this->getDefaultTask($app->getAppRequest())];
             }
         }
 
@@ -84,9 +85,9 @@ class ControllerDispatcher
         return $event->getResponse();
     }
 
-    protected function getDefaultTask(ServerRequestInterface $request): string
+    protected function getDefaultTask(AppRequest $request): string
     {
-        $task = strtolower($request->getMethod());
+        $task = strtolower($request->getOverrideMethod());
 
         $map = [
             'get' => 'index',

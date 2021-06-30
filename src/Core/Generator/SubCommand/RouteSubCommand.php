@@ -16,6 +16,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The GenControllerSubCommand class.
@@ -64,6 +65,9 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
                 $this->getDestPath($io),
                 [
                     'name' => $name,
+                    'ns' => StrNormalize::toClassNamespace(
+                        $this->getNamesapce($io) . '/' . StrNormalize::toPascalCase($name)
+                    ),
                 ],
                 $force
             );
