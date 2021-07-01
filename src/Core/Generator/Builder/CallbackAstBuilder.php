@@ -154,7 +154,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
                 //
             }
 
-            public function beforeTraverse(array $nodes)
+            public function beforeTraverse(array $nodes): mixed
             {
                 if (!$this->beforeTraverse) {
                     return null;
@@ -163,7 +163,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
                 return ($this->beforeTraverse)($nodes, $this);
             }
 
-            public function afterTraverse(array $nodes)
+            public function afterTraverse(array $nodes): mixed
             {
                 if (!$this->afterTraverse) {
                     return null;
@@ -172,7 +172,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
                 return ($this->afterTraverse)($nodes, $this);
             }
 
-            public function enterNode(Node $node)
+            public function enterNode(Node $node): mixed
             {
                 if (!$this->enterNode) {
                     return null;
@@ -181,7 +181,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
                 return ($this->enterNode)($node, $this);
             }
 
-            public function leaveNode(Node $node)
+            public function leaveNode(Node $node): mixed
             {
                 if (!$this->leaveNode) {
                     return null;

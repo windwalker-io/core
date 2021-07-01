@@ -13,6 +13,7 @@ namespace App\Migration;
 
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Migration\Migration;
+use Windwalker\Database\Schema\Schema;
 
 /**
  * Migration UP: {% $version %}_{% $name %}.

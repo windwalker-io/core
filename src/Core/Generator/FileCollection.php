@@ -15,6 +15,7 @@ use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Edge\Compiler\EdgeCompiler;
 use Windwalker\Edge\Edge;
 use Windwalker\Event\EventAwareInterface;
+use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Iterator\FilesIterator;
 use Windwalker\Utilities\Reflection\ReflectAccessor;
 
@@ -24,6 +25,8 @@ use Windwalker\Utilities\Reflection\ReflectAccessor;
 class FileCollection implements EventAwareInterface
 {
     use MessageOutputTrait;
+
+    protected array $results = [];
 
     /**
      * FileCollection constructor.
@@ -46,6 +49,8 @@ class FileCollection implements EventAwareInterface
 
     public function replaceTo(string $destDir, callable|array $data, bool $force = false): static
     {
+        $this->results = [];
+
         return $this->each(
             function (FileData $file) use ($force, $destDir, $data) {
                 if (is_callable($data)) {
@@ -64,6 +69,8 @@ class FileCollection implements EventAwareInterface
                     $dest   = $file->compileDestFile($destDir, $data);
                     $action = '<comment>EXISTS</comment>';
                 }
+
+                $this->results[] = $dest;
 
                 $this->emitMessage("[$action] " . $dest->getRelativePath(WINDWALKER_ROOT));
             }
@@ -111,5 +118,13 @@ class FileCollection implements EventAwareInterface
         $this->files = $files;
 
         return $this;
+    }
+
+    /**
+     * @return array<FileObject>
+     */
+    public function getResults(): array
+    {
+        return $this->results;
     }
 }

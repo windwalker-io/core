@@ -319,7 +319,7 @@ class MigrationService implements EventAwareInterface
      *
      * @return  FileCollection
      */
-    public function copyMigrationFile(string $dir, string $name, string $source): FileCollection
+    public function copyMigrationFile(string $dir, string $name, string $source, array $options = []): FileCollection
     {
         $codeGenerator = $this->app->make(CodeGenerator::class);
         $migrations = $this->getMigrations($dir);
@@ -336,7 +336,7 @@ class MigrationService implements EventAwareInterface
 
         $date = new \DateTimeImmutable('now');
 
-        $version = $date->format('YmdHis');
+        $version = $date->format($options['version_format'] ?? 'YmdHis');
         $year    = $date->format('Y');
 
         return $codeGenerator->from($source)
