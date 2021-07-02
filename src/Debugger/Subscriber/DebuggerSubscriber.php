@@ -174,12 +174,20 @@ class DebuggerSubscriber
         $dbConns     = [];
 
         foreach ($connections as $connection => $factory) {
-            $db        = $app->service(DatabaseManager::class)->get($connection);
+            $db = $app->service(DatabaseManager::class)->get($connection);
+            $version = null;
+
+            try {
+                $version = $db->getDriver()->getVersion();
+            } catch (\Throwable $e) {
+                // No actions.
+            }
+
             $dbConns[] = [
                 'name' => $connection,
                 'platform' => $db->getPlatform()->getName(),
                 'driver' => $db->getOptions()['driver'],
-                'version' => $db->getDriver()->getVersion(),
+                'version' => $version ?? '',
             ];
         }
 
