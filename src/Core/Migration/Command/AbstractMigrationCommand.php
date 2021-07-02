@@ -207,10 +207,14 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
             $dbExportService = $this->app->make(DatabaseExportService::class);
 
-            $dest = $dbExportService->export($io);
+            try {
+                $dest = $dbExportService->export($io);
 
-            $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
-            $io->style()->newLine();
+                $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
+                $io->style()->newLine();
+            } catch (\DomainException $e) {
+                $io->errorStyle()->warning($e->getMessage());
+            }
         }
     }
 
