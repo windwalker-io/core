@@ -71,34 +71,11 @@ class MigrationService implements EventAwareInterface
         }
 
         if ($logFile) {
-            if (is_file($logFile)) {
-                Filesystem::delete($logFile);
-            }
-
-            Filesystem::mkdir(dirname($logFile));
-
-            $logStream = new Stream($logFile, Stream::MODE_WRITE_ONLY_FROM_END);
-
-            // Log query
-            $this->on(
-                QueryEndEvent::class,
-                function (QueryEndEvent $event) use ($logStream) {
-                    $logStream->write($event->getDebugQueryString() . "\n\n");
-                }
-            );
-
-            // Log failed
-            $this->on(
-                QueryFailedEvent::class,
-                function (QueryFailedEvent $event) use ($logStream) {
-                    $e = $event->getException();
-                    $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->getDebugQueryString()}\n\n");
-                }
-            );
+            $this->handleLogging($logFile);
         }
 
         $count     = 0;
-        $direction = ($targetVersion > $currentVersion) ? Migration::UP : Migration::DOWN;
+        $direction = ($targetVersion >= $currentVersion) ? Migration::UP : Migration::DOWN;
 
         if ($direction === Migration::DOWN) {
             krsort($migrations);
@@ -344,5 +321,42 @@ class MigrationService implements EventAwareInterface
                 $dir,
                 compact('name', 'version', 'year'),
             );
+    }
+
+    /**
+     * handleLogging
+     *
+     * @param  string  $logFile
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function handleLogging(string $logFile): void
+    {
+        if (is_file($logFile)) {
+            Filesystem::delete($logFile);
+        }
+
+        Filesystem::mkdir(dirname($logFile));
+
+        $logStream = new Stream($logFile, Stream::MODE_WRITE_ONLY_FROM_END);
+
+        // Log query
+        $this->on(
+            QueryEndEvent::class,
+            function (QueryEndEvent $event) use ($logStream) {
+                $logStream->write($event->getDebugQueryString() . "\n\n");
+            }
+        );
+
+        // Log failed
+        $this->on(
+            QueryFailedEvent::class,
+            function (QueryFailedEvent $event) use ($logStream) {
+                $e = $event->getException();
+                $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->getDebugQueryString()}\n\n");
+            }
+        );
     }
 }
