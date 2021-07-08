@@ -48,7 +48,28 @@ class DebugConsole
             return;
         }
 
-        echo $this->renderConsole($tmpl, $collector);
+        if ($this->isHtmlPage()) {
+            echo $this->renderConsole($tmpl, $collector);
+        }
+    }
+
+    protected function isHtmlPage(): bool
+    {
+        if (!function_exists('header_list')) {
+            return false;
+        }
+
+        $headers = headers_list();
+
+        foreach ($headers as $header) {
+            $header = strtolower($header);
+
+            if (str_starts_with($header, 'content-type') && str_contains($header, 'text/html')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function renderConsole(string $tmpl, Collection $collector): string
