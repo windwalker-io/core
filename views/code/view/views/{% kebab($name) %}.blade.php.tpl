@@ -23,8 +23,8 @@ use Windwalker\Core\Router\SystemUri;
 
 {% $phpClose %}
 
-@@extends('global.body')
+@extends('global.body')
 
-@@section('content')
+@section('content')
     <h2>{% $name %} view</h2>
-@@stop
+@stop

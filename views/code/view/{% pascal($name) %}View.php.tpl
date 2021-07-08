@@ -20,8 +20,8 @@ use Windwalker\Core\View\ViewModelInterface;
  * The {% pascal($name) %}View class.
  */
 #[ViewModel(
-    layout: '@kebab($name)',
-    js: '@kebab($name).js'
+    layout: '{% kebab($name) %}',
+    js: '{% kebab($name) %}.js'
 )]
 class {% pascal($name) %}View implements ViewModelInterface
 {
