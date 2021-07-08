@@ -10,6 +10,9 @@
 declare(strict_types=1);
 
 namespace {
+
+    use Windwalker\Core\View\CollapseWrapper;
+
     if (!function_exists('env')) {
         /**
          * Get ENV var.
@@ -24,6 +27,30 @@ namespace {
         function env(string $name, $default = null): ?string
         {
             return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
+        }
+    }
+
+    if (!function_exists('html_escape')) {
+        /**
+         * html_escape
+         *
+         * @param string $string
+         * @param bool   $nl2br
+         * @param bool   $doubleEncode
+         *
+         * @return  string
+         *
+         * @since  3.4
+         */
+        function html_escape(mixed $string, bool $nl2br = false, bool $doubleEncode = true): string
+        {
+            $string = htmlspecialchars((string) $string, ENT_QUOTES, 'UTF-8', $doubleEncode);
+
+            if ($nl2br) {
+                $string = nl2br($string);
+            }
+
+            return $string;
         }
     }
 }
