@@ -17,9 +17,11 @@ use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column as DbColumn;
 use Windwalker\Database\Schema\Ddl\Constraint;
 use Windwalker\ORM\Attributes\AutoIncrement;
+use Windwalker\ORM\Attributes\Cast;
 use Windwalker\ORM\Attributes\CastNullable;
 use Windwalker\ORM\Attributes\Column;
 use Windwalker\ORM\Attributes\PK;
+use Windwalker\ORM\Cast\JsonCast;
 use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
@@ -109,7 +111,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
                         array_splice(
                             $node->stmts,
-                            $i + $last + 1,
+                            $i + $last,
                             0,
                             [$prop]
                         );
@@ -165,28 +167,56 @@ class EntityMemberBuilder extends AbstractAstBuilder
         $dt      = $this->getORM()->getDb()->getPlatform()->getDataType();
         $default = $dbColumn->getColumnDefault();
 
-        switch ($dbColumn->getDataType()) {
-            case 'datetime':
-                $type    = '?Chronos';
-                $default = null;
+        if ($dbColumn->getDataType() === 'datetime') {
+            $type    = '?Chronos';
+            $default = null;
 
-                $this->addUse(Chronos::class);
-                break;
+            $this->addUse(Chronos::class);
+        } elseif ($this->isJsonType($dbColumn)) {
+            $type = 'array';
+            $default = [];
+        } else {
+            $type    = $dt::getPhpType($dbColumn->getDataType());
+            $default = TypeCast::try($default, $type);
 
-            default:
-                $type    = $dt::getPhpType($dbColumn->getDataType());
-                $default = TypeCast::try($default, $type);
-
-                if ($dbColumn->isAutoIncrement() || $dbColumn->getIsNullable()) {
-                    if (str_contains($type, '|')) {
-                        $type .= '|null';
-                    } else {
-                        $type = '?' . $type;
-                    }
+            if ($dbColumn->isAutoIncrement() || $dbColumn->getIsNullable()) {
+                if (str_contains($type, '|')) {
+                    $type .= '|null';
+                } else {
+                    $type = '?' . $type;
                 }
+            }
         }
 
         return [$type, $default];
+    }
+
+    protected function isJsonType(DbColumn $dbColumn): bool
+    {
+        $name = $dbColumn->getColumnName();
+
+        return $this->once(
+            'is.json:' . $name,
+            function () use ($name) {
+                $tbManager = $this->getTableManager();
+
+                if ($tbManager->getPlatform()->getName() === 'MySQL') {
+                    $db = $this->getORM()->getDb();
+                    $clause = (string) $db->select('CHECK_CLAUSE')
+                        ->from('information_schema.CHECK_CONSTRAINTS')
+                        ->where('CONSTRAINT_SCHEMA', $db->getDatabase()->getName())
+                        ->where('TABLE_NAME', $tbManager->getName())
+                        ->where('CONSTRAINT_NAME', $name)
+                        ->result();
+
+                    return str_starts_with($clause, 'json_valid');
+                }
+
+                // todo: support other db
+
+                return false;
+            }
+        );
     }
 
     protected function createAccessorsIfNotExists(
@@ -307,12 +337,13 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
     public function getLastOf(array $stmts, string $class): ?int
     {
-        $stmts = array_filter(
-            array_map(fn($stmt) => $stmt::class, $stmts),
-            fn($stmt) => $stmt === $class
-        );
+        foreach ($stmts as $i => $stmt) {
+            if ($stmt instanceof $class) {
+                return $i;
+            }
+        }
 
-        return array_key_last($stmts);
+        return null;
     }
 
     protected function addUse(string $ns): void
@@ -406,6 +437,18 @@ class EntityMemberBuilder extends AbstractAstBuilder
                 $this->attribute(
                     'CastNullable',
                     new Node\Expr\ClassConstFetch(new Node\Name('Chronos'), 'class')
+                ),
+            );
+        }
+
+        if ($this->isJsonType($dbColumn)) {
+            $this->addUse(Cast::class);
+            $this->addUse(JsonCast::class);
+
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'Cast',
+                    new Node\Expr\ClassConstFetch(new Node\Name('JsonCast'), 'class')
                 ),
             );
         }

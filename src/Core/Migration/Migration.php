@@ -159,4 +159,17 @@ class Migration
 
         return $this;
     }
+
+    public function dropTableColumns(string $table, ...$columns): static
+    {
+        if ($columns !== []) {
+            $tm = $this->getTable($table);
+
+            foreach ($columns as $column) {
+                $tm->dropColumn($column);
+            }
+        }
+
+        return $this;
+    }
 }
