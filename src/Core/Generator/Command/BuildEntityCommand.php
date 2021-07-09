@@ -56,14 +56,14 @@ class BuildEntityCommand implements CommandInterface
 
         $command->addOption(
             'props',
-            null,
+            'p',
             InputOption::VALUE_NONE,
             'Generate properties'
         );
 
         $command->addOption(
             'methods',
-            null,
+            'm',
             InputOption::VALUE_NONE,
             'Generate methods'
         );
