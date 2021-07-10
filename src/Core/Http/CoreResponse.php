@@ -22,24 +22,13 @@ use Windwalker\Http\Response\XmlResponse;
 /**
  * The ResponseFactory class.
  */
-class ResponseFactory
+class CoreResponse extends Response
 {
-    /**
-     * ResponseFactory constructor.
-     */
-    public function __construct(
-        protected ?string $body = null,
-        protected int $status = 200,
-        protected array $headers = [],
-    ) {
-        //
-    }
-
     protected function prepare(mixed $body, ?int $status, array $headers): array
     {
         return [
-            $body ?? $this->body,
-            $status ?? $this->status,
+            $body ?? $this->stream,
+            $status ?? $this->statusCode,
             array_merge($this->headers, $headers)
         ];
     }
@@ -55,9 +44,7 @@ class ResponseFactory
      */
     public function response(mixed $body = '', ?int $status = null, array $headers = []): Response
     {
-        [$body, $status, $headers] = $this->prepare($body, $status, $headers);
-
-        return Response::fromString((string) $body, $status, $headers);
+        return Response::from(...$this->prepare($body, $status, $headers));
     }
 
     public function json(mixed $body, ?int $status = null, array $headers = [], int $options = 0): JsonResponse

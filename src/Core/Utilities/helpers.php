@@ -59,7 +59,7 @@ namespace Windwalker {
 
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
-    use Windwalker\Core\Http\ResponseFactory;
+    use Windwalker\Core\Http\CoreResponse;
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
@@ -187,9 +187,9 @@ namespace Windwalker {
     }
 
     if (!function_exists('\Windwalker\response')) {
-        function response(mixed $data = '', int $status = 200, array $headers = []): ResponseFactory
+        function response(mixed $data = '', int $status = 200, array $headers = []): CoreResponse
         {
-            return new ResponseFactory($data, $status, $headers);
+            return new CoreResponse($data, $status, $headers);
         }
     }
 
