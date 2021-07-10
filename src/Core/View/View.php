@@ -19,6 +19,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Html\HtmlFrame;
+use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\RouteUri;
@@ -455,12 +456,31 @@ class View implements EventAwareInterface
 
     protected function preparePaths(object $vm): void
     {
-        $ref = new \ReflectionClass($vm);
-        $dir = dirname($ref->getFileName()) . '/views';
+        $dir = $this->getTemplatePath($vm);
 
         if (is_dir($dir)) {
-            $this->addPath($dir, PriorityQueue::HIGH);
+            $this->addPath($dir, PriorityQueue::LOW);
         }
+
+        $langService = $this->app->service(LangService::class);
+
+        $langDir = $dir . '/' . $langService->getLocale();
+
+        if (is_dir($dir)) {
+            $this->addPath($langDir, PriorityQueue::BELOW_NORMAL);
+        }
+
+        $fallbackDir = $dir . '/' . $langService->getLocale();
+
+        if (is_dir($dir)) {
+            $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL);
+        }
+    }
+
+    protected function getTemplatePath(object $vm): string
+    {
+        $ref = new \ReflectionClass($vm);
+        return dirname($ref->getFileName()) . '/views';
     }
 
     protected function getPageAttribute(): ?ViewModel
