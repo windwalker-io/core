@@ -13,6 +13,7 @@ namespace Windwalker\Core\Edge;
 
 use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Core\Theme\ThemeInterface;
+use Windwalker\Edge\Exception\LayoutNotFoundException;
 use Windwalker\Edge\Loader\EdgeFileLoader;
 use Windwalker\Edge\Loader\EdgeLoaderInterface;
 use Windwalker\Utilities\Str;
@@ -79,6 +80,10 @@ class CoreFileLoader implements EdgeLoaderInterface
      */
     public function has(string $key): bool
     {
-        return $this->find($key) !== null;
+        try {
+            return $this->find($key) !== null;
+        } catch (LayoutNotFoundException) {
+            return false;
+        }
     }
 }
