@@ -47,7 +47,17 @@ class SeedService implements EventAwareInterface
     {
         $entry = FileObject::wrap($file);
 
-        $seeders = $this->includeList($entry);
+        $seeder = new Seeder($entry, $this->db, $this->fakerService);
+        $db  = $seeder->db;
+        $orm = $db->orm();
+        $app = $this->app;
+
+        $seeders = include $entry->getPathname();
+
+        if (!is_array($seeders) && is_callable($seeder->import)) {
+            $this->runImport($seeder);
+            return 1;
+        }
 
         $count = 0;
 
@@ -57,27 +67,14 @@ class SeedService implements EventAwareInterface
                 $this->db,
                 $this->fakerService
             );
-            $db     = $seeder->db;
-            $orm    = $db->orm();
-            $app    = $this->app;
+            $db  = $seeder->db;
+            $orm = $db->orm();
+            $app = $this->app;
 
             include $seederFile;
 
             if (is_callable($seeder->import)) {
-                $seeder->addEventDealer($this);
-
-                $this->emitMessage(
-                    "Import seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
-                );
-
-                $this->app->call($seeder->import);
-
-                if ($seeder->count > 0) {
-                    $this->emitMessage('');
-                }
-
-                $this->emitMessage('  <comment>Import completed...</comment>');
-
+                $this->runImport($seeder);
                 $count++;
             }
         }
@@ -89,7 +86,17 @@ class SeedService implements EventAwareInterface
     {
         $entry = FileObject::wrap($file);
 
-        $seeders = $this->includeList($entry);
+        $seeder = new Seeder($entry, $this->db, $this->fakerService);
+        $db     = $seeder->db;
+        $orm    = $db->orm();
+        $app    = $this->app;
+
+        $seeders = include $entry;
+
+        if (!is_array($seeders) && is_callable($seeder->clear)) {
+            $this->runClear($seeder);
+            return 1;
+        }
 
         $seeders = TypeCast::toArray($seeders);
         $seeders = array_reverse($seeders);
@@ -102,19 +109,14 @@ class SeedService implements EventAwareInterface
                 $this->db,
                 $this->fakerService
             );
-            $db     = $seeder->db;
-            $orm    = $db->orm();
-            $app    = $this->app;
+            $db  = $seeder->db;
+            $orm = $db->orm();
+            $app = $this->app;
 
             include $seederFile;
 
             if (is_callable($seeder->clear)) {
-                $this->app->call($seeder->clear);
-                $seeder->addEventDealer($this);
-
-                $this->emitMessage(
-                    "Clear seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
-                );
+                $this->runClear($seeder);
 
                 $count++;
             }
@@ -128,28 +130,28 @@ class SeedService implements EventAwareInterface
         return ucwords(StrNormalize::toSpaceSeparated($name));
     }
 
-    /**
-     * includeList
-     *
-     * @param  FileObject  $entry
-     *
-     * @return  iterable
-     */
-    protected function includeList(FileObject $entry): iterable
-    {
-        $files = include $entry;
-
-        if (!is_iterable($files)) {
-            throw new \LogicException(
-                sprintf(
-                    'Seed entry file: %s should return array or iterable',
-                    $entry->getPathname()
-                )
-            );
-        }
-
-        return $files;
-    }
+    // /**
+    //  * includeList
+    //  *
+    //  * @param  FileObject  $entry
+    //  *
+    //  * @return  ?iterable
+    //  */
+    // protected function includeSeeders(FileObject $entry): ?iterable
+    // {
+    //     $seeder = include $entry;
+    //
+    //     if (!is_iterable($seeder)) {
+    //         throw new \LogicException(
+    //             sprintf(
+    //                 'Seed entry file: %s should return array ,iterable or void',
+    //                 $entry->getPathname()
+    //             )
+    //         );
+    //     }
+    //
+    //     return $seeder;
+    // }
 
     /**
      * copyMigrationFile
@@ -173,5 +175,49 @@ class SeedService implements EventAwareInterface
                 $dir,
                 compact('name', 'year'),
             );
+    }
+
+    /**
+     * runSeeder
+     *
+     * @param  Seeder  $seeder
+     *
+     * @return  void
+     */
+    protected function runImport(Seeder $seeder): void
+    {
+        $seeder->addEventDealer($this);
+
+        $this->emitMessage(
+            "Import seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
+        );
+
+        $this->app->call($seeder->import);
+
+        if ($seeder->count > 0) {
+            $this->emitMessage('');
+        }
+
+        $this->emitMessage('  <comment>Import completed...</comment>');
+
+        return;
+    }
+
+    /**
+     * runClear
+     *
+     * @param  Seeder  $seeder
+     *
+     * @return  void
+     */
+    protected function runClear(Seeder $seeder): void
+    {
+        $seeder->addEventDealer($this);
+
+        $this->app->call($seeder->clear);
+
+        $this->emitMessage(
+            "Clear seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
+        );
     }
 }

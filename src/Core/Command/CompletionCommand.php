@@ -47,6 +47,12 @@ class CompletionCommand implements CommandInterface
             InputOption::VALUE_REQUIRED,
             'The shell type.'
         );
+        $command->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force override.'
+        );
     }
 
     public function execute(IOInterface $io): int
@@ -63,12 +69,13 @@ class CompletionCommand implements CommandInterface
         $home = $_SERVER['HOME'] ?? '~';
         $hookName = '.windwalker_completion_' . $shell;
         $hookFile = $home . '/' . $hookName;
+        $force = $this->io->getOption('force');
 
-        if (!is_file($hookFile)) {
+        if (!is_file($hookFile) || $force) {
             $this->io->writeln('Write hook file to: ' . $hookFile);
             file_put_contents($hookFile, $this->hook($shell));
         } else {
-            $this->io->writeln('<info>' . $hookFile . '</info> has prepared.');
+            $this->io->writeln('File: <info>' . $hookFile . '</info> has exists.');
         }
 
         $profileFile = match($shell) {
@@ -82,7 +89,7 @@ class CompletionCommand implements CommandInterface
         $content = $file->exists() ? $file->read() : str();
 
         if ($content->contains($hookName)) {
-            $this->io->writeln('Already registered in file: ' . $file->getPathname());
+            $this->io->writeln('File: <info>' . $file->getPathname() . '</info> already registered');
 
             return 0;
         }
@@ -92,13 +99,13 @@ class CompletionCommand implements CommandInterface
 
         $this->io->writeln(
             sprintf(
-                'Register source <comment>~/%s</comment> to <option>%s</option>',
+                'Register source <comment>~/%s</comment> to <info>%s</info>',
                 $hookName,
                 $profileFile
             )
         );
 
-        $this->io->writeln("Please restart terminal or type \"<info>source $profileFile</info>\" to refresh.");
+        $this->io->writeln("Please restart terminal or type `<info>source $profileFile</info>` to refresh.");
 
         return 0;
     }

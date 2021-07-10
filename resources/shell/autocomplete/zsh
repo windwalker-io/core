@@ -22,6 +22,11 @@ function {name} {
         return $?;
     fi;
 
+    if [ "$RESULT" = "" ]; then
+        _path_files;
+        return 0;
+    fi;
+
     compadd -- $RESULT;
 };
 
