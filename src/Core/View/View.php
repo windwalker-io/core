@@ -272,7 +272,10 @@ class View implements EventAwareInterface
                 return $layout[$layoutType];
             }
 
-            if (in_array($layoutType, $layout, true)) {
+            if (
+                in_array($layoutType, $layout, true)
+                && !is_string(array_search($layoutType, $layout, true))
+            ) {
                 return $layoutType;
             }
 
