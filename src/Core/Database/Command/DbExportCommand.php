@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Command;
+namespace Windwalker\Core\Database\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +19,6 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
-use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Filesystem\FileObject;
 
