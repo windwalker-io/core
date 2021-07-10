@@ -1,0 +1,28 @@
+function {name} {
+    function realpath {
+        [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+    }
+
+    local -x CMDLINE_CONTENTS="$words";
+    local -x CMDLINE_CURSOR_INDEX;
+    local -x SCRIPT="$(echo $CMDLINE_CONTENTS | cut -d " " -f 1)"
+    local -x FULLSCRIPT=($(realpath $SCRIPT))
+    (( CMDLINE_CURSOR_INDEX = ${#${(j. .)words[1,CURRENT]}} ));
+
+    local RESULT STATUS;
+    RESULT=("${(@f)$( php ${FULLSCRIPT[@]} _completion --shell-type zsh )}");
+    STATUS=$?;
+
+    if [ $STATUS -eq 200 ]; then
+        _path_files;
+        return 0;
+
+    elif [ $STATUS -ne 0 ]; then
+        echo -e "$RESULT";
+        return $?;
+    fi;
+
+    compadd -- $RESULT;
+};
+
+compdef {name} "windwalker";

@@ -27,7 +27,8 @@
         "symfony/console": "^5.2",
         "fakerphp/faker": "^1.0",
         "symfony/process": "^5.2",
-        "nikic/php-parser": "^4.10"
+        "nikic/php-parser": "^4.10",
+        "stecman/symfony-console-completion": "^0.11.0"
     },
     "require-dev" : {
     },

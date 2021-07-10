@@ -48,7 +48,7 @@ class ServeCommand implements CommandInterface
             'host',
             InputArgument::OPTIONAL,
             'The server host.',
-            'localhost:8000'
+            'localhost'
         );
 
         $command->addArgument(
@@ -85,7 +85,7 @@ class ServeCommand implements CommandInterface
 
         [$domain, $port] = explode(':', $host) + [null, null];
 
-        $port ??= '8000';
+        $port ??= $this->getUnusedPort($host);
 
         if ($io->getOption('port')) {
             $port = $io->getOption('port');
@@ -132,5 +132,24 @@ class ServeCommand implements CommandInterface
         );
 
         return 0;
+    }
+
+    protected function getUnusedPort(string $host, int $start = 8000): string
+    {
+        while (!$this->portAvailable($host, $start)) {
+            $start++;
+        }
+
+        return (string) $start;
+    }
+
+    protected function portAvailable(string $host, int $port): bool
+    {
+        try {
+            $connection = @fsockopen($host, $port);
+            return false;
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 }
