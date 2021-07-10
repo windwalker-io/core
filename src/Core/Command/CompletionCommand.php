@@ -73,7 +73,7 @@ class CompletionCommand implements CommandInterface
 
         $profileFile = match($shell) {
             'zsh' => $home . '/.zshrc',
-            'bash' => $this->getBashProfile($shell),
+            'bash' => $this->getBashProfile($home),
             default => throw new \RuntimeException('No support for <info>' . $shell . '</info> now.')
         };
 
