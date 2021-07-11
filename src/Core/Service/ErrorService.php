@@ -110,7 +110,7 @@ class ErrorService
      */
     public function error(int $code, string $message, string $file, int $line, $context = null): void
     {
-        if (error_reporting() === 0) {
+        if (!(error_reporting() & $code)) {
             return;
         }
 
