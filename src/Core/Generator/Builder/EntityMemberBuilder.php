@@ -197,10 +197,10 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
         return $this->once(
             'is.json:' . $name,
-            function () use ($name) {
+            function () use ($dbColumn, $name) {
                 $tbManager = $this->getTableManager();
 
-                if ($tbManager->getPlatform()->getName() === 'MySQL') {
+                if (str_contains($this->getORM()->getDb()->getDriver()->getVersion(), 'MariaDB')) {
                     $db = $this->getORM()->getDb();
                     $clause = (string) $db->select('CHECK_CLAUSE')
                         ->from('information_schema.CHECK_CONSTRAINTS')
@@ -210,6 +210,10 @@ class EntityMemberBuilder extends AbstractAstBuilder
                         ->result();
 
                     return str_starts_with($clause, 'json_valid');
+                }
+
+                if ($tbManager->getPlatform()->getName() === 'MySQL') {
+                    return strtolower($dbColumn->getDataType()) === 'json';
                 }
 
                 // todo: support other db
