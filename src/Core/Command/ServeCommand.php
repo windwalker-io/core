@@ -147,7 +147,13 @@ class ServeCommand implements CommandInterface
     {
         try {
             $connection = @fsockopen($host, $port);
-            return false;
+
+            if ($connection) {
+                fclose($connection);
+                return false;
+            }
+
+            return true;
         } catch (\Throwable $e) {
             return true;
         }
