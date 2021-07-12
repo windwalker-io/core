@@ -37,9 +37,9 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     protected int $options = 0;
 
     public function __construct(
-        protected AppContext $app,
         protected Router $router,
         EventEmitter $dispatcher,
+        protected ?AppContext $app = null,
         ?RouteBuilder $routeBuilder = null
     ) {
         $this->routeBuilder = $routeBuilder ?? new RouteBuilder(new Std());

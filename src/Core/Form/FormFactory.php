@@ -25,9 +25,9 @@ class FormFactory
      * FormFactory constructor.
      *
      * @param  ApplicationInterface  $app
-     * @param  FormRenderer          $renderer
+     * @param  FormRenderer|null     $renderer
      */
-    public function __construct(protected ApplicationInterface $app, protected FormRenderer $renderer)
+    public function __construct(protected ApplicationInterface $app, protected ?FormRenderer $renderer = null)
     {
         //
     }

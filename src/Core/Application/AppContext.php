@@ -70,7 +70,7 @@ class AppContext implements WebApplicationInterface
         $this->container = $container;
     }
 
-    public function getRootApp(): WebApplication
+    public function getRootApp(): WebApplicationInterface
     {
         return $this->container->get(WebApplication::class);
     }

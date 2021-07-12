@@ -25,6 +25,7 @@ use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Output\Output;
+use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
@@ -134,7 +135,7 @@ class WebApplication implements WebApplicationInterface
         $container = $this->getContainer()->createChild();
 
         if ($request !== null) {
-            $container->share(ServerRequestInterface::class, $request);
+            $container->share(ServerRequest::class, $request);
         }
 
         $request ??= $container->get(ServerRequestInterface::class);

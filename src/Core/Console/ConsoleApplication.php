@@ -13,6 +13,8 @@ namespace Windwalker\Core\Console;
 
 use Composer\InstalledVersions;
 use JetBrains\PhpStorm\NoReturn;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
@@ -26,15 +28,24 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
+use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
 use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\ConsoleProvider;
+use Windwalker\Core\Provider\WebProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Filesystem\Path;
+use Windwalker\Http\Request\ServerRequest;
+use Windwalker\Http\Request\ServerRequestFactory;
+use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
+
+use Windwalker\Utilities\Str;
 
 use function Windwalker\DI\create;
 
@@ -315,6 +326,34 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         mixed $return = 0
     ): void {
         exit((int) $return);
+    }
+
+    public function prepareWebSimulator(string|UriInterface|null $uri = null, ?string $docroot = null): WebAppSimulator
+    {
+        $app = new WebAppSimulator($container = $this->getContainer());
+
+        $uri ??= Uri::wrap($app->config('web_simulator.uri') ?: 'https://local.dev');
+        $docroot = Path::normalize(
+            $docroot ?? $app->config('web_simulator.docroot') ?? Path::findRoot(__DIR__)
+        );
+        $index = $app->path('@public/index.php');
+
+        $script = Str::removeLeft($index, $docroot);
+        $script = Path::clean($script, '/');
+
+        return $this->prepareWebSimulatorByRequest(ServerRequestFactory::createFromUri($uri, $script));
+    }
+
+    public function prepareWebSimulatorByRequest(?ServerRequestInterface $request = null): WebAppSimulator {
+        $app = new WebAppSimulator($container = $this->getContainer());
+
+        $container->share(WebApplication::class, $app);
+
+        $this->getContainer()->registerServiceProvider(new WebProvider($app));
+
+        $container->share(ServerRequest::class, $request);
+
+        return $app;
     }
 
     /**

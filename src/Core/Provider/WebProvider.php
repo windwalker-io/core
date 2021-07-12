@@ -11,15 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Jenssegers\Agent\Agent;
+use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
-use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -36,9 +35,9 @@ class WebProvider implements ServiceProviderInterface
     /**
      * RequestProvider constructor.
      *
-     * @param  WebApplication  $parentApp
+     * @param  WebApplicationInterface  $parentApp
      */
-    public function __construct(protected WebApplication $parentApp)
+    public function __construct(protected WebApplicationInterface $parentApp)
     {
     }
 
@@ -117,7 +116,21 @@ class WebProvider implements ServiceProviderInterface
     protected function registerRequestObject(Container $container): void
     {
         // Request
-        $container->share(ServerRequest::class, fn() => ServerRequestFactory::createFromGlobals())
+        $container->share(
+            ServerRequest::class,
+            function (Container $container) {
+                if ($container->has(ServerRequestFactoryInterface::class)) {
+                    return $container->get(ServerRequestFactoryInterface::class)
+                        ->createServerRequest(
+                            $_SERVER['REQUEST_METHOD'],
+                            ServerRequestFactory::prepareUri($_SERVER),
+                            $_SERVER
+                        );
+                }
+
+                return ServerRequestFactory::createFromGlobals();
+            }
+        )
             ->alias(ServerRequestInterface::class, ServerRequest::class);
 
         // System Uri
