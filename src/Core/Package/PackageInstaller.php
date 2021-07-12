@@ -113,7 +113,7 @@ class PackageInstaller
 
         /** @var FileObject $file */
         foreach ($files as $file) {
-            $items[$file->getRealPath()] = $dest . '/' . $file->getRelativePath();
+            $items[$file->getRealPath()] = $dest . '/' . $file->getRelativePathname();
         }
 
         return $this->addResources($name, $items, $tags);

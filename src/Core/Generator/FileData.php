@@ -60,7 +60,7 @@ class FileData
             return $this->dest;
         }
 
-        $path = $this->src->getRelativePath();
+        $path = $this->src->getRelativePathname();
         $destPath = $this->compile($path, $data);
 
         $this->destFilePath = Str::removeRight($destPath, '.tpl');

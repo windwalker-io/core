@@ -72,7 +72,7 @@ class FileCollection implements EventAwareInterface
 
                 $this->results[] = $dest;
 
-                $this->emitMessage("[$action] " . $dest->getRelativePath(WINDWALKER_ROOT));
+                $this->emitMessage("[$action] " . $dest->getRelativePathname(WINDWALKER_ROOT));
             }
         );
     }

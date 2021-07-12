@@ -111,7 +111,7 @@ class GenReviseCommand implements CommandInterface
                 continue;
             }
 
-            $relativePath = $file->getRelativePath();
+            $relativePath = $file->getRelativePathname();
 
             $relativePath = strtr($relativePath, $data);
 
