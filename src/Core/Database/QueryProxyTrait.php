@@ -55,6 +55,7 @@ use Windwalker\Query\Query;
  * @method $this havingNotBetween($column, $start, $end)
  * @method $this havingLike($column, string $search)
  * @method $this havingNotLike($column, string $search)
+ * @method $this debug(bool $pre = false, bool $format = true, bool $asString = false)
  * @method string|array qn($text)
  * @method string|array q($text)
  */
