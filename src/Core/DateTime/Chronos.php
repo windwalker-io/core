@@ -54,6 +54,15 @@ class Chronos extends \DateTimeImmutable
         return static::create($date, $tz);
     }
 
+    public static function wrapOrNull(mixed $date = 'now', string|\DateTimeZone $tz = null): ?static
+    {
+        if ($date === null) {
+            return null;
+        }
+
+        return static::wrap($date, $tz);
+    }
+
     /**
      * Constructor.
      *

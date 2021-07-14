@@ -115,13 +115,11 @@ namespace Windwalker {
          * @param  mixed|string               $date
          * @param  string|\DateTimeZone|null  $tz
          *
-         * @return  Chronos
-         *
-         * @throws \Exception
+         * @return Chronos|null
          */
-        function chronos(mixed $date = 'now', string|\DateTimeZone $tz = null): Chronos
+        function chronos(mixed $date = 'now', string|\DateTimeZone $tz = null): ?Chronos
         {
-            return new Chronos($date, $tz);
+            return Chronos::wrapOrNull($date, $tz);
         }
     }
 
