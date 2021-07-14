@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Event\EventAwareInterface;
@@ -82,12 +83,12 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $options = $event->getOptions();
         $query   = $event->getQuery();
 
-        $handler = function (array $query) use ($route): array {
+        $handler = function (array $query) use ($navigator, $options, $route): array {
             $id = $route . ':' . json_encode($query);
 
             return $this->once(
                 'route:' . $id,
-                function () use ($query, $route) {
+                function () use ($query, $route, $options, $navigator) {
                     $routeObject = $this->findRoute($route);
 
                     if (!$routeObject) {
@@ -96,13 +97,19 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                     [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
 
+                    $navigator = $this;
+                    $event = $this->emit(
+                        AfterRouteBuildEvent::class,
+                        compact('navigator', 'query', 'route', 'options', 'url')
+                    );
+
                     $systemUri = $this->app->getSystemUri();
 
                     if ($systemUri->script && $systemUri->script !== 'index.php') {
-                        $url = $systemUri->script . '/' . $url;
+                        $url = $systemUri->script . '/' . $event->getUrl();
                     }
 
-                    return [$url, $query];
+                    return [$url, $event->getQuery()];
                 }
             );
         };

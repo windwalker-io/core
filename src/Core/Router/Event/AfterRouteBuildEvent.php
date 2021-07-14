@@ -15,10 +15,12 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Event\AbstractEvent;
 
 /**
- * The BeforeRouteBuildEvent class.
+ * The AfterRouteBuildEvent class.
  */
-class BeforeRouteBuildEvent extends AbstractEvent
+class AfterRouteBuildEvent extends AbstractEvent
 {
+    protected string $url = '';
+
     protected string $route = '';
 
     protected array $query = [];
@@ -103,6 +105,26 @@ class BeforeRouteBuildEvent extends AbstractEvent
     public function setOptions(int $options)
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function &getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param  string  $url
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setUrl(string $url): static
+    {
+        $this->url = $url;
 
         return $this;
     }
