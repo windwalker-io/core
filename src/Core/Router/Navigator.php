@@ -119,7 +119,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      *
      * @return  RouteUri
      */
-    public function createRouteUri(mixed $uri, ?array $vars, int $options = 0): RouteUri
+    public function createRouteUri(mixed $uri, ?array $vars = [], int $options = 0): RouteUri
     {
         return new RouteUri($uri, $vars, $this, $options);
     }
