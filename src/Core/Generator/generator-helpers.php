@@ -36,7 +36,7 @@ if (!function_exists('pascal')) {
 if (!function_exists('snake')) {
     function snake(string $string): string
     {
-        return StrNormalize::toUnderscoreSeparated($string);
+        return StrNormalize::toSnakeCase($string);
     }
 }
 

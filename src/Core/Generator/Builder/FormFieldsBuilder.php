@@ -19,6 +19,7 @@ use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\DI\Attributes\Inject;
+use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\NumberField;
 use Windwalker\Form\Field\TextareaField;
 use Windwalker\Form\Field\TextField;
@@ -140,6 +141,13 @@ class FormFieldsBuilder extends AbstractAstBuilder
             $label = "\$this->lang->trans('" . $this->langPrefix . '.' . $colName . "')";
         } else {
             $label = "'" . StrNormalize::toPascalCase($column->getColumnName()) . "'";
+        }
+
+        if ($column->isAutoIncrement()) {
+            $this->addUse(HiddenField::class);
+            return <<<PHP
+        \$form->add('$colName', HiddenField::class);
+PHP;
         }
 
         switch ($column->getDataType()) {

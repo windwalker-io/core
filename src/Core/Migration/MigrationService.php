@@ -15,6 +15,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Generator\FileCollection;
+use Windwalker\Core\Migration\Exception\MigrationExistsException;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
@@ -304,7 +305,8 @@ class MigrationService implements EventAwareInterface
         // Check name not exists
         foreach ($migrations as $migration) {
             if (strtolower($name) === strtolower($migration->name)) {
-                throw new \RuntimeException(
+                throw new MigrationExistsException(
+                    $migration,
                     'Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" .
                     $migration->file->getPathname() . '</info>'
                 );

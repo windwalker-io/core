@@ -131,7 +131,7 @@ class BuildEntityCommand implements CommandInterface
 
             $this->io->newLine();
             $this->io->writeln("Handling: <info>$class</info>");
-            
+
             $props = $this->io->getOption('props');
             $methods = $this->io->getOption('methods');
 

@@ -12,14 +12,19 @@ declare(strict_types=1);
 namespace App\Enum;
 
 use MyCLabs\Enum\Enum;
+use Windwalker\Form\Enum\EnumTranslatableInterface;
+use Windwalker\Form\Enum\EnumTranslatableTrait;
+use Windwalker\Language\Language;
 
 /**
  * The {% pascal($name) %} enum class.
  *
  * @options Add options here.
  */
-class {% pascal($name) %} extends Enum
+class {% pascal($name) %} extends Enum implements EnumTranslatableInterface
 {
+    use EnumTranslatableTrait;
+
     // public const OPTION = '';
 
     /**
@@ -35,5 +40,10 @@ class {% pascal($name) %} extends Enum
     public function __construct(mixed $value)
     {
         parent::__construct($value);
+    }
+
+    public function trans(Language $lang, ...$args): string
+    {
+        return $lang->trans('app.{% snake($name) %}.' . $this->getValue());
     }
 }
