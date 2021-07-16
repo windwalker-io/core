@@ -218,15 +218,11 @@ class ErrorService
      *
      * @param integer $constant
      *
-     * @return  string
+     * @return  ?string
      */
     public function getLevelName(int $constant): ?string
     {
-        if ($this->constants[$constant]) {
-            return $this->constants[$constant];
-        }
-
-        return null;
+        return $this->constants[$constant] ?? null;
     }
 
     /**
@@ -302,7 +298,7 @@ class ErrorService
      *
      * @return static Return self to support chaining.
      */
-    public function addHandler(callable $handler, ?string $name = null)
+    public function addHandler(callable $handler, ?string $name = null): static
     {
         if ($name) {
             $this->handlers[$name] = $handler;
@@ -320,7 +316,7 @@ class ErrorService
      *
      * @return  static
      */
-    public function removeHandler(string $name)
+    public function removeHandler(string $name): static
     {
         unset($this->handlers[$name]);
 
@@ -344,7 +340,7 @@ class ErrorService
      *
      * @return  static  Return self to support chaining.
      */
-    public function setHandlers(array $handlers)
+    public function setHandlers(array $handlers): static
     {
         $this->handlers = $handlers;
 
@@ -407,5 +403,13 @@ class ErrorService
         }
 
         return trim(explode("\n", $message)[0]);
+    }
+
+    public static function getReportLevel(): int
+    {
+        return E_ALL
+            & ~E_USER_WARNING
+            & ~E_USER_DEPRECATED
+            & ~E_USER_NOTICE;
     }
 }
