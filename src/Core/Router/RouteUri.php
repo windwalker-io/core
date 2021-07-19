@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use ParagonIE\ConstantTime\Base64UrlSafe;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Http\Response\RedirectResponse;
@@ -190,6 +191,15 @@ class RouteUri extends Uri implements NavConstantInterface
     public function delVar(string $name): static
     {
         return $this->withoutVar($name);
+    }
+
+    public function withReturn(string $var = 'return', mixed $return = null): static
+    {
+        $return ??= $this->navigator->getAppContext()->getSystemUri()->full();
+
+        $return = Base64UrlSafe::decode($return);
+
+        return $this->var($var, $return);
     }
 
     /**
