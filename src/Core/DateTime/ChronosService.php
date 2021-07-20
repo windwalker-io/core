@@ -75,6 +75,10 @@ class ChronosService
         string $format = Chronos::FORMAT_YMD_HIS,
         string|\DateTimeZone $from = null
     ): string {
+        if ($date === null || $date === '') {
+            return '';
+        }
+
         return $this->toServer($date, $from)->format($format);
     }
 
@@ -90,6 +94,10 @@ class ChronosService
         string $format = Chronos::FORMAT_YMD_HIS,
         string|\DateTimeZone $to = null
     ): string {
+        if ($date === null || $date === '') {
+            return '';
+        }
+
         return $this->toLocal($date, $to)->format($format);
     }
 
