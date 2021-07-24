@@ -56,7 +56,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
 
     public static function wrapOrNull(mixed $date = 'now', string|\DateTimeZone $tz = null): ?static
     {
-        if ($date === null) {
+        if ($date === null || $date === '') {
             return null;
         }
 
