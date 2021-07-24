@@ -305,9 +305,9 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * @link    http://www.ietf.org/rfc/rfc3339.txt
      * @since   2.1
      */
-    public function toISO8601(): string
+    public function toISO8601(bool $micro = false): string
     {
-        return $this->format(static::RFC3339);
+        return $this->format($micro ? static::RFC3339_EXTENDED : static::RFC3339);
     }
 
     /**
@@ -344,6 +344,6 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
 
     public function jsonSerialize(): string
     {
-        return $this->toISO8601();
+        return $this->toISO8601(true);
     }
 }
