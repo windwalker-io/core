@@ -344,6 +344,6 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
 
     public function jsonSerialize(): string
     {
-        return $this->format('Y-m-d\TH:i:s');
+        return $this->toISO8601();
     }
 }
