@@ -14,7 +14,7 @@ namespace Windwalker\Core\DateTime;
 /**
  * The Chronos class.
  */
-class Chronos extends \DateTimeImmutable
+class Chronos extends \DateTimeImmutable implements \JsonSerializable
 {
     public const FORMAT_YMD = 'Y-m-d';
 
@@ -340,5 +340,10 @@ class Chronos extends \DateTimeImmutable
         }
 
         return (float) $this->format('U.u');
+    }
+
+    public function jsonSerialize(): string
+    {
+        return $this->format('Y-m-d\TH:i:s');
     }
 }
