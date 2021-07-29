@@ -30,7 +30,13 @@ class LanguageProvider implements ServiceProviderInterface, BootableDeferredProv
     {
         $container->prepareSharedObject(LangService::class)
             ->alias(Language::class, LangService::class)
-            ->alias(LanguageInterface::class, Language::class);
+            ->alias(LanguageInterface::class, Language::class)
+            ->extend(
+                LangService::class,
+                function (LangService $langService) {
+                    return $langService->loadAllFromPath(__DIR__ . '/../../../resources/languages', 'php');
+                }
+            );
     }
 
     /**
@@ -38,6 +44,7 @@ class LanguageProvider implements ServiceProviderInterface, BootableDeferredProv
      */
     public function bootDeferred(Container $container): void
     {
+        // todo: move to after request start
         $container->get(LangService::class)->loadAll();
     }
 }

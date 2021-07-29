@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
 
@@ -19,6 +20,13 @@ use Windwalker\Database\DatabaseAdapter;
  */
 class ChronosService
 {
+    use TranslatorTrait;
+
+    public const UNIT_MINUTE = 'minute';
+    public const UNIT_HOUR = 'hour';
+    public const UNIT_DAY = 'day';
+    public const UNIT_WEEK = 'week';
+
     /**
      * ChronosService constructor.
      *
@@ -241,5 +249,48 @@ class ChronosService
         string|\DateTimeZone $timezone = null
     ): Chronos {
         return Chronos::createFromFormat($format, $time, $timezone);
+    }
+
+    public function relative(mixed $date, ?string $unit = null, mixed $current = 'now', ?string $format = null): string
+    {
+        $date = Chronos::wrap($date);
+        $current = Chronos::wrap($current);
+
+        $diff = $current->getTimestamp() - $date->getTimestamp();
+
+        // Less than one minute.
+        if ($diff < 60) {
+            return $this->trans('windwalker.datetime.relative.less.than.minute');
+        }
+
+        // Minutes
+        $diff = round($diff / 60);
+
+        if ($diff < 60 || $unit === static::UNIT_MINUTE) {
+            return $this->choice('windwalker.datetime.relative.minute', $diff, d: $diff);
+        }
+
+        // Hours
+        $diff = round($diff / 60);
+
+        if ($diff < 24 || $unit === static::UNIT_HOUR) {
+            return $this->choice('windwalker.datetime.relative.hour', $diff, d: $diff);
+        }
+
+        // Days
+        $diff = round($diff / 24);
+
+        if ($diff < 7 || $unit === static::UNIT_DAY) {
+            return $this->choice('windwalker.datetime.relative.day', $diff, d: $diff);
+        }
+
+        // Weeks
+        $diff = round($diff / 7);
+
+        if ($diff <= 4 || $unit === static::UNIT_DAY) {
+            return $this->choice('windwalker.datetime.relative.week', $diff, d: $diff);
+        }
+
+        return $date->format($format ?? Chronos::FORMAT_YMD_HIS);
     }
 }
