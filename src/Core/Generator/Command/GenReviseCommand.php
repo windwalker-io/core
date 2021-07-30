@@ -176,6 +176,7 @@ class GenReviseCommand implements CommandInterface
             StrNormalize::toCamelCase($name) => '{% camel($name) %}',
             StrNormalize::toKebabCase($name) => '{% kebab($name) %}',
             StrNormalize::toSnakeCase($name) => '{% snake($name) %}',
+            StrNormalize::toDotSeparated($name) => '{% dot($name) %}',
             // $className => '{% $className %}',
             '<?php' => '{% $phpOpen %}',
             '?>' => '{% $phpClose %}',

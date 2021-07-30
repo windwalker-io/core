@@ -44,6 +44,6 @@ class {% pascal($name) %} extends Enum implements EnumTranslatableInterface
 
     public function trans(Language $lang, ...$args): string
     {
-        return $lang->trans('app.{% snake($name) %}.' . $this->getValue());
+        return $lang->trans('app.{% dot($name) %}.' . $this->getValue());
     }
 }

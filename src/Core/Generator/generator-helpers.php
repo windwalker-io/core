@@ -40,6 +40,13 @@ if (!function_exists('snake')) {
     }
 }
 
+if (!function_exists('dot')) {
+    function dot(string $string): string
+    {
+        return strtolower(StrNormalize::toDotSeparated($string));
+    }
+}
+
 if (!function_exists('singular')) {
     function singular(string $string): string
     {
