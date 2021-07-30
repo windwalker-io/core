@@ -13,6 +13,7 @@ namespace Windwalker\Core\Manager;
 
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
+use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\ORM\ORM;
 
 /**
@@ -47,6 +48,14 @@ class DatabaseManager extends AbstractManager
 
         $db->orm()->setAttributesResolver($this->container->getAttributesResolver());
 
+        if ($db->getPlatform()->getName() === AbstractPlatform::MYSQL) {
+            $options = $db->getOptions();
+
+            if ($options['strict'] ?? true) {
+                $this->strictMode($db, $options);
+            }
+        }
+
         return $db;
     }
 
@@ -58,5 +67,23 @@ class DatabaseManager extends AbstractManager
     public function getDatabaseFactory(): DatabaseFactory
     {
         return $this->container->resolve(DatabaseFactory::class);
+    }
+
+    protected function strictMode(DatabaseAdapter $db, array $options): void
+    {
+        $modes = $options['modes'] ?? [
+                'ONLY_FULL_GROUP_BY',
+                'STRICT_TRANS_TABLES',
+                'ERROR_FOR_DIVISION_BY_ZERO',
+                'NO_ENGINE_SUBSTITUTION',
+                'NO_ZERO_IN_DATE',
+                'NO_ZERO_DATE',
+            ];
+
+        try {
+            $db->execute("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
+        } catch (\RuntimeException $e) {
+            // If not success, hide error.
+        }
     }
 }
