@@ -12,6 +12,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Language\LangService;
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
@@ -303,6 +304,9 @@ class WindwalkerExtension implements
         $globals['nav'] = $this->app->resolve(Navigator::class)
             ->withOptions($navOptions);
 
-        return $globals;
+        return array_merge(
+            $globals,
+            $this->app->service(RendererService::class)->getGlobals()
+        );
     }
 }
