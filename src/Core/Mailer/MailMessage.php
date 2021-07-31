@@ -16,12 +16,15 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
+use Windwalker\Core\Asset\AssetService;
 
 /**
  * The MailMessage class.
  */
 class MailMessage extends Email
 {
+    protected AssetService|null $asset = null;
+
     /**
      * MailMessage constructor.
      *
@@ -50,5 +53,30 @@ class MailMessage extends Email
         }
 
         return $this->mailer->send($this, $envelope, $flags);
+    }
+
+    public function renderBody(string $path, array $data = []): static
+    {
+        if ($this->mailer instanceof RenderableMailerInterface) {
+            $data['message'] = $this;
+            $data['asset'] = $this->asset ??= $this->mailer->createAssetService();
+
+            $this->html(
+                $this->mailer->renderBody(
+                    $path,
+                    $data
+                )
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return AssetService|null
+     */
+    public function getAsset(): ?AssetService
+    {
+        return $this->asset;
     }
 }

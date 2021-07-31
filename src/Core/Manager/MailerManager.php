@@ -37,11 +37,6 @@ class MailerManager extends AbstractManager
         return 'mail';
     }
 
-    public static function buildDsn()
-    {
-
-    }
-
     public function createMailer(array $options = []): MailerInterface
     {
         $options = Arr::mergeRecursive(

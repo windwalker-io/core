@@ -19,15 +19,21 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Mailer\Event\BeforeSendEvent;
+use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 /**
  * The Mailer class.
  */
-class Mailer implements MailerInterface
+class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareInterface
 {
+    use EventAwareTrait;
     use OptionsResolverTrait;
 
     /**
@@ -64,13 +70,23 @@ class Mailer implements MailerInterface
     {
         $envelope ??= $this->envelop;
 
+        $this->prepareMessage($message, $flags);
+
+        $mailer = $this;
+        $event = $this->emit(
+            BeforeSendEvent::class,
+            compact('mailer', 'message', 'envelope', 'flags')
+        );
+
+        $flags = $event->getFlags();
+        $envelope = $event->getEnvelope();
+        $message = $event->getMessage();
+
         if ($flags & static::IGNORE_ENVELOPE) {
             $envelope = null;
         }
 
-        $this->prepareMessage($message, $flags);
-
-        if ($flags & static::FORCE_SEND || $this->container->getParam('mail.enabled')) {
+        if ($flags & static::FORCE_SEND || !$this->container->getParam('mail.disable_all')) {
             return $this->transport->send($message, $envelope);
         }
 
@@ -155,5 +171,28 @@ class Mailer implements MailerInterface
         }
 
         return $addresses;
+    }
+
+    /**
+     * renderBody
+     *
+     * @param  string  $layout
+     * @param  array   $data
+     * @param  array   $options
+     *
+     * @return  string
+     */
+    public function renderBody(string $layout, array $data = [], array $options = []): string
+    {
+        return $this->container->get(RendererService::class)->render(
+            $layout,
+            $data,
+            $options
+        );
+    }
+
+    public function createAssetService(): AssetService
+    {
+        return $this->container->newInstance(AssetService::class);
     }
 }
