@@ -11,19 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Edge\CoreFileLoader;
 use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Pagination\PaginationFactory;
-use Windwalker\Core\Renderer\Edge\WindwalkerExtension;
 use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Edge\Cache\EdgeFileCache;
-use Windwalker\Edge\Component\ComponentExtension;
-use Windwalker\Edge\Edge;
 use Windwalker\Renderer\CompositeRenderer;
-use Windwalker\Renderer\EdgeRenderer;
 use Windwalker\Renderer\RendererInterface;
 
 /**

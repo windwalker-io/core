@@ -16,6 +16,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
@@ -73,16 +74,7 @@ class WebApplication implements WebApplicationInterface
         $container = $this->getContainer();
         $container->registerServiceProvider(new AppProvider($this));
 
-        $container->registerByConfig($this->config('di') ?? []);
-
-        foreach (iterator_to_array($this->config) as $service => $config) {
-            if (!is_array($config) || !($config['enabled'] ?? true)) {
-                continue;
-                // throw new \LogicException("Config: '{$service}' must be array");
-            }
-
-            $container->registerByConfig($config ?: []);
-        }
+        $this->registerAllConfigs($container);
 
         // Middlewares
         $middlewares = $this->config('middlewares') ?? [];
@@ -139,6 +131,8 @@ class WebApplication implements WebApplicationInterface
         }
 
         $request ??= $container->get(ServerRequestInterface::class);
+
+        $this->bootProvidersBeforeRequest($container);
 
         // @event
         $event = $this->emit(
@@ -244,5 +238,21 @@ class WebApplication implements WebApplicationInterface
     protected function terminating(Container $container): void
     {
         //
+    }
+
+    /**
+     * bootProvidersBeforeRequest
+     *
+     * @param  Container  $container
+     *
+     * @return  void
+     */
+    protected function bootProvidersBeforeRequest(Container $container): void
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider instanceof RequestBootableProviderInterface) {
+                $provider->bootBeforeRequest($container);
+            }
+        }
     }
 }

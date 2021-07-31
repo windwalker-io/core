@@ -15,8 +15,10 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceAwareTrait;
+use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
@@ -35,6 +37,11 @@ trait ApplicationTrait
     }
     use EventAwareTrait;
     use ProcessRunnerTrait;
+
+    /**
+     * @var array<ServiceProviderInterface>
+     */
+    protected array $providers = [];
 
     /**
      * config
@@ -108,6 +115,27 @@ trait ApplicationTrait
     public function loadConfig(mixed $source, ?string $format = null, array $options = []): void
     {
         $this->getContainer()->loadParameters($source, $format, $options);
+    }
+
+    protected function registerAllConfigs(Container $container): void
+    {
+        $container->registerByConfig($this->config('di') ?? [], $providers);
+
+        foreach (iterator_to_array($this->config) as $service => $config) {
+            if (!is_array($config) || !($config['enabled'] ?? true)) {
+                continue;
+            }
+
+            $container->registerByConfig($config ?: [], $providers);
+        }
+
+        foreach ($providers as $provider) {
+            if ($provider instanceof BootableDeferredProviderInterface) {
+                $provider->bootDeferred($container);
+            }
+        }
+
+        $this->providers = $providers;
     }
 
     protected function registerListeners(Container $container): void
