@@ -24,7 +24,8 @@ use Windwalker\Core\Console\ConsoleApplication;
  * The ServeCommand class.
  */
 #[CommandWrapper(
-    description: 'Start PHP Dev Server.'
+    description: 'Start PHP Dev Server.',
+    aliases: ['dev:serve']
 )]
 class ServeCommand implements CommandInterface
 {

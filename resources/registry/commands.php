@@ -10,8 +10,8 @@
 declare(strict_types=1);
 
 return [
-    'dev:serve' => \Windwalker\Core\Command\ServeCommand::class,
-    'dev:dumper' => \Windwalker\Core\Command\DumpServerCommand::class,
+    'server:start' => \Windwalker\Core\Command\ServeCommand::class,
+    'server:dumper' => \Windwalker\Core\Command\DumpServerCommand::class,
 
     'cache:clear' => \Windwalker\Core\Command\CacheClearCommand::class,
 
