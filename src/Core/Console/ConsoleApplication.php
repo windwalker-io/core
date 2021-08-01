@@ -95,6 +95,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         $container->registerServiceProvider(new AppProvider($this));
 
         $this->registerAllConfigs($container);
+        $container->registerServiceProvider(new ConsoleProvider($this));
 
         // Commands
         $commands = Arr::flatten((array) $this->config('commands'), ':');
