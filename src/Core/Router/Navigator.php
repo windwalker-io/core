@@ -104,9 +104,10 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                     );
 
                     $systemUri = $this->app->getSystemUri();
+                    $url = $event->getUrl();
 
                     if ($systemUri->script && $systemUri->script !== 'index.php') {
-                        $url = $systemUri->script . '/' . $event->getUrl();
+                        $url = $systemUri->script . '/' . $url;
                     }
 
                     return [$url, $event->getQuery()];
