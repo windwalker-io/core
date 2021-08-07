@@ -23,6 +23,7 @@ use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Field\NumberField;
 use Windwalker\Form\Field\TextareaField;
 use Windwalker\Form\Field\TextField;
+use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -140,7 +141,12 @@ class FormFieldsBuilder extends AbstractAstBuilder
         if ($this->langPrefix) {
             $label = "\$this->lang->trans('" . $this->langPrefix . '.' . $colName . "')";
         } else {
-            $label = "'" . StrNormalize::toPascalCase($column->getColumnName()) . "'";
+            $label = Str::surrounds(
+                StrNormalize::toSpaceSeparated(
+                    StrNormalize::toPascalCase($column->getColumnName())
+                ),
+                "'"
+            );
         }
 
         if ($column->isAutoIncrement()) {
