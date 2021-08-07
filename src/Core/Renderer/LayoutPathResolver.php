@@ -11,8 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer;
 
+use Windwalker\Data\Collection;
+use Windwalker\Database\Test\Schema\SchemaTest;
 use Windwalker\DI\Container;
+use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Utilities\Iterator\PriorityQueue;
+
+use function Windwalker\collect;
 
 /**
  * The LayoutPathResolver class.
@@ -35,7 +40,6 @@ class LayoutPathResolver
     public function __construct(protected Container $container, ?array $aliases = null)
     {
         $this->aliases = $aliases ?? $this->container->getParam('renderer.aliases') ?? [];
-        $this->namespaces = (array) ($this->container->getParam('renderer.namespaces') ?? []);
 
         $this->addPaths($this->container->getParam('renderer.paths') ?? []);
 
@@ -44,7 +48,30 @@ class LayoutPathResolver
         }
     }
 
-    public function resolveLayout(string $layout, ?PathsBag &$paths = null): string
+    public function resolveLayout(string $layout, array $extensions = []): string
+    {
+        $layout = $this->resolveAlias($layout);
+
+        [$ns, $layout] = static::extractNamespace($layout);
+
+        $pathsBag = $this->getPathsBag($ns);
+
+        foreach ($pathsBag->getClonedPaths() as $path) {
+            $info = CompositeRenderer::findFileInfoByExtensions(
+                $path,
+                str_replace('.', '/', $layout),
+                $extensions
+            );
+
+            if ($info) {
+                return $info->getPathname();
+            }
+        }
+
+        return $layout;
+    }
+
+    public function resolveAlias(string $layout, ?PathsBag &$paths = null): string
     {
         while (isset($this->aliases[$layout])) {
             $layouts = (array) $this->aliases[$layout];
@@ -92,8 +119,6 @@ class LayoutPathResolver
             $layout = implode('.', $segments);
         }
 
-        $paths = $this->getPathsBag(static::getNamespaceFromPath($layout));
-
         return $layout;
     }
 
@@ -106,7 +131,17 @@ class LayoutPathResolver
 
     public static function getNamespaceFromPath(string $path): string
     {
-        return str_contains($path, '::') ? explode('::', $layout, 2)[0] : 'main';
+        return str_contains($path, '::') ? explode('::', $path, 2)[0] : 'main';
+    }
+
+    /**
+     * @param  string  $path
+     *
+     * @return  array<?string>
+     */
+    public static function extractNamespace(string $path): array
+    {
+        return Collection::explode('::', $path, 2)->leftPad(2, null)->dump();
     }
 
     /**
