@@ -31,9 +31,14 @@ class RouteBuilder
         $this->parser = $parser;
     }
 
+    public function parse(string $pattern): array
+    {
+        return $this->parser->parse($pattern);
+    }
+
     public function build(string $pattern, array $vars): array
     {
-        $variants = $this->parser->parse($pattern);
+        $variants = $this->parse($pattern);
         $variant  = $this->findVariant($variants, $vars);
 
         return $this->compileUri($variant, $vars);

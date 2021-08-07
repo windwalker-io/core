@@ -20,7 +20,10 @@ use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
+
+use function Symfony\Component\String\s;
 
 /**
  * The Navigator class.
@@ -59,11 +62,32 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     public function self(int $options = self::TYPE_PATH): RouteUri
     {
-        $route = $this->getMatchedRoute()?->getName() ?? $this->app->getSystemUri()->current();
+        $route = $this->getMatchedRoute();
+        $to = $route?->getName() ?? $this->app->getSystemUri()->current();
+
+        $vars = null;
+
+        if ($route) {
+            $keys = [];
+
+            $variants = $this->routeBuilder->parse($route->getPattern());
+            $variant = array_pop($variants);
+
+            foreach ($variant as $segment) {
+                if (is_array($segment) && isset($segment[0])) {
+                    $keys[] = $segment[0];
+                }
+            }
+
+            $vars = Arr::only($route?->getVars(), $keys);
+        }
 
         return $this->to(
-            $route,
-            $this->app->getServerRequest()->getQueryParams(),
+            $to,
+            array_merge(
+                $vars,
+                $this->app->getServerRequest()->getQueryParams()
+            ),
             $options
         );
     }
