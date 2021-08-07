@@ -45,7 +45,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function emergency(string|array $channel, string|array $message, array $context = [])
+    public function emergency(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::EMERGENCY, $message, $context);
 
@@ -65,7 +65,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function alert(string|array $channel, string|array $message, array $context = [])
+    public function alert(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::ALERT, $message, $context);
 
@@ -84,7 +84,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function critical(string|array $channel, string|array $message, array $context = [])
+    public function critical(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::CRITICAL, $message, $context);
 
@@ -102,7 +102,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function error(string|array $channel, string|array $message, array $context = [])
+    public function error(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::ERROR, $message, $context);
 
@@ -122,7 +122,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function warning(string|array $channel, string|array $message, array $context = [])
+    public function warning(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::WARNING, $message, $context);
 
@@ -139,7 +139,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function notice(string|array $channel, string|array $message, array $context = [])
+    public function notice(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::NOTICE, $message, $context);
 
@@ -158,7 +158,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function info(string|array $channel, string|array $message, array $context = [])
+    public function info(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::INFO, $message, $context);
 
@@ -175,7 +175,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function debug(string|array $channel, string|array $message, array $context = [])
+    public function debug(string|array $channel, string|array $message, array $context = []): static
     {
         $this->log($channel, LogLevel::DEBUG, $message, $context);
 
@@ -193,7 +193,7 @@ class LoggerService
      * @return static
      * @throws \Exception
      */
-    public function log(string|array $channel, string|int $level, string|array $message, array $context = [])
+    public function log(string|array $channel, string|int $level, string|array $message, array $context = []): static
     {
         if (is_array($channel)) {
             foreach ($channel as $cat) {

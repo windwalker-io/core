@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Edge;
 
+use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Core\Renderer\PathsBag;
 use Windwalker\Core\Theme\ThemeInterface;
@@ -29,12 +30,11 @@ class CoreFileLoader implements EdgeLoaderInterface
      *
      * @param  EdgeFileLoader  $loader
      * @param  LayoutPathResolver  $pathResolver
-     * @param  ThemeInterface  $theme
      */
     public function __construct(
         protected EdgeFileLoader $loader,
         protected LayoutPathResolver $pathResolver,
-        protected ThemeInterface $theme
+        protected array $extensions = []
     ) {
     }
 
@@ -47,20 +47,10 @@ class CoreFileLoader implements EdgeLoaderInterface
      */
     public function find(string $key): string
     {
-        // if (str_starts_with($key, '@theme')) {
-        //     $key = ltrim(Str::removeLeft($key, '@theme'), './');
-        //
-        //     $key = $this->theme->path($key);
-        // }
-show($key);exit(' @Checkpoint');
-        /** @var PathsBag $paths */
-        $key = $this->pathResolver->resolveLayout($key, $paths);
-
-        foreach (iterator_to_array($paths->getClonedPaths()) as $path) {
-            $this->loader->addPath($path);
-        }
-
-        return $this->loader->find($key);
+        return $this->pathResolver->resolveLayout(
+            $key,
+            $this->extensions
+        );
     }
 
     /**
@@ -72,8 +62,6 @@ show($key);exit(' @Checkpoint');
      */
     public function load(string $path): string
     {
-        // $path = $this->pathResolver->resolveLayout($path);
-
         return $this->loader->load($path);
     }
 
@@ -91,5 +79,25 @@ show($key);exit(' @Checkpoint');
         } catch (LayoutNotFoundException) {
             return false;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtensions(): array
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * @param  array  $extensions
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setExtensions(array $extensions): static
+    {
+        $this->extensions = $extensions;
+
+        return $this;
     }
 }

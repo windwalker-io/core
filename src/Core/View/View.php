@@ -56,8 +56,6 @@ class View implements EventAwareInterface
 
     protected string $layout = '';
 
-    protected ?RendererInterface $renderer = null;
-
     protected ?ResponseInterface $response = null;
 
     /**
@@ -192,8 +190,7 @@ class View implements EventAwareInterface
 
             $this->prepareHtmlFrame($vm);
 
-            $content = $this->getRenderer()
-                ->render($this->layout, $data, ['context' => $vm]);
+            $content = $this->rendererService->render($this->layout, $data, ['context' => $vm]);
 
             $response = $this->getResponse();
             $response->getBody()->write($content);
@@ -426,26 +423,6 @@ class View implements EventAwareInterface
     public function addPath(string $path, int $priority = 100): static
     {
         $this->rendererService->addPath($path, $priority);
-
-        return $this;
-    }
-
-    /**
-     * @return RendererInterface
-     */
-    public function getRenderer(): RendererInterface
-    {
-        return $this->renderer ??= $this->rendererService->createRenderer();
-    }
-
-    /**
-     * @param  RendererInterface|null  $renderer
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRenderer(RendererInterface|null $renderer): static
-    {
-        $this->renderer = $renderer;
 
         return $this;
     }

@@ -51,10 +51,10 @@ class LayoutPathResolver
     public function resolveLayout(string $layout, array $extensions = []): string
     {
         $layout = $this->resolveAlias($layout);
-
+        
         [$ns, $layout] = static::extractNamespace($layout);
 
-        $pathsBag = $this->getPathsBag($ns);
+        $pathsBag = $this->getPathsBag($ns ?? 'main');
 
         foreach ($pathsBag->getClonedPaths() as $path) {
             $info = CompositeRenderer::findFileInfoByExtensions(
@@ -68,13 +68,19 @@ class LayoutPathResolver
             }
         }
 
-        return $layout;
+        return throw new \RuntimeException(
+            sprintf(
+                'Unable to find layout: %s - Paths: %s',
+                $layout,
+                implode("|\n", $pathsBag->dumpPaths())
+            )
+        );
     }
 
-    public function resolveAlias(string $layout, ?PathsBag &$paths = null): string
+    public function resolveAlias(string $layout): string
     {
         while (isset($this->aliases[$layout])) {
-            $layouts = (array) $this->aliases[$layout];
+            $layout = $this->aliases[$layout];
 
             // if ($layout instanceof \Closure) {
             //     $layout = $this->container->call($layout);
@@ -107,9 +113,8 @@ class LayoutPathResolver
         // Handle Aliases
         if (str_starts_with($layout, '@')) {
             $segments = preg_split('[/|\\\\|\.]', $layout, 2);
-
             while (isset($this->aliases[$segments[0]])) {
-                $segments[0] = (array) $this->aliases[$segments[0]];
+                $segments[0] = $this->aliases[$segments[0]];
 
                 // if ($segments[0] instanceof \Closure) {
                 //     $segments[0] = $this->container->call($segments[0]);

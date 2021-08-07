@@ -292,7 +292,7 @@ class WindwalkerExtension implements
         $globals['uri'] = $this->app->resolve(SystemUri::class);
         $globals['chronos'] = $this->app->resolve(ChronosService::class);
         $globals['asset'] = $this->app->resolve(AssetService::class);
-        $globals['theme'] = $this->app->resolve(ThemeInterface::class);
+        // $globals['theme'] = $this->app->resolve(ThemeInterface::class);
         $globals['lang'] = $this->app->resolve(LangService::class);
 
         $navOptions = RouteUri::MODE_MUTE;

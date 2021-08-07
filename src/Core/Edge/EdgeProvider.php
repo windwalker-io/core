@@ -71,7 +71,13 @@ class EdgeProvider implements ServiceProviderInterface
                     $container->newInstance(WindwalkerExtension::class)
                 );
                 $edge->setLoader(
-                    $container->newInstance(CoreFileLoader::class, ['loader' => $edge->getLoader()])
+                    $container->newInstance(
+                        CoreFileLoader::class,
+                        [
+                            'loader' => $edge->getLoader(),
+                            'extensions' => $container->getParam('renderer.renderers.edge.1')
+                        ]
+                    )
                 );
 
                 $cache = $edge->getCache();

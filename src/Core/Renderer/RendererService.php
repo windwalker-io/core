@@ -22,7 +22,10 @@ use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TemplateFactoryInterface;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Iterator\PriorityQueue;
+
+use function Windwalker\collect;
 
 /**
  * The RendererService class.
@@ -52,7 +55,11 @@ class RendererService
     {
         $data = array_merge($this->getGlobals(), $data);
 
-        return $renderer->render($this->resolveLayout($layout), $data, $options);
+        return $renderer->render(
+            $this->resolveLayout($layout),
+            $data,
+            $options
+        );
     }
 
     public function make(string $layout, array $options = []): \Closure
@@ -69,6 +76,20 @@ class RendererService
         }
 
         return $renderer;
+    }
+
+    public function getRendererFactories(): array
+    {
+        return $this->app->config('renderer.renderers') ?? [];
+    }
+
+    public function getSupportedExtensions(): array
+    {
+        return collect($this->getRendererFactories())
+            ->map(fn (array $f) => $f[1])
+            ->flatten()
+            ->values()
+            ->dump();
     }
 
     public function addGlobal(string $name, mixed $value): static
@@ -95,7 +116,7 @@ class RendererService
 
     public function resolveLayout(string $layout): string
     {
-        return $this->resolver->resolveLayout($layout);
+        return $this->resolver->resolveLayout($layout, $this->getSupportedExtensions());
     }
 
     protected function prepareGlobals(array $globals): array
@@ -131,9 +152,9 @@ class RendererService
         return $this;
     }
 
-    public function addPath(string|array $paths, int $priority = PriorityQueue::ABOVE_NORMAL): static
+    public function addPath(string|array $paths, ?int $priority = PriorityQueue::ABOVE_NORMAL, string $ns = 'main'): static
     {
-        $this->resolver->addPaths($paths, $priority);
+        $this->resolver->addPaths($paths, $priority, $ns);
 
         return $this;
     }
