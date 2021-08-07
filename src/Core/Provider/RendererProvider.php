@@ -38,7 +38,7 @@ class RendererProvider implements ServiceProviderInterface
         $container->prepareObject(
             CompositeRenderer::class,
             function (CompositeRenderer $renderer) use ($container) {
-                $renderer->setPaths($container->getParam('renderer.paths') ?? []);
+                // $renderer->setPaths($container->getParam('renderer.paths') ?? []);
                 $renderer->setFactories($container->getParam('renderer.renderers') ?? []);
                 $renderer->setOptions($container->getParam('renderer.options') ?? []);
 

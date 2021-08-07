@@ -22,6 +22,7 @@ use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TemplateFactoryInterface;
+use Windwalker\Utilities\Iterator\PriorityQueue;
 
 /**
  * The RendererService class.
@@ -123,10 +124,27 @@ class RendererService
      *
      * @return  static  Return self to support chaining.
      */
-    public function setGlobals(array $globals)
+    public function setGlobals(array $globals): static
     {
         $this->globals = $globals;
 
         return $this;
+    }
+
+    public function addPath(string|array $paths, int $priority = PriorityQueue::ABOVE_NORMAL): static
+    {
+        $this->resolver->addPaths($paths, $priority);
+
+        return $this;
+    }
+
+    public function getPaths(): PriorityQueue
+    {
+        return $this->resolver->getPathsBag('main')->getClonedPaths();
+    }
+
+    public function dumpPaths(): array
+    {
+        return iterator_to_array(clone $this->getPaths());
     }
 }

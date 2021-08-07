@@ -425,11 +425,7 @@ class View implements EventAwareInterface
 
     public function addPath(string $path, int $priority = 100): static
     {
-        $renderer = $this->getRenderer();
-
-        if ($renderer instanceof CompositeRenderer) {
-            $renderer->addPath($path, $priority);
-        }
+        $this->rendererService->addPath($path, $priority);
 
         return $this;
     }

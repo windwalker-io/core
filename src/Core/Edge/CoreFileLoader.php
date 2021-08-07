@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Edge;
 
 use Windwalker\Core\Renderer\LayoutPathResolver;
+use Windwalker\Core\Renderer\PathsBag;
 use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Edge\Exception\LayoutNotFoundException;
 use Windwalker\Edge\Loader\EdgeFileLoader;
@@ -51,8 +52,13 @@ class CoreFileLoader implements EdgeLoaderInterface
         //
         //     $key = $this->theme->path($key);
         // }
+show($key);exit(' @Checkpoint');
+        /** @var PathsBag $paths */
+        $key = $this->pathResolver->resolveLayout($key, $paths);
 
-        $key = $this->pathResolver->resolveLayout($key);
+        foreach (iterator_to_array($paths->getClonedPaths()) as $path) {
+            $this->loader->addPath($path);
+        }
 
         return $this->loader->find($key);
     }
