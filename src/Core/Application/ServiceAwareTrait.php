@@ -86,7 +86,7 @@ trait ServiceAwareTrait
      *
      * @throws Exception\DefinitionException
      */
-    public function bind(string $id, $value, int $options = 0)
+    public function bind(string $id, mixed $value, int $options = 0): mixed
     {
         $this->getContainer()->bind($id, $value, $options);
 
@@ -96,15 +96,16 @@ trait ServiceAwareTrait
     /**
      * resolve
      *
-     * @param  mixed $source
-     * @param  bool  $forceNew
+     * @param  mixed  $source
+     * @param  array  $args
+     * @param  int    $options
      *
-     * @return  mixed|object|string
+     * @return mixed
      *
      * @throws ReflectionException
      */
-    public function resolve($source, bool $forceNew = false)
+    public function resolve(mixed $source, array $args = [], int $options = 0): mixed
     {
-        return $this->getContainer()->resolve($source);
+        return $this->getContainer()->resolve($source, $args, $options);
     }
 }
