@@ -4,7 +4,7 @@
  * Part of unicorn project.
  *
  * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    LGPL-2.0-or-later
+ * @license    MIT
  */
 
 declare(strict_types=1);

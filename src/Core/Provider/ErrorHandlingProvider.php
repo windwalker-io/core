@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    LGPL-2.0-or-later
+ * @license    MIT
  */
 
 namespace Windwalker\Core\Provider;

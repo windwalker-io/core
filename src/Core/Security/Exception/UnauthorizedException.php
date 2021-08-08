@@ -3,7 +3,7 @@
  * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2017 LYRASOFT.
- * @license    LGPL-2.0-or-later
+ * @license    MIT
  */
 
 namespace Windwalker\Core\Security\Exception;
