@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Debugger;
 
+use Composer\InstalledVersions;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\DateTime\ChronosService;
@@ -87,7 +88,9 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
         $collector = $container->get('debugger.collector');
 
         // Collect DB
-        $this->collectDatabase($container, $collector);
+        if (InstalledVersions::isInstalled('windwalker/database')) {
+            $this->collectDatabase($container, $collector);
+        }
     }
 
     /**

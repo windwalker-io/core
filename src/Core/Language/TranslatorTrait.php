@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Language;
 
+use JetBrains\PhpStorm\Language;
 use Windwalker\DI\Attributes\Inject;
 
 /**
@@ -19,20 +20,20 @@ use Windwalker\DI\Attributes\Inject;
 trait TranslatorTrait
 {
     #[Inject]
-    protected LangService $langService;
+    protected LangService $translator;
 
     public function trans(string $id, ...$args): string
     {
-        return $this->langService->trans($id, ...$args);
+        return $this->translator->trans($id, ...$args);
     }
 
     public function choice(string $id, int|float $number, ...$args): string
     {
-        return $this->langService->choice($id, $number, ...$args);
+        return $this->translator->choice($id, $number, ...$args);
     }
 
     public function has(string $id, ?string $locale = null, bool $fallback = true): bool
     {
-        return $this->langService->has($id, $locale, $fallback);
+        return $this->translator->has($id, $locale, $fallback);
     }
 }

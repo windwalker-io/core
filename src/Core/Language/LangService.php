@@ -23,29 +23,52 @@ use Windwalker\Utilities\Str;
 
 /**
  * The Lang class.
+ *
+ * @method $this load(string $file, ?string $format = 'ini', ?string $locale = null, array $options = [])
+ * @method string resolveNamespace(string $key)
+ * @method array find(string $id, ?string $locale = null, bool $fallback = true)
+ * @method string[] get(string $id, ?string $locale = null, bool $fallback = true)
+ * @method string trans(string $id, ...$args)
+ * @method string choice(string $id, int|float $number, ...$args)
+ * @method string replace(string $string, array $args = [])
+ * @method bool has(string $id, ?string $locale = null, bool $fallback = true)
+ * @method $this addString(string $key, string $string, ?string $locale = null)
+ * @method $this addStrings(array $strings, ?string $locale = null)
+ * @method $this setDebug(bool $debug)
+ * @method array getOrphans()
+ * @method array getUsed()
+ * @method string getLocale()
+ * @method $this setLocale(string $locale)
+ * @method string getFallback()
+ * @method $this setFallback(string $fallback)
+ * @method mixed normalize(string $string)
+ * @method array getStrings()
+ * @method $this setStrings(array $strings)
+ * @method string getNamespace()
+ * @method $this setNamespace(string $namespace)
+ * @method bool isDebug()
  */
-class LangService extends Language
+class LangService
 {
     use PathsAwareTrait;
 
     protected array $loadedFiles = [];
 
+    protected ?Language $language = null;
+
+    protected ?LangService $parent = null;
+
     /**
      * @inheritDoc
      */
-    public function __construct(protected Config $config, protected PathResolver $pathResolver)
-    {
-        parent::__construct(
-            $config->getDeep('language.locale') ?: 'en-US',
-            $config->getDeep('language.fallback') ?: 'en-US'
-        );
+    public function __construct(
+        protected Config $config,
+        protected PathResolver $pathResolver,
+        ?Language $language = null
+    ) {
+        $this->language = $language;
 
-        $debug = $config->getDeep('app.debug') ?? false;
-        $langDebug = $config->getDeep('language.debug') ?? false;
-
-        $this->addPath($config->getDeep('language.paths'));
-
-        $this->setDebug($debug && $langDebug);
+        $this->addPath($this->config->getDeep('language.paths') ?? []);
     }
 
     public function __invoke(string $id, ...$args): string
@@ -155,5 +178,91 @@ class LangService extends Language
     public function __clone(): void
     {
         $this->paths = clone $this->paths;
+    }
+
+    /**
+     * @return Language
+     */
+    public function getLanguage(): Language
+    {
+        return $this->language ??= $this->createLanguage();
+    }
+
+    protected function createLanguage(): Language
+    {
+        if (!class_exists(Language::class)) {
+            throw new \DomainException('Please install windwalker/language first.');
+        }
+
+        $language = new Language(
+            $this->config->getDeep('language.locale') ?: 'en-US',
+            $this->config->getDeep('language.fallback') ?: 'en-US'
+        );
+
+        $debug = $this->config->getDeep('app.debug') ?? false;
+        $langDebug = $this->config->getDeep('language.debug') ?? false;
+
+        $language->setDebug($debug && $langDebug);
+
+        return $language;
+    }
+
+    /**
+     * @param  Language|null  $language
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setLanguage(?Language $language): static
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * extract
+     *
+     * @param  string  $namespace
+     *
+     * @return  static
+     */
+    public function extract(string $namespace): static
+    {
+        $new = clone $this;
+        $new->setLanguage($this->getLanguage()->extract($namespace));
+        $new->parent = $this;
+
+        return $new;
+    }
+
+    /**
+     * @return self
+     */
+    public function getParent(): ?self
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param  self  $parent
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setParent(?self $parent): static
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function __call(string $name, array $args): mixed
+    {
+        $r = $this->getLanguage()->$name(...$args);
+
+        if ($r instanceof Language) {
+            return $this;
+        }
+
+        return $r;
     }
 }

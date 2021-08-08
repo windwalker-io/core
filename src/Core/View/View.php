@@ -44,6 +44,7 @@ use Windwalker\Utilities\Options\OptionsResolverTrait;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
+use Windwalker\Language\Language;
 
 /**
  * The ViewModel class.
@@ -449,18 +450,20 @@ class View implements EventAwareInterface
             $this->addPath($dir, PriorityQueue::LOW);
         }
 
-        $langService = $this->app->service(LangService::class);
+        if (class_exists(Language::class)) {
+            $langService = $this->app->service(LangService::class);
 
-        $langDir = $dir . '/' . $langService->getLocale();
+            $langDir = $dir . '/' . $langService->getLocale();
 
-        if (is_dir($dir)) {
-            $this->addPath($langDir, PriorityQueue::BELOW_NORMAL);
-        }
+            if (is_dir($dir)) {
+                $this->addPath($langDir, PriorityQueue::BELOW_NORMAL);
+            }
 
-        $fallbackDir = $dir . '/' . $langService->getLocale();
+            $fallbackDir = $dir . '/' . $langService->getLocale();
 
-        if (is_dir($dir)) {
-            $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL);
+            if (is_dir($dir)) {
+                $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL);
+            }
         }
     }
 

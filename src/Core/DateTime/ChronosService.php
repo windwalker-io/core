@@ -52,6 +52,10 @@ class ChronosService
 
     public function getSqlFormat(?DatabaseAdapter $db = null): string
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first to use: ' . __METHOD__);
+        }
+
         $db ??= $this->db;
 
         return $db->getDateFormat();
@@ -59,6 +63,10 @@ class ChronosService
 
     public function getNullDate(?DatabaseAdapter $db = null): string
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first to use: ' . __METHOD__);
+        }
+
         $db ??= $this->db;
 
         return $db->getNullDate();
@@ -66,6 +74,10 @@ class ChronosService
 
     public function isNullDate(string|int|null|\DateTimeInterface $date, ?DatabaseAdapter $db = null): bool
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first to use: ' . __METHOD__);
+        }
+
         $db ??= $this->db;
 
         return $db->isNullDate($date);

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Language\LangService;
+use Windwalker\Core\Language\TranslatorWrapper;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -37,6 +38,8 @@ class LanguageProvider implements ServiceProviderInterface, BootableDeferredProv
                     return $langService->loadAllFromPath(__DIR__ . '/../../../resources/languages', 'php');
                 }
             );
+
+        $container->prepareSharedObject(TranslatorWrapper::class);
     }
 
     /**
