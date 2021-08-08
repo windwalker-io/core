@@ -75,7 +75,7 @@ class StatusCommand extends AbstractMigrationCommand
         }
 
         ksort($migrations);
-        $versions = $this->migrationService->getVersions();
+        $versions = $migrationService->getVersions();
 
         $table = new Table($io);
         $table->setHeaders(['Status', 'Version', 'Migration Name']);
