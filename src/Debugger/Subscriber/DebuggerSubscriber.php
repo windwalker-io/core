@@ -145,8 +145,11 @@ class DebuggerSubscriber
             'version' => $res->getProtocolVersion(),
         ];
         $http['state']    = $app->getState()->all();
-        $http['session']  = $app->service(Session::class)->all();
-        $http['cookies']  = $app->service(CookiesInterface::class)->getStorage();
+
+        if (InstalledVersions::isInstalled('windwalker/session')) {
+            $http['session']  = $app->service(Session::class)->all();
+            $http['cookies']  = $app->service(CookiesInterface::class)->getStorage();
+        }
 
         $collector['http'] = $http;
 
@@ -170,7 +173,7 @@ class DebuggerSubscriber
         $systemCollector['config']            = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
 
         // Database
-        $connections = $app->config('database.connections');
+        $connections = $app->config('database.connections') ?? [];
         $dbConns     = [];
 
         foreach ($connections as $connection => $factory) {
