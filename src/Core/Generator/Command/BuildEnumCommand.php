@@ -20,6 +20,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Core\Generator\Builder\EnumBuilder;
 use Windwalker\Core\Utilities\ClassFinder;
+use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\ORM\ORM;
@@ -36,7 +37,7 @@ class BuildEnumCommand implements CommandInterface
     /**
      * BuildEntityCommand constructor.
      */
-    public function __construct(#[Autowire] protected ClassFinder $classFinder, protected ORM $orm)
+    public function __construct(#[Autowire] protected ClassFinder $classFinder, protected ?ORM $orm = null)
     {
     }
 
@@ -81,6 +82,10 @@ class BuildEnumCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first.');
+        }
+
         $this->io = $io;
 
         $ns = $io->getArgument('ns');

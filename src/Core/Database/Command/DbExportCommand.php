@@ -20,6 +20,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Filesystem\FileObject;
 
 /**
@@ -31,11 +32,9 @@ class DbExportCommand implements CommandInterface
     /**
      * DbExportCommand constructor.
      *
-     * @param  DatabaseManager        $databaseManager
      * @param  ApplicationInterface   $app
      */
     public function __construct(
-        protected DatabaseManager $databaseManager,
         protected ApplicationInterface $app,
     ) {
     }
@@ -45,7 +44,12 @@ class DbExportCommand implements CommandInterface
      */
     public function configure(Command $command): void
     {
-        $default = $this->databaseManager->getDefaultName();
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first.');
+        }
+
+        $databaseManager = $this->app->service(DatabaseManager::class);
+        $default = $databaseManager->getDefaultName();
 
         $command->addArgument(
             'dest',

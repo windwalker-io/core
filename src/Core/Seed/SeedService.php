@@ -16,6 +16,7 @@ use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Generator\FileCollection;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Utilities\StrNormalize;
@@ -32,15 +33,16 @@ class SeedService implements EventAwareInterface
      * MigrationService constructor.
      *
      * @param  ApplicationInterface  $app
-     * @param  DatabaseAdapter       $db
      * @param  FakerService          $fakerService
+     * @param  DatabaseAdapter|null  $db
      */
     public function __construct(
         protected ApplicationInterface $app,
-        protected DatabaseAdapter $db,
-        protected FakerService $fakerService
+        #[Autowire]
+        protected FakerService $fakerService,
+        protected ?DatabaseAdapter $db = null,
     ) {
-        //
+
     }
 
     public function import(string|\SplFileInfo $file): int

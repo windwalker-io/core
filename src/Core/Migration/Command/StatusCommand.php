@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Autowire;
+use Windwalker\DI\Attributes\Service;
 
 /**
  * The StatusCommand class.
@@ -27,10 +27,8 @@ class StatusCommand extends AbstractMigrationCommand
 {
     /**
      * StatusCommand constructor.
-     *
-     * @param  MigrationService  $migrationService
      */
-    public function __construct(#[Autowire] protected MigrationService $migrationService)
+    public function __construct()
     {
     }
 
@@ -68,7 +66,8 @@ class StatusCommand extends AbstractMigrationCommand
             | static::CREATE_DATABASE
         );
 
-        $migrations = $this->migrationService->getMigrations($this->getMigrationFolder($io));
+        $migrationService = $this->app->make(MigrationService::class);
+        $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));
 
         if ($migrations === []) {
             $io->writeln('No migrations found.');

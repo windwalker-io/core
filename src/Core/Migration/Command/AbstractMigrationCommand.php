@@ -76,6 +76,10 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
     protected function preprocess(IOInterface $io, int $options = 0): void
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first.');
+        }
+
         if ($options & static::NO_TIME_LIMIT) {
             set_time_limit(0);
         }

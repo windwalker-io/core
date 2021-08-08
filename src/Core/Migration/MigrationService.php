@@ -39,11 +39,11 @@ class MigrationService implements EventAwareInterface
      * MigrationService constructor.
      *
      * @param  ApplicationInterface  $app
-     * @param  DatabaseAdapter       $db
+     * @param  DatabaseAdapter|null  $db
      */
-    public function __construct(protected ApplicationInterface $app, protected DatabaseAdapter $db)
+    public function __construct(protected ApplicationInterface $app, protected ?DatabaseAdapter $db = null)
     {
-        $this->db->addEventDealer($this->getEventDispatcher());
+        $this->db?->addEventDealer($this->getEventDispatcher());
     }
 
     /**

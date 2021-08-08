@@ -18,6 +18,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\DI\Attributes\Autowire;
+use Windwalker\DI\Attributes\Service;
 use Windwalker\Utilities\Str;
 
 /**
@@ -28,12 +29,9 @@ class CreateCommand extends AbstractMigrationCommand
 {
     /**
      * CreateCommand constructor.
-     *
-     * @param  MigrationService  $migrationService
      */
-    public function __construct(
-        protected MigrationService $migrationService,
-    ) {
+    public function __construct() {
+
     }
 
     /**
@@ -65,7 +63,9 @@ class CreateCommand extends AbstractMigrationCommand
     {
         $name = $io->getArgument('name');
 
-        $this->migrationService->copyMigrationFile(
+        $migrationService = $this->app->make(MigrationService::class);
+
+        $migrationService->copyMigrationFile(
             $this->getMigrationFolder($io),
             $name,
             __DIR__ . '/../../../../resources/templates/migration/*'
