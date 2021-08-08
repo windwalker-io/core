@@ -122,6 +122,10 @@ class JsonApiMiddleware extends JsonResponseMiddleware
      */
     protected function getMessage(): string
     {
+        if (!class_exists(Session::class)) {
+            return '';
+        }
+
         $msg = $this->app->service(Session::class)->getFlashBag()->all();
 
         return implode("\n", Arr::collapse($msg));
