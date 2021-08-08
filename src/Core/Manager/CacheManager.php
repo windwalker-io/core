@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2020 __ORGANIZATION__.
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 declare(strict_types=1);
@@ -36,7 +36,7 @@ class CacheManager extends AbstractManager
      *
      * @return  mixed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  4.0.0-beta1
      */
     protected function getDefaultFactory(string $name, ...$args): mixed
     {

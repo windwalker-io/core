@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 declare(strict_types=1);
@@ -332,7 +332,7 @@ class MigrationService implements EventAwareInterface
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  4.0.0-beta1
      */
     public function handleLogging(string $logFile): void
     {

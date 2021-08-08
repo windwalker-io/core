@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Controller;
@@ -28,7 +28,7 @@ use Windwalker\Utilities\StrNormalize;
 /**
  * The ControllerDispatcher class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  4.0.0-beta1
  */
 class ControllerDispatcher
 {
@@ -159,7 +159,7 @@ class ControllerDispatcher
      * @return  ResponseInterface|Response
      *
      * @throws \JsonException
-     * @since  __DEPLOY_VERSION__
+     * @since  4.0.0-beta1
      */
     protected function handleResponse(mixed $res): ResponseInterface
     {

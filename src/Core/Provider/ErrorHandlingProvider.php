@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Provider;
@@ -20,7 +20,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The ErrorHandleringProvider class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  4.0.0-beta1
  */
 class ErrorHandlingProvider implements ServiceProviderInterface, BootableProviderInterface
 {

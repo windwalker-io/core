@@ -4,7 +4,7 @@
  * Part of starter project.
  *
  * @copyright  Copyright (C) 2020 .
- * @license    __LICENSE__
+ * @license    LGPL-2.0-or-later
  */
 
 namespace Windwalker\Core\Runtime;
@@ -18,7 +18,7 @@ use Windwalker\Utilities\Arr;
 /**
  * The Runtime class.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  4.0.0-beta1
  */
 class Runtime
 {
@@ -86,7 +86,7 @@ class Runtime
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  4.0.0-beta1
      */
     public static function isBooted(): bool
     {
