@@ -103,11 +103,22 @@ class PackageInstallCommand implements CommandInterface
 
         // Discover and prepare-install
         $installer = $registry->prepareInstall();
-        
-        if (!$packages || !$tags) {
+
+        if (!$packages && !$tags) {
             $targets = $this->askForTargets($registry);
         } else {
             $targets = [];
+
+            if (!$packages) {
+                foreach ($registry->getPackages() as $package) {
+                    $name = $package::getName();
+                    $tagNames = array_keys($installer->getChild($name)->tags);
+
+                    if (array_intersect($tagNames, $tags)) {
+                        $packages[] = $package::getName();
+                    }
+                }
+            }
 
             foreach ($packages as $package) {
                 $targets[$package] ??= [];

@@ -44,12 +44,12 @@ class DbExportCommand implements CommandInterface
      */
     public function configure(Command $command): void
     {
-        if (!class_exists(DatabaseAdapter::class)) {
-            throw new \DomainException('Please install windwalker/database first.');
+        try {
+            $databaseManager = $this->app->service(DatabaseManager::class);
+            $default = $databaseManager->getDefaultName();
+        } catch (\Throwable $e) {
+            $default = 'local';
         }
-
-        $databaseManager = $this->app->service(DatabaseManager::class);
-        $default = $databaseManager->getDefaultName();
 
         $command->addArgument(
             'dest',
@@ -61,7 +61,7 @@ class DbExportCommand implements CommandInterface
             'connection',
             'c',
             InputOption::VALUE_REQUIRED,
-            'Connection to export, default is: ' . $default
+            'Connection to export, default is: ' . ($default ?? 'local')
         );
     }
 
@@ -70,6 +70,10 @@ class DbExportCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
+        if (!class_exists(DatabaseAdapter::class)) {
+            throw new \DomainException('Please install windwalker/database first.');
+        }
+
         $now  = new \DateTimeImmutable('now');
         $conn = $io->getOption('connection');
 
