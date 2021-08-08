@@ -17,12 +17,10 @@ use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
-use Windwalker\DI\ServiceAwareTrait;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
-use Windwalker\Event\EventEmitter;
 use Windwalker\Event\EventListenableInterface;
 
 /**
