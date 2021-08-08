@@ -164,7 +164,7 @@ class DebuggerSubscriber
         $collector->def('system', []);
 
         $systemCollector                      = $collector->proxy('system');
-        $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
+        // $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
         $systemCollector['core_version']      = InstalledVersions::getPrettyVersion('windwalker/core');
         $systemCollector['php_version']       = PHP_VERSION;
         $systemCollector['config']            = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
