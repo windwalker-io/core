@@ -26,6 +26,7 @@ use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
+use Windwalker\Core\View\Event\PrepareDataEvent;
 use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
@@ -150,8 +151,9 @@ class View implements EventAwareInterface
 
         $layout = $this->resolveLayout();
 
+        // @event Before Prepare Data
         $event = $this->emit(
-            BeforeRenderEvent::class,
+            PrepareDataEvent::class,
             [
                 'view' => $this,
                 'viewModel' => $vm,
@@ -169,9 +171,20 @@ class View implements EventAwareInterface
             $this->injectData($vm, $data);
         }
 
-        $response = $this->handleVMResponse(
-            $vm->prepare($this->app, $this)
+        // @event Before Render
+        $event = $this->emit(
+            BeforeRenderEvent::class,
+            [
+                'view' => $this,
+                'viewModel' => $vm,
+                'data' => $data,
+                'layout' => $layout,
+                'state' => $this->getState(),
+                'response' => $vm->prepare($this->app, $this)
+            ]
         );
+
+        $response = $this->handleVMResponse($event->getResponse());
 
         if ($response instanceof RedirectResponse) {
             return $response;
@@ -200,6 +213,7 @@ class View implements EventAwareInterface
             $content = $response->getBody()->getContents();
         }
 
+        // @event After Render
         $event = $this->emit(
             AfterRenderEvent::class,
             [
