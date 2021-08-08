@@ -30,12 +30,12 @@ class ChronosService
     /**
      * ChronosService constructor.
      *
-     * @param  Config           $config
-     * @param  DatabaseAdapter  $db
+     * @param  Config            $config
+     * @param  ?DatabaseAdapter  $db
      */
     public function __construct(
         protected Config $config,
-        protected DatabaseAdapter $db
+        protected ?DatabaseAdapter $db = null
     ) {
         //
     }
