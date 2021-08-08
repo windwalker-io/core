@@ -113,6 +113,10 @@ class PackageInstaller
 
         /** @var FileObject $file */
         foreach ($files as $file) {
+            if ($file->isDir()) {
+                continue;
+            }
+
             $items[$file->getRealPath()] = $dest . '/' . $file->getRelativePathname();
         }
 
