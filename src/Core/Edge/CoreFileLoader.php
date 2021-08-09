@@ -47,10 +47,18 @@ class CoreFileLoader implements EdgeLoaderInterface
      */
     public function find(string $key): string
     {
-        return $this->pathResolver->resolveLayout(
-            $key,
-            $this->extensions
-        );
+        try {
+            return $this->pathResolver->resolveLayout(
+                $key,
+                $this->extensions
+            );
+        } catch (\RuntimeException $e) {
+            if ($this->loader->has($key)) {
+                return $this->loader->find($key);
+            }
+
+            throw $e;
+        }
     }
 
     /**
