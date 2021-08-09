@@ -31,9 +31,8 @@ class MailTestCommand implements CommandInterface
      * MailTestCommand constructor.
      *
      * @param  ApplicationInterface  $app
-     * @param  Mailer                $mailer
      */
-    public function __construct(protected ApplicationInterface $app, protected Mailer $mailer)
+    public function __construct(protected ApplicationInterface $app)
     {
     }
 
@@ -66,6 +65,10 @@ class MailTestCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
+        if (!class_exists(\Symfony\Component\Mailer\MailerInterface::class)) {
+            throw new \DomainException('Please install symfony/mailer ^5.0 first.');
+        }
+
         $custom = $io->getOption('message');
         $subject = $io->getOption('subject');
 
@@ -93,7 +96,8 @@ class MailTestCommand implements CommandInterface
             $date->format('Y-m-d H:i:s')
         );
 
-        $this->mailer->createMessage($title)
+        $mailer = $this->app->make(Mailer::class);
+        $mailer->createMessage($title)
             ->to(...$recipients)
             ->from($from)
             ->html($body)

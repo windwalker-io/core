@@ -10,8 +10,6 @@
 declare(strict_types=1);
 
 return [
-    'reinstall' => \Windwalker\Core\Command\ReinstallCommand::class,
-
     'server:start' => \Windwalker\Core\Command\ServeCommand::class,
     'server:dumper' => \Windwalker\Core\Command\DumpServerCommand::class,
 
