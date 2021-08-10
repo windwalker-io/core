@@ -25,11 +25,13 @@ trait ServiceAwareTrait
     /**
      * make
      *
-     * @param  mixed  $class
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return  object
+     * @param  class-string<T>  $class
+     * @param  array            $args
+     * @param  int              $options
+     *
+     * @return  T
      */
     public function make($class, array $args = [], int $options = 0): object
     {
@@ -39,11 +41,13 @@ trait ServiceAwareTrait
     /**
      * service
      *
-     * @param  mixed  $class
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return  object
+     * @param  class-string<T>  $class
+     * @param  array            $args
+     * @param  int              $options
+     *
+     * @return  T
      *
      * @throws Exception\DefinitionException
      */
@@ -96,11 +100,13 @@ trait ServiceAwareTrait
     /**
      * resolve
      *
-     * @param  mixed  $source
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return mixed
+     * @param  mixed|class-string<T>  $source
+     * @param  array                  $args
+     * @param  int                    $options
+     *
+     * @return mixed|T
      *
      * @throws ReflectionException
      */
