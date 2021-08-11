@@ -14,7 +14,7 @@ namespace App\Enum;
 use MyCLabs\Enum\Enum;
 use Windwalker\Form\Enum\EnumTranslatableInterface;
 use Windwalker\Form\Enum\EnumTranslatableTrait;
-use Windwalker\Language\Language;
+use Windwalker\Language\LanguageInterface;
 
 /**
  * The {% pascal($name) %} enum class.
@@ -42,7 +42,7 @@ class {% pascal($name) %} extends Enum implements EnumTranslatableInterface
         parent::__construct($value);
     }
 
-    public function trans(Language $lang, ...$args): string
+    public function trans(LanguageInterface $lang, ...$args): string
     {
         return $lang->trans('app.{% dot($name) %}.' . $this->getValue());
     }
