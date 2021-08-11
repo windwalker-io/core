@@ -19,22 +19,26 @@ interface ServiceAwareInterface
     /**
      * make
      *
-     * @param  string $class
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return  object
+     * @param  class-string<T>  $class
+     * @param  array            $args
+     * @param  int              $options
+     *
+     * @return  T
      */
     public function make(string $class, array $args = [], int $options = 0): object;
 
     /**
      * service
      *
-     * @param  mixed  $class
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return  object
+     * @param  class-string<T>  $class
+     * @param  array            $args
+     * @param  int              $options
+     *
+     * @return  T
      */
     public function service(string $class, array $args = [], int $options = 0): object;
 
@@ -64,11 +68,13 @@ interface ServiceAwareInterface
     /**
      * resolve
      *
-     * @param  mixed  $source
-     * @param  array  $args
-     * @param  int    $options
+     * @template T
      *
-     * @return  mixed
+     * @param  mixed|class-string<T>  $source
+     * @param  array                  $args
+     * @param  int                    $options
+     *
+     * @return mixed|T
      */
     public function resolve(mixed $source, array $args = [], int $options = 0): mixed;
 }

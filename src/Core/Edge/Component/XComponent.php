@@ -33,7 +33,11 @@ class XComponent extends DynamicComponent
      */
     public function render(): \Closure|string
     {
-        $this->is = $this->pathResolver->resolveLayout($this->is);
+        try {
+            $this->is = $this->pathResolver->resolveLayout($this->is);
+        } catch (\RuntimeException $e) {
+            //
+        }
 
         return parent::render();
     }
