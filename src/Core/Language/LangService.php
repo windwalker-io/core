@@ -17,6 +17,7 @@ use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
 use Windwalker\Language\Language;
+use Windwalker\Language\LanguageInterface;
 use Windwalker\Language\LanguageNormalizer;
 use Windwalker\Utilities\Paths\PathsAwareTrait;
 use Windwalker\Utilities\Str;
@@ -27,11 +28,6 @@ use Windwalker\Utilities\Str;
  * @method $this load(string $file, ?string $format = 'ini', ?string $locale = null, array $options = [])
  * @method string resolveNamespace(string $key)
  * @method array find(string $id, ?string $locale = null, bool $fallback = true)
- * @method string[] get(string $id, ?string $locale = null, bool $fallback = true)
- * @method string trans(string $id, ...$args)
- * @method string choice(string $id, int|float $number, ...$args)
- * @method string replace(string $string, array $args = [])
- * @method bool has(string $id, ?string $locale = null, bool $fallback = true)
  * @method $this addString(string $key, string $string, ?string $locale = null)
  * @method $this addStrings(array $strings, ?string $locale = null)
  * @method $this setDebug(bool $debug)
@@ -48,7 +44,7 @@ use Windwalker\Utilities\Str;
  * @method $this setNamespace(string $namespace)
  * @method bool isDebug()
  */
-class LangService
+class LangService implements LanguageInterface
 {
     use PathsAwareTrait;
 
@@ -264,5 +260,30 @@ class LangService
         }
 
         return $r;
+    }
+
+    public function get(string $id, ?string $locale = null, bool $fallback = true): array
+    {
+        return $this->getLanguage()->get($id, $locale, $fallback);
+    }
+
+    public function trans(string $id, ...$args): string
+    {
+        return $this->getLanguage()->trans($id, ...$args);
+    }
+
+    public function choice(string $id, float|int $number, ...$args)
+    {
+        return $this->getLanguage()->choice($id, $number, ...$args);
+    }
+
+    public function replace(string $string, array $args = []): string
+    {
+        return $this->getLanguage()->replace($string, $args);
+    }
+
+    public function has(string $id, ?string $locale = null, bool $fallback = true): bool
+    {
+        return $this->getLanguage()->has($id, $locale, $fallback);
     }
 }
