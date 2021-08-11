@@ -25,6 +25,7 @@ use Windwalker\Data\Collection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryStartEvent;
+use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -146,7 +147,11 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
                                 $query = $event->getQuery();
 
-                                if ($query instanceof Query && $query->getType() === Query::TYPE_SELECT) {
+                                if (
+                                    $db->getPlatform()->getName() === AbstractPlatform::MYSQL
+                                    && $query instanceof Query
+                                    && $query->getType() === Query::TYPE_SELECT
+                                ) {
                                     $query = clone $query;
                                     $query->sql('EXPLAIN ' . $query);
                                     $data['explain'] = $db->prepare($query)->all();
