@@ -74,6 +74,8 @@ class DbExportCommand implements CommandInterface
             throw new \DomainException('Please install windwalker/database first.');
         }
 
+        $databaseManager = $this->app->service(DatabaseManager::class);
+
         $now  = new \DateTimeImmutable('now');
         $conn = $io->getOption('connection');
 
@@ -83,7 +85,7 @@ class DbExportCommand implements CommandInterface
 
         $dest = $io->getArgument('dest') ?: sprintf(
             $this->app->path('@temp/sql-export/sql-%s-%s.sql'),
-            $conn ?? $this->databaseManager->getDefaultName(),
+            $conn ?? $databaseManager->getDefaultName(),
             $now->format('Y-m-d-H-i-s')
         );
 
