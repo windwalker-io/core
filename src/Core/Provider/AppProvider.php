@@ -9,12 +9,10 @@
 
 namespace Windwalker\Core\Provider;
 
-use phpDocumentor\Reflection\ProjectFactory;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Package\PackageRegistry;
-use Windwalker\Core\Pagination\PaginationFactory;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
@@ -59,6 +57,11 @@ class AppProvider implements ServiceProviderInterface
         $this->prepareEvents($container);
 
         $this->prepareUtilities($container);
+
+        $container->mergeParameters(
+            'di.attributes',
+            require __DIR__ . '/../../../etc/attributes.php'
+        );
     }
 
     /**
