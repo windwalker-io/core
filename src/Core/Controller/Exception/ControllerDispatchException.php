@@ -12,7 +12,7 @@ namespace Windwalker\Core\Controller\Exception;
 /**
  * The ControllerDispatchException class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class ControllerDispatchException extends \LogicException
 {

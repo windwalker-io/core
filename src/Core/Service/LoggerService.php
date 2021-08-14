@@ -16,7 +16,7 @@ use Windwalker\Core\Manager\LoggerManager;
 /**
  * The LoggerService class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class LoggerService
 {

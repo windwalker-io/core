@@ -36,7 +36,7 @@ class CacheManager extends AbstractManager
      *
      * @return  mixed
      *
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     protected function getDefaultFactory(string $name, ...$args): mixed
     {

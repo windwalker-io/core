@@ -184,7 +184,7 @@ class SystemUri extends Uri implements \JsonSerializable
      *
      * @return  string
      *
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     public static function normalize(string $uri): string
     {

@@ -16,7 +16,7 @@ use Windwalker\Utilities\Utf8String;
 /**
  * The ErrorService class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class ErrorService
 {

@@ -332,7 +332,7 @@ class MigrationService implements EventAwareInterface
      *
      * @return  void
      *
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     public function handleLogging(string $logFile): void
     {

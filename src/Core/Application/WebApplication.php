@@ -35,7 +35,7 @@ use Windwalker\Session\Session;
 /**
  * The WebApplication class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class WebApplication implements WebApplicationInterface
 {

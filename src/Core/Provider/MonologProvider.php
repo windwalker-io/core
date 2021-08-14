@@ -22,7 +22,7 @@ use function Windwalker\DI\create;
 /**
  * The MonologProvider class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class MonologProvider implements ServiceProviderInterface
 {
