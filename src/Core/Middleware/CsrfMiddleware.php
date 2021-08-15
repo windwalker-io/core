@@ -44,6 +44,10 @@ class CsrfMiddleware implements MiddlewareInterface
 
     public function run(ServerRequestInterface $request, \Closure $next): mixed
     {
+        if ($this->isExclude()) {
+            return $next($request);
+        }
+
         $methods = $this->getOption('working_methods')
             ?? [
                 'post',
@@ -57,10 +61,30 @@ class CsrfMiddleware implements MiddlewareInterface
         if (in_array($method, $methods, true)) {
             $this->csrfService->validate(
                 $this->app->getAppRequest(),
-                $this->getOption('input_method')
+                $this->getOption('input_method'),
+                $this->getOption('invalid_message'),
             );
         }
 
         return $next($request);
+    }
+
+    protected function isExclude(): bool
+    {
+        $excludes = $this->getOption('excludes');
+
+        if (is_callable($excludes)) {
+            if ($this->app->call($excludes)) {
+                return true;
+            }
+        } elseif ($excludes !== null) {
+            $excludes = (array) $excludes;
+
+            $route = $this->app->getMatchedRoute()?->getName();
+
+            return in_array($route, $excludes, true);
+        }
+
+        return false;
     }
 }

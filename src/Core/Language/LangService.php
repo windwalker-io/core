@@ -186,9 +186,7 @@ class LangService implements LanguageInterface
 
     protected function createLanguage(): Language
     {
-        if (!class_exists(Language::class)) {
-            throw new \DomainException('Please install windwalker/language first.');
-        }
+        static::checkLanguageInstalled();
 
         $language = new Language(
             $this->config->getDeep('language.locale') ?: 'en-US',
@@ -201,6 +199,13 @@ class LangService implements LanguageInterface
         $language->setDebug($debug && $langDebug);
 
         return $language;
+    }
+
+    public static function checkLanguageInstalled(): void
+    {
+        if (!class_exists(Language::class)) {
+            throw new \DomainException('Please install windwalker/language first.');
+        }
     }
 
     /**

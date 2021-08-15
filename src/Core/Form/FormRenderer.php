@@ -45,7 +45,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            '@theme.form.field-wrapper',
+            '@theme::form.field-wrapper',
             compact('field', 'wrapper', 'options', 'renderer')
         );
     }
@@ -64,7 +64,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            '@theme.form.label',
+            '@theme::form.label',
             compact('field', 'label', 'options', 'renderer')
         );
     }
@@ -83,7 +83,7 @@ class FormRenderer implements FormRendererInterface
         $renderer = $this;
 
         return $this->rendererService->render(
-            '@theme.form.input',
+            '@theme::form.input',
             compact('field', 'input', 'options', 'renderer')
         );
     }

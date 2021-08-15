@@ -65,9 +65,10 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $route = $this->getMatchedRoute();
         $to = $route?->getName() ?? $this->app->getSystemUri()->current();
 
-        $vars = null;
+        $vars = [];
+        $withoutVars = (bool) ($options & static::WITHOUT_VARS);
 
-        if ($route) {
+        if ($route && !$withoutVars) {
             $keys = [];
 
             $variants = $this->routeBuilder->parse($route->getPattern());

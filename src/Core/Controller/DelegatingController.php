@@ -57,6 +57,7 @@ class DelegatingController implements ControllerInterface
         }
 
         // Prepare Module
+        // Todo: Remove module system
         if ($this->module) {
             /** @var ModuleInterface $module */
             $module = $this->app->make($this->module);
@@ -87,6 +88,7 @@ class DelegatingController implements ControllerInterface
         try {
             $res = $this->app->call($handler, $args);
 
+            // Todo: Remove module system
             if ($this->module) {
                 $this->app->getContainer()->remove($this->module)
                     ->removeAlias(ModuleInterface::class);
