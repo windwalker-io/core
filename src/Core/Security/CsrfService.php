@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Security;
 
 use Windwalker\Core\Http\AppRequest;
+use Windwalker\Core\Language\LangService;
+use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DOM\DOMElement;
@@ -24,6 +26,8 @@ use function Windwalker\DOM\h;
  */
 class CsrfService
 {
+    use TranslatorTrait;
+
     protected string $tokenKey = 'csrf-token';
 
     /**
@@ -32,15 +36,18 @@ class CsrfService
      * @param  Config   $config
      * @param  Session  $session
      */
-    public function __construct(protected Config $config, protected Session $session)
-    {
+    public function __construct(
+        protected Config $config,
+        protected Session $session,
+        protected LangService $langService
+    ) {
         //
     }
 
-    public function validate(AppRequest $request, ?string $message = null): void
+    public function validate(AppRequest $request, ?string $method = null, ?string $message = null): void
     {
-        if (!$this->checkToken($request)) {
-            throw new InvalidTokenException($message ?? 'Invalid CSRF Token');
+        if (!$this->checkToken($request, $method)) {
+            throw new InvalidTokenException($message ?? $this->getInvalidMessage());
         }
     }
 
@@ -116,5 +123,15 @@ class CsrfService
         $this->tokenKey = $tokenKey;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInvalidMessage(): string
+    {
+        $this->langService::checkLanguageInstalled();
+
+        return $this->trans('windwalker.security.message.csrf.invalid');
     }
 }

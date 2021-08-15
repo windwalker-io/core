@@ -15,4 +15,5 @@ return [
     'windwalker.datetime.relative.hour' => ':d hour ago|:d hours ago',
     'windwalker.datetime.relative.day' => ':d day ago|:d days ago',
     'windwalker.datetime.relative.week' => ':d week ago|:d weeks ago',
+    'windwalker.security.message.csrf.invalid' => 'Your session token has expired, please refresh this page and try again.'
 ];

@@ -13,24 +13,23 @@ use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Relay\Relay;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
+use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\WebProvider;
+use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Output\Output;
 use Windwalker\Http\Request\ServerRequest;
-use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Session\Session;
 
 /**
  * The WebApplication class.
@@ -167,8 +166,7 @@ class WebApplication implements WebApplicationInterface
             compact('container', 'middlewares', 'request')
         );
 
-        $response = $runner::createRequestHandler($event->getMiddlewares())
-            ->handle($event->getRequest());
+        $response = $this->dispatch($appContext, $event->getRequest(), $event->getMiddlewares());
 
         // @event
         $event = $this->emit(
@@ -177,6 +175,44 @@ class WebApplication implements WebApplicationInterface
         );
 
         return $event->getResponse();
+    }
+
+    /**
+     * @param  ServerRequestInterface  $request
+     * @param  iterable                $middlewares
+     *
+     * @return ResponseInterface
+     */
+    protected function dispatch(
+        AppContext $app,
+        ServerRequestInterface $request,
+        iterable $middlewares
+    ): mixed {
+        try {
+            return MiddlewareRunner::createRequestHandler($middlewares)
+                ->handle($request);
+        } catch (ValidateFailException|InvalidTokenException $e) {
+            if ($app->isDebug()) {
+                throw $e;
+            }
+
+            $app->addMessage($e->getMessage(), 'warning');
+            $nav = $app->service(Navigator::class);
+
+            return $this->redirect($nav->back());
+        } catch (\Throwable $e) {
+            if ($app->isDebug()
+                || strtoupper($app->getRequestMethod()) === 'GET'
+                || $app->getAppRequest()->acceptJson()
+            ) {
+                throw $e;
+            } else {
+                $app->addMessage($e->getMessage(), 'warning');
+                $nav = $app->service(Navigator::class);
+
+                return $this->redirect($nav->back());
+            }
+        }
     }
 
     /**
@@ -230,7 +266,7 @@ class WebApplication implements WebApplicationInterface
             TerminatingEvent::class,
             [
                 'app' => $this,
-                'container' => $this->getContainer()
+                'container' => $this->getContainer(),
             ]
         );
     }

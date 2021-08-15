@@ -31,4 +31,6 @@ interface NavConstantInterface
     public const REDIRECT_ALLOW_OUTSIDE = 1 << 6;
 
     public const REDIRECT_INSTANT = 1 << 7;
+
+    public const WITHOUT_VARS = 1 << 8;
 }
