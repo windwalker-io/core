@@ -17,8 +17,8 @@ use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
 use Windwalker\Language\Language;
-use Windwalker\Language\LanguageInterface;
 use Windwalker\Language\LanguageNormalizer;
+use Windwalker\Utilities\Contract\LanguageInterface;
 use Windwalker\Utilities\Paths\PathsAwareTrait;
 use Windwalker\Utilities\Str;
 

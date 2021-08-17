@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace App\Enum;
 
 use MyCLabs\Enum\Enum;
-use Windwalker\Form\Enum\EnumTranslatableInterface;
-use Windwalker\Form\Enum\EnumTranslatableTrait;
-use Windwalker\Language\LanguageInterface;
+use Windwalker\Utilities\Enum\EnumTranslatableInterface;
+use Windwalker\Utilities\Enum\EnumTranslatableTrait;
+use Windwalker\Utilities\Contract\LanguageInterface;
 
 /**
  * The {% pascal($name) %} enum class.
