@@ -28,7 +28,7 @@ use Windwalker\Utilities\StrNormalize;
 /**
  * The ControllerDispatcher class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class ControllerDispatcher
 {
@@ -159,7 +159,7 @@ class ControllerDispatcher
      * @return  ResponseInterface|Response
      *
      * @throws \JsonException
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     protected function handleResponse(mixed $res): ResponseInterface
     {

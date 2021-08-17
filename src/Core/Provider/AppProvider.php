@@ -24,7 +24,7 @@ use Windwalker\Filter\FilterFactory;
 /**
  * The AppProvider class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class AppProvider implements ServiceProviderInterface
 {

@@ -1,7 +1,7 @@
 {
     "name": "windwalker/core",
     "description": "Next generation PHP framework.",
-    "homepage": "https://github.com/ventoviro/windwalker-core",
+    "homepage": "https://github.com/windwalker-io/core",
     "license": "MIT",
     "minimum-stability": "beta",
     "require": {

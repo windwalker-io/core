@@ -20,7 +20,7 @@ use Windwalker\DI\ServiceProviderInterface;
 /**
  * The ErrorHandleringProvider class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class ErrorHandlingProvider implements ServiceProviderInterface, BootableProviderInterface
 {

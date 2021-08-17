@@ -51,7 +51,7 @@ class CmdWrapper implements WrapperInterface
      *
      * @return  mixed
      *
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     public function __invoke(mixed $src): Process
     {

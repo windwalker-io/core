@@ -14,7 +14,7 @@ use Windwalker\DI\Container;
 /**
  * IniSetterTrait
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 trait IniSetterTrait
 {

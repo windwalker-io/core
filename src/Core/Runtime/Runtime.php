@@ -18,7 +18,7 @@ use Windwalker\Utilities\Arr;
 /**
  * The Runtime class.
  *
- * @since  4.0.0-beta1
+ * @since  4.0
  */
 class Runtime
 {
@@ -86,7 +86,7 @@ class Runtime
      *
      * @return  bool
      *
-     * @since  4.0.0-beta1
+     * @since  4.0
      */
     public static function isBooted(): bool
     {
