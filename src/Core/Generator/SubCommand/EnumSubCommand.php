@@ -26,6 +26,10 @@ use Windwalker\Utilities\Str;
 )]
 class EnumSubCommand extends AbstractGeneratorSubCommand
 {
+    protected string $defaultNamespace = 'App\\Enum';
+
+    protected string $defaultDir = 'src/Enum';
+
     protected bool $requireDest = false;
 
     /**
@@ -66,7 +70,7 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('enum/*.tpl'))
             ->replaceTo(
-                'src/Enum',
+                $this->getDestPath($io),
                 [
                     'name' => $name,
                     'ns' => $this->getNamesapce($io),

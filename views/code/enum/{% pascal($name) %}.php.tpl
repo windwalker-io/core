@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace App\Enum;
+namespace {% $ns %};
 
 use MyCLabs\Enum\Enum;
 use Windwalker\Utilities\Enum\EnumTranslatableInterface;
