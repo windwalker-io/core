@@ -23,6 +23,8 @@ class PackageRegistry
      */
     protected array $packages = [];
 
+    public bool $discovered = false;
+
     protected ?PackageInstaller $installer = null;
 
     /**
@@ -41,6 +43,10 @@ class PackageRegistry
 
     public function discover(): void
     {
+        if ($this->discovered) {
+            return;
+        }
+
         $mainComposer = json_decode(
             file_get_contents($this->app->path('@root/composer.json')),
             true,
@@ -75,6 +81,8 @@ class PackageRegistry
                 $this->packages[$packageClass] = $this->app->make($packageClass);
             }
         }
+
+        $this->discovered = true;
     }
 
     public function prepareInstall(): PackageInstaller
@@ -99,9 +107,12 @@ class PackageRegistry
 
     /**
      * @return AbstractPackage[]
+     * @throws \JsonException
      */
     public function getPackages(): array
     {
+        $this->discover();
+
         return $this->packages;
     }
 
