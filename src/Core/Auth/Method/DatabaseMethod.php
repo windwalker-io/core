@@ -70,11 +70,10 @@ class DatabaseMethod implements MethodInterface
     {
         $loginNames = (array) $this->getOption('login_name');
         $table      = $this->getOption('table');
-        $password   = $credential['password'] ?? '';
 
         $usernames = Arr::only($credential, $loginNames);
 
-        $password = $credential['password'];
+        $password = $credential['password'] ?? '';
 
         if ($usernames === [] || (string) $password === '') {
             return new AuthResult(AuthResult::EMPTY_CREDENTIAL, $credential);

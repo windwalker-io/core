@@ -22,6 +22,11 @@ trait TranslatorTrait
     #[Inject]
     protected LangService $translator;
 
+    public function useLangNamespace(string $ns): LangService
+    {
+        return $this->translator = $this->translator->extract($ns);
+    }
+
     public function trans(string $id, ...$args): string
     {
         return $this->translator->trans($id, ...$args);

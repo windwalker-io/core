@@ -134,7 +134,7 @@ class HtmlFrame
      *
      * @return  string
      */
-    public function getFavicon(): string
+    public function getFavicon(): ?string
     {
         return $this->favicon;
     }
@@ -146,7 +146,7 @@ class HtmlFrame
      *
      * @return  static  Return self to support chaining.
      */
-    public function setFavicon(string $favicon): static
+    public function setFavicon(?string $favicon): static
     {
         $this->favicon = $favicon;
 

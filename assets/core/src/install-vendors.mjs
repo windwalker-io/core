@@ -7,6 +7,7 @@
 
 import { src, symlink, copy } from '@windwalker-io/fusion';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
+import { loadJson } from './utils.mjs';
 import path from 'path';
 import fs from 'fs';
 
@@ -55,14 +56,6 @@ function findVendors() {
     .flat();
 
   return [ ...new Set(vendors) ];
-}
-
-function loadJson(file) {
-  if (!fs.existsSync(file)) {
-    return null;
-  }
-
-  return JSON.parse(fs.readFileSync(file));
 }
 
 function deleteLinks(dir) {

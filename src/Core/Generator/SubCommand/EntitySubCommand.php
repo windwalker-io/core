@@ -24,6 +24,10 @@ use Windwalker\Utilities\Str;
 )]
 class EntitySubCommand extends AbstractGeneratorSubCommand
 {
+    protected string $defaultNamespace = 'App\\Entity';
+
+    protected string $defaultDir = 'src/Entity';
+
     /**
      * Executes the current command.
      *
@@ -45,7 +49,7 @@ class EntitySubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
             ->replaceTo(
-                $this->app->path('src/Entity'),
+                $this->getDestPath($io),
                 [
                     'name' => $name,
                     'ns' => $this->getNamesapce($io),

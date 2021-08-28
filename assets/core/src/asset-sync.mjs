@@ -8,7 +8,9 @@
 import { dest as toDest, src } from '@windwalker-io/fusion';
 import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
+import { loadJson } from './utils.mjs';
 import rename from 'gulp-rename';
+import path from 'path';
 
 export function jsSync(source = 'src/Module', dest) {
   // const root = source + '/**/assets/';
@@ -27,10 +29,13 @@ export function jsSync(source = 'src/Module', dest) {
   //   }
   // });
 
-  source += '/**/assets/*.{js,mjs}';
+  const sourceList = [];
 
-  let stream = prepareStream(src(source));
-  //
+  sourceList.push(...findModules('**/assets/*.{js,mjs}'));
+  sourceList.push(source + '**/assets/*.{js,mjs}');
+
+  let stream = prepareStream(src(sourceList));
+
   stream = stream.pipe(rename((path) => {
     path.dirname = path.dirname.replace(/assets$/, '').toLowerCase();
   }));
@@ -56,4 +61,24 @@ export function jsSync(source = 'src/Module', dest) {
       resolve(data);
     });
   });
+}
+
+export function findModules(suffix = '') {
+  const pkg = path.resolve(process.cwd(), 'composer.json');
+
+  const pkgJson = loadJson(pkg);
+
+  const vendors = Object.keys(pkgJson['require'] || {})
+    .concat(Object.keys(pkgJson['require-dev'] || {}))
+    .map(id => `vendor/${id}/composer.json`)
+    .map((file) => loadJson(file))
+    .filter(pkgJson => pkgJson?.extra?.windwalker != null)
+    .map(pkgJson => {
+      return pkgJson?.extra?.windwalker?.modules?.map((module) => {
+        return `vendor/${pkgJson.name}/${module}/${suffix}`;
+      }) || [];
+    })
+    .flat();
+
+  return [ ...new Set(vendors) ];
 }

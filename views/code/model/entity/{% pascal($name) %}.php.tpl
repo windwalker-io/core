@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace {% $ns %};
 
 use Windwalker\ORM\Attributes\AutoIncrement;
 use Windwalker\ORM\Attributes\Column;

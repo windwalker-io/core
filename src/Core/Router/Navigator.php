@@ -171,6 +171,19 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->app->redirect($uri, $code, (bool) ($options & static::REDIRECT_INSTANT));
     }
 
+    public function redirectTo(
+        string $route,
+        array $query = [],
+        int $code = 303,
+        int $options = self::TYPE_PATH,
+    ): ResponseInterface {
+        return $this->app->redirect(
+            $this->to($route, $query),
+            $code,
+            (bool) ($options & static::REDIRECT_INSTANT)
+        );
+    }
+
     public function redirectSelf(int $code = 303, int $options = 0): ResponseInterface
     {
         return $this->redirect($this->self(), $code, $options);

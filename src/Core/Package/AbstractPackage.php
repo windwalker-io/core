@@ -32,13 +32,7 @@ abstract class AbstractPackage
     {
         $name = static::$name ?? static::composerJson()['name'] ?? null;
 
-        if ($name !== null) {
-            return $name;
-        }
-
-        $ns = (new \ReflectionClass(static::class))->getShortName();
-
-        return StrNormalize::toKebabCase(Str::removeRight(static::class, 'Package'));
+        return $name ?? StrNormalize::toKebabCase(Str::removeRight(static::class, 'Package'));
     }
 
     public static function version(): string
@@ -78,7 +72,7 @@ abstract class AbstractPackage
 
     protected static function composerJsonFile(): string
     {
-        return static::dir() . '/../composer.json';
+        return static::root() . '/composer.json';
     }
 
     /**
@@ -91,6 +85,22 @@ abstract class AbstractPackage
     public static function dir(): string
     {
         return dirname(static::fileName());
+    }
+
+    public static function root(): string
+    {
+        return dirname(static::dir());
+    }
+
+    public static function path(?string $suffix = null): string
+    {
+        $path = static::root();
+
+        if ((string) $suffix !== '') {
+            $path .= DIRECTORY_SEPARATOR . $suffix;
+        }
+
+        return $path;
     }
 
     /**

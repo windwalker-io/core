@@ -16,6 +16,8 @@ use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\Utilities\Str;
 
+use function Windwalker\DI\create;
+
 /**
  * Trait RouteConfigurationTrait
  *
@@ -260,8 +262,12 @@ trait RouteConfigurationTrait
      *
      * @since  3.5
      */
-    public function middleware(mixed $class): static
+    public function middleware(mixed $class, ...$args): static
     {
+        if (is_string($class)) {
+            $class = create($class, ...$args);
+        }
+
         $this->options['middlewares']   ??= [];
         $this->options['middlewares'][] = $class;
 

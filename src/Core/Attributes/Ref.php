@@ -21,7 +21,7 @@ use function Windwalker\ref;
 /**
  * The Ref class.
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Ref implements ContainerAttributeInterface
 {
     /**

@@ -24,6 +24,7 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The BuildEntityCommand class.
@@ -105,6 +106,7 @@ class BuildEntityCommand implements CommandInterface
 
         if (str_contains($ns, '*')) {
             $ns      = Str::removeRight($ns, '\\*');
+            $ns      = StrNormalize::toClassNamespace($ns);
             $classes = $this->classFinder->findClasses($ns);
             $this->handleClasses($classes);
             return 0;
