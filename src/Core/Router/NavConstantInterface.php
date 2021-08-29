@@ -33,4 +33,6 @@ interface NavConstantInterface
     public const REDIRECT_INSTANT = 1 << 7;
 
     public const WITHOUT_VARS = 1 << 8;
+
+    public const IGNORE_EVENTS = 1 << 9;
 }

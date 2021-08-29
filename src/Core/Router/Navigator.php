@@ -99,14 +99,16 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
         $navigator = $this;
 
-        $event = $this->emit(
-            BeforeRouteBuildEvent::class,
-            compact('navigator', 'query', 'route', 'options')
-        );
+        if (!($options & static::IGNORE_EVENTS)) {
+            $event = $this->emit(
+                BeforeRouteBuildEvent::class,
+                compact('navigator', 'query', 'route', 'options')
+            );
 
-        $route   = $event->getRoute();
-        $options = $event->getOptions();
-        $query   = $event->getQuery();
+            $route   = $event->getRoute();
+            $options = $event->getOptions();
+            $query   = $event->getQuery();
+        }
 
         $handler = function (array $query) use ($navigator, $options, $route): array {
             $id = $route . ':' . json_encode($query);
@@ -123,19 +125,24 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                     [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);
 
                     $navigator = $this;
-                    $event = $this->emit(
-                        AfterRouteBuildEvent::class,
-                        compact('navigator', 'query', 'route', 'options', 'url')
-                    );
+
+                    if (!($options & static::IGNORE_EVENTS)) {
+                        $event = $this->emit(
+                            AfterRouteBuildEvent::class,
+                            compact('navigator', 'query', 'route', 'options', 'url')
+                        );
+
+                        $query = $event->getQuery();
+                        $url = $event->getUrl();
+                    }
 
                     $systemUri = $this->app->getSystemUri();
-                    $url = $event->getUrl();
 
                     if ($systemUri->script && $systemUri->script !== 'index.php') {
                         $url = $systemUri->script . '/' . $url;
                     }
 
-                    return [$url, $event->getQuery()];
+                    return [$url, $query];
                 }
             );
         };
