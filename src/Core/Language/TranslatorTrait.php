@@ -41,4 +41,12 @@ trait TranslatorTrait
     {
         return $this->translator->has($id, $locale, $fallback);
     }
+
+    /**
+     * @return LangService
+     */
+    public function getTranslator(): LangService
+    {
+        return $this->translator;
+    }
 }

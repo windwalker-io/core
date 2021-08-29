@@ -888,7 +888,7 @@ class AssetService implements EventAwareInterface
      *
      * @since  3.5.22.6
      */
-    public function addUriBase(string $uri, $path = 'path'): string
+    public function addUriBase(string $uri, string $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
             $uri = $this->systemUri::normalize($this->$path . '/' . $uri);

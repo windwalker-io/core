@@ -274,6 +274,7 @@ class View implements EventAwareInterface
     {
         $vm = $this->getViewModel();
 
+        // Get global layout overrides
         $layouts = $this->app->config('di.layouts') ?? [];
         $layout = $layouts[$vm::class] ?? $this->getLayoutMap();
 
@@ -485,7 +486,11 @@ class View implements EventAwareInterface
         $ref = new \ReflectionClass($vm);
         $ns  = $ref->getNamespaceName();
 
-        return Str::removeLeft($ns, $root);
+        if (str_starts_with($ns, $root)) {
+            return Str::removeLeft($ns, $root);
+        }
+
+        return substr($ns, strpos($ns, 'Module') + 7);
     }
 
     public function header(string $name, string|array $value): static

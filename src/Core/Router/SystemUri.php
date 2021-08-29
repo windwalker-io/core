@@ -191,6 +191,91 @@ class SystemUri extends Uri implements \JsonSerializable
         return (new Uri($uri))->toString();
     }
 
+    /**
+     * addUriBase
+     *
+     * @param  string  $uri
+     * @param  string  $path
+     *
+     * @return string
+     *
+     * @since  3.5.22.6
+     */
+    public function addUriBase(string $uri, ?string $base = null): string
+    {
+        if (!static::isAbsoluteUrl($uri)) {
+            $base ??= $this->path;
+
+            $uri = $this::normalize($base . '/' . $uri);
+        }
+
+        return $uri;
+    }
+
+    /**
+     * removeBase
+     *
+     * @param  string  $assetUri
+     *
+     * @return  string
+     */
+    // public function addSysPath(string $assetUri): string
+    // {
+    //     if (static::isFullUrl($assetUri)) {
+    //         return $assetUri;
+    //     }
+    //
+    //     $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
+    //     $base     = rtrim($this->pathResolver->resolve('@public'), '/\\');
+    //
+    //     if (!$base) {
+    //         return '/';
+    //     }
+    //
+    //     $match = '';
+    //
+    //     // @see http://stackoverflow.com/a/6704596
+    //     for ($i = strlen($base) - 1; $i >= 0; $i -= 1) {
+    //         $chunk = substr($base, $i);
+    //         $len   = strlen($chunk);
+    //
+    //         if (str_starts_with($assetUri, $chunk) && $len > strlen($match)) {
+    //             $match = $chunk;
+    //         }
+    //     }
+    //
+    //     return $base . DIRECTORY_SEPARATOR . ltrim(substr($assetUri, strlen($match)), '/\\');
+    // }
+
+    /**
+     * isAbsoluteUrl
+     *
+     * @param  string  $uri
+     *
+     * @return  boolean
+     */
+    public static function isAbsoluteUrl(string $uri): bool
+    {
+        return stripos($uri, 'http') === 0 || str_starts_with($uri, '/');
+    }
+
+    public static function isFullUrl(string $uri): bool
+    {
+        return stripos($uri, 'http') === 0;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->all();
+    }
+
     public function __get(string $name)
     {
         switch ($name) {
@@ -257,17 +342,5 @@ class SystemUri extends Uri implements \JsonSerializable
         }
 
         throw new \BadMethodCallException('Method: ' . __CLASS__ . '::' . $name . '() not found.');
-    }
-
-    /**
-     * Specify data which should be serialized to JSON
-     * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     * @since 5.4
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->all();
     }
 }

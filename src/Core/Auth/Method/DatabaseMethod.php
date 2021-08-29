@@ -49,7 +49,7 @@ class DatabaseMethod implements MethodInterface
             [
                 'id_name' => 'id',
                 'login_name' => 'username',
-                'password_algo' => \PASSWORD_BCRYPT,
+                'password_algo' => \PASSWORD_DEFAULT,
             ]
         )
             ->setRequired(
