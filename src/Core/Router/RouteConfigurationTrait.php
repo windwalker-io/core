@@ -183,6 +183,24 @@ trait RouteConfigurationTrait
     }
 
     /**
+     * layoutPaths
+     *
+     * @param  array<string>  $paths
+     *
+     * @return  static
+     */
+    public function layoutPaths(string ...$paths): static
+    {
+        $this->options['layoutPaths'] ??= [];
+
+        foreach ($paths as $path) {
+            $this->options['layoutPaths'][] = $path;
+        }
+
+        return $this;
+    }
+
+    /**
      * matchHook
      *
      * @param  callable[]  $hooks

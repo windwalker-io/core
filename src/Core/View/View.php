@@ -27,24 +27,19 @@ use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\Event\AfterRenderEvent;
 use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\Event\PrepareDataEvent;
-use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filesystem\Path;
-use Windwalker\Http\Response\AbstractContentTypeResponse;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Renderer\CompositeRenderer;
-use Windwalker\Renderer\RendererInterface;
-use Windwalker\Stream\Stream;
+use Windwalker\Language\Language;
 use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
-use Windwalker\Language\Language;
 
 /**
  * The ViewModel class.
@@ -160,7 +155,7 @@ class View implements EventAwareInterface
                 'viewModel' => $vm,
                 'data' => $data,
                 'layout' => $layout,
-                'state' => $this->getState()
+                'state' => $this->getState(),
             ]
         );
 
@@ -181,7 +176,7 @@ class View implements EventAwareInterface
                 'data' => $data,
                 'layout' => $layout,
                 'state' => $this->getState(),
-                'response' => $vm->prepare($this->app, $this)
+                'response' => $vm->prepare($this->app, $this),
             ]
         );
 
@@ -196,7 +191,14 @@ class View implements EventAwareInterface
 
             $data['vm'] = $vm;
 
-            $this->preparePaths($this->getAppTemplatePath($vm), 'app');
+            $route = $this->app->getMatchedRoute();
+
+            if ($paths = $route?->getOption('layoutPaths')) {
+                foreach ((array) $paths as $path) {
+                    $this->addPath($path);
+                }
+            }
+
             $this->preparePaths($this->getTemplatePath($vm));
 
             if (!$this->layout) {
@@ -224,7 +226,7 @@ class View implements EventAwareInterface
                 'data' => $data,
                 'layout' => $layout,
                 'content' => $content,
-                'response' => $response
+                'response' => $response,
             ]
         );
 
@@ -319,8 +321,8 @@ class View implements EventAwareInterface
 
     protected function prepareHtmlFrame(ViewModelInterface $vm): void
     {
-        $asset  = $this->asset;
-        $name   = strtolower(ltrim($this->guessName($vm), '\\/'));
+        $asset = $this->asset;
+        $name = strtolower(ltrim($this->guessName($vm), '\\/'));
         $vmName = Path::clean($name, '/');
         $this->addBodyClass($vm::class);
 
@@ -497,7 +499,7 @@ class View implements EventAwareInterface
         $root = $this->app->config('asset.namespace_base');
 
         $ref = new \ReflectionClass($vm);
-        $ns  = $ref->getNamespaceName();
+        $ns = $ref->getNamespaceName();
 
         if (str_starts_with($ns, $root)) {
             return Str::removeLeft($ns, $root);
@@ -570,6 +572,7 @@ class View implements EventAwareInterface
     protected function getTemplatePath(object $vm): string
     {
         $ref = new \ReflectionClass($vm);
+
         return dirname($ref->getFileName()) . '/views';
     }
 }
