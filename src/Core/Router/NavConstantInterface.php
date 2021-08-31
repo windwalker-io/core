@@ -34,5 +34,7 @@ interface NavConstantInterface
 
     public const WITHOUT_VARS = 1 << 8;
 
-    public const IGNORE_EVENTS = 1 << 9;
+    public const WITHOUT_QUERY = 1 << 9;
+
+    public const IGNORE_EVENTS = 1 << 10;
 }

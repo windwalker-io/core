@@ -175,21 +175,29 @@ trait ApplicationTrait
                 }
             }
         } elseif (is_callable($listener)) {
-            // Events name => listener
+            // Events EventName => listener
             $dispatcher->on($name, $listener);
         } elseif (is_array($listener)) {
-            // EventAwareObject name => Array<EventName, Listener>
+            if (isset($listener[1]) && $listener[1] === '__invoke') {
+                // EventAwareObject name => Array<EventName, [object, __invoke]>
+                $listener[0] = $container->resolve($listener[0]);
+                $this->handleListener($container, $dispatcher, $name, $listener);
+            } else {
+                // EventAwareObject name => Array<EventName, Listeners>
+                $container->extend($name, function (EventAwareInterface $object) use ($name, $listener, $container) {
+                    foreach ($listener as $eventName => $eventListener) {
+                        $this->handleListener($container, $object->getEventDispatcher(), $eventName, $eventListener);
+                    }
+
+                    return $object;
+                });
+            }
+        } else {
+            // EventAwareObject name => Array<int, Subscriber>
             $container->extend($name, function (EventAwareInterface $object) use ($listener, $container) {
-                foreach ($listener as $eventName => $eventListener) {
-                    $this->handleListener($container, $object->getEventDispatcher(), $eventName, $eventListener);
-                }
+                $object->subscribe($container->resolve($listener));
                 return $object;
             });
-        } else {
-            // Simply Subscriber class name
-            $dispatcher->subscribe(
-                $container->resolve($listener)
-            );
         }
     }
 

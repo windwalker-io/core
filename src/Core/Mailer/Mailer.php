@@ -66,7 +66,7 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
     /**
      * @inheritDoc
      */
-    public function send(RawMessage $message, Envelope $envelope = null, int $flags = 0): SentMessage
+    public function send(MailMessage|RawMessage $message, Envelope $envelope = null, int $flags = 0): SentMessage
     {
         $envelope ??= $this->envelop;
 

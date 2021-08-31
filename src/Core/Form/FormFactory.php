@@ -40,6 +40,10 @@ class FormFactory
             ->setBuilder(fn(string $class, ...$args) => $this->app->make($class, $args));
 
         if ($definition !== null) {
+            if (is_string($definition)) {
+                $definition = $this->app->make($definition, $args);
+            }
+
             $form->defineFormFields($definition);
         }
 

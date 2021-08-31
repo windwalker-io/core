@@ -39,6 +39,10 @@ class MailerManager extends AbstractManager
 
     public function createMailer(array $options = []): MailerInterface
     {
+        if (!class_exists(Transport::class)) {
+            throw new \DomainException('Please install symfony/mailer ^5.0||6.0 first.');
+        }
+
         $options = Arr::mergeRecursive(
             [
                 'envelope' => [

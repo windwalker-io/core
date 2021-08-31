@@ -83,14 +83,21 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $vars = Arr::only($route?->getVars(), $keys);
         }
 
+        $query = ($options & static::WITHOUT_QUERY) ? [] : $this->app->getServerRequest()->getQueryParams();
+
         return $this->to(
             $to,
             array_merge(
                 $vars,
-                $this->app->getServerRequest()->getQueryParams()
+                $query
             ),
             $options
         );
+    }
+
+    public function selfNoQuery(int $options = self::TYPE_PATH): RouteUri
+    {
+        return $this->self($options | static::WITHOUT_QUERY);
     }
 
     public function to(string $route, array $query = [], int $options = self::TYPE_PATH): RouteUri
