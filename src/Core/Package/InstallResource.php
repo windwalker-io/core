@@ -32,6 +32,8 @@ class InstallResource
 
     public array $views = [];
 
+    public array $modules = [];
+
     /**
      * InstallResource constructor.
      *
@@ -58,7 +60,8 @@ class InstallResource
                 'seeders',
                 'languages',
                 'routes',
-                'views'
+                'views',
+                'modules',
             ]
         );
     }

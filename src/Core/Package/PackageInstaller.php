@@ -97,6 +97,18 @@ class PackageInstaller
         );
     }
 
+    public function installModules(string $module, string|array $tags = []): static
+    {
+
+
+        return $this->installResource(
+            'modules',
+            Filesystem::globAll($module),
+            $this->app->path('@views/packages/'),
+            $tags
+        );
+    }
+
     public function installSeeders(string $path, string|array $tags = []): static
     {
         return $this->installResource(
