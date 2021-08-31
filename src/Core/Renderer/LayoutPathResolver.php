@@ -121,7 +121,7 @@ class LayoutPathResolver
                 // }
             }
 
-            $layout = implode('.', $segments);
+            $layout = implode('/', $segments);
         }
 
         return $layout;

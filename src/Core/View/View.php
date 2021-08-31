@@ -196,7 +196,8 @@ class View implements EventAwareInterface
 
             $data['vm'] = $vm;
 
-            $this->preparePaths($vm);
+            $this->preparePaths($this->getAppTemplatePath($vm), 'app');
+            $this->preparePaths($this->getTemplatePath($vm));
 
             if (!$this->layout) {
                 throw new \LogicException('View must provide at least 1 layout name.');
@@ -436,19 +437,17 @@ class View implements EventAwareInterface
         return $this;
     }
 
-    public function addPath(string $path, int $priority = 100): static
+    public function addPath(string $path, int $priority = 100, string $ns = 'main'): static
     {
-        $this->rendererService->addPath($path, $priority);
+        $this->rendererService->addPath($path, $priority, $ns);
 
         return $this;
     }
 
-    protected function preparePaths(object $vm): void
+    protected function preparePaths(string $dir, string $ns = 'main'): void
     {
-        $dir = $this->getTemplatePath($vm);
-
         if (is_dir($dir)) {
-            $this->addPath($dir, PriorityQueue::LOW);
+            $this->addPath($dir, PriorityQueue::LOW, $ns);
         }
 
         if (class_exists(Language::class)) {
@@ -457,21 +456,35 @@ class View implements EventAwareInterface
             $langDir = $dir . '/' . $langService->getLocale();
 
             if (is_dir($dir)) {
-                $this->addPath($langDir, PriorityQueue::BELOW_NORMAL);
+                $this->addPath($langDir, PriorityQueue::BELOW_NORMAL, $ns);
             }
 
             $fallbackDir = $dir . '/' . $langService->getLocale();
 
             if (is_dir($dir)) {
-                $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL);
+                $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL, $ns);
             }
         }
     }
 
-    protected function getTemplatePath(object $vm): string
+    public function addViewPath(string|object $view, int $priority = 100, string $ns = 'main'): static
     {
-        $ref = new \ReflectionClass($vm);
-        return dirname($ref->getFileName()) . '/views';
+        if (is_object($view)) {
+            $view = $view::class;
+        }
+
+        $ref = new \ReflectionClass($view);
+
+        $this->addPath(dirname($ref->getFileName()) . '/views', $priority, $ns);
+
+        return $this;
+    }
+
+    public function addParentViewPath(int $priority = 100, string $ns = 'main'): static
+    {
+        $this->addViewPath(get_parent_class($this->getViewModel()), $priority, $ns);
+
+        return $this;
     }
 
     protected function getPageAttribute(): ?ViewModel
@@ -545,5 +558,18 @@ class View implements EventAwareInterface
         $handler($this->htmlFrame);
 
         return $this;
+    }
+
+    protected function getAppTemplatePath(ViewModelInterface $vm): string
+    {
+        $name = $this->guessName($vm);
+
+        return $this->app->path('@source/Module/' . $name . '/views');
+    }
+
+    protected function getTemplatePath(object $vm): string
+    {
+        $ref = new \ReflectionClass($vm);
+        return dirname($ref->getFileName()) . '/views';
     }
 }
