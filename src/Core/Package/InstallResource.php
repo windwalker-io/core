@@ -62,7 +62,7 @@ class InstallResource
             get_object_vars($this),
             [
                 'config',
-                'migration',
+                'migrations',
                 'seeders',
                 'languages',
                 'routes',
