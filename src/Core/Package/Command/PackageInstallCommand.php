@@ -135,13 +135,15 @@ class PackageInstallCommand implements CommandInterface
         foreach ($targets as $package => $tags) {
             $pkgInstaller = $installer->getChild($package);
 
+            $callbacks = $pkgInstaller->getAllCallbacks($tags);
+
             $io->writeln("Installing: <comment>$package</comment>");
 
             if ($tags === []) {
-                $this->install($pkgInstaller->installResources->dump());
+                $this->install($pkgInstaller->installResources, $callbacks);
             } else {
                 foreach ($tags as $tag) {
-                    $this->install($pkgInstaller->tags[$tag]->dump());
+                    $this->install($pkgInstaller->tags[$tag], $callbacks);
                 }
             }
         }
@@ -149,13 +151,13 @@ class PackageInstallCommand implements CommandInterface
         return 0;
     }
 
-    protected function install(array $resources): void
+    protected function install(InstallResource $installResource, array $callbacks): void
     {
         $root = $this->app->path('@root');
         $dry = $this->io->getOption('dry-run') !== false;
         $force = $this->io->getOption('force') !== false;
 
-        foreach ($resources as $files) {
+        foreach ($installResource->dump() as $files) {
             if ($files !== []) {
                 foreach ($files as $src => $dest) {
                     $prefix = '[<info>Copied</info>]';
@@ -171,6 +173,10 @@ class PackageInstallCommand implements CommandInterface
                             }
 
                             Filesystem::copy($src, $dest, $force);
+
+                            foreach ($callbacks as $callback) {
+                                $callback($src, $dest, $force);
+                            }
                         }
                     }
 

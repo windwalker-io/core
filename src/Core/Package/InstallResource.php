@@ -34,6 +34,8 @@ class InstallResource
 
     public array $modules = [];
 
+    protected array $callbacks = [];
+
     /**
      * InstallResource constructor.
      *
@@ -46,7 +48,11 @@ class InstallResource
 
     public function add(string $name, array $data): static
     {
-        $this->$name = array_merge($this->$name, $data);
+        $this->$name = array_merge(
+            $this->$name,
+            $data
+        );
+
         return $this;
     }
 
@@ -64,5 +70,32 @@ class InstallResource
                 'modules',
             ]
         );
+    }
+
+    public function addCallback(callable $callback): static
+    {
+        $this->callbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCallbacks(): array
+    {
+        return $this->callbacks;
+    }
+
+    /**
+     * @param  array  $callbacks
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setCallbacks(array $callbacks): static
+    {
+        $this->callbacks = $callbacks;
+
+        return $this;
     }
 }
