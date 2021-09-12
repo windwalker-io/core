@@ -20,6 +20,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
+use Windwalker\Core\Manager\MailerManager;
 
 /**
  * The MailTestCommand class.
@@ -57,6 +58,12 @@ class MailTestCommand implements CommandInterface
             's',
             InputOption::VALUE_REQUIRED,
             'Mail subject title.'
+        );
+        $command->addOption(
+            'connection',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'Connection name.'
         );
     }
 
@@ -96,7 +103,7 @@ class MailTestCommand implements CommandInterface
             $date->format('Y-m-d H:i:s')
         );
 
-        $mailer = $this->app->make(Mailer::class);
+        $mailer = $this->app->make(MailerManager::class)->get($io->getOption('connection'));
         $mailer->createMessage($title)
             ->to(...$recipients)
             ->from($from)
