@@ -65,7 +65,7 @@ class MailTestCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        if (!class_exists(\Symfony\Component\Mailer\MailerInterface::class)) {
+        if (!interface_exists(\Symfony\Component\Mailer\MailerInterface::class)) {
             throw new \DomainException('Please install symfony/mailer ^5.0 first.');
         }
 
