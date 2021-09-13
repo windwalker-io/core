@@ -97,7 +97,7 @@ class LangService implements LanguageInterface
             $file = Str::removeRight($file, '.' . $format);
         }
 
-        if ($locale === $fallback || $this->isDebug()) {
+        if ($locale === $fallback || !$this->isDebug()) {
             $this->loadLanguageFile("$path/$fallback/$file.$format", $format, $fallback);
         }
 
