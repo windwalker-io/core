@@ -163,6 +163,10 @@ trait ApplicationTrait
         string|int $name,
         mixed $listener
     ): void {
+        if ($listener === null || $listener === false) {
+            return;
+        }
+
         if (is_numeric($name)) {
             if ($dispatcher instanceof EventListenableInterface) {
                 if ($listener instanceof \Closure) {
