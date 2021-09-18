@@ -14,6 +14,8 @@ namespace Windwalker\Core\Manager;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Attributes\Ref;
+use Windwalker\Core\Http\Browser;
+use Windwalker\DI\Container;
 use Windwalker\Http\Event\ResponseEvent;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Session;
@@ -51,6 +53,24 @@ class SessionManager extends AbstractManager
             );
 
             return $cookies;
+        };
+    }
+
+    public static function createSession(string $bridge, string $handler, string $cookies, array $options = []): \Closure
+    {
+        return function (Container $container) use ($cookies, $handler, $bridge, $options) {
+            $bridge = $container->resolve(
+                'session.factories.bridges.' . $bridge,
+                [
+                    'handler' => $container->resolve('session.factories.handlers.' . $handler)
+                ]
+            );
+            $cookies = $container->resolve('session.factories.cookies.' . $cookies);
+            $ini = $container->getParam('session.ini');
+
+            $options['ini'] = $ini;
+
+            return new Session($options, $bridge, $cookies);
         };
     }
 }

@@ -21,6 +21,7 @@ use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Provider\AppProvider;
+use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
@@ -133,6 +134,8 @@ class WebApplication implements WebApplicationInterface
 
         $this->bootProvidersBeforeRequest($container);
 
+        $this->registerListeners($container);
+
         // @event
         $event = $this->emit(
             BeforeRequestEvent::class,
@@ -147,8 +150,6 @@ class WebApplication implements WebApplicationInterface
                 fn(AppContext $context): AppContext => $context->setController($handler)
             );
         }
-
-        $this->registerListeners($container);
 
         $runner = $container->newInstance(MiddlewareRunner::class);
 
@@ -285,6 +286,8 @@ class WebApplication implements WebApplicationInterface
      */
     protected function bootProvidersBeforeRequest(Container $container): void
     {
+        $container->registerServiceProvider(new RequestProvider($container));
+
         foreach ($this->providers as $provider) {
             if ($provider instanceof RequestBootableProviderInterface) {
                 $provider->bootBeforeRequest($container);

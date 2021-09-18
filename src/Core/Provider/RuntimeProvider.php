@@ -29,7 +29,8 @@ class RuntimeProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
-        $config    = $container->getParameters();
+        $config = $container->getParameters();
+
         $container->share(Config::class, $config);
         $container->share(Container::class, $container);
 
