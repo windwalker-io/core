@@ -90,11 +90,19 @@ class SystemUri extends Uri implements \JsonSerializable
     }
 
     /**
+     * @param  string|null  $ignore
+     *
      * @return string|null
      */
-    public function getScriptName(): ?string
+    public function getScriptName(?string $ignore = null): ?string
     {
-        return $this->scriptName;
+        $script = $this->scriptName;
+
+        if ($script === $ignore) {
+            return '';
+        }
+
+        return $script;
     }
 
     /**
