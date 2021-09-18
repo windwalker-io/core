@@ -98,7 +98,7 @@ class AppState implements \JsonSerializable
     {
         $key    = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
-        $value  = $driver->get($key) ?? $this->state->get($key);
+        $value  = $this->state->get($key) ?? $driver->get($key);
 
         return $value;
     }
