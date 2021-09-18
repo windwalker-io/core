@@ -14,15 +14,14 @@ namespace Windwalker\Core\Migration;
 use Windwalker\Core\Seed\CountingOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Manager\TableManager;
-use Windwalker\ORM\ORM;
-use Windwalker\Utilities\Classes\MarcoableTrait;
+use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
 
 /**
  * The Migration class.
  */
 class Migration
 {
-    use MarcoableTrait;
+    use InstanceMarcoableTrait;
     use CountingOutputTrait;
 
     public const UP = 'up';
