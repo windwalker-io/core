@@ -40,7 +40,11 @@ class MailerManager extends AbstractManager
     public function createMailer(array $options = []): MailerInterface
     {
         if (!class_exists(Transport::class)) {
-            throw new \DomainException('Please install symfony/mailer ^5.0||6.0 first.');
+            throw new \DomainException('Please install symfony/mailer ^5.0||^6.0 first.');
+        }
+
+        if (!env('MAIL_ENABLED')) {
+            $options['dsn'] = 'null://null';
         }
 
         $options = Arr::mergeRecursive(
