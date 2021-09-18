@@ -230,6 +230,8 @@ class AppContext implements WebApplicationInterface
     }
 
     /**
+     * @param  string|null  $prefix
+     *
      * @return AppState
      */
     public function getState(?string $prefix = null): AppState
@@ -241,6 +243,11 @@ class AppContext implements WebApplicationInterface
         }
 
         return $state;
+    }
+
+    public function state(string $name, mixed $driver = null): mixed
+    {
+        return $this->getState()->get($name, $driver);
     }
 
     /**
