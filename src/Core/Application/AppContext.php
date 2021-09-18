@@ -374,9 +374,9 @@ class AppContext implements WebApplicationInterface
         return $this->getRootApp()->redirect($url, $code, $instant);
     }
 
-    public function addMessage(string|array $messages, string $type = 'info'): static
+    public function addMessage(string|array $messages, ?string $type = 'info'): static
     {
-        $this->service(Session::class)->addFlash($messages, $type);
+        $this->service(Session::class)->addFlash($messages, $type ?? 'info');
 
         return $this;
     }

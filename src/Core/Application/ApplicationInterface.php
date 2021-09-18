@@ -17,6 +17,7 @@ use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\DI\Container;
 use Windwalker\Event\DispatcherAwareInterface;
 use Windwalker\Event\EventAwareInterface;
+use Windwalker\Session\Session;
 
 /**
  * Interface ApplicationInterface
@@ -82,6 +83,8 @@ interface ApplicationInterface extends
      * @return  void
      */
     public function loadConfig(mixed $source, ?string $format = null, array $options = []): void;
+
+    public function addMessage(string|array $messages, ?string $type = 'info'): static;
 
     /**
      * Close this request.
