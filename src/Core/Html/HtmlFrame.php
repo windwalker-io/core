@@ -267,7 +267,7 @@ class HtmlFrame
      *
      * @return  string
      */
-    public function renderMetadata()
+    public function renderMetadata(): string
     {
         $html = [];
 
@@ -370,6 +370,25 @@ class HtmlFrame
     public function setMetadata(Metadata $metadata): static
     {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    public function setDescription(string $text): static
+    {
+        $this->addMetadata('description', $text, true);
+        $this->addMetadata('og:description', $text, true);
+
+        return $this;
+    }
+
+    public function setCoverImages(string ...$images): static
+    {
+        $this->getMetadata()->removeOpenGraph('og:image');
+
+        foreach ($images as $image) {
+            $this->addOpenGraph('og:image', $image, true);
+        }
 
         return $this;
     }
