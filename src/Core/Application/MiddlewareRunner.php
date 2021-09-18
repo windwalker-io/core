@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Relay\Relay;
 use Windwalker\DI\Container;
+use Windwalker\Utilities\Wrapper\RawWrapper;
 
 /**
  * The MiddlewareRunner class.
@@ -66,6 +67,10 @@ class MiddlewareRunner
     {
         if ($middleware === false || $middleware === null) {
             return null;
+        }
+
+        if ($middleware instanceof RawWrapper) {
+            $middleware = $middleware();
         }
 
         if (is_callable($middleware)) {
