@@ -67,10 +67,10 @@ class WindwalkerExtension implements
             'formToken' => [$this, 'formToken'],
 
             // Authorisation
-            // 'can' => [$this, 'can'],
-            // 'cannot' => [$this, 'cannot'],
-            // 'endcan' => [$this, 'endcan'],
-            // 'endcannot' => [$this, 'endcan'],
+            'can' => [$this, 'can'],
+            'cannot' => [$this, 'cannot'],
+            'endcan' => [$this, 'endcan'],
+            'endcannot' => [$this, 'endcan'],
 
             // Asset
             // 'css' => [$this, 'css'],
@@ -261,6 +261,21 @@ class WindwalkerExtension implements
     public function enddebug(string $expression): string
     {
         return "<?php endif; ?>";
+    }
+
+    public function can(string $expression): string
+    {
+        return "<?php if (\$app->service(\Windwalker\Core\Auth\AuthService::class)->can{$expression}): ?>";
+    }
+
+    public function cannot(string $expression): string
+    {
+        return "<?php if (\$app->service(\Windwalker\Core\Auth\AuthService::class)->cannot{$expression}): ?>";
+    }
+
+    public function endcan(string $expression): string
+    {
+        return '<?php endif; ?>';
     }
 
     /**

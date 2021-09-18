@@ -23,6 +23,11 @@ use Windwalker\Authorization\AuthorizationInterface;
 class AuthService
 {
     /**
+     * @var callable
+     */
+    protected $userRetrieveHandler;
+
+    /**
      * AuthService constructor.
      *
      * @param  AuthenticationInterface  $authentication
@@ -46,9 +51,21 @@ class AuthService
         return $resultSet->getMatchedResult();
     }
 
-    public function authorise(string $policy, mixed $user, ...$args): bool
+    public function authorize(string $policy, mixed $user = null, ...$args): bool
     {
-        return $this->authorization->authorise($policy, $user, ...$args);
+        $user ??= $this->getUser();
+
+        return $this->authorization->authorize($policy, $user, ...$args);
+    }
+
+    public function can(string $policy, mixed $user = null, ...$args): bool
+    {
+        return $this->authorize($policy, $user, $args);
+    }
+
+    public function cannot(string $policy, mixed $user = null, ...$args): bool
+    {
+        return !$this->authorize($policy, $user, $args);
     }
 
     /**
@@ -87,6 +104,31 @@ class AuthService
     public function setAuthorization(AuthorizationInterface $authorization): static
     {
         $this->authorization = $authorization;
+
+        return $this;
+    }
+
+    public function getUser(): mixed
+    {
+        return $this->getUserRetrieveHandler()($this);
+    }
+
+    /**
+     * @return callable
+     */
+    public function getUserRetrieveHandler(): callable
+    {
+        return $this->userRetrieveHandler ??= static fn () => null;
+    }
+
+    /**
+     * @param  callable  $userRetrieveHandler
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setUserRetrieveHandler(callable $userRetrieveHandler): static
+    {
+        $this->userRetrieveHandler = $userRetrieveHandler;
 
         return $this;
     }
