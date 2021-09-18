@@ -17,7 +17,7 @@ use Windwalker\Core\Attributes\JsonApi;
 use Windwalker\Core\Attributes\Module;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Attributes\ViewModel;
-use Windwalker\DI\Attributes\AttributeType;
+use Windwalker\Attributes\AttributeType;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Attributes\Decorator;
 use Windwalker\DI\Attributes\Inject;
