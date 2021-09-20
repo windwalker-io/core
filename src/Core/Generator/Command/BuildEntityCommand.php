@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\Database\DatabaseAdapter;
@@ -37,8 +38,11 @@ class BuildEntityCommand implements CommandInterface
     /**
      * BuildEntityCommand constructor.
      */
-    public function __construct(#[Autowire] protected ClassFinder $classFinder, protected ?ORM $orm = null)
-    {
+    public function __construct(
+        #[Autowire] protected ClassFinder $classFinder,
+        protected ConsoleApplication $app,
+        protected ?ORM $orm = null,
+    ) {
     }
 
     /**
@@ -147,6 +151,7 @@ class BuildEntityCommand implements CommandInterface
             }
 
             $builder = new EntityMemberBuilder($meta = $this->orm->getEntityMetadata($class));
+            $builder->addEventDealer($this->app);
             $newCode = $builder->process(
                 compact('props', 'methods'),
                 $added

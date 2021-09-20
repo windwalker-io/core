@@ -115,9 +115,24 @@ namespace Windwalker {
          * @param  mixed|string               $date
          * @param  string|\DateTimeZone|null  $tz
          *
+         * @return Chronos
+         */
+        function chronos(mixed $date = 'now', string|\DateTimeZone $tz = null): Chronos
+        {
+            return Chronos::wrap($date, $tz);
+        }
+    }
+
+    if (!function_exists('\Windwalker\chronosOrNull')) {
+        /**
+         * chronos
+         *
+         * @param  mixed|string               $date
+         * @param  string|\DateTimeZone|null  $tz
+         *
          * @return Chronos|null
          */
-        function chronos(mixed $date = 'now', string|\DateTimeZone $tz = null): ?Chronos
+        function chronosOrNull(mixed $date = 'now', string|\DateTimeZone $tz = null): ?Chronos
         {
             return Chronos::wrapOrNull($date, $tz);
         }

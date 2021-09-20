@@ -102,6 +102,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $this->registerCommands($commands);
 
+        $this->registerListeners($container);
+
         $this->registerEvents();
 
         $this->on(ConsoleTerminateEvent::class, fn ($event) => $this->terminating($container));

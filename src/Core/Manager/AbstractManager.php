@@ -53,6 +53,21 @@ abstract class AbstractManager implements EventAwareInterface
         return $this->config->getDeep('default');
     }
 
+    public function has(?string $name = null): bool
+    {
+        $name ??= $this->getDefaultName();
+
+        if ($name === null) {
+            throw new \InvalidArgumentException('Empty definition name.');
+        }
+
+        $define = $this->config->getDeep($this->getFactoryPath($name));
+
+        $define ??= $this->getDefaultFactory($name);
+
+        return $define !== null;
+    }
+
     /**
      * create
      *

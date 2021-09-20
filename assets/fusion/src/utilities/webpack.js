@@ -8,13 +8,15 @@
 import { babelBasicOptions } from './babel.js';
 
 export async function webpackBasicConfig() {
+  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-module-eval-source-map');
+
   return {
     mode: process.env.NODE_ENV || 'development',
     output: {
       filename: '[name].js',
       sourceMapFilename: '[name].js.map'
     },
-    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map',
+    devtool,
     stats: {
       all: false,
       errors: true,
@@ -56,6 +58,7 @@ export async function webpackBasicConfig() {
 
 export async function webpackVue3Config() {
   const VueLoaderPlugin = await getVueLoader(3);
+  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map');
 
   return {
     mode: process.env.NODE_ENV || 'development',
@@ -69,7 +72,7 @@ export async function webpackVue3Config() {
       warnings: true,
       version: false,
     },
-    devtool: process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map',
+    devtool,
     // ensure we are using the version of Vue that supports templates
     resolve: {
       alias: {

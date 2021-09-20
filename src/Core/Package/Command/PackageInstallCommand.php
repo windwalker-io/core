@@ -83,6 +83,13 @@ class PackageInstallCommand implements CommandInterface
             'Force override files.',
             false
         );
+        $command->addOption(
+            'link',
+            'l',
+            InputOption::VALUE_OPTIONAL,
+            'Force override files.',
+            false
+        );
     }
 
     /**
@@ -157,6 +164,8 @@ class PackageInstallCommand implements CommandInterface
         $dry = $this->io->getOption('dry-run') !== false;
         $force = $this->io->getOption('force') !== false;
 
+
+
         foreach ($installResource->dump() as $files) {
             if ($files !== []) {
                 foreach ($files as $src => $dest) {
@@ -172,7 +181,17 @@ class PackageInstallCommand implements CommandInterface
                                 $prefix = '[<comment>Override</comment>]';
                             }
 
-                            Filesystem::copy($src, $dest, $force);
+                            if ($this->io->getOption('link') !== false) {
+                                if (is_file($dest) && $force) {
+                                    Filesystem::delete($dest);
+                                }
+
+                                Filesystem::mkdir(dirname($dest));
+
+                                Filesystem::symlink($src, $dest);
+                            } else {
+                                Filesystem::copy($src, $dest, $force);
+                            }
 
                             foreach ($callbacks as $callback) {
                                 $callback($src, $dest, $force);

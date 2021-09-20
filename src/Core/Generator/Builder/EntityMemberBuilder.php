@@ -12,10 +12,15 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\Builder;
 
 use PhpParser\Node;
+use Unicorn\Enum\BasicState;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
+use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
 use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column as DbColumn;
 use Windwalker\Database\Schema\Ddl\Constraint;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\ORM\Attributes\AutoIncrement;
 use Windwalker\ORM\Attributes\Cast;
 use Windwalker\ORM\Attributes\CastNullable;
@@ -27,13 +32,15 @@ use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\StrNormalize;
+use Windwalker\Utilities\Symbol;
 use Windwalker\Utilities\TypeCast;
 
 /**
  * The EntityMemberBuilder class.
  */
-class EntityMemberBuilder extends AbstractAstBuilder
+class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterface
 {
+    use EventAwareTrait;
     use InstanceCacheTrait;
 
     protected array $uses = [];
@@ -172,7 +179,11 @@ class EntityMemberBuilder extends AbstractAstBuilder
             $default = null;
 
             $this->addUse(Chronos::class);
-        } elseif ($this->isJsonType($dbColumn)) {
+        } elseif ($dbColumn->columnName === 'state' && $dbColumn->getDataType() === 'tinyint') {
+            $type = 'BasicState';
+            $default = Symbol::none();
+            $this->addUse(BasicState::class);
+        }  elseif ($this->isJsonType($dbColumn)) {
             $type = 'array';
             $default = [];
         } else {
@@ -266,7 +277,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
         // Getter
         if (!$ref->hasMethod($getter)) {
             $added[]   = $getter;
-            $methods[] = $factory->method($getter)
+            $method = $factory->method($getter)
                 ->makePublic()
                 ->addStmt(
                     new Node\Stmt\Return_(
@@ -278,15 +289,29 @@ class EntityMemberBuilder extends AbstractAstBuilder
                 )
                 ->setReturnType($type)
                 ->getNode();
+
+            $event = $this->emit(
+                BuildEntityMethodEvent::class,
+                [
+                    'accessorType' => 'getter',
+                    'methodName' => $getter,
+                    'method' => $method,
+                    'propName' => $propName,
+                    'type' => $type,
+                    'entityMemberBuilder' => $this
+                ]
+            );
+
+            $methods[] = $event->getMethod();
         }
 
         if (!$ref->hasMethod($setter)) {
             $added[] = $setter;
 
             if ($specialSetter && method_exists($this, $specialSetter)) {
-                $methods[] = $this->$specialSetter($setter, $propName, $type);
+                $method = $this->$specialSetter($setter, $propName, $type);
             } else {
-                $methods[] = $factory->method($setter)
+                $method = $factory->method($setter)
                     ->makePublic()
                     ->addParam(
                         $factory->param($propName)
@@ -305,9 +330,31 @@ class EntityMemberBuilder extends AbstractAstBuilder
                     ->setReturnType('static')
                     ->getNode();
             }
+
+            $event = $this->emit(
+                BuildEntityMethodEvent::class,
+                [
+                    'accessorType' => 'setter',
+                    'methodName' => $getter,
+                    'method' => $method,
+                    'propName' => $propName,
+                    'type' => $type,
+                    'entityMemberBuilder' => $this
+                ]
+            );
+
+            $methods[] = $event->getMethod();
         }
 
         return $methods;
+    }
+
+    /**
+     * @return EntityMetadata
+     */
+    public function getMetadata(): EntityMetadata
+    {
+        return $this->metadata;
     }
 
     protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
@@ -327,7 +374,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
                     ),
                     $factory->staticCall(
                         new Node\Name('Chronos'),
-                        'wrap',
+                        'wrapOrNull',
                         [
                             new Node\Expr\Variable($propName)
                         ]
@@ -350,7 +397,7 @@ class EntityMemberBuilder extends AbstractAstBuilder
         return null;
     }
 
-    protected function addUse(string $ns): void
+    public function addUse(string $ns): void
     {
         if (!in_array($ns, $this->uses, true)) {
             $this->uses[]      = $ns;
@@ -407,12 +454,16 @@ class EntityMemberBuilder extends AbstractAstBuilder
 
         [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
 
-        /** @var Node\Stmt\Property $prop */
-        $prop = $factory->property($propName)
+        $propBuilder = $factory->property($propName)
             ->makeProtected()
-            ->setType($type)
-            ->setDefault($default)
-            ->getNode();
+            ->setType($type);
+
+        if (!Symbol::none()->is($default)) {
+            $propBuilder->setDefault($default);
+        }
+
+        /** @var Node\Stmt\Property $prop */
+        $prop = $propBuilder->getNode();
 
         $this->addUse(Column::class);
 
@@ -445,6 +496,22 @@ class EntityMemberBuilder extends AbstractAstBuilder
             );
         }
 
+        if ($type === 'BasicState') {
+            $this->addUse(Cast::class);
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'Cast',
+                    new Node\Scalar\String_('int')
+                ),
+            );
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'Cast',
+                    new Node\Expr\ClassConstFetch(new Node\Name('BasicState'), 'class')
+                ),
+            );
+        }
+
         if ($this->isJsonType($dbColumn)) {
             $this->addUse(Cast::class);
             $this->addUse(JsonCast::class);
@@ -457,7 +524,17 @@ class EntityMemberBuilder extends AbstractAstBuilder
             );
         }
 
-        return $prop;
+        $event = $this->emit(
+            BuildEntityPropertyEvent::class,
+            [
+                'prop' => $prop,
+                'propName' => $propName,
+                'column' => $dbColumn,
+                'entityMemberBuilder' => $this
+            ]
+        );
+
+        return $event->getProp();
     }
 
     protected function getPks(): array

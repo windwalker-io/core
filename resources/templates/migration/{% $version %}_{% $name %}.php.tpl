@@ -23,7 +23,12 @@ use Windwalker\Database\Schema\Schema;
  */
 $mig->up(
     static function () use ($mig) {
-        //
+        $mig->createTable(
+            '{table}',
+            function (Schema $schema) {
+                //
+            }
+        );
     }
 );
 
@@ -32,6 +37,6 @@ $mig->up(
  */
 $mig->down(
     static function () use ($mig) {
-        //
+        // $mig->dropTables('{table}');
     }
 );

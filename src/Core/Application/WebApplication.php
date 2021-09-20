@@ -294,4 +294,9 @@ class WebApplication implements WebApplicationInterface
             }
         }
     }
+
+    public function addMessage(array|string $messages, ?string $type = 'info'): static
+    {
+        return $this;
+    }
 }
