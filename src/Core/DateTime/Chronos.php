@@ -141,7 +141,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * @throws \Exception
      * @since   2.1
      */
-    public static function create(string $date = 'now', string|\DateTimeZone $tz = null): static
+    public static function create(mixed $date = 'now', string|\DateTimeZone $tz = null): static
     {
         return new static($date, $tz);
     }
@@ -175,6 +175,25 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
         );
 
         return $chronos;
+    }
+
+    /**
+     * @see https://stackoverflow.com/a/22381301/8134785
+     *
+     * @param  \DateInterval  $diff
+     *
+     * @return  int
+     */
+    public static function intervalToSeconds(\DateInterval $diff): int
+    {
+        return (int) ($diff->format('%r') . (
+            ($diff->s) +
+            (60 * ($diff->i)) +
+            (60 * 60 * ($diff->h)) +
+            (24 * 60 * 60 * ($diff->d)) +
+            (30 * 24 * 60 * 60 * ($diff->m)) +
+            (365 * 24 * 60 * 60 * ($diff->y))
+        ));
     }
 
     /**
