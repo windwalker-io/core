@@ -43,4 +43,9 @@ class WebAppSimulator implements WebApplicationInterface
     {
         return new RedirectResponse($url, $code);
     }
+
+    public function addMessage(array|string $messages, ?string $type = 'info'): static
+    {
+        return $this;
+    }
 }

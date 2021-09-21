@@ -60,6 +60,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
     protected ?OutputInterface $output = null;
 
+    public ?WebAppSimulator $webSimulator = null;
+
     /**
      * ConsoleApplication constructor.
      *
@@ -322,13 +324,11 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
     public function prepareWebSimulator(string|UriInterface|null $uri = null, ?string $docroot = null): WebAppSimulator
     {
-        $app = new WebAppSimulator($container = $this->getContainer());
-
-        $uri ??= Uri::wrap($app->config('web_simulator.uri') ?: 'https://local.dev');
+        $uri ??= Uri::wrap($this->config('web_simulator.uri') ?: 'https://local.dev');
         $docroot = Path::normalize(
-            $docroot ?? $app->config('web_simulator.docroot') ?? Path::findRoot(__DIR__)
+            $docroot ?? $this->config('web_simulator.docroot') ?? Path::findRoot(__DIR__)
         );
-        $index = $app->path('@public/index.php');
+        $index = $this->path('@public/index.php');
 
         $script = Str::removeLeft($index, $docroot);
         $script = Path::clean($script, '/');
@@ -337,6 +337,10 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     }
 
     public function prepareWebSimulatorByRequest(?ServerRequestInterface $request = null): WebAppSimulator {
+        if ($this->webSimulator) {
+            return $this->webSimulator;
+        }
+
         $app = new WebAppSimulator($container = $this->getContainer());
 
         $container->share(WebApplication::class, $app);
@@ -345,7 +349,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $container->share(ServerRequest::class, $request);
 
-        return $app;
+        return $this->webSimulator = $app;
     }
 
     /**
