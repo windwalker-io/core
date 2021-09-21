@@ -13,6 +13,7 @@ namespace Windwalker\Core\Generator\Builder;
 
 use PhpParser\Node;
 use Unicorn\Enum\BasicState;
+use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
 use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
@@ -85,7 +86,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 if ($options['methods'] ?? true) {
                     $methods = $this->createAccessorsIfNotExists(
                         (string) $node->props[0]->name,
-                        $node->type,
+                        $node,
                         $added
                     );
 
@@ -129,7 +130,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     if (($options['methods'] ?? true) && isset($prop->props[0])) {
                         $methods = $this->createAccessorsIfNotExists(
                             (string) $prop->props[0]->name,
-                            $prop->type,
+                            $prop,
                             $added
                         );
 
@@ -236,12 +237,25 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected function createAccessorsIfNotExists(
         string $propName,
-        Node $type,
+        Node\Stmt\Property $prop,
         array &$added = null
     ): array {
         $added   = [];
         $factory = $this->createNodeFactory();
         $ref     = $this->metadata->getReflector();
+        $type    = $prop->type;
+        $tbManager = $this->getTableManager();
+
+        $ref = $this->metadata->getReflector();
+        $propRef = $ref->getProperty($propName);
+        $col = AttributesAccessor::getFirstAttributeInstance(
+            $propRef,
+            Column::class,
+            \ReflectionAttribute::IS_INSTANCEOF
+        );
+
+        $colName = $col?->getName();
+        $column  = $colName ? $tbManager->getColumn($colName) : null;
 
         $isBool   = false;
         $specialSetter = null;
@@ -297,6 +311,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     'methodName' => $getter,
                     'method' => $method,
                     'propName' => $propName,
+                    'column' => $column,
+                    'prop' => $prop,
                     'type' => $type,
                     'entityMemberBuilder' => $this
                 ]
@@ -338,6 +354,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     'methodName' => $getter,
                     'method' => $method,
                     'propName' => $propName,
+                    'column' => $column,
+                    'prop' => $prop,
                     'type' => $type,
                     'entityMemberBuilder' => $this
                 ]
@@ -488,6 +506,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         if ($type === '?Chronos') {
             $this->addUse(CastNullable::class);
+            $prop->setAttribute('fullType', Chronos::class);
             $prop->attrGroups[] = $this->attributeGroup(
                 $this->attribute(
                     'CastNullable',
@@ -498,6 +517,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         if ($type === 'BasicState') {
             $this->addUse(Cast::class);
+            $prop->setAttribute('fullType', BasicState::class);
             $prop->attrGroups[] = $this->attributeGroup(
                 $this->attribute(
                     'Cast',
@@ -556,5 +576,16 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 return array_keys($constraint->getColumns());
             }
         );
+    }
+
+    public function findFQCN(string $shortName): ? string
+    {
+        foreach ($this->uses as $use) {
+            if (str_ends_with(strtolower($use), strtolower($shortName))) {
+                return $use;
+            }
+        }
+
+        return null;
     }
 }

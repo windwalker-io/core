@@ -29,6 +29,10 @@ class BuildEntityMethodEvent extends AbstractEvent
 
     protected string $propName = '';
 
+    protected Node\Stmt\Property $prop;
+
+    protected ?Column $column;
+
     protected ClassMethod $method;
 
     protected Node $type;
@@ -163,5 +167,56 @@ class BuildEntityMethodEvent extends AbstractEvent
     public function isSetter(): bool
     {
         return $this->accessorType === 'setter';
+    }
+
+    /**
+     * @return Property
+     */
+    public function getProp(): Property
+    {
+        return $this->prop;
+    }
+
+    /**
+     * @param  Property  $prop
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setProp(Property $prop): static
+    {
+        $this->prop = $prop;
+
+        return $this;
+    }
+
+    /**
+     * @return ?Column
+     */
+    public function getColumn(): ?Column
+    {
+        return $this->column;
+    }
+
+    /**
+     * @param  ?Column  $column
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setColumn(?Column $column): static
+    {
+        $this->column = $column;
+
+        return $this;
+    }
+
+    public function getTypeName(): string
+    {
+        $type = $this->type;
+
+        if ($type instanceof Node\NullableType) {
+            $type = $type->type;
+        }
+
+        return (string) $type;
     }
 }

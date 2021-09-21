@@ -53,7 +53,7 @@ class AuthService
 
     public function authorize(string $policy, mixed $user = null, ...$args): bool
     {
-        $user ??= $this->getUser();
+        $user ??= $this->getUser($user);
 
         return $this->authorization->authorize($policy, $user, ...$args);
     }
@@ -108,9 +108,9 @@ class AuthService
         return $this;
     }
 
-    public function getUser(): mixed
+    public function getUser(mixed $conditions = null): mixed
     {
-        return $this->getUserRetrieveHandler()($this);
+        return $this->getUserRetrieveHandler()($conditions, $this);
     }
 
     /**
