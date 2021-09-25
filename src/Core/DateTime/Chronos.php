@@ -156,7 +156,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * @return static|bool
      * @throws \Exception
      */
-    public static function createFromFormat($format, $time, $timezone = null)
+    public static function createFromFormat($format, $time, $timezone = null): static|false
     {
         $timezone = static::wrapTimezoneObject($timezone);
 
