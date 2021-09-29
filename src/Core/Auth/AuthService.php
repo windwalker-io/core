@@ -34,15 +34,15 @@ class AuthService
      * @param  AuthorizationInterface   $authorization
      */
     public function __construct(
-        protected AuthenticationInterface $authentication,
-        protected AuthorizationInterface $authorization
+        protected ?AuthenticationInterface $authentication = null,
+        protected ?AuthorizationInterface $authorization = null
     ) {
         //
     }
 
     public function authenticate(array $credential, ResultSet &$resultSet = null): false|AuthResult
     {
-        $resultSet = $this->authentication->authenticate($credential);
+        $resultSet = $this->getAuthentication()->authenticate($credential);
 
         if (!$resultSet->isSuccess()) {
             return false;
@@ -55,7 +55,7 @@ class AuthService
     {
         $user ??= $this->getUser($user);
 
-        return $this->authorization->authorize($policy, $user, ...$args);
+        return $this->getAuthorization()->authorize($policy, $user, ...$args);
     }
 
     public function can(string $policy, mixed $user = null, ...$args): bool
@@ -73,6 +73,10 @@ class AuthService
      */
     public function getAuthentication(): AuthenticationInterface
     {
+        if (!interface_exists(AuthenticationInterface::class)) {
+            throw new \DomainException('Please install windwalker/authentication ^4.0 first.');
+        }
+
         return $this->authentication;
     }
 
@@ -81,6 +85,10 @@ class AuthService
      */
     public function getAuthorization(): AuthorizationInterface
     {
+        if (!interface_exists(AuthorizationInterface::class)) {
+            throw new \DomainException('Please install windwalker/authorization ^4.0 first.');
+        }
+
         return $this->authorization;
     }
 
