@@ -33,11 +33,6 @@ class DatabaseManager extends AbstractManager
         return 'connections.' . $name;
     }
 
-    public function getDefaultName(): ?string
-    {
-        return parent::getDefaultName();
-    }
-
     /**
      * create
      *

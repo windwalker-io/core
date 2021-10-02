@@ -197,7 +197,7 @@ class Route implements \JsonSerializable
             }
         }
 
-        $options = $this->getOptions();
+        $options = $new->getOptions();
 
         if (!isset($options['pattern'])) {
             throw new \LogicException('Route: ' . $name . ' has no pattern.');

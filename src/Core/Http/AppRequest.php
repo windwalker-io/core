@@ -357,7 +357,7 @@ class AppRequest implements \JsonSerializable
      * which is a value of any type other than a resource.
      * @since 5.4
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $req = FormatRegistry::makeDumpable($this->getRequest());
         $req['stream'] = null;
