@@ -13,6 +13,19 @@ namespace Windwalker\Core\DateTime;
 
 /**
  * The Chronos class.
+ *
+ * @property-read string $daysinmonth
+ * @property-read string $dayofweek
+ * @property-read string $dayofyear
+ * @property-read bool $isleapyear
+ * @property-read string $day
+ * @property-read string $hour
+ * @property-read string $minute
+ * @property-read string $second
+ * @property-read string $month
+ * @property-read string $ordinal
+ * @property-read string $week
+ * @property-read string $year
  */
 class Chronos extends \DateTimeImmutable implements \JsonSerializable
 {
@@ -178,14 +191,46 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     }
 
     /**
+     * createInterval
+     *
+     * @param  string|int  $duration Can be these formats:
+     *                               - 30 (int) Will be 30 seconds.
+     *                               - `PT30S` DateInterval format, see: https://www.php.net/manual/en/dateinterval.construct.php
+     *                               - `30seconds` DateTime format.
+     *
+     * @return  \DateInterval
+     *
+     * @throws \Exception
+     */
+    public static function createInterval(string|int $duration): \DateInterval
+    {
+        if (is_int($duration)) {
+            $duration = 'PT' . $duration . 'S';
+        }
+
+        if (str_starts_with($duration, 'P')) {
+            return new \DateInterval($duration);
+        }
+
+        $now = new static();
+
+        return $now->diff(new static($duration));
+    }
+
+    /**
      * @see https://stackoverflow.com/a/22381301/8134785
      *
-     * @param  \DateInterval  $diff
+     * @param  \DateInterval|string  $diff
      *
      * @return  int
+     * @throws \Exception
      */
-    public static function intervalToSeconds(\DateInterval $diff): int
+    public static function intervalToSeconds(\DateInterval|string $diff): int
     {
+        if (!$diff instanceof \DateInterval) {
+            $diff = new \DateInterval($diff);
+        }
+
         return (int) ($diff->format('%r') . (
             ($diff->s) +
             (60 * ($diff->i)) +
@@ -214,6 +259,48 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
         $this->setTimezone($bakTz);
 
         return $formatted;
+    }
+
+    public function isFuture(): bool
+    {
+        return $this->getTimestamp() > time();
+    }
+
+    public function isPast(): bool
+    {
+        return $this->getTimestamp() < time();
+    }
+
+    /**
+     * Check date is now.
+     *
+     * You can provide a range as first argument. If you set as 30s, then the range is before 30s and after 30s,
+     * total is 60s. The range string format please see {@see createInterval()}
+     *
+     * @param  string|int|\DateInterval|null  $range The current time range, if is NULL, will compare to second.
+     *
+     * @return  bool
+     *
+     * @throws \Exception
+     */
+    public function isCurrent(string|int|\DateInterval|null $range = null): bool
+    {
+        if (is_string($range) || is_int($range)) {
+            $range = static::createInterval($range);
+        }
+
+        if ($range === null) {
+            return $this->getTimestamp() === time();
+        }
+
+        $now = time();
+        $sec = static::intervalToSeconds($range);
+
+        $start = $now - $sec;
+        $end = $now + $sec;
+        $self = $this->getTimestamp();
+
+        return $self >= $start && $self <= $end;
     }
 
     /**
