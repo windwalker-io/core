@@ -104,7 +104,17 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             // After class traversed, add properties and methods
             if ($node instanceof Node\Stmt\Class_) {
-                $last = $this->getLastOf($node->stmts, Node\Stmt\Property::class) ?? 0;
+                $last = $this->getLastOf($node->stmts, Node\Stmt\Property::class) ?? null;
+
+                if ($last === null) {
+                    $last = $this->getLastOf($node->stmts, Node\Stmt\TraitUse::class) ?? null;
+
+                    if ($last !== null) {
+                        $last++;
+                    }
+                }
+
+                $last ??= 0;
 
                 // Add methods for existing properties
                 array_push(

@@ -28,32 +28,9 @@ class {% pascal($name) %} implements EntityInterface
 {
     use EntityTrait;
 
-    #[Column('id'), PK, AutoIncrement]
-    protected ?int $id = null;
-
     #[EntitySetup]
     public static function setup(EntityMetadata $metadata): void
     {
         //
-    }
-
-    /**
-    * @return int|null
-    */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
-    * @param  int|null  $id
-    *
-    * @return  static  Return self to support chaining.
-    */
-    public function setId(?int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 }
