@@ -13,6 +13,7 @@ namespace Windwalker\Core\Asset;
 
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
 
 /**
  * The AbstractScript class.
@@ -25,6 +26,8 @@ use Windwalker\Utilities\Arr;
  */
 abstract class AbstractScript
 {
+    use InstanceMarcoableTrait;
+
     #[Inject]
     protected AssetService $asset;
 
