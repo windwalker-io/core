@@ -575,4 +575,14 @@ class View implements EventAwareInterface
 
         return dirname($ref->getFileName()) . '/views';
     }
+
+    public function getPaths(): PriorityQueue
+    {
+        return $this->rendererService->getPaths();
+    }
+
+    public function dumpPaths(): array
+    {
+        return $this->rendererService->dumpPaths();
+    }
 }
