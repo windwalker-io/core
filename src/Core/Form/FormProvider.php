@@ -13,6 +13,7 @@ namespace Windwalker\Core\Form;
 
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Form\Renderer\FormRendererInterface;
 
 /**
  * The FormProvider class.
@@ -29,6 +30,7 @@ class FormProvider implements ServiceProviderInterface
     public function register(Container $container): void
     {
         $container->prepareSharedObject(FormFactory::class);
-        $container->prepareSharedObject(FormRenderer::class);
+        $container->prepareSharedObject(FormRenderer::class)
+            ->alias(FormRendererInterface::class, FormRenderer::class);
     }
 }

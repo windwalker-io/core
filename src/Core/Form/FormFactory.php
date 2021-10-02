@@ -15,6 +15,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
+use Windwalker\Form\Renderer\FormRendererInterface;
 
 /**
  * The FormFactory class.
@@ -27,7 +28,7 @@ class FormFactory
      * @param  ApplicationInterface  $app
      * @param  FormRenderer|null     $renderer
      */
-    public function __construct(protected ApplicationInterface $app, protected ?FormRenderer $renderer = null)
+    public function __construct(protected ApplicationInterface $app, protected ?FormRendererInterface $renderer = null)
     {
         //
     }
