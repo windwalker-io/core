@@ -374,10 +374,19 @@ class HtmlFrame
         return $this;
     }
 
-    public function setDescription(string $text): static
+    public function setDescription(?string $text): static
     {
         $this->addMetadata('description', $text, true);
         $this->addMetadata('og:description', $text, true);
+
+        return $this;
+    }
+
+    public function setDescriptionIfNotEmpty(?string $text): static
+    {
+        if ((string) $text !== '') {
+            $this->setDescription($text);
+        }
 
         return $this;
     }
@@ -387,7 +396,18 @@ class HtmlFrame
         $this->getMetadata()->removeOpenGraph('og:image');
 
         foreach ($images as $image) {
-            $this->addOpenGraph('og:image', $image, true);
+            $this->addOpenGraph('og:image', $image);
+        }
+
+        return $this;
+    }
+
+    public function setCoverImagesIfNotEmpty(string ...$images): static
+    {
+        $images = array_filter($images);
+
+        if ($images !== []) {
+            $this->setCoverImages(...$images);
         }
 
         return $this;
