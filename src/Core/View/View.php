@@ -191,15 +191,7 @@ class View implements EventAwareInterface
 
             $data['vm'] = $vm;
 
-            $route = $this->app->getMatchedRoute();
-
-            if ($paths = $route?->getOption('layoutPaths')) {
-                foreach ((array) $paths as $path) {
-                    $this->addPath($path);
-                }
-            }
-
-            $this->preparePaths($this->getTemplatePath($vm));
+            $this->preparePaths($vm);
 
             if (!$this->layout) {
                 throw new \LogicException('View must provide at least 1 layout name.');
@@ -446,8 +438,23 @@ class View implements EventAwareInterface
         return $this;
     }
 
-    protected function preparePaths(string $dir, string $ns = 'main'): void
+    protected function preparePaths(ViewModelInterface $vm, string $ns = 'main'): void
     {
+        // Prepare App view override
+        $this->addPath($this->getAppTemplatePath($vm));
+
+        // Prepare route override paths
+        $route = $this->app->getMatchedRoute();
+
+        if ($paths = $route?->getOption('layoutPaths')) {
+            foreach ((array) $paths as $path) {
+                $this->addPath($path);
+            }
+        }
+
+        // Prepare Self view paths
+        $dir = $this->getTemplatePath($vm);
+
         if (is_dir($dir)) {
             $this->addPath($dir, PriorityQueue::LOW, $ns);
         }
@@ -566,7 +573,7 @@ class View implements EventAwareInterface
     {
         $name = $this->guessName($vm);
 
-        return $this->app->path('@source/Module/' . $name . '/views');
+        return $this->app->path('@views/' . strtolower($name));
     }
 
     protected function getTemplatePath(object $vm): string
