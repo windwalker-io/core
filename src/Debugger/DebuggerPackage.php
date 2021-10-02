@@ -153,7 +153,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
                                     && $query->getType() === Query::TYPE_SELECT
                                 ) {
                                     $query = clone $query;
-                                    $query->sql('EXPLAIN ' . $query);
+                                    $query->prefix('EXPLAIN');
                                     $data['explain'] = $db->prepare($query)->all();
                                 }
 

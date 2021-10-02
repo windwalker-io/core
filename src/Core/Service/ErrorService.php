@@ -116,7 +116,7 @@ class ErrorService
 
         $content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
-        throw new \ErrorException($content, 500, $code, $file, $line, new \Error());
+        throw new \ErrorException($content, 500, $code, $file, $line);
     }
 
     /**
