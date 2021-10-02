@@ -290,6 +290,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      */
     public function findRoute(string $route): ?Route
     {
+        // Find by view class
         if (str_contains($route, '\\')) {
             foreach ($this->router->getRoutes() as $routeObject) {
                 $view = $routeObject->getOption('vars')['view'] ?? null;

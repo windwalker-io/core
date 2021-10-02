@@ -145,7 +145,19 @@ class Router implements EventAwareInterface
 
     public function getRoute(string $name): ?Route
     {
-        return $this->routes[$name] ?? null;
+        $found = $this->routes[$name] ?? null;
+
+        if (!$found) {
+            foreach ($this->routes as $route) {
+                $aliases = $route->getOption('aliases') ?? [];
+
+                if (in_array($name, $aliases, true)) {
+                    return $route;
+                }
+            }
+        }
+
+        return $found;
     }
 
     /**

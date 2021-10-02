@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Psr\Http\Message\UriInterface;
+use Windwalker\Uri\Uri;
+
 /**
  * The Route class.
  */
@@ -70,6 +73,36 @@ class Route implements \JsonSerializable
     public function controller(string|array|callable $handler, ?string $task = null): static
     {
         return $this->handler($handler, $task);
+    }
+
+    public function redirect(mixed $to, array $query = [], int $options = NavConstantInterface::TYPE_PATH): static
+    {
+        return $this->controller(
+            function (Navigator $nav) use ($to, $query, $options) {
+                if ($to instanceof UriInterface) {
+                    return $to;
+                }
+
+                if (is_string($to) && SystemUri::isAbsoluteUrl($to)) {
+                    return new Uri($to);
+                }
+
+                return $nav->to($to, $query, $options);
+            }
+        );
+    }
+
+    public function alias(string|array|null $route): static
+    {
+        if ($route === null) {
+            $route = [];
+        } else {
+            $route = array_unique(array_merge((array) $route, $this->options['aliases'] ?? []));
+        }
+
+        $this->options['aliases'] = $route;
+
+        return $this;
     }
 
     public function view(string $view): static
