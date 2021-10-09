@@ -47,7 +47,8 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
             'renderer.paths',
             [
                 Path::normalize(__DIR__ . '/../../views/debugger'),
-            ]
+            ],
+            Container::MERGE_OVERRIDE
         );
 
         $container->share(

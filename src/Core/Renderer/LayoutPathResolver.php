@@ -197,4 +197,24 @@ class LayoutPathResolver
 
         return $this;
     }
+
+    /**
+     * @return PathsBag[]
+     */
+    public function getPathsBags(): array
+    {
+        return $this->pathsBags;
+    }
+
+    /**
+     * @param  PathsBag[]  $pathsBags
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setPathsBags(array $pathsBags): static
+    {
+        $this->pathsBags = $pathsBags;
+
+        return $this;
+    }
 }

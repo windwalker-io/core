@@ -159,13 +159,24 @@ class RendererService
         return $this;
     }
 
-    public function getPaths(): PriorityQueue
+    public function getPaths(string $ns = 'main'): PriorityQueue
     {
-        return $this->resolver->getPathsBag('main')->getClonedPaths();
+        return $this->resolver->getPathsBag($ns)->getClonedPaths();
     }
 
-    public function dumpPaths(): array
+    public function dumpPaths(string $ns = 'main'): array
     {
-        return iterator_to_array(clone $this->getPaths());
+        return iterator_to_array(clone $this->getPaths($ns));
+    }
+
+    public function dumpAllPaths(): array
+    {
+        $paths = [];
+
+        foreach ($this->resolver->getPathsBags() as $name => $bag) {
+            $paths[$name] = iterator_to_array(clone $bag->getPaths());
+        }
+
+        return $paths;
     }
 }

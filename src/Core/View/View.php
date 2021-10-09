@@ -192,7 +192,7 @@ class View implements EventAwareInterface
             $data['vm'] = $vm;
 
             $this->preparePaths($vm);
-
+show($this->rendererService->dumpAllPaths());
             if (!$this->layout) {
                 throw new \LogicException('View must provide at least 1 layout name.');
             }
@@ -455,10 +455,6 @@ class View implements EventAwareInterface
         // Prepare Self view paths
         $dir = $this->getTemplatePath($vm);
 
-        if (is_dir($dir)) {
-            $this->addPath($dir, PriorityQueue::LOW, $ns);
-        }
-
         if (class_exists(Language::class)) {
             $langService = $this->app->service(LangService::class);
 
@@ -470,9 +466,13 @@ class View implements EventAwareInterface
 
             $fallbackDir = $dir . '/' . $langService->getLocale();
 
-            if (is_dir($dir)) {
+            if ($langDir !== $fallbackDir && is_dir($dir)) {
                 $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL, $ns);
             }
+        }
+
+        if (is_dir($dir)) {
+            $this->addPath($dir, PriorityQueue::BELOW_NORMAL, $ns);
         }
     }
 

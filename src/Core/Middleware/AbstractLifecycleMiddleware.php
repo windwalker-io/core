@@ -58,6 +58,10 @@ abstract class AbstractLifecycleMiddleware implements MiddlewareInterface
     {
         $r = $this->preprocess($request);
 
+        if ($r instanceof ResponseInterface) {
+            return $r;
+        }
+
         $response = $handler->handle($r ?? $request);
 
         $r = $this->postProcess($response);
