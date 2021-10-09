@@ -185,20 +185,26 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $dt      = $this->getORM()->getDb()->getPlatform()->getDataType();
         $default = $dbColumn->getColumnDefault();
 
-        if ($dbColumn->getDataType() === 'datetime') {
+        $dataType = $dbColumn->getDataType();
+        $len = $dbColumn->getErratas()['custom_length'] ?? null;
+
+        if ($dataType === 'datetime') {
             $type    = '?Chronos';
             $default = null;
 
             $this->addUse(Chronos::class);
-        } elseif ($dbColumn->columnName === 'state' && $dbColumn->getDataType() === 'tinyint') {
+        } elseif ($dbColumn->columnName === 'state' && $dataType === 'tinyint') {
             $type = 'BasicState';
             $default = Symbol::none();
             $this->addUse(BasicState::class);
-        }  elseif ($this->isJsonType($dbColumn)) {
+        } elseif ($dataType === 'tinyint' && $len === '1') {
+            $type = 'bool';
+            $default = TypeCast::try($default, $type);
+        } elseif ($this->isJsonType($dbColumn)) {
             $type = 'array';
             $default = [];
         } else {
-            $type    = $dt::getPhpType($dbColumn->getDataType());
+            $type    = $dt::getPhpType($dataType);
             $default = TypeCast::try($default, $type);
 
             if ($dbColumn->isAutoIncrement() || $dbColumn->getIsNullable()) {
@@ -513,6 +519,18 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         $prop->attrGroups[] = new Node\AttributeGroup($attrs);
+
+        if ($type === 'bool') {
+            $this->addUse(Cast::class);
+            $prop->setAttribute('fullType', 'bool');
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'Cast',
+                    new Node\Scalar\String_('bool'),
+                    new Node\Scalar\String_('int'),
+                ),
+            );
+        }
 
         if ($type === '?Chronos') {
             $this->addUse(CastNullable::class);
