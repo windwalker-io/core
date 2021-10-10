@@ -140,9 +140,7 @@ trait ApplicationTrait
     {
         $listeners = $this->config('listeners') ?? [];
 
-        foreach ($listeners as $name => $listener) {
-            $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
-        }
+        $this->handleListeners($listeners, $container);
 
         foreach (iterator_to_array($this->config) as $service => $config) {
             if (!($config['enabled'] ?? true)) {
@@ -151,9 +149,7 @@ trait ApplicationTrait
 
             $listeners = $config['listeners'] ?? [];
 
-            foreach ($listeners as $name => $listener) {
-                $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
-            }
+            $this->handleListeners($listeners, $container);
         }
     }
 
@@ -216,5 +212,20 @@ trait ApplicationTrait
         }
 
         throw new \OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
+    }
+
+    /**
+     * handleListeners
+     *
+     * @param  mixed      $listeners
+     * @param  Container  $container
+     *
+     * @return  void
+     */
+    public function handleListeners(mixed $listeners, Container $container): void
+    {
+        foreach ($listeners as $name => $listener) {
+            $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
+        }
     }
 }

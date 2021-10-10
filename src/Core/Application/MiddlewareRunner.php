@@ -55,7 +55,7 @@ class MiddlewareRunner
     public function compileMiddlewares(iterable $middlewares, ?callable $last = null): \Generator
     {
         foreach ($middlewares as $i => $middleware) {
-            yield $this->container->resolve($middleware);
+            yield $this->resolveMiddleware($middleware);
         }
 
         if ($last) {
@@ -70,7 +70,11 @@ class MiddlewareRunner
         }
 
         if ($middleware instanceof RawWrapper) {
-            $middleware = $middleware();
+            return $middleware();
+        }
+
+        if (is_callable($middleware)) {
+            $middleware = $this->container->call($middleware);
         }
 
         if (is_callable($middleware)) {

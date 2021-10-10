@@ -182,6 +182,18 @@ class RouteCreator
             $route->middlewares($middlewares);
         }
 
+        // Subscribers
+        $subscribers = array_filter(
+            array_column($groups, 'subscribers'), 
+            'is_array'
+        );
+
+        if ($subscribers !== []) {
+            foreach ($subscribers as $subs) {
+                $route->subscribes($subs);
+            }
+        }
+
         $route->groups($this->groups);
 
         if ($handler) {

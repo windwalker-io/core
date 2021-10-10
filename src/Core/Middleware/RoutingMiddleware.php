@@ -100,6 +100,12 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
                 ->setMatchedRoute($matched)
         );
 
+        $subscribers = $matched->getSubscribers();
+
+        if ($subscribers !== []) {
+            $this->app->handleListeners($subscribers, $this->app->getContainer());
+        }
+
         $middlewares = $matched->getMiddlewares();
         $runner = $this->app->make(MiddlewareRunner::class);
 

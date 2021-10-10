@@ -298,6 +298,58 @@ trait RouteConfigurationTrait
     }
 
     /**
+     * Subscribe event listeners.
+     *
+     * Arguments can be:
+     * - (callable with #[ListenTo(EventName::class)])
+     * - (EventName::class, callable)
+     * - (EventAware::class, Subscriber::class)
+     * - (EventAware::class, EventName::class, callable)
+     *
+     * @param ...$args
+     *
+     * @return  $this
+     */
+    public function subscribe(...$args): static
+    {
+        $this->options['subscribers'] ??= [];
+
+        $count = count($args);
+
+        if ($count === 1) {
+            $this->options['subscribers'][] = $args[0];
+        } elseif ($count === 2) {
+            $this->options['subscribers'][$args[0]][] = $args[1];
+        } elseif ($count === 3) {
+            $this->options['subscribers'][$args[0]][$args[1]] = $args[2];
+        } else {
+            throw new \BadMethodCallException(
+                sprintf(
+                    '%s() should got 1 ~ 3 arguments, %s given.',
+                    __METHOD__,
+                    $count
+                )
+            );
+        }
+
+        return $this;
+    }
+
+    public function subscribes(array $subscribers): static
+    {
+        $this->options['subscribers'] ??= [];
+
+        $this->options['subscribers'] = Arr::mergeRecursive($this->options['subscribers'], $subscribers);
+
+        return $this;
+    }
+
+    public function getSubscribers(): array
+    {
+        return $this->options['subscribers'] ?? [];
+    }
+
+    /**
      * scheme
      *
      * @param  string  $value

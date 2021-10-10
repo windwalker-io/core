@@ -223,6 +223,7 @@ class Route implements \JsonSerializable
         $options['extra']['action']      = $options['actions'] ?? [];
         $options['extra']['hook']        = $options['hooks'] ?? [];
         $options['extra']['middlewares'] = $options['middlewares'] ?? [];
+        $options['extra']['subscribers'] = $options['subscribers'] ?? [];
         $options['extra']['groups'] = $groups;
 
         $new->setOptions($options);
