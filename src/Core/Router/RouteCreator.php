@@ -328,8 +328,8 @@ class RouteCreator
      */
     public function load(string|iterable|callable ...$paths): static
     {
-        if (is_callable($paths)) {
-            $paths($this);
+        if (is_callable($paths[0])) {
+            $paths[0]($this);
             return $this;
         }
 
