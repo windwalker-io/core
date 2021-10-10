@@ -42,7 +42,8 @@ return [
     'build:entity' => \Windwalker\Core\Generator\Command\BuildEntityCommand::class,
     'build:enum' => \Windwalker\Core\Generator\Command\BuildEnumCommand::class,
 
+    'lang:merge' => \Windwalker\Core\Command\LangMergeCommand::class,
+
     '_completion' => \Stecman\Component\Symfony\Console\BashCompletion\CompletionCommand::class,
     'auto-complete' => \Windwalker\Core\Command\CompletionCommand::class,
-
 ];
