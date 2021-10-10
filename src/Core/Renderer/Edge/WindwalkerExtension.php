@@ -134,7 +134,7 @@ class WindwalkerExtension implements
      */
     public function teleport(string $expression): string
     {
-        return "<?php \$asset->getTeleport()->start{$expression} ?>";
+        return "<?php \$asset->startTeleport{$expression} ?>";
     }
 
     /**
@@ -146,7 +146,7 @@ class WindwalkerExtension implements
      */
     public function endTeleport(string $expression): string
     {
-        return "<?php \$asset->getTeleport()->end() ?>";
+        return "<?php \$asset->endTeleport{$expression} ?>";
     }
 
     /**

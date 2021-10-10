@@ -132,9 +132,11 @@ class WebApplication implements WebApplicationInterface
 
         $request ??= $container->get(ServerRequestInterface::class);
 
-        $this->bootProvidersBeforeRequest($container);
-
         $this->registerListeners($container);
+
+        // Boot after listeners registered to make sure no services been created
+        // before Container::extend()
+        $this->bootProvidersBeforeRequest($container);
 
         // @event
         $event = $this->emit(

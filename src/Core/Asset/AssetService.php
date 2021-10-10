@@ -97,12 +97,12 @@ class AssetService implements EventAwareInterface
     protected string $root = '';
 
     /**
-     * @var Teleport|null
+     * @var Teleport[]
      */
-    protected ?Teleport $teleport = null;
+    protected array $teleports = [];
 
     /**
-     * @var ImportMap
+     * @var ImportMap|null
      */
     protected ?ImportMap $importMap = null;
 
@@ -1090,22 +1090,39 @@ class AssetService implements EventAwareInterface
         return $this->config->getDeep('app.debug');
     }
 
-    /**
-     * @return Teleport|null
-     */
-    public function getTeleport(): ?Teleport
+    public function startTeleport(string $name, array $data = [], string $profile = 'main'): static
     {
-        return $this->teleport ??= new Teleport(['debug' => $this->isDebug()]);
+        $this->getTeleport($profile)->start($name, $data);
+
+        return $this;
+    }
+
+    public function endTeleport(string $profile = 'main'): static
+    {
+        $this->getTeleport($profile)->end();
+
+        return $this;
     }
 
     /**
+     * @param  string  $name
+     *
+     * @return Teleport
+     */
+    public function getTeleport(string $name = 'main'): Teleport
+    {
+        return $this->teleports[$name] ??= new Teleport(['debug' => $this->isDebug()]);
+    }
+
+    /**
+     * @param  string    $name
      * @param  Teleport  $teleport
      *
      * @return  static  Return self to support chaining.
      */
-    public function setTeleport(Teleport $teleport): static
+    public function setTeleport(string $name, Teleport $teleport): static
     {
-        $this->teleport = $teleport;
+        $this->teleports[$name] = $teleport;
 
         return $this;
     }
@@ -1126,6 +1143,26 @@ class AssetService implements EventAwareInterface
     public function setImportMap(?ImportMap $importMap): static
     {
         $this->importMap = $importMap;
+
+        return $this;
+    }
+
+    /**
+     * @return Teleport[]
+     */
+    public function getTeleports(): array
+    {
+        return $this->teleports;
+    }
+
+    /**
+     * @param  Teleport[]  $teleports
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setTeleports(array $teleports): static
+    {
+        $this->teleports = $teleports;
 
         return $this;
     }
