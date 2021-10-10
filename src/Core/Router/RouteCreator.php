@@ -320,7 +320,7 @@ class RouteCreator
     /**
      * load
      *
-     * @param  string|iterable  $paths
+     * @param  string|iterable|callable  $paths
      *
      * @return  RouteCreator
      *
@@ -333,16 +333,13 @@ class RouteCreator
             return $this;
         }
 
-        $paths = TypeCast::toIterable($paths);
+        $paths = TypeCast::toArray($paths);
 
+        $files = \Windwalker\glob_all($paths);
         $router = $this;
 
-        foreach ($paths as $path) {
-            $files = \Windwalker\glob($path);
-
-            foreach ($files as $file) {
-                require $file;
-            }
+        foreach ($files as $file) {
+            require $file;
         }
 
         return $this;

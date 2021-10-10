@@ -192,7 +192,7 @@ class View implements EventAwareInterface
             $data['vm'] = $vm;
 
             $this->preparePaths($vm);
-show($this->rendererService->dumpAllPaths());
+
             if (!$this->layout) {
                 throw new \LogicException('View must provide at least 1 layout name.');
             }
