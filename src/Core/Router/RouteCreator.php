@@ -320,13 +320,13 @@ class RouteCreator
     /**
      * load
      *
-     * @param  string|iterable|callable  $paths
+     * @param  string|iterable|callable  ...$paths
      *
      * @return  RouteCreator
      *
      * @since  3.5
      */
-    public function load(string|iterable|callable $paths): static
+    public function load(string|iterable|callable ...$paths): static
     {
         if (is_callable($paths)) {
             $paths($this);
