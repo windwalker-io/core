@@ -146,7 +146,9 @@ class WindwalkerExtension implements
      */
     public function endTeleport(string $expression): string
     {
-        return "<?php \$asset->endTeleport{$expression} ?>";
+        $expression = static::stripParentheses($expression);
+
+        return "<?php \$asset->endTeleport($expression) ?>";
     }
 
     /**
