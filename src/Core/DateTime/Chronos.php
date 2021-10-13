@@ -90,7 +90,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
         $tz = static::wrapTimezoneObject($tz);
 
         // If the date is numeric assume a unix timestamp and convert it.
-        $date = is_numeric($date) ? date('c', $date) : $date;
+        $date = is_numeric($date) ? date('c', (int) $date) : $date;
 
         if ($date instanceof \DateTimeInterface) {
             $date = $date->format('Y-m-d H:i:s.u');

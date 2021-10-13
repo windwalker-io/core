@@ -48,7 +48,7 @@ class QueueManager extends AbstractManager
 
             register_shutdown_function(fn () => $tmp->delete());
 
-            (new Process(
+            $process = (new Process(
                 [
                     (new PhpExecutableFinder())->find(),
                     'windwalker',
@@ -59,6 +59,8 @@ class QueueManager extends AbstractManager
             ))
                 ->setWorkingDirectory(WINDWALKER_ROOT)
                 ->mustRun();
+
+            return $process->getOutput();
         };
     }
 }
