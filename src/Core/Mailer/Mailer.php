@@ -195,4 +195,24 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
     {
         return $this->container->newInstance(AssetService::class);
     }
+
+    /**
+     * @return TransportInterface
+     */
+    public function getTransport(): TransportInterface
+    {
+        return $this->transport;
+    }
+
+    /**
+     * @param  TransportInterface  $transport
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setTransport(TransportInterface $transport): static
+    {
+        $this->transport = $transport;
+
+        return $this;
+    }
 }
