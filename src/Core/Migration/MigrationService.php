@@ -301,6 +301,7 @@ class MigrationService implements EventAwareInterface
     {
         $codeGenerator = $this->app->make(CodeGenerator::class);
         $migrations = $this->getMigrations($dir);
+        $versions = [];
 
         // Check name not exists
         foreach ($migrations as $migration) {
@@ -311,11 +312,20 @@ class MigrationService implements EventAwareInterface
                     $migration->file->getPathname() . '</info>'
                 );
             }
+
+            $versions[] = $migration->version;
         }
 
+        $format = $options['version_format'] ?? 'YmdHi%04d';
+        $i = 1;
         $date = new \DateTimeImmutable('now');
 
-        $version = $date->format($options['version_format'] ?? 'YmdHis');
+        do {
+            $dateFormat = sprintf($format, $i);
+            $version = $date->format($dateFormat);
+            $i++;
+        } while (in_array($version, $versions, true));
+
         $year    = $date->format('Y');
 
         return $codeGenerator->from($source)

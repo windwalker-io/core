@@ -44,6 +44,12 @@ return [
 
     'lang:merge' => \Windwalker\Core\Command\LangMergeCommand::class,
 
+    'queue:worker' => \Windwalker\Core\Queue\Command\QueueWorkerCommand::class,
+    'queue:restart' => \Windwalker\Core\Queue\Command\QueueRestartCommand::class,
+    'queue:retry' => \Windwalker\Core\Queue\Command\QueueRetryCommand::class,
+    'queue:table' => \Windwalker\Core\Queue\Command\QueueTableCommand::class,
+    'queue:failed-table' => \Windwalker\Core\Queue\Command\QueueFailedTableCommand::class,
+
     '_completion' => \Stecman\Component\Symfony\Console\BashCompletion\CompletionCommand::class,
     'auto-complete' => \Windwalker\Core\Command\CompletionCommand::class,
 ];
