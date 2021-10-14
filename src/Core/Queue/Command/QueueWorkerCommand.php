@@ -28,8 +28,6 @@ use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
 use Windwalker\Queue\Failer\QueueFailerInterface;
-use Windwalker\Queue\Job\CallableJob;
-use Windwalker\Queue\Job\JobInterface;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
 use Windwalker\Queue\Worker;
@@ -190,19 +188,9 @@ class QueueWorkerCommand implements CommandInterface
         ];
     }
 
-    public function runJob(JobInterface $job): mixed
+    public function runJob(callable $job): mixed
     {
-        if ($job instanceof CallableJob) {
-            $callback = $job->getCallback();
-
-            if ($callback instanceof SerializableClosure) {
-                $callback = $callback->getClosure();
-            }
-
-            return $this->app->call($callback);
-        }
-
-        return $job();
+        return $this->app->call($job);
     }
 
     protected function listenToWorker(Worker $worker, IOInterface $io, string $connection)
@@ -213,7 +201,7 @@ class QueueWorkerCommand implements CommandInterface
                 $this->app->addMessage(
                     sprintf(
                         'Run Job: <info>%s</info> - Message ID: <info>%s</info>',
-                        $event->getJob()->getName(),
+                        get_debug_type($event->getJob()),
                         $event->getMessage()->getId()
                     )
                 );
@@ -228,7 +216,7 @@ class QueueWorkerCommand implements CommandInterface
                     $this->app->addMessage(
                         sprintf(
                             'Job %s failed: %s (%s)',
-                            $event->getJob()->getName(),
+                            get_debug_type($event->getJob()),
                             $event->getException()->getMessage(),
                             $message->getId()
                         ),

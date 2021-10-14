@@ -30,6 +30,19 @@ class QueueManager extends AbstractManager
         return 'queue';
     }
 
+    public function create(?string $name = null, ...$args): object
+    {
+        $instance = parent::create($name, ...$args);
+
+        $instance->getObjectBuilder()->setBuilder(
+            function (mixed $class, ...$args) {
+                return $this->container->resolve($class, $args);
+            }
+        );
+
+        return $instance;
+    }
+
     public function createQueue(string $driverClass, ...$args): Queue
     {
         return new Queue(
@@ -48,7 +61,7 @@ class QueueManager extends AbstractManager
 
             register_shutdown_function(fn () => $tmp->delete());
 
-            (new Process(
+            $process = (new Process(
                 [
                     (new PhpExecutableFinder())->find(),
                     'windwalker',
@@ -59,6 +72,8 @@ class QueueManager extends AbstractManager
             ))
                 ->setWorkingDirectory(WINDWALKER_ROOT)
                 ->mustRun();
+
+            return $process->getOutput();
         };
     }
 }

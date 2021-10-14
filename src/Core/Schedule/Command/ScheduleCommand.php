@@ -14,12 +14,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleEvent;
-use Windwalker\Queue\Job\JobInterface;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -127,10 +125,6 @@ class ScheduleCommand implements CommandInterface
 
         if (is_string($handler) && class_exists($handler)) {
             $handler = $this->app->make($handler);
-        }
-
-        if ($handler instanceof JobInterface) {
-            return $this->app->call([$handler, 'execute']);
         }
 
         return $this->app->call($handler);
