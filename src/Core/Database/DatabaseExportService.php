@@ -114,7 +114,7 @@ class DatabaseExportService
      */
     public static function stripPrefix(string $table, string $prefix = null): string
     {
-        $num = strlen($prefix);
+        $num = strlen((string) $prefix);
 
         if (str_starts_with($table, $prefix)) {
             $table = '#__' . substr($table, $num);
