@@ -10,6 +10,7 @@ namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Environment\PlatformHelper;
 use Windwalker\Filesystem\Filesystem;
@@ -36,65 +37,64 @@ class MySQLExporter extends AbstractExporter
         $cmd     = sprintf(
             '%s --defaults-extra-file=%s %s',
             $md,
-            $this->createPasswordCnfFile(
-                $options['user'],
-                $options['password'],
-            ),
+            $this->createPasswordCnfFile($options),
             $options['dbname'],
         );
 
         $process = $this->app->createProcess($cmd);
 
-        $process->run(
-            function ($type, $buffer) use ($stream) {
-                $stream->write($buffer);
-            }
-        );
+        try {
+            $process->mustRun(
+                function ($type, $buffer) use ($stream) {
+                    $stream->write($buffer);
+                }
+            );
+        } catch (ProcessFailedException $e) {
+            $this->emitMessage(
+                [
+                    'Error: ' . $e->getMessage(),
+                    'Fallback to php backup script.'
+                ]
+            );
 
-        if ($process->isSuccessful()) {
-            return;
-        }
+            $tableInfos = $this->db->getSchema()->getTables(true);
 
-        $this->emitMessage(
-            [
-                'Error: ' . $process->getErrorOutput(),
-                'Fallback to php backup script.'
-            ]
-        );
+            foreach ($tableInfos as $tableInfo) {
+                $sql = [];
 
-        $tableInfos = $this->db->getSchema()->getTables(true);
+                // Table
+                $sql[] = "DROP TABLE `{$tableInfo->tableName}` IF EXISTS";
+                $sql[] = $this->getCreateTable($tableInfo->tableName);
 
-        foreach ($tableInfos as $tableInfo) {
-            $sql = [];
+                $stream->write((string) implode(";\n", $sql));
 
-            // Table
-            $sql[] = "DROP TABLE `{$tableInfo->tableName}` IF EXISTS";
-            $sql[] = $this->getCreateTable($tableInfo->tableName);
+                // Data
+                $inserts = $this->getInserts($tableInfo->tableName);
 
-            $stream->write((string) implode(";\n", $sql));
-
-            // Data
-            $inserts = $this->getInserts($tableInfo);
-
-            if ($inserts) {
-                $stream->write((string) $inserts);
+                if ($inserts) {
+                    $stream->write((string) $inserts);
+                }
             }
         }
 
         $stream->close();
     }
 
-    protected function createPasswordCnfFile(string $user, string $password): string
+    protected function createPasswordCnfFile(array $options): string
     {
         $tmpFile = $this->app->path('@temp/.md.cnf');
 
-        $user     = addslashes($user);
-        $password = addslashes($password);
+        $user     = addslashes($options['user'] ?? 'root');
+        $password = addslashes($options['password'] ?? '');
+        $host = addslashes($options['host'] ?? 'localhost');
+        $port = addslashes($options['port'] ?? '3306');
 
         $content = <<<CNF
 [mysqldump]
 user='$user'
 password='$password'
+host='$host'
+port='$port'
 CNF;
 
         Filesystem::write($tmpFile, $content);
