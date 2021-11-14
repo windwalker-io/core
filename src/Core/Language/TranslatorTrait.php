@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Language;
 
 use Windwalker\DI\Attributes\Inject;
+use Windwalker\Utilities\Wrapper\RawWrapper;
 
 /**
  * The TranslatorTrait class.
@@ -26,12 +27,12 @@ trait TranslatorTrait
         return $this->lang = $this->lang->extract($ns);
     }
 
-    public function trans(string $id, ...$args): string
+    public function trans(string|RawWrapper $id, ...$args): string
     {
         return $this->lang->trans($id, ...$args);
     }
 
-    public function choice(string $id, int|float $number, ...$args): string
+    public function choice(string|RawWrapper $id, int|float $number, ...$args): string
     {
         return $this->lang->choice($id, $number, ...$args);
     }

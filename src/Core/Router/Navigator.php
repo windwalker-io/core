@@ -149,7 +149,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                         $url = $systemUri->script . '/' . $url;
                     }
 
-                    return [$url, $query];
+                    return [$url, $query, $routeObject];
                 }
             );
         };

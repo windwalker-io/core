@@ -21,6 +21,7 @@ use Windwalker\Language\LanguageNormalizer;
 use Windwalker\Utilities\Contract\LanguageInterface;
 use Windwalker\Utilities\Paths\PathsAwareTrait;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\Wrapper\RawWrapper;
 
 /**
  * The Lang class.
@@ -272,12 +273,12 @@ class LangService implements LanguageInterface
         return $this->getLanguage()->get($id, $locale, $fallback);
     }
 
-    public function trans(string $id, ...$args): string
+    public function trans(string|RawWrapper $id, ...$args): string
     {
         return $this->getLanguage()->trans($id, ...$args);
     }
 
-    public function choice(string $id, float|int $number, ...$args)
+    public function choice(string|RawWrapper $id, float|int $number, ...$args)
     {
         return $this->getLanguage()->choice($id, $number, ...$args);
     }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Utilities\Base64Url;
@@ -27,6 +28,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @var callable
      */
     protected $handler;
+
+    protected array|null $handledData = null;
 
     protected int $options = 0;
 
@@ -285,6 +288,19 @@ class RouteUri extends Uri implements NavConstantInterface
         return $this->navigator->redirect($this, $code, $options);
     }
 
+    #[ArrayShape(['string', 'array', Route::class])]
+    public function getHandledData(): array
+    {
+        return $this->handledData ??= ($this->handler)($this->vars);
+    }
+
+    public function cacheReset(): static
+    {
+        $this->handledData = null;
+
+        return $this;
+    }
+
     /**
      * Magic method to get the string representation of the URI object.
      *
@@ -298,7 +314,7 @@ class RouteUri extends Uri implements NavConstantInterface
             $vars = [];
 
             try {
-                [$uri, $vars] = ($this->handler)($this->vars);
+                [$uri, $vars] = $this->getHandledData();
 
                 $uri = new Uri($uri);
             } catch (RouteNotFoundException $e) {
