@@ -9,6 +9,7 @@
 
 namespace Windwalker\Core\Service;
 
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Utilities\Utf8String;
@@ -74,7 +75,7 @@ class ErrorService
      *
      * @param  Config  $config
      */
-    public function __construct(Config $config)
+    public function __construct(Config $config, protected ApplicationInterface $app)
     {
         $this->config = $config->proxy('error');
     }
@@ -132,7 +133,13 @@ class ErrorService
     {
         try {
             foreach ($this->handlers as $handler) {
-                $handler($exception);
+                $this->app->call(
+                    $handler,
+                    [
+                        $exception,
+                        'exception' => $exception
+                    ]
+                );
             }
         } catch (\Throwable $e) {
             $msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;

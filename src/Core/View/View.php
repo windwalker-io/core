@@ -127,6 +127,13 @@ class View implements EventAwareInterface
             ->default(null);
     }
 
+    public function renderLayout(string $layout, array $data = []): mixed
+    {
+        $options['layout'] = $layout;
+
+        return $this->render($data, $options);
+    }
+
     public function render(array $data = []): mixed
     {
         $vm = $this->getViewModel();
