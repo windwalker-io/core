@@ -11,8 +11,9 @@ import { loadJson } from './utils.mjs';
 import path from 'path';
 import fs from 'fs';
 
-export async function installVendors(vendors) {
-  const root = 'www/assets/vendor';
+export async function installVendors(npmVendors, composerVendors = [], to = 'www/assets/vendor') {
+  const root = to;
+  let vendors = npmVendors;
 
   if (!fs.existsSync(root)) {
     fs.mkdirSync(root);
@@ -33,12 +34,19 @@ export async function installVendors(vendors) {
 
   vendors.forEach((vendor) => {
     if (fs.existsSync(`node_modules/${vendor}/`)) {
-      console.log(`[Link] node_modules/${vendor}/ => www/assets/vendor/${vendor}/`);
+      console.log(`[Link NPM] node_modules/${vendor}/ => www/assets/vendor/${vendor}/`);
       src(`node_modules/${vendor}/`).pipe(symlink(`www/assets/vendor/${vendor}`));
     }
   });
 
-  console.log('[Link] resources/assets/vendor/**/* => www/assets/vendor/');
+  composerVendors.forEach((vendor) => {
+    if (fs.existsSync(`vendor/${vendor}/assets`)) {
+      console.log(`[Link Composer] vendor/${vendor}/assets => www/assets/vendor/${vendor}/`);
+      src(`vendor/${vendor}/assets/`).pipe(symlink(`www/assets/vendor/${vendor}/`));
+    }
+  });
+
+  console.log('[Link Local] resources/assets/vendor/**/* => www/assets/vendor/');
   src('resources/assets/vendor/*').pipe(symlink('www/assets/vendor/'));
 }
 

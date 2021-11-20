@@ -105,7 +105,9 @@ export async function webpackVue3Config() {
           test: /\.vue$/,
           loader: 'vue-loader',
           options: {
-
+            compilerOptions: {
+              whitespace: 'preserve'
+            }
           }
         },
         {
