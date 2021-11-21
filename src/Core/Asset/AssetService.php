@@ -21,6 +21,7 @@ use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
+use function Aws\default_http_handler;
 use function Windwalker\DOM\h;
 use function Windwalker\uid;
 
@@ -244,30 +245,31 @@ class AssetService implements EventAwareInterface
      */
     public function has(string $uri, bool $strict = false): bool|string
     {
-        if (static::isAbsoluteUrl($uri)) {
+        if (static::isFullUrl($uri)) {
             return $uri;
         }
 
         $assetUri = $this->path;
 
-        if (static::isAbsoluteUrl($assetUri)) {
+        if (static::isFullUrl($assetUri)) {
             return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
         }
 
-        $root = $this->addSysPath($assetUri);
+        $uri = $this->resolveAlias($uri);
+        $file = $this->addSysPath($uri);
 
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
-        if (is_file($root . '/' . $uri)) {
+        if (is_file($file)) {
             return $this->addUriBase($uri, 'path');
         }
 
         if (!$strict) {
-            if (is_file($root . '/' . $assetFile)) {
+            if (is_file($this->addSysPath($assetFile))) {
                 return $this->addUriBase($assetFile, 'path');
             }
 
-            if (is_file($root . '/' . $assetMinFile)) {
+            if (is_file($this->addSysPath($assetMinFile))) {
                 return $this->addUriBase($assetMinFile, 'path');
             }
         }
@@ -518,7 +520,7 @@ class AssetService implements EventAwareInterface
         }
 
         $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-        $base     = rtrim($this->pathResolver->resolve('@public'), '/\\');
+        $base     = rtrim($this->pathResolver->resolve('@public/' . $this->getAssetFolder()), '/\\');
 
         if (!$base) {
             return '/';
@@ -812,7 +814,7 @@ class AssetService implements EventAwareInterface
         // Check has .min
         // $uri = Uri::addUriBase($uri, 'path');
 
-        if (static::isAbsoluteUrl($uri)) {
+        if (static::isFullUrl($uri)) {
             return $uri;
         }
 
@@ -822,26 +824,24 @@ class AssetService implements EventAwareInterface
             return rtrim($assetUri, '/') . '/' . ltrim($uri, '/');
         }
 
-        $root = $this->addSysPath($assetUri);
-
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
         // Use uncompressed file first
         if ($this->isDebug()) {
-            if (is_file($root . '/' . $assetFile)) {
+            if (is_file($this->addSysPath($assetFile))) {
                 return $this->addUriBase($assetFile, $path);
             }
 
-            if (is_file($root . '/' . $assetMinFile)) {
+            if (is_file($this->addSysPath($assetMinFile))) {
                 return $this->addUriBase($assetMinFile, $path);
             }
         } else {
             // Use min file first
-            if (is_file($root . '/' . $assetMinFile)) {
+            if (is_file($this->addSysPath($assetMinFile))) {
                 return $this->addUriBase($assetMinFile, $path);
             }
 
-            if (is_file($root . '/' . $assetFile)) {
+            if (is_file($this->addSysPath($assetFile))) {
                 return $this->addUriBase($assetFile, $path);
             }
         }
@@ -982,6 +982,8 @@ class AssetService implements EventAwareInterface
         }
 
         if ($uri !== null) {
+            $uri = $this->resolveAlias($uri);
+
             if ($version) {
                 if (str_contains($uri, '?')) {
                     $uri .= '&' . $version;
@@ -1012,6 +1014,8 @@ class AssetService implements EventAwareInterface
         }
 
         if ($uri !== null) {
+            $uri = $this->resolveAlias($uri);
+
             if ($version) {
                 if (str_contains($uri, '?')) {
                     $uri .= '&' . $version;
@@ -1033,7 +1037,7 @@ class AssetService implements EventAwareInterface
      */
     public function getAssetFolder(): string
     {
-        return $this->config->getDeep('asset.folder', 'asset');
+        return $this->config->getDeep('asset.folder') ?? 'assets';
     }
 
     /**

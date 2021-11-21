@@ -68,7 +68,7 @@ class LangService implements LanguageInterface
         $this->addPath($this->config->getDeep('language.paths') ?? []);
     }
 
-    public function __invoke(string $id, ...$args): string
+    public function __invoke(string|RawWrapper $id, ...$args): string
     {
         return $this->trans($id, ...$args);
     }

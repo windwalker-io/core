@@ -116,8 +116,6 @@ class PseudoCrypt
             $mod = bcmod($int, '62');
             $key .= chr(static::$chars62[$mod]);
             $int = bcdiv($int, '62');
-
-            show($int);
         }
 
         return strrev($key);

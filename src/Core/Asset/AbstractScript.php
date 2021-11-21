@@ -125,6 +125,22 @@ abstract class AbstractScript
         return Arr::mergeRecursive($options1, $options2);
     }
 
+    public function warn(string $message): static
+    {
+        $this->internalJS("console.warn('$message')");
+
+        return $this;
+    }
+
+    public function warnIfDebug(string $message): static
+    {
+        if ($this->asset->isDebug()) {
+            $this->warn($message);
+        }
+
+        return $this;
+    }
+
     /**
      * Handle dynamic calls to the asset object.
      *
