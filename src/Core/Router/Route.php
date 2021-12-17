@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router;
 
 use Psr\Http\Message\UriInterface;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Uri\Uri;
 
 /**
@@ -78,7 +79,11 @@ class Route implements \JsonSerializable
     public function redirect(mixed $to, array $query = [], int $options = NavConstantInterface::TYPE_PATH): static
     {
         return $this->controller(
-            function (Navigator $nav) use ($to, $query, $options) {
+            function (Navigator $nav, ApplicationInterface $app) use ($to, $query, $options) {
+                if ($to instanceof \Closure) {
+                    return $app->call($to);
+                }
+
                 if ($to instanceof UriInterface) {
                     return $to;
                 }
