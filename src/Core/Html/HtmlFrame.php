@@ -142,7 +142,7 @@ class HtmlFrame
     /**
      * Method to set property favicon
      *
-     * @param  string  $favicon
+     * @param  string|null  $favicon
      *
      * @return  static  Return self to support chaining.
      */
