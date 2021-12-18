@@ -202,7 +202,7 @@ namespace Windwalker {
     if (!function_exists('\Windwalker\response')) {
         function response(mixed $data = '', int $status = 200, array $headers = []): CoreResponse
         {
-            return new CoreResponse($data, $status, $headers);
+            return CoreResponse::fromString($data, $status, $headers);
         }
     }
 
