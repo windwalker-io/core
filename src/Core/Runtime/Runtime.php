@@ -130,10 +130,7 @@ class Runtime
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
 
         // Get allow remote ips from config.
-        if (isset($_SERVER['HTTP_CLIENT_IP'])
-            || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-            || !in_array(@$_SERVER['REMOTE_ADDR'], $allowIps, true)
-        ) {
+        if (!in_array(@$_SERVER['REMOTE_ADDR'], $allowIps, true)) {
             header('HTTP/1.1 403 Forbidden');
 
             exit('Forbidden');
