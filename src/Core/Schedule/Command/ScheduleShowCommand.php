@@ -14,6 +14,7 @@ namespace Windwalker\Core\Schedule\Command;
 use Lorisleiva\CronTranslator\CronTranslator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
@@ -109,10 +110,7 @@ class ScheduleShowCommand implements CommandInterface
         $count = 0;
         $tz = $io->getOption('tz');
         $time = $io->getOption('time') ?: 'now';
-
-        if (!class_exists(CronTranslator::class)) {
-            throw new \DomainException("Please install `lorisleiva/cron-translator` to describe CRON expression.");
-        }
+        $canDescribe = class_exists(CronTranslator::class);
 
         foreach ($events as $event) {
             if ($names !== [] && !in_array($event->getName(), $names, true)) {
@@ -128,11 +126,15 @@ class ScheduleShowCommand implements CommandInterface
             $nextDue1 = $expr->getNextRunDate($time, 1, false, $tz);
             $nextDue2 = $expr->getNextRunDate($time, 2, false, $tz);
 
+            if ($count !== 1) {
+                $table->addRow(new TableSeparator());
+            }
+
             $table->addRow(
                 [
                     '<fg=cyan>' . $event->getName() . '</>',
                     (string) $event,
-                    CronTranslator::translate($expr->getExpression()),
+                    $canDescribe ? CronTranslator::translate($expr->getExpression()) : '-',
                     $expr->isDue($time, $tz) ? '<info>v</info>' : '',
                     $nextDue0->format('Y-m-d H:i:s')
                     . "\n" . $nextDue1->format('Y-m-d H:i:s')
@@ -151,5 +153,9 @@ class ScheduleShowCommand implements CommandInterface
         $io->newLine();
         $table->render();
         $io->newLine();
+
+        if (!$canDescribe) {
+            $io->style()->warning("Consider install `lorisleiva/cron-translator` to describe CRON expression.");
+        }
     }
 }
