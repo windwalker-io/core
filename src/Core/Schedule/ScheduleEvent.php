@@ -166,7 +166,7 @@ class ScheduleEvent
 
     public function weekly(): static
     {
-        return $this->setExpression('@weakly');
+        return $this->setExpression('@weekly');
     }
 
     public function monthly(): static

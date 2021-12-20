@@ -31,7 +31,8 @@ return [
     'seed:clear' => \Windwalker\Core\Seed\Command\SeedClearCommand::class,
     'seed:create' => \Windwalker\Core\Seed\Command\SeedCreateCommand::class,
 
-    'schedule' => \Windwalker\Core\Schedule\Command\ScheduleCommand::class,
+    'schedule:run' => \Windwalker\Core\Schedule\Command\ScheduleRunCommand::class,
+    'schedule:show' => \Windwalker\Core\Schedule\Command\ScheduleShowCommand::class,
 
     'asset:version' => \Windwalker\Core\Asset\Command\AssetVersionCommand::class,
 

@@ -14,6 +14,7 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -85,5 +86,6 @@ class AppProvider implements ServiceProviderInterface
     {
         $container->prepareSharedObject(FilterFactory::class);
         $container->prepareSharedObject(FilterService::class);
+        $container->prepareSharedObject(ScheduleService::class);
     }
 }
