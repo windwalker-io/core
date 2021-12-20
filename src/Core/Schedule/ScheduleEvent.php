@@ -111,7 +111,8 @@ class ScheduleEvent
 
     public function everyHours(?int $every = null, ?int $from = null, ?int $to = 23): static
     {
-        return $this->setPart(static::HOUR_POSITION, static::every($every, $from, $to));
+        return $this->setPart(static::HOUR_POSITION, static::every($every, $from, $to))
+            ->minuteOfHour(0);
     }
 
     public function hourOfDay(int|string ...$v): static
@@ -121,7 +122,9 @@ class ScheduleEvent
 
     public function everyDays(?int $every = null, ?int $from = null, ?int $to = 31): static
     {
-        return $this->setPart(static::DAY_POSITION, static::every($every, $from, $to));
+        return $this->setPart(static::DAY_POSITION, static::every($every, $from, $to))
+            ->hourOfDay(0)
+            ->minuteOfHour(0);
     }
 
     public function dayOfMonth(int|string ...$v): static
@@ -131,7 +134,10 @@ class ScheduleEvent
 
     public function everyMonths(?int $every = null, ?int $from = null, ?int $to = 12): static
     {
-        return $this->setPart(static::MONTH_POSITION, static::every($every, $from, $to));
+        return $this->setPart(static::MONTH_POSITION, static::every($every, $from, $to))
+            ->dayOfMonth(1)
+            ->hourOfDay(0)
+            ->minuteOfHour(0);
     }
 
     public function monthOfYear(int|string ...$v): static
@@ -141,7 +147,10 @@ class ScheduleEvent
 
     public function everyWeeks(?int $every = null, ?int $from = null, ?int $to = 12): static
     {
-        return $this->setPart(static::WEEK_POSITION, static::every($every, $from, $to));
+        return $this->setPart(static::WEEK_POSITION, static::every($every, $from, $to))
+            ->dayOfWeek(1)
+            ->hourOfDay(0)
+            ->minuteOfHour(0);
     }
 
     public function dayOfWeek(int|string ...$v): static
