@@ -35,21 +35,39 @@ class StarterInstaller
         $io = $event->getIO();
 
         static::genSecretCode($event);
+        static::appName($event);
 
         static::noIgnoreLockFile($event);
 
         static::genEnv($event);
 
-        static::appName($event);
-
         // Complete
         $io->write('Install complete.');
+    }
+
+    public static function appName(Event $event): void
+    {
+        $io = $event->getIO();
+        $name = trim((string) $io->ask('App Name: '));
+
+        if (!$name) {
+            return;
+        }
+
+        $file = getcwd() . '/etc/conf/app.php';
+
+        $content = file_get_contents($file);
+        $name = addslashes($name);
+
+        $content = str_replace("'name' => 'Windwalker'", "'name' => '$name'", $content);
+
+        file_put_contents($file, $content);
     }
 
     /**
      * Generate secret code.
      *
-     * @param  IOInterface  $io
+     * @param  Event  $event
      *
      * @return  void
      * @throws \Exception
@@ -75,32 +93,15 @@ class StarterInstaller
         $file = getcwd() . '/.gitignore';
         $ignore = file_get_contents($file);
 
-        str_replace('yarn.lock', '# yarn.lock', $ignore);
-        str_replace('composer.lock', '# composer.lock', $ignore);
+        $ignore = str_replace(
+            ['yarn.lock', 'composer.lock'],
+            ['# yarn.lock', '# composer.lock'],
+            $ignore
+        );
 
         file_put_contents($file, $ignore);
 
         $io->write('Remove .lock files from .gitignore.');
-    }
-
-    public static function appName(Event $event): void
-    {
-        $io = $event->getIO();
-        $name = trim((string) $io->ask('App Name: '));
-
-        if (!$name) {
-            return;
-        }
-
-        $env = getcwd() . '/.env';
-
-        $content = file_get_contents($env);
-
-        if (str_contains($content, 'APP_NAME=Windwalker')) {
-            $content = str_replace('APP_NAME=Windwalker', 'APP_NAME=' . $name, $content);
-        }
-
-        file_put_contents($env, $content);
     }
 
     /**
