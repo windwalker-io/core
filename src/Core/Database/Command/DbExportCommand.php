@@ -22,6 +22,8 @@ use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Filesystem\FileObject;
+use Windwalker\Filesystem\Path;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The DbExportCommand class.
@@ -83,8 +85,11 @@ class DbExportCommand implements CommandInterface
             $this->app->getContainer()->getParameters()->setDeep('database.default', $conn);
         }
 
+        $appName = $this->app->config('app.name') ?? 'windwalker';
+
         $dest = $io->getArgument('dest') ?: sprintf(
-            $this->app->path('@temp/sql-export/sql-%s-%s.sql'),
+            $this->app->path('@temp/sql-export/%s-sql-%s-%s.sql'),
+            StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             $conn ?? $databaseManager->getDefaultName(),
             $now->format('Y-m-d-H-i-s')
         );

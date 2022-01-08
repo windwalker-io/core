@@ -20,6 +20,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -76,6 +77,66 @@ class IO implements IOInterface
         if (is_string($question)) {
             $question = new Question($question, $default);
         }
+
+        return $this->getQuestionHelper()->ask(
+            $this->input,
+            $this->output,
+            $question
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function askConfirmation(
+        string|ConfirmationQuestion $question,
+        bool $default = true,
+        string $trueAnswerRegex = '/^y/i'
+    ): bool {
+        if (is_string($question)) {
+            $question = new ConfirmationQuestion($question, $default, $trueAnswerRegex);
+        }
+
+        return $this->getQuestionHelper()->ask(
+            $this->input,
+            $this->output,
+            $question
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function askAndValidate(
+        string|Question $question,
+        callable $validator,
+        ?int $attempts = null,
+        ?string $default = null
+    ): mixed {
+        if (is_string($question)) {
+            $question = new Question($question, $default);
+        }
+
+        $question->setValidator($validator);
+        $question->setMaxAttempts($attempts);
+
+        return $this->getQuestionHelper()->ask(
+            $this->input,
+            $this->output,
+            $question
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function askAndHideAnswer(string|Question $question): mixed
+    {
+        if (is_string($question)) {
+            $question = new Question($question);
+        }
+
+        $question->setHidden(true);
 
         return $this->getQuestionHelper()->ask(
             $this->input,
@@ -473,7 +534,7 @@ class IO implements IOInterface
             $input = $this->input;
         }
 
-        $newIO->input  = $input ?? $this->input;
+        $newIO->input = $input ?? $this->input;
         $newIO->output = $output ?? $this->output;
 
         return $newIO;

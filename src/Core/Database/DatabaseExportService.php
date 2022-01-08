@@ -19,7 +19,9 @@ use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Path;
 use Windwalker\Stream\Stream;
+use Windwalker\Utilities\StrNormalize;
 
 use function Windwalker\uid;
 
@@ -54,10 +56,12 @@ class DatabaseExportService
      */
     public function export(?OutputInterface $output = null): FileObject
     {
-        $dir  = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
-        $dir  = $this->app->path($dir);
+        $dir = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
+        $dir = $this->app->path($dir);
+        $appName = $this->app->config('app.name') ?? 'windwalker';
         $dest = sprintf(
-            '%s/ww-sql-backup-%s-%s.sql',
+            '%s/%s-backup-%s-%s.sql',
+            StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             $dir,
             gmdate('Y-m-d-H-i-s'),
             uid()

@@ -23,9 +23,10 @@ class StarterInstaller
     /**
      * Do install.
      *
-     * @param Event $event The command event.
+     * @param  Event  $event  The command event.
      *
      * @return  void
+     * @throws \Exception
      */
     public static function rootInstall(Event $event): void
     {
@@ -35,7 +36,11 @@ class StarterInstaller
 
         static::genSecretCode($event);
 
+        static::noIgnoreLockFile($event);
+
         static::genEnv($event);
+
+        static::appName($event);
 
         // Complete
         $io->write('Install complete.');
@@ -44,9 +49,10 @@ class StarterInstaller
     /**
      * Generate secret code.
      *
-     * @param IOInterface $io
+     * @param  IOInterface  $io
      *
      * @return  void
+     * @throws \Exception
      */
     public static function genSecretCode(Event $event): void
     {
@@ -60,6 +66,41 @@ class StarterInstaller
         file_put_contents($file, $config);
 
         $io->write('Auto created secret key.');
+    }
+
+    public static function noIgnoreLockFile(Event $event): void
+    {
+        $io = $event->getIO();
+
+        $file = getcwd() . '/.gitignore';
+        $ignore = file_get_contents($file);
+
+        str_replace('yarn.lock', '# yarn.lock', $ignore);
+        str_replace('composer.lock', '# composer.lock', $ignore);
+
+        file_put_contents($file, $ignore);
+
+        $io->write('Remove .lock files from .gitignore.');
+    }
+
+    public static function appName(Event $event): void
+    {
+        $io = $event->getIO();
+        $name = trim((string) $io->ask('App Name: '));
+
+        if (!$name) {
+            return;
+        }
+
+        $env = getcwd() . '/.env';
+
+        $content = file_get_contents($env);
+
+        if (str_contains($content, 'APP_NAME=windwalker')) {
+            $content = str_replace('APP_NAME=windwalker', 'APP_NAME=' . $name, $content);
+        }
+
+        file_put_contents($env, $content);
     }
 
     /**
@@ -102,12 +143,13 @@ class StarterInstaller
             $io->write('Please select database drivers: ');
 
             foreach ($supportedDrivers as $i => $driver) {
-                $io->write("  [$i] $driver");
+                $j = $i + 1;
+                $io->write("  [$j] $driver");
             }
 
             $k = $io->ask('> ');
 
-            $driver = $supportedDrivers[$k] ?? 'pdo_mysql';
+            $driver = $supportedDrivers[$k + 1] ?? 'pdo_mysql';
 
             $io->write('Selected driver: ' . $driver);
 
