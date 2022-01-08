@@ -61,8 +61,8 @@ class DatabaseExportService
         $appName = $this->app->config('app.name') ?? 'windwalker';
         $dest = sprintf(
             '%s/%s-backup-%s-%s.sql',
-            StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             $dir,
+            StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             gmdate('Y-m-d-H-i-s'),
             uid()
         );
