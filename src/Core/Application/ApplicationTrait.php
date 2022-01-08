@@ -41,6 +41,11 @@ trait ApplicationTrait
      */
     protected array $providers = [];
 
+    public function getAppName(): string
+    {
+        return (string) ($this->config('app.name') ?? 'Windwalker');
+    }
+
     /**
      * config
      *

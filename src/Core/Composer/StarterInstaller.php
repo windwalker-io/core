@@ -96,8 +96,8 @@ class StarterInstaller
 
         $content = file_get_contents($env);
 
-        if (str_contains($content, 'APP_NAME=windwalker')) {
-            $content = str_replace('APP_NAME=windwalker', 'APP_NAME=' . $name, $content);
+        if (str_contains($content, 'APP_NAME=Windwalker')) {
+            $content = str_replace('APP_NAME=Windwalker', 'APP_NAME=' . $name, $content);
         }
 
         file_put_contents($env, $content);

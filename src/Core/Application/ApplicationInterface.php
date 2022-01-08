@@ -31,6 +31,8 @@ interface ApplicationInterface extends
 
     public const CLIENT_CONSOLE = 'console';
 
+    public function getAppName(): string;
+
     /**
      * config
      *
