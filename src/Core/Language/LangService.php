@@ -109,6 +109,17 @@ class LangService implements LanguageInterface
         return $this;
     }
 
+    public function loadFileFromVendor(
+        string $vendor,
+        string $file,
+        string $format = 'php',
+        ?string $locale = null
+    ): static {
+        $path = "@vendor/{$vendor}/resources/languages";
+
+        return $this->loadFileFromPath($path, $file, $format, $locale);
+    }
+
     public function loadAllFromPath(string $path, string $format, ?string $locale = null): static
     {
         $locale = $locale ?? $this->getLocale();
@@ -143,6 +154,13 @@ class LangService implements LanguageInterface
         }
 
         return $this;
+    }
+
+    public function loadAllFromVendor(string $vendor, string $format, ?string $locale = null): static
+    {
+        $path = "@vendor/{$vendor}/resources/languages";
+
+        return $this->loadAllFromPath($path, $format, $locale);
     }
 
     public function loadAll(string $format = 'php', ?string $locale = null): static
