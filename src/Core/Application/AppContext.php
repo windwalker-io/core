@@ -30,6 +30,8 @@ use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Session\Session;
 use Windwalker\Uri\Uri;
 
+use function Windwalker\str;
+
 /**
  * The Context class.
  *
@@ -379,6 +381,17 @@ class AppContext implements WebApplicationInterface
         $this->service(Session::class)->addFlash($messages, $type ?? 'info');
 
         return $this;
+    }
+
+    public function getStage(): ?string
+    {
+        $matched = $this->getMatchedRoute();
+
+        if (!$matched) {
+            return null;
+        }
+
+        return (string) $matched->getExtraValue('namespace');
     }
 
     /**
