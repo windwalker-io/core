@@ -7,12 +7,19 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Service;
 
+use ErrorException;
+use InvalidArgumentException;
+use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Utilities\Utf8String;
+
+use function is_string;
 
 /**
  * The ErrorService class.
@@ -84,7 +91,7 @@ class ErrorService
      * down
      *
      * @return  void
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function down(): void
     {
@@ -98,15 +105,15 @@ class ErrorService
     /**
      * The error handler.
      *
-     * @param   integer $code    The level of the error raised, as an integer.
-     * @param   string  $message The error message, as a string.
-     * @param   string  $file    The filename that the error was raised in, as a string.
-     * @param   integer $line    The line number the error was raised at, as an integer.
-     * @param   mixed   $context An array that contains variables in the scope which this error occurred.
+     * @param  integer  $code  The level of the error raised, as an integer.
+     * @param  string   $message  The error message, as a string.
+     * @param  string   $file  The filename that the error was raised in, as a string.
+     * @param  integer  $line  The line number the error was raised at, as an integer.
+     * @param  mixed    $context  An array that contains variables in the scope which this error occurred.
      *
-     * @throws  \ErrorException
      * @return  void
      *
+     * @throws  ErrorException
      * @see  http://php.net/manual/en/function.set-error-handler.php
      */
     public function error(int $code, string $message, string $file, int $line, $context = null): void
@@ -117,19 +124,19 @@ class ErrorService
 
         $content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
-        throw new \ErrorException($content, 500, $code, $file, $line);
+        throw new ErrorException($content, 500, $code, $file, $line);
     }
 
     /**
      * The exception handler.
      *
-     * @param \Throwable $exception The exception object.
+     * @param  Throwable  $exception  The exception object.
      *
      * @return  void
      *
      * @link  http://php.net/manual/en/function.set-exception-handler.php
      */
-    public function exception(\Throwable $exception): void
+    public function exception(Throwable $exception): void
     {
         try {
             foreach ($this->handlers as $handler) {
@@ -137,11 +144,11 @@ class ErrorService
                     $handler,
                     [
                         $exception,
-                        'exception' => $exception
+                        'exception' => $exception,
                     ]
                 );
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;
 
             if ($this->config->get('system.debug')) {
@@ -157,12 +164,12 @@ class ErrorService
     /**
      * respond
      *
-     * @param \Throwable $exception
+     * @param  Throwable  $exception
      *
      * @return  void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    protected function simpleHandler(\Throwable $exception): void
+    protected function simpleHandler(Throwable $exception): void
     {
         if ($this->config->getDeep('app.debug')) {
             echo $exception;
@@ -201,16 +208,16 @@ class ErrorService
     /**
      * Method to set property errorTemplate
      *
-     * @param   string $errorTemplate
-     * @param   string $engine
+     * @param  string  $errorTemplate
+     * @param  string  $engine
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setErrorTemplate(string $errorTemplate, ?string $engine = null): void
     {
-        if (!\is_string($errorTemplate)) {
-            throw new \InvalidArgumentException('Please use string as template name (Example: "folder.file").');
+        if (!is_string($errorTemplate)) {
+            throw new InvalidArgumentException('Please use string as template name (Example: "folder.file").');
         }
 
         $this->errorTemplate = $errorTemplate;
@@ -223,7 +230,7 @@ class ErrorService
     /**
      * getLevelName
      *
-     * @param integer $constant
+     * @param  integer  $constant
      *
      * @return  ?string
      */
@@ -235,7 +242,7 @@ class ErrorService
     /**
      * getLevelCode
      *
-     * @param   string $name
+     * @param  string  $name
      *
      * @return  integer|false
      */
@@ -249,9 +256,9 @@ class ErrorService
     /**
      * registerErrorHandler
      *
-     * @param bool $restore
-     * @param int  $type
-     * @param bool $shutdown
+     * @param  bool  $restore
+     * @param  int   $type
+     * @param  bool  $shutdown
      */
     public function register(bool $restore = true, int $type = E_ALL | E_STRICT, bool $shutdown = false): void
     {
@@ -300,8 +307,8 @@ class ErrorService
     /**
      * Method to set property handler
      *
-     * @param   callable $handler
-     * @param   string   $name
+     * @param  callable  $handler
+     * @param  string    $name
      *
      * @return static Return self to support chaining.
      */
@@ -319,7 +326,7 @@ class ErrorService
     /**
      * removeHandler
      *
-     * @param   string $name
+     * @param  string  $name
      *
      * @return  static
      */
@@ -343,7 +350,7 @@ class ErrorService
     /**
      * Method to set property handlers
      *
-     * @param   callable[] $handlers
+     * @param  callable[]  $handlers
      *
      * @return  static  Return self to support chaining.
      */
@@ -367,7 +374,7 @@ class ErrorService
     /**
      * Method to set property engine
      *
-     * @param   string $engine
+     * @param  string  $engine
      *
      * @return  static  Return self to support chaining.
      */
@@ -381,7 +388,7 @@ class ErrorService
     /**
      * normalizeCode
      *
-     * @param int $code
+     * @param  int  $code
      *
      * @return  int
      */
@@ -399,7 +406,7 @@ class ErrorService
     /**
      * normalizeMessage
      *
-     * @param string $message
+     * @param  string  $message
      *
      * @return  string
      */

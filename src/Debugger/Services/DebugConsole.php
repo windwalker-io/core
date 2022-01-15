@@ -15,8 +15,6 @@ use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Data\Collection;
-use Windwalker\Debugger\DebuggerPackage;
-use Windwalker\Utilities\Str;
 
 /**
  * The DebugConsole class.
@@ -45,6 +43,7 @@ class DebugConsole
                 $body = $response->getBody();
                 $body->write($console);
             }
+
             return;
         }
 
@@ -86,7 +85,7 @@ class DebugConsole
             [
                 'collector' => $collector,
                 'css' => $css,
-                'js' => $js
+                'js' => $js,
             ]
         );
     }

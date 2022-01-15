@@ -15,7 +15,6 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
-use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Generator\Builder\CallbackAstBuilder;
@@ -104,7 +103,7 @@ class CommandSubCommand extends AbstractGeneratorSubCommand
                     'className' => $className = Str::ensureRight($name, 'Command'),
                     'name' => Str::removeRight($name, 'Command'),
                     'ns' => $ns = $this->getNamesapce($io),
-                    'desc' => $io->getOption('desc')
+                    'desc' => $io->getOption('desc'),
                 ],
                 $force
             );
@@ -121,6 +120,7 @@ class CommandSubCommand extends AbstractGeneratorSubCommand
                     if ($node instanceof Node\Expr\ArrayItem) {
                         if ((string) $node->key->value === $cname) {
                             $io->style()->warning("Command name: $cname exists.");
+
                             return NodeTraverser::STOP_TRAVERSAL;
                         }
                     }

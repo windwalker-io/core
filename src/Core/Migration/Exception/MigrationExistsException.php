@@ -11,13 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Exception;
 
+use RuntimeException;
 use Throwable;
 use Windwalker\Core\Migration\Migration;
 
 /**
  * The MigrationExistsException class.
  */
-class MigrationExistsException extends \RuntimeException
+class MigrationExistsException extends RuntimeException
 {
     /**
      * Construct the exception. Note: The message is NOT binary safe.

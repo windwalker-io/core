@@ -15,8 +15,6 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 
-use function Windwalker\fs;
-
 /**
  * The PackageInstaller class.
  */
@@ -39,7 +37,7 @@ class PackageInstaller
     /**
      * PackageInstaller constructor.
      *
-     * @param  string|null           $name
+     * @param  string|null  $name
      * @param  ApplicationInterface  $app
      */
     public function __construct(public ?string $name, protected ApplicationInterface $app)

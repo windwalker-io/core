@@ -11,8 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Controller;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use ReflectionException;
 use Windwalker\DI\Container;
 use Windwalker\DI\ContainerAwareTrait;
 
@@ -40,7 +39,7 @@ class Controller implements ControllerInterface
      * @param  array   $args
      *
      * @return mixed
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function execute(string $task, array $args = []): mixed
     {

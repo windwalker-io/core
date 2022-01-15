@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Console;
 
 use Composer\InstalledVersions;
+use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -29,7 +30,6 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
 use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
@@ -44,7 +44,6 @@ use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Request\ServerRequestFactory;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
-
 use Windwalker\Utilities\Str;
 
 use function Windwalker\DI\create;
@@ -108,7 +107,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $this->registerEvents();
 
-        $this->on(ConsoleTerminateEvent::class, fn ($event) => $this->terminating($container));
+        $this->on(ConsoleTerminateEvent::class, fn($event) => $this->terminating($container));
 
         $this->booting($container->createChild());
 
@@ -233,8 +232,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
             }
         );
 
-        $this->on(MessageOutputEvent::class, fn (MessageOutputEvent $event) => $event->writeWith($output));
-        $this->on(ErrorMessageOutputEvent::class, fn (ErrorMessageOutputEvent $event) => $event->writeWith($output));
+        $this->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output));
+        $this->on(ErrorMessageOutputEvent::class, fn(ErrorMessageOutputEvent $event) => $event->writeWith($output));
     }
 
     /**
@@ -274,10 +273,13 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
      *
      * @return  int
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function runCommand(string|Command $command, array|InputInterface|IOInterface $input, ?OutputInterface $output = null): int
-    {
+    public function runCommand(
+        string|Command $command,
+        array|InputInterface|IOInterface $input,
+        ?OutputInterface $output = null
+    ): int {
         if (is_string($command)) {
             if (str_contains($command, '\\')) {
                 $commands = (array) $this->config('console.commands');
@@ -336,7 +338,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         return $this->prepareWebSimulatorByRequest(ServerRequestFactory::createFromUri($uri, $script));
     }
 
-    public function prepareWebSimulatorByRequest(?ServerRequestInterface $request = null): WebAppSimulator {
+    public function prepareWebSimulatorByRequest(?ServerRequestInterface $request = null): WebAppSimulator
+    {
         if ($this->webSimulator) {
             return $this->webSimulator;
         }
@@ -363,7 +366,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     protected function getProcessOutputCallback(?OutputInterface $output = null): callable
     {
         $output ??= new ConsoleOutput();
-        $err    = $output->getErrorOutput();
+        $err = $output->getErrorOutput();
 
         return static function ($type, $buffer) use ($err, $output) {
             if (Process::ERR === $type) {

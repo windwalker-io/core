@@ -51,7 +51,7 @@ trait ProcessRunnerTrait
             ]
         );
 
-        $env         = $process->getEnv();
+        $env = $process->getEnv();
         $env['PATH'] = $path;
 
         if (PlatformHelper::isWindows()) {
@@ -74,8 +74,8 @@ trait ProcessRunnerTrait
     /**
      * runProcess
      *
-     * @param  string|array|Process           $process
-     * @param  mixed                          $input
+     * @param  string|array|Process  $process
+     * @param  mixed  $input
      * @param  bool|callable|OutputInterface  $output
      *
      * @return Process

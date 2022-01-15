@@ -3,7 +3,7 @@
 /**
  * Part of starter project.
  *
- * @copyright    Copyright (C) 2021 __ORGANIZATION__.
+ * @copyright      Copyright (C) 2021 __ORGANIZATION__.
  * @license        MIT
  */
 
@@ -20,7 +20,6 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Assert\TypeAssert;
 use Windwalker\Utilities\StrInflector;
 use Windwalker\Utilities\StrNormalize;
@@ -43,7 +42,7 @@ class GenReviseCommand implements CommandInterface
     /**
      * configure
      *
-     * @param    Command  $command
+     * @param  Command  $command
      *
      * @return    void
      */
@@ -74,7 +73,7 @@ class GenReviseCommand implements CommandInterface
         //     InputOption::VALUE_REQUIRED,
         //     'Pascal class name of this file.',
         // );
-        
+
         $command->addOption(
             'ns',
             null,
@@ -87,7 +86,7 @@ class GenReviseCommand implements CommandInterface
     /**
      * Executes the current command.
      *
-     * @param    IOInterface  $io
+     * @param  IOInterface  $io
      *
      * @return    int Return 0 is success, 1-255 is failure.
      */
@@ -124,14 +123,14 @@ class GenReviseCommand implements CommandInterface
 
             $io->writeln('[<info>WRITE</info>] ' . $destPath);
         }
-        
+
         return 0;
     }
 
     protected function getNamesapce(IOInterface $io): string
     {
         [$dest] = $this->getNameParts($io);
-        $ns  = $io->getOption('ns');
+        $ns = $io->getOption('ns');
 
         $ns .= '\\' . $dest;
 
@@ -164,6 +163,7 @@ class GenReviseCommand implements CommandInterface
 
         TypeAssert::assert((bool) $ns, 'Please provide --ns {Namespace}');
         TypeAssert::assert((bool) $name, 'Please provide --name {Name}');
+
         // TypeAssert::assert((bool) $className, 'Please provide --class {Class}');
 
         return [

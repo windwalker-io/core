@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Mailer\Subscriber;
 
+use LogicException;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+use UnexpectedValueException;
 use Windwalker\Core\Mailer\Event\BeforeSendEvent;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
@@ -27,7 +29,7 @@ class MailInlinerSubscriber
     public function beforeSend(BeforeSendEvent $event): void
     {
         if (!class_exists(CssToInlineStyles::class)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Please install tijsverkoyen/css-to-inline-styles ^2.0 first.'
             );
         }
@@ -58,7 +60,7 @@ class MailInlinerSubscriber
                     }
                 }
             }
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             // No action
         }
 

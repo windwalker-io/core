@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use DomainException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -68,7 +69,7 @@ class DumpServerCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!class_exists(DumpServer::class)) {
-            throw new \DomainException('Please install symfony/var-dumper ^5.0 first.');
+            throw new DomainException('Please install symfony/var-dumper ^5.0 first.');
         }
 
         $descriptor = match ($format = $io->getOption('format')) {

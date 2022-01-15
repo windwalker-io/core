@@ -14,8 +14,6 @@ namespace Windwalker\Core\Generator\SubCommand;
 use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Filesystem\Path;
-use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
 /**

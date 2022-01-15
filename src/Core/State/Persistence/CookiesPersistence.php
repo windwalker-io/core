@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\State\Persistence;
 
+use ArrayIterator;
+use Iterator;
 use Windwalker\Session\Cookie\CookiesInterface;
 
 /**
@@ -44,8 +46,8 @@ class CookiesPersistence implements PersistenceInterface
         $this->cookies->remove($key);
     }
 
-    public function all(): \Iterator
+    public function all(): Iterator
     {
-        return new \ArrayIterator($this->cookies->getStorage());
+        return new ArrayIterator($this->cookies->getStorage());
     }
 }

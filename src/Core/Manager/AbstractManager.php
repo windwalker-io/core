@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use InvalidArgumentException;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
@@ -44,7 +45,7 @@ abstract class AbstractManager implements EventAwareInterface
      */
     public function __construct(Config $config, Container $container)
     {
-        $this->config    = $config->proxy($this->getConfigPrefix());
+        $this->config = $config->proxy($this->getConfigPrefix());
         $this->container = $container;
     }
 
@@ -58,7 +59,7 @@ abstract class AbstractManager implements EventAwareInterface
         $name ??= $this->getDefaultName();
 
         if ($name === null) {
-            throw new \InvalidArgumentException('Empty definition name.');
+            throw new InvalidArgumentException('Empty definition name.');
         }
 
         $define = $this->config->getDeep($this->getFactoryPath($name));
@@ -81,7 +82,7 @@ abstract class AbstractManager implements EventAwareInterface
         $name ??= $this->getDefaultName();
 
         if ($name === null) {
-            throw new \InvalidArgumentException('Empty definition name.');
+            throw new InvalidArgumentException('Empty definition name.');
         }
 
         $args = $this->prepareArguments($name, $args);
@@ -91,7 +92,7 @@ abstract class AbstractManager implements EventAwareInterface
         $define ??= $this->getDefaultFactory($name, ...$args);
 
         if (!$define) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf(
                     '%s::%s() definition: "%s" not found, the factory key is: %s',
                     static::class,
@@ -107,7 +108,7 @@ abstract class AbstractManager implements EventAwareInterface
         $this->emit(InstanceCreatedEvent::class, [
             'instance' => $instance,
             'instanceName' => $name,
-            'args' => $args
+            'args' => $args,
         ]);
 
         return $instance;

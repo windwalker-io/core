@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator;
 
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
-use Windwalker\Utilities\StrNormalize;
 
 /**
  * The GeneratorEdgeExtension class.

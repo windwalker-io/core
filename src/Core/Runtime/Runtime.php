@@ -7,12 +7,13 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Runtime;
 
 use Windwalker\Core\Provider\RuntimeProvider;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
-use Windwalker\Http\Helper\HttpHelper;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -130,7 +131,8 @@ class Runtime
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
 
         // Get allow remote ips from config.
-        if (isset($_SERVER['HTTP_CLIENT_IP'])
+        if (
+            isset($_SERVER['HTTP_CLIENT_IP'])
             || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
             || !in_array(@$_SERVER['REMOTE_ADDR'], $allowIps, true)
         ) {

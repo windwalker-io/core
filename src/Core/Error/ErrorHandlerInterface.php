@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,7 +7,11 @@
  * @license    GNU General Public License version 2 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Error;
+
+use Throwable;
 
 /**
  * The ErrorHandlerInterface class.
@@ -18,9 +23,9 @@ interface ErrorHandlerInterface
     /**
      * __invoke
      *
-     * @param  \Throwable $e
+     * @param  Throwable  $e
      *
      * @return  void
      */
-    public function __invoke(\Throwable $e): void;
+    public function __invoke(Throwable $e): void;
 }

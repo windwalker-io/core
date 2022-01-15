@@ -23,6 +23,7 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Request\ServerRequestFactory;
@@ -47,7 +48,7 @@ class WebProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function register(Container $container): void
     {
@@ -87,7 +88,7 @@ class WebProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     protected function registerAppContext(Container $container): void
     {
@@ -111,7 +112,7 @@ class WebProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     protected function registerRequestObject(Container $container): void
     {

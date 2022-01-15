@@ -11,14 +11,12 @@ declare(strict_types=1);
 
 namespace {
 
-    use Windwalker\Core\View\CollapseWrapper;
-
     if (!function_exists('env')) {
         /**
          * Get ENV var.
          *
-         * @param string $name
-         * @param mixed  $default
+         * @param  string  $name
+         * @param  mixed   $default
          *
          * @return  string
          *
@@ -34,9 +32,9 @@ namespace {
         /**
          * html_escape
          *
-         * @param string $string
-         * @param bool   $nl2br
-         * @param bool   $doubleEncode
+         * @param  string  $string
+         * @param  bool    $nl2br
+         * @param  bool    $doubleEncode
          *
          * @return  string
          *
@@ -57,6 +55,9 @@ namespace {
 
 namespace Windwalker {
 
+    use Closure;
+    use DateTimeZone;
+    use Exception;
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
     use Windwalker\Core\Http\CoreResponse;
@@ -71,7 +72,7 @@ namespace Windwalker {
          *
          * If server not running, will dump to HTML.
          *
-         * @param mixed ...$args
+         * @param  mixed  ...$args
          *
          * @return  void
          *
@@ -102,7 +103,7 @@ namespace Windwalker {
     }
 
     if (!function_exists('\Windwalker\cmd')) {
-        function cmd(string|\Closure $cmd, ?string $input = null, bool $ignoreError = false): CmdWrapper
+        function cmd(string|Closure $cmd, ?string $input = null, bool $ignoreError = false): CmdWrapper
         {
             return new CmdWrapper($cmd, $input, $ignoreError);
         }
@@ -112,12 +113,12 @@ namespace Windwalker {
         /**
          * chronos
          *
-         * @param  mixed|string               $date
-         * @param  string|\DateTimeZone|null  $tz
+         * @param  mixed|string              $date
+         * @param  string|DateTimeZone|null  $tz
          *
          * @return Chronos
          */
-        function chronos(mixed $date = 'now', string|\DateTimeZone $tz = null): Chronos
+        function chronos(mixed $date = 'now', string|DateTimeZone $tz = null): Chronos
         {
             return Chronos::wrap($date, $tz);
         }
@@ -127,12 +128,12 @@ namespace Windwalker {
         /**
          * chronos
          *
-         * @param  mixed|string               $date
-         * @param  string|\DateTimeZone|null  $tz
+         * @param  mixed|string              $date
+         * @param  string|DateTimeZone|null  $tz
          *
          * @return Chronos|null
          */
-        function chronosOrNull(mixed $date = 'now', string|\DateTimeZone $tz = null): ?Chronos
+        function chronosOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?Chronos
         {
             return Chronos::wrapOrNull($date, $tz);
         }
@@ -142,14 +143,14 @@ namespace Windwalker {
         /**
          * chronos
          *
-         * @param  string                     $format
-         * @param  string|\DateTimeZone|null  $tz
+         * @param  string                    $format
+         * @param  string|DateTimeZone|null  $tz
          *
          * @return  Chronos
          *
-         * @throws \Exception
+         * @throws Exception
          */
-        function now(string $format, string|\DateTimeZone $tz = null): string
+        function now(string $format, string|DateTimeZone $tz = null): string
         {
             return Chronos::now($format, $tz);
         }

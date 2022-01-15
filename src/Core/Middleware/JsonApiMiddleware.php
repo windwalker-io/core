@@ -11,12 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
-use Windwalker\Core\Response\Buffer\AbstractBuffer;
+use Throwable;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Session\Session;
 use Windwalker\Utilities\Arr;
@@ -29,7 +31,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 {
     use DICreateTrait;
 
-    public function run(\Closure $callback): ResponseInterface
+    public function run(Closure $callback): ResponseInterface
     {
         try {
             /** @var ResponseInterface $response */
@@ -69,17 +71,17 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             }
 
             return $response;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->handleException($e);
         }
     }
 
-    protected function handleException(\Throwable $e): Response
+    protected function handleException(Throwable $e): Response
     {
         $data = [];
 
         if ($this->app->isDebug()) {
-            $data['exception']  = $e::class;
+            $data['exception'] = $e::class;
             $data['backtraces'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
 
             foreach ($data['backtraces'] as &$datum) {
@@ -105,7 +107,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             $e->getLine()
         );
 
-        $buffer         = new JsonBuffer($message, $data, false, $e->getCode());
+        $buffer = new JsonBuffer($message, $data, false, $e->getCode());
         $buffer->status = ErrorService::normalizeCode($e->getCode());
 
         return (new JsonResponse($buffer))
@@ -118,7 +120,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
      * getMessage
      *
      * @return  string
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     protected function getMessage(): string
     {

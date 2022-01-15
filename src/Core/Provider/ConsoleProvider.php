@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Console\Color;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

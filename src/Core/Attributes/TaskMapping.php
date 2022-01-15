@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Attribute;
+
 /**
  * The TaskMapping class.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS)]
 class TaskMapping
 {
     /**

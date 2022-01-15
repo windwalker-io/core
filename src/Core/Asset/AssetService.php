@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,9 +7,17 @@
  * @license    GNU General Public License version 2 or later;
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Asset;
 
+use Exception;
+use FilesystemIterator;
 use JetBrains\PhpStorm\ArrayShape;
+use OutOfRangeException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use SplFileInfo;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Router\SystemUri;
@@ -21,7 +30,6 @@ use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
-use function Aws\default_http_handler;
 use function Windwalker\DOM\h;
 use function Windwalker\uid;
 
@@ -284,7 +292,7 @@ class AssetService implements EventAwareInterface
      * @param  array  $internalAttrs
      *
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function renderCSS(bool $withInternal = false, array $internalAttrs = []): string
     {
@@ -301,7 +309,7 @@ class AssetService implements EventAwareInterface
         );
 
         $withInternal = $event->isWithInternal();
-        $html         = $event->getHtml();
+        $html = $event->getHtml();
 
         foreach ($this->styles as $url => $style) {
             $defaultAttrs = [
@@ -316,7 +324,7 @@ class AssetService implements EventAwareInterface
             }
 
             if ($style->getOption('sri')) {
-                $attrs['integrity']   = $style->getOption('sri');
+                $attrs['integrity'] = $style->getOption('sri');
                 $attrs['crossorigin'] = 'anonymous';
             }
 
@@ -357,7 +365,7 @@ class AssetService implements EventAwareInterface
         );
 
         $withInternal = $event->isWithInternal();
-        $html         = $event->getHtml();
+        $html = $event->getHtml();
 
         foreach ($this->scripts as $url => $script) {
             $defaultAttrs = [
@@ -371,7 +379,7 @@ class AssetService implements EventAwareInterface
             }
 
             if ($script->getOption('sri')) {
-                $attrs['integrity']   = $script->getOption('sri');
+                $attrs['integrity'] = $script->getOption('sri');
                 $attrs['crossorigin'] = 'anonymous';
             }
             if ($script->getOption('body')) {
@@ -420,7 +428,7 @@ class AssetService implements EventAwareInterface
      * getVersion
      *
      * @return  string
-     * @throws \Exception
+     * @throws Exception
      */
     public function getVersion(): string
     {
@@ -451,7 +459,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  string
      *
-     * @throws \Exception
+     * @throws Exception
      * @since  3.4.9.3
      */
     public function appendVersion(string $uri, ?string $version = null): string
@@ -486,15 +494,15 @@ class AssetService implements EventAwareInterface
             return $version = md5($assetUri . $this->config->getDeep('app.secret'));
         }
 
-        $time  = '';
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
+        $time = '';
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
                 $this->addSysPath($assetUri),
-                \FilesystemIterator::FOLLOW_SYMLINKS
+                FilesystemIterator::FOLLOW_SYMLINKS
             )
         );
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($files as $file) {
             if ($file->isLink() || $file->isDir()) {
                 continue;
@@ -520,7 +528,7 @@ class AssetService implements EventAwareInterface
         }
 
         $assetUri = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $assetUri), '/\\');
-        $base     = rtrim($this->pathResolver->resolve('@public/' . $this->getAssetFolder()), '/\\');
+        $base = rtrim($this->pathResolver->resolve('@public/' . $this->getAssetFolder()), '/\\');
 
         if (!$base) {
             return '/';
@@ -531,7 +539,7 @@ class AssetService implements EventAwareInterface
         // @see http://stackoverflow.com/a/6704596
         for ($i = strlen($base) - 1; $i >= 0; $i -= 1) {
             $chunk = substr($base, $i);
-            $len   = strlen($chunk);
+            $len = strlen($chunk);
 
             if (str_starts_with($assetUri, $chunk) && $len > strlen($match)) {
                 $match = $chunk;
@@ -678,7 +686,7 @@ class AssetService implements EventAwareInterface
     public function setImportMaps(array $map): static
     {
         $im = $this->getImportMap();
-        
+
         foreach ($map['imports'] ?? [] as $name => $item) {
             if ($item instanceof RawWrapper) {
                 $item = $item();
@@ -769,7 +777,7 @@ class AssetService implements EventAwareInterface
 
         while (isset($this->aliases[$name])) {
             $alias = $this->aliases[$name];
-            $name  = $alias->getHref();
+            $name = $alias->getHref();
         }
 
         return $alias ?? null;
@@ -868,11 +876,11 @@ class AssetService implements EventAwareInterface
         $ext = Path::getExtension($uri);
 
         if (Str::endsWith($uri, '.min.' . $ext)) {
-            $assetFile    = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
+            $assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
             $assetMinFile = $uri;
         } else {
             $assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
-            $assetFile    = $uri;
+            $assetFile = $uri;
         }
 
         return [$assetFile, $assetMinFile];
@@ -973,7 +981,7 @@ class AssetService implements EventAwareInterface
      * @param  bool         $version
      *
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function path(?string $uri = null, string|bool $version = false): string
     {
@@ -1005,7 +1013,7 @@ class AssetService implements EventAwareInterface
      * @param  bool         $version
      *
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function root(?string $uri = null, string|bool $version = false): string
     {
@@ -1059,14 +1067,14 @@ class AssetService implements EventAwareInterface
 
         $allow = [
             'path',
-            'root'
+            'root',
         ];
 
         if (in_array($name, $allow)) {
             return $this->$name();
         }
 
-        throw new \OutOfRangeException(sprintf('Property %s not exists.', $name));
+        throw new OutOfRangeException(sprintf('Property %s not exists.', $name));
     }
 
     /**
@@ -1078,9 +1086,9 @@ class AssetService implements EventAwareInterface
      */
     public function reset(): self
     {
-        $this->styles          = [];
-        $this->scripts         = [];
-        $this->internalStyles  = [];
+        $this->styles = [];
+        $this->scripts = [];
+        $this->internalStyles = [];
         $this->internalScripts = [];
 
         return $this;

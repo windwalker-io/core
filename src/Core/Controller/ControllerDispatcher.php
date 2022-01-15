@@ -7,11 +7,16 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Controller;
 
+use Closure;
+use JsonException;
+use LogicException;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Attributes\TaskMapping;
@@ -54,7 +59,7 @@ class ControllerDispatcher
         $controller = $event->getController();
 
         if ($controller === null) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'Controller not found, please set "controller" as a callable to :' . $app::class
                 )
@@ -106,10 +111,10 @@ class ControllerDispatcher
         return $task;
     }
 
-    protected function prepareArrayCallable(array $handler, AppContext $app): \Closure
+    protected function prepareArrayCallable(array $handler, AppContext $app): Closure
     {
         if (\Windwalker\count($handler) !== 2) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Controller callable should be array with 2 elements, got: ' . \Windwalker\count($handler)
             );
         }
@@ -145,7 +150,7 @@ class ControllerDispatcher
         $mapping = AttributesAccessor::getFirstAttributeInstance(
             $class,
             TaskMapping::class,
-            \ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF
         );
 
         return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
@@ -158,7 +163,7 @@ class ControllerDispatcher
      *
      * @return  ResponseInterface|Response
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @since  4.0
      */
     protected function handleResponse(mixed $res): ResponseInterface

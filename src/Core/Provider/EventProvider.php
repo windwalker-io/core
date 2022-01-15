@@ -14,6 +14,7 @@ namespace Windwalker\Core\Provider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventDispatcher;
 use Windwalker\Event\EventEmitter;
@@ -44,7 +45,7 @@ class EventProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function register(Container $container): void
     {

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Edge\Component;
 
+use Closure;
+use RuntimeException;
 use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Edge\Component\DynamicComponent;
 
@@ -29,13 +31,13 @@ class XComponent extends DynamicComponent
     /**
      * Get the view / contents that represent the component.
      *
-     * @return \Closure|string
+     * @return Closure|string
      */
-    public function render(): \Closure|string
+    public function render(): Closure|string
     {
         try {
             $this->is = $this->pathResolver->resolveLayout($this->is);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             //
         }
 

@@ -60,7 +60,7 @@ class ClassFinder
     {
         $dirs = $this->findDirsFromNamespace($ns);
         $dirs = array_map(
-            fn ($dir) => $dir . '/*.php',
+            fn($dir) => $dir . '/*.php',
             $dirs
         );
 

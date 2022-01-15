@@ -15,6 +15,7 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 
 /**
@@ -40,7 +41,7 @@ class DateTimeProvider implements ServiceProviderInterface, BootableProviderInte
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function register(Container $container): void
     {

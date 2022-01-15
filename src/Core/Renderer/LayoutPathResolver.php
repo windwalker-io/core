@@ -11,13 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer;
 
+use RuntimeException;
 use Windwalker\Data\Collection;
-use Windwalker\Database\Test\Schema\SchemaTest;
 use Windwalker\DI\Container;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Utilities\Iterator\PriorityQueue;
-
-use function Windwalker\collect;
 
 /**
  * The LayoutPathResolver class.
@@ -51,7 +49,7 @@ class LayoutPathResolver
     public function resolveLayout(string $layout, array $extensions = []): string
     {
         $layout = $this->resolveAlias($layout);
-        
+
         [$ns, $layout] = static::extractNamespace($layout);
 
         $pathsBag = $this->getPathsBag($ns ?? 'main');
@@ -68,7 +66,7 @@ class LayoutPathResolver
             }
         }
 
-        return throw new \RuntimeException(
+        return throw new RuntimeException(
             sprintf(
                 'Unable to find layout: %s - Paths: %s',
                 $layout,

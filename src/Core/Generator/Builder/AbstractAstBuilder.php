@@ -11,14 +11,16 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Builder;
 
+use Closure;
 use PhpParser\BuilderFactory;
 use PhpParser\Lexer\Emulative;
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
-use PhpParser\Node;
+use PhpParser\PrettyPrinter\Standard;
 
 /**
  * The AbstractAstBuilder class.
@@ -27,7 +29,7 @@ abstract class AbstractAstBuilder
 {
     private ?Parser $parser = null;
 
-    protected ?\Closure $handler = null;
+    protected ?Closure $handler = null;
 
     abstract public function process(array $options = []): string;
 
@@ -76,7 +78,7 @@ abstract class AbstractAstBuilder
 
     public function attribute(string $name, ...$args): Node\Attribute
     {
-        $args = array_map(fn ($arg) => new Node\Arg($arg), $args);
+        $args = array_map(fn($arg) => new Node\Arg($arg), $args);
 
         return new Node\Attribute(
             new Node\Name($name),
@@ -86,30 +88,30 @@ abstract class AbstractAstBuilder
 
     protected function convertCode(
         string $code,
-        ?\Closure $enterNode = null,
-        ?\Closure $leaveNode = null
+        ?Closure $enterNode = null,
+        ?Closure $leaveNode = null
     ): string {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new CloningVisitor());
 
         $parser = $this->getParser();
-        $oldAst    = $parser->parse($code);
+        $oldAst = $parser->parse($code);
         $oldTokens = $this->getLexer()->getTokens();
 
         $traverser->addVisitor($this->createVisitor($enterNode, $leaveNode));
         $newAst = $traverser->traverse($oldAst);
 
-        $prettyPrinter = new \PhpParser\PrettyPrinter\Standard();
+        $prettyPrinter = new Standard();
 
         return $prettyPrinter->printFormatPreserving($newAst, $oldAst, $oldTokens);
     }
 
-    protected function createVisitor(?\Closure $enterNode, ?\Closure $leaveNode): NodeVisitorAbstract
+    protected function createVisitor(?Closure $enterNode, ?Closure $leaveNode): NodeVisitorAbstract
     {
-        return new class($enterNode, $leaveNode) extends NodeVisitorAbstract {
+        return new class ($enterNode, $leaveNode) extends NodeVisitorAbstract {
             public function __construct(
-                protected ?\Closure $enterNode = null,
-                protected ?\Closure $leaveNode = null
+                protected ?Closure $enterNode = null,
+                protected ?Closure $leaveNode = null
             ) {
                 //
             }

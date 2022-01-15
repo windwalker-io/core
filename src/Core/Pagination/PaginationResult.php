@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
 
+use ArrayIterator;
 use Exception;
+use IteratorAggregate;
+use JsonSerializable;
 use Traversable;
 
 /**
@@ -19,7 +22,7 @@ use Traversable;
  *
  * @since  2.0
  */
-class PaginationResult implements \JsonSerializable, \IteratorAggregate
+class PaginationResult implements JsonSerializable, IteratorAggregate
 {
     /**
      * Property first.
@@ -105,7 +108,7 @@ class PaginationResult implements \JsonSerializable, \IteratorAggregate
 
         // Lower
         $offset = $current - 1;
-        $pages  = $pagination->getPages();
+        $pages = $pagination->getPages();
 
         // -1 is simple pagination
         if ($total === -1) {
@@ -275,7 +278,7 @@ class PaginationResult implements \JsonSerializable, \IteratorAggregate
      */
     public function getAll(): array
     {
-        $all   = [];
+        $all = [];
         $pages = $this->getPages();
 
         if ($first = $this->getFirst()) {
@@ -324,6 +327,6 @@ class PaginationResult implements \JsonSerializable, \IteratorAggregate
      */
     public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->getAll());
+        return new ArrayIterator($this->getAll());
     }
 }

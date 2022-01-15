@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
 
+use ArrayAccess;
 use Fig\Link\Link;
 use Windwalker\Utilities\Contract\AccessibleInterface;
 use Windwalker\Utilities\Options\OptionAccessTrait;
@@ -51,7 +52,7 @@ class AssetLink extends Link
         return $new;
     }
 
-    public function withOptions(array|\ArrayAccess|AccessibleInterface $options): static
+    public function withOptions(array|ArrayAccess|AccessibleInterface $options): static
     {
         $new = clone $this;
         $new->options = $options;

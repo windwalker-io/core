@@ -106,7 +106,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     protected function getNamesapce(IOInterface $io, ?string $suffix = null): string
     {
         [$dest] = $this->getNameParts($io, $suffix);
-        $ns  = $io->getOption('ns');
+        $ns = $io->getOption('ns');
 
         $ns .= '\\' . $dest;
 
@@ -116,7 +116,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     protected function getDestPath(IOInterface $io, ?string $suffix = null): string
     {
         [$dest] = $this->getNameParts($io, $suffix);
-        $dir  = $io->getOption('dir');
+        $dir = $io->getOption('dir');
 
         return Path::normalize($this->app->path($dir . '/' . $dest));
     }

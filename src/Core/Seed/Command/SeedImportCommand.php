@@ -15,7 +15,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Migration\Command\AbstractMigrationCommand;
 use Windwalker\Core\Seed\SeedService;
 use Windwalker\Filesystem\FileObject;
 

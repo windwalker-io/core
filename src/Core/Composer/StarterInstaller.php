@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,10 +7,13 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Composer;
 
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
+use Exception;
 
 use function Windwalker\uid;
 
@@ -26,7 +30,7 @@ class StarterInstaller
      * @param  Event  $event  The command event.
      *
      * @return  void
-     * @throws \Exception
+     * @throws Exception
      */
     public static function rootInstall(Event $event): void
     {
@@ -70,7 +74,7 @@ class StarterInstaller
      * @param  Event  $event
      *
      * @return  void
-     * @throws \Exception
+     * @throws Exception
      */
     public static function genSecretCode(Event $event): void
     {
@@ -107,7 +111,7 @@ class StarterInstaller
     /**
      * Generate database config. will store in: etc/secret.yml.
      *
-     * @param IOInterface $io
+     * @param  IOInterface  $io
      *
      * @return  void
      */
@@ -154,10 +158,10 @@ class StarterInstaller
 
             $io->write('Selected driver: ' . $driver);
 
-            $vars['DATABASE_DRIVER']   = $driver;
-            $vars['DATABASE_HOST']     = $io->ask('Database host [localhost]: ', 'localhost');
-            $vars['DATABASE_NAME']     = $io->ask('Database name [acme]: ', 'acme');
-            $vars['DATABASE_USER']     = $io->ask('Database user [root]: ', 'root');
+            $vars['DATABASE_DRIVER'] = $driver;
+            $vars['DATABASE_HOST'] = $io->ask('Database host [localhost]: ', 'localhost');
+            $vars['DATABASE_NAME'] = $io->ask('Database name [acme]: ', 'acme');
+            $vars['DATABASE_USER'] = $io->ask('Database user [root]: ', 'root');
             $vars['DATABASE_PASSWORD'] = $io->askAndHideAnswer('Database password: ');
 
             foreach ($vars as $key => $value) {

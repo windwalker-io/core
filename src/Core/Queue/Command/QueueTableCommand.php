@@ -17,7 +17,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Migration\Command\AbstractMigrationCommand;
 use Windwalker\Core\Migration\MigrationService;
 
 /**

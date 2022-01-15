@@ -11,13 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-
 use Windwalker\Filesystem\Filesystem;
 
 use function Windwalker\uid;
@@ -59,7 +59,7 @@ class AssetVersionCommand implements CommandInterface
      * @param  IOInterface  $io
      *
      * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(IOInterface $io): int
     {

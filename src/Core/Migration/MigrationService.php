@@ -11,6 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
+use RuntimeException;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Generator\CodeGenerator;
@@ -21,10 +25,8 @@ use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Stream\Stream;
-use Windwalker\Utilities\SimpleTemplate;
 
 use function Windwalker\chronos;
 
@@ -49,7 +51,7 @@ class MigrationService implements EventAwareInterface
     /**
      * migrate
      *
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
@@ -57,25 +59,25 @@ class MigrationService implements EventAwareInterface
      */
     public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): int
     {
-        $migrations     = $this->getMigrations($path);
-        $versions       = $this->getVersions();
+        $migrations = $this->getMigrations($path);
+        $versions = $this->getVersions();
         $currentVersion = $this->getCurrentVersion();
 
         if ($migrations === []) {
-            throw new \RuntimeException('No migrations found.');
+            throw new RuntimeException('No migrations found.');
         }
 
         if ($targetVersion === null) {
             $targetVersion = max(array_merge($versions, array_keys($migrations)));
         } elseif ($targetVersion !== '0' && empty($migrations[$targetVersion])) {
-            throw new \RuntimeException('Version is not valid.');
+            throw new RuntimeException('Version is not valid.');
         }
 
         if ($logFile) {
             $this->handleLogging($logFile);
         }
 
-        $count     = 0;
+        $count = 0;
         $direction = ($targetVersion >= $currentVersion) ? Migration::UP : Migration::DOWN;
 
         if ($direction === Migration::DOWN) {
@@ -123,7 +125,7 @@ class MigrationService implements EventAwareInterface
      *
      * @return  void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function executeMigration(Migration $migration, string $direction = Migration::UP): void
     {
@@ -231,14 +233,14 @@ class MigrationService implements EventAwareInterface
     public function storeVersion(
         Migration $migration,
         string $direction,
-        \DateTimeInterface $start,
-        \DateTimeInterface $end
+        DateTimeInterface $start,
+        DateTimeInterface $end
     ): void {
         if ($direction === Migration::UP) {
-            $data['version']    = $migration->version;
-            $data['name']       = $migration->name;
+            $data['version'] = $migration->version;
+            $data['name'] = $migration->name;
             $data['start_time'] = $start->format($this->db->getDateFormat());
-            $data['end_time']   = $end->format($this->db->getDateFormat());
+            $data['end_time'] = $end->format($this->db->getDateFormat());
 
             $this->db->getWriter()->insertOne($this->getLogTable(), $data);
         } else {
@@ -318,7 +320,7 @@ class MigrationService implements EventAwareInterface
 
         $format = $options['version_format'] ?? 'YmdHi%04d';
         $i = 1;
-        $date = new \DateTimeImmutable('now');
+        $date = new DateTimeImmutable('now');
 
         do {
             $dateFormat = sprintf($format, $i);
@@ -326,7 +328,7 @@ class MigrationService implements EventAwareInterface
             $i++;
         } while (in_array($version, $versions, true));
 
-        $year    = $date->format('Y');
+        $year = $date->format('Y');
 
         return $codeGenerator->from($source)
             ->replaceTo(

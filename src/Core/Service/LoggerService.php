@@ -7,8 +7,11 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Service;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Windwalker\Core\Manager\LoggerManager;
@@ -38,12 +41,12 @@ class LoggerService
     /**
      * System is unusable.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function emergency(string|array $channel, string|array $message, array $context = []): static
     {
@@ -58,12 +61,12 @@ class LoggerService
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function alert(string|array $channel, string|array $message, array $context = []): static
     {
@@ -77,12 +80,12 @@ class LoggerService
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function critical(string|array $channel, string|array $message, array $context = []): static
     {
@@ -95,12 +98,12 @@ class LoggerService
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function error(string|array $channel, string|array $message, array $context = []): static
     {
@@ -115,12 +118,12 @@ class LoggerService
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function warning(string|array $channel, string|array $message, array $context = []): static
     {
@@ -132,12 +135,12 @@ class LoggerService
     /**
      * Normal but significant events.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function notice(string|array $channel, string|array $message, array $context = []): static
     {
@@ -151,12 +154,12 @@ class LoggerService
      *
      * Example: User logs in, SQL logs.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function info(string|array $channel, string|array $message, array $context = []): static
     {
@@ -168,12 +171,12 @@ class LoggerService
     /**
      * Detailed debug information.
      *
-     * @param string|array $channel
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function debug(string|array $channel, string|array $message, array $context = []): static
     {
@@ -185,13 +188,13 @@ class LoggerService
     /**
      * Logs with an arbitrary level.
      *
-     * @param string|array $channel
-     * @param string|int   $level
-     * @param string|array $message
-     * @param array        $context
+     * @param  string|array  $channel
+     * @param  string|int    $level
+     * @param  string|array  $message
+     * @param  array         $context
      *
      * @return static
-     * @throws \Exception
+     * @throws Exception
      */
     public function log(string|array $channel, string|int $level, string|array $message, array $context = []): static
     {

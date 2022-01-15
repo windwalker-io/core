@@ -29,6 +29,5 @@ class QuestionFactory
 
     public function create()
     {
-
     }
 }

@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset\Command;
 
+use JsonException;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Console\CommandInterface;
@@ -22,10 +24,8 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Filesystem\FileObject;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Str;
-use Windwalker\Utilities\StrNormalize;
 
 /**
  * The AssetSyncCommand class.
@@ -92,13 +92,13 @@ class AssetSyncCommand implements CommandInterface
      * @param  IOInterface  $io
      *
      * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function execute(IOInterface $io): int
     {
         $dir = $io->getArgument('dir') ?? '@source/Module';
         $dir = $this->app->path($dir);
-        
+
         // $dest = $io->getArgument('dest');
 
         // if (!$dest) {
@@ -118,7 +118,7 @@ class AssetSyncCommand implements CommandInterface
             handler: function (ViewModel $vm, string $className, FileObject $file) use ($io, &$map) {
                 $this->handleAssets($vm, $className, $file, $io, $map);
             },
-            options: \ReflectionAttribute::IS_INSTANCEOF
+            options: ReflectionAttribute::IS_INSTANCEOF
         );
 
         $flags = JSON_THROW_ON_ERROR;
@@ -140,8 +140,8 @@ class AssetSyncCommand implements CommandInterface
         $src = $dir . '/assets/**/*.{js,mjs}';
         $src = Path::relative($this->app->path('@root') . '/', $src);
         $dest = Path::clean(
-                strtolower(ltrim($vm->getModuleName() ?? $this->guessName($className, $ns), '/\\'))
-            ) . DIRECTORY_SEPARATOR;
+            strtolower(ltrim($vm->getModuleName() ?? $this->guessName($className, $ns), '/\\'))
+        ) . DIRECTORY_SEPARATOR;
 
         $map['js'][$src] = $dest;
 
@@ -155,7 +155,7 @@ class AssetSyncCommand implements CommandInterface
 
     protected function guessName(string $class, string $nsBase): string
     {
-        $ref = new \ReflectionClass($class);
+        $ref = new ReflectionClass($class);
         $ns = $ref->getNamespaceName();
 
         return Str::removeLeft($ns, $nsBase);

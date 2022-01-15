@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Debugger\Module\Ajax;
 
+use RuntimeException;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Attributes\Controller;
 use Windwalker\Core\Attributes\JsonApi;
@@ -40,7 +41,7 @@ class AjaxController
     #[JsonApi]
     public function data(#[Autowire] DashboardRepository $repository, AppContext $app): mixed
     {
-        $id   = $app->input('id');
+        $id = $app->input('id');
         $path = $app->input('path');
         $data = $repository->getItem((string) $id);
 
@@ -64,6 +65,6 @@ class AjaxController
             return $result;
         }
 
-        throw new \RuntimeException('Wrong path format.');
+        throw new RuntimeException('Wrong path format.');
     }
 }

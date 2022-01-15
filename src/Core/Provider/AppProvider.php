@@ -7,6 +7,8 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
@@ -78,7 +80,7 @@ class AppProvider implements ServiceProviderInterface
     {
         $container->bind(
             EventEmitter::class,
-            fn () => $container->newInstance(CoreEventEmitter::class)
+            fn() => $container->newInstance(CoreEventEmitter::class)
         );
     }
 

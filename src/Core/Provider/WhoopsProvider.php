@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 use Windwalker\Core\Service\ErrorService;
@@ -48,7 +49,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
         }
 
         $error->addHandler(
-            function (\Throwable $e) use ($whoops) {
+            function (Throwable $e) use ($whoops) {
                 $whoops->allowQuit(false);
                 $whoops->handleException($e);
             },

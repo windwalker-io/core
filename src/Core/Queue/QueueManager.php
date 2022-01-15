@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Queue;
 
+use Closure;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Core\Manager\AbstractManager;
@@ -53,13 +54,13 @@ class QueueManager extends AbstractManager
         );
     }
 
-    public static function createSyncHandler(): \Closure
+    public static function createSyncHandler(): Closure
     {
         return function (QueueMessage $message) {
             $tmp = Filesystem::createTemp(WINDWALKER_TEMP);
             $tmp->write(serialize($message));
 
-            register_shutdown_function(fn () => $tmp->delete());
+            register_shutdown_function(fn() => $tmp->delete());
 
             $process = (new Process(
                 [
@@ -67,7 +68,7 @@ class QueueManager extends AbstractManager
                     'windwalker',
                     'queue:worker',
                     '--once',
-                    '--file=' . $tmp . ''
+                    '--file=' . $tmp . '',
                 ]
             ))
                 ->setWorkingDirectory(WINDWALKER_ROOT)

@@ -11,18 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer;
 
+use Closure;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Asset\AssetService;
-use Windwalker\Core\DateTime\ChronosService;
-use Windwalker\Core\Language\LangService;
-use Windwalker\Core\Router\Navigator;
-use Windwalker\Core\Router\RouteUri;
-use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TemplateFactoryInterface;
-use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 
 use function Windwalker\collect;
@@ -62,7 +55,7 @@ class RendererService
         );
     }
 
-    public function make(string $layout, array $options = []): \Closure
+    public function make(string $layout, array $options = []): Closure
     {
         return $this->createRenderer()->make($this->resolveLayout($layout), $options);
     }
@@ -86,7 +79,7 @@ class RendererService
     public function getSupportedExtensions(): array
     {
         return collect($this->getRendererFactories())
-            ->map(fn (array $f) => $f[1])
+            ->map(fn(array $f) => $f[1])
             ->flatten()
             ->values()
             ->dump();
@@ -152,8 +145,11 @@ class RendererService
         return $this;
     }
 
-    public function addPath(string|array $paths, ?int $priority = PriorityQueue::ABOVE_NORMAL, string $ns = 'main'): static
-    {
+    public function addPath(
+        string|array $paths,
+        ?int $priority = PriorityQueue::ABOVE_NORMAL,
+        string $ns = 'main'
+    ): static {
         $this->resolver->addPaths($paths, $priority, $ns);
 
         return $this;

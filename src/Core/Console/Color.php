@@ -9,9 +9,14 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Console;
 
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+
+use function count;
+use function strlen;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -50,7 +55,9 @@ final class Color
     ];
 
     private $foreground;
+
     private $background;
+
     private $options = [];
 
     public function __construct(string $foreground = '', string $background = '', array $options = [])
@@ -60,7 +67,13 @@ final class Color
 
         foreach ($options as $option) {
             if (!isset(self::AVAILABLE_OPTIONS[$option])) {
-                throw new InvalidArgumentException(sprintf('Invalid option specified: "%s". Expected one of (%s).', $option, implode(', ', array_keys(self::AVAILABLE_OPTIONS))));
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Invalid option specified: "%s". Expected one of (%s).',
+                        $option,
+                        implode(', ', array_keys(self::AVAILABLE_OPTIONS))
+                    )
+                );
             }
 
             $this->options[$option] = self::AVAILABLE_OPTIONS[$option];
@@ -69,7 +82,7 @@ final class Color
 
     public function apply(string $text): string
     {
-        return $this->set().$text.$this->unset();
+        return $this->set() . $text . $this->unset();
     }
 
     public function set(): string
@@ -84,7 +97,7 @@ final class Color
         foreach ($this->options as $option) {
             $setCodes[] = $option['set'];
         }
-        if (0 === \count($setCodes)) {
+        if (0 === count($setCodes)) {
             return '';
         }
 
@@ -103,7 +116,7 @@ final class Color
         foreach ($this->options as $option) {
             $unsetCodes[] = $option['unset'];
         }
-        if (0 === \count($unsetCodes)) {
+        if (0 === count($unsetCodes)) {
             return '';
         }
 
@@ -119,26 +132,32 @@ final class Color
         if ('#' === $color[0]) {
             $color = substr($color, 1);
 
-            if (3 === \strlen($color)) {
-                $color = $color[0].$color[0].$color[1].$color[1].$color[2].$color[2];
+            if (3 === strlen($color)) {
+                $color = $color[0] . $color[0] . $color[1] . $color[1] . $color[2] . $color[2];
             }
 
-            if (6 !== \strlen($color)) {
+            if (6 !== strlen($color)) {
                 throw new InvalidArgumentException(sprintf('Invalid "%s" color.', $color));
             }
 
-            return ($background ? '4' : '3').$this->convertHexColorToAnsi(hexdec($color));
+            return ($background ? '4' : '3') . $this->convertHexColorToAnsi(hexdec($color));
         }
 
         if (isset(self::COLORS[$color])) {
-            return ($background ? '4' : '3').self::COLORS[$color];
+            return ($background ? '4' : '3') . self::COLORS[$color];
         }
 
         if (isset(self::BRIGHT_COLORS[$color])) {
-            return ($background ? '10' : '9').self::BRIGHT_COLORS[$color];
+            return ($background ? '10' : '9') . self::BRIGHT_COLORS[$color];
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid "%s" color; expected one of (%s).', $color, implode(', ', array_merge(array_keys(self::COLORS), array_keys(self::BRIGHT_COLORS)))));
+        throw new InvalidArgumentException(
+            sprintf(
+                'Invalid "%s" color; expected one of (%s).',
+                $color,
+                implode(', ', array_merge(array_keys(self::COLORS), array_keys(self::BRIGHT_COLORS)))
+            )
+        );
     }
 
     private function convertHexColorToAnsi(int $color): string

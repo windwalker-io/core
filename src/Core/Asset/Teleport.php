@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of windwalker  project.
  *
@@ -6,8 +7,11 @@
  * @license    GNU General Public License version 2 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Asset;
 
+use LogicException;
 use Windwalker\Utilities\Options\OptionAccessTrait;
 
 /**
@@ -36,7 +40,7 @@ class Teleport
     /**
      * AssetTemplate constructor.
      *
-     * @param array $options
+     * @param  array  $options
      */
     public function __construct(array $options = [])
     {
@@ -46,8 +50,8 @@ class Teleport
     /**
      * addTemplate
      *
-     * @param string $name
-     * @param string $string
+     * @param  string  $name
+     * @param  string  $string
      *
      * @return  static
      */
@@ -61,7 +65,7 @@ class Teleport
     /**
      * removeTemplate
      *
-     * @param   string $name
+     * @param  string  $name
      *
      * @return  static
      */
@@ -113,15 +117,18 @@ class Teleport
     /**
      * startTemplate
      *
-     * @param string $__assetTemplateName
-     * @param array  $__assetTemplateData
+     * @param  string  $__assetTemplateName
+     * @param  array   $__assetTemplateData
      *
      * @return  $this
      */
     public function start(string $__assetTemplateName, array $__assetTemplateData = []): static
     {
         if ($this->currentName) {
-            throw new \LogicException('Does not support nested teleport for: ' . $__assetTemplateName . '. current teleport is: ' . $this->currentName);
+            throw new LogicException(
+                'Does not support nested teleport for: ' . $__assetTemplateName .
+                '. current teleport is: ' . $this->currentName
+            );
         }
 
         $this->currentName = $__assetTemplateName;

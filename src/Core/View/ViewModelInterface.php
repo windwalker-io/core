@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\View;
 
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\State\AppState;
 
 /**
  * Interface ViewModelInterface

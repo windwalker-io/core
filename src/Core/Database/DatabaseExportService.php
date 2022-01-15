@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database;
 
+use Exception;
+use SplFileInfo;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
@@ -52,7 +54,7 @@ class DatabaseExportService
      *
      * @return FileObject
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function export(?OutputInterface $output = null): FileObject
     {
@@ -71,7 +73,7 @@ class DatabaseExportService
     }
 
     public function exportTo(
-        string|\SplFileInfo $dest,
+        string|SplFileInfo $dest,
         ?OutputInterface $output = null
     ): FileObject {
         $dest = FileObject::wrap($dest);

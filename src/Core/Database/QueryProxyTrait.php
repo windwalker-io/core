@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database;
 
+use Closure;
 use Windwalker\Query\Clause\Clause;
 use Windwalker\Query\Query;
 
@@ -24,10 +25,10 @@ use Windwalker\Query\Query;
  * @method  $this  join(string $type, mixed $table, ?string $alias = null, ...$on)
  * @method  $this  where(mixed $column, mixed ...$args)
  * @method  $this  whereRaw(Clause|string $string, ...$args)
- * @method  $this  orWhere(array|\Closure $wheres)
+ * @method  $this  orWhere(array|Closure $wheres)
  * @method  $this  having(mixed $column, mixed ...$args)
  * @method  $this  havingRaw(mixed $string, mixed ...$args)
- * @method  $this  orHaving(array|\Closure $wheres)
+ * @method  $this  orHaving(array|Closure $wheres)
  * @method  $this  order(mixed $column, ?string $dir = null)
  * @method  $this  group(...$columns)
  * @method  $this  limit(?int $limit)
@@ -67,7 +68,7 @@ trait QueryProxyTrait
 {
     abstract protected function getInnerQuery(): Query;
 
-    public function __call(string $name, array$args = []): mixed
+    public function __call(string $name, array $args = []): mixed
     {
         $query = $this->getInnerQuery();
 

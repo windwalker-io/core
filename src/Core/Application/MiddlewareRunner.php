@@ -11,9 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Generator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionException;
 use Relay\Relay;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\Wrapper\RawWrapper;
@@ -45,14 +47,14 @@ class MiddlewareRunner
     /**
      * compileMiddlewares
      *
-     * @param  iterable  $middlewares
+     * @param  iterable       $middlewares
      * @param  callable|null  $last
      *
-     * @return \Generator
+     * @return Generator
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function compileMiddlewares(iterable $middlewares, ?callable $last = null): \Generator
+    public function compileMiddlewares(iterable $middlewares, ?callable $last = null): Generator
     {
         foreach ($middlewares as $i => $middleware) {
             yield $this->resolveMiddleware($middleware);

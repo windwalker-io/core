@@ -75,7 +75,7 @@ class EdgeProvider implements ServiceProviderInterface
                         CoreFileLoader::class,
                         [
                             'loader' => $edge->getLoader(),
-                            'extensions' => $container->getParam('renderer.renderers.edge.1')
+                            'extensions' => $container->getParam('renderer.renderers.edge.1'),
                         ]
                     )
                 );

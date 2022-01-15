@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Attribute;
 use Psr\Http\Message\RequestInterface;
 use Windwalker\Core\Middleware\CsrfMiddleware;
 use Windwalker\DI\Attributes\AttributeHandler;
@@ -19,7 +20,7 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 /**
  * The Csrf class.
  */
-#[\Attribute(\Attribute::TARGET_FUNCTION | \Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
 class Csrf implements ContainerAttributeInterface
 {
     public function __invoke(AttributeHandler $handler): callable
@@ -30,7 +31,7 @@ class Csrf implements ContainerAttributeInterface
             return $container->newInstance(CsrfMiddleware::class)
                 ->run(
                     $container->get(RequestInterface::class),
-                    fn () => $handler(...$args)
+                    fn() => $handler(...$args)
                 );
         };
     }

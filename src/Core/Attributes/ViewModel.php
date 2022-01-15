@@ -11,24 +11,16 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Attribute;
 use Psr\Http\Message\ResponseInterface;
-use Windwalker\Core\Asset\AssetService;
-use Windwalker\Core\Html\HtmlFrame;
-use Windwalker\Core\Module\ModuleInterface;
-use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\View;
-use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
-use Windwalker\DI\Container;
-use Windwalker\Filesystem\Path;
-use Windwalker\Http\Response\HtmlResponse;
-use Windwalker\Utilities\Str;
 
 /**
  * The HtmlPage class.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS)]
 class ViewModel implements ContainerAttributeInterface
 {
     public array $css;
@@ -56,7 +48,7 @@ class ViewModel implements ContainerAttributeInterface
         public array $options = []
     ) {
         $this->css = (array) $css;
-        $this->js  = (array) $js;
+        $this->js = (array) $js;
     }
 
     public function __invoke(AttributeHandler $handler): callable

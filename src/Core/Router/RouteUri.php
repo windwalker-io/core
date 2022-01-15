@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Closure;
 use JetBrains\PhpStorm\ArrayShape;
 use Psr\Http\Message\ResponseInterface;
+use Stringable;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Http\Response\RedirectResponse;
@@ -38,22 +40,22 @@ class RouteUri extends Uri implements NavConstantInterface
     /**
      * RouteUri constructor.
      *
-     * @param  \Closure|\Stringable|string  $uri
-     * @param  array|null                   $vars
-     * @param  Navigator                    $navigator
-     * @param  int                          $options
+     * @param  Closure|Stringable|string  $uri
+     * @param  array|null                 $vars
+     * @param  Navigator                  $navigator
+     * @param  int                        $options
      */
     public function __construct(mixed $uri, ?array $vars, protected Navigator $navigator, int $options = 0)
     {
-        if ($uri instanceof \Closure) {
+        if ($uri instanceof Closure) {
             $this->handler = $uri;
-            $uri           = '';
+            $uri = '';
         }
 
         parent::__construct((string) $uri);
 
         if ($vars !== null) {
-            $this->vars  = array_merge($this->vars, $vars ?? []);
+            $this->vars = array_merge($this->vars, $vars ?? []);
             $this->query = UriHelper::buildQuery($this->vars);
         }
 
@@ -69,7 +71,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function options(int $options): static
     {
-        $new          = clone $this;
+        $new = clone $this;
         $new->options = $options;
 
         return $new;
@@ -310,7 +312,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function __toString(): string
     {
-        if ($this->handler instanceof \Closure) {
+        if ($this->handler instanceof Closure) {
             $vars = [];
 
             try {
@@ -387,7 +389,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function withStatus(int $status): static
     {
-        $new         = clone $this;
+        $new = clone $this;
         $new->status = $status;
 
         return $new;

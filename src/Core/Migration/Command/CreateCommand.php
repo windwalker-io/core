@@ -15,11 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\Service;
-use Windwalker\Utilities\Str;
 
 /**
  * The CreateCommand class.
@@ -30,8 +26,8 @@ class CreateCommand extends AbstractMigrationCommand
     /**
      * CreateCommand constructor.
      */
-    public function __construct() {
-
+    public function __construct()
+    {
     }
 
     /**

@@ -11,21 +11,26 @@ declare(strict_types=1);
 
 namespace Windwalker\Debugger\Module\Dashboard;
 
+use FilesystemIterator;
+use Psr\Cache\InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RuntimeException;
+use SplFileInfo;
+use Throwable;
 use Windwalker\Data\Collection;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-
-use function Windwalker\uid;
 
 /**
  * The DashboardRepository class.
  */
 class DashboardRepository
 {
-    public const FILE_SEPARATOR = '{{ Debugger data ---------- }}';
-
     use InstanceCacheTrait;
+
+    public const FILE_SEPARATOR = '{{ Debugger data ---------- }}';
 
     public function getItem(string $id): array
     {
@@ -34,7 +39,7 @@ class DashboardRepository
         $file = $dir . '/' . $id;
 
         if (!is_file($file)) {
-            throw new \RuntimeException('ID ' . $id . ' not found.');
+            throw new RuntimeException('ID ' . $id . ' not found.');
         }
 
         [$basicData, $data] = explode(static::FILE_SEPARATOR, file_get_contents($file));
@@ -46,7 +51,7 @@ class DashboardRepository
      * getItems
      *
      * @return array
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getItems(int $limit = 100, bool $includeData = false): array
     {
@@ -59,7 +64,7 @@ class DashboardRepository
 
             $items = [];
 
-            /** @var \SplFileInfo $file */
+            /** @var SplFileInfo $file */
             foreach ($files as $file) {
                 [$basicData, $data] = explode(static::FILE_SEPARATOR, file_get_contents($file->getPathname()));
 
@@ -83,7 +88,7 @@ class DashboardRepository
     /**
      * getFiles
      *
-     * @return  \RecursiveIteratorIterator
+     * @return  RecursiveIteratorIterator
      */
     public function getFiles(): iterable
     {
@@ -93,8 +98,8 @@ class DashboardRepository
             return [];
         }
 
-        return new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+        return new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
         );
     }
 
@@ -102,7 +107,7 @@ class DashboardRepository
      * getLastItem
      *
      * @return  array
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getLastItem(): array
     {
@@ -119,14 +124,14 @@ class DashboardRepository
             'method' => $collector->getDeep('http.request.method'),
             'response' => $collector->getDeep('http.response'),
             'time' => microtime(true),
-            'ip' => $collector->getDeep('system.remoteIP')
+            'ip' => $collector->getDeep('system.remoteIP'),
         ];
 
         $content = implode(
             static::FILE_SEPARATOR,
             [
                 json_encode($basicData),
-                json_encode($collector)
+                json_encode($collector),
             ]
         );
 
@@ -148,7 +153,7 @@ class DashboardRepository
         $files = $this->getFiles();
         $items = [];
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($files as $file) {
             if (is_file($file->getPathname())) {
                 @$items[$file->getMTime()] = $file;
@@ -159,7 +164,7 @@ class DashboardRepository
 
         $i = 0;
 
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach ($items as $file) {
             $i++;
 
@@ -170,7 +175,7 @@ class DashboardRepository
             if (is_file($file->getPathname())) {
                 try {
                     @Filesystem::delete($file->getPathname());
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     // Ignore error
                 }
             }

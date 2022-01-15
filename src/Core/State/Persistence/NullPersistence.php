@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\State\Persistence;
 
+use ArrayIterator;
+use Iterator;
+
 /**
  * The NullPersistence class.
  */
@@ -30,8 +33,8 @@ class NullPersistence implements PersistenceInterface
     {
     }
 
-    public function all(): \Iterator
+    public function all(): Iterator
     {
-        return new \ArrayIterator([]);
+        return new ArrayIterator([]);
     }
 }

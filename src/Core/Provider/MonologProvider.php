@@ -7,6 +7,8 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Provider;
 
 use Monolog\Handler\HandlerInterface;

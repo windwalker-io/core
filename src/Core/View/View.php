@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\View;
 
+use LogicException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
+use ReflectionClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
@@ -139,7 +142,7 @@ class View implements EventAwareInterface
         $vm = $this->getViewModel();
 
         if (!$vm instanceof ViewModelInterface && method_exists($vm, 'prepare')) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     '%s must implement %s or has prepare() method.',
                     $vm::class,
@@ -201,7 +204,7 @@ class View implements EventAwareInterface
             $this->preparePaths($vm);
 
             if (!$this->layout) {
-                throw new \LogicException('View must provide at least 1 layout name.');
+                throw new LogicException('View must provide at least 1 layout name.');
             }
 
             $this->prepareHtmlFrame($vm);
@@ -251,7 +254,7 @@ class View implements EventAwareInterface
         }
 
         if (!is_array($data)) {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 sprintf(
                     'ViewModel return value not support for: %s',
                     get_debug_type($data)
@@ -303,7 +306,7 @@ class View implements EventAwareInterface
 
     protected function injectData(object $vm, array $data): void
     {
-        $ref = new \ReflectionClass($vm);
+        $ref = new ReflectionClass($vm);
 
         foreach ($ref->getProperties() as $property) {
             AttributesAccessor::runAttributeIfExists(
@@ -489,7 +492,7 @@ class View implements EventAwareInterface
             $view = $view::class;
         }
 
-        $ref = new \ReflectionClass($view);
+        $ref = new ReflectionClass($view);
 
         $this->addPath(dirname($ref->getFileName()) . '/views', $priority, $ns);
 
@@ -512,7 +515,7 @@ class View implements EventAwareInterface
     {
         $root = $this->app->config('asset.namespace_base');
 
-        $ref = new \ReflectionClass($vm);
+        $ref = new ReflectionClass($vm);
         $ns = $ref->getNamespaceName();
 
         if (str_starts_with($ns, $root)) {
@@ -585,7 +588,7 @@ class View implements EventAwareInterface
 
     protected function getTemplatePath(object $vm): string
     {
-        $ref = new \ReflectionClass($vm);
+        $ref = new ReflectionClass($vm);
 
         return dirname($ref->getFileName()) . '/views';
     }

@@ -1,10 +1,13 @@
 <?php
+
 /**
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2018 LYRASOFT.
  * @license    MIT
  */
+
+declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer\Edge;
 
@@ -21,8 +24,8 @@ class EdgeHelper
     /**
      * attr
      *
-     * @param string|array $name
-     * @param mixed        $value
+     * @param  string|array  $name
+     * @param  mixed         $value
      *
      * @return  string
      *

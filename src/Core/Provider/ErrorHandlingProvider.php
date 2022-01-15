@@ -7,9 +7,10 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Provider;
 
-use Symfony\Component\Console\Application;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\ErrorService;

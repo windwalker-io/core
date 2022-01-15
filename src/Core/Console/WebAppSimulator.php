@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Console;
 
 use Psr\Http\Message\ResponseInterface;
+use Stringable;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Application\WebApplicationTrait;
 use Windwalker\DI\Container;
@@ -39,7 +40,7 @@ class WebAppSimulator implements WebApplicationInterface
         die(0);
     }
 
-    public function redirect(\Stringable|string $url, int $code = 303, bool $instant = false): ResponseInterface
+    public function redirect(Stringable|string $url, int $code = 303, bool $instant = false): ResponseInterface
     {
         return new RedirectResponse($url, $code);
     }

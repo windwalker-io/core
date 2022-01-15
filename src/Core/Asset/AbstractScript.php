@@ -36,8 +36,8 @@ abstract class AbstractScript
     /**
      * inited
      *
-     * @param   string $name
-     * @param   mixed  ...$data
+     * @param  string  $name
+     * @param  mixed   ...$data
      *
      * @return bool
      */
@@ -57,7 +57,7 @@ abstract class AbstractScript
     /**
      * available
      *
-     * @param mixed ...$data
+     * @param  mixed  ...$data
      *
      * @return  bool
      *
@@ -76,7 +76,7 @@ abstract class AbstractScript
     /**
      * getInitedId
      *
-     * @param   mixed ...$data
+     * @param  mixed  ...$data
      *
      * @return  string
      */
@@ -91,7 +91,7 @@ abstract class AbstractScript
 
         if (!is_bool($quote)) {
             $data[] = $quote;
-            $quote  = false;
+            $quote = false;
         }
 
         if (count($data) > 1) {
@@ -110,9 +110,9 @@ abstract class AbstractScript
     /**
      * mergeOptions
      *
-     * @param array $options1
-     * @param array $options2
-     * @param bool  $recursive
+     * @param  array  $options1
+     * @param  array  $options2
+     * @param  bool   $recursive
      *
      * @return  array
      */
@@ -144,8 +144,8 @@ abstract class AbstractScript
     /**
      * Handle dynamic calls to the asset object.
      *
-     * @param   string $method The method name.
-     * @param   array  $args   The arguments of method call.
+     * @param  string  $method  The method name.
+     * @param  array   $args    The arguments of method call.
      *
      * @return  mixed
      */

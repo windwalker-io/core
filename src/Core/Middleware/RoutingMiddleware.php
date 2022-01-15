@@ -18,15 +18,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Controller\DefaultController;
-use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeRoutingEvent;
-use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
-use Windwalker\Core\Router\SystemUri;
-use Windwalker\DI\Container;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\EventAwareInterface;
@@ -59,7 +55,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
      *
-     * @param  ServerRequestInterface   $request
+     * @param  ServerRequestInterface  $request
      * @param  RequestHandlerInterface  $handler
      *
      * @return ResponseInterface
@@ -76,7 +72,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             [
                 'route' => $route,
                 'request' => $request,
-                'systemUri' => $this->app->getSystemUri()
+                'systemUri' => $this->app->getSystemUri(),
             ]
         );
 
@@ -88,7 +84,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
                 'route' => $route,
                 'request' => $request,
                 'systemUri' => $event->getSystemUri(),
-                'matched' => $matched
+                'matched' => $matched,
             ]
         );
 
@@ -112,7 +108,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         return $runner->run(
             $request,
             $middlewares,
-            fn (ServerRequestInterface $request) => $handler->handle($request)
+            fn(ServerRequestInterface $request) => $handler->handle($request)
         );
     }
 

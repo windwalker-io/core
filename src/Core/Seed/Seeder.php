@@ -13,6 +13,7 @@ namespace Windwalker\Core\Seed;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
+use SplFileInfo;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
 use Windwalker\Utilities\StrNormalize;
@@ -42,12 +43,12 @@ class Seeder
     /**
      * Migration constructor.
      *
-     * @param  \SplFileInfo     $file
+     * @param  SplFileInfo     $file
      * @param  DatabaseAdapter  $db
      * @param  FakerService     $faker
      */
     public function __construct(
-        public \SplFileInfo $file,
+        public SplFileInfo $file,
         public DatabaseAdapter $db,
         protected FakerService $faker
     ) {

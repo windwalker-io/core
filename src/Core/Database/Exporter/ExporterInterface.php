@@ -30,7 +30,7 @@ interface ExporterInterface
     /**
      * Export to stream resource.
      *
-     * @param resource $resource
+     * @param  resource  $resource
      *
      * @return  void
      */

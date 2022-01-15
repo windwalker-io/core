@@ -11,12 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
 
+use JsonSerializable;
 use Windwalker\Core\Router\RouteUri;
 
 /**
  * The PageItem class.
  */
-class PageItem implements \JsonSerializable
+class PageItem implements JsonSerializable
 {
     /**
      * PageItem constructor.

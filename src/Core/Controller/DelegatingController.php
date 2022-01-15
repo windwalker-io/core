@@ -11,13 +11,15 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Controller;
 
+use LogicException;
+use ReflectionException;
+use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
-use Windwalker\DI\Container;
 
 /**
  * The DelegatingController class.
@@ -48,7 +50,7 @@ class DelegatingController implements ControllerInterface
      * @param  array   $args
      *
      * @return mixed
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function execute(string $task, array $args = []): mixed
     {
@@ -73,7 +75,7 @@ class DelegatingController implements ControllerInterface
 
         if (!method_exists($this->controller, $task)) {
             if ($task !== 'index') {
-                throw new \LogicException(
+                throw new LogicException(
                     sprintf(
                         'Method: %s::%s() not found.',
                         $this->controller::class,
@@ -102,18 +104,21 @@ class DelegatingController implements ControllerInterface
 
             $this->app->addMessage($e->getMessage(), 'warning');
             $nav = $this->app->service(Navigator::class);
+
             return $nav->back();
-        } catch (\Throwable $e) {
-            if ($this->app->isDebug()
+        } catch (Throwable $e) {
+            if (
+                $this->app->isDebug()
                 || strtoupper($this->app->getRequestMethod()) === 'GET'
                 || $this->app->getAppRequest()->acceptJson()
             ) {
                 throw $e;
-            } else {
-                $this->app->addMessage($e->getMessage(), 'warning');
-                $nav = $this->app->service(Navigator::class);
-                return $nav->back();
             }
+
+            $this->app->addMessage($e->getMessage(), 'warning');
+            $nav = $this->app->service(Navigator::class);
+
+            return $nav->back();
         }
     }
 

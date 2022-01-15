@@ -7,12 +7,16 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Stringable;
+use Throwable;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
@@ -194,7 +198,7 @@ class WebApplication implements WebApplicationInterface
         try {
             return MiddlewareRunner::createRequestHandler($middlewares)
                 ->handle($request);
-        } catch (ValidateFailException|InvalidTokenException $e) {
+        } catch (ValidateFailException | InvalidTokenException $e) {
             if ($app->isDebug()) {
                 throw $e;
             }
@@ -203,31 +207,32 @@ class WebApplication implements WebApplicationInterface
             $nav = $app->service(Navigator::class);
 
             return $this->redirect($nav->back());
-        } catch (\Throwable $e) {
-            if ($app->isDebug()
+        } catch (Throwable $e) {
+            if (
+                $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
                 || $app->getAppRequest()->acceptJson()
             ) {
                 throw $e;
-            } else {
-                $app->addMessage($e->getMessage(), 'warning');
-                $nav = $app->service(Navigator::class);
-
-                return $this->redirect($nav->back());
             }
+
+            $app->addMessage($e->getMessage(), 'warning');
+            $nav = $app->service(Navigator::class);
+
+            return $this->redirect($nav->back());
         }
     }
 
     /**
      * Redirect to another URL.
      *
-     * @param  string|\Stringable  $url
-     * @param  int                 $code
-     * @param  bool                $instant
+     * @param  string|Stringable  $url
+     * @param  int                $code
+     * @param  bool               $instant
      *
      * @return  ResponseInterface
      */
-    public function redirect(string|\Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
+    public function redirect(string|Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
     {
         // Perform a basic sanity check to make sure we don't have any CRLF garbage.
         $url = preg_split("/[\r\n]/", (string) $url)[0];

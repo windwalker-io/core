@@ -3,7 +3,7 @@
 /**
  * Part of starter project.
  *
- * @copyright    Copyright (C) 2021 __ORGANIZATION__.
+ * @copyright      Copyright (C) 2021 __ORGANIZATION__.
  * @license        MIT
  */
 
@@ -14,7 +14,7 @@ namespace Windwalker\Core\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\Process;
+use Throwable;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -39,7 +39,7 @@ class ServeCommand implements CommandInterface
     /**
      * configure
      *
-     * @param    Command  $command
+     * @param  Command  $command
      *
      * @return    void
      */
@@ -76,7 +76,7 @@ class ServeCommand implements CommandInterface
     /**
      * Executes the current command.
      *
-     * @param    IOInterface  $io
+     * @param  IOInterface  $io
      *
      * @return    int Return 0 is success, 1-255 is failure.
      */
@@ -151,11 +151,12 @@ class ServeCommand implements CommandInterface
 
             if ($connection) {
                 fclose($connection);
+
                 return false;
             }
 
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return true;
         }
     }

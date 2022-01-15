@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use Closure;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,7 +23,6 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Console\CmdWrapper;
-use Windwalker\Utilities\Arr;
 
 use function Windwalker\cmd;
 
@@ -188,7 +188,7 @@ class RunCommand implements CommandInterface
 
     protected function prepareCmd(mixed $cmd): CmdWrapper
     {
-        if ($cmd instanceof \Closure || !$cmd instanceof CmdWrapper) {
+        if ($cmd instanceof Closure || !$cmd instanceof CmdWrapper) {
             $cmd = cmd($cmd);
         }
 

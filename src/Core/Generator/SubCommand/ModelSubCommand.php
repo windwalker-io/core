@@ -13,7 +13,6 @@ namespace Windwalker\Core\Generator\SubCommand;
 
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Utilities\Str;
 
 /**
  * The GenViewSubCommand class.

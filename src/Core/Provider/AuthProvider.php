@@ -20,8 +20,6 @@ use Windwalker\Core\Auth\AuthService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 
-use function Windwalker\ref;
-
 /**
  * The AuthProvider class.
  */

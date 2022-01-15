@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use BadMethodCallException;
 use Windwalker\DI\Definition\DefinitionInterface;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Options\OptionAccessTrait;
@@ -286,7 +287,7 @@ trait RouteConfigurationTrait
             $class = create($class, ...$args);
         }
 
-        $this->options['middlewares']   ??= [];
+        $this->options['middlewares'] ??= [];
         $this->options['middlewares'][] = $class;
 
         return $this;
@@ -323,7 +324,7 @@ trait RouteConfigurationTrait
         } elseif ($count === 3) {
             $this->options['subscribers'][$args[0]][$args[1]] = $args[2];
         } else {
-            throw new \BadMethodCallException(
+            throw new BadMethodCallException(
                 sprintf(
                     '%s() should got 1 ~ 3 arguments, %s given.',
                     __METHOD__,
@@ -448,6 +449,6 @@ trait RouteConfigurationTrait
             return $this->handlers(Str::removeRight(strtolower($name), 'handler'), ...$args);
         }
 
-        throw new \BadMethodCallException(sprintf('Method: %s not exists', $name));
+        throw new BadMethodCallException(sprintf('Method: %s not exists', $name));
     }
 }

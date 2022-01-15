@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Mailer;
 
+use LogicException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Email;
@@ -43,7 +44,7 @@ class MailMessage extends Email
     public function send(?Envelope $envelope = null, int $flags = 0): SentMessage
     {
         if ($this->mailer === null) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     '%s must set into %s if you use $message->send()',
                     Mailer::class,

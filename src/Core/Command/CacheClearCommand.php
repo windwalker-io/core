@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandInterface;
@@ -70,7 +71,7 @@ class CacheClearCommand implements CommandInterface
      */
     protected function clearCacheRoot(IOInterface $io): void
     {
-        /** @var \SplFileInfo $file */
+        /** @var SplFileInfo $file */
         foreach (Filesystem::items(WINDWALKER_CACHE, false) as $file) {
             if (in_array($file->getBasename(), ['.gitignore', '.htaccess', 'web.config'])) {
                 continue;

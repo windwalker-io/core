@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Module;
 
+use ReflectionClass;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\Attributes\Inject;
@@ -56,7 +57,7 @@ abstract class AbstractModule implements ModuleInterface
     {
         $root = $this->app->config('asset.namespace_base');
 
-        $ref = new \ReflectionClass($this);
+        $ref = new ReflectionClass($this);
         $ns = $ref->getNamespaceName();
 
         return StrNormalize::toDotSeparated(Str::removeLeft($ns, $root));

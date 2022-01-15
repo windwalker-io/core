@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
-use Windwalker\Core\Application\AppContext;
+use Attribute;
 use Windwalker\Core\Middleware\JsonResponseMiddleware;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
@@ -19,7 +19,7 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 /**
  * The Json class.
  */
-#[\Attribute(\Attribute::TARGET_FUNCTION | \Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
 class Json implements ContainerAttributeInterface
 {
     public function __invoke(AttributeHandler $handler): callable
@@ -27,7 +27,7 @@ class Json implements ContainerAttributeInterface
         return function (...$args) use ($handler) {
             $container = $handler->getContainer();
 
-            return $container->newInstance(JsonResponseMiddleware::class)->run(fn () => $handler(...$args));
+            return $container->newInstance(JsonResponseMiddleware::class)->run(fn() => $handler(...$args));
         };
     }
 }

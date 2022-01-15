@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\State\Persistence;
 
+use Iterator;
+
 /**
  * Interface PersistenceInterface
  */
@@ -22,5 +24,5 @@ interface PersistenceInterface
 
     public function forget(string $key): void;
 
-    public function all(): \Iterator;
+    public function all(): Iterator;
 }

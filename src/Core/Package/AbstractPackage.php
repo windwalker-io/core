@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Package;
 
 use Composer\InstalledVersions;
+use JsonException;
+use ReflectionClass;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Str;
@@ -45,7 +47,7 @@ abstract class AbstractPackage
      *
      * @return  array
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public static function composerJson(): ?array
     {
@@ -57,7 +59,7 @@ abstract class AbstractPackage
      *
      * @return  array|null
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     protected static function loadComposerJson(): ?array
     {
@@ -112,7 +114,7 @@ abstract class AbstractPackage
      */
     public static function fileName(): string
     {
-        return (new \ReflectionClass(static::class))->getFileName();
+        return (new ReflectionClass(static::class))->getFileName();
     }
 
     /**
@@ -124,7 +126,7 @@ abstract class AbstractPackage
      */
     public static function namespace(): string
     {
-        return (new \ReflectionClass(static::class))->getNamespaceName();
+        return (new ReflectionClass(static::class))->getNamespaceName();
     }
 
     protected function mergeConfig(Container $container, array $data, bool $override = false): void
@@ -137,6 +139,7 @@ abstract class AbstractPackage
                         $storage,
                     );
                 }
+
                 return Arr::mergeRecursive(
                     $storage,
                     $data

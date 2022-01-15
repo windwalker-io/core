@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database\Command;
 
+use DateTimeImmutable;
+use DomainException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -34,7 +37,7 @@ class DbExportCommand implements CommandInterface
     /**
      * DbExportCommand constructor.
      *
-     * @param  ApplicationInterface   $app
+     * @param  ApplicationInterface  $app
      */
     public function __construct(
         protected ApplicationInterface $app,
@@ -49,7 +52,7 @@ class DbExportCommand implements CommandInterface
         try {
             $databaseManager = $this->app->service(DatabaseManager::class);
             $default = $databaseManager->getDefaultName();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $default = 'local';
         }
 
@@ -73,12 +76,12 @@ class DbExportCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!class_exists(DatabaseAdapter::class)) {
-            throw new \DomainException('Please install windwalker/database first.');
+            throw new DomainException('Please install windwalker/database first.');
         }
 
         $databaseManager = $this->app->service(DatabaseManager::class);
 
-        $now  = new \DateTimeImmutable('now');
+        $now = new DateTimeImmutable('now');
         $conn = $io->getOption('connection');
 
         if ($conn) {

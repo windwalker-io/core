@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Windwalker\Core\Application\AppContext;
@@ -42,7 +43,7 @@ class CsrfMiddleware implements MiddlewareInterface
         $this->options = $options;
     }
 
-    public function run(ServerRequestInterface $request, \Closure $next): mixed
+    public function run(ServerRequestInterface $request, Closure $next): mixed
     {
         if ($this->isExclude()) {
             return $next($request);
@@ -53,7 +54,7 @@ class CsrfMiddleware implements MiddlewareInterface
                 'post',
                 'put',
                 'patch',
-                'delete'
+                'delete',
             ];
 
         $method = strtolower($this->app->getAppRequest()->getOverrideMethod());

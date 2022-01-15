@@ -12,14 +12,12 @@ declare(strict_types=1);
 namespace Windwalker\Core\Error;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Throwable;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
-use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Response\HtmlResponse;
-use Windwalker\Http\Server\HttpServer;
-use Windwalker\Http\Server\ServerInterface;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 /**
@@ -54,11 +52,11 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
     /**
      * __invoke
      *
-     * @param  \Throwable  $e
+     * @param  Throwable  $e
      *
      * @return  void
      */
-    public function __invoke(\Throwable $e): void
+    public function __invoke(Throwable $e): void
     {
         $renderer = $this->container->get(RendererService::class);
 

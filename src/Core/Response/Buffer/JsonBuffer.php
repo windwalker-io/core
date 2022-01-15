@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,7 +7,11 @@
  * @license    GNU General Public License version 2 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Response\Buffer;
+
+use JsonException;
 
 /**
  * The JsonBuffer class.
@@ -19,7 +24,7 @@ class JsonBuffer extends AbstractBuffer
      * Method for sending the response in JSON format
      *
      * @return  string  The response in JSON format
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function toString(): string
     {

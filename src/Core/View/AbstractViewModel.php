@@ -26,5 +26,5 @@ abstract class AbstractViewModel implements ViewModelInterface
      *
      * @return  mixed
      */
-    abstract public function prepare(AppContext $app, \Windwalker\Core\View\View $view): mixed;
+    abstract public function prepare(AppContext $app, View $view): mixed;
 }

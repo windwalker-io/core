@@ -1,10 +1,13 @@
 <?php
+
 /**
  * Part of phoenix project.
  *
  * @copyright  Copyright (C) 2019 LYRASOFT.
  * @license    MIT
  */
+
+declare(strict_types=1);
 
 namespace Windwalker\Core\Response\Buffer;
 

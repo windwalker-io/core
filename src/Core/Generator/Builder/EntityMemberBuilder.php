@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\Builder;
 
 use PhpParser\Node;
+use ReflectionAttribute;
+use ReflectionProperty;
 use Unicorn\Enum\BasicState;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
@@ -63,10 +65,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     public function process(array $options = [], ?array &$addedMembers = null): string
     {
         // Get properties
-        $ref   = $this->metadata->getReflector();
+        $ref = $this->metadata->getReflector();
         $class = $this->metadata->getClassName();
         // $props = $this->metadata->getProperties();
-        /** @var \ReflectionProperty $lastProp */
+        /** @var ReflectionProperty $lastProp */
         // $lastProp = $props[array_key_last($props)];
         [$create, $delete, $keep] = $this->getColumnsDiff($class);
 
@@ -80,7 +82,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             if ($node instanceof Node\Stmt\UseUse) {
                 $this->uses[] = (string) $node->name;
             }
-            
+
             // Handle existing properties
             if ($node instanceof Node\Stmt\Property) {
                 if ($options['methods'] ?? true) {
@@ -165,9 +167,11 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         $node->stmts,
                         ++$last,
                         0,
-                        [$this->createNodeFactory()
-                            ->use($use)
-                            ->getNode()]
+                        [
+                            $this->createNodeFactory()
+                                ->use($use)
+                                ->getNode(),
+                        ]
                     );
                 }
             }
@@ -182,14 +186,14 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn): array
     {
-        $dt      = $this->getORM()->getDb()->getPlatform()->getDataType();
+        $dt = $this->getORM()->getDb()->getPlatform()->getDataType();
         $default = $dbColumn->getColumnDefault();
 
         $dataType = $dbColumn->getDataType();
         $len = $dbColumn->getErratas()['custom_length'] ?? null;
 
         if ($dataType === 'datetime') {
-            $type    = '?Chronos';
+            $type = '?Chronos';
             $default = null;
 
             $this->addUse(Chronos::class);
@@ -204,7 +208,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $type = 'array';
             $default = [];
         } else {
-            $type    = $dt::getPhpType($dataType);
+            $type = $dt::getPhpType($dataType);
             $default = TypeCast::try($default, $type);
 
             if ($dbColumn->isAutoIncrement() || $dbColumn->getIsNullable()) {
@@ -256,10 +260,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         Node\Stmt\Property $prop,
         array &$added = null
     ): array {
-        $added   = [];
+        $added = [];
         $factory = $this->createNodeFactory();
-        $ref     = $this->metadata->getReflector();
-        $type    = $prop->type;
+        $ref = $this->metadata->getReflector();
+        $type = $prop->type;
         $tbManager = $this->getTableManager();
 
         $ref = $this->metadata->getReflector();
@@ -267,13 +271,13 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $col = AttributesAccessor::getFirstAttributeInstance(
             $propRef,
             Column::class,
-            \ReflectionAttribute::IS_INSTANCEOF
+            ReflectionAttribute::IS_INSTANCEOF
         );
 
         $colName = $col?->getName();
-        $column  = $colName ? $tbManager->getColumn($colName) : null;
+        $column = $colName ? $tbManager->getColumn($colName) : null;
 
-        $isBool   = false;
+        $isBool = false;
         $specialSetter = null;
         $typeNode = $type;
 
@@ -306,7 +310,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         // Getter
         if (!$ref->hasMethod($getter)) {
-            $added[]   = $getter;
+            $added[] = $getter;
             $method = $factory->method($getter)
                 ->makePublic()
                 ->addStmt(
@@ -330,7 +334,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     'column' => $column,
                     'prop' => $prop,
                     'type' => $type,
-                    'entityMemberBuilder' => $this
+                    'entityMemberBuilder' => $this,
                 ]
             );
 
@@ -373,7 +377,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     'column' => $column,
                     'prop' => $prop,
                     'type' => $type,
-                    'entityMemberBuilder' => $this
+                    'entityMemberBuilder' => $this,
                 ]
             );
 
@@ -394,6 +398,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
     {
         $factory = $this->createNodeFactory();
+
         return $factory->method($setter)
             ->makePublic()
             ->addParam(
@@ -410,7 +415,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         new Node\Name('Chronos'),
                         'wrapOrNull',
                         [
-                            new Node\Expr\Variable($propName)
+                            new Node\Expr\Variable($propName),
                         ]
                     ),
                 )
@@ -434,7 +439,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     public function addUse(string $ns): void
     {
         if (!in_array($ns, $this->uses, true)) {
-            $this->uses[]      = $ns;
+            $this->uses[] = $ns;
             $this->addedUses[] = $ns;
         }
     }
@@ -452,11 +457,11 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             fn(Column $column) => $column->getName(),
             $this->metadata->getColumns()
         );
-        $dbColumns    = $this->getTableColumns($table);
+        $dbColumns = $this->getTableColumns($table);
 
         $diffCreate = array_diff($dbColumns, $classColumns);
         $diffDelete = array_diff($classColumns, $dbColumns);
-        $diffKeep   = array_intersect($dbColumns, $classColumns);
+        $diffKeep = array_intersect($dbColumns, $classColumns);
 
         return [$diffCreate, $diffDelete, $diffKeep];
     }
@@ -483,8 +488,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $factory = $this->createNodeFactory();
 
         $tbManager = $this->getTableManager();
-        $dbColumn  = $tbManager->getColumn($createColumn);
-        $propName  = StrNormalize::toCamelCase($createColumn);
+        $dbColumn = $tbManager->getColumn($createColumn);
+        $propName = StrNormalize::toCamelCase($createColumn);
 
         [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
 
@@ -578,7 +583,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 'prop' => $prop,
                 'propName' => $propName,
                 'column' => $dbColumn,
-                'entityMemberBuilder' => $this
+                'entityMemberBuilder' => $this,
             ]
         );
 
@@ -606,7 +611,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         );
     }
 
-    public function findFQCN(string $shortName): ? string
+    public function findFQCN(string $shortName): ?string
     {
         foreach ($this->uses as $use) {
             if (str_ends_with(strtolower($use), strtolower($shortName))) {

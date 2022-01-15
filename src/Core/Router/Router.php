@@ -14,14 +14,11 @@ namespace Windwalker\Core\Router;
 use FastRoute\BadRouteException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
-use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
-
 use Windwalker\Utilities\Str;
 
 use function FastRoute\simpleDispatcher;
@@ -41,9 +38,10 @@ class Router implements EventAwareInterface
     /**
      * Router constructor.
      *
-     * @param  Route[]            $routes
+     * @param  Route[]  $routes
      */
-    public function __construct(array $routes = []) {
+    public function __construct(array $routes = [])
+    {
         $this->routes = $routes;
     }
 
@@ -98,7 +96,7 @@ class Router implements EventAwareInterface
 
     public function match(ServerRequestInterface $request, ?string $route = null): Route
     {
-        $route      = Str::ensureLeft(rtrim($route ?? $request->getUri()->getPath(), '/'), '/');
+        $route = Str::ensureLeft(rtrim($route ?? $request->getUri()->getPath(), '/'), '/');
         $dispatcher = $this->getRouteDispatcher($request);
 
         // Always use GET to match route since FastRoute dose not supports match all methods.
@@ -117,7 +115,7 @@ class Router implements EventAwareInterface
 
                 /** @var Route $route */
                 $route = clone $route;
-                $vars  = array_merge(array_map('urldecode', $vars), $route->getVars());
+                $vars = array_merge(array_map('urldecode', $vars), $route->getVars());
                 $route->vars($vars);
 
                 return $route;

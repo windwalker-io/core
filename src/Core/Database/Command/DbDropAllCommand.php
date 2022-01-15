@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Database\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Windwalker\Console\CommandInterface;
@@ -32,14 +31,13 @@ class DbDropAllCommand implements CommandInterface
     /**
      * DbExportCommand constructor.
      *
-     * @param  DatabaseManager        $databaseManager
-     * @param  ApplicationInterface   $app
+     * @param  DatabaseManager       $databaseManager
+     * @param  ApplicationInterface  $app
      */
     public function __construct(
         protected DatabaseManager $databaseManager,
         protected ApplicationInterface $app,
     ) {
-
     }
 
     public function configure(Command $command): void
@@ -70,6 +68,7 @@ class DbDropAllCommand implements CommandInterface
 
         if (!$io->getOption('force') && !$io->ask($qn)) {
             $io->writeln('Cancelled.');
+
             return 0;
         }
 

@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use DateTime;
+use DateTimeZone;
+use DomainException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,7 +21,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
 use Windwalker\Core\Manager\MailerManager;
 
@@ -73,7 +75,7 @@ class MailTestCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!interface_exists(\Symfony\Component\Mailer\MailerInterface::class)) {
-            throw new \DomainException('Please install symfony/mailer ^5.0 first.');
+            throw new DomainException('Please install symfony/mailer ^5.0 first.');
         }
 
         $custom = $io->getOption('message');
@@ -92,8 +94,8 @@ class MailTestCommand implements CommandInterface
             $recipients = [$from];
         }
 
-        $date = new \DateTime('now', new \DateTimeZone($this->app->config('app.server_timezone')));
-        $date->setTimezone(new \DateTimeZone($this->app->config('app.timezone')));
+        $date = new DateTime('now', new DateTimeZone($this->app->config('app.server_timezone')));
+        $date->setTimezone(new DateTimeZone($this->app->config('app.timezone')));
 
         $io->writeln('Sending...');
 

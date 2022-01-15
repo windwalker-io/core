@@ -58,7 +58,7 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         $resolver->setDefaults(
             [
                 'cc' => '',
-                'bcc' => ''
+                'bcc' => '',
             ]
         );
     }

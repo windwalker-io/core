@@ -15,12 +15,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Generator\CodeGenerator;
-use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Core\Seed\SeedService;
-use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Attributes\Service;
-use Windwalker\Utilities\Str;
 
 /**
  * The CreateCommand class.
@@ -31,7 +27,7 @@ class SeedCreateCommand extends AbstractSeedCommand
     /**
      * CreateCommand constructor.
      *
-     * @param  SeedService    $seedService
+     * @param  SeedService  $seedService
      */
     public function __construct(
         #[Service]

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
@@ -80,7 +81,7 @@ class ResetCommand extends AbstractMigrationCommand
      * @param  IOInterface  $io
      *
      * @return  mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(IOInterface $io): int
     {

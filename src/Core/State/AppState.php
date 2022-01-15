@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\State;
 
+use AppendIterator;
+use Generator;
+use JsonSerializable;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\State\Persistence\CookiesPersistence;
 use Windwalker\Core\State\Persistence\NullPersistence;
@@ -29,7 +32,7 @@ use Windwalker\Utilities\Iterator\UniqueIterator;
 /**
  * The UserState class.
  */
-class AppState implements \JsonSerializable
+class AppState implements JsonSerializable
 {
     use InstanceCacheTrait;
 
@@ -40,7 +43,7 @@ class AppState implements \JsonSerializable
     /**
      * UserState constructor.
      *
-     * @param  Container   $container
+     * @param  Container  $container
      */
     public function __construct(
         protected Container $container
@@ -96,9 +99,9 @@ class AppState implements \JsonSerializable
      */
     public function &get(string $key, mixed $driver = null): mixed
     {
-        $key    = $this->getKeyName($key);
+        $key = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
-        $value  = $this->state->get($key) ?? $driver->get($key);
+        $value = $this->state->get($key) ?? $driver->get($key);
 
         return $value;
     }
@@ -132,7 +135,7 @@ class AppState implements \JsonSerializable
 
     public function remember(string $key, mixed $value, mixed $driver = null): mixed
     {
-        $key    = $this->getKeyName($key);
+        $key = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
 
         $driver->store($key, $value);
@@ -155,9 +158,9 @@ class AppState implements \JsonSerializable
      */
     public function has(string $key, mixed $driver = null): bool
     {
-        $key    = $this->getKeyName($key);
+        $key = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
-        $value  = $driver->get($key);
+        $value = $driver->get($key);
 
         if ($value !== null) {
             return true;
@@ -168,7 +171,7 @@ class AppState implements \JsonSerializable
 
     public function forget(string $key, mixed $driver = null): static
     {
-        $key    = $this->getKeyName($key);
+        $key = $this->getKeyName($key);
         $driver = $this->resolvePersistDriver($driver);
 
         $driver->forget($key);
@@ -179,11 +182,11 @@ class AppState implements \JsonSerializable
     /**
      * @inheritDoc
      */
-    public function all(mixed $driver = null): \Generator
+    public function all(mixed $driver = null): Generator
     {
         $driver = $this->resolvePersistDriver($driver);
 
-        $iter = new \AppendIterator();
+        $iter = new AppendIterator();
         $iter->append($this->state->getIterator());
         $iter->append($driver->all());
 
@@ -230,7 +233,7 @@ class AppState implements \JsonSerializable
      */
     public function withPrefix(string $prefix): static
     {
-        $new         = clone $this;
+        $new = clone $this;
         $new->prefix = $prefix;
 
         return $new;

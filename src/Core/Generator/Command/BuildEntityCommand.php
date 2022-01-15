@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Command;
 
+use DomainException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -81,6 +82,7 @@ class BuildEntityCommand implements CommandInterface
             'Do not replace origin file.'
         );
 
+        // phpcs:disable
         $command->setHelp(
             <<<HELP
             $ <info>php windwalker build:entity Foo</info> => Use short name, will auto build App\\Entity\\Foo class
@@ -89,6 +91,7 @@ class BuildEntityCommand implements CommandInterface
             $ <info>php windwalker build:entity "App\\Entity\\*"</info> => Use wildcards, will build all App\\Entity\\* classes
             HELP
         );
+        // phpcs:enable
     }
 
     /**
@@ -101,7 +104,7 @@ class BuildEntityCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!class_exists(DatabaseAdapter::class)) {
-            throw new \DomainException('Please install windwalker/database first.');
+            throw new DomainException('Please install windwalker/database first.');
         }
 
         $this->io = $io;
@@ -109,10 +112,11 @@ class BuildEntityCommand implements CommandInterface
         $ns = $io->getArgument('ns');
 
         if (str_contains($ns, '*')) {
-            $ns      = Str::removeRight($ns, '\\*');
-            $ns      = StrNormalize::toClassNamespace($ns);
+            $ns = Str::removeRight($ns, '\\*');
+            $ns = StrNormalize::toClassNamespace($ns);
             $classes = $this->classFinder->findClasses($ns);
             $this->handleClasses($classes);
+
             return 0;
         }
 
@@ -123,6 +127,7 @@ class BuildEntityCommand implements CommandInterface
         if (!class_exists($ns)) {
             $classes = $this->classFinder->findClasses($io->getArgument('ns'));
             $this->handleClasses($classes);
+
             return 0;
         }
 

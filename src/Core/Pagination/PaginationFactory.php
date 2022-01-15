@@ -30,8 +30,8 @@ class PaginationFactory
     /**
      * PaginationFactory constructor.
      *
-     * @param  Navigator  $navigator
-     * @param  SystemUri  $systemUri
+     * @param  Navigator        $navigator
+     * @param  SystemUri        $systemUri
      * @param  RendererService  $rendererService
      */
     public function __construct(

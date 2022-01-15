@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Seed;
 
+use DateTimeImmutable;
+use SplFileInfo;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Generator\CodeGenerator;
@@ -42,15 +44,14 @@ class SeedService implements EventAwareInterface
         protected FakerService $fakerService,
         protected ?DatabaseAdapter $db = null,
     ) {
-
     }
 
-    public function import(string|\SplFileInfo $file): int
+    public function import(string|SplFileInfo $file): int
     {
         $entry = FileObject::wrap($file);
 
         $seeder = new Seeder($entry, $this->db, $this->fakerService);
-        $db  = $seeder->db;
+        $db = $seeder->db;
         $orm = $db->orm();
         $app = $this->app;
 
@@ -58,6 +59,7 @@ class SeedService implements EventAwareInterface
 
         if (!is_array($seeders) && is_callable($seeder->import)) {
             $this->runImport($seeder);
+
             return 1;
         }
 
@@ -69,7 +71,7 @@ class SeedService implements EventAwareInterface
                 $this->db,
                 $this->fakerService
             );
-            $db  = $seeder->db;
+            $db = $seeder->db;
             $orm = $db->orm();
             $app = $this->app;
 
@@ -84,19 +86,20 @@ class SeedService implements EventAwareInterface
         return $count;
     }
 
-    public function clear(string|\SplFileInfo $file): int
+    public function clear(string|SplFileInfo $file): int
     {
         $entry = FileObject::wrap($file);
 
         $seeder = new Seeder($entry, $this->db, $this->fakerService);
-        $db     = $seeder->db;
-        $orm    = $db->orm();
-        $app    = $this->app;
+        $db = $seeder->db;
+        $orm = $db->orm();
+        $app = $this->app;
 
         $seeders = include $entry;
 
         if (!is_array($seeders) && is_callable($seeder->clear)) {
             $this->runClear($seeder);
+
             return 1;
         }
 
@@ -111,7 +114,7 @@ class SeedService implements EventAwareInterface
                 $this->db,
                 $this->fakerService
             );
-            $db  = $seeder->db;
+            $db = $seeder->db;
             $orm = $db->orm();
             $app = $this->app;
 
@@ -168,9 +171,9 @@ class SeedService implements EventAwareInterface
     {
         $codeGenerator = $this->app->make(CodeGenerator::class);
 
-        $date = new \DateTimeImmutable('now');
+        $date = new DateTimeImmutable('now');
 
-        $year    = $date->format('Y');
+        $year = $date->format('Y');
 
         return $codeGenerator->from($source)
             ->replaceTo(

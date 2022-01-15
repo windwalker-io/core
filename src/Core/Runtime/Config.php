@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Runtime;
 
 use Windwalker\DI\Parameters;
-use Windwalker\Filesystem\Path;
 
 /**
  * The Config class.

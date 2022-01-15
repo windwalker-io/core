@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http;
 
+use Stringable;
 use Windwalker\Http\Response\EmptyResponse;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\JsonResponse;
@@ -29,7 +30,7 @@ class CoreResponse extends Response
         return [
             $body ?? $this->stream,
             $status ?? $this->statusCode,
-            array_merge($this->headers, $headers)
+            array_merge($this->headers, $headers),
         ];
     }
 
@@ -82,7 +83,7 @@ class CoreResponse extends Response
         return new TextResponse($body, $status, $headers);
     }
 
-    public function redirect(string|\Stringable $body, int $status = 303, array $headers = []): RedirectResponse
+    public function redirect(string|Stringable $body, int $status = 303, array $headers = []): RedirectResponse
     {
         [$body, $status, $headers] = $this->prepare($body, $status, $headers);
 

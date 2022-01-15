@@ -11,10 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\SubCommand;
 
-use Symfony\Component\Console\Command\Command;
+use ReflectionException;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Utilities\Str;
 
 /**
  * The GenViewSubCommand class.
@@ -34,7 +33,7 @@ class EntitySubCommand extends AbstractGeneratorSubCommand
      * @param  IOInterface  $io
      *
      * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function execute(IOInterface $io): int
     {

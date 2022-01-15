@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Queue\Command;
 
+use DomainException;
 use Laravel\SerializableClosure\SerializableClosure;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -22,6 +23,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Service\LoggerService;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
@@ -40,7 +42,8 @@ use Windwalker\Queue\Worker;
 )]
 class QueueWorkerCommand implements CommandInterface
 {
-    public function __construct(protected ConsoleApplication $app) {
+    public function __construct(protected ConsoleApplication $app)
+    {
     }
 
     /**
@@ -133,12 +136,12 @@ class QueueWorkerCommand implements CommandInterface
      * @param  IOInterface  $io
      *
      * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function execute(IOInterface $io): int
     {
         if (!class_exists(Worker::class)) {
-            throw new \DomainException('Please install windwalker/queue first.');
+            throw new DomainException('Please install windwalker/queue first.');
         }
 
         $channels = $io->getArgument('channels') ?: 'default';
@@ -294,7 +297,7 @@ class QueueWorkerCommand implements CommandInterface
      *
      * @return  Worker
      *
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     protected function getWorker(?string $connection): Worker
     {

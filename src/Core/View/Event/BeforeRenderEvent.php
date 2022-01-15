@@ -11,12 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\View\Event;
 
-use Psr\Http\Message\ResponseInterface;
+use Attribute;
 
 /**
  * The BeforeRenderEvent class.
  */
-#[\Attribute(\Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD)]
 class BeforeRenderEvent extends AbstractViewRenderEvent
 {
     protected mixed $response;

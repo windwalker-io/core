@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use LogicException;
 use Windwalker\Data\Collection;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\TypeCast;
+
+use function Windwalker\glob_all;
 
 /**
  * The RouteCreator class.
@@ -79,7 +82,7 @@ class RouteCreator
 
         $new = clone $this;
         $new->setOptions($data);
-        $new->group          = $group;
+        $new->group = $group;
         $new->groups[$group] = $data;
 
         // Find parents
@@ -117,7 +120,7 @@ class RouteCreator
 
         foreach ($parents as $parent) {
             if (!isset($this->preparedGroups[$parent])) {
-                throw new \LogicException(
+                throw new LogicException(
                     sprintf(
                         'Unable to find parent group: %s for route group: %s',
                         $parent,
@@ -184,7 +187,7 @@ class RouteCreator
 
         // Subscribers
         $subscribers = array_filter(
-            array_column($groups, 'subscribers'), 
+            array_column($groups, 'subscribers'),
             'is_array'
         );
 
@@ -342,12 +345,13 @@ class RouteCreator
     {
         if (is_callable($paths)) {
             $paths($this);
+
             return $this;
         }
 
         $paths = TypeCast::toArray($paths);
 
-        $files = \Windwalker\glob_all($paths);
+        $files = glob_all($paths);
         $router = $this;
 
         foreach ($files as $file) {

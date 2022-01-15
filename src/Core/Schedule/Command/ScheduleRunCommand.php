@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of earth project.
  *
@@ -6,10 +7,12 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Schedule\Command;
 
+use Generator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
@@ -112,7 +115,7 @@ class ScheduleRunCommand implements CommandInterface
         return $this->app->call($handler);
     }
 
-    protected function getAvailableEvents(Schedule $schedule, IOInterface $io): \Generator
+    protected function getAvailableEvents(Schedule $schedule, IOInterface $io): Generator
     {
         $tags = $io->getOption('tags') ?? '';
         $tags = Arr::explodeAndClear(',', $tags);

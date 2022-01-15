@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of phoenix project.
  *
@@ -6,7 +7,11 @@
  * @license    GNU General Public License version 2 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Html;
+
+use Stringable;
 
 use function Windwalker\DOM\h;
 
@@ -34,13 +39,13 @@ class Metadata
     /**
      * addMetadata
      *
-     * @param  string              $name
-     * @param  string|\Stringable  $content
-     * @param  bool                $replace
+     * @param  string             $name
+     * @param  string|Stringable  $content
+     * @param  bool               $replace
      *
      * @return static
      */
-    public function addMetadata(string $name, string|\Stringable $content, bool $replace = false): static
+    public function addMetadata(string $name, string|Stringable $content, bool $replace = false): static
     {
         if (!isset($this->metadata[$name]) || $replace) {
             $this->metadata[$name] = [];
@@ -63,7 +68,7 @@ class Metadata
     /**
      * removeMetadata
      *
-     * @param  string $name
+     * @param  string  $name
      *
      * @return  static
      */
@@ -79,13 +84,13 @@ class Metadata
     /**
      * addOpenGraph
      *
-     * @param  string              $type
-     * @param  string|\Stringable  $content
-     * @param  bool                $replace
+     * @param  string             $type
+     * @param  string|Stringable  $content
+     * @param  bool               $replace
      *
      * @return static
      */
-    public function addOpenGraph(string $type, string|\Stringable $content, bool $replace = false)
+    public function addOpenGraph(string $type, string|Stringable $content, bool $replace = false)
     {
         if (!isset($this->openGraphs[$type]) || $replace) {
             $this->openGraphs[$type] = [];
@@ -108,7 +113,7 @@ class Metadata
     /**
      * removeOpenGraph
      *
-     * @param  string $type
+     * @param  string  $type
      *
      * @return  static
      */
@@ -134,7 +139,7 @@ class Metadata
     /**
      * Method to set property metadata
      *
-     * @param   array $metadata
+     * @param  array  $metadata
      *
      * @return  static  Return self to support chaining.
      */
@@ -158,7 +163,7 @@ class Metadata
     /**
      * Method to set property openGraphs
      *
-     * @param   array $openGraphs
+     * @param  array  $openGraphs
      *
      * @return  static  Return self to support chaining.
      */
@@ -172,7 +177,7 @@ class Metadata
     /**
      * escape
      *
-     * @param   string $string
+     * @param  string  $string
      *
      * @return  string
      */

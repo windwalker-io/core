@@ -50,7 +50,8 @@ if (!function_exists('dot')) {
 if (!function_exists('singular')) {
     function singular(string $string): string
     {
-        return StrInflector::toSingular($string);}
+        return StrInflector::toSingular($string);
+    }
 }
 
 if (!function_exists('plural')) {

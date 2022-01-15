@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database\Exporter;
 
+use DomainException;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Platform\AbstractPlatform;
@@ -26,7 +27,7 @@ class ExporterFactory
 
         $class = match ($platform->getName()) {
             AbstractPlatform::MYSQL => MySQLExporter::class,
-            default => throw new \DomainException(
+            default => throw new DomainException(
                 sprintf(
                     '%s exporter not yet prepared.',
                     $platform->getName()

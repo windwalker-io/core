@@ -17,6 +17,7 @@ use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Manager\SessionManager;
 use Windwalker\Core\Security\CsrfService;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Event\ResponseEvent;
 use Windwalker\Session\Cookie\ArrayCookies;
@@ -35,7 +36,7 @@ class SessionProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function register(Container $container): void
     {

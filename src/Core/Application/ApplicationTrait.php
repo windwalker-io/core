@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Closure;
+use OutOfRangeException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Runtime\Config;
@@ -67,7 +70,7 @@ trait ApplicationTrait
      * @param  string  $path
      *
      * @return  string
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function path(string $path): string
     {
@@ -170,7 +173,7 @@ trait ApplicationTrait
 
         if (is_numeric($name)) {
             if ($dispatcher instanceof EventListenableInterface) {
-                if ($listener instanceof \Closure) {
+                if ($listener instanceof Closure) {
                     // Closure with ListenTo() attribute
                     $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
                     $event->listen($dispatcher, $listener);
@@ -201,6 +204,7 @@ trait ApplicationTrait
             // EventAwareObject name => Array<int, Subscriber>
             $container->extend($name, function (EventAwareInterface $object) use ($listener, $container) {
                 $object->subscribe($container->resolve($listener));
+
                 return $object;
             });
         }
@@ -216,7 +220,7 @@ trait ApplicationTrait
             return $this->getContainer();
         }
 
-        throw new \OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
+        throw new OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
     }
 
     /**

@@ -11,10 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Html;
 
+use Stringable;
 use Windwalker\DOM\DOMElement;
-
-use Windwalker\DOM\DOMTokenList;
-
 use Windwalker\DOM\HTMLElement;
 
 use function Windwalker\DOM\h;
@@ -156,13 +154,13 @@ class HtmlFrame
     /**
      * addCustomTag
      *
-     * @param  string|DOMElement        $tag
-     * @param  string|\Stringable|null  $content
-     * @param  array                    $attribs
+     * @param  string|DOMElement       $tag
+     * @param  string|Stringable|null  $content
+     * @param  array                   $attribs
      *
      * @return  static
      */
-    public function addCustomTag(string|DOMElement $tag, string|\Stringable|null $content = null, $attribs = [])
+    public function addCustomTag(string|DOMElement $tag, string|Stringable|null $content = null, $attribs = [])
     {
         if (!$tag instanceof DOMElement) {
             $tag = h($tag, $attribs, $content);
@@ -200,13 +198,13 @@ class HtmlFrame
     /**
      * addMetadata
      *
-     * @param  string              $name
-     * @param  string|\Stringable  $content
-     * @param  bool                $replace
+     * @param  string             $name
+     * @param  string|Stringable  $content
+     * @param  bool               $replace
      *
      * @return static
      */
-    public function addMetadata(string $name, string|\Stringable $content, bool $replace = false): static
+    public function addMetadata(string $name, string|Stringable $content, bool $replace = false): static
     {
         $this->metadata->addMetadata($name, $content, $replace);
 
@@ -216,13 +214,13 @@ class HtmlFrame
     /**
      * addOpenGraph
      *
-     * @param  string              $type
-     * @param  string|\Stringable  $content
-     * @param  bool                $replace
+     * @param  string             $type
+     * @param  string|Stringable  $content
+     * @param  bool               $replace
      *
      * @return static
      */
-    public function addOpenGraph(string $type, string|\Stringable $content, bool $replace = false): static
+    public function addOpenGraph(string $type, string|Stringable $content, bool $replace = false): static
     {
         $this->metadata->addOpenGraph($type, $content, $replace);
 

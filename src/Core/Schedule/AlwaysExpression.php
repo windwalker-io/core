@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of earth project.
  *
@@ -6,9 +7,13 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
+use DateTimeInterface;
+use InvalidArgumentException;
 
 /**
  * The AlwaysExpression class.
@@ -20,7 +25,7 @@ class AlwaysExpression extends CronExpression
     /**
      * Validate a CronExpression.
      *
-     * @param string $expression The CRON expression to validate.
+     * @param  string  $expression  The CRON expression to validate.
      *
      * @return bool True if a valid CRON expression was passed. False if not.
      * @see \Cron\CronExpression::factory
@@ -35,8 +40,8 @@ class AlwaysExpression extends CronExpression
      * specific date.  This method assumes that the current number of
      * seconds are irrelevant, and should be called once per minute.
      *
-     * @param string|\DateTimeInterface $currentTime Relative calculation date
-     * @param null|string               $timeZone    TimeZone to use instead of the system default
+     * @param  string|DateTimeInterface  $currentTime  Relative calculation date
+     * @param  null|string               $timeZone     TimeZone to use instead of the system default
      *
      * @return bool Returns TRUE if the cron is due to run or FALSE if not
      */
@@ -48,10 +53,10 @@ class AlwaysExpression extends CronExpression
     /**
      * Set or change the CRON expression
      *
-     * @param string $value CRON expression (e.g. 8 * * * *)
+     * @param  string  $value  CRON expression (e.g. 8 * * * *)
      *
      * @return static
-     * @throws \InvalidArgumentException if not a valid CRON expression
+     * @throws InvalidArgumentException if not a valid CRON expression
      */
     public function setExpression(string $value): CronExpression
     {

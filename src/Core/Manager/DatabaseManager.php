@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use RuntimeException;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Platform\AbstractPlatform;
@@ -82,7 +83,7 @@ class DatabaseManager extends AbstractManager
 
         try {
             $db->execute("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             // If not success, hide error.
         }
     }

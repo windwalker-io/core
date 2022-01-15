@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
+use SplFileInfo;
 use Windwalker\Core\Seed\CountingOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Manager\TableManager;
@@ -29,7 +30,9 @@ class Migration
     public const DOWN = 'down';
 
     public string $version;
+
     public string $name;
+
     public string $fullName;
 
     /**
@@ -45,11 +48,11 @@ class Migration
     /**
      * Migration constructor.
      *
-     * @param  \SplFileInfo     $file
+     * @param  SplFileInfo     $file
      * @param  DatabaseAdapter  $db
      */
     public function __construct(
-        public \SplFileInfo $file,
+        public SplFileInfo $file,
         public DatabaseAdapter $db
     ) {
         $name = $this->file->getBasename('.php');
@@ -57,7 +60,7 @@ class Migration
         [$id, $name] = explode('_', $name, 2);
 
         $this->version = $id;
-        $this->name    = $name;
+        $this->name = $name;
         $this->fullName = $id . '_' . $name;
     }
 
@@ -93,7 +96,7 @@ class Migration
     /**
      * Get DB table object.
      *
-     * @param string $name
+     * @param  string  $name
      *
      * @return  TableManager
      */
@@ -105,9 +108,9 @@ class Migration
     /**
      * createTable
      *
-     * @param string   $name
-     * @param callable $callback
-     * @param array    $options
+     * @param  string    $name
+     * @param  callable  $callback
+     * @param  array     $options
      *
      * @return TableManager
      */
@@ -119,8 +122,8 @@ class Migration
     /**
      * updateTable
      *
-     * @param string   $name
-     * @param callable $callback
+     * @param  string    $name
+     * @param  callable  $callback
      *
      * @return  TableManager
      */
@@ -132,9 +135,9 @@ class Migration
     /**
      * saveTable
      *
-     * @param string   $name
-     * @param callable $callback
-     * @param array    $options
+     * @param  string    $name
+     * @param  callable  $callback
+     * @param  array     $options
      *
      * @return TableManager
      */
@@ -146,7 +149,7 @@ class Migration
     /**
      * Drop a table.
      *
-     * @param   string|array $names
+     * @param  string|array  $names
      *
      * @return  static
      */

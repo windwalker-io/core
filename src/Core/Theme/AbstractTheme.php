@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Theme;
 
-use Windwalker\Renderer\CompositeRenderer;
-
 /**
  * The AbstractTheme class.
  */

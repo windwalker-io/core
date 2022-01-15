@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;

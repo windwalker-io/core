@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
 
+use JsonException;
+
 /**
  * The ImportMap class.
  */
@@ -18,7 +20,7 @@ class ImportMap
 {
     protected array $data = [
         'imports' => [],
-        'scopes' => []
+        'scopes' => [],
     ];
 
     /**
@@ -175,7 +177,7 @@ class ImportMap
      *
      * @return  string
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function render(string $type = 'importmap', int $jsonFlags = 0): string
     {

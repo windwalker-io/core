@@ -11,13 +11,21 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
+use Exception;
+use InvalidArgumentException;
+use JsonSerializable;
+
 /**
  * The Chronos class.
  *
  * @property-read string $daysinmonth
  * @property-read string $dayofweek
  * @property-read string $dayofyear
- * @property-read bool $isleapyear
+ * @property-read bool   $isleapyear
  * @property-read string $day
  * @property-read string $hour
  * @property-read string $minute
@@ -27,7 +35,7 @@ namespace Windwalker\Core\DateTime;
  * @property-read string $week
  * @property-read string $year
  */
-class Chronos extends \DateTimeImmutable implements \JsonSerializable
+class Chronos extends DateTimeImmutable implements JsonSerializable
 {
     public const FORMAT_YMD = 'Y-m-d';
 
@@ -51,23 +59,23 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      *
      * @return  static
      *
-     * @throws \Exception
+     * @throws Exception
      * @since  3.5.19
      */
-    public static function wrap(mixed $date = 'now', string|\DateTimeZone $tz = null): static
+    public static function wrap(mixed $date = 'now', string|DateTimeZone $tz = null): static
     {
         if ($date instanceof static) {
             return $date;
         }
 
-        if ($date instanceof \DateTimeInterface) {
+        if ($date instanceof DateTimeInterface) {
             return static::createFromFormat('U.u', $date->format('U.u'), $date->getTimezone());
         }
 
         return static::create($date, $tz);
     }
 
-    public static function wrapOrNull(mixed $date = 'now', string|\DateTimeZone $tz = null): ?static
+    public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?static
     {
         if ($date === null || $date === '') {
             return null;
@@ -82,17 +90,17 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * @param  string  $date  String in a format accepted by strtotime(), defaults to "now".
      * @param  mixed   $tz    Time zone to be used for the date. Might be a string or a DateTimeZone object.
      *
-     * @throws \Exception
+     * @throws Exception
      * @since   2.1
      */
-    public function __construct(mixed $date = 'now', string|\DateTimeZone $tz = null)
+    public function __construct(mixed $date = 'now', string|DateTimeZone $tz = null)
     {
         $tz = static::wrapTimezoneObject($tz);
 
         // If the date is numeric assume a unix timestamp and convert it.
         $date = is_numeric($date) ? date('c', (int) $date) : $date;
 
-        if ($date instanceof \DateTimeInterface) {
+        if ($date instanceof DateTimeInterface) {
             $date = $date->format('Y-m-d H:i:s.u');
         }
 
@@ -100,10 +108,10 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
         parent::__construct($date, $tz);
     }
 
-    public static function wrapTimezoneObject(string|\DateTimeZone $tz = null): ?\DateTimeZone
+    public static function wrapTimezoneObject(string|DateTimeZone $tz = null): ?DateTimeZone
     {
         if (is_string($tz)) {
-            $tz = new \DateTimeZone($tz);
+            $tz = new DateTimeZone($tz);
         }
 
         return $tz;
@@ -112,15 +120,15 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     /**
      * toFormat
      *
-     * @param  string|\DateTimeInterface  $date
-     * @param  string                     $format
+     * @param  string|DateTimeInterface  $date
+     * @param  string                    $format
      *
      * @return string
      *
-     * @throws \Exception
+     * @throws Exception
      * @since  3.2
      */
-    public static function toFormat(string|\DateTimeInterface $date, string $format): string
+    public static function toFormat(string|DateTimeInterface $date, string $format): string
     {
         if (is_string($date)) {
             $date = new static($date);
@@ -132,13 +140,13 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     /**
      * current
      *
-     * @param  string                     $format
-     * @param  string|\DateTimeZone|null  $tz
+     * @param  string                    $format
+     * @param  string|DateTimeZone|null  $tz
      *
      * @return  string
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function now(string $format = self::FORMAT_YMD_HIS, string|\DateTimeZone $tz = null): string
+    public static function now(string $format = self::FORMAT_YMD_HIS, string|DateTimeZone $tz = null): string
     {
         return (new static('now', $tz))->format($format, $tz);
     }
@@ -151,10 +159,10 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      *
      * @return  static
      *
-     * @throws \Exception
+     * @throws Exception
      * @since   2.1
      */
-    public static function create(mixed $date = 'now', string|\DateTimeZone $tz = null): static
+    public static function create(mixed $date = 'now', string|DateTimeZone $tz = null): static
     {
         return new static($date, $tz);
     }
@@ -167,7 +175,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * @param  mixed   $timezone  A DateTimeZone object representing the desired time zone.
      *
      * @return static|bool
-     * @throws \Exception
+     * @throws Exception
      */
     public static function createFromFormat($format, $time, $timezone = null): static|false
     {
@@ -193,23 +201,24 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     /**
      * createInterval
      *
-     * @param  string|int  $duration Can be these formats:
-     *                               - 30 (int) Will be 30 seconds.
-     *                               - `PT30S` DateInterval format, see: https://www.php.net/manual/en/dateinterval.construct.php
-     *                               - `30seconds` DateTime format.
+     * @param  string|int  $duration  Can be these formats:
+     *                                - 30 (int) Will be 30 seconds.
+     *                                - `PT30S` DateInterval format, see:
+     *                                https://www.php.net/manual/en/dateinterval.construct.php
+     *                                - `30seconds` DateTime format.
      *
-     * @return  \DateInterval
+     * @return  DateInterval
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function createInterval(string|int $duration): \DateInterval
+    public static function createInterval(string|int $duration): DateInterval
     {
         if (is_int($duration)) {
             $duration = 'PT' . $duration . 'S';
         }
 
         if (str_starts_with($duration, 'P')) {
-            return new \DateInterval($duration);
+            return new DateInterval($duration);
         }
 
         $now = new static();
@@ -220,31 +229,31 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     /**
      * @see https://stackoverflow.com/a/22381301/8134785
      *
-     * @param  \DateInterval|string  $diff
+     * @param  DateInterval|string  $diff
      *
      * @return  int
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function intervalToSeconds(\DateInterval|string $diff): int
+    public static function intervalToSeconds(DateInterval|string $diff): int
     {
-        if (!$diff instanceof \DateInterval) {
-            $diff = new \DateInterval($diff);
+        if (!$diff instanceof DateInterval) {
+            $diff = new DateInterval($diff);
         }
 
         return (int) ($diff->format('%r') . (
-            ($diff->s) +
-            (60 * ($diff->i)) +
-            (60 * 60 * ($diff->h)) +
-            (24 * 60 * 60 * ($diff->d)) +
-            (30 * 24 * 60 * 60 * ($diff->m)) +
-            (365 * 24 * 60 * 60 * ($diff->y))
-        ));
+                ($diff->s) +
+                (60 * ($diff->i)) +
+                (60 * 60 * ($diff->h)) +
+                (24 * 60 * 60 * ($diff->d)) +
+                (30 * 24 * 60 * 60 * ($diff->m)) +
+                (365 * 24 * 60 * 60 * ($diff->y))
+            ));
     }
 
     /**
      * @inheritDoc
      */
-    public function format($format, string|\DateTimeZone $tz = null): string
+    public function format($format, string|DateTimeZone $tz = null): string
     {
         if (!$tz) {
             return parent::format($format);
@@ -277,13 +286,13 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
      * You can provide a range as first argument. If you set as 30s, then the range is before 30s and after 30s,
      * total is 60s. The range string format please see {@see createInterval()}
      *
-     * @param  string|int|\DateInterval|null  $range The current time range, if is NULL, will compare to second.
+     * @param  string|int|DateInterval|null  $range  The current time range, if is NULL, will compare to second.
      *
      * @return  bool
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function isCurrent(string|int|\DateInterval|null $range = null): bool
+    public function isCurrent(string|int|DateInterval|null $range = null): bool
     {
         if (is_string($range) || is_int($range)) {
             $range = static::createInterval($range);
@@ -352,7 +361,7 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
                 return $this->format('Y');
         }
 
-        throw new \InvalidArgumentException('Property ' . $name . ' not exists.');
+        throw new InvalidArgumentException('Property ' . $name . ' not exists.');
     }
 
     /**
@@ -387,16 +396,16 @@ class Chronos extends \DateTimeImmutable implements \JsonSerializable
     /**
      * Method to wrap the setTimezone() function and set the internal time zone object.
      *
-     * @param  \DateTimeZone|string  $timezone  The new DateTimeZone object.
+     * @param  DateTimeZone|string  $timezone  The new DateTimeZone object.
      *
      * @return  static
      *
      * @since   2.1
      */
-    public function setTimezone(\DateTimeZone|string $timezone): static
+    public function setTimezone(DateTimeZone|string $timezone): static
     {
-        if (!$timezone instanceof \DateTimeZone) {
-            $timezone = new \DateTimeZone($timezone);
+        if (!$timezone instanceof DateTimeZone) {
+            $timezone = new DateTimeZone($timezone);
         }
 
         return parent::setTimezone($timezone);

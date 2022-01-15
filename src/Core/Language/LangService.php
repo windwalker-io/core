@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Language;
 
+use DomainException;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Filesystem\FileObject;
@@ -223,7 +224,7 @@ class LangService implements LanguageInterface
     public static function checkLanguageInstalled(): void
     {
         if (!class_exists(Language::class)) {
-            throw new \DomainException('Please install windwalker/language first.');
+            throw new DomainException('Please install windwalker/language first.');
         }
     }
 

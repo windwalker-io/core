@@ -39,7 +39,7 @@ class RouteBuilder
     public function build(string $pattern, array $vars): array
     {
         $variants = $this->parse($pattern);
-        $variant  = $this->findVariant($variants, $vars);
+        $variant = $this->findVariant($variants, $vars);
 
         return $this->compileUri($variant, $vars);
     }
@@ -72,8 +72,8 @@ class RouteBuilder
     /**
      * compileUri
      *
-     * @param  array   $variant
-     * @param  array   $vars
+     * @param  array  $variant
+     * @param  array  $vars
      *
      * @return  array
      */

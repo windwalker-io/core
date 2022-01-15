@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use LogicException;
 use Windwalker\Core\Runtime\Config;
-use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Filesystem\Path;
 
 /**
@@ -70,7 +70,7 @@ class PathResolver
         $base = $this->config->get($base);
 
         if (!$base) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf(
                     'The system path: %s not exists in config.',
                     $base

@@ -62,7 +62,7 @@ class FormFactory
      * @return  FieldDefinitionInterface
      *
      * @psalm-template T
-     * @psalm-param T $definition
+     * @psalm-param T                                $definition
      *
      * @psalm-return T
      */
@@ -76,13 +76,13 @@ class FormFactory
     /**
      * createField
      *
-     * @param  string  $fieldClass
+     * @param  string     $fieldClass
      * @param  Form|null  $form
      *
      * @return  AbstractField
      *
      * @psalm-template T
-     * @psalm-param T $fieldClass
+     * @psalm-param T     $fieldClass
      *
      * @psalm-return T
      */

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
+use Attribute;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\DI\Attributes\AttributeHandler;
@@ -19,7 +20,7 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 /**
  * The Controller class.
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS)]
 class Controller implements ContainerAttributeInterface
 {
     /**

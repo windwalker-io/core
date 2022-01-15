@@ -32,13 +32,13 @@ class MailerProvider implements ServiceProviderInterface
 
         $container->bind(
             Mailer::class,
-            fn (MailerManager $manager) => $manager->get()
+            fn(MailerManager $manager) => $manager->get()
         )
             ->alias(MailerInterface::class, Mailer::class);
 
         $container->bind(
             Transport::class,
-            fn (Container $container) => new Transport(
+            fn(Container $container) => new Transport(
                 $container->call([Transport::class, 'getDefaultFactories'])
             )
         );

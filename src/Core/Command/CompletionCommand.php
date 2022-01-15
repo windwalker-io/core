@@ -11,13 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-
 use Windwalker\Filesystem\FileObject;
 
 use function Windwalker\str;
@@ -78,10 +77,10 @@ class CompletionCommand implements CommandInterface
             $this->io->writeln('File: <info>' . $hookFile . '</info> has exists.');
         }
 
-        $profileFile = match($shell) {
+        $profileFile = match ($shell) {
             'zsh' => $home . '/.zshrc',
             'bash' => $this->getBashProfile($home),
-            default => throw new \RuntimeException('No support for <info>' . $shell . '</info> now.')
+            default => throw new RuntimeException('No support for <info>' . $shell . '</info> now.')
         };
 
         $file = new FileObject($profileFile);
@@ -147,7 +146,10 @@ class CompletionCommand implements CommandInterface
     protected function getShellType(): string
     {
         if (!getenv('SHELL')) {
-            throw new \RuntimeException('Could not read SHELL environment variable. Please specify your shell type using the --shell-type option.');
+            throw new RuntimeException(
+                'Could not read SHELL environment variable. ' .
+                'Please specify your shell type using the --shell-type option.'
+            );
         }
 
         return basename(getenv('SHELL'));

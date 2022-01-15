@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Builder;
 
+use Closure;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -19,16 +20,17 @@ use PhpParser\NodeVisitorAbstract;
  */
 class CallbackAstBuilder extends AbstractAstBuilder
 {
-    protected ?\Closure $beforeTraverse = null;
-    protected ?\Closure $afterTraverse = null;
+    protected ?Closure $beforeTraverse = null;
+
+    protected ?Closure $afterTraverse = null;
 
     /**
      * CallbackAstBuilder constructor.
      */
     public function __construct(
         protected ?string $code = null,
-        protected ?\Closure $enterNode = null,
-        protected ?\Closure $leaveNode = null
+        protected ?Closure $enterNode = null,
+        protected ?Closure $leaveNode = null
     ) {
         //
     }
@@ -43,19 +45,19 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return \Closure|null
+     * @return Closure|null
      */
-    public function getEnterNode(): ?\Closure
+    public function getEnterNode(): ?Closure
     {
         return $this->enterNode;
     }
 
     /**
-     * @param  \Closure|null  $enterNode
+     * @param  Closure|null  $enterNode
      *
      * @return  static  Return self to support chaining.
      */
-    public function enterNode(?\Closure $enterNode): static
+    public function enterNode(?Closure $enterNode): static
     {
         $this->enterNode = $enterNode;
 
@@ -63,19 +65,19 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return \Closure|null
+     * @return Closure|null
      */
-    public function getLeaveNode(): ?\Closure
+    public function getLeaveNode(): ?Closure
     {
         return $this->leaveNode;
     }
 
     /**
-     * @param  \Closure|null  $leaveNode
+     * @param  Closure|null  $leaveNode
      *
      * @return  static  Return self to support chaining.
      */
-    public function leaveNode(?\Closure $leaveNode): static
+    public function leaveNode(?Closure $leaveNode): static
     {
         $this->leaveNode = $leaveNode;
 
@@ -83,19 +85,19 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return \Closure|null
+     * @return Closure|null
      */
-    public function getBeforeTraverse(): ?\Closure
+    public function getBeforeTraverse(): ?Closure
     {
         return $this->beforeTraverse;
     }
 
     /**
-     * @param  \Closure|null  $beforeTraverse
+     * @param  Closure|null  $beforeTraverse
      *
      * @return  static  Return self to support chaining.
      */
-    public function beforeTraverse(?\Closure $beforeTraverse): static
+    public function beforeTraverse(?Closure $beforeTraverse): static
     {
         $this->beforeTraverse = $beforeTraverse;
 
@@ -103,19 +105,19 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return \Closure|null
+     * @return Closure|null
      */
-    public function getAfterTraverse(): ?\Closure
+    public function getAfterTraverse(): ?Closure
     {
         return $this->afterTraverse;
     }
 
     /**
-     * @param  \Closure|null  $afterTraverse
+     * @param  Closure|null  $afterTraverse
      *
      * @return  static  Return self to support chaining.
      */
-    public function afterTraverse(?\Closure $afterTraverse): static
+    public function afterTraverse(?Closure $afterTraverse): static
     {
         $this->afterTraverse = $afterTraverse;
 
@@ -142,14 +144,14 @@ class CallbackAstBuilder extends AbstractAstBuilder
         return $this;
     }
 
-    protected function createVisitor(?\Closure $enterNode, ?\Closure $leaveNode): NodeVisitorAbstract
+    protected function createVisitor(?Closure $enterNode, ?Closure $leaveNode): NodeVisitorAbstract
     {
-        return new class($enterNode, $leaveNode) extends NodeVisitorAbstract {
+        return new class ($enterNode, $leaveNode) extends NodeVisitorAbstract {
             public function __construct(
-                protected ?\Closure $enterNode = null,
-                protected ?\Closure $leaveNode = null,
-                protected ?\Closure $beforeTraverse = null,
-                protected ?\Closure $afterTraverse = null,
+                protected ?Closure $enterNode = null,
+                protected ?Closure $leaveNode = null,
+                protected ?Closure $beforeTraverse = null,
+                protected ?Closure $afterTraverse = null,
             ) {
                 //
             }

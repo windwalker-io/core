@@ -11,8 +11,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Closure;
 use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ResponseInterface;
+use Stringable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
@@ -22,8 +24,6 @@ use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-
-use function Symfony\Component\String\s;
 
 /**
  * The Navigator class.
@@ -47,7 +47,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         ?RouteBuilder $routeBuilder = null
     ) {
         $this->routeBuilder = $routeBuilder ?? new RouteBuilder(new Std());
-        $this->dispatcher   = $dispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function back(int $options = self::TYPE_PATH): RouteUri
@@ -112,9 +112,9 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                 compact('navigator', 'query', 'route', 'options')
             );
 
-            $route   = $event->getRoute();
+            $route = $event->getRoute();
             $options = $event->getOptions();
-            $query   = $event->getQuery();
+            $query = $event->getQuery();
         }
 
         $handler = function (array $query) use ($navigator, $options, $route): array {
@@ -160,9 +160,9 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     /**
      * createRouteUri
      *
-     * @param  \Closure|\Stringable|string  $uri
-     * @param  array|null                   $vars
-     * @param  int                          $options
+     * @param  Closure|Stringable|string  $uri
+     * @param  array|null                  $vars
+     * @param  int                         $options
      *
      * @return  RouteUri
      */
@@ -171,12 +171,12 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return new RouteUri($uri, $vars, $this, $options);
     }
 
-    public function redirectInstant(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
+    public function redirectInstant(Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
     {
         return $this->redirect($uri, $code, $options | static::REDIRECT_INSTANT);
     }
 
-    public function redirect(\Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
+    public function redirect(Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
     {
         if ($options & static::REDIRECT_ALLOW_OUTSIDE) {
             $uri = $this->validateRedirectUrl($uri);
@@ -203,7 +203,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->redirect($this->self(), $code, $options);
     }
 
-    public function validateRedirectUrl(\Stringable|string $uri): string
+    public function validateRedirectUrl(Stringable|string $uri): string
     {
         $root = $this->app->getSystemUri()->root;
 
@@ -249,7 +249,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      */
     public function withOptions(int $options): static
     {
-        $new          = clone $this;
+        $new = clone $this;
         $new->options = $options;
 
         return $new;

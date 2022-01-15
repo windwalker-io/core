@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of phoenix project.
  *
@@ -6,10 +7,16 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Utilities;
 
+use DomainException;
+use ErrorException;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Server\Connection;
+
+use function count;
 
 /**
  * The Dumper class.
@@ -40,7 +47,7 @@ class Dumper
     public function __construct(?string $host = null)
     {
         if (!class_exists(Connection::class)) {
-            throw new \DomainException('Please install symfony/var-dumper ^4.1 first.');
+            throw new DomainException('Please install symfony/var-dumper ^4.1 first.');
         }
 
         $this->host = $host ?: env('VAR_DUMP_SERVER_HOST') ?: 'tcp://127.0.0.1:9912';
@@ -51,7 +58,7 @@ class Dumper
     /**
      * dump
      *
-     * @param mixed ...$args
+     * @param  mixed  ...$args
      *
      * @return  void
      *
@@ -62,7 +69,7 @@ class Dumper
         $values = $this->handleValues($args);
 
         $data = (new VarCloner())->cloneVar($values);
-show($this->connection->write($data));
+        show($this->connection->write($data));
         if ($this->connection->write($data) === false) {
             dump($values);
         }
@@ -75,7 +82,7 @@ show($this->connection->write($data));
      *
      * @return  bool
      *
-     * @throws \ErrorException
+     * @throws ErrorException
      * @since  3.4.6
      */
     public function dumpToServer(...$args): bool
@@ -90,7 +97,7 @@ show($this->connection->write($data));
     /**
      * handleValues
      *
-     * @param array $args
+     * @param  array  $args
      *
      * @return  array|mixed
      *
@@ -98,7 +105,7 @@ show($this->connection->write($data));
      */
     protected function handleValues(array $args): mixed
     {
-        if (\count($args) === 1) {
+        if (count($args) === 1) {
             $values = $args[0];
         } else {
             $values = [];
@@ -126,7 +133,7 @@ show($this->connection->write($data));
     /**
      * Method to set property connection
      *
-     * @param   Connection $connection
+     * @param  Connection  $connection
      *
      * @return  static  Return self to support chaining.
      *

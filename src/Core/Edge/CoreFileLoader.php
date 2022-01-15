@@ -11,14 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Edge;
 
-use Windwalker\Core\Manager\Logger;
+use RuntimeException;
 use Windwalker\Core\Renderer\LayoutPathResolver;
-use Windwalker\Core\Renderer\PathsBag;
-use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Edge\Exception\LayoutNotFoundException;
 use Windwalker\Edge\Loader\EdgeFileLoader;
 use Windwalker\Edge\Loader\EdgeLoaderInterface;
-use Windwalker\Utilities\Str;
 
 /**
  * The EdgeFileLoader class.
@@ -28,7 +25,7 @@ class CoreFileLoader implements EdgeLoaderInterface
     /**
      * EdgeFileLoader constructor.
      *
-     * @param  EdgeFileLoader  $loader
+     * @param  EdgeFileLoader      $loader
      * @param  LayoutPathResolver  $pathResolver
      */
     public function __construct(
@@ -52,7 +49,7 @@ class CoreFileLoader implements EdgeLoaderInterface
                 $key,
                 $this->extensions
             );
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             if ($this->loader->has($key)) {
                 return $this->loader->find($key);
             }

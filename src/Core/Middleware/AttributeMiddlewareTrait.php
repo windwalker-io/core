@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -31,9 +32,9 @@ trait AttributeMiddlewareTrait
     {
         return $this->run(
             $request,
-            fn (ServerRequestInterface $request): ResponseInterface => $handler->handle($request)
+            fn(ServerRequestInterface $request): ResponseInterface => $handler->handle($request)
         );
     }
 
-    abstract public function run(ServerRequestInterface $request, \Closure $next): mixed;
+    abstract public function run(ServerRequestInterface $request, Closure $next): mixed;
 }

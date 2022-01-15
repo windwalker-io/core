@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use DomainException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -18,14 +19,7 @@ use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mime\Address;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
-
-use Windwalker\DI\Container;
-use Windwalker\DI\Definition\ObjectBuilderDefinition;
-
 use Windwalker\Utilities\Arr;
-
-use function Windwalker\DI\create;
-use function Windwalker\ref;
 
 /**
  * The MailerManager class.
@@ -40,7 +34,7 @@ class MailerManager extends AbstractManager
     public function createMailer(array $options = []): MailerInterface
     {
         if (!class_exists(Transport::class)) {
-            throw new \DomainException('Please install symfony/mailer ^5.0||^6.0 first.');
+            throw new DomainException('Please install symfony/mailer ^5.0||^6.0 first.');
         }
 
         if (!env('MAIL_ENABLED')) {
@@ -51,7 +45,7 @@ class MailerManager extends AbstractManager
             [
                 'envelope' => [
                     'sender' => null,
-                    'recipients' => []
+                    'recipients' => [],
                 ],
                 'dsn' => [
                     'scheme' => '',
@@ -66,7 +60,7 @@ class MailerManager extends AbstractManager
                 'cc' => '',
 
                 // Auto BCC to emails, use (,) separate addresses.
-                'bcc' => ''
+                'bcc' => '',
             ],
             $options
         );

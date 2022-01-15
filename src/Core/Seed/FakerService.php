@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of earth project.
  *
@@ -6,18 +7,16 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Seed;
 
-use Faker\Factory;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
-use Windwalker\DI\Container;
+use Psr\Cache\InvalidArgumentException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-
-use function Windwalker\DI\create;
-use function Windwalker\Promise\resolve;
 
 /**
  * The FakerService class.
@@ -32,7 +31,7 @@ class FakerService implements EventAwareInterface
     /**
      * create
      *
-     * @param string $locale
+     * @param  string  $locale
      *
      * @return  FakerGenerator
      *
@@ -55,12 +54,12 @@ class FakerService implements EventAwareInterface
     /**
      * getInstance
      *
-     * @param string $locale
-     * @param bool   $new
+     * @param  string  $locale
+     * @param  bool    $new
      *
      * @return  FakerGenerator
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @since  3.5
      */

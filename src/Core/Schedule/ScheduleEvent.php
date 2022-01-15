@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of earth project.
  *
@@ -6,9 +7,13 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
+use DateTimeInterface;
+use DateTimeZone;
 
 use function Windwalker\nope;
 
@@ -53,9 +58,9 @@ class ScheduleEvent
     /**
      * ScheduleEvent constructor.
      *
-     * @param  string  $name
+     * @param  string                 $name
      * @param  CronExpression|string  $expression
-     * @param  callable|null  $handler
+     * @param  callable|null          $handler
      */
     public function __construct(
         protected string $name,
@@ -215,18 +220,18 @@ class ScheduleEvent
     /**
      * isDue
      *
-     * @param  \DateTimeInterface|string  $currentTime
-     * @param  \DateTimeZone|string|null  $timeZone
+     * @param  DateTimeInterface|string  $currentTime
+     * @param  DateTimeZone|string|null  $timeZone
      *
      * @return  bool
      *
      * @since  3.5.3
      */
     public function isDue(
-        \DateTimeInterface|string $currentTime = 'now',
-        \DateTimeZone|string|null $timeZone = null
+        DateTimeInterface|string $currentTime = 'now',
+        DateTimeZone|string|null $timeZone = null
     ): bool {
-        if ($timeZone instanceof \DateTimeZone) {
+        if ($timeZone instanceof DateTimeZone) {
             $timeZone = $timeZone->getName();
         }
 

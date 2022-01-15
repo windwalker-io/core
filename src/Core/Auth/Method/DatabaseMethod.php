@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Auth\Method;
 
+use JsonException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Authentication\AuthResult;
 use Windwalker\Authentication\Method\MethodInterface;
@@ -20,6 +21,8 @@ use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Query\Query;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
+
+use const PASSWORD_DEFAULT;
 
 /**
  * The DatabaseMethod class.
@@ -49,7 +52,7 @@ class DatabaseMethod implements MethodInterface
             [
                 'id_name' => 'id',
                 'login_name' => 'username',
-                'password_algo' => \PASSWORD_DEFAULT,
+                'password_algo' => PASSWORD_DEFAULT,
             ]
         )
             ->setRequired(
@@ -69,7 +72,7 @@ class DatabaseMethod implements MethodInterface
     public function authenticate(array $credential): AuthResult
     {
         $loginNames = (array) $this->getOption('login_name');
-        $table      = $this->getOption('table');
+        $table = $this->getOption('table');
 
         $usernames = Arr::only($credential, $loginNames);
 
@@ -113,7 +116,7 @@ class DatabaseMethod implements MethodInterface
      *
      * @return  void
      *
-     * @throws \JsonException
+     * @throws JsonException
      * @since  1.4.6
      */
     protected function rehash(Collection $user, array $credential): void

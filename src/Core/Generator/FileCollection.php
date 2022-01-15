@@ -66,7 +66,7 @@ class FileCollection implements EventAwareInterface
 
                     $action = $isExists ? '<fg=cyan>OVERRIDE</>' : '<info>CREATE</info>';
                 } else {
-                    $dest   = $file->compileDestFile($destDir, $data);
+                    $dest = $file->compileDestFile($destDir, $data);
                     $action = '<comment>EXISTS</comment>';
                 }
 

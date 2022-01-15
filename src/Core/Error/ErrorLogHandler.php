@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,9 +7,13 @@
  * @license    GNU General Public License version 2 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Error;
 
+use Exception;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Throwable;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
@@ -61,12 +66,12 @@ class ErrorLogHandler implements ErrorHandlerInterface
     /**
      * __invoke
      *
-     * @param  \Throwable $e
+     * @param  Throwable  $e
      *
      * @return  void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function __invoke(\Throwable $e): void
+    public function __invoke(Throwable $e): void
     {
         // Do not log 4xx errors
         $code = $e->getCode();
@@ -82,7 +87,12 @@ class ErrorLogHandler implements ErrorHandlerInterface
 
             $traces = '';
 
-            foreach (BacktraceHelper::normalizeBacktraces($e->getTrace(), $this->config->get('@root')) as $i => $trace) {
+            foreach (
+                BacktraceHelper::normalizeBacktraces(
+                    $e->getTrace(),
+                    $this->config->get('@root')
+                ) as $i => $trace
+            ) {
                 $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
             }
 

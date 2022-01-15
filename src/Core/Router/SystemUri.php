@@ -11,12 +11,16 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use BadMethodCallException;
+use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Uri\PsrUri;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Str;
+
+use function dirname;
 
 /**
  * The SystemUri class.
@@ -38,7 +42,7 @@ use Windwalker\Utilities\Str;
  * @method string path($uri = null)
  * @method string scheme()
  */
-class SystemUri extends Uri implements \JsonSerializable
+class SystemUri extends Uri implements JsonSerializable
 {
     use InstanceCacheTrait;
 
@@ -53,7 +57,7 @@ class SystemUri extends Uri implements \JsonSerializable
         $uri = static::getSystemUri($request);
 
         // Get the host and path from the URI.
-        $path   = rtrim($uri->getPath(), '/\\');
+        $path = rtrim($uri->getPath(), '/\\');
         $script = trim($server['SCRIPT_NAME'] ?? '', '/');
 
         // Check if the path includes "index.php".
@@ -71,7 +75,7 @@ class SystemUri extends Uri implements \JsonSerializable
 
     protected static function getSystemUri(ServerRequestInterface $request): static
     {
-        $uri           = new static((string) $request->getUri());
+        $uri = new static((string) $request->getUri());
         $uri->original = (string) $uri;
 
         $server = $request->getServerParams();
@@ -79,10 +83,10 @@ class SystemUri extends Uri implements \JsonSerializable
         // If we are working from a CGI SAPI with the 'cgi.fix_pathinfo' directive disabled we use PHP_SELF.
         if (str_contains(PHP_SAPI, 'cgi') && !ini_get('cgi.fix_pathinfo') && !empty($server['REQUEST_URI'])) {
             // We aren't expecting PATH_INFO within PHP_SELF so this should work.
-            $uri = $uri->withPath(rtrim(\dirname($server['PHP_SELF'] ?? ''), '/\\'));
+            $uri = $uri->withPath(rtrim(dirname($server['PHP_SELF'] ?? ''), '/\\'));
         } else {
             // Pretty much everything else should be handled with SCRIPT_NAME.
-            $uri = $uri->withPath(rtrim(\dirname($server['SCRIPT_NAME'] ?? ''), '/\\'));
+            $uri = $uri->withPath(rtrim(dirname($server['SCRIPT_NAME'] ?? ''), '/\\'));
         }
 
         // Clear the unused parts of the requested URI.
@@ -112,7 +116,7 @@ class SystemUri extends Uri implements \JsonSerializable
      */
     public function withScriptName(string $scriptName): static
     {
-        $new             = $this;
+        $new = $this;
         $new->scriptName = $scriptName;
 
         return $new;
@@ -121,8 +125,8 @@ class SystemUri extends Uri implements \JsonSerializable
     /**
      * addPrefix
      *
-     * @param   string $name
-     * @param   string $url
+     * @param  string  $name
+     * @param  string  $url
      *
      * @return  string
      */
@@ -188,7 +192,7 @@ class SystemUri extends Uri implements \JsonSerializable
     /**
      * clear
      *
-     * @param string $uri
+     * @param  string  $uri
      *
      * @return  string
      *
@@ -324,7 +328,7 @@ class SystemUri extends Uri implements \JsonSerializable
                         $route = trim(substr($route, strlen($file)), '/');
                     }
 
-                    return UriNormalizer::ensureDir(rtrim($route,'/'));
+                    return UriNormalizer::ensureDir(rtrim($route, '/'));
                 })();
         }
 
@@ -334,8 +338,8 @@ class SystemUri extends Uri implements \JsonSerializable
     /**
      * __call
      *
-     * @param   string $name
-     * @param   array  $args
+     * @param  string  $name
+     * @param  array   $args
      *
      * @return  mixed
      */
@@ -349,6 +353,6 @@ class SystemUri extends Uri implements \JsonSerializable
             return $this->$name;
         }
 
-        throw new \BadMethodCallException('Method: ' . __CLASS__ . '::' . $name . '() not found.');
+        throw new BadMethodCallException('Method: ' . __CLASS__ . '::' . $name . '() not found.');
     }
 }

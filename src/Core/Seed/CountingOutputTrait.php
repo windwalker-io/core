@@ -1,10 +1,13 @@
 <?php
+
 /**
  * Part of earth project.
  *
  * @copyright  Copyright (C) 2018 LYRASOFT.
  * @license    MIT
  */
+
+declare(strict_types=1);
 
 namespace Windwalker\Core\Seed;
 

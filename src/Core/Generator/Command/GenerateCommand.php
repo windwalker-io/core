@@ -24,6 +24,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
+use Windwalker\DI\Exception\DefinitionException;
 
 /**
  * The GenerateCommand class.
@@ -35,7 +36,7 @@ use Windwalker\Core\Console\SubCommandAwareInterface;
 class GenerateCommand implements CommandInterface, SubCommandAwareInterface
 {
     protected ?array $subCommands = null;
-    
+
     /**
      * GenerateCommand constructor.
      */
@@ -89,7 +90,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
                 $definition->addOptions($subCommand->getDefinition()->getOptions());
 
                 $command->setDefinition($definition);
-                
+
                 $appDefinition = $this->app->getDefinition();
                 $options = $appDefinition->getOptions();
 
@@ -135,6 +136,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
 
         if (!$task) {
             $this->showList($io);
+
             return 0;
         }
 
@@ -184,7 +186,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
      *
      * @return  Command
      *
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     protected function resolveSubCommand(string $name, string $command): object
     {

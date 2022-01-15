@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Command;
 
+use DomainException;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -22,7 +24,6 @@ use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\PlatformHelper;
-use Windwalker\ORM\ORM;
 
 /**
  * The AbstractMigrationCommand class.
@@ -30,8 +31,11 @@ use Windwalker\ORM\ORM;
 abstract class AbstractMigrationCommand implements CommandInterface
 {
     public const AUTO_BACKUP = 1;
+
     public const NO_TIME_LIMIT = 1 << 1;
+
     public const CREATE_DATABASE = 1 << 2;
+
     public const TOGGLE_CONNECTION = 1 << 3;
 
     #[Inject]
@@ -77,7 +81,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
     protected function preprocess(IOInterface $io, int $options = 0): void
     {
         if (!class_exists(DatabaseAdapter::class)) {
-            throw new \DomainException('Please install windwalker/database first.');
+            throw new DomainException('Please install windwalker/database first.');
         }
 
         if ($options & static::NO_TIME_LIMIT) {
@@ -201,7 +205,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
      *
      * @return  void
      *
-     * @throws \Exception
+     * @throws Exception
      */
     protected function backup(IOInterface $io): void
     {
@@ -216,7 +220,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
                 $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
                 $io->style()->newLine();
-            } catch (\DomainException $e) {
+            } catch (DomainException $e) {
                 $io->errorStyle()->warning($e->getMessage());
             }
         }
@@ -252,8 +256,8 @@ abstract class AbstractMigrationCommand implements CommandInterface
     /**
      * Get the ENV suggestion depend on platform.
      *
-     * @param string $env
-     * @param string $value
+     * @param  string  $env
+     * @param  string  $value
      *
      * @return  string
      *

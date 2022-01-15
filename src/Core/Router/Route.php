@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Closure;
+use JsonSerializable;
+use LogicException;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Uri\Uri;
@@ -18,7 +21,7 @@ use Windwalker\Uri\Uri;
 /**
  * The Route class.
  */
-class Route implements \JsonSerializable
+class Route implements JsonSerializable
 {
     use RouteConfigurationTrait;
 
@@ -80,7 +83,7 @@ class Route implements \JsonSerializable
     {
         return $this->controller(
             function (Navigator $nav, ApplicationInterface $app) use ($to, $query, $options) {
-                if ($to instanceof \Closure) {
+                if ($to instanceof Closure) {
                     return $app->call($to);
                 }
 
@@ -182,7 +185,7 @@ class Route implements \JsonSerializable
     {
         $new = clone $this;
 
-        $name   = $this->getName();
+        $name = $this->getName();
         $groups = $this->getGroups();
 
         // Set group data
@@ -205,7 +208,7 @@ class Route implements \JsonSerializable
         $options = $new->getOptions();
 
         if (!isset($options['pattern'])) {
-            throw new \LogicException('Route: ' . $name . ' has no pattern.');
+            throw new LogicException('Route: ' . $name . ' has no pattern.');
         }
 
         // Prefix
@@ -225,8 +228,8 @@ class Route implements \JsonSerializable
 
         $new->name = implode('::', $namespaces);
 
-        $options['extra']['action']      = $options['actions'] ?? [];
-        $options['extra']['hook']        = $options['hooks'] ?? [];
+        $options['extra']['action'] = $options['actions'] ?? [];
+        $options['extra']['hook'] = $options['hooks'] ?? [];
         $options['extra']['middlewares'] = $options['middlewares'] ?? [];
         $options['extra']['subscribers'] = $options['subscribers'] ?? [];
         $options['extra']['groups'] = $groups;

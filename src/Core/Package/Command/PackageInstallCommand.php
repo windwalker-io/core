@@ -16,19 +16,16 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use UnexpectedValueException;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\InstallResource;
-use Windwalker\Core\Package\PackageInstaller;
 use Windwalker\Core\Package\PackageRegistry;
-
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
-
-use function Windwalker\collect;
 
 /**
  * The PackageInstallCommand class.
@@ -164,8 +161,6 @@ class PackageInstallCommand implements CommandInterface
         $dry = $this->io->getOption('dry-run') !== false;
         $force = $this->io->getOption('force') !== false;
 
-
-
         foreach ($installResource->dump() as $files) {
             if ($files !== []) {
                 foreach ($files as $src => $dest) {
@@ -243,7 +238,7 @@ class PackageInstallCommand implements CommandInterface
         }
 
         if ($options === []) {
-            throw new \UnexpectedValueException('No packages found.');
+            throw new UnexpectedValueException('No packages found.');
         }
 
         $qn = new ChoiceQuestion(
@@ -276,7 +271,7 @@ class PackageInstallCommand implements CommandInterface
     {
         $foundPackages = $registry->getPackages();
 
-        $names = array_map(fn (AbstractPackage $pkg) => $pkg::getName(), $foundPackages);
+        $names = array_map(fn(AbstractPackage $pkg) => $pkg::getName(), $foundPackages);
 
         foreach ($packages as $package) {
             if (!in_array($package, $names, true)) {

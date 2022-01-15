@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,8 +7,11 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Pagination;
 
+use InvalidArgumentException;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
@@ -122,8 +126,8 @@ class Pagination
     /**
      * Pagination constructor.
      *
-     * @param  Navigator        $navigator
-     * @param  SystemUri        $systemUri
+     * @param  Navigator  $navigator
+     * @param  SystemUri  $systemUri
      * @param  RendererService  $rendererService
      */
     public function __construct(
@@ -219,8 +223,11 @@ class Pagination
      *
      * @return string
      */
-    public function render(?PaginationResult $result = null, callable|string $template = null, array $options = []): string
-    {
+    public function render(
+        ?PaginationResult $result = null,
+        callable|string $template = null,
+        array $options = []
+    ): string {
         $result ??= $this->compile();
         $template ??= $this->getTemplate();
 
@@ -229,13 +236,13 @@ class Pagination
         }
 
         if (!is_callable($template)) {
-            throw new \InvalidArgumentException('Template Should be string or callable.');
+            throw new InvalidArgumentException('Template Should be string or callable.');
         }
 
         return $template(
             [
                 'result' => $result,
-                'pagination' => $this
+                'pagination' => $this,
             ]
         );
     }
@@ -252,7 +259,7 @@ class Pagination
         $this->neighbours = (int) $neighbours;
 
         if ($this->neighbours <= 0) {
-            throw new \InvalidArgumentException('Number of neighboring pages must be at least 1');
+            throw new InvalidArgumentException('Number of neighboring pages must be at least 1');
         }
 
         return $this;
@@ -290,7 +297,7 @@ class Pagination
         $this->limit = (int) $limit;
 
         if ($this->limit < 0) {
-            throw new \InvalidArgumentException('Items per page must be at least 1');
+            throw new InvalidArgumentException('Items per page must be at least 1');
         }
 
         return $this;

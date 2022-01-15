@@ -14,13 +14,11 @@ namespace Windwalker\Debugger;
 use Composer\InstalledVersions;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageInstaller;
-use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Event\QueryEndEvent;
@@ -57,7 +55,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
         );
 
         $app = $container->get(ApplicationInterface::class);
-        
+
         if ($app instanceof WebApplication) {
             $app->subscribe($this);
         }
@@ -98,7 +96,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
     /**
      * collectDatabase
      *
-     * @param  Container   $container
+     * @param  Container  $container
      * @param  Collection  $collector
      *
      * @return  void
@@ -114,7 +112,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
                     function (InstanceCreatedEvent $event) use ($collector) {
                         $name = $event->getInstanceName();
                         $dbCollector = $collector->proxy('db.queries');
-                        $startTime   = null;
+                        $startTime = null;
                         $memory = null;
 
                         /** @var DatabaseAdapter $db */
@@ -135,13 +133,13 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
                                     return;
                                 }
 
-                                $data['time']        = microtime(true) - $startTime;
-                                $data['memory']      = memory_get_usage(false) - $memory;
-                                $data['raw_query']   = (string) $event->getQuery();
+                                $data['time'] = microtime(true) - $startTime;
+                                $data['memory'] = memory_get_usage(false) - $memory;
+                                $data['raw_query'] = (string) $event->getQuery();
                                 $data['debug_query'] = $event->getDebugQueryString();
-                                $data['bounded']     = $event->getBounded();
-                                $data['connection']  = $name;
-                                $data['count']       = $event->getStatement()->countAffected();
+                                $data['bounded'] = $event->getBounded();
+                                $data['connection'] = $name;
+                                $data['count'] = $event->getStatement()->countAffected();
                                 $data['backtrace'] = BacktraceHelper::normalizeBacktraces(debug_backtrace());
 
                                 unset($data['start_time']);

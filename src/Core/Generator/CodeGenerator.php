@@ -14,7 +14,6 @@ namespace Windwalker\Core\Generator;
 use Laminas\Code\Generator\DocBlockGenerator;
 use Laminas\Code\Generator\FileGenerator;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Router\RouteCreator;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Utilities\Str;
 
@@ -57,7 +56,7 @@ class CodeGenerator
         if (is_file($filepath)) {
             return FileGenerator::fromArray(
                 [
-                    'body' => file_get_contents($filepath)
+                    'body' => file_get_contents($filepath),
                 ]
             );
         }

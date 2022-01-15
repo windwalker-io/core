@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
@@ -6,10 +7,13 @@
  * @license    GNU Lesser General Public License version 3 or later.
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Database\Exporter;
 
+use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Environment\PlatformHelper;
@@ -34,7 +38,7 @@ class MySQLExporter extends AbstractExporter
         $md = trim($this->findMysqldump());
 
         $options = $this->db->getDriver()->getOptions();
-        $cmd     = sprintf(
+        $cmd = sprintf(
             '%s --defaults-extra-file=%s %s',
             $md,
             $this->createPasswordCnfFile($options),
@@ -53,7 +57,7 @@ class MySQLExporter extends AbstractExporter
             $this->emitMessage(
                 [
                     'Error: ' . $e->getMessage(),
-                    'Fallback to php backup script.'
+                    'Fallback to php backup script.',
                 ]
             );
 
@@ -84,7 +88,7 @@ class MySQLExporter extends AbstractExporter
     {
         $tmpFile = $this->app->path('@temp/.md.cnf');
 
-        $user     = addslashes($options['user'] ?? 'root');
+        $user = addslashes($options['user'] ?? 'root');
         $password = addslashes($options['password'] ?? '');
         $host = addslashes($options['host'] ?? 'localhost');
         $port = addslashes($options['port'] ?? '3306');
@@ -184,12 +188,12 @@ CNF;
      *
      * @return string
      *
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     protected function getInserts(string $table): string
     {
-        $db    = $this->db;
+        $db = $this->db;
         $query = $db->select('*')->from($table);
 
         $sql = [];

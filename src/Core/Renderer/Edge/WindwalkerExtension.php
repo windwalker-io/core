@@ -1,10 +1,13 @@
 <?php
+
 /**
  * Part of Windwalker project.
  *
  * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
  * @license    GNU General Public License version 2 or later.
  */
+
+declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer\Edge;
 
@@ -16,7 +19,6 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
 use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
@@ -92,7 +94,7 @@ class WindwalkerExtension implements
     /**
      * translate
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -104,7 +106,7 @@ class WindwalkerExtension implements
     /**
      * sprintf
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -116,7 +118,7 @@ class WindwalkerExtension implements
     /**
      * messages
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -128,7 +130,7 @@ class WindwalkerExtension implements
     /**
      * route
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -140,7 +142,7 @@ class WindwalkerExtension implements
     /**
      * route
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -154,7 +156,7 @@ class WindwalkerExtension implements
     /**
      * formToken
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -166,7 +168,7 @@ class WindwalkerExtension implements
     /**
      * attr
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -180,7 +182,7 @@ class WindwalkerExtension implements
     /**
      * show
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -194,7 +196,7 @@ class WindwalkerExtension implements
     /**
      * dead
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -208,7 +210,7 @@ class WindwalkerExtension implements
     /**
      * ds
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -222,7 +224,7 @@ class WindwalkerExtension implements
     /**
      * dead
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -236,7 +238,7 @@ class WindwalkerExtension implements
     /**
      * dead
      *
-     * @param string $expression
+     * @param  string  $expression
      *
      * @return  string
      *
@@ -256,7 +258,7 @@ class WindwalkerExtension implements
     /**
      * enddebug
      *
-     * @param   string $expression
+     * @param  string  $expression
      *
      * @return  string
      */
@@ -283,7 +285,7 @@ class WindwalkerExtension implements
     /**
      * Strip the parentheses from the given expression.
      *
-     * @param  string $expression
+     * @param  string  $expression
      *
      * @return string
      */

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Http;
 
 use JetBrains\PhpStorm\Immutable;
+use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
@@ -23,10 +24,6 @@ use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;
-use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\Assert\ArgumentsAssert;
-
-use Windwalker\Utilities\TypeCast;
 
 use function Windwalker\collect;
 
@@ -34,7 +31,7 @@ use function Windwalker\collect;
  * The AppRequest class.
  */
 #[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
-class AppRequest implements \JsonSerializable
+class AppRequest implements JsonSerializable
 {
     use FilterAwareTrait;
 
@@ -62,7 +59,7 @@ class AppRequest implements \JsonSerializable
     {
         return $this->request->getHeaderLine('X-Http-Method-Override')
             ?: $this->input('_method')
-            ?: $this->request->getMethod();
+                ?: $this->request->getMethod();
     }
 
     /**
@@ -309,7 +306,7 @@ class AppRequest implements \JsonSerializable
      */
     public function withSystemUri(SystemUri $uri): static
     {
-        $new            = clone $this;
+        $new = clone $this;
         $new->systemUri = $uri;
 
         return $new;
@@ -365,7 +362,7 @@ class AppRequest implements \JsonSerializable
         return array_merge(
             $req,
             [
-                'systemUri' => $this->getSystemUri()
+                'systemUri' => $this->getSystemUri(),
             ]
         );
     }

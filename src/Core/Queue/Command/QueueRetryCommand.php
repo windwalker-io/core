@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Queue\Command;
 
+use InvalidArgumentException;
+use JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,6 +22,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Queue\QueueFailerManager;
 use Windwalker\Core\Queue\QueueManager;
+use Windwalker\DI\Exception\DefinitionException;
 
 /**
  * The QueueRestartCommand class.
@@ -74,8 +77,8 @@ class QueueRetryCommand implements CommandInterface
      * @param  IOInterface  $io
      *
      * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \JsonException
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws JsonException
+     * @throws DefinitionException
      */
     public function execute(IOInterface $io): int
     {
@@ -96,7 +99,7 @@ class QueueRetryCommand implements CommandInterface
             $ids = $io->getArgument('ids');
 
             if ($ids === []) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     'Please provide at least 1 ID or use --all option.'
                 );
             }
@@ -118,7 +121,8 @@ class QueueRetryCommand implements CommandInterface
             if (!$all) {
                 $io->writeln(
                     sprintf(
-                        'Resend failed-job: <info>%s</info> to connection: <info>%s</info> queue: <comment>%s</comment>',
+                        'Resend failed-job: <info>%s</info> to connection: <info>%s</info> ' .
+                        'queue: <comment>%s</comment>',
                         $id,
                         $connection,
                         $failed['channel']

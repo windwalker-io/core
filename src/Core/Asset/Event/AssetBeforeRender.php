@@ -20,6 +20,7 @@ use Windwalker\Event\AbstractEvent;
 class AssetBeforeRender extends AbstractEvent
 {
     public const TYPE_CSS = 'css';
+
     public const TYPE_JS = 'js';
 
     protected AssetService $assetService;

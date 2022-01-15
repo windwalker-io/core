@@ -11,13 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Command;
 
+use DomainException;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Core\Generator\Builder\EnumBuilder;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\Database\DatabaseAdapter;
@@ -63,6 +64,7 @@ class BuildEnumCommand implements CommandInterface
             'Do not save class.'
         );
 
+        // phpcs:disable
         $command->setHelp(
             <<<HELP
             $ <info>php windwalker build:enum Foo</info> => Use short name, will auto build App\\Enum\\Foo class
@@ -71,6 +73,7 @@ class BuildEnumCommand implements CommandInterface
             $ <info>php windwalker build:enum "App\\Enum\\*"</info> => Use wildcards, will build all App\\Enum\\* classes
             HELP
         );
+        // phpcs:enable
     }
 
     /**
@@ -83,7 +86,7 @@ class BuildEnumCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!class_exists(DatabaseAdapter::class)) {
-            throw new \DomainException('Please install windwalker/database first.');
+            throw new DomainException('Please install windwalker/database first.');
         }
 
         $this->io = $io;
@@ -91,9 +94,10 @@ class BuildEnumCommand implements CommandInterface
         $ns = $io->getArgument('ns');
 
         if (str_contains($ns, '*')) {
-            $ns      = Str::removeRight($ns, '\\*');
+            $ns = Str::removeRight($ns, '\\*');
             $classes = $this->classFinder->findClasses($ns);
             $this->handleClasses($classes);
+
             return 0;
         }
 
@@ -104,6 +108,7 @@ class BuildEnumCommand implements CommandInterface
         if (!class_exists($ns)) {
             $classes = $this->classFinder->findClasses($io->getArgument('ns'));
             $this->handleClasses($classes);
+
             return 0;
         }
 
@@ -124,12 +129,12 @@ class BuildEnumCommand implements CommandInterface
             $this->io->newLine();
             $this->io->writeln("Handling: <info>$class</info>");
 
-            $ref = new \ReflectionClass($class);
+            $ref = new ReflectionClass($class);
 
             $content = file_get_contents($ref->getFileName());
 
             $newCode = preg_replace_callback(
-                // @see https://stackoverflow.com/a/29290586
+            // @see https://stackoverflow.com/a/29290586
                 '/(?:\/\*(?:[^*]|(?:\*[^\/]))*\*\/)\s+class/',
                 function (array $matches) use ($ref) {
                     $methods = [];

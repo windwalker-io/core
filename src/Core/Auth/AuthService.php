@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Auth;
 
+use DomainException;
 use Windwalker\Authentication\Authentication;
 use Windwalker\Authentication\AuthenticationInterface;
 use Windwalker\Authentication\AuthResult;
@@ -74,7 +75,7 @@ class AuthService
     public function getAuthentication(): AuthenticationInterface
     {
         if (!interface_exists(AuthenticationInterface::class)) {
-            throw new \DomainException('Please install windwalker/authentication ^4.0 first.');
+            throw new DomainException('Please install windwalker/authentication ^4.0 first.');
         }
 
         return $this->authentication;
@@ -86,7 +87,7 @@ class AuthService
     public function getAuthorization(): AuthorizationInterface
     {
         if (!interface_exists(AuthorizationInterface::class)) {
-            throw new \DomainException('Please install windwalker/authorization ^4.0 first.');
+            throw new DomainException('Please install windwalker/authorization ^4.0 first.');
         }
 
         return $this->authorization;
@@ -126,7 +127,7 @@ class AuthService
      */
     public function getUserRetrieveHandler(): callable
     {
-        return $this->userRetrieveHandler ??= static fn () => null;
+        return $this->userRetrieveHandler ??= static fn() => null;
     }
 
     /**

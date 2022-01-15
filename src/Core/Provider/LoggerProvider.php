@@ -16,6 +16,7 @@ use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Manager\LoggerManager;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 
 /**
@@ -29,7 +30,7 @@ class LoggerProvider implements ServiceProviderInterface, RequestBootableProvide
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws DefinitionException
      */
     public function register(Container $container): void
     {

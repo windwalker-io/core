@@ -121,7 +121,7 @@ class ScheduleShowCommand implements CommandInterface
             $tags = $event->getTags();
             sort($tags);
 
-            $expr    = $event->getExpression();
+            $expr = $event->getExpression();
             $nextDue0 = $expr->getNextRunDate($time, 0, false, $tz);
             $nextDue1 = $expr->getNextRunDate($time, 1, false, $tz);
             $nextDue2 = $expr->getNextRunDate($time, 2, false, $tz);
@@ -139,7 +139,7 @@ class ScheduleShowCommand implements CommandInterface
                     $nextDue0->format('Y-m-d H:i:s')
                     . "\n" . $nextDue1->format('Y-m-d H:i:s')
                     . "\n" . $nextDue2->format('Y-m-d H:i:s'),
-                    '<fg=gray>' . implode(' ', $tags) . '</>'
+                    '<fg=gray>' . implode(' ', $tags) . '</>',
                 ]
             );
         }
@@ -147,6 +147,7 @@ class ScheduleShowCommand implements CommandInterface
         if ($count === 0) {
             $io->writeln('No events.');
             $io->newLine();
+
             return;
         }
 

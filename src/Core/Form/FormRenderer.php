@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Form;
 
 use Windwalker\Core\Renderer\RendererService;
-use Windwalker\Core\Theme\ThemeInterface;
 use Windwalker\DOM\DOMElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Renderer\FormRendererInterface;

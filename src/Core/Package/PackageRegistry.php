@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Package;
 
+use JsonException;
 use Windwalker\Core\Application\ApplicationInterface;
 
 /**
@@ -107,7 +108,7 @@ class PackageRegistry
 
     /**
      * @return AbstractPackage[]
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getPackages(): array
     {

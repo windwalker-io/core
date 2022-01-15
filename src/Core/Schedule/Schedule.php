@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of earth project.
  *
@@ -6,9 +7,18 @@
  * @license    MIT
  */
 
+declare(strict_types=1);
+
 namespace Windwalker\Core\Schedule;
 
+use BadMethodCallException;
 use Cron\CronExpression;
+use DateTimeInterface;
+use DateTimeZone;
+use DomainException;
+use Generator;
+use ReflectionException;
+use Windwalker\DI\Exception\DependencyResolutionException;
 
 /**
  * The Schedule class.
@@ -38,7 +48,7 @@ class Schedule
     public function __construct()
     {
         if (!class_exists(CronExpression::class)) {
-            throw new \DomainException('Please install `dragonmantank/cron-expression ^3.1` first.');
+            throw new DomainException('Please install `dragonmantank/cron-expression ^3.1` first.');
         }
     }
 
@@ -66,19 +76,19 @@ class Schedule
     /**
      * getDueEvents
      *
-     * @param  array                      $tags
-     * @param  string|\DateTimeInterface  $currentTime
-     * @param  \DateTimeZone|string|null  $timezone
+     * @param  array                     $tags
+     * @param  string|DateTimeInterface  $currentTime
+     * @param  DateTimeZone|string|null  $timezone
      *
-     * @return  ScheduleEvent[]|\Generator
+     * @return  ScheduleEvent[]|Generator
      *
      * @since  3.5.3
      */
     public function getDueEvents(
         array $tags = [],
-        \DateTimeInterface|string $currentTime = 'now',
-        \DateTimeZone|string|null $timezone = null
-    ): \Generator {
+        DateTimeInterface|string $currentTime = 'now',
+        DateTimeZone|string|null $timezone = null
+    ): Generator {
         foreach ($this->getEvents($tags) as $name => $event) {
             if ($event->isDue($currentTime, $timezone)) {
                 yield $name => $event;
@@ -105,13 +115,13 @@ class Schedule
     /**
      * Method to get property Events
      *
-     * @param array $tags
+     * @param  array  $tags
      *
-     * @return  ScheduleEvent[]|\Generator
+     * @return  ScheduleEvent[]|Generator
      *
      * @since  3.5.3
      */
-    public function getEvents(array $tags = []): \Generator
+    public function getEvents(array $tags = []): Generator
     {
         foreach ($this->events as $name => $event) {
             if ($tags === [] || array_intersect($event->getTags(), $tags) === $tags) {
@@ -123,7 +133,7 @@ class Schedule
     /**
      * Method to set property events
      *
-     * @param ScheduleEvent[] $events
+     * @param  ScheduleEvent[]  $events
      *
      * @return  static  Return self to support chaining.
      *
@@ -139,7 +149,7 @@ class Schedule
     /**
      * createCronExpression
      *
-     * @param string $expr
+     * @param  string  $expr
      *
      * @return  CronExpression
      *
@@ -153,13 +163,13 @@ class Schedule
     /**
      * __call
      *
-     * @param string $name
-     * @param array  $args
+     * @param  string  $name
+     * @param  array   $args
      *
      * @return  mixed
      *
-     * @throws \ReflectionException
-     * @throws \Windwalker\DI\Exception\DependencyResolutionException
+     * @throws ReflectionException
+     * @throws DependencyResolutionException
      * @since  3.5.3
      */
     public function __call(string $name, array $args)
@@ -178,7 +188,7 @@ class Schedule
             return $this->task($args[0])->$name();
         }
 
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             sprintf(
                 'Call to undefined method %s::%s()',
                 __CLASS__,

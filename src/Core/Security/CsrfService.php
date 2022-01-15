@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Security;
 
+use Exception;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Language\TranslatorTrait;
@@ -53,8 +54,8 @@ class CsrfService
 
     public function input(array $attrs = []): DOMElement
     {
-        $attrs['type']  = 'hidden';
-        $attrs['name']  = $this->getToken();
+        $attrs['type'] = 'hidden';
+        $attrs['name'] = $this->getToken();
         $attrs['value'] = 1;
         $attrs['class'] = $attrs['class'] ?? 'anticsrf';
 
@@ -83,7 +84,7 @@ class CsrfService
      *
      * @return  string
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function createToken(): string
     {

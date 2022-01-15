@@ -13,6 +13,7 @@ namespace Windwalker\Debugger\Subscriber;
 
 use Composer\InstalledVersions;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\DateTime\ChronosService;
@@ -34,8 +35,6 @@ use Windwalker\Http\Helper\HttpHelper;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 
-use function Windwalker\collect;
-use function Windwalker\ref;
 use function Windwalker\uid;
 
 /**
@@ -78,13 +77,13 @@ class DebuggerSubscriber
         BeforeAppDispatchEvent $event
     ): void {
         $container = $event->getContainer();
-        $app       = $container->get(AppContext::class);
+        $app = $container->get(AppContext::class);
         $collector = $container->get('debugger.collector');
 
         $chronosService = $app->service(ChronosService::class);
 
         // System info
-        $info         = [];
+        $info = [];
         $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
 
         $collector['system'] = $info;
@@ -95,11 +94,11 @@ class DebuggerSubscriber
         BeforeControllerDispatchEvent $event
     ): void {
         /** @var AppContext $app */
-        $app       = $this->container->get(AppContext::class);
+        $app = $this->container->get(AppContext::class);
         $collector = $this->container->get('debugger.collector');
 
-        $routing['matched']    = $app->getMatchedRoute();
-        $routing['routes']     = $app->service(Router::class)->getRoutes();
+        $routing['matched'] = $app->getMatchedRoute();
+        $routing['routes'] = $app->service(Router::class)->getRoutes();
         $routing['controller'] = $event->getController();
 
         $collector['routing'] = $routing;
@@ -110,7 +109,7 @@ class DebuggerSubscriber
         AfterRequestEvent $event
     ): void {
         $container = $event->getContainer();
-        $app       = $container->get(AppContext::class);
+        $app = $container->get(AppContext::class);
 
         /** @var Collection $collector */
         $collector = $this->container->get('debugger.collector');
@@ -118,9 +117,9 @@ class DebuggerSubscriber
         $http = [];
 
         $appReq = $app->getAppRequest();
-        $req    = $appReq->getRequest();
+        $req = $appReq->getRequest();
 
-        $http['request']        = [
+        $http['request'] = [
             'headers' => $req->getHeaders(),
             'server' => $req->getServerParams(),
             'attributes' => $req->getAttributes(),
@@ -132,9 +131,9 @@ class DebuggerSubscriber
             'version' => $req->getProtocolVersion(),
             'target' => $req->getRequestTarget(),
         ];
-        $http['systemUri']      = $appReq->getSystemUri();
+        $http['systemUri'] = $appReq->getSystemUri();
         $http['overrideMethod'] = $appReq->getOverrideMethod();
-        $http['remoteIP']       = HttpHelper::getIp($req->getServerParams());
+        $http['remoteIP'] = HttpHelper::getIp($req->getServerParams());
 
         $res = $event->getResponse();
 
@@ -144,11 +143,11 @@ class DebuggerSubscriber
             'headers' => $res->getHeaders(),
             'version' => $res->getProtocolVersion(),
         ];
-        $http['state']    = $app->getState()->all();
+        $http['state'] = $app->getState()->all();
 
         if (InstalledVersions::isInstalled('windwalker/session')) {
-            $http['session']  = $app->service(Session::class)->all();
-            $http['cookies']  = $app->service(CookiesInterface::class)->getStorage();
+            $http['session'] = $app->service(Session::class)->all();
+            $http['cookies'] = $app->service(CookiesInterface::class)->getStorage();
         }
 
         $collector['http'] = $http;
@@ -166,22 +165,22 @@ class DebuggerSubscriber
 
         $collector->def('system', []);
 
-        $systemCollector                      = $collector->proxy('system');
+        $systemCollector = $collector->proxy('system');
         // $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
-        $systemCollector['core_version']      = InstalledVersions::getPrettyVersion('windwalker/core');
-        $systemCollector['php_version']       = PHP_VERSION;
-        $systemCollector['config']            = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
+        $systemCollector['core_version'] = InstalledVersions::getPrettyVersion('windwalker/core');
+        $systemCollector['php_version'] = PHP_VERSION;
+        $systemCollector['config'] = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
 
         // Database
         $connections = $app->config('database.connections') ?? [];
-        $dbConns     = [];
+        $dbConns = [];
 
         foreach ($connections as $connection => $factory) {
             try {
                 $db = $app->service(DatabaseManager::class)->get($connection);
                 $version = null;
                 $version = $db->getDriver()->getVersion();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // No actions.
                 continue;
             }
@@ -239,7 +238,7 @@ class DebuggerSubscriber
 
             // Write new file
             $this->dashboardRepository->writeFile($id, $collector);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             echo $e;
         }
 

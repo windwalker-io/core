@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandInterface;
@@ -18,11 +19,9 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\Input\InputOption;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Data\Collection;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
-
 use Windwalker\Filesystem\Path;
 
 use function Windwalker\fs;
@@ -100,7 +99,7 @@ class LangMergeCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         $filename = $io->getArgument('filename');
-        $to   = $io->getArgument('target_locale');
+        $to = $io->getArgument('target_locale');
         $from = $io->getArgument('from_locale');
 
         $dir = $io->getOption('dir') ?? $this->app->path('@languages');
@@ -120,7 +119,7 @@ class LangMergeCommand implements CommandInterface
             $toFile = fs($dir . '/' . $to . '/' . $file->getBasename());
 
             if (!$fromFile?->exists()) {
-                throw new \RuntimeException('File: ' . $fromFile . ' not exists.');
+                throw new RuntimeException('File: ' . $fromFile . ' not exists.');
             }
 
             $data = $fromFile->readAndParse()->collapse();

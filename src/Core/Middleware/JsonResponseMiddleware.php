@@ -11,10 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
@@ -38,16 +40,16 @@ class JsonResponseMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $this->run(fn () => $handler->handle($request));
+        return $this->run(fn() => $handler->handle($request));
     }
 
-    public function run(\Closure $callback): ResponseInterface
+    public function run(Closure $callback): ResponseInterface
     {
         try {
             $response = $callback();
 
             return static::toJsonResponse($response);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json(
                 [
                     'error' => !$this->app->isDebug() ? $e->getMessage() : sprintf(

@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\DI\Attributes\Service;
 
 /**
  * The StatusCommand class.
@@ -71,6 +70,7 @@ class StatusCommand extends AbstractMigrationCommand
 
         if ($migrations === []) {
             $io->writeln('No migrations found.');
+
             return 0;
         }
 
@@ -90,7 +90,7 @@ class StatusCommand extends AbstractMigrationCommand
                 [
                     $status,
                     $migration->version,
-                    '<comment>' . $migration->name . '</comment>'
+                    '<comment>' . $migration->name . '</comment>',
                 ]
             );
         }
