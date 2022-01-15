@@ -30,8 +30,6 @@ use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Session\Session;
 use Windwalker\Uri\Uri;
 
-use function Windwalker\str;
-
 /**
  * The Context class.
  *
