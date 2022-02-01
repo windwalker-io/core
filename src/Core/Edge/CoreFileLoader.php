@@ -54,7 +54,11 @@ class CoreFileLoader implements EdgeLoaderInterface
                 return $this->loader->find($key);
             }
 
-            throw $e;
+            throw new LayoutNotFoundException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
         }
     }
 
