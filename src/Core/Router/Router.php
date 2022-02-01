@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use FastRoute\BadRouteException;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
@@ -133,12 +134,53 @@ class Router implements EventAwareInterface
             return false;
         }
 
-        // TODO: Match Host
+        // Match Hosts
+        $hosts = $route->getHosts();
+
+        if (($hosts !== []) && !$this->matchHost($request, $hosts, $route)) {
+            return false;
+        }
 
         // Match schemes
         $scheme = $route->getScheme();
 
         return !($scheme && $scheme !== $uri->getScheme());
+    }
+
+    /**
+     * matchHost
+     *
+     * @param  ServerRequestInterface  $request
+     * @param  array                   $hosts
+     * @param  Route                   $route
+     *
+     * @return bool
+     */
+    protected function matchHost(ServerRequestInterface $request, array $hosts, Route $route): bool
+    {
+        $currentHost = $request->getUri()->getHost();
+        $found = false;
+
+        foreach ($hosts as $host) {
+            $hostRegexes = $this->patternToRegex($host);
+
+            foreach ($hostRegexes as [$hostRegex, $varNames]) {
+                preg_match('~' . $hostRegex . '~', $currentHost, $matches);
+
+                if ($matches !== []) {
+                    $found = true;
+                }
+
+                $variables = array_intersect_key(
+                    $matches,
+                    array_flip($varNames),
+                );
+
+                $route->vars($variables);
+            }
+        }
+
+        return $found !== false;
     }
 
     public function getRoute(string $name): ?Route
@@ -176,5 +218,92 @@ class Router implements EventAwareInterface
         $this->routes = $routes;
 
         return $this;
+    }
+
+    public function patternToRegex(string $pattern): array
+    {
+        $items = [];
+
+        foreach ((new Std())->parse($pattern) as $parsedItem) {
+            $items[] = $this->buildRegexForRoute($parsedItem);
+        }
+
+        return $items;
+    }
+
+    /**
+     * @see vendor/nikic/fast-route/src/DataGenerator/RegexBasedAbstract.php
+     *
+     * @param  array  $routeData
+     *
+     * @return  array
+     */
+    private function buildRegexForRoute(array $routeData): array
+    {
+        $regex = '';
+        $variables = [];
+
+        foreach ($routeData as $part) {
+            if (is_string($part)) {
+                $regex .= preg_quote($part, '~');
+                continue;
+            }
+
+            [$varName, $regexPart] = $part;
+
+            if (isset($variables[$varName])) {
+                throw new BadRouteException(
+                    sprintf(
+                        'Cannot use the same placeholder "%s" twice',
+                        $varName
+                    )
+                );
+            }
+
+            if ($this->regexHasCapturingGroups($regexPart)) {
+                throw new BadRouteException(
+                    sprintf(
+                        'Regex "%s" for parameter "%s" contains a capturing group',
+                        $regexPart,
+                        $varName
+                    )
+                );
+            }
+
+            $variables[$varName] = $varName;
+            $regex .= "(?P<$varName>" . $regexPart . ')';
+        }
+
+        return [$regex, $variables];
+    }
+
+    /**
+     * @param  string
+     *
+     * @return bool
+     */
+    private function regexHasCapturingGroups(string $regex): bool
+    {
+        if (!str_contains($regex, '(')) {
+            // Needs to have at least a ( to contain a capturing group
+            return false;
+        }
+
+        // Semi-accurate detection for capturing groups
+        return (bool) preg_match(
+            '~
+                (?:
+                    \(\?\(
+                  | \[ [^\]\\\\]* (?: \\\\ . [^\]\\\\]* )* \]
+                  | \\\\ .
+                ) (*SKIP)(*FAIL) |
+                \(
+                (?!
+                    \? (?! <(?![!=]) | P< | \' )
+                  | \*
+                )
+            ~x',
+            $regex
+        );
     }
 }

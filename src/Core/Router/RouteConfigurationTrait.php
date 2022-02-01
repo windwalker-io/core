@@ -371,6 +371,28 @@ trait RouteConfigurationTrait
         return $this->options['scheme'] ?? null;
     }
 
+    public function host(string $value): static
+    {
+        $this->options['hosts'][] = $value;
+
+        return $this;
+    }
+
+    public function hosts(string ...$hosts): static
+    {
+        $this->options['hosts'] = array_merge(
+            $this->options['hosts'],
+            array_values($hosts)
+        );
+
+        return $this;
+    }
+
+    public function getHosts(): array
+    {
+        return $this->options['hosts'] ?? [];
+    }
+
     /**
      * extra
      *

@@ -224,9 +224,20 @@ class Route implements JsonSerializable
             array_column($groups, 'namespace')
         );
         $options['extra']['namespace'] = implode('::', $namespaces);
-        $namespaces[] = $this->name;
+        $nss = $namespaces;
+        $nss[] = $this->name;
 
-        $new->name = implode('::', $namespaces);
+        $new->name = implode('::', $nss);
+
+        $options['aliases'] ??= [];
+
+        foreach ($options['aliases'] as &$alias) {
+            $nss = $namespaces;
+            $nss[] = $alias;
+            $alias = implode('::', $nss);
+        }
+
+        unset($alias);
 
         $options['extra']['action'] = $options['actions'] ?? [];
         $options['extra']['hook'] = $options['hooks'] ?? [];
