@@ -20,6 +20,8 @@ use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Controller\DefaultController;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeRoutingEvent;
+use Windwalker\Core\Events\Web\RoutingNotMatchedEvent;
+use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
@@ -76,7 +78,21 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ]
         );
 
-        $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+        try {
+            $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+        } catch (RouteNotFoundException $e) {
+            $event = $this->emit(
+                RoutingNotMatchedEvent::class,
+                [
+                    'route' => $route,
+                    'request' => $request,
+                    'systemUri' => $event->getSystemUri(),
+                    'exception' => $e,
+                ]
+            );
+
+            throw $event->getException();
+        }
 
         $event = $this->emit(
             AfterRoutingEvent::class,
