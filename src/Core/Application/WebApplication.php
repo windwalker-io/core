@@ -128,11 +128,14 @@ class WebApplication implements WebApplicationInterface
         $this->boot();
 
         // Level 3
-        $container = $this->getContainer()->createChild();
+        $container = $this->getContainer();
 
         if ($request !== null) {
             $container->share(ServerRequest::class, $request);
         }
+
+        // Level 3
+        $container = $container->createChild();
 
         $request ??= $container->get(ServerRequestInterface::class);
 
@@ -211,7 +214,7 @@ class WebApplication implements WebApplicationInterface
             if (
                 $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
-                || $app->getAppRequest()->acceptJson()
+                || $app->getAppRequest()->isAcceptJson()
             ) {
                 throw $e;
             }

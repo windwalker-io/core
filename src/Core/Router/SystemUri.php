@@ -14,7 +14,6 @@ namespace Windwalker\Core\Router;
 use BadMethodCallException;
 use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Uri\PsrUri;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;

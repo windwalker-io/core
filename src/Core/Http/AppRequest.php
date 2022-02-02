@@ -45,9 +45,25 @@ class AppRequest implements JsonSerializable
      * @param  ServerRequestInterface  $request
      * @param  SystemUri               $systemUri
      */
-    public function __construct(protected ServerRequestInterface $request, protected SystemUri $systemUri)
-    {
+    public function __construct(
+        protected ServerRequestInterface $request,
+        protected SystemUri $systemUri,
+        protected ProxyResolver $proxyResolver
+    ) {
         //
+    }
+
+    public function getClientIP(): string
+    {
+        if ($this->proxyResolver->isProxy()) {
+            if ($this->proxyResolver->isTrustedProxy()) {
+                return $this->request->getServerParams()['REMOTE_ADDR'] ?? '';
+            }
+
+            return $this->proxyResolver->getForwardedIP();
+        }
+
+        return $this->request->getServerParams()['REMOTE_ADDR'] ?? '';
     }
 
     public function getMethod(): string
@@ -312,7 +328,7 @@ class AppRequest implements JsonSerializable
         return $new;
     }
 
-    public function accept(string $type): bool
+    public function isAccept(string $type): bool
     {
         return str_contains(
             $this->getRequest()->getHeaderLine('accept'),
@@ -320,9 +336,9 @@ class AppRequest implements JsonSerializable
         );
     }
 
-    public function acceptJson(): bool
+    public function isAcceptJson(): bool
     {
-        return $this->accept('application/json');
+        return $this->isAccept('application/json');
     }
 
     /**
@@ -365,5 +381,13 @@ class AppRequest implements JsonSerializable
                 'systemUri' => $this->getSystemUri(),
             ]
         );
+    }
+
+    /**
+     * @return ProxyResolver
+     */
+    public function getProxyResolver(): ProxyResolver
+    {
+        return $this->proxyResolver;
     }
 }

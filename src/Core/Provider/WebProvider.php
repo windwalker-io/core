@@ -19,6 +19,7 @@ use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
+use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -137,8 +138,15 @@ class WebProvider implements ServiceProviderInterface
         // System Uri
         $container->share(
             SystemUri::class,
-            fn(Container $container) => SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
+            function (Container $container) {
+                return $container->get(ProxyResolver::class)->handleProxyHost(
+                    SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
+                );
+            }
         );
+
+        // Proxy
+        $container->prepareSharedObject(ProxyResolver::class);
 
         // App Request
         $container->share(

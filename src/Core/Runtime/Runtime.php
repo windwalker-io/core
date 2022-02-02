@@ -124,7 +124,7 @@ class Runtime
             $allowIps = Arr::explodeAndClear(',', (string) $allowIps);
         }
 
-        if (in_array('all', $allowIps, true)) {
+        if (in_array('all', $allowIps, true) || in_array('REMOTE_ADDR', $allowIps, true)) {
             return;
         }
 

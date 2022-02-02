@@ -110,7 +110,7 @@ class DelegatingController implements ControllerInterface
             if (
                 $this->app->isDebug()
                 || strtoupper($this->app->getRequestMethod()) === 'GET'
-                || $this->app->getAppRequest()->acceptJson()
+                || $this->app->getAppRequest()->isAcceptJson()
             ) {
                 throw $e;
             }
