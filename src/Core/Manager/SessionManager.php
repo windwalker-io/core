@@ -38,7 +38,7 @@ class SessionManager extends AbstractManager
     {
         return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
             $cookies = new ArrayCookies($request->getCookieParams());
-            $cookies->setOptions(static::secureIfSsl($request, $params));
+            $cookies->setOptions($params);
 
             $app->getRootApp()->on(
                 'response',
@@ -61,22 +61,10 @@ class SessionManager extends AbstractManager
     {
         return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
             $cookies = new Cookies();
-            $cookies->setOptions(static::secureIfSsl($request, $params));
+            $cookies->setOptions($params);
 
             return $cookies;
         };
-    }
-
-    protected static function secureIfSsl(ServerRequestInterface $request, array $params): array
-    {
-        if (
-            ($params['secure_if_ssl'] ?? false)
-            && $request->getUri()->getScheme() === 'https'
-        ) {
-            $params['secure'] = true;
-        }
-
-        return $params;
     }
 
     public static function createSession(
