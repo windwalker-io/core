@@ -294,11 +294,12 @@ class SystemUri extends Uri implements JsonSerializable
                 return $this->cacheStorage['full'] ??= $this->original;
 
             case 'current':
-                return $this->cacheStorage['current'] ??= UriNormalizer::ensureDir(
+                return $this->cacheStorage['current'] ??= rtrim(
                     Uri::wrap($this->original)
                         ->toString(
                             static::FULL_HOST | static::PATH
                         ),
+                    '/'
                 );
 
             case 'script':
