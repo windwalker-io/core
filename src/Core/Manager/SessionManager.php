@@ -18,6 +18,7 @@ use Windwalker\Core\Attributes\Ref;
 use Windwalker\DI\Container;
 use Windwalker\Http\Event\ResponseEvent;
 use Windwalker\Session\Cookie\ArrayCookies;
+use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
 
 /**
@@ -37,7 +38,7 @@ class SessionManager extends AbstractManager
     {
         return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
             $cookies = new ArrayCookies($request->getCookieParams());
-            $cookies->setOptions($params);
+            $cookies->setOptions(static::secureIfSsl($request, $params));
 
             $app->getRootApp()->on(
                 'response',
@@ -54,6 +55,28 @@ class SessionManager extends AbstractManager
 
             return $cookies;
         };
+    }
+
+    public static function nativeCookies(): callable
+    {
+        return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
+            $cookies = new Cookies();
+            $cookies->setOptions(static::secureIfSsl($request, $params));
+
+            return $cookies;
+        };
+    }
+
+    protected static function secureIfSsl(ServerRequestInterface $request, array $params): array
+    {
+        if (
+            ($params['secure_if_ssl'] ?? false)
+            && $request->getUri()->getScheme() === 'https'
+        ) {
+            $params['secure'] = true;
+        }
+
+        return $params;
     }
 
     public static function createSession(
