@@ -8,7 +8,7 @@
 import { babelBasicOptions } from './babel.js';
 
 export async function webpackBasicConfig() {
-  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-module-eval-source-map');
+  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-cheap-module-source-map');
 
   return {
     mode: process.env.NODE_ENV || 'development',
@@ -58,7 +58,7 @@ export async function webpackBasicConfig() {
 
 export async function webpackVue3Config() {
   const VueLoaderPlugin = await getVueLoader(3);
-  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'cheap-eval-source-map');
+  const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-cheap-source-map');
 
   return {
     mode: process.env.NODE_ENV || 'development',
@@ -147,7 +147,10 @@ export async function getVueLoader(version = 3) {
   } catch (e) {
     const chalk = (await import('chalk')).default;
     console.error(chalk.red(e.message));
-    console.error(`\nPlease run "${chalk.yellow('yarn add vue vue-loader vue-style-loader @vue/compiler-sfc file-loader')}" first.\n`);
+    console.error(
+      `\nPlease run "${chalk.yellow('yarn add vue@^3.0 vue-loader@^16.0 vue-style-loader ' +
+      '@vue/compiler-sfc file-loader')}" first.\n`
+    );
     process.exit(255);
   }
 }

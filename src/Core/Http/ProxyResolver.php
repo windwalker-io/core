@@ -14,6 +14,7 @@ namespace Windwalker\Core\Http;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\IpHelper;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
@@ -27,8 +28,14 @@ class ProxyResolver
 
     protected string $headerPrefix = 'x-';
 
-    public function __construct(#[Ref('http')] protected array $config, protected ServerRequestInterface $request)
+    /**
+     * @var array
+     */
+    protected array $config;
+
+    public function __construct(Config $config, protected ServerRequestInterface $request)
     {
+        $this->config = (array) $config->getDeep('http');
     }
 
     public function getHeader(string $name): ?string
@@ -36,7 +43,7 @@ class ProxyResolver
         $name = $this->getHeaderPrefix() . $name;
         $name = strtolower($name);
 
-        if (!in_array($name, $this->config['trusted_headers'], true)) {
+        if (!in_array($name, $this->config['trusted_headers'] ?? [], true)) {
             return null;
         }
 
