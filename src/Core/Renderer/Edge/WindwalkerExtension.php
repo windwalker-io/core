@@ -67,6 +67,7 @@ class WindwalkerExtension implements
             // 'widget' => [$this, 'widget'],
             // 'route' => [$this, 'route'],
             'formToken' => [$this, 'formToken'],
+            'csrf' => [$this, 'formToken'],
 
             // Authorisation
             'can' => [$this, 'can'],
