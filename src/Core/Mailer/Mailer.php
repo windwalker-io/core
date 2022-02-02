@@ -102,9 +102,13 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         $from = $message->getFrom();
 
         if ($from === []) {
-            $message->from(
-                $this->container->getParam('mail.from')
-            );
+            $message->from($this->container->getParam('mail.from'));
+        }
+
+        if ($message->getReplyTo() === []) {
+            if ($reply = $this->container->getParam('mail.reply_to')) {
+                $message->replyTo($reply);
+            }
         }
 
         if ($flags & static::IGNORE_AUTO_CC) {
