@@ -25,13 +25,27 @@ class ProxyResolver
 {
     use InstanceCacheTrait;
 
+    protected string $headerPrefix = 'x-';
+
     public function __construct(#[Ref('http')] protected array $config, protected ServerRequestInterface $request)
     {
     }
 
+    public function getHeader(string $name): ?string
+    {
+        $name = $this->getHeaderPrefix() . $name;
+        $name = strtolower($name);
+
+        if (!in_array($name, $this->config['trusted_headers'], true)) {
+            return null;
+        }
+
+        return $this->request->getHeaderLine($name);
+    }
+
     public function isProxy(): bool
     {
-        return (bool) $this->request->getHeaderLine('x-forwarded-for');
+        return (bool) $this->getHeader('forwarded-for');
     }
 
     public function isTrustedProxy(): bool
@@ -41,17 +55,17 @@ class ProxyResolver
 
     public function getForwardedIP(): ?string
     {
-        return $this->request->getHeaderLine('x-forwarded-for');
+        return $this->getHeader('forwarded-for');
     }
 
     public function getForwardedHost(): ?string
     {
-        return $this->request->getHeaderLine('x-forwarded-host');
+        return $this->getHeader('forwarded-host');
     }
 
     public function getForwardedProto(): ?string
     {
-        return $this->request->getHeaderLine('x-forwarded-proto');
+        return $this->getHeader('forwarded-proto');
     }
 
     public function getRemoteAddr(): ?string
@@ -99,11 +113,36 @@ class ProxyResolver
 
     public function handleProxyHost(SystemUri $uri): SystemUri
     {
-        if ($this->isTrustedProxy()) {
-            $uri = $uri->withHost($this->getForwardedHost());
-            $uri = $uri->withScheme($this->getForwardedProto());
+        if ($this->isProxy() && $this->isTrustedProxy()) {
+            if ($this->getForwardedHost()) {
+                $uri = $uri->withHost($this->getForwardedHost());
+            }
+
+            if ($this->getForwardedProto()) {
+                $uri = $uri->withScheme($this->getForwardedProto());
+            }
         }
 
         return $uri;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeaderPrefix(): string
+    {
+        return $this->headerPrefix;
+    }
+
+    /**
+     * @param  string  $headerPrefix
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setHeaderPrefix(string $headerPrefix): static
+    {
+        $this->headerPrefix = $headerPrefix;
+
+        return $this;
     }
 }
