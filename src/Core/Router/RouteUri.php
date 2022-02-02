@@ -399,4 +399,12 @@ class RouteUri extends Uri implements NavConstantInterface
     {
         return new RedirectResponse($this, $status ?? $this->status, $headers);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function __clone(): void
+    {
+        $this->handledData = null;
+    }
 }
