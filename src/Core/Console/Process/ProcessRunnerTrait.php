@@ -14,6 +14,7 @@ namespace Windwalker\Core\Console\Process;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Windwalker\Console\IOInterface;
 use Windwalker\Environment\PlatformHelper;
 
 /**
@@ -93,6 +94,10 @@ trait ProcessRunnerTrait
 
         if ($input !== null) {
             $process->setInput($input);
+        }
+
+        if ($output instanceof IOInterface) {
+            $output = $output->getOutput();
         }
 
         if ($output === true) {

@@ -137,7 +137,7 @@ class View implements EventAwareInterface
         return $this->render($data, $options);
     }
 
-    public function render(array $data = []): mixed
+    public function render(array $data = []): ResponseInterface
     {
         $vm = $this->getViewModel();
 
