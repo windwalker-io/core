@@ -34,20 +34,20 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
 
   vendors.forEach((vendor) => {
     if (fs.existsSync(`node_modules/${vendor}/`)) {
-      console.log(`[Link NPM] node_modules/${vendor}/ => www/assets/vendor/${vendor}/`);
-      src(`node_modules/${vendor}/`).pipe(symlink(`www/assets/vendor/${vendor}`));
+      console.log(`[Link NPM] node_modules/${vendor}/ => ${root}/${vendor}/`);
+      src(`node_modules/${vendor}/`).pipe(symlink(`${root}/${vendor}`));
     }
   });
 
   composerVendors.forEach((vendor) => {
     if (fs.existsSync(`vendor/${vendor}/assets`)) {
-      console.log(`[Link Composer] vendor/${vendor}/assets => www/assets/vendor/${vendor}/`);
-      src(`vendor/${vendor}/assets/`).pipe(symlink(`www/assets/vendor/${vendor}/`));
+      console.log(`[Link Composer] vendor/${vendor}/assets => ${root}/${vendor}/`);
+      src(`vendor/${vendor}/assets/`).pipe(symlink(`${root}/${vendor}/`));
     }
   });
 
-  console.log('[Link Local] resources/assets/vendor/**/* => www/assets/vendor/');
-  src('resources/assets/vendor/*').pipe(symlink('www/assets/vendor/'));
+  console.log(`[Link Local] resources/assets/vendor/**/* => ${root}/`);
+  src('resources/assets/vendor/*').pipe(symlink(`${root}/`));
 }
 
 function findVendors() {
