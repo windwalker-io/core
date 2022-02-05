@@ -11,17 +11,17 @@ import EventEmitter from 'events';
 
 export const watching = {
   tasks: [],
-  start: false
+  start: {}
 };
 
 export function watch(glob, opt, fn) {
   if (
     (typeof opt === 'object' && fn == null)
-      || (opt == null && fn == null)
+    || (opt == null && fn == null)
   ) {
-    if (cliInput['watch'] && !watching.start) {
-      const task = findCurrentTask(new Error());
+    const task = findCurrentTask(new Error());
 
+    if (cliInput['watch'] && !watching.start[task]) {
       const fn = gulp._registry._tasks[task];
 
       if (!fn) {

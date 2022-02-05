@@ -38,13 +38,12 @@ function storeNewTasks(tasks) {
 }
 
 gulp.on('stop', () => {
-  if (cliInput['watch'] && !watching.start) {
+  if (cliInput['watch']) {
     watching.tasks.forEach((watchTask) => {
-      if (watchTask) {
+      if (watchTask && !watching.start[watchTask.task]) {
         gulp.watch(...watchTask.args);
+        watching.start[watchTask.task] = true;
       }
     });
-
-    watching.start = true;
   }
 });
