@@ -154,7 +154,7 @@ class StarterInstaller
 
             $k = $io->ask('> ');
 
-            $driver = $supportedDrivers[$k] ?? 'pdo_mysql';
+            $driver = $supportedDrivers[$k - 1] ?? 'pdo_mysql';
 
             $io->write('Selected driver: ' . $driver);
 
