@@ -1232,4 +1232,22 @@ abstract class AbstractController implements EventTriggerableInterface, \Seriali
 
         return $this;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function __serialize(): array
+    {
+        return [$this->getInput()];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function __unserialize(array $data): void
+    {
+        [$input] = $data;
+
+        $this->setInput($input);
+    }
 }

@@ -250,6 +250,8 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      *
      * @return \Traversable An instance of an object implementing Iterator or Traversable
      */
+    #[\ReturnTypeWillChange]
+        #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->dispatchers);
@@ -262,6 +264,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->hasDispatcher($offset);
@@ -275,6 +278,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getDispatcher($offset);
@@ -289,6 +293,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->addDispatcher($offset, $value);
@@ -302,6 +307,7 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->removeDispatcher($offset);
@@ -312,6 +318,8 @@ class CompositeDispatcher implements DispatcherInterface, LoggerAwareInterface, 
      *
      * @return  int
      */
+    #[\ReturnTypeWillChange]
+        #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->dispatchers);

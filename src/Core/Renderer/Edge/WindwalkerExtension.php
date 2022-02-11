@@ -363,6 +363,8 @@ class WindwalkerExtension implements EdgeExtensionInterface
      */
     public static function stripParentheses($expression)
     {
+        $expression = (string) $expression;
+
         if (strpos($expression, '(') === 0) {
             $expression = substr($expression, 1, -1);
         }

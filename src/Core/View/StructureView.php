@@ -142,6 +142,7 @@ class StructureView extends AbstractView implements \JsonSerializable
      *
      * @throws \RuntimeException
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $result = $this->getHandledData();

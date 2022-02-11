@@ -324,6 +324,7 @@ class Repository implements \ArrayAccess
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->state->exists($offset);
@@ -337,6 +338,7 @@ class Repository implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->state->get($offset);
@@ -351,6 +353,7 @@ class Repository implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->state->set($offset, $value);
@@ -364,6 +367,7 @@ class Repository implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->state->set($offset, null);

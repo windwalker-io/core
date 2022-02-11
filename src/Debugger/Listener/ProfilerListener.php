@@ -94,7 +94,7 @@ class ProfilerListener
         $collector['system.ip']   = $input->server->getString('REMOTE_ADDR');
 
         $collector['system.method.http']   = $input->getMethod();
-        $collector['system.method.custom'] = strtoupper($input->get('_method'));
+        $collector['system.method.custom'] = strtoupper((string) $input->get('_method'));
 
         $profiler->mark(__FUNCTION__, [
             'tag' => 'system.process',

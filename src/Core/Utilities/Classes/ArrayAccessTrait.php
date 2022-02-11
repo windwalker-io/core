@@ -29,6 +29,7 @@ trait ArrayAccessTrait
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         $field = $this->dataField;
@@ -43,6 +44,7 @@ trait ArrayAccessTrait
      *
      * @return  mixed The value of this property.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         $field = $this->dataField;
@@ -62,6 +64,7 @@ trait ArrayAccessTrait
      *
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $field = $this->dataField;
@@ -80,6 +83,7 @@ trait ArrayAccessTrait
      *
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $field = $this->dataField;

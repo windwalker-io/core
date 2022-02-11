@@ -549,6 +549,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return \Traversable An instance of an object implementing Iterator or Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->loggers);
@@ -561,6 +562,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->hasLogger($offset);
@@ -574,6 +576,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @return  mixed The value to return.
      * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getLogger($offset);
@@ -588,6 +591,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->addLogger($offset, $value);
@@ -601,6 +605,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->removeLogger($offset);
@@ -611,6 +616,7 @@ class LoggerManager implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return  int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->loggers);

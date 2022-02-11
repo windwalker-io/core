@@ -320,6 +320,7 @@ abstract class AbstractView implements \ArrayAccess
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->data[$offset]);
@@ -333,6 +334,7 @@ abstract class AbstractView implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
@@ -347,6 +349,7 @@ abstract class AbstractView implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->set($offset, $value);
@@ -360,6 +363,7 @@ abstract class AbstractView implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         if ($this->offsetExists($offset)) {

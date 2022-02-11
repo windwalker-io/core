@@ -112,6 +112,8 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      *
      * @return \Traversable An instance of an object implementing Iterator or Traversable
      */
+    #[\ReturnTypeWillChange]
+        #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator([]);
@@ -124,6 +126,7 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return false;
@@ -137,6 +140,7 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return null;
@@ -151,6 +155,7 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         return;
@@ -164,6 +169,7 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         return;
@@ -174,6 +180,8 @@ class NullObject implements NullObjectInterface, SilencerArrayAccessInterface
      *
      * @return  int
      */
+    #[\ReturnTypeWillChange]
+        #[\ReturnTypeWillChange]
     public function count()
     {
         return 0;

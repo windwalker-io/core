@@ -47,7 +47,7 @@ class ViewModel implements \ArrayAccess
      */
     public function getRepository($name = null)
     {
-        $name = strtolower($name);
+        $name = strtolower((string) $name);
 
         if ($name) {
             if (isset($this->repositories[$name])) {
@@ -195,6 +195,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->exists($offset);
@@ -208,6 +209,7 @@ class ViewModel implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  mixed The value to return.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getRepository($offset);
@@ -222,6 +224,7 @@ class ViewModel implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         throw new \BadMethodCallException('Use setRepository() instead array access.');
@@ -235,6 +238,7 @@ class ViewModel implements \ArrayAccess
      * @throws  \InvalidArgumentException
      * @return  void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         $this->removeRepository($offset);
@@ -245,6 +249,7 @@ class ViewModel implements \ArrayAccess
      *
      * @return  int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->repositories);

@@ -338,6 +338,7 @@ class Pagination
      *
      * @return  static  Return self to support chaining.
      */
+    #[\ReturnTypeWillChange]
     public function offset($offset)
     {
         $this->offset = (int) $offset;

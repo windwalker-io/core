@@ -215,6 +215,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return \Traversable An instance of an object implementing Iterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->helpers);
@@ -227,6 +228,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return boolean true on success or false on failure.
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->helpers[$offset]);
@@ -239,6 +241,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return mixed Can return all value types.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getHelper($offset);
@@ -252,6 +255,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->addHelper($offset, $value);
@@ -264,6 +268,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         if (isset($this->helpers[$offset])) {
@@ -276,6 +281,7 @@ class HelperSet implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @return int The custom count as an integer.
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->helpers);
