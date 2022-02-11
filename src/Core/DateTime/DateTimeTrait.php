@@ -367,6 +367,7 @@ trait DateTimeTrait
      * @return static|bool
      * @throws \Exception
      */
+    #[\ReturnTypeWillChange]
     public static function createFromFormat($format, $time, $timezone = null)
     {
         $datetime = parent::createFromFormat($format, $time, self::getTimezoneObject($timezone));
