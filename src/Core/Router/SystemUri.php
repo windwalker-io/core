@@ -355,4 +355,17 @@ class SystemUri extends Uri implements JsonSerializable
 
         throw new BadMethodCallException('Method: ' . __CLASS__ . '::' . $name . '() not found.');
     }
+
+    /**
+     * @param  string  $origin
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function withOriginal(string $origin): static
+    {
+        $new = clone $this;
+        $new->original = $origin;
+
+        return $new;
+    }
 }

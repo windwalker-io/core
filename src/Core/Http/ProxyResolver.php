@@ -16,6 +16,7 @@ use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\IpHelper;
+use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
@@ -128,6 +129,12 @@ class ProxyResolver
             if ($this->getForwardedProto()) {
                 $uri = $uri->withScheme($this->getForwardedProto());
             }
+
+            $origin = Uri::wrap($uri->getOriginal());
+            $origin = $origin->withHost($uri->getHost());
+            $origin = $origin->withScheme($uri->getScheme());
+
+            $uri = $uri->withOriginal((string) $origin);
         }
 
         return $uri;
