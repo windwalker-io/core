@@ -149,7 +149,7 @@ class BuildEnumCommand implements CommandInterface
                     return <<<PHP
                         /**
                          * The {$ref->getShortName()} enum class.
-                         * 
+                         *
                         $methods
                          */
                         class
