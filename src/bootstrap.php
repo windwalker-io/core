@@ -9,4 +9,4 @@
 
 declare(strict_types=1);
 
-include_once __DIR__ . '/Core/Utilities/helpers.php';
+include_once __DIR__ . '/functions.php';

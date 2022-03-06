@@ -58,15 +58,17 @@ namespace Windwalker {
     use Closure;
     use DateTimeZone;
     use Exception;
+    use Psr\Log\LogLevel;
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
     use Windwalker\Core\Http\CoreResponse;
+    use Windwalker\Core\Manager\Logger;
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
     use Windwalker\Core\View\CollapseWrapper;
 
-    if (!function_exists('ds')) {
+    if (!function_exists('Windwalker\ds')) {
         /**
          * Dump to server.
          *
@@ -160,9 +162,11 @@ namespace Windwalker {
         /**
          * Nothing but just return self for some flow control use case.
          *
-         * @param  mixed  $value
+         * @template T
          *
-         * @return  mixed
+         * @param  mixed|T  $value
+         *
+         * @return  mixed|T
          */
         function with(mixed $value): mixed
         {
@@ -211,6 +215,34 @@ namespace Windwalker {
         function collapse(...$args): CollapseWrapper
         {
             return new CollapseWrapper($args);
+        }
+    }
+
+    if (!function_exists('\Windwalker\log')) {
+        function log(string|array $channel, string|int $level, string|array $message, array $context = []): void
+        {
+            Logger::log($channel, $level, $message, $context);
+        }
+    }
+
+    if (!function_exists('\Windwalker\log_info')) {
+        function log_info(string|array $channel, string|array $message, array $context = []): void
+        {
+            Logger::log($channel, LogLevel::INFO, $message, $context);
+        }
+    }
+
+    if (!function_exists('\Windwalker\log_debug')) {
+        function log_debug(string|array $channel, string|array $message, array $context = []): void
+        {
+            Logger::log($channel, LogLevel::DEBUG, $message, $context);
+        }
+    }
+
+    if (!function_exists('\Windwalker\log_notice')) {
+        function log_notice(string|array $channel, string|array $message, array $context = []): void
+        {
+            Logger::log($channel, LogLevel::NOTICE, $message, $context);
         }
     }
 }
