@@ -30,6 +30,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
 use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
@@ -104,6 +105,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
         $this->registerCommands($commands);
 
         $this->registerListeners($container);
+
+        $this->bootProvidersBeforeRequest($container);
 
         $this->registerEvents();
 
@@ -380,5 +383,14 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
     protected function terminating(Container $container): void
     {
         //
+    }
+
+    protected function bootProvidersBeforeRequest(Container $container)
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider instanceof RequestBootableProviderInterface) {
+                $provider->bootBeforeRequest($container);
+            }
+        }
     }
 }
