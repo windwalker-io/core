@@ -34,6 +34,8 @@ class InstallResource
 
     public array $modules = [];
 
+    public array $files = [];
+
     protected array $callbacks = [];
 
     /**
@@ -68,6 +70,7 @@ class InstallResource
                 'routes',
                 'views',
                 'modules',
+                'files',
             ]
         );
     }

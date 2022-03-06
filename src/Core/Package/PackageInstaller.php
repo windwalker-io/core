@@ -90,6 +90,16 @@ class PackageInstaller
         );
     }
 
+    public function installFiles(string $path, string $dest, string|array $tags = []): static
+    {
+        return $this->installResource(
+            'files',
+            Filesystem::globAll($path),
+            $this->app->path('@root/' . $dest),
+            $tags
+        );
+    }
+
     public function installViews(string $path, string|array $tags = []): static
     {
         return $this->installResource(
