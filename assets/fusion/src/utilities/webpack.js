@@ -80,7 +80,7 @@ export async function webpackVue3Config() {
         'vuex': 'vuex/dist/vuex.esm-bundler',
         '@': '.' // Will be overwrite when compile
       },
-      extensions: ['*', '.js', '.vue', '.json', '.ts']
+      extensions: ['.js', '.vue', '.json', '.ts']
     },
     module: {
       rules: [

@@ -400,7 +400,7 @@ class ErrorService
             $code = substr($stringCode, 0, 3);
         }
 
-        return ResponseHelper::validateStatus($code) ? $code : 500;
+        return ResponseHelper::validateStatus($code) ? (int) $code : 500;
     }
 
     /**
