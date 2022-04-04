@@ -129,16 +129,30 @@ class Runtime
         }
 
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
+        $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
 
         // Get allow remote ips from config.
-        if (
-            isset($_SERVER['HTTP_CLIENT_IP'])
-            || isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-            || !in_array(@$_SERVER['REMOTE_ADDR'], $allowIps, true)
-        ) {
-            header('HTTP/1.1 403 Forbidden');
-
-            exit('Forbidden');
+        if (!in_array($remoteAddr, $allowIps, true)) {
+            static::forbidden();
         }
+
+        if (isset($clientIp) && $clientIp !== $remoteAddr) {
+            static::forbidden();
+        }
+
+        if (isset($httpForwardedFor) && $httpForwardedFor !== $remoteAddr) {
+            static::forbidden();
+        }
+
+        // Allow
+    }
+
+    private static function forbidden(): void
+    {
+        header('HTTP/1.1 403 Forbidden');
+
+        exit('Forbidden');
     }
 }
