@@ -39,6 +39,7 @@ trait ProcessRunnerTrait
 
         $process->setTimeout(0);
         $process->setIdleTimeout(0);
+        $process->setEnv([]);
 
         $phpPath = dirname($this->getPhpBinary() ?: '/use/local/bin');
 
