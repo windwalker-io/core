@@ -56,11 +56,13 @@ namespace {
 namespace Windwalker {
 
     use Closure;
+    use DateTimeInterface;
     use DateTimeZone;
     use Exception;
     use Psr\Log\LogLevel;
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
+    use Windwalker\Core\DateTime\ChronosService;
     use Windwalker\Core\Http\CoreResponse;
     use Windwalker\Core\Manager\Logger;
     use Windwalker\Core\Runtime\Runtime;
@@ -243,6 +245,43 @@ namespace Windwalker {
         function log_notice(string|array $channel, string|array $message, array $context = []): void
         {
             Logger::log($channel, LogLevel::NOTICE, $message, $context);
+        }
+    }
+
+    if (!function_exists('\Windwalker\date_compare')) {
+        /**
+         * Compare date with another date. All dates will be compared as UTC timezone.
+         *
+         * ```php
+         * date_compare(
+         *     'now', // This will be UTC timezone
+         *     $date2, // Another date with timezone 'Asia/Tokyo'
+         * );
+         * ```
+         *
+         * If you want to compare UTC with local time, use this.
+         *
+         * ```php
+         * date_compare(
+         *     chronos('now', 'Asia/Tokyo'),
+         *     $date2, // Another date with timezone 'Asia/Tokyo'
+         * );
+         * ```
+         *
+         * @param  string|DateTimeInterface  $date1
+         * @param  string|DateTimeInterface  $date2
+         * @param  string|null               $operator
+         *
+         * @return  bool|int
+         *
+         * @throws Exception
+         */
+        function date_compare(
+            string|DateTimeInterface $date1,
+            string|DateTimeInterface $date2,
+            ?string $operator = null
+        ): bool|int {
+            return ChronosService::compare($date1, $date2, $operator);
         }
     }
 }

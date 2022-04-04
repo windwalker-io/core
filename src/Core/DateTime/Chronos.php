@@ -259,15 +259,10 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
             return parent::format($format);
         }
 
-        $bakTz = $this->getTimezone();
+        $new = clone $this;
+        $new = $new->setTimezone($tz);
 
-        $this->setTimezone($tz);
-
-        $formatted = parent::format($format);
-
-        $this->setTimezone($bakTz);
-
-        return $formatted;
+        return $new->format($format);
     }
 
     public function isFuture(): bool
@@ -420,9 +415,9 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @link    http://www.ietf.org/rfc/rfc3339.txt
      * @since   2.1
      */
-    public function toISO8601(bool $micro = false): string
+    public function toISO8601(bool $micro = false, string|DateTimeZone $tz = null): string
     {
-        return $this->format($micro ? static::RFC3339_EXTENDED : static::RFC3339);
+        return $this->format($micro ? static::RFC3339_EXTENDED : static::RFC3339, $tz);
     }
 
     /**
@@ -434,9 +429,9 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @link    http://www.ietf.org/rfc/rfc2822.txt
      * @since   2.1
      */
-    public function toRFC822(): string
+    public function toRFC822(string|DateTimeZone $tz = null): string
     {
-        return $this->format(static::RFC2822);
+        return $this->format(static::RFC2822, $tz);
     }
 
     /**

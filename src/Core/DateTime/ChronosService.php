@@ -150,7 +150,23 @@ class ChronosService
     }
 
     /**
-     * compare
+     * Compare date with another date. All dates will be compared as UTC timezone.
+     *
+     * ```php
+     * ChronosService::compare(
+     *     'now', // This will be UTC timezone
+     *     $date2, // Another date with timezone 'Asia/Tokyo'
+     * );
+     * ```
+     *
+     * If you want to compare UTC with local time, use this.
+     *
+     * ```php
+     * ChronosService::compare(
+     *     chronos('now', 'Asia/Tokyo'),
+     *     $date2, // Another date with timezone 'Asia/Tokyo'
+     * );
+     * ```
      *
      * @param  string|DateTimeInterface  $date1
      * @param  string|DateTimeInterface  $date2
