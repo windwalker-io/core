@@ -14,6 +14,7 @@ import fs from 'fs';
 export async function installVendors(npmVendors, composerVendors = [], to = 'www/assets/vendor') {
   const root = to;
   let vendors = npmVendors;
+  const action = process.env.INSTALL_VENDOR === 'hard' ? 'Copy' : 'Link';
 
   if (!fs.existsSync(root)) {
     fs.mkdirSync(root);
@@ -26,7 +27,7 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
   dirs.unshift(root);
 
   dirs.forEach((dir) => {
-    deleteLinks(dir);
+    deleteExists(dir);
   });
 
   vendors = findVendors().concat(vendors);
@@ -34,20 +35,28 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
 
   vendors.forEach((vendor) => {
     if (fs.existsSync(`node_modules/${vendor}/`)) {
-      console.log(`[Link NPM] node_modules/${vendor}/ => ${root}/${vendor}/`);
-      src(`node_modules/${vendor}/`).pipe(symlink(`${root}/${vendor}`));
+      console.log(`[${action} NPM] node_modules/${vendor}/ => ${root}/${vendor}/`);
+      doInstall(`node_modules/${vendor}/`, `${root}/${vendor}/`);
     }
   });
 
   composerVendors.forEach((vendor) => {
     if (fs.existsSync(`vendor/${vendor}/assets`)) {
-      console.log(`[Link Composer] vendor/${vendor}/assets => ${root}/${vendor}/`);
-      src(`vendor/${vendor}/assets/`).pipe(symlink(`${root}/${vendor}/`));
+      console.log(`[${action} Composer] vendor/${vendor}/assets => ${root}/${vendor}/`);
+      doInstall(`vendor/${vendor}/assets/`, `${root}/${vendor}/`);
     }
   });
 
-  console.log(`[Link Local] resources/assets/vendor/**/* => ${root}/`);
-  src('resources/assets/vendor/*').pipe(symlink(`${root}/`));
+  console.log(`[${action} Local] resources/assets/vendor/**/* => ${root}/`);
+  doInstall('resources/assets/vendor/*', `${root}/`);
+}
+
+function doInstall(source, dest) {
+  if (process.env.INSTALL_VENDOR === 'hard') {
+    copy(source + '/**/*', dest);
+  } else {
+    src(source).pipe(symlink(dest));
+  }
 }
 
 function findVendors() {
@@ -66,13 +75,20 @@ function findVendors() {
   return [ ...new Set(vendors) ];
 }
 
-function deleteLinks(dir) {
-  const links = fs.readdirSync(dir, { withFileTypes: true })
-    .filter(d => d.isSymbolicLink());
+function deleteExists(dir) {
+  if (!fs.existsSync(dir)) {
+    return;
+  }
 
-  links.forEach((link) => {
-    fs.unlink(path.join(dir, link.name), () => {});
+  const subDirs = fs.readdirSync(dir, { withFileTypes: true });
+
+  subDirs.forEach((subDir) => {
+    if (subDir.isSymbolicLink() || subDir.isFile()) {
+      fs.unlinkSync(path.join(dir, subDir.name));
+    } else if (subDir.isDirectory()) {
+      deleteExists(path.join(dir, subDir.name));
+    }
   });
 
-  fs.rmdir(dir, () => {});
+  fs.rmdirSync(dir);
 }
