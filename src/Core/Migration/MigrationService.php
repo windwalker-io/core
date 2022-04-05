@@ -360,7 +360,7 @@ class MigrationService implements EventAwareInterface
         $this->on(
             QueryEndEvent::class,
             function (QueryEndEvent $event) use ($logStream) {
-                $logStream->write($event->getDebugQueryString() . "\n\n");
+                $logStream->write($event->getDebugQueryString() . ";\n\n");
             }
         );
 
