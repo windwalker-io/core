@@ -398,7 +398,7 @@ class View implements EventAwareInterface
 
         $this->htmlFrame->addBodyClass('module-' . $module);
         $this->htmlFrame->addBodyClass('view-' . StrNormalize::toKebabCase($viewName));
-        $this->htmlFrame->addBodyClass('layout-' . $this->layout);
+        $this->htmlFrame->addBodyClass('layout-' . str_replace('.', '-', $this->layout));
     }
 
     /**

@@ -48,7 +48,7 @@ class CsrfService
     public function validate(AppRequest $request, ?string $method = null, ?string $message = null): void
     {
         if (!$this->checkToken($request, $method)) {
-            throw new InvalidTokenException($message ?? $this->getInvalidMessage());
+            throw new InvalidTokenException($message ?? $this->getInvalidMessage(), 403);
         }
     }
 
