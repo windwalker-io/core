@@ -130,8 +130,8 @@ class Runtime
 
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
         $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
-        $clientIp = $_SERVER['REMOTE_ADDR'] ?? '';
-        $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+        $clientIp = $_SERVER['REMOTE_ADDR'] ?? null;
+        $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
 
         // Get allow remote ips from config.
         if (!in_array($remoteAddr, $allowIps, true)) {
