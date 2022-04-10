@@ -15,13 +15,13 @@
   "author": "Simon Asika",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1",
-    "webpack-dynamic-public-path": "^1.0.7"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
-    "@windwalker-io/fusion": "^1.0",
     "@tailwindcss/custom-forms": "^0.2.1",
     "@tailwindcss/ui": "^0.7.2",
+    "@windwalker-io/fusion": "^1.0",
+    "bootstrap": "^5.0",
     "autoprefixer": "^10.2.6",
     "axios": "^0.21.1",
     "gulp": "^4.0.2",
@@ -34,7 +34,7 @@
     "tailwindcss": "^2.1.4",
     "vue": "^3.0.11",
     "vue-router": "^4.0.8",
-    "webpack": "^4.0"
+    "webpack": "^5.0"
   },
   "windwalker": {
     "vendors": [

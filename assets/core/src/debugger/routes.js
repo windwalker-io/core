@@ -10,10 +10,10 @@ import $http from './services/http.js';
 import { currentData, currentId } from './services/store.js';
 
 const routes = [
-  { path: '/', component: () => import('./views/Dashboard.vue') },
-  { path: '/system/:id?', component: () => import('./views/System.vue') },
-  { path: '/request/:id?', component: () => import('./views/Request.vue') },
-  { path: '/db/:id?', component: () => import('./views/Database.vue') },
+  { name: 'dashboard', path: '/', component: () => import('./views/Dashboard.vue') },
+  { name: 'system', path: '/system/:id?', component: () => import('./views/System.vue') },
+  { name: 'request', path: '/request/:id?', component: () => import('./views/Request.vue') },
+  { name: 'db', path: '/db/:id?', component: () => import('./views/Database.vue') },
 ];
 
 const router = createRouter({

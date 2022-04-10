@@ -9,7 +9,6 @@ import fusion, { watch, parallel, src, dest } from '@windwalker-io/fusion';
 import { babelBasicOptions } from '@windwalker-io/fusion/src/utilities/babel.js';
 import postcss from 'gulp-postcss';
 import tailwindcss from 'tailwindcss';
-import WebpackDynamicPublicPathPlugin from 'webpack-dynamic-public-path';
 
 export async function debuggers() {
   // Watch start
@@ -21,13 +20,8 @@ export async function debuggers() {
     'dist/debugger/',
     {
       override: (config) => {
-        config.output.publicPath = "publicPathPlaceholder";
-
-          config.plugins.push(
-          new WebpackDynamicPublicPathPlugin({
-            externalPublicPath: "window.externalPublicPath"
-          })
-        );
+        // @see https://webpack.js.org/guides/public-path/#automatic-publicpath
+        config.output.publicPath = "auto";
       }
     }
   );
