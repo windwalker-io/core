@@ -71,7 +71,7 @@ class Punycode
      */
     public static function toAscii($string)
     {
-        $string = explode('@', $string);
+        $string = explode('@', (string) $string);
 
         // Not addressing UTF-8 user names
         $new = $string[0];
