@@ -15,6 +15,8 @@ use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use Exception;
 
+use Windwalker\Core\Utilities\Base64Url;
+
 use function Windwalker\uid;
 
 /**
@@ -83,7 +85,11 @@ class StarterInstaller
 
         $config = file_get_contents($file);
 
-        $config = str_replace('{{ REPLACE THIS AS RANDOM SECRET CODE }}', uid(), $config);
+        $config = str_replace(
+            '{{ REPLACE THIS AS RANDOM SECRET CODE }}',
+            Base64Url::encode(random_bytes(16)),
+            $config
+        );
 
         file_put_contents($file, $config);
 
