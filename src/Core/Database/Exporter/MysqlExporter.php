@@ -39,13 +39,15 @@ class MysqlExporter extends AbstractExporter
 
                 $process = Process::fromShellCommandline(
                     sprintf(
-                        '%s --defaults-extra-file=%s %s > %s',
+                        '%s --defaults-extra-file=%s %s %s > %s',
                         $md,
                         $this->createPasswordCnfFile(
+                            $options['host'],
                             $options['user'],
                             $options['password']
                         ),
                         $options['database'],
+                        env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
                         $file
                     )
                 );
@@ -84,7 +86,7 @@ class MysqlExporter extends AbstractExporter
         $stream->close();
     }
 
-    protected function createPasswordCnfFile(string $user, string $password): string
+    protected function createPasswordCnfFile(string $host, string $user, string $password): string
     {
         $tmpFile = WINDWALKER_TEMP . '/.md.cnf';
 
@@ -93,6 +95,7 @@ class MysqlExporter extends AbstractExporter
 
         $content = <<<CNF
 [mysqldump]
+host='$host'
 user='$user'
 password='$password'
 CNF;
