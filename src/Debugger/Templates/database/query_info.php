@@ -129,7 +129,7 @@ $editor = $package->get('editor');
                     <td><?php echo $item->select_type ?></td>
                     <td><?php echo $item->table ?></td>
                     <td><?php echo $item->type ?></td>
-                    <td><?php echo str_replace(',', ', ', $item->possible_keys) ?></td>
+                    <td><?php echo str_replace(',', ', ', (string) $item->possible_keys) ?></td>
                     <td><strong><?php echo $item->key ?></strong></td>
                     <td><?php echo $item->key_len ?></td>
                     <td><?php echo $item->ref ?></td>
@@ -169,7 +169,7 @@ $editor = $package->get('editor');
                                 </td>
                                 <td class="48%">
                                     <?php if ($editor): ?>
-                                        <a href="<?php echo $editor; ?>://open?file=<?php echo urlencode($trace['pathname']); ?>&amp;line=<?php echo urlencode($trace['line']); ?>">
+                                        <a href="<?php echo $editor; ?>://open?file=<?php echo urlencode((string) $trace['pathname']); ?>&amp;line=<?php echo urlencode((string) $trace['line']); ?>">
                                             <?php echo $trace['file']; ?>
                                         </a>
                                     <?php else: ?>
