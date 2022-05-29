@@ -130,8 +130,8 @@ use Windwalker\Uri\UriData;
             /
             ID: <span class="text-muted"><?php echo $item->id; ?></span>
             /
-            <a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?>" style="word-break: break-all" target="_blank">
-                <?php echo $item['collector']['system.uri.full'] ?>
+            <a class="text-muted" href="<?php echo $item['collector']['system.uri.full'] ?? '#' ?>" style="word-break: break-all" target="_blank">
+                <?php echo $item['collector']['system.uri.full'] ?? '' ?>
                 <small class="fa fa-external-link-alt"></small>
             </a>
         </p>
