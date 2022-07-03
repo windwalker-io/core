@@ -314,6 +314,7 @@ class View implements EventAwareInterface
                 Prop::class,
                 function ($attr) use ($data, $vm, $property) {
                     if (array_key_exists($property->getName(), $data)) {
+                        $property->setAccessible(true);
                         $property->setValue($vm, $data[$property->getName()]);
                     }
                 }
