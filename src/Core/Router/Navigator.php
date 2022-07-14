@@ -178,7 +178,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     public function redirect(Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
     {
-        if ($options & static::REDIRECT_ALLOW_OUTSIDE) {
+        if (!($options & static::REDIRECT_ALLOW_OUTSIDE)) {
             $uri = $this->validateRedirectUrl($uri);
         }
 
