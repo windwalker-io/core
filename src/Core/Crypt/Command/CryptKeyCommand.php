@@ -42,12 +42,13 @@ class CryptKeyCommand implements CommandInterface
             'length',
             InputArgument::OPTIONAL,
             'The bytes length.',
-            '16'
+            '32'
         );
 
-        $command->addArgument(
+        $command->addOption(
             'output',
-            InputArgument::OPTIONAL,
+            'o',
+            InputOption::VALUE_REQUIRED,
             'The output file, keep empty will print to terminal.'
         );
 
@@ -92,7 +93,7 @@ class CryptKeyCommand implements CommandInterface
         $prefix = $io->getOption('prefix');
         $str = $prefix . $str;
 
-        $output = $io->getArgument('output');
+        $output = $io->getOption('output');
 
         if ($output) {
             $output = Path::realpath($output);

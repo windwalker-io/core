@@ -22,6 +22,7 @@ return [
     'mail:test' => \Windwalker\Core\Command\MailTestCommand::class,
 
     'mig:go' => \Windwalker\Core\Migration\Command\MigrateGoCommand::class,
+    'mig:back' => \Windwalker\Core\Migration\Command\MigrateBackCommand::class,
     'mig:reset' => \Windwalker\Core\Migration\Command\ResetCommand::class,
     'mig:status' => \Windwalker\Core\Migration\Command\StatusCommand::class,
     'mig:create' => \Windwalker\Core\Migration\Command\CreateCommand::class,
