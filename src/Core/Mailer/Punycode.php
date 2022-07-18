@@ -101,7 +101,7 @@ class Punycode
      */
     public static function toUtf8($string)
     {
-        $string = explode('@', $string);
+        $string = explode('@', (string) $string);
 
         // Not addressing UTF-8 user names
         $new = $string[0];
