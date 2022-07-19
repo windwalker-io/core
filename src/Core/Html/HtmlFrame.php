@@ -375,7 +375,7 @@ class HtmlFrame
     public function setDescription(string $text): static
     {
         $this->addMetadata('description', $text, true);
-        $this->addMetadata('og:description', $text, true);
+        $this->addOpenGraph('og:description', $text, true);
 
         return $this;
     }
