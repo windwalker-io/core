@@ -215,7 +215,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $uri = $root;
         }
 
-        return $uri;
+        return (string) $uri;
     }
 
     public function absolute(string $url, int $options = RouteUri::TYPE_PATH): string
