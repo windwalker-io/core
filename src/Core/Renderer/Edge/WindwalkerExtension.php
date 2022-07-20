@@ -83,6 +83,7 @@ class WindwalkerExtension implements
             'attr' => [$this, 'attr'],
 
             // Debug
+            'dump' => [$this, 'dump'],
             'shown' => [$this, 'shown'],
             'dd' => [$this, 'dd'],
             'ds' => [$this, 'ds'],
@@ -190,6 +191,11 @@ class WindwalkerExtension implements
     public function shown(string $expression): string
     {
         return "<?php show{$expression} ?>";
+    }
+
+    public function dump(string $expression): string
+    {
+        return "<?php dump{$expression} ?>";
     }
 
     /**
