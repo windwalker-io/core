@@ -14,6 +14,7 @@ namespace Windwalker\Core\Generator\SubCommand;
 use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -62,7 +63,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'name' => $name,
+                    'name' => StrNormalize::toKebabCase($name),
                     'ns' => StrNormalize::toClassNamespace(
                         $this->getNamesapce($io) . '/' . StrNormalize::toPascalCase($name)
                     ),
@@ -71,5 +72,14 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
             );
 
         return 0;
+    }
+
+    protected function getDestPath(IOInterface $io, ?string $suffix = null): string
+    {
+        [$dest] = $this->getNameParts($io, $suffix);
+        $dest = StrNormalize::toKebabCase($dest);
+        $dir = $io->getOption('dir');
+
+        return Path::normalize($this->app->path($dir . '/' . $dest));
     }
 }
