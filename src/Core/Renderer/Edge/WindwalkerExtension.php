@@ -157,8 +157,6 @@ class WindwalkerExtension implements
     /**
      * formToken
      *
-     * @param  string  $expression
-     *
      * @return  string
      */
     public function formToken(): string
@@ -247,9 +245,9 @@ class WindwalkerExtension implements
      */
     public function debug(string $expression): string
     {
-        if ($expression) {
-            $expression = static::stripParentheses($expression);
+        $expression = static::stripParentheses($expression);
 
+        if ($expression) {
             return "<?php if(\$app->isDebug()) { {$expression}; } ?>";
         }
 

@@ -369,9 +369,7 @@ class AppContext implements WebApplicationInterface
     {
         $systemUri = $this->getSystemUri();
 
-        if ($systemUri) {
-            $url = $systemUri->absolute((string) $url);
-        }
+        $url = $systemUri->absolute((string) $url);
 
         return $this->getRootApp()->redirect($url, $code, $instant);
     }
