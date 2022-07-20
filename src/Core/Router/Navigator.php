@@ -211,7 +211,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $uri = (string) $uri;
         }
 
-        if (stripos($uri, $root) !== 0) {
+        if (stripos((string) $uri, $root) !== 0) {
             $uri = $root;
         }
 
