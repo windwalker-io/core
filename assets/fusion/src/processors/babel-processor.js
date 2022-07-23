@@ -65,7 +65,13 @@ export default class BabelProcessor extends JsProcessor {
 
   compile(dest, options) {
     return this.pipe(
-      gulpBabel(options.babel.get()).on('error', logError(e => console.log(e.codeFrame)))
+      gulpBabel(options.babel.get())
+        // The following steeam will lose babel stream's end event
+        // We force emit it again.
+        .on('end', () => {
+          this.stream.emit('end')
+        })
+        .on('error', logError(e => console.log(e.codeFrame)))
     );
   }
 }

@@ -42,7 +42,9 @@ export async function jsProd() {
 export async function babel() {
   fusion.watch(['./src/js/**/*.js']);
 
-  fusion.babel('./src/js/**/*.js', './dest/js/babel/', { module: 'systemjs'});
+  return waitAllEnded(
+    fusion.babel('./src/js/**/*.js', './dest/js/babel/', { module: 'systemjs'})
+  );
 }
 
 export async function module() {
