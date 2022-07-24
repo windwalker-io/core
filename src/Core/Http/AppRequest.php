@@ -17,10 +17,13 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Form\Exception\ValidateFailException;
+use Windwalker\Core\Http\Event\RequestGetValueEvent;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\Data\Format\FormatRegistry;
+use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;
@@ -31,8 +34,9 @@ use function Windwalker\collect;
  * The AppRequest class.
  */
 #[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
-class AppRequest implements JsonSerializable
+class AppRequest implements JsonSerializable, EventAwareInterface
 {
+    use EventAwareTrait;
     use FilterAwareTrait;
 
     protected ?array $input = null;
@@ -74,8 +78,9 @@ class AppRequest implements JsonSerializable
     public function getOverrideMethod(): string
     {
         return $this->request->getHeaderLine('X-Http-Method-Override')
-            ?: $this->input('_method')
-                ?: $this->request->getMethod();
+            ?: $this->getRequest()->getParsedBody()['_method']
+            ?? $this->getUri()->getQueryValues()['_method']
+                ?? $this->request->getMethod();
     }
 
     /**
@@ -100,11 +105,31 @@ class AppRequest implements JsonSerializable
         return $new;
     }
 
+    /**
+     * getEvent
+     *
+     * @return  array
+     */
+    protected function getUriQueryValues(): mixed
+    {
+        $values = $this->getUri()->getQueryValues();
+
+        $appRequest = $this;
+        $type = RequestGetValueEvent::TYPE_QUERY;
+
+        $event = $this->emit(
+            RequestGetValueEvent::class,
+            compact('appRequest', 'values', 'type')
+        );
+
+        return $event->getValues();
+    }
+
     public function getQueryValues(): array
     {
         return array_merge(
             $this->getUrlVars(),
-            $this->getUri()->getQueryValues()
+            $this->getUriQueryValues()
         );
     }
 
@@ -117,7 +142,16 @@ class AppRequest implements JsonSerializable
             return [];
         }
 
-        return $this->matchedRoute->getVars();
+        $appRequest = $this;
+        $values = $this->matchedRoute->getVars();
+        $type = RequestGetValueEvent::TYPE_URL_VARS;
+
+        $event = $this->emit(
+            RequestGetValueEvent::class,
+            compact('appRequest', 'values', 'type')
+        );
+
+        return $event->getValues();
     }
 
     /**
@@ -138,7 +172,17 @@ class AppRequest implements JsonSerializable
 
     public function getBodyValues(): array
     {
-        return $this->getRequest()->getParsedBody();
+        $values = $this->getRequest()->getParsedBody();
+
+        $appRequest = $this;
+        $type = RequestGetValueEvent::TYPE_BODY;
+
+        $event = $this->emit(
+            RequestGetValueEvent::class,
+            compact('appRequest', 'values', 'type')
+        );
+
+        return $event->getValues();
     }
 
     /**
@@ -146,7 +190,7 @@ class AppRequest implements JsonSerializable
      */
     public function getInput(): array
     {
-        return $this->input;
+        return (array) $this->input;
     }
 
     /**

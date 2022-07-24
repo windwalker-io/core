@@ -149,7 +149,7 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(ProxyResolver::class);
 
         // App Request
-        $container->share(
+        $container->set(
             AppRequest::class,
             fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
         );

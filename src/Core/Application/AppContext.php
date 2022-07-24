@@ -286,6 +286,8 @@ class AppContext implements WebApplicationInterface
     {
         $this->appRequest = $request;
 
+        $request->addEventDealer($this);
+
         return $this;
     }
 
