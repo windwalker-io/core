@@ -6,7 +6,7 @@
  */
 
 import del from 'del';
-import fusion, { dest, series, src, waitAllEnded, watch } from '../src/index.js';
+import fusion, { dest, series, src, watch, wait } from '../src/index.js';
 import { parallel } from '../src/index.js';
 import { babelEmptyOptions, BabelOptions } from '../src/utilities/babel.js';
 
@@ -42,7 +42,7 @@ export async function jsProd() {
 export async function babel() {
   fusion.watch(['./src/js/**/*.js']);
 
-  return waitAllEnded(
+  return wait(
     fusion.babel('./src/js/**/*.js', './dest/js/babel/', { module: 'systemjs'})
   );
 }
@@ -68,7 +68,7 @@ export async function rollup() {
 export async function vue() {
   fusion.watch(['./src/vue/**/*.js']);
 
-  return waitAllEnded(
+  return wait(
     fusion.vue('./src/vue/main.ts', './dest/vue/vue-dest.js'),
     fusion.vue('./src/vue/entries/*.ts', './dest/vue/pages/', { root: './src/vue' })
   );

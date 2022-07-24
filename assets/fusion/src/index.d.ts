@@ -80,8 +80,8 @@ declare namespace Fusion {
   export const lastRun: typeof lr;
   export const copy: taskProcessor<CssOptions>;
   export function livereload(source: string | Array<string>, options: any): Promise<NodeJS.ReadWriteStream>;
-  export function waitAllEnded(...args: Array<Promise<NodeJS.ReadWriteStream>>): Promise<NodeJS.ReadWriteStream[]>;
-  export function waitFirstEnded(...args: Array<Promise<NodeJS.ReadWriteStream>>): Promise<NodeJS.ReadWriteStream>;
+  export function wait(...args: Array<Promise<NodeJS.ReadWriteStream>>): Promise<NodeJS.ReadWriteStream[]>;
+  export function waitFirst(...args: Array<Promise<NodeJS.ReadWriteStream>>): Promise<NodeJS.ReadWriteStream>;
 
   export const css: taskProcessor<CssOptions>;
   export const CssProcessor: Processor<CssOptions>;

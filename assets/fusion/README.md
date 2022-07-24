@@ -1,8 +1,8 @@
 # Windwalker Fusion
 
-[![npm](https://img.shields.io/npm/l/windwalker-fusion.svg)](https://www.npmjs.com/package/windwalker-fusion)
-[![npm](https://img.shields.io/npm/v/windwalker-fusion.svg)](https://www.npmjs.com/package/windwalker-fusion)
-[![npm](https://img.shields.io/npm/dt/windwalker-fusion.svg)](https://www.npmjs.com/package/windwalker-fusion)
+[![npm](https://img.shields.io/npm/l/@windwalker-io/fusion.svg)](https://www.npmjs.com/package/@windwalker-io/fusion.svg)
+[![npm](https://img.shields.io/npm/v/@windwalker-io/fusion.svg)](https://www.npmjs.com/package/@windwalker-io/fusion.svg)
+[![npm](https://img.shields.io/npm/dt/@windwalker-io/fusion.svg)](https://www.npmjs.com/package/@windwalker-io/fusion.svg)
 
 Windwalker Fusion provides a clean, fluent API to run Gulp tasks for compiling your code.
 Fusion supports several common CSS and JavaScript pre-processors.
@@ -19,10 +19,10 @@ npm install @windwalker-io/fusion --save-dev
 cp -r node_modules/@windwalker-io/fusion/config/fusionfile.mjs ./
 ```
 
-The `fusionfile.js` is your configuration on top of Gulp. The example code is:
+The `fusionfile.mjs` is your configuration on top of Gulp. The example code is:
 
 ```js
-const fusion = require('windwalker-fusion');
+import fusion from '@windwalker-io/fusion';
 
 // The task `main`
 fusion.task('main', function () {
@@ -38,10 +38,10 @@ package.json
 
 ```json
 "scripts": {
-    "build": "cross-env node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
-    "build:dev": "cross-env NODE_ENV=development node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
-    "build:prod": "cross-env NODE_ENV=production node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
-    "watch": "cross-env NODE_ENV=development node_modules/.bin/gulp --watch --gulpfile=fusionfile.mjs",
-    "watch:reload": "cross-env NODE_ENV=development node_modules/.bin/gulp --watch --livereload --gulpfile=fusionfile.mjs"
+"build": "cross-env node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
+"build:dev": "cross-env NODE_ENV=development node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
+"build:prod": "cross-env NODE_ENV=production node_modules/.bin/gulp --gulpfile=fusionfile.mjs",
+"watch": "cross-env NODE_ENV=development node_modules/.bin/gulp --watch --gulpfile=fusionfile.mjs",
+"watch:reload": "cross-env NODE_ENV=development node_modules/.bin/gulp --watch --livereload --gulpfile=fusionfile.mjs"
 },
 ```

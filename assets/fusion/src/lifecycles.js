@@ -77,7 +77,17 @@ const notifySuccess = debounce(() => {
   // }
 }, 300);
 
+/**
+ * @param promises
+ * @returns {Promise<Awaited<unknown>[]>}
+ *
+ * @deprecated
+ */
 export function waitAllEnded(...promises) {
+  return wait(...promises);
+}
+
+export function wait(...promises) {
   const waitQueue = [];
 
   promises.forEach((promise) => {
@@ -91,7 +101,17 @@ export function waitAllEnded(...promises) {
   return Promise.all(waitQueue);
 }
 
+/**
+ * @param promises
+ * @returns {Promise<Awaited<unknown>[]>}
+ *
+ * @deprecated
+ */
 export function waitFirstEnded(...promises) {
+  return waitFirst(...promises);
+}
+
+export function waitFirst(...promises) {
   const waitQueue = [];
 
   promises.forEach((promise) => {
