@@ -17,6 +17,7 @@ use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
+use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\DOM\DOMElement;
 use Windwalker\Session\Session;
 
@@ -88,7 +89,7 @@ class CsrfService
      */
     public function createToken(): string
     {
-        return bin2hex(random_bytes(16));
+        return Base64Url::encode(random_bytes(32));
     }
 
     public function checkToken(AppRequest $request, ?string $method = null): bool
