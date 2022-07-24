@@ -24,7 +24,7 @@ export default class VueProcessor extends WebpackProcessor {
 
   compile(dest, options) {
     let src = options.root;
-    
+
     if (!src) {
       src = this.source;
 

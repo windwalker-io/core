@@ -29,13 +29,7 @@ export function prepareStream(stream) {
       //   message: '[Something Error] Please see terminal to know more information.',
       //   icon: path.resolve() + '/../resources/img/error.png'
       // });
-    }))
-    .on('end', e => {
-      postTask();
-    })
-    .on('finish', e => {
-      //
-    });
+    }));
 
   return stream;
 }
@@ -44,6 +38,10 @@ export function postStream(stream) {
   if (cliInput['livereload']) {
     stream = stream.pipe(livereload(config.livereload));
   }
+
+  stream.on('end', (e) => {
+    postTask();
+  });
 
   return stream;
 }
