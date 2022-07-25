@@ -1,4 +1,4 @@
-import { DestMethod, SrcMethod, WatchMethod, lastRun as lr } from 'gulp';
+import { DestMethod, SrcMethod, WatchMethod, parallel as gulpParallel, series as gulpSeries, lastRun as lr } from 'gulp';
 import { Gulp } from 'gulp';
 import { Settings } from 'gulp-typescript';
 import * as vfs from 'vinyl-fs';
@@ -101,6 +101,10 @@ declare namespace Fusion {
   export const RollupProcessor: Processor<RollupOptions>;
   export const vue: taskProcessor<VueOptions>;
   export const VueProcessor: Processor<VueOptions>;
+
+  // Gulp
+  export const parallel: typeof gulpParallel;
+  export const series: typeof gulpSeries;
 }
 
 export = Fusion;
