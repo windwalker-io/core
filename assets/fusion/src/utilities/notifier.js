@@ -31,4 +31,4 @@ export const notify = debounce((options = {}) => {
   );
 
   child.unref();
-}, 150);
+}, 250);
