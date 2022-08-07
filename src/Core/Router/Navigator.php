@@ -208,7 +208,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         $root = $this->app->getSystemUri()->root;
 
         if (str_starts_with((string) $uri, '/')) {
-            $uri = (string) $uri;
+            return (string) $uri;
         }
 
         if (stripos((string) $uri, $root) !== 0) {
