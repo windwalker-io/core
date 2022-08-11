@@ -80,7 +80,7 @@ class ControllerDispatcher
             $controller = fn(AppContext $app): mixed => $this->container->call($controller, $app->getUrlVars());
         }
 
-        $response = $this->handleResponse($controller($app));
+        $response = static::anyToResponse($controller($app));
 
         $event = $app->emit(
             AfterControllerDispatchEvent::class,
@@ -161,12 +161,12 @@ class ControllerDispatcher
      *
      * @param  mixed  $res
      *
-     * @return  ResponseInterface|Response
+     * @return ResponseInterface
      *
      * @throws JsonException
      * @since  4.0
      */
-    protected function handleResponse(mixed $res): ResponseInterface
+    public static function anyToResponse(mixed $res): ResponseInterface
     {
         if ($res instanceof RouteUri) {
             return $res->toResponse();

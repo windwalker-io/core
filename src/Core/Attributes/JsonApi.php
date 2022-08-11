@@ -24,7 +24,7 @@ class JsonApi implements ContainerAttributeInterface
 {
     public function __invoke(AttributeHandler $handler): callable
     {
-        return function (...$args) use ($handler) {
+        return static function (...$args) use ($handler) {
             $container = $handler->getContainer();
 
             return $container->newInstance(JsonApiMiddleware::class)->run(fn() => $handler(...$args));

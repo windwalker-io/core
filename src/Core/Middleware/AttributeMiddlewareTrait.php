@@ -15,6 +15,7 @@ use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Windwalker\Core\Controller\ControllerDispatcher;
 
 /**
  * Trait AttributeMiddlewareTrait
@@ -30,9 +31,11 @@ trait AttributeMiddlewareTrait
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $this->run(
-            $request,
-            fn(ServerRequestInterface $request): ResponseInterface => $handler->handle($request)
+        return ControllerDispatcher::anyToResponse(
+            $this->run(
+                $request,
+                fn(ServerRequestInterface $request): ResponseInterface => $handler->handle($request)
+            )
         );
     }
 
