@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Http;
 
 use Stringable;
+use Windwalker\Http\Response\AttachmentResponse;
 use Windwalker\Http\Response\EmptyResponse;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\JsonResponse;
@@ -90,10 +91,10 @@ class CoreResponse extends Response
         return new RedirectResponse($body, $status, $headers);
     }
 
-    public function attachment(mixed $body, ?int $status = null, array $headers = []): RedirectResponse
+    public function attachment(mixed $body, ?int $status = null, array $headers = []): AttachmentResponse
     {
         [$body, $status, $headers] = $this->prepare($body, $status, $headers);
 
-        return new RedirectResponse($body, $status, $headers);
+        return new AttachmentResponse($body, $status, $headers);
     }
 }
