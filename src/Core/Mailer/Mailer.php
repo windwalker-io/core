@@ -20,6 +20,7 @@ use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Mailer\Event\BeforeSendEvent;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
@@ -33,7 +34,7 @@ use Windwalker\Utilities\Options\OptionsResolverTrait;
  */
 class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
     use OptionsResolverTrait;
 
     /**

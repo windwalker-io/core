@@ -16,6 +16,7 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ServerRequestInterface;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
@@ -29,7 +30,7 @@ use function FastRoute\simpleDispatcher;
  */
 class Router implements EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     /**
      * @var Route[]

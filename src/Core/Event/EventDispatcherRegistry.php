@@ -22,6 +22,8 @@ class EventDispatcherRegistry
 {
     protected array $events = [];
 
+    protected RootEventEmitter $rootDispatcher;
+
     /**
      * EventDispatcherRegistry constructor.
      *
@@ -29,11 +31,16 @@ class EventDispatcherRegistry
      */
     public function __construct(protected ApplicationInterface $app)
     {
+        $this->rootDispatcher = new RootEventEmitter($this);
     }
 
     public function createDispatcher(ListenerProviderInterface $provider = null): EventEmitter
     {
-        return new CoreEventEmitter($provider);
+        $dispatcher = new EventEmitter($provider);
+
+        $dispatcher->addDealer($this->rootDispatcher);
+
+        return $dispatcher;
     }
 
     public function collect(object $event): void
@@ -43,5 +50,13 @@ class EventDispatcherRegistry
         }
 
         $this->events[] = $event;
+    }
+
+    /**
+     * @return RootEventEmitter
+     */
+    public function getRootDispatcher(): RootEventEmitter
+    {
+        return $this->rootDispatcher;
     }
 }

@@ -18,6 +18,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Controller\DefaultController;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeRoutingEvent;
 use Windwalker\Core\Events\Web\RoutingNotMatchedEvent;
@@ -35,7 +36,7 @@ use Windwalker\Event\EventAwareTrait;
  */
 class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
     use DICreateTrait;
 
     /**

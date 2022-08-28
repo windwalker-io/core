@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use InvalidArgumentException;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
@@ -25,7 +26,7 @@ use Windwalker\Utilities\Cache\InstanceCacheTrait;
 abstract class AbstractManager implements EventAwareInterface
 {
     use InstanceCacheTrait;
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     /**
      * @var Config

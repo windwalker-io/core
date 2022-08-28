@@ -15,9 +15,9 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Windwalker\Event\EventEmitter;
 
 /**
- * The CoreEventEmitter class.
+ * The RootEventEmitter class.
  */
-class CoreEventEmitter extends EventEmitter
+class RootEventEmitter extends EventEmitter
 {
     /**
      * @inheritDoc

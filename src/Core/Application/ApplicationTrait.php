@@ -17,6 +17,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
+use Windwalker\Core\Event\CoreEventAwareTrait;
+use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
@@ -43,6 +45,8 @@ trait ApplicationTrait
      * @var array<ServiceProviderInterface>
      */
     protected array $providers = [];
+
+    protected ?EventDispatcherRegistry $dispatcherRegistry = null;
 
     public function getAppName(): string
     {
@@ -146,6 +150,9 @@ trait ApplicationTrait
 
     protected function registerListeners(Container $container): void
     {
+        $this->dispatcherRegistry ??= new EventDispatcherRegistry($this);
+        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
+
         $listeners = $this->config('listeners') ?? [];
 
         $this->handleListeners($listeners, $container);

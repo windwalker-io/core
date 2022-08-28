@@ -16,6 +16,7 @@ use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Http\Event\RequestGetValueEvent;
 use Windwalker\Core\Router\Route;
@@ -36,7 +37,7 @@ use function Windwalker\collect;
 #[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
 class AppRequest implements JsonSerializable, EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
     use FilterAwareTrait;
 
     protected ?array $input = null;

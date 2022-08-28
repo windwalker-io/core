@@ -13,7 +13,7 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
-use Windwalker\Core\Event\CoreEventEmitter;
+use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Schedule\ScheduleService;
@@ -78,9 +78,11 @@ class AppProvider implements ServiceProviderInterface
      */
     protected function prepareEvents(Container $container): void
     {
+        $container->prepareSharedObject(EventDispatcherRegistry::class);
+
         $container->bind(
             EventEmitter::class,
-            fn() => $container->newInstance(CoreEventEmitter::class)
+            fn() => $container->get(EventDispatcherRegistry::class)->createDispatcher()
         );
     }
 

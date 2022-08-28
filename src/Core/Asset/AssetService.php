@@ -20,6 +20,7 @@ use RecursiveIteratorIterator;
 use SplFileInfo;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\Event\AssetBeforeRender;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Event\EventAwareInterface;
@@ -40,7 +41,7 @@ use function Windwalker\uid;
  */
 class AssetService implements EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     /**
      * Property styles.

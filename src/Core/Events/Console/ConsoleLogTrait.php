@@ -11,14 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
-use Windwalker\Event\EventAwareTrait;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 
 /**
  * Trait MessageEventTrait
  */
 trait ConsoleLogTrait
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     public function consoleLog(string|array $messages, ?string $type = null): ConsoleLogEvent
     {

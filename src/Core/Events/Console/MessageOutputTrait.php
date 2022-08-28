@@ -11,14 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
-use Windwalker\Event\EventAwareTrait;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 
 /**
  * Trait MessageOutputTrait
  */
 trait MessageOutputTrait
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     public function emitMessage(string|array $messages, bool $newLine = true, int $options = 0): MessageOutputEvent
     {

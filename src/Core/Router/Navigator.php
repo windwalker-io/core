@@ -16,6 +16,7 @@ use FastRoute\RouteParser\Std;
 use Psr\Http\Message\ResponseInterface;
 use Stringable;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
@@ -31,7 +32,7 @@ use Windwalker\Utilities\Cache\InstanceCacheTrait;
 class Navigator implements NavConstantInterface, EventAwareInterface
 {
     use InstanceCacheTrait;
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     /**
      * @var RouteBuilder

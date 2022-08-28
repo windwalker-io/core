@@ -17,6 +17,7 @@ use ReflectionProperty;
 use Unicorn\Enum\BasicState;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
 use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
 use Windwalker\Database\Manager\TableManager;
@@ -43,7 +44,7 @@ use Windwalker\Utilities\TypeCast;
  */
 class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterface
 {
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
     use InstanceCacheTrait;
 
     protected array $uses = [];

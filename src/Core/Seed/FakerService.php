@@ -14,6 +14,7 @@ namespace Windwalker\Core\Seed;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
 use Psr\Cache\InvalidArgumentException;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
@@ -26,7 +27,7 @@ use Windwalker\Utilities\Cache\InstanceCacheTrait;
 class FakerService implements EventAwareInterface
 {
     use InstanceCacheTrait;
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     /**
      * create

@@ -21,6 +21,7 @@ use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Attributes\ViewModel;
+use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Module\ModuleInterface;
@@ -50,7 +51,7 @@ use Windwalker\Utilities\Wrapper\WrapperInterface;
 class View implements EventAwareInterface
 {
     use OptionsResolverTrait;
-    use EventAwareTrait;
+    use CoreEventAwareTrait;
 
     protected string|array|null $layoutMap = null;
 
