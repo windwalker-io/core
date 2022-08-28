@@ -957,7 +957,7 @@ class AssetService implements EventAwareInterface
                 foreach ($array as $key => $value) {
                     $encodedKey = json_encode((string) $key);
 
-                    if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', $key) === 0) {
+                    if (!$quoteKey && preg_match('/[^0-9A-Za-z_]+/m', (string) $key) === 0) {
                         $encodedKey = substr(substr($encodedKey, 0, -1), 1);
                     }
 
