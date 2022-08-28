@@ -92,6 +92,8 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
             return;
         }
 
+        $this->prepareBoot();
+
         // Prepare child
         $container = $this->getContainer();
         $container->registerServiceProvider(new AppProvider($this));

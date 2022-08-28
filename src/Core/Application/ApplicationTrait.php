@@ -17,8 +17,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
-use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
+use Windwalker\Core\Event\RootEventEmitter;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
@@ -148,11 +148,15 @@ trait ApplicationTrait
         $this->providers = $providers;
     }
 
-    protected function registerListeners(Container $container): void
+    protected function prepareBoot(): void
     {
         $this->dispatcherRegistry ??= new EventDispatcherRegistry($this);
-        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
 
+        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
+    }
+
+    protected function registerListeners(Container $container): void
+    {
         $listeners = $this->config('listeners') ?? [];
 
         $this->handleListeners($listeners, $container);

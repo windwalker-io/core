@@ -74,6 +74,8 @@ class WebApplication implements WebApplicationInterface
             return;
         }
 
+        $this->prepareBoot();
+
         // Prepare child
         $container = $this->getContainer();
         $container->registerServiceProvider(new AppProvider($this));
