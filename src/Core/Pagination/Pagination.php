@@ -310,11 +310,11 @@ class Pagination
      */
     public function getPages(): int
     {
-        if ($this->limit === 0) {
+        if ($this->getLimit() === 0) {
             return 1;
         }
 
-        return (int) ceil($this->total / $this->limit);
+        return (int) ceil($this->getTotal() / $this->getLimit());
     }
 
     /**
