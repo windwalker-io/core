@@ -35,19 +35,22 @@ class JsonApiMiddleware extends JsonResponseMiddleware
     public function run(Closure $callback): ResponseInterface
     {
         try {
-            /** @var ResponseInterface $response */
+            /** @var ResponseInterface|mixed $response */
             $response = $callback();
 
-            // Allow redirect
-            if ($response instanceof RedirectResponse || $response->hasHeader('location')) {
-                return $response;
-            }
+            if ($response instanceof ResponseInterface) {
+                // Allow redirect
+                if ($response instanceof RedirectResponse || $response->hasHeader('location')) {
+                    return $response;
+                }
 
-            if (
-                $response->hasHeader('Content-Type')
-                && !str_contains($response->getHeaderLine('Content-Type'), 'application/json')
-            ) {
-                return $response;
+                // Allow override non-json response
+                if (
+                    $response->hasHeader('Content-Type')
+                    && !str_contains($response->getHeaderLine('Content-Type'), 'application/json')
+                ) {
+                    return $response;
+                }
             }
 
             $message = $this->getMessage();
