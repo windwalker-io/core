@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use LogicException;
 use Windwalker\Data\Collection;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Classes\FlowControlTrait;
 use Windwalker\Utilities\TypeCast;
 
 use function Windwalker\glob_all;
@@ -24,6 +25,7 @@ use function Windwalker\glob_all;
 class RouteCreator
 {
     use RouteConfigurationTrait;
+    use FlowControlTrait;
 
     /**
      * @var Route[]|Collection

@@ -276,6 +276,7 @@ trait RouteConfigurationTrait
      * middleware
      *
      * @param  string|array|callable|DefinitionInterface  $class
+     * @param  mixed                                      ...$args
      *
      * @return  static
      *
@@ -283,6 +284,10 @@ trait RouteConfigurationTrait
      */
     public function middleware(mixed $class, ...$args): static
     {
+        if (!$class) {
+            return $this;
+        }
+
         if (is_string($class)) {
             $class = create($class, ...$args);
         }
