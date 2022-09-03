@@ -72,8 +72,12 @@ trait QueryProxyTrait
     {
         $query = $this->getInnerQuery();
 
-        $query->$name(...$args);
+        $result = $query->$name(...$args);
 
-        return $this;
+        if ($result === $query) {
+            return $this;
+        }
+
+        return $result;
     }
 }
