@@ -20,6 +20,7 @@ use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Response\JsonResponse;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Session\Session;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Reflection\BacktraceHelper;
@@ -36,6 +37,18 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         try {
             /** @var ResponseInterface $response */
             $response = $callback();
+
+            // Allow redirect
+            if ($response instanceof RedirectResponse || $response->hasHeader('location')) {
+                return $response;
+            }
+
+            if (
+                $response->hasHeader('Content-Type')
+                && !str_contains($response->getHeaderLine('Content-Type'), 'application/json')
+            ) {
+                return $response;
+            }
 
             $message = $this->getMessage();
 

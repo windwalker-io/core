@@ -22,6 +22,8 @@ use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\Http\Response\JsonResponse;
 
+use Windwalker\Http\Response\RedirectResponse;
+
 use function Windwalker\response;
 
 /**
@@ -47,6 +49,18 @@ class JsonResponseMiddleware implements MiddlewareInterface
     {
         try {
             $response = $callback();
+
+            // Allow redirect
+            if ($response instanceof RedirectResponse || $response->hasHeader('location')) {
+                return $response;
+            }
+
+            if (
+                $response->hasHeader('Content-Type')
+                && !str_contains($response->getHeaderLine('Content-Type'), 'application/json')
+            ) {
+                return $response;
+            }
 
             return static::toJsonResponse($response);
         } catch (Throwable $e) {
