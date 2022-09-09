@@ -41,6 +41,11 @@ class AppState implements JsonSerializable
     protected string $prefix = '';
 
     /**
+     * @var null|AppRequest
+     */
+    protected ?AppRequest $request = null;
+
+    /**
      * UserState constructor.
      *
      * @param  Container  $container
