@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router;
 
 use FastRoute\RouteParser;
+use Windwalker\Data\Collection;
 use Windwalker\Utilities\TypeCast;
 
 /**
@@ -91,7 +92,7 @@ class RouteBuilder
 
             $var = TypeCast::forceString($vars[$name] ?? '{' . $name . '}');
 
-            $segments[] = urlencode($var);
+            $segments[] = $this->encodeSegments($var);
 
             unset($vars[$name]);
         }
@@ -104,5 +105,12 @@ class RouteBuilder
 
         // Remove start slash to make this uri relative.
         return [ltrim($pattern, '/'), $vars];
+    }
+
+    protected function encodeSegments(string $var): string
+    {
+        return (string) $segments = Collection::explode('/', $var)
+            ->map('urlencode')
+            ->implode('/');
     }
 }
