@@ -14,10 +14,7 @@ namespace Windwalker\Core\Composer;
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use Exception;
-
 use Windwalker\Core\Utilities\Base64Url;
-
-use function Windwalker\uid;
 
 /**
  * The StarterInstaller class.
