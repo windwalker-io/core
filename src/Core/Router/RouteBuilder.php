@@ -91,7 +91,7 @@ class RouteBuilder
 
             $var = TypeCast::forceString($vars[$name] ?? '{' . $name . '}');
 
-            $segments[] = $var;
+            $segments[] = urlencode($var);
 
             unset($vars[$name]);
         }
