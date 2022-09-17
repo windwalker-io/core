@@ -92,9 +92,23 @@ export function wait(...promises) {
 
   promises.forEach((promise) => {
     waitQueue.push(new Promise((resolve) => {
-      promise.then((stream) => {
-        stream.on('end', resolve);
-      });
+      if (promise instanceof Promise) {
+        // If is promise
+        promise.then((stream) => {
+          if (stream instanceof Promise) {
+            // If is pipe promise
+            return stream.then(resolve);
+          } else if (stream.on) {
+            // If is processor stream
+            stream.on('end', resolve);
+          } else {
+            resolve(stream);
+          }
+        });
+      } else {
+        // If is processor stream
+        promise.on('end', resolve);
+      }
     }));
   });
 
