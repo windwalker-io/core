@@ -5,9 +5,10 @@
  * @license    MIT
  */
 
-import fusion, { watch, parallel, src, dest } from '@windwalker-io/fusion';
+import fusion, { watch, parallel, src, dest, wait } from '@windwalker-io/fusion';
 import { babelBasicOptions } from '@windwalker-io/fusion/src/utilities/babel.js';
 import postcss from 'gulp-postcss';
+import path from 'path';
 import tailwindcss from 'tailwindcss';
 
 export async function debuggers() {
@@ -15,17 +16,27 @@ export async function debuggers() {
   watch(['src/debugger/**/*.{js,vue}', 'scss/**/*.scss']);
   // Watch end
 
-  fusion.vue(
-    'src/debugger/debugger.js',
-    'dist/debugger/',
-    {
-      override: (config) => {
-        // @see https://webpack.js.org/guides/public-path/#automatic-publicpath
-        config.output.publicPath = "auto";
+  return wait(
+    fusion.vue(
+      'src/debugger/debugger.js',
+      'dist/debugger/',
+      {
+        override: (config) => {
+          config.resolve.alias = {
+            '@': path.resolve(path.resolve(), './src/debugger/') // Will be overwrite when compile
+          }
+
+          // @see https://webpack.js.org/guides/public-path/#automatic-publicpath
+          config.output.publicPath = "auto";
+
+          config.output.chunkFilename = process.env.NODE_ENV === 'production'
+            ? 'chunk-vendor-[id].js'
+            : 'dev/chunk-vendor-[id].js';
+        }
       }
-    }
+    ),
+    fusion.copy('images/**/*', 'dist/images/')
   );
-  fusion.copy('images/**/*', 'dist/images/');
 }
 
 export async function console() {

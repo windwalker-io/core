@@ -3,6 +3,9 @@ node_modules
 yarn.lock
 !.gitkeep
 
+# Dev
+/dist/debugger/dev
+
 # Test
 #/fusionfile.js
 /test/dest/*

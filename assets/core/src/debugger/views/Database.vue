@@ -21,7 +21,7 @@
 
       <div class="mt-5">
         <div class="mb-4" v-for="(query, i) of data.queries">
-          <query-info :item="query" :i="i + 1" />
+          <QueryInfo :item="query" :i="i + 1" />
         </div>
       </div>
 
@@ -31,13 +31,13 @@
 
 <script>
 import { computed, ref } from 'vue';
-import QueryInfo from '../components/db/query-info.vue';
+import QueryInfo from '../components/db/QueryInfo.vue';
 import DefaultLayout from '../layouts/DefaultLayout.vue';
 import $http from '../services/http.js';
 
 export default {
   name: 'Database',
-  components: { DefaultLayout, QueryInfo },
+  components: { QueryInfo, DefaultLayout },
   async beforeRouteEnter(to, from ,next) {
     next(async (vm) => {
       const res = await $http.get('ajax/data?path=db');

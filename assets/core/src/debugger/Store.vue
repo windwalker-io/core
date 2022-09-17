@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { currentId } from './services/store.js';
+import { currentId } from '@/services/store.js';
 
 export default {
   name: 'Store',
