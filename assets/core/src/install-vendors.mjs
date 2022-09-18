@@ -30,7 +30,7 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
     deleteExists(dir);
   });
 
-  vendors = findVendors().concat(vendors);
+  vendors = findVendors(composerVendors).concat(vendors);
   vendors = [...new Set(vendors)];
 
   vendors.forEach((vendor) => {
@@ -59,7 +59,30 @@ function doInstall(source, dest) {
   }
 }
 
-function findVendors() {
+function findVendors(composerVendors = []) {
+  const pkg = path.resolve(process.cwd(), 'package.json');
+
+  const pkgJson = loadJson(pkg);
+
+  let vendors = Object.keys(pkgJson.devDependencies || {})
+    .concat(Object.keys(pkgJson.dependencies || {}))
+    .map(id => `node_modules/${id}/package.json`)
+    .map((file) => loadJson(file))
+    .filter(pkgJson => pkgJson.windwalker != null)
+    .map(pkgJson => pkgJson.windwalker.vendors || [])
+    .flat();
+
+  composerVendors.forEach((cv) => {
+    const composerManifest = `vendor/${cv}/composer.json`;
+    const composerJson = loadJson(composerManifest);
+
+    vendors = vendors.concat(composerJson?.windwalker?.asset_vendors || []);
+  });
+
+  return [ ...new Set(vendors) ];
+}
+
+function findComposerVendors(packageName) {
   const pkg = path.resolve(process.cwd(), 'package.json');
 
   const pkgJson = loadJson(pkg);

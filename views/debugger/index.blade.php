@@ -21,6 +21,11 @@ use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 
+$data = [
+    'systemPath' => WINDWALKER_ROOT,
+    'editor' => $app->config('debugger.editor') ?: 'phpstorm'
+];
+
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -30,6 +35,9 @@ use Windwalker\Core\Router\SystemUri;
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Windwalker Debugger</title>
+    <script>
+        document.__data = {!! json_encode($data) !!};
+    </script>
 </head>
 <body>
     <app id="app"></app>

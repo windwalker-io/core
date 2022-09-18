@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 /**
  * Part of earth project.
  *
@@ -7,6 +5,7 @@ import fs from 'fs';
  * @license    __LICENSE__
  */
 
+import fs from 'fs';
 
 export function loadJson(file) {
   if (!fs.existsSync(file)) {

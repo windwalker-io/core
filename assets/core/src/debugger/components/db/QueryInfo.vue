@@ -1,5 +1,4 @@
 <template>
-  <!-- component -->
   <div :id="`query-${i}`" class="card rounded-3 border border-1 border-primary">
     <div class="card-header d-flex justify-content-between">
       <h4 class="m-0">
@@ -40,19 +39,28 @@
           v-html="formatQuery(item.debug_query)"
           ></pre>
       </div>
-      <div class="py-4">
-        Query Time:
-        <span class="badge bg-secondary">
-          {{ round(item.time * 1000) }}ms
-        </span>
-        Memory:
-        <span class="badge bg-secondary">
-          {{ round(item.memory / 1024 / 1024) }}MB
-        </span>
-        Return Rows
-        <span class="badge bg-secondary rounded-pill">
-          {{ item.count }}
-        </span>
+      <div class="py-4 d-flex justify-content-between">
+        <div>
+          Query Time:
+          <span class="badge" :class="`bg-${stateColor(item.time * 1000, 15)}`">
+            {{ round(item.time * 1000) }}ms
+          </span>
+          Memory:
+          <span class="badge" :class="`bg-${stateColor(item.memory / 1024 / 1024, 0.05)}`">
+            {{ round(item.memory / 1024 / 1024) }}MB
+          </span>
+          Return Rows
+          <span class="badge bg-info rounded-pill">
+            {{ item.count }}
+          </span>
+        </div>
+
+        <div>
+          <button class="btn btn-primary" @click="openBacktrace(item.backtrace, i)">
+            <svg style="height: 14px; fill: white;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"/></svg>
+            Backtrace
+          </button>
+        </div>
       </div>
     </div>
 
@@ -135,24 +143,34 @@
 
 <script>
 import { format } from 'sql-formatter';
+import { stateColor } from '../../services/utilities.js';
 import { goToLast } from '../../services/nav.js';
 
 export default {
   name: 'query-info',
   props: {
     i: Number,
-    item: Object
+    item: Object,
+    totalCount: Number,
+    totalTime: Number,
+    totalMemory: Number,
   },
-  setup(props) {
+  setup(props, { emit }) {
     function copy() {
       navigator.clipboard.writeText(props.item.debug_query);
+    }
+
+    function openBacktrace(backtrace) {
+      emit('open-backtrace', backtrace, props.i);
     }
 
     return {
       formatQuery,
       round,
       goToLast,
-      copy
+      copy,
+      stateColor,
+      openBacktrace
     };
   }
 };
