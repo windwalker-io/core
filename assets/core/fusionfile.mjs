@@ -10,6 +10,7 @@ import { babelBasicOptions } from '@windwalker-io/fusion/src/utilities/babel.js'
 import postcss from 'gulp-postcss';
 import path from 'path';
 import tailwindcss from 'tailwindcss';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 export async function debuggers() {
   // Watch start
@@ -32,6 +33,10 @@ export async function debuggers() {
           config.output.chunkFilename = process.env.NODE_ENV === 'production'
             ? 'chunk-vendor-[id].js'
             : 'dev/chunk-vendor-[id].js';
+
+          // config.plugins.push(
+          //   new BundleAnalyzerPlugin()
+          // );
         }
       }
     ),

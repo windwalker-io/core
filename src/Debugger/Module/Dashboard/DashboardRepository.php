@@ -23,6 +23,8 @@ use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
+use function Windwalker\fs;
+
 /**
  * The DashboardRepository class.
  */
@@ -36,7 +38,7 @@ class DashboardRepository
     {
         $dir = $this->getCacheFolder();
 
-        $file = $dir . '/' . $id;
+        $file = $dir->appendPath($id);
 
         if (!is_file($file)) {
             throw new RuntimeException('ID ' . $id . ' not found.');
@@ -56,27 +58,19 @@ class DashboardRepository
     public function getItems(int $limit = 100, bool $includeData = false): array
     {
         return $this->once('items', function () use ($includeData, $limit) {
-            $files = $this->getFiles();
+            $folders = $this->getFilesOrFolders();
 
-            if (!$files) {
+            if (!$folders) {
                 return [];
             }
 
             $items = [];
 
-            /** @var SplFileInfo $file */
-            foreach ($files as $file) {
-                [$basicData, $data] = explode(static::FILE_SEPARATOR, file_get_contents($file->getPathname()));
+            /** @var FileObject $folder */
+            foreach ($folders as $folder) {
+                $basicData = $folder->appendPath('/basic.json')->read()->jsonDecode();
 
-                $item = json_decode($basicData, true);
-
-                $item['id'] = $file->getBasename();
-
-                if ($includeData) {
-                    $item['data'] = $data;
-                }
-
-                $items[$file->getMTime()] = $item;
+                $items[$folder->getMTime()] = $basicData;
             }
 
             krsort($items);
@@ -88,19 +82,17 @@ class DashboardRepository
     /**
      * getFiles
      *
-     * @return  RecursiveIteratorIterator
+     * @return  iterable<FileObject>
      */
-    public function getFiles(): iterable
+    public function getFilesOrFolders(): iterable
     {
         $dir = $this->getCacheFolder();
 
-        if (!is_dir($dir)) {
+        if (!$dir->isDir()) {
             return [];
         }
 
-        return new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
-        );
+        return $dir->items();
     }
 
     /**
@@ -124,21 +116,18 @@ class DashboardRepository
             'method' => $collector->getDeep('http.request.method'),
             'response' => $collector->getDeep('http.response'),
             'time' => microtime(true),
-            'ip' => $collector->getDeep('system.remoteIP'),
+            'ip' => $collector->getDeep('http.remoteIP'),
         ];
 
-        $content = implode(
-            static::FILE_SEPARATOR,
-            [
-                json_encode($basicData),
-                json_encode($collector),
-            ]
-        );
+        $folder = $this->getCacheFolder()->appendPath('/' . $id);
 
-        return Filesystem::write(
-            $this->getCacheFolder() . '/' . $id,
-            $content
-        );
+        $folder->appendPath('/basic.json')->write(json_encode($basicData));
+        $folder->appendPath('/db.json')->write(json_encode($collector['db']));
+        $folder->appendPath('/system.json')->write(json_encode($collector['system']));
+        $folder->appendPath('/routing.json')->write(json_encode($collector['routing']));
+        $folder->appendPath('/http.json')->write(json_encode($collector['http']));
+
+        return $folder;
     }
 
     /**
@@ -148,36 +137,32 @@ class DashboardRepository
      *
      * @return  void
      */
-    public function deleteOldFiles(int $maxFiles = 100): void
+    public function deleteOldRecords(int $maxFiles = 100): void
     {
-        $files = $this->getFiles();
+        $folders = $this->getFilesOrFolders();
         $items = [];
 
-        /** @var SplFileInfo $file */
-        foreach ($files as $file) {
-            if (is_file($file->getPathname())) {
-                @$items[$file->getMTime()] = $file;
-            }
+        /** @var FileObject $folder */
+        foreach ($folders as $folder) {
+            @$items[$folder->getMTime()] = $folder;
         }
 
         krsort($items);
 
         $i = 0;
 
-        /** @var SplFileInfo $file */
-        foreach ($items as $file) {
+        /** @var FileObject $folder */
+        foreach ($items as $folder) {
             $i++;
 
             if ($i < $maxFiles) {
                 continue;
             }
 
-            if (is_file($file->getPathname())) {
-                try {
-                    @Filesystem::delete($file->getPathname());
-                } catch (Throwable $e) {
-                    // Ignore error
-                }
+            try {
+                @$folder->deleteIfExists();
+            } catch (Throwable $e) {
+                // Ignore error
             }
         }
     }
@@ -185,10 +170,10 @@ class DashboardRepository
     /**
      * getCacheFolder
      *
-     * @return  string
+     * @return  FileObject
      */
-    protected function getCacheFolder(): string
+    protected function getCacheFolder(): FileObject
     {
-        return WINDWALKER_CACHE . '/profiler';
+        return fs(WINDWALKER_CACHE . '/profiler');
     }
 }

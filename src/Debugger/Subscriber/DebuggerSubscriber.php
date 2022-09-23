@@ -222,7 +222,7 @@ class DebuggerSubscriber
             }
 
             // Delete old files
-            $this->dashboardRepository->deleteOldFiles(
+            $this->dashboardRepository->deleteOldRecords(
                 $this->container->getParam('debugger.cache.max_files') ?? 100
             );
 
@@ -230,7 +230,6 @@ class DebuggerSubscriber
             $collector = $this->container->get('debugger.collector');
 
             $id = uid('ww_', true);
-            $collector['id'] = $id;
 
             // Debug console
             $debugConsole = $this->container->newInstance(DebugConsole::class);

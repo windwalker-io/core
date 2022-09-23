@@ -15,9 +15,9 @@
     </div>
 
     <!-- Body -->
-    <div class="row gx-0 flex-wrap flex-md-nowrap">
+    <div class="d-flex flex-column flex-md-row">
       <!-- Sidebar -->
-      <div class="h-w-sidebar col-md-2">
+      <div class="h-w-sidebar" style="width: 200px">
         <div class="nav flex-column bg-light h-100">
           <div class="nav-item">
             <router-link to="/"
@@ -51,7 +51,7 @@
       </div>
 
       <!-- Content Body -->
-      <div class="col-md-10">
+      <div class="flex-grow-1">
         <router-view></router-view>
       </div>
     </div>
