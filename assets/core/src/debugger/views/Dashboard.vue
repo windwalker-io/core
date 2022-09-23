@@ -30,7 +30,9 @@
       <tbody>
       <tr v-for="item of items">
         <td>
-          {{ item.id }}
+          <a href="#" @click.prevent="selectId(item.id)" class="link-secondary">
+            {{ item.id }}
+          </a>
         </td>
         <td>
           <button class="btn btn-primary btn-sm"
