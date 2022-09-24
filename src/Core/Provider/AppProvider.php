@@ -39,7 +39,7 @@ class AppProvider implements ServiceProviderInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(ApplicationInterface $app)
+    public function __construct(ApplicationInterface $app, protected ?ProfilerFactory $profilerFactory = null)
     {
         $this->app = $app;
     }
@@ -57,7 +57,12 @@ class AppProvider implements ServiceProviderInterface
         $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
         $container->prepareSharedObject(PackageRegistry::class);
-        $container->prepareSharedObject(ProfilerFactory::class);
+
+        if ($this->profilerFactory) {
+            $container->share(ProfilerFactory::class, $this->profilerFactory);
+        } else {
+            $container->prepareSharedObject(ProfilerFactory::class);
+        }
 
         $this->prepareEvents($container);
 

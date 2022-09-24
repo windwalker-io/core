@@ -24,6 +24,7 @@ use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Form\Exception\ValidateFailException;
+use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
@@ -74,11 +75,15 @@ class WebApplication implements WebApplicationInterface
             return;
         }
 
+        // Start profiler
+        $profilerFactory = new ProfilerFactory();
+        $profilerFactory->get('main')->mark('boot', ['system']);
+
         $this->prepareBoot();
 
         // Prepare child
         $container = $this->getContainer();
-        $container->registerServiceProvider(new AppProvider($this));
+        $container->registerServiceProvider(new AppProvider($this, $profilerFactory));
 
         $this->registerAllConfigs($container);
 

@@ -59,7 +59,7 @@
           {{ dateFormat(item.time) }}
         </td>
         <td>
-          {{ item.response.status }}
+          {{ item.response?.status }}
         </td>
       </tr>
       </tbody>

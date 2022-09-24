@@ -56,7 +56,7 @@
     </div>
 
     <teleport to=".nav-item--request">
-      <ul class="nav ps-4 small">
+      <ul class="nav flex-column ps-4 small">
         <li class="nav-item">
           <a href="#" class="nav-link" @click.prevent="goto('get')">
             GET Variables
