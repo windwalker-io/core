@@ -47,8 +47,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      */
     public function __construct(protected AppContext $app, protected Router $router)
     {
-        $this->addEventDealer($router);
-        $this->addEventDealer($app);
+        //
     }
 
     /**
@@ -66,6 +65,9 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $this->addEventDealer($this->router);
+        $this->addEventDealer($this->app);
+
         $router = $this->router;
 
         $route = $this->app->getSystemUri()->route;
