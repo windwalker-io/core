@@ -20,9 +20,7 @@ use Windwalker\Event\EventEmitter;
  */
 class EventDispatcherRegistry
 {
-    protected array $events = [];
-
-    protected RootEventEmitter $rootDispatcher;
+    protected EventEmitter $rootDispatcher;
 
     /**
      * EventDispatcherRegistry constructor.
@@ -31,31 +29,24 @@ class EventDispatcherRegistry
      */
     public function __construct(protected ApplicationInterface $app)
     {
-        $this->rootDispatcher = new RootEventEmitter($this);
+        $this->rootDispatcher = new EventEmitter();
     }
 
-    public function createDispatcher(ListenerProviderInterface $provider = null): EventEmitter
-    {
-        $dispatcher = new EventEmitter($provider);
+    public function createDispatcher(
+        EventCollector $collector,
+        ListenerProviderInterface $provider = null
+    ): CoreEventEmitter {
+        $dispatcher = new CoreEventEmitter($collector, $provider);
 
         $dispatcher->addDealer($this->rootDispatcher);
 
         return $dispatcher;
     }
 
-    public function collect(object $event): void
-    {
-        if (!$this->app->isDebug()) {
-            return;
-        }
-
-        $this->events[] = $event;
-    }
-
     /**
-     * @return RootEventEmitter
+     * @return EventEmitter
      */
-    public function getRootDispatcher(): RootEventEmitter
+    public function getRootDispatcher(): EventEmitter
     {
         return $this->rootDispatcher;
     }

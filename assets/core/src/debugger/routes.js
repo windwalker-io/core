@@ -15,6 +15,7 @@ const routes = [
   { name: 'request', path: '/request/:id?', component: () => import('./views/Request.vue') },
   { name: 'routing', path: '/routing/:id?', component: () => import('./views/Routing.vue') },
   { name: 'timeline', path: '/timeline/:id?', component: () => import('./views/Timeline.vue') },
+  { name: 'events', path: '/events/:id?', component: () => import('./views/Events.vue') },
   { name: 'db', path: '/db/:id?', component: () => import('./views/Database.vue') },
 ];
 

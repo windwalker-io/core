@@ -112,6 +112,10 @@ export default {
       vm.data = res.data.data;
     });
   },
+  async beforeRouteUpdate(to, from ,next) {
+    const res = await $http.get('ajax/data?path=http');
+    this.data = res.data.data;
+  },
   setup() {
     const data = ref(null);
     const root = ref(null);

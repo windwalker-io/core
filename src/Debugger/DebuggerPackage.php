@@ -111,7 +111,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
                     InstanceCreatedEvent::class,
                     function (InstanceCreatedEvent $event) use ($collector) {
                         $name = $event->getInstanceName();
-                        $dbCollector = $collector->proxy('db.queries');
+                        $dbCollector = $collector->proxy('db.queries.' . $name);
                         $startTime = null;
                         $memory = null;
 

@@ -85,11 +85,9 @@ class AppProvider implements ServiceProviderInterface
      */
     protected function prepareEvents(Container $container): void
     {
-        $container->prepareSharedObject(EventDispatcherRegistry::class);
-
-        $container->bind(
-            EventEmitter::class,
-            fn() => $container->get(EventDispatcherRegistry::class)->createDispatcher()
+        $container->share(
+            EventDispatcherRegistry::class,
+            fn () => new EventDispatcherRegistry($this->app)
         );
     }
 

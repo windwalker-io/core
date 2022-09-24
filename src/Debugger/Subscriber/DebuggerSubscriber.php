@@ -18,6 +18,8 @@ use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\DateTime\ChronosService;
+use Windwalker\Core\Event\EventCollector;
+use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
@@ -38,6 +40,7 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
+use Windwalker\Event\Provider\CompositeListenerProvider;
 use Windwalker\Http\Helper\HttpHelper;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
@@ -238,6 +241,14 @@ class DebuggerSubscriber
         $profiler = $this->container->get(ProfilerFactory::class)->getInstances();
 
         $collector->setDeep('profiler', $profiler);
+
+        // Events
+        $eventCollector = $this->container->get(EventCollector::class);
+
+        $collector->setDeep('events', [
+            'invoked' => $eventCollector->getInvokedListeners(),
+            'uninvoked' => $eventCollector->getUninvokedListeners()
+        ]);
 
         // Database
         $connections = $app->config('database.connections') ?? [];

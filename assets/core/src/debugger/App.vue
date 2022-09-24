@@ -1,24 +1,27 @@
 <template>
   <div class="c-main-wrapper">
-    <div class="navbar navbar-expand-lg navbar-dark bg-dark"
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark"
       style="height: 60px">
-      <!-- Logo -->
-      <div class="h-w-sidebar">
-        <img src="assets/vendor/@windwalker-io/core/dist/images/windwalker-logo-h-w.svg" alt="logo"
-          style="height: 30px">
-      </div>
+      <div class="container-fluid">
+        <!-- Logo -->
+        <div class="navbar-brand">
+          <img src="assets/vendor/@windwalker-io/core/dist/images/windwalker-logo-h-w.svg" alt="logo"
+            style="height: 30px">
+        </div>
 
-      <!-- Header  -->
-      <div class="">
+        <!-- Header  -->
+        <div class="">
 
+        </div>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="d-flex flex-column flex-md-row">
+    <div class="d-flex flex-column flex-md-row" style="margin-top: 60px;">
       <!-- Sidebar -->
-      <div class="h-w-sidebar" style="min-width: 200px">
-        <div class="nav flex-column bg-light h-100">
+      <div class="h-w-sidebar bg-light">
+        <div class="nav flex-column bg-light position-sticky"
+          style="min-width: 200px; top: 60px">
           <div class="nav-item nav-item--dashboard">
             <router-link to="/"
               class="c-sidebar-menu-item nav-link"
@@ -52,6 +55,13 @@
               class="c-sidebar-menu-item nav-link"
               :class="{ active: currentRoute === 'timeline' }">
               Timeline
+            </router-link>
+          </div>
+          <div class="nav-item nav-item--timeline">
+            <router-link to="/events"
+              class="c-sidebar-menu-item nav-link"
+              :class="{ active: currentRoute === 'events' }">
+              Events
             </router-link>
           </div>
           <div class="nav-item nav-item--db">

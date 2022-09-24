@@ -9,6 +9,8 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 
 /* import specific icons */
+import { faList } from '@fortawesome/free-solid-svg-icons/faList'
+import { faArrowsRotate } from '@fortawesome/free-solid-svg-icons/faArrowsRotate'
 import { faEye } from '@fortawesome/free-solid-svg-icons/faEye'
 import { faExternalLink } from '@fortawesome/free-solid-svg-icons/faExternalLink'
 
@@ -16,4 +18,6 @@ import { faExternalLink } from '@fortawesome/free-solid-svg-icons/faExternalLink
 library.add(
   faEye,
   faExternalLink,
+  faList,
+  faArrowsRotate,
 );

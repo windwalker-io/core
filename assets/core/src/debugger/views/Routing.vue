@@ -164,6 +164,15 @@ export default {
       vm.data = res.data.data;
     });
   },
+  async beforeRouteUpdate(to, from ,next) {
+    const params = new URLSearchParams();
+    params.set('path[request]', 'http::request');
+    params.set('path[uri]', 'http::systemUri');
+    params.set('path[routing]', 'routing');
+
+    const res = await $http.get('ajax/data?' + params.toString());
+    vm.data = res.data.data;
+  },
   setup() {
     const data = ref(null);
 

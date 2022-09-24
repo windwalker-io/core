@@ -121,10 +121,10 @@ class DashboardRepository
     /**
      * getLastItem
      *
-     * @return  array
+     * @return  Collection
      * @throws InvalidArgumentException
      */
-    public function getLastItem(): array
+    public function getLastItem(): Collection
     {
         $items = $this->getItems();
 
@@ -150,6 +150,7 @@ class DashboardRepository
         $folder->appendPath('/routing.json')->write(json_encode($collector['routing']));
         $folder->appendPath('/http.json')->write(json_encode($collector['http']));
         $folder->appendPath('/profiler.json')->write(json_encode($collector['profiler']));
+        $folder->appendPath('/events.json')->write(json_encode($collector['events']));
 
         return $folder;
     }

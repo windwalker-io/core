@@ -7,32 +7,56 @@
     <div v-if="data" class="p-4">
       <!-- DB info -->
 
-      <div>
-        <h4>Queries</h4>
+      <ul class="nav nav-pills" id="profilers-tab" role="tablist">
+        <li class="nav-item" role="presentation"
+          v-for="(instance, i) of instances">
+          <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
+            :data-bs-target="`tab-${instance}`"
+            type="button"
+            role="tab"
+            aria-selected="true">
+            {{ instance }}
+          </button>
+        </li>
+      </ul>
 
-        <div class="my-3">
-          Count: <span class="badge bg-info">{{ data?.queries?.length || 0 }}</span>
-          -
-          Time:
-          <span class="badge" :class="`bg-${stateColor(totalTime, 15 * (data?.queries?.length || 0))}`">
-            {{ round(totalTime) }}ms
-          </span>
-          -
-          Memory:
-          <span class="badge" :class="`bg-${stateColor(totalMemory, 0.05 * (data?.queries?.length || 0))}`">
-            {{ round(totalMemory) }}MB
-          </span>
-        </div>
-      </div>
+      <div class="tab-content mt-4" id="myTabContent">
+        <div class="tab-pane fade "
+          v-for="(instance, i) of instances"
+          :class="[ i === 0 ? 'show active' : '' ]"
+          :id="`tab-${instance}`"
+          role="tabpanel"
+          tabindex="0">
 
-      <div class="mt-5">
-        <div class="mb-4" v-for="(query, i) of data.queries">
-          <QueryInfo :item="query" :i="i + 1"
-            :total-count="data?.queries?.length || 0"
-            :total-time="totalTime"
-            :total-memory="totalMemory"
-            @open-backtrace="openBacktrace"
-          />
+          <div>
+            <h4>Queries</h4>
+
+            <div class="my-3">
+              Count: <span class="badge bg-info">{{ data?.queries[instance]?.length || 0 }}</span>
+              -
+              Time:
+              <span class="badge" :class="`bg-${stateColor(totalTime(instance), 15 * (data?.queries[instance]?.length || 0))}`">
+            {{ round(totalTime(instance)) }}ms
+          </span>
+              -
+              Memory:
+              <span class="badge" :class="`bg-${stateColor(totalMemory(instance), 0.05 * (data?.queries[instance]?.length || 0))}`">
+            {{ round(totalMemory(instance)) }}MB
+          </span>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <div class="mb-4" v-for="(query, i) of data.queries[instance]">
+              <QueryInfo :item="query" :i="i + 1"
+                :total-count="data?.queries[instance]?.length || 0"
+                :total-time="totalTime(instance)"
+                :total-memory="totalMemory(instance)"
+                @open-backtrace="openBacktrace"
+              />
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -81,24 +105,23 @@ export default {
   setup() {
     const data = ref(null);
 
-    const totalTime = computed(() => {
-      return data.value?.queries?.reduce((sum, query) => {
+    function totalTime(instance) {
+      return data.value?.queries[instance]?.reduce((sum, query) => {
         return sum + query.time;
       }, 0) * 1000;
-    });
+    }
 
-    const totalMemory = computed(() => {
-      return data.value?.queries?.reduce((sum, query) => {
+    function totalMemory(instance) {
+      return data.value?.queries[instance]?.reduce((sum, query) => {
         return sum + query.memory;
       }, 0) / 1024 / 1024;
-    });
+    }
 
     const showBacktraceModal = ref(false);
     const backtrace = ref([]);
     const backtraceIndex = ref(0);
 
     function openBacktrace(trace, i) {
-      console.log(i);
       backtrace.value = trace;
       backtraceIndex.value = i;
       showBacktraceModal.value = true;
@@ -115,6 +138,8 @@ export default {
       return path.replace(sysPath, 'ROOT');
     }
 
+    const instances = computed(() => data.value.connections.map((conn) => conn.name));
+
     return {
       data,
       totalTime,
@@ -122,6 +147,7 @@ export default {
       showBacktraceModal,
       backtrace,
       backtraceIndex,
+      instances,
 
       openBacktrace,
       getEditorLink,
