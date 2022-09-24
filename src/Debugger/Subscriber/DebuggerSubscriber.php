@@ -231,7 +231,8 @@ class DebuggerSubscriber
         $collector->def('system', []);
 
         $systemCollector = $collector->proxy('system');
-        $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
+        // Mostly we won't install whole framework
+        // $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
         $systemCollector['core_version'] = InstalledVersions::getPrettyVersion('windwalker/core');
         $systemCollector['php_version'] = PHP_VERSION;
         $systemCollector['messages'] = $session->getFlashBag()->peek();
