@@ -39,6 +39,8 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     use CoreEventAwareTrait;
     use DICreateTrait;
 
+    protected bool $booted = false;
+
     /**
      * RoutingMiddleware constructor.
      *
@@ -65,8 +67,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $this->addEventDealer($this->router);
-        $this->addEventDealer($this->app);
+        $this->boot();
 
         $router = $this->router;
 
@@ -170,5 +171,20 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         }
 
         return $handler;
+    }
+
+    /**
+     * @return  void
+     */
+    protected function boot(): void
+    {
+        if ($this->booted) {
+            return;
+        }
+
+        $this->addEventDealer($this->router);
+        $this->addEventDealer($this->app);
+
+        $this->booted = true;
     }
 }
