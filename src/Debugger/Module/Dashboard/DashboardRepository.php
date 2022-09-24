@@ -169,7 +169,7 @@ class DashboardRepository
 
         /** @var FileObject $folder */
         foreach ($folders as $folder) {
-            @$items[$folder->getMTime()] = $folder;
+            @$items[$folder->getBasename()] = $folder;
         }
 
         krsort($items);
