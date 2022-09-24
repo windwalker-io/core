@@ -47,6 +47,44 @@ use Windwalker\Core\Router\SystemUri;
         </div>
     </a>
     <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
+        href="{{ $nav->to('debugger::home') }}#request/{{ $collector['id'] }}"
+        target="_blank"
+    >
+        <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3"
+        >
+            {{ $collector->getDeep('http.request.method') }}
+        </div>
+    </a>
+    <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
+        href="{{ $nav->to('debugger::home') }}#routing/{{ $collector['id'] }}"
+        target="_blank"
+    >
+        <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3 " style="margin-right: 10px">
+            {{ $collector->getDeep('http.response.status') }}
+        </div>
+        <div class="wd-text-white" style="font-family: monospace">
+            {{ $collector->getDeep('routing.matched')->getName() }}
+        </div>
+    </a>
+    <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
+        href="{{ $nav->to('debugger::home') }}#routing/{{ $collector['id'] }}"
+        target="_blank"
+    >
+        <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3 ">
+            <svg style="height: 14px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class=" wd-mb-1"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M232 120C232 106.7 242.7 96 256 96C269.3 96 280 106.7 280 120V243.2L365.3 300C376.3 307.4 379.3 322.3 371.1 333.3C364.6 344.3 349.7 347.3 338.7 339.1L242.7 275.1C236 271.5 232 264 232 255.1L232 120zM256 0C397.4 0 512 114.6 512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0zM48 256C48 370.9 141.1 464 256 464C370.9 464 464 370.9 464 256C464 141.1 370.9 48 256 48C141.1 48 48 141.1 48 256z"/></svg>
+            {{ $collector->getDeep('profiler.main')->getEndTime() }}ms
+        </div>
+    </a>
+    <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
+        href="{{ $nav->to('debugger::home') }}#routing/{{ $collector['id'] }}"
+        target="_blank"
+    >
+        <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3 ">
+            <svg style="height: 14px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class=" wd-mb-1"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M320 0H141.3C124.3 0 108 6.7 96 18.7L18.7 96C6.7 108 0 124.3 0 141.3V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64zM160 88v48c0 13.3-10.7 24-24 24s-24-10.7-24-24V88c0-13.3 10.7-24 24-24s24 10.7 24 24zm80 0v48c0 13.3-10.7 24-24 24s-24-10.7-24-24V88c0-13.3 10.7-24 24-24s24 10.7 24 24zm80 0v48c0 13.3-10.7 24-24 24s-24-10.7-24-24V88c0-13.3 10.7-24 24-24s24 10.7 24 24z"/></svg>
+            {{ round($collector->getDeep('profiler.main')->getMemory() / 1024 / 1024, 2) }}MB
+        </div>
+    </a>
+    <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
         href="{{ $nav->to('debugger::home') }}#db/{{ $collector['id'] }}"
         target="_blank"
     >
@@ -54,7 +92,13 @@ use Windwalker\Core\Router\SystemUri;
         >
             <svg style="height: 14px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="database" class="svg-inline--fa fa-database fa-w-14 wd-text-gray-800 wd-mb-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M448 73.12v45.75C448 159.1 347.6 192 224 192S0 159.1 0 118.9V73.12C0 32.88 100.4 0 224 0S448 32.88 448 73.12zM448 176v102.9C448 319.1 347.6 352 224 352S0 319.1 0 278.9V176c48.12 33.12 136.2 48.62 224 48.62S399.9 209.1 448 176zM448 336v102.9C448 479.1 347.6 512 224 512s-224-32.88-224-73.13V336c48.12 33.13 136.2 48.63 224 48.63S399.9 369.1 448 336z"></path></svg>
             <span class="wd-text-sm">
-                {{ $collector->extract('db.queries')->count() }}
+                <?php
+                $count = 0;
+                foreach ($collector->extract('db.queries') as $queries) {
+                    $count += count($queries);
+                }
+                ?>
+                {{ $count }}
             </span>
         </div>
     </a>

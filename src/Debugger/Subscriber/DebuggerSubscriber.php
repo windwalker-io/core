@@ -314,6 +314,8 @@ class DebuggerSubscriber
 
             $id = uid('ww_', true);
 
+            $collector['id'] = $id;
+
             // Debug console
             $debugConsole = $this->container->newInstance(DebugConsole::class);
             $debugConsole->pushToPage($collector, $response);
