@@ -37,6 +37,7 @@
     "sql-formatter": "^10.6.0",
     "tailwindcss": "^2.1.4",
     "vue": "^3.0.11",
+    "vuedraggable": "^3.0||^4.0.3",
     "vue-router": "^4.0.8",
     "webpack": "^5.0",
     "webpack-bundle-analyzer": "^4.6.1"

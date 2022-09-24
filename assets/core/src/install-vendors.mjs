@@ -82,22 +82,6 @@ function findVendors(composerVendors = []) {
   return [ ...new Set(vendors) ];
 }
 
-function findComposerVendors(packageName) {
-  const pkg = path.resolve(process.cwd(), 'package.json');
-
-  const pkgJson = loadJson(pkg);
-
-  const vendors = Object.keys(pkgJson.devDependencies || {})
-    .concat(Object.keys(pkgJson.dependencies || {}))
-    .map(id => `node_modules/${id}/package.json`)
-    .map((file) => loadJson(file))
-    .filter(pkgJson => pkgJson.windwalker != null)
-    .map(pkgJson => pkgJson.windwalker.vendors || [])
-    .flat();
-
-  return [ ...new Set(vendors) ];
-}
-
 function deleteExists(dir) {
   if (!fs.existsSync(dir)) {
     return;
