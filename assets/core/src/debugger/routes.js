@@ -13,6 +13,7 @@ const routes = [
   { name: 'dashboard', path: '/', component: () => import('./views/Dashboard.vue') },
   { name: 'system', path: '/system/:id?', component: () => import('./views/System.vue') },
   { name: 'request', path: '/request/:id?', component: () => import('./views/Request.vue') },
+  { name: 'routing', path: '/routing/:id?', component: () => import('./views/Routing.vue') },
   { name: 'db', path: '/db/:id?', component: () => import('./views/Database.vue') },
 ];
 
@@ -36,8 +37,8 @@ router.beforeEach(async (to, from) => {
       currentId.value = to.params.id;
 
       const params = new URLSearchParams({
-        'path[url]': 'http.systemUri.full',
-        'path[status]': 'http.response.status',
+        'path[url]': 'http::systemUri.full',
+        'path[status]': 'http::response.status',
       });
       const res = await $http.get('ajax/data?' + params.toString());
 

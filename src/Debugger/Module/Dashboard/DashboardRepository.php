@@ -34,26 +34,45 @@ class DashboardRepository
 
     public const FILE_SEPARATOR = '{{ Debugger data ---------- }}';
 
-    public function getItem(string $id): array
+    public function getDataByPath(string $id, string $path = ''): mixed
+    {
+        [$section, $path] = explode('::', $path, 2) + ['', ''];
+
+        $data = $this->getItem($id, $section);
+
+        if ($path) {
+            $data = $data->getDeep($path);
+        }
+
+        return $data;
+    }
+
+    public function getItem(string $id, string $section = 'basic'): Collection
     {
         $dir = $this->getCacheFolder();
 
-        $file = $dir->appendPath($id);
+        $folder = $dir->appendPath('/' . $id);
 
-        if (!is_file($file)) {
+        if (!$folder->isDir()) {
             throw new RuntimeException('ID ' . $id . ' not found.');
         }
 
-        [$basicData, $data] = explode(static::FILE_SEPARATOR, file_get_contents($file));
+        $file = $folder->appendPath('/' . $section . '.json');
 
-        return json_decode($data, true);
+        if (!$file->isFile()) {
+            throw new RuntimeException("File: $section.json in ID: $id not found.");
+        }
+
+        return $file->read()->jsonDecode();
     }
 
     /**
      * getItems
      *
+     * @param  int   $limit
+     * @param  bool  $includeData
+     *
      * @return array
-     * @throws InvalidArgumentException
      */
     public function getItems(int $limit = 100, bool $includeData = false): array
     {
@@ -68,9 +87,13 @@ class DashboardRepository
 
             /** @var FileObject $folder */
             foreach ($folders as $folder) {
+                if (!$folder->isDir()) {
+                    continue;
+                }
+
                 $basicData = $folder->appendPath('/basic.json')->read()->jsonDecode();
 
-                $items[$folder->getMTime()] = $basicData;
+                $items[$folder->getBasename()] = $basicData;
             }
 
             krsort($items);

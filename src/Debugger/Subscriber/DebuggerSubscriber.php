@@ -21,6 +21,7 @@ use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
+use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Router\Router;
 use Windwalker\Data\Collection;
@@ -44,6 +45,8 @@ use function Windwalker\uid;
 class DebuggerSubscriber
 {
     protected bool $finished = false;
+
+    public bool $disableCollection = false;
 
     /**
      * DebuggerSubscriber constructor.
@@ -72,38 +75,6 @@ class DebuggerSubscriber
     //     $this->collectDatabase($container, $collector);
     // }
 
-    #[ListenTo(BeforeAppDispatchEvent::class)]
-    public function beforeAppDispatch(
-        BeforeAppDispatchEvent $event
-    ): void {
-        $container = $event->getContainer();
-        $app = $container->get(AppContext::class);
-        $collector = $container->get('debugger.collector');
-
-        $chronosService = $app->service(ChronosService::class);
-
-        // System info
-        $info = [];
-        $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
-
-        $collector['system'] = $info;
-    }
-
-    #[ListenTo(BeforeControllerDispatchEvent::class)]
-    public function beforeControllerDispatch(
-        BeforeControllerDispatchEvent $event
-    ): void {
-        /** @var AppContext $app */
-        $app = $this->container->get(AppContext::class);
-        $collector = $this->container->get('debugger.collector');
-
-        $routing['matched'] = $app->getMatchedRoute();
-        $routing['routes'] = $app->service(Router::class)->getRoutes();
-        $routing['controller'] = $event->getController();
-
-        $collector['routing'] = $routing;
-    }
-
     #[ListenTo(AfterRequestEvent::class)]
     public function afterRequest(
         AfterRequestEvent $event
@@ -111,12 +82,20 @@ class DebuggerSubscriber
         $container = $event->getContainer();
         $app = $container->get(AppContext::class);
 
+        $appReq = $app->getAppRequest();
+        $matchedRoute = $appReq->getMatchedRoute();
+
+        if (str_starts_with((string) $matchedRoute?->getPattern(), '/_debugger')) {
+            $this->disableCollection = true;
+
+            return;
+        }
+
         /** @var Collection $collector */
         $collector = $this->container->get('debugger.collector');
 
         $http = [];
 
-        $appReq = $app->getAppRequest();
         $req = $appReq->getRequest();
 
         $http['request'] = [
@@ -128,8 +107,10 @@ class DebuggerSubscriber
             'query' => $req->getQueryParams(),
             'cookies' => $req->getCookieParams(),
             'body' => $req->getParsedBody(),
+            'files' => $req->getUploadedFiles(),
             'version' => $req->getProtocolVersion(),
             'target' => $req->getRequestTarget(),
+            'env' => $_ENV ?? [],
         ];
         $http['systemUri'] = $appReq->getSystemUri();
         $http['overrideMethod'] = $appReq->getOverrideMethod();
@@ -155,10 +136,55 @@ class DebuggerSubscriber
         $this->finishCollected($event->getResponse());
     }
 
-    public function collectOthers(): void
-    {
+    #[ListenTo(BeforeAppDispatchEvent::class)]
+    public function beforeAppDispatch(
+        BeforeAppDispatchEvent $event
+    ): void {
+        if ($this->disableCollection) {
+            return;
+        }
+
+        $container = $event->getContainer();
+        $app = $container->get(AppContext::class);
+        $collector = $container->get('debugger.collector');
+
+        $chronosService = $app->service(ChronosService::class);
+
+        // System info
+        $info = [];
+        $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
+
+        $collector['system'] = $info;
+    }
+
+    #[ListenTo(BeforeControllerDispatchEvent::class)]
+    public function beforeControllerDispatch(
+        BeforeControllerDispatchEvent $event
+    ): void {
+        if ($this->disableCollection) {
+            return;
+        }
+
         /** @var AppContext $app */
         $app = $this->container->get(AppContext::class);
+        $collector = $this->container->get('debugger.collector');
+
+        $routing['matched'] = $app->getMatchedRoute();
+        $routing['routes'] = $app->service(Router::class)->getRoutes();
+        $routing['controller'] = $event->getController();
+
+        $collector['routing'] = $routing;
+    }
+
+    public function collectOthers(): void
+    {
+        if ($this->disableCollection) {
+            return;
+        }
+
+        /** @var AppContext $app */
+        $app = $this->container->get(AppContext::class);
+        $session = $this->container->get(Session::class);
 
         /** @var Collection $collector */
         $collector = $this->container->get('debugger.collector');
@@ -166,9 +192,10 @@ class DebuggerSubscriber
         $collector->def('system', []);
 
         $systemCollector = $collector->proxy('system');
-        // $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
+        $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
         $systemCollector['core_version'] = InstalledVersions::getPrettyVersion('windwalker/core');
         $systemCollector['php_version'] = PHP_VERSION;
+        $systemCollector['messages'] = $session->getFlashBag()->peek();
         $systemCollector['config'] = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
 
         // Database
@@ -198,6 +225,10 @@ class DebuggerSubscriber
 
     protected function finishCollected(?ResponseInterface $response = null): void
     {
+        if ($this->disableCollection) {
+            return;
+        }
+
         if ($this->finished) {
             return;
         }

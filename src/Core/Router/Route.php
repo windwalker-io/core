@@ -16,6 +16,7 @@ use JsonSerializable;
 use LogicException;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\Uri\Uri;
 
 /**
@@ -271,6 +272,26 @@ class Route implements JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return get_object_vars($this);
+        $properties = get_object_vars($this);
+
+        foreach ($properties['groups'] ?? [] as $gn => $group) {
+            foreach ($group['middlewares'] ?? [] as $key => $middleware) {
+                if ($middleware instanceof ObjectBuilderDefinition) {
+                    $properties['groups'][$gn]['middlewares'][$key] = $middleware->getClass();
+                } elseif (is_object($middleware)) {
+                    $properties['groups'][$gn]['middlewares'][$key] = $middleware::class;
+                }
+            }
+        }
+
+        foreach ($properties['options']['middlewares'] as &$middleware) {
+            if ($middleware instanceof ObjectBuilderDefinition) {
+                $middleware = $middleware->getClass();
+            } elseif (is_object($middleware)) {
+                $middleware = $middleware::class;
+            }
+        }
+
+        return $properties;
     }
 }

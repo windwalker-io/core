@@ -43,23 +43,16 @@ class AjaxController
     {
         $id = $app->input('id');
         $path = $app->input('path');
-        $data = $repository->getItem((string) $id);
-
-        if (!$path) {
-            return $data;
-        }
-
-        $data = collect($data);
 
         if (is_string($path)) {
-            return $data->getDeep($path);
+            return $repository->getDataByPath((string) $id, $path);
         }
 
         if (is_array($path)) {
             $result = [];
 
             foreach ($path as $k => $p) {
-                $result[$k] = $data->getDeep($p);
+                $result[$k] = $repository->getDataByPath((string) $id, $p);
             }
 
             return $result;

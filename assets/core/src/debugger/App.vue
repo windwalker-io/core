@@ -17,30 +17,37 @@
     <!-- Body -->
     <div class="d-flex flex-column flex-md-row">
       <!-- Sidebar -->
-      <div class="h-w-sidebar" style="width: 200px">
+      <div class="h-w-sidebar" style="min-width: 200px">
         <div class="nav flex-column bg-light h-100">
-          <div class="nav-item">
+          <div class="nav-item nav-item--dashboard">
             <router-link to="/"
               class="c-sidebar-menu-item nav-link"
               :class="{ active: currentRoute === 'dashboard' }">
               Dashboard
             </router-link>
           </div>
-          <div class="nav-item">
+          <div class="nav-item nav-item--system">
             <router-link to="/system"
               class="c-sidebar-menu-item nav-link"
               :class="{ active: currentRoute === 'system' }">
               System
             </router-link>
           </div>
-          <div class="nav-item">
+          <div class="nav-item nav-item--request">
             <router-link to="/request"
               class="c-sidebar-menu-item nav-link"
               :class="{ active: currentRoute === 'request' }">
               Request
             </router-link>
           </div>
-          <div class="nav-item">
+          <div class="nav-item nav-item--routing">
+            <router-link to="/routing"
+              class="c-sidebar-menu-item nav-link"
+              :class="{ active: currentRoute === 'routing' }">
+              Routing
+            </router-link>
+          </div>
+          <div class="nav-item nav-item--db">
             <router-link to="/db"
               class="c-sidebar-menu-item nav-link"
               :class="{ active: currentRoute === 'db' }">
