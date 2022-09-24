@@ -14,6 +14,7 @@ const routes = [
   { name: 'system', path: '/system/:id?', component: () => import('./views/System.vue') },
   { name: 'request', path: '/request/:id?', component: () => import('./views/Request.vue') },
   { name: 'routing', path: '/routing/:id?', component: () => import('./views/Routing.vue') },
+  { name: 'timeline', path: '/timeline/:id?', component: () => import('./views/Timeline.vue') },
   { name: 'db', path: '/db/:id?', component: () => import('./views/Database.vue') },
 ];
 

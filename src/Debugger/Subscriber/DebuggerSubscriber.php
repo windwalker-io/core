@@ -13,16 +13,22 @@ namespace Windwalker\Debugger\Subscriber;
 
 use Composer\InstalledVersions;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\DateTime\ChronosService;
+use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
+use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Core\Profiler\Profiler;
+use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Router\Router;
 use Windwalker\Data\Collection;
 use Windwalker\Data\Format\FormatRegistry;
@@ -48,6 +54,8 @@ class DebuggerSubscriber
 
     public bool $disableCollection = false;
 
+    protected Profiler $profiler;
+
     /**
      * DebuggerSubscriber constructor.
      */
@@ -65,15 +73,60 @@ class DebuggerSubscriber
         //
     }
 
-    // #[ListenTo(BeforeRequestEvent::class)]
-    // public function beforeRequest(BeforeRequestEvent $event): void
-    // {
-    //     $container = $event->getContainer();
-    //     $collector = $container->get('debugger.collector');
-    //
-    //     // Collect DB
-    //     $this->collectDatabase($container, $collector);
-    // }
+    #[ListenTo(BeforeRequestEvent::class)]
+    public function beforeRequest(BeforeRequestEvent $event): void
+    {
+        $profilerFactory = $this->container->get(ProfilerFactory::class);
+        $this->profiler = $profilerFactory->get('main');
+
+        $this->profiler->mark('RequestStart', ['system']);
+    }
+
+    #[ListenTo(AfterRoutingEvent::class)]
+    public function afterRouting(AfterRoutingEvent $event): void
+    {
+        $matchedRoute = $event->getMatched();
+
+        if (str_starts_with((string) $matchedRoute?->getPattern(), '/_debugger')) {
+            $this->disableCollection = true;
+        }
+
+        $this->profiler->mark('AfterRouting', ['system']);
+    }
+
+    #[ListenTo(BeforeAppDispatchEvent::class)]
+    public function beforeAppDispatch(
+        BeforeAppDispatchEvent $event
+    ): void {
+        if ($this->disableCollection) {
+            return;
+        }
+
+        $this->profiler->mark('BeforeAppDispatch', ['system']);
+
+        $container = $event->getContainer();
+        $app = $container->get(AppContext::class);
+        $collector = $container->get('debugger.collector');
+
+        $chronosService = $app->service(ChronosService::class);
+
+        // System info
+        $info = [];
+        $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
+
+        $collector['system'] = $info;
+    }
+
+    #[ListenTo(AfterControllerDispatchEvent::class)]
+    public function afterControllerDispatch(
+        AfterControllerDispatchEvent $event
+    ): void {
+        if ($this->disableCollection) {
+            return;
+        }
+
+        $this->profiler->mark('AfterControllerDispatch', ['system']);
+    }
 
     #[ListenTo(AfterRequestEvent::class)]
     public function afterRequest(
@@ -90,6 +143,8 @@ class DebuggerSubscriber
 
             return;
         }
+
+        $this->profiler->mark('AfterRequest', ['system']);
 
         /** @var Collection $collector */
         $collector = $this->container->get('debugger.collector');
@@ -136,27 +191,6 @@ class DebuggerSubscriber
         $this->finishCollected($event->getResponse());
     }
 
-    #[ListenTo(BeforeAppDispatchEvent::class)]
-    public function beforeAppDispatch(
-        BeforeAppDispatchEvent $event
-    ): void {
-        if ($this->disableCollection) {
-            return;
-        }
-
-        $container = $event->getContainer();
-        $app = $container->get(AppContext::class);
-        $collector = $container->get('debugger.collector');
-
-        $chronosService = $app->service(ChronosService::class);
-
-        // System info
-        $info = [];
-        $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
-
-        $collector['system'] = $info;
-    }
-
     #[ListenTo(BeforeControllerDispatchEvent::class)]
     public function beforeControllerDispatch(
         BeforeControllerDispatchEvent $event
@@ -164,6 +198,8 @@ class DebuggerSubscriber
         if ($this->disableCollection) {
             return;
         }
+
+        $this->profiler->mark('BeforeControllerDispatch');
 
         /** @var AppContext $app */
         $app = $this->container->get(AppContext::class);
@@ -197,6 +233,11 @@ class DebuggerSubscriber
         $systemCollector['php_version'] = PHP_VERSION;
         $systemCollector['messages'] = $session->getFlashBag()->peek();
         $systemCollector['config'] = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
+
+        // Timeline
+        $profiler = $this->container->get(ProfilerFactory::class)->getInstances();
+
+        $collector->setDeep('profiler', $profiler);
 
         // Database
         $connections = $app->config('database.connections') ?? [];

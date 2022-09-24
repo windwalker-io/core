@@ -149,6 +149,7 @@ class DashboardRepository
         $folder->appendPath('/system.json')->write(json_encode($collector['system']));
         $folder->appendPath('/routing.json')->write(json_encode($collector['routing']));
         $folder->appendPath('/http.json')->write(json_encode($collector['http']));
+        $folder->appendPath('/profiler.json')->write(json_encode($collector['profiler']));
 
         return $folder;
     }

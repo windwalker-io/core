@@ -15,6 +15,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
+use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Core\Service\FilterService;
@@ -56,6 +57,7 @@ class AppProvider implements ServiceProviderInterface
         $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
         $container->prepareSharedObject(PackageRegistry::class);
+        $container->prepareSharedObject(ProfilerFactory::class);
 
         $this->prepareEvents($container);
 

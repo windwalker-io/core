@@ -47,6 +47,13 @@
               Routing
             </router-link>
           </div>
+          <div class="nav-item nav-item--timeline">
+            <router-link to="/timeline"
+              class="c-sidebar-menu-item nav-link"
+              :class="{ active: currentRoute === 'timeline' }">
+              Timeline
+            </router-link>
+          </div>
           <div class="nav-item nav-item--db">
             <router-link to="/db"
               class="c-sidebar-menu-item nav-link"
