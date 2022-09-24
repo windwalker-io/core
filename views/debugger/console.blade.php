@@ -67,7 +67,7 @@ use Windwalker\Core\Router\SystemUri;
         </div>
     </a>
     <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
-        href="{{ $nav->to('debugger::home') }}#routing/{{ $collector['id'] }}"
+        href="{{ $nav->to('debugger::home') }}#timeline/{{ $collector['id'] }}"
         target="_blank"
     >
         <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3 ">
@@ -76,7 +76,7 @@ use Windwalker\Core\Router\SystemUri;
         </div>
     </a>
     <a class="wd-px-5 wd-flex wd-items-center hover:wd-bg-gray-700 wd-no-underline"
-        href="{{ $nav->to('debugger::home') }}#routing/{{ $collector['id'] }}"
+        href="{{ $nav->to('debugger::home') }}#timeline/{{ $collector['id'] }}"
         target="_blank"
     >
         <div class="wd-bg-white wd-text-gray-800 wd-rounded-full wd-px-3 ">
