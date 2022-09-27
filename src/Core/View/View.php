@@ -59,6 +59,8 @@ class View implements EventAwareInterface
 
     protected ?ResponseInterface $response = null;
 
+    protected bool $booted = false;
+
     /**
      * View constructor.
      *
@@ -76,8 +78,17 @@ class View implements EventAwareInterface
         array $options = []
     ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
+    }
+
+    public function boot(): void
+    {
+        if ($this->booted) {
+            return;
+        }
 
         $this->addEventDealer($this->app);
+
+        $this->booted = true;
     }
 
     /**
@@ -140,6 +151,8 @@ class View implements EventAwareInterface
 
     public function render(array $data = []): ResponseInterface
     {
+        $this->boot();
+
         $vm = $this->getViewModel();
 
         if (!$vm instanceof ViewModelInterface && method_exists($vm, 'prepare')) {
