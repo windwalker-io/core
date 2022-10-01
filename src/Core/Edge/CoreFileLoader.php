@@ -16,17 +16,21 @@ use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Edge\Exception\LayoutNotFoundException;
 use Windwalker\Edge\Loader\EdgeFileLoader;
 use Windwalker\Edge\Loader\EdgeLoaderInterface;
+use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
  * The EdgeFileLoader class.
  */
 class CoreFileLoader implements EdgeLoaderInterface
 {
+    use InstanceCacheTrait;
+
     /**
      * EdgeFileLoader constructor.
      *
      * @param  EdgeFileLoader      $loader
      * @param  LayoutPathResolver  $pathResolver
+     * @param  array               $extensions
      */
     public function __construct(
         protected EdgeFileLoader $loader,
@@ -44,22 +48,27 @@ class CoreFileLoader implements EdgeLoaderInterface
      */
     public function find(string $key): string
     {
-        try {
-            return $this->pathResolver->resolveLayout(
-                $key,
-                $this->extensions
-            );
-        } catch (RuntimeException $e) {
-            if ($this->loader->has($key)) {
-                return $this->loader->find($key);
-            }
+        return $this->once(
+            $key,
+            function () use ($key) {
+                try {
+                    return $this->pathResolver->resolveLayout(
+                        $key,
+                        $this->extensions
+                    );
+                } catch (RuntimeException $e) {
+                    if ($this->loader->has($key)) {
+                        return $this->loader->find($key);
+                    }
 
-            throw new LayoutNotFoundException(
-                $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
+                    throw new LayoutNotFoundException(
+                        $e->getMessage(),
+                        $e->getCode(),
+                        $e
+                    );
+                }
+            }
+        );
     }
 
     /**

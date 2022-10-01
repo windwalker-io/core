@@ -54,7 +54,7 @@ class PathResolver
     public function resolve(string $path): ?string
     {
         if (!str_starts_with($path, '@')) {
-            return Path::normalize($this->addBase($path));
+            return $this->addBase($path);
         }
 
         if (str_contains($path, '\\')) {
@@ -78,7 +78,7 @@ class PathResolver
             );
         }
 
-        return Path::normalize($base . '/' . $path);
+        return $base . '/' . $path;
     }
 
     public function addBase(string $path, string $base = '@root'): string

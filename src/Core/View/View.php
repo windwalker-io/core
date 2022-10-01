@@ -395,7 +395,7 @@ class View implements EventAwareInterface
         $classNames = [];
 
         $root = $this->app->config('asset.namespace_base');
-        $fullName = ltrim(Str::removeLeft($fullName, $root), '\\');
+        $fullName = ltrim(Str::removeLeft($fullName, $root, 'ascii'), '\\');
 
         $names = explode('\\', $fullName);
         $shortName = array_pop($names);
@@ -539,7 +539,7 @@ class View implements EventAwareInterface
         $ns = $ref->getNamespaceName();
 
         if (str_starts_with($ns, $root)) {
-            return Str::removeLeft($ns, $root);
+            return Str::removeLeft($ns, $root, 'ascii');
         }
 
         return substr($ns, strpos($ns, 'Module') + 7);

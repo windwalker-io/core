@@ -105,25 +105,29 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $options |= $this->options;
 
-        $navigator = $this;
+        $id = $route . ':' . $options;
 
-        if (!($options & static::IGNORE_EVENTS)) {
-            $event = $this->emit(
-                BeforeRouteBuildEvent::class,
-                compact('navigator', 'query', 'route', 'options')
-            );
-
-            $route = $event->getRoute();
-            $options = $event->getOptions();
-            $query = $event->getQuery();
+        if ($query !== []) {
+            $id .= ':' . json_encode($query);
         }
 
-        $handler = function (array $query) use ($navigator, $options, $route): array {
-            $id = $route . ':' . json_encode($query);
+        return $this->once(
+            $id,
+            function () use ($options, $query, $route) {
+                $navigator = $this;
 
-            return $this->once(
-                'route:' . $id,
-                function () use ($query, $route, $options, $navigator) {
+                if (!($options & static::IGNORE_EVENTS)) {
+                    $event = $this->emit(
+                        BeforeRouteBuildEvent::class,
+                        compact('navigator', 'query', 'route', 'options')
+                    );
+
+                    $route = $event->getRoute();
+                    $options = $event->getOptions();
+                    $query = $event->getQuery();
+                }
+
+                $handler = function (array $query) use ($navigator, $options, $route): array {
                     $routeObject = $this->findRoute($route);
 
                     if (!$routeObject) {
@@ -151,11 +155,11 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                     }
 
                     return [$url, $query, $routeObject];
-                }
-            );
-        };
+                };
 
-        return $this->createRouteUri($handler, $query, $options);
+                return $this->createRouteUri($handler, $query, $options);
+            }
+        );
     }
 
     /**

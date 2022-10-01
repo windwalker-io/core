@@ -22,6 +22,7 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
 use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
+use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
  * The WindwalkerExtension class.
@@ -33,6 +34,8 @@ class WindwalkerExtension implements
     DirectivesExtensionInterface,
     GlobalVariablesExtensionInterface
 {
+    use InstanceCacheTrait;
+
     /**
      * WindwalkerExtension constructor.
      *
@@ -310,27 +313,32 @@ class WindwalkerExtension implements
      */
     public function getGlobals(): array
     {
-        $globals = [];
+        return $this->once(
+            'globals',
+            function () {
+                $globals = [];
 
-        $globals['app'] = $this->app;
-        $globals['uri'] = $this->app->resolve(SystemUri::class);
-        $globals['chronos'] = $this->app->resolve(ChronosService::class);
-        $globals['asset'] = $this->app->resolve(AssetService::class);
-        // $globals['theme'] = $this->app->resolve(ThemeInterface::class);
-        $globals['lang'] = $this->app->resolve(LangService::class);
+                $globals['app'] = $this->app;
+                $globals['uri'] = $this->app->resolve(SystemUri::class);
+                $globals['chronos'] = $this->app->resolve(ChronosService::class);
+                $globals['asset'] = $this->app->resolve(AssetService::class);
+                // $globals['theme'] = $this->app->resolve(ThemeInterface::class);
+                $globals['lang'] = $this->app->resolve(LangService::class);
 
-        $navOptions = RouteUri::MODE_MUTE;
+                $navOptions = RouteUri::MODE_MUTE;
 
-        if ($this->app->isDebug()) {
-            $navOptions |= RouteUri::DEBUG_ALERT;
-        }
+                if ($this->app->isDebug()) {
+                    $navOptions |= RouteUri::DEBUG_ALERT;
+                }
 
-        $globals['nav'] = $this->app->resolve(Navigator::class)
-            ->withOptions($navOptions);
+                $globals['nav'] = $this->app->resolve(Navigator::class)
+                    ->withOptions($navOptions);
 
-        return array_merge(
-            $globals,
-            $this->app->service(RendererService::class)->getGlobals()
+                return array_merge(
+                    $globals,
+                    $this->app->service(RendererService::class)->getGlobals()
+                );
+            }
         );
     }
 }

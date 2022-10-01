@@ -37,6 +37,8 @@ class RouteUri extends Uri implements NavConstantInterface
 
     protected int $status = 303;
 
+    protected ?string $cache = null;
+
     /**
      * RouteUri constructor.
      *
@@ -312,6 +314,10 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function __toString(): string
     {
+        if ($this->cache !== null) {
+            return $this->cache;
+        }
+
         if ($this->handler instanceof Closure) {
             $vars = [];
 
@@ -357,14 +363,14 @@ class RouteUri extends Uri implements NavConstantInterface
         $options = $this->navigator->getOptions() | $this->options;
 
         if ($options & static::TYPE_RAW) {
-            return $uri;
+            return $this->cache = $uri;
         }
 
         if ($options & static::TYPE_FULL) {
-            return $this->navigator->absolute($uri, static::TYPE_FULL);
+            return $this->cache = $this->navigator->absolute($uri, static::TYPE_FULL);
         }
 
-        return $this->navigator->absolute($uri, static::TYPE_PATH);
+        return $this->cache = $this->navigator->absolute($uri, static::TYPE_PATH);
     }
 
     public function withMessage(string|array $messages, string $type = 'info'): static
@@ -406,5 +412,11 @@ class RouteUri extends Uri implements NavConstantInterface
     public function __clone(): void
     {
         $this->handledData = null;
+        $this->cache = null;
+    }
+
+    public function resetCache(): void
+    {
+        $this->cache = null;
     }
 }

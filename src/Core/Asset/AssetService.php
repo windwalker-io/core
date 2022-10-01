@@ -28,6 +28,7 @@ use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
 use Windwalker\Uri\UriNormalizer;
+use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
@@ -42,6 +43,7 @@ use function Windwalker\uid;
 class AssetService implements EventAwareInterface
 {
     use CoreEventAwareTrait;
+    use InstanceCacheTrait;
 
     /**
      * Property styles.
@@ -199,19 +201,35 @@ class AssetService implements EventAwareInterface
 
     public function addLink(string $type, string $url, array $options = [], array $attrs = []): AssetLink
     {
-        $alias = $this->resolveRawAlias($url);
+        // Cache same url and options to enhance performance
+        $key = "$type:$url";
 
-        $link = $alias ?? new AssetLink($this->handleUri($url), $options);
-
-        $link = $link->withOptions($options);
-
-        foreach ($attrs as $name => $value) {
-            $link = $link->withAttribute($name, $value);
+        if ($options !== []) {
+            $key .= ':' . json_encode($options);
         }
 
-        $this->$type[$url] = $link;
+        if ($attrs !== []) {
+            $key .= ':' . json_encode($attrs);
+        }
 
-        return $link;
+        return $this->once(
+            $key,
+            function () use ($options, $url, $attrs, $type) {
+                $alias = $this->resolveRawAlias($url);
+
+                $link = $alias ?? new AssetLink($this->handleUri($url), $options);
+
+                $link = $link->withOptions($options);
+
+                foreach ($attrs as $name => $value) {
+                    $link = $link->withAttribute($name, $value);
+                }
+
+                $this->$type[$url] = $link;
+
+                return $link;
+            }
+        );
     }
 
     /**
@@ -437,13 +455,13 @@ class AssetService implements EventAwareInterface
             return $this->version;
         }
 
-        if ($this->config->getDeep('app.debug')) {
+        if ($this->isDebug()) {
             return $this->version = uid();
         }
 
-        $sumFile = $this->pathResolver->resolve(
-            $this->config->getDeep('asset.version_file')
-        );
+        $versionFile = $this->cacheStorage['version.file'] ??= $this->config->getDeep('asset.version_file');
+
+        $sumFile = $this->pathResolver->resolve($versionFile);
 
         if (!is_file($sumFile)) {
             return $this->version = $this->detectVersion();
@@ -492,7 +510,7 @@ class AssetService implements EventAwareInterface
         $assetUri = $this->path;
 
         if (static::isAbsoluteUrl($assetUri)) {
-            return $version = md5($assetUri . $this->config->getDeep('app.secret'));
+            return $version = md5($assetUri . $this->getAppSecret());
         }
 
         $time = '';
@@ -512,7 +530,7 @@ class AssetService implements EventAwareInterface
             $time .= $file->getMTime();
         }
 
-        return $version = md5($this->config->getDeep('app.secret') . $time);
+        return $version = md5($this->getAppSecret() . $time);
     }
 
     /**
@@ -874,17 +892,26 @@ class AssetService implements EventAwareInterface
         ?string &$assetFile = null,
         ?string &$assetMinFile = null
     ): array {
-        $ext = Path::getExtension($uri);
+        $cache = $this->once(
+            'uri:' . $uri,
+            function () use ($uri) {
+                $ext = Path::getExtension($uri);
 
-        if (Str::endsWith($uri, '.min.' . $ext)) {
-            $assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
-            $assetMinFile = $uri;
-        } else {
-            $assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
-            $assetFile = $uri;
-        }
+                if (Str::endsWith($uri, '.min.' . $ext)) {
+                    $assetFile = substr($uri, 0, -strlen('.min.' . $ext)) . '.' . $ext;
+                    $assetMinFile = $uri;
+                } else {
+                    $assetMinFile = substr($uri, 0, -strlen('.' . $ext)) . '.min.' . $ext;
+                    $assetFile = $uri;
+                }
 
-        return [$assetFile, $assetMinFile];
+                return [$assetFile, $assetMinFile];
+            }
+        );
+
+        [$assetFile, $assetMinFile] = $cache;
+
+        return $cache;
     }
 
     /**
@@ -1046,7 +1073,7 @@ class AssetService implements EventAwareInterface
      */
     public function getAssetFolder(): string
     {
-        return $this->config->getDeep('asset.folder') ?? 'assets';
+        return $this->cacheStorage['asset.folder'] ??= ($this->config->getDeep('asset.folder') ?? 'assets');
     }
 
     /**
@@ -1100,7 +1127,7 @@ class AssetService implements EventAwareInterface
      */
     public function isDebug(): bool
     {
-        return $this->config->getDeep('app.debug');
+        return $this->cacheStorage['debug'] ??= $this->config->getDeep('app.debug');
     }
 
     public function startTeleport(string $name, array $data = [], string $profile = 'main'): static
@@ -1178,5 +1205,14 @@ class AssetService implements EventAwareInterface
         $this->teleports = $teleports;
 
         return $this;
+    }
+
+    /**
+     * @return  string
+     *
+     */
+    protected function getAppSecret(): string
+    {
+        return $this->cacheStorage['app.secret'] ??= (string) $this->config->getDeep('app.secret');
     }
 }
