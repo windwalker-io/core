@@ -30,7 +30,7 @@ class MailerProvider implements ServiceProviderInterface
     {
         $container->prepareSharedObject(MailerManager::class);
 
-        $container->bind(
+        $container->bindShared(
             Mailer::class,
             fn(MailerManager $manager) => $manager->get()
         )

@@ -205,7 +205,7 @@ trait ApplicationTrait
                 $listener[0] = $container->resolve($listener[0]);
                 $this->handleListener($container, $dispatcher, $name, $listener);
             } elseif ($container->has($name)) {
-                // EventAwareObject name => Array<EventName, Listeners>
+                // EventAwareObject name => Array<EventName or int, Listeners>
                 $container->extend($name, function (EventAwareInterface $object) use ($name, $listener, $container) {
                     foreach ($listener as $eventName => $eventListener) {
                         $this->handleListener($container, $object->getEventDispatcher(), $eventName, $eventListener);
@@ -215,7 +215,7 @@ trait ApplicationTrait
                 });
             }
         } elseif ($container->has($name)) {
-            // EventAwareObject name => Array<int, Subscriber>
+            // EventAwareObject Array<int, Subscriber>
             $container->extend($name, function (EventAwareInterface $object) use ($listener, $container) {
                 $object->subscribe($container->resolve($listener));
 

@@ -392,6 +392,8 @@ class View implements EventAwareInterface
 
     protected function addBodyClass(string $fullName): void
     {
+        $classNames = [];
+
         $root = $this->app->config('asset.namespace_base');
         $fullName = ltrim(Str::removeLeft($fullName, $root), '\\');
 
@@ -401,19 +403,22 @@ class View implements EventAwareInterface
 
         $stage = null;
 
-        if (\Windwalker\count($names) > 1) {
+        if (count($names) > 1) {
             $stage = $names[array_key_first($names)];
         }
 
         if ($stage) {
-            $this->htmlFrame->addBodyClass('stage-' . StrNormalize::toKebabCase($stage));
+            $classNames[] = 'stage-' . $stage;
         }
 
-        $module = StrNormalize::toKebabCase(implode('-', $names));
+        $module = implode('-', $names);
+        $classNames[] = 'module-' . $module;
+        $classNames[] = 'view-' . $viewName;
+        $classNames[] = 'layout-' . str_replace('.', '-', $this->layout);
 
-        $this->htmlFrame->addBodyClass('module-' . $module);
-        $this->htmlFrame->addBodyClass('view-' . StrNormalize::toKebabCase($viewName));
-        $this->htmlFrame->addBodyClass('layout-' . str_replace('.', '-', $this->layout));
+        $c = StrNormalize::toKebabCase(implode('##', $classNames));
+
+        $this->htmlFrame->addBodyClass(str_replace('##', ' ', $c));
     }
 
     /**

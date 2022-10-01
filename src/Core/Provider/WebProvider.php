@@ -28,6 +28,7 @@ use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Request\ServerRequestFactory;
+use Windwalker\Utilities\Reflection\ReflectAccessor;
 
 /**
  * The RequestProvider class.
