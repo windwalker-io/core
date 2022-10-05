@@ -92,7 +92,7 @@ class ForceSslMiddleware implements MiddlewareInterface
      */
     protected function normalizeCode(int $code): int
     {
-        if ($code < 300 && $code >= 400) {
+        if ($code < 300 || $code >= 400) {
             $code = 303;
         }
 

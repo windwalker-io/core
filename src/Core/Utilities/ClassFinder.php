@@ -38,7 +38,7 @@ class ClassFinder
             if (str_starts_with($ns, $prefix)) {
                 foreach ($paths as $path) {
                     $dir = Path::normalize($path);
-                    $p = Str::removeLeft($ns, $prefix);
+                    $p = Str::removeLeft($ns, $prefix, 'ascii');
                     $dir .= '/' . $p;
 
                     $dirs[] = $dir;
