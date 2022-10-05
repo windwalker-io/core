@@ -38,10 +38,7 @@ class DebugConsole
             $ct = $response->getHeaderLine('content-type');
 
             if (str_contains($ct, 'text/html') || str_contains($ct, 'text/plain')) {
-                $console = $this->renderConsole($tmpl, $collector);
-
-                $body = $response->getBody();
-                $body->write($console);
+                echo $this->renderConsole($tmpl, $collector);
             }
 
             return;

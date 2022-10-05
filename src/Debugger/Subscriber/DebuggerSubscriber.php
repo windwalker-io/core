@@ -13,13 +13,11 @@ namespace Windwalker\Debugger\Subscriber;
 
 use Composer\InstalledVersions;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Event\EventCollector;
-use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
@@ -27,7 +25,6 @@ use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
-use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Profiler\Profiler;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -40,7 +37,6 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
-use Windwalker\Event\Provider\CompositeListenerProvider;
 use Windwalker\Http\Helper\HttpHelper;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
@@ -58,6 +54,16 @@ class DebuggerSubscriber
     public bool $disableCollection = false;
 
     protected Profiler $profiler;
+
+    /**
+     * @var Collection|null
+     */
+    protected ?Collection $collector = null;
+
+    /**
+     * @var Collection|null
+     */
+    protected ?Collection $queue = null;
 
     /**
      * DebuggerSubscriber constructor.
@@ -109,7 +115,7 @@ class DebuggerSubscriber
 
         $container = $event->getContainer();
         $app = $container->get(AppContext::class);
-        $collector = $container->get('debugger.collector');
+        $collector = $this->getCollector();
 
         $chronosService = $app->service(ChronosService::class);
 
@@ -118,6 +124,31 @@ class DebuggerSubscriber
         $info['time'] = $chronosService->createLocal()->format('Y-m-d H:i:s');
 
         $collector['system'] = $info;
+    }
+
+    #[ListenTo(BeforeControllerDispatchEvent::class)]
+    public function beforeControllerDispatch(
+        BeforeControllerDispatchEvent $event
+    ): void {
+        if ($this->disableCollection) {
+            return;
+        }
+
+        $this->profiler->mark('BeforeControllerDispatch');
+
+        $this->getQueue()->push(
+            function () use ($event) {
+                /** @var AppContext $app */
+                $app = $this->container->get(AppContext::class);
+                $collector = $this->getCollector();
+
+                $routing['matched'] = $app->getMatchedRoute();
+                $routing['routes'] = $app->service(Router::class)->getRoutes();
+                $routing['controller'] = $event->getController();
+
+                $collector['routing'] = $routing;
+            }
+        );
     }
 
     #[ListenTo(AfterControllerDispatchEvent::class)]
@@ -149,70 +180,61 @@ class DebuggerSubscriber
 
         $this->profiler->mark('AfterRequest', ['system']);
 
-        /** @var Collection $collector */
-        $collector = $this->container->get('debugger.collector');
+        $this->getQueue()->push(
+            function () use ($app, $event, $appReq) {
+                /** @var Collection $collector */
+                $collector = $this->getCollector();
 
-        $http = [];
+                $http = [];
 
-        $req = $appReq->getRequest();
+                $req = $appReq->getRequest();
 
-        $http['request'] = [
-            'headers' => $req->getHeaders(),
-            'server' => $req->getServerParams(),
-            'attributes' => $req->getAttributes(),
-            'method' => $req->getMethod(),
-            'uri' => $req->getUri(),
-            'query' => $req->getQueryParams(),
-            'cookies' => $req->getCookieParams(),
-            'body' => $req->getParsedBody(),
-            'files' => $req->getUploadedFiles(),
-            'version' => $req->getProtocolVersion(),
-            'target' => $req->getRequestTarget(),
-            'env' => $_ENV ?? [],
-        ];
-        $http['systemUri'] = $appReq->getSystemUri();
-        $http['overrideMethod'] = $appReq->getOverrideMethod();
-        $http['remoteIP'] = HttpHelper::getIp($req->getServerParams());
+                $http['request'] = [
+                    'headers' => $req->getHeaders(),
+                    'server' => $req->getServerParams(),
+                    'attributes' => $req->getAttributes(),
+                    'method' => $req->getMethod(),
+                    'uri' => $req->getUri(),
+                    'query' => $req->getQueryParams(),
+                    'cookies' => $req->getCookieParams(),
+                    'body' => $req->getParsedBody(),
+                    'files' => $req->getUploadedFiles(),
+                    'version' => $req->getProtocolVersion(),
+                    'target' => $req->getRequestTarget(),
+                    'env' => $_ENV ?? [],
+                ];
+                $http['systemUri'] = $appReq->getSystemUri();
+                $http['overrideMethod'] = $appReq->getOverrideMethod();
+                $http['remoteIP'] = HttpHelper::getIp($req->getServerParams());
 
-        $res = $event->getResponse();
+                $res = $event->getResponse();
 
-        $http['response'] = [
-            'status' => $res->getStatusCode(),
-            'statusText' => $res->getReasonPhrase(),
-            'headers' => $res->getHeaders(),
-            'version' => $res->getProtocolVersion(),
-        ];
-        $http['state'] = $app->getState()->all();
+                $http['response'] = [
+                    'status' => $res->getStatusCode(),
+                    'statusText' => $res->getReasonPhrase(),
+                    'headers' => $res->getHeaders(),
+                    'version' => $res->getProtocolVersion(),
+                ];
+                $http['state'] = $app->getState()->all();
 
-        if (InstalledVersions::isInstalled('windwalker/session')) {
-            $http['session'] = $app->service(Session::class)->all();
-            $http['cookies'] = $app->service(CookiesInterface::class)->getStorage();
-        }
+                if (InstalledVersions::isInstalled('windwalker/session')) {
+                    $http['session'] = $app->service(Session::class)->all();
+                    $http['cookies'] = $app->service(CookiesInterface::class)->getStorage();
+                }
 
-        $collector['http'] = $http;
+                $collector['http'] = $http;
 
-        $this->finishCollected($event->getResponse());
-    }
+                $this->finishCollected($event->getResponse());
+            }
+        );
 
-    #[ListenTo(BeforeControllerDispatchEvent::class)]
-    public function beforeControllerDispatch(
-        BeforeControllerDispatchEvent $event
-    ): void {
-        if ($this->disableCollection) {
-            return;
-        }
-
-        $this->profiler->mark('BeforeControllerDispatch');
-
-        /** @var AppContext $app */
-        $app = $this->container->get(AppContext::class);
-        $collector = $this->container->get('debugger.collector');
-
-        $routing['matched'] = $app->getMatchedRoute();
-        $routing['routes'] = $app->service(Router::class)->getRoutes();
-        $routing['controller'] = $event->getController();
-
-        $collector['routing'] = $routing;
+        register_shutdown_function(
+            function () {
+                foreach ($this->getQueue() as $handler) {
+                    $handler();
+                }
+            }
+        );
     }
 
     public function collectOthers(): void
@@ -226,7 +248,7 @@ class DebuggerSubscriber
         $session = $this->container->get(Session::class);
 
         /** @var Collection $collector */
-        $collector = $this->container->get('debugger.collector');
+        $collector = $this->getCollector();
 
         $collector->def('system', []);
 
@@ -311,7 +333,7 @@ class DebuggerSubscriber
             );
 
             /** @var Collection $collector */
-            $collector = $this->container->get('debugger.collector');
+            $collector = $this->getCollector();
 
             $id = uid('ww_', true);
 
@@ -333,5 +355,15 @@ class DebuggerSubscriber
     public function __destruct()
     {
         $this->finishCollected();
+    }
+
+    public function getCollector(): Collection
+    {
+        return $this->collector ??= $this->container->get('debugger.collector');
+    }
+
+    public function getQueue(): Collection
+    {
+        return $this->queue ??= $this->container->get('debugger.queue');
     }
 }

@@ -39,6 +39,16 @@ use Windwalker\Utilities\Reflection\BacktraceHelper;
 #[EventSubscriber]
 class DebuggerPackage extends AbstractPackage implements ServiceProviderInterface, BootableDeferredProviderInterface
 {
+    /**
+     * @var Collection|\Closure[]
+     */
+    protected Collection $collector;
+
+    /**
+     * @var Collection|\Closure[]
+     */
+    protected Collection $queue;
+
     public function register(Container $container): void
     {
         $container->mergeParameters(
@@ -51,7 +61,12 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
         $container->share(
             'debugger.collector',
-            new Collection()
+            $this->collector = new Collection()
+        );
+
+        $container->share(
+            'debugger.queue',
+            $this->queue = new Collection()
         );
 
         $app = $container->get(ApplicationInterface::class);
@@ -85,11 +100,10 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
     public function beforeRequest(BeforeRequestEvent $event): void
     {
         $container = $event->getContainer();
-        $collector = $container->get('debugger.collector');
 
         // Collect DB
         if (InstalledVersions::isInstalled('windwalker/database')) {
-            $this->collectDatabase($container, $collector);
+            $this->collectDatabase($container, $this->collector);
         }
     }
 
@@ -135,28 +149,32 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
                                 $data['time'] = microtime(true) - $startTime;
                                 $data['memory'] = memory_get_usage(false) - $memory;
-                                $data['raw_query'] = (string) $event->getQuery();
-                                $data['debug_query'] = $event->getDebugQueryString();
-                                $data['bounded'] = $event->getBounded();
-                                $data['connection'] = $name;
                                 $data['count'] = $event->getStatement()->countAffected();
-                                $data['backtrace'] = BacktraceHelper::normalizeBacktraces(debug_backtrace());
+                                $backtrace = debug_backtrace();
 
-                                unset($data['start_time']);
+                                $this->queue->push(
+                                    function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
+                                        $data['raw_query'] = (string) $event->getQuery();
+                                        $data['debug_query'] = $event->getDebugQueryString();
+                                        $data['bounded'] = $event->getBounded();
+                                        $data['connection'] = $name;
+                                        $data['backtrace'] = BacktraceHelper::normalizeBacktraces($backtrace);
 
-                                $query = $event->getQuery();
+                                        $query = $event->getQuery();
 
-                                if (
-                                    $db->getPlatform()->getName() === AbstractPlatform::MYSQL
-                                    && $query instanceof Query
-                                    && $query->getType() === Query::TYPE_SELECT
-                                ) {
-                                    $query = clone $query;
-                                    $query->prefix('EXPLAIN');
-                                    $data['explain'] = $db->prepare($query)->all();
-                                }
+                                        if (
+                                            $db->getPlatform()->getName() === AbstractPlatform::MYSQL
+                                            && $query instanceof Query
+                                            && $query->getType() === Query::TYPE_SELECT
+                                        ) {
+                                            $query = clone $query;
+                                            $query->prefix('EXPLAIN');
+                                            $data['explain'] = $db->prepare($query)->all();
+                                        }
 
-                                $dbCollector->push($data);
+                                        $dbCollector->push($data);
+                                    }
+                                );
 
                                 $startTime = null;
                             }
