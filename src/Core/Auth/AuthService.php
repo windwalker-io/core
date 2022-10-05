@@ -61,12 +61,12 @@ class AuthService
 
     public function can(string $policy, mixed $user = null, ...$args): bool
     {
-        return $this->authorize($policy, $user, $args);
+        return $this->authorize($policy, $user, ...$args);
     }
 
     public function cannot(string $policy, mixed $user = null, ...$args): bool
     {
-        return !$this->authorize($policy, $user, $args);
+        return !$this->authorize($policy, $user, ...$args);
     }
 
     /**
