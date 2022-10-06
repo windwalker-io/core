@@ -56,7 +56,7 @@ class AuthService
     {
         $user ??= $this->getUser($user);
 
-        return $this->getAuthorization()->authorize($policy, $user, ...$args);
+        return $this->getAuthorization()->authorize($user, ...$args);
     }
 
     public function can(string $policy, mixed $user = null, ...$args): bool
