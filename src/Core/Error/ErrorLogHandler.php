@@ -77,30 +77,40 @@ class ErrorLogHandler implements ErrorHandlerInterface
         $code = $e->getCode();
 
         if ($code < 400 || $code >= 500) {
-            $message = sprintf(
-                'Code: %s - %s - File: %s (%d)',
-                $e->getCode(),
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            );
-
-            $traces = '';
-
-            foreach (
-                BacktraceHelper::normalizeBacktraces(
-                    $e->getTrace(),
-                    $this->config->get('@root')
-                ) as $i => $trace
-            ) {
-                $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
-            }
+            $message = static::handleExceptionLogText($e, $this->config->get('@root'));
 
             $this->logger->error(
                 $this->config->getDeep('error.log_channel') ?? 'error',
-                $message . "\n" . $traces,
+                $message,
                 ['exception' => $e]
             );
         }
+    }
+
+    /**
+     * @param  Throwable  $e
+     * @param  string     $root
+     *
+     * @return  string
+     */
+    public static function handleExceptionLogText(Throwable $e, string $root): string
+    {
+        $message = sprintf(
+            'Code: %s - %s - File: %s (%d)',
+            $e->getCode(),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        );
+
+        $traces = '';
+
+        foreach (
+            BacktraceHelper::normalizeBacktraces($e->getTrace(), $root) as $i => $trace
+        ) {
+            $traces .= '    #' . ($i + 1) . ' - ' . $trace['function'] . ' ' . $trace['file'] . "\n";
+        }
+
+        return $message . "\n" . $traces;
     }
 }

@@ -15,9 +15,11 @@ use LogicException;
 use ReflectionException;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Error\ErrorLogHandler;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Service\LoggerService;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 
@@ -107,6 +109,8 @@ class DelegatingController implements ControllerInterface
 
             return $nav->back();
         } catch (Throwable $e) {
+            $this->logError($e);
+
             if (
                 $this->app->isDebug()
                 || strtoupper($this->app->getRequestMethod()) === 'GET'
@@ -168,5 +172,25 @@ class DelegatingController implements ControllerInterface
         $this->module = $module;
 
         return $this;
+    }
+
+    /**
+     * @param  Throwable  $e
+     *
+     * @return  void
+     *
+     * @throws ReflectionException
+     * @throws \Windwalker\DI\Exception\DefinitionException
+     */
+    protected function logError(Throwable $e): void
+    {
+        $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
+
+        $this->app->service(LoggerService::class)
+            ->error(
+                $this->app->config('error.log_channel') ?? 'error',
+                $message,
+                ['exception' => $e]
+            );
     }
 }
