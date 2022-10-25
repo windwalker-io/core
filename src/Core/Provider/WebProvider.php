@@ -63,7 +63,10 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(ControllerDispatcher::class);
 
         // Navigator
-        $container->prepareSharedObject(Navigator::class);
+        $container->prepareSharedObject(
+            Navigator::class,
+            fn(Navigator $nav, Container $container) => $nav->addEventDealer($container->get(AppContext::class))
+        );
 
         // Renderer
         $this->extendRenderer($container);
