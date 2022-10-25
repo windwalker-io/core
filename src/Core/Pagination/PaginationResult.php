@@ -248,7 +248,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * getPages
      *
-     * @return  array
+     * @return  array<PageItem>
      */
     public function getPages(): array
     {
