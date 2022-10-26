@@ -15,13 +15,13 @@
   "author": "Simon Asika",
   "license": "MIT",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.2.0",
-    "@fortawesome/free-solid-svg-icons": "^6.2.0",
-    "@fortawesome/vue-fontawesome": "^3.0.1",
-    "axios": "^0.21.1",
-    "dayjs": "^1.11.5"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
+    "dayjs": "^1.11.5",
+    "@fortawesome/vue-fontawesome": "^3.0.1",
+    "@fortawesome/fontawesome-svg-core": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@tailwindcss/custom-forms": "^0.2.1",
     "@tailwindcss/ui": "^0.7.2",
     "@windwalker-io/fusion": "^1.0",
