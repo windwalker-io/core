@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Html;
 
 use Stringable;
-
 use Windwalker\DOM\DOMElement;
 
 use function Windwalker\DOM\h;
