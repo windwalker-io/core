@@ -13,6 +13,8 @@ namespace Windwalker\Core\Html;
 
 use Stringable;
 
+use Windwalker\DOM\DOMElement;
+
 use function Windwalker\DOM\h;
 
 /**
@@ -56,13 +58,24 @@ class Metadata
         }
 
         foreach ((array) $content as $item) {
-            $this->metadata[$name][] = h('meta', [
-                'name' => $this->escape($name),
-                'content' => $this->escape($item),
-            ]);
+            $this->metadata[$name][] = $this->createMetadataTag($name, $item);
         }
 
         return $this;
+    }
+
+    /**
+     * @param  string  $name
+     * @param  mixed   $content
+     *
+     * @return  DOMElement
+     */
+    protected function createMetadataTag(string $name, mixed $content): DOMElement
+    {
+        return h('meta', [
+            'name' => $this->escape($name),
+            'content' => $this->escape($content),
+        ]);
     }
 
     /**
@@ -101,13 +114,18 @@ class Metadata
         }
 
         foreach ((array) $content as $item) {
-            $this->openGraphs[$type][] = h('meta', [
-                'property' => $this->escape($type),
-                'content' => $this->escape($item),
-            ]);
+            $this->openGraphs[$type][] = $this->createOpenGraphTag($type, $item);
         }
 
         return $this;
+    }
+
+    public function createOpenGraphTag(string $type, string $content): DOMElement
+    {
+        return h('meta', [
+            'property' => $this->escape($type),
+            'content' => $this->escape($content),
+        ]);
     }
 
     /**
