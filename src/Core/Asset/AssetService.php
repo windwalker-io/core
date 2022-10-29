@@ -288,16 +288,16 @@ class AssetService implements EventAwareInterface
         $this->normalizeUri($uri, $assetFile, $assetMinFile);
 
         if (is_file($file)) {
-            return $this->addUriBase($uri, 'path');
+            return $this->addAssetBase($uri, 'path');
         }
 
         if (!$strict) {
             if (is_file($this->addSysPath($assetFile))) {
-                return $this->addUriBase($assetFile, 'path');
+                return $this->addAssetBase($assetFile, 'path');
             }
 
             if (is_file($this->addSysPath($assetMinFile))) {
-                return $this->addUriBase($assetMinFile, 'path');
+                return $this->addAssetBase($assetMinFile, 'path');
             }
         }
 
@@ -856,25 +856,25 @@ class AssetService implements EventAwareInterface
         // Use uncompressed file first
         if ($this->isDebug()) {
             if (is_file($this->addSysPath($assetFile))) {
-                return $this->addUriBase($assetFile, $path);
+                return $this->addAssetBase($assetFile, $path);
             }
 
             if (is_file($this->addSysPath($assetMinFile))) {
-                return $this->addUriBase($assetMinFile, $path);
+                return $this->addAssetBase($assetMinFile, $path);
             }
         } else {
             // Use min file first
             if (is_file($this->addSysPath($assetMinFile))) {
-                return $this->addUriBase($assetMinFile, $path);
+                return $this->addAssetBase($assetMinFile, $path);
             }
 
             if (is_file($this->addSysPath($assetFile))) {
-                return $this->addUriBase($assetFile, $path);
+                return $this->addAssetBase($assetFile, $path);
             }
         }
 
         // All file not found, fallback to default uri.
-        return $this->addUriBase($uri, $path);
+        return $this->addAssetBase($uri, $path);
     }
 
     /**
@@ -927,7 +927,24 @@ class AssetService implements EventAwareInterface
     public function addUriBase(string $uri, string $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
+            $uri = $this->systemUri::normalize($this->systemUri->$path . '/' . $uri);
+        }
+
+        if ($path === 'root' && $uri[0] === '/') {
+            $uri = $this->systemUri->host($uri);
+        }
+
+        return $uri;
+    }
+
+    public function addAssetBase(string $uri, string $path = 'path'): string
+    {
+        if (!static::isAbsoluteUrl($uri)) {
             $uri = $this->systemUri::normalize($this->$path . '/' . $uri);
+        }
+
+        if ($path === 'root' && $uri[0] === '/') {
+            $uri = $this->systemUri->host($uri);
         }
 
         return $uri;
