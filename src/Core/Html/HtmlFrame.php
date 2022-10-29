@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Html;
 
 use Stringable;
+use Windwalker\Core\Asset\AssetService;
 use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
@@ -76,8 +77,10 @@ class HtmlFrame
      *
      * @param  Metadata|null  $metadata
      */
-    public function __construct(Metadata $metadata = null)
-    {
+    public function __construct(
+        protected AssetService $asset,
+        Metadata $metadata = null
+    ) {
         $this->body = HTMLElement::create('body');
         $this->html = HTMLElement::create('html');
         $this->metadata = $metadata ?? new Metadata();
@@ -394,6 +397,8 @@ class HtmlFrame
         $this->getMetadata()->removeOpenGraph('og:image');
 
         foreach ($images as $image) {
+            $image = $this->asset->addAssetBase($image, 'root');
+
             $this->addOpenGraph('og:image', $image);
         }
 
