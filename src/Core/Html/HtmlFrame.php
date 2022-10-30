@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Html;
 
+use Fig\Link\Link;
+use JetBrains\PhpStorm\ExpectedValues;
+use Psr\Link\LinkInterface;
 use Stringable;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\DOM\DOMElement;
@@ -154,24 +157,112 @@ class HtmlFrame
         return $this;
     }
 
+    public function addLink(string|LinkInterface $relOrLink, string $href = '', array $attrs = []): DOMElement
+    {
+        if (is_string($relOrLink)) {
+            $link = new Link($relOrLink, $href);
+        } else {
+            $link = $relOrLink;
+        }
+
+        if ($href) {
+            $link = $link->withHref($href);
+        }
+
+        foreach ($attrs as $name => $value) {
+            $link = $link->withAttribute($name, $value);
+        }
+
+        return $this->addCustomTag($link);
+    }
+
+    public function addHreflang(
+        string $hreflang,
+        string $href,
+        array $attrs = [],
+    ): DOMElement {
+        $link = new Link('alternate');
+        $link = $link->withHref($href)
+            ->withAttribute('hreflang', $hreflang);
+
+        return $this->addLink($link, attrs: $attrs);
+    }
+
+    public function addPreload(
+        #[ExpectedValues(
+            [
+                'audio',
+                'document',
+                'embed',
+                'fetch',
+                'font',
+                'image',
+                'object',
+                'script',
+                'style',
+                'track',
+                'worker',
+                'video',
+            ]
+        )]
+        string $as,
+        string $href,
+        array $attrs = [],
+        ?string $type = null,
+        ?string $media = null,
+    ): DOMElement {
+        $link = (new PreloadLink('preload', $href))
+            ->withAs($as);
+
+        if ($type) {
+            $link = $link->withType($type);
+        }
+
+        if ($media) {
+            $link = $link->withMedia($media);
+        }
+
+        return $this->addLink($link, attrs: $attrs);
+    }
+
+    public static function linkToElement(LinkInterface $link): DOMElement
+    {
+        $attribs = array_merge(
+            [
+                'href' => $link->getHref(),
+                'rel' => $link->getRels()[0] ?? '',
+            ],
+            $link->getAttributes()
+        );
+
+        return h('link', $attribs);
+    }
+
     /**
      * addCustomTag
      *
-     * @param  string|DOMElement       $tag
-     * @param  string|Stringable|null  $content
-     * @param  array                   $attribs
+     * @param  string|LinkInterface|DOMElement  $tag
+     * @param  string|Stringable|null           $content
+     * @param  array                            $attribs
      *
-     * @return  static
+     * @return  DOMElement
      */
-    public function addCustomTag(string|DOMElement $tag, string|Stringable|null $content = null, $attribs = [])
-    {
+    public function addCustomTag(
+        string|LinkInterface|DOMElement $tag,
+        string|Stringable|null $content = null,
+        array $attribs = []
+    ): DOMElement {
+        if ($tag instanceof LinkInterface) {
+            $tag = self::linkToElement($tag);
+        }
+
         if (!$tag instanceof DOMElement) {
             $tag = h($tag, $attribs, $content);
         }
 
         $this->customTags[] = $tag;
 
-        return $this;
+        return $tag;
     }
 
     /**
@@ -187,7 +278,7 @@ class HtmlFrame
     /**
      * Method to set property customTags
      *
-     * @param  array  $customTags
+     * @param  array<DOMElement>  $customTags
      *
      * @return  static  Return self to support chaining.
      */
