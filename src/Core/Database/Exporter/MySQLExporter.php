@@ -39,10 +39,11 @@ class MySQLExporter extends AbstractExporter
 
         $options = $this->db->getDriver()->getOptions();
         $cmd = sprintf(
-            '%s --defaults-extra-file=%s %s',
+            '%s --defaults-extra-file=%s %s %s',
             $md,
             $this->createPasswordCnfFile($options),
             $options['dbname'],
+            env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
         );
 
         $process = $this->app->createProcess($cmd);

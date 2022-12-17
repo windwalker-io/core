@@ -21,8 +21,8 @@ use Symfony\Component\Process\Process;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Console\CmdWrapper;
+use Windwalker\Core\Console\ConsoleApplication;
 
 use function Windwalker\cmd;
 
@@ -35,9 +35,9 @@ class RunCommand implements CommandInterface
     /**
      * RunCommand constructor.
      *
-     * @param  ApplicationInterface  $app
+     * @param  ConsoleApplication  $app
      */
-    public function __construct(protected ApplicationInterface $app)
+    public function __construct(protected ConsoleApplication $app)
     {
     }
 
@@ -95,11 +95,7 @@ class RunCommand implements CommandInterface
 
         foreach ($names as $name) {
             if (!isset($scripts[$name])) {
-                throw new CommandNotFoundException(
-                    sprintf(
-                        "Script name: $name not found."
-                    )
-                );
+                throw new CommandNotFoundException("Script name: $name not found.");
             }
 
             $io->newLine();
@@ -153,7 +149,7 @@ class RunCommand implements CommandInterface
      *
      * @return  void
      */
-    protected function listScripts(array $scripts, IOInterface $io)
+    protected function listScripts(array $scripts, IOInterface $io): void
     {
         if (!$scripts) {
             $io->writeln("\nNo custom scripts.\n");
