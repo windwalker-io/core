@@ -353,7 +353,10 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $container->share(WebApplication::class, $app);
 
-        $this->getContainer()->registerServiceProvider(new WebProvider($app));
+        $container->registerServiceProvider(new WebProvider($app));
+
+        // Override back ApplicationInterface
+        $container->alias(ApplicationInterface::class, static::class);
 
         $container->share(ServerRequest::class, $request);
 
