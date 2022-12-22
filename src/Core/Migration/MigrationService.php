@@ -321,6 +321,7 @@ class MigrationService implements EventAwareInterface
         $format = $options['version_format'] ?? 'YmdHi%04d';
         $i = 1;
         $date = new DateTimeImmutable('now');
+        $entity = $options['entity'] ?? 'Table';
 
         do {
             $dateFormat = sprintf($format, $i);
@@ -333,7 +334,7 @@ class MigrationService implements EventAwareInterface
         return $codeGenerator->from($source)
             ->replaceTo(
                 $dir,
-                compact('name', 'version', 'year'),
+                compact('name', 'version', 'year', 'entity'),
             );
     }
 

@@ -46,6 +46,12 @@ class CreateCommand extends AbstractMigrationCommand
             InputArgument::REQUIRED,
             'Migration name',
         );
+
+        $command->addArgument(
+            'entity',
+            InputArgument::OPTIONAL,
+            'Entity name',
+        );
     }
 
     /**
@@ -58,13 +64,15 @@ class CreateCommand extends AbstractMigrationCommand
     public function execute(IOInterface $io): int
     {
         $name = $io->getArgument('name');
+        $entity = $io->getArgument('entity');
 
         $migrationService = $this->app->make(MigrationService::class);
 
         $migrationService->copyMigrationFile(
             $this->getMigrationFolder($io),
             $name,
-            __DIR__ . '/../../../../resources/templates/migration/*'
+            __DIR__ . '/../../../../resources/templates/migration/*',
+            compact('entity')
         );
 
         return 0;
