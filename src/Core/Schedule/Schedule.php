@@ -30,6 +30,7 @@ use Windwalker\DI\Exception\DependencyResolutionException;
  * @method ScheduleEvent daily(string $name)
  * @method ScheduleEvent hourly(string $name)
  * @method ScheduleEvent minutely(string $name)
+ * @method ScheduleEvent always(string $name)
  *
  * @since  3.5.3
  */
@@ -182,6 +183,7 @@ class Schedule
             'daily',
             'hourly',
             'minutely',
+            'always',
         ];
 
         if (in_array(strtolower($name), $exprs)) {
