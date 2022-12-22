@@ -87,11 +87,13 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
             $envelope = null;
         }
 
-        if ($flags & static::FORCE_SEND || !$this->container->getParam('mail.disable_all')) {
+        $enabled = env('MAIL_ENABLED');
+
+        if ($flags & static::FORCE_SEND || $enabled) {
             return $this->transport->send($message, $envelope);
         }
 
-        return new SentMessage($message, $envelope);
+        return new SentMessage($message, Envelope::create($message));
     }
 
     protected function prepareMessage(RawMessage $message, int $flags = 0): void

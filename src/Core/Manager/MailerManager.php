@@ -15,14 +15,14 @@ use DomainException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
-use Symfony\Component\Mime\Address;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
 use Windwalker\Utilities\Arr;
 
 /**
  * The MailerManager class.
+ *
+ * @method Mailer get(?string $name = null, ...$args)
  */
 class MailerManager extends AbstractManager
 {
@@ -35,10 +35,6 @@ class MailerManager extends AbstractManager
     {
         if (!class_exists(Transport::class)) {
             throw new DomainException('Please install symfony/mailer ^5.0||^6.0 first.');
-        }
-
-        if (!env('MAIL_ENABLED')) {
-            $options['dsn'] = 'null://null';
         }
 
         $options = Arr::mergeRecursive(

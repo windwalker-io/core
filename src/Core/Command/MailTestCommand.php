@@ -67,6 +67,12 @@ class MailTestCommand implements CommandInterface
             InputOption::VALUE_REQUIRED,
             'Connection name.'
         );
+        $command->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force send if disabled.'
+        );
     }
 
     /**
@@ -80,6 +86,7 @@ class MailTestCommand implements CommandInterface
 
         $custom = $io->getOption('message');
         $subject = $io->getOption('subject');
+        $force = $io->getOption('force');
 
         if ($custom) {
             $custom = '<p><strong>Custom message:</strong> ' . $custom . '</p>';
@@ -110,7 +117,7 @@ class MailTestCommand implements CommandInterface
             ->to(...$recipients)
             ->from($from)
             ->html($body)
-            ->send(null, MailerInterface::FORCE_SEND);
+            ->send(null, $force ? MailerInterface::FORCE_SEND : 0);
 
         $io->writeln(sprintf('Test mail sent to: <info>%s</info>.', implode(' ', $recipients)));
 
