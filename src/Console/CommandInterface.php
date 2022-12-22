@@ -18,6 +18,13 @@ use Symfony\Component\Console\Command\Command;
  */
 interface CommandInterface
 {
+    // see https://tldp.org/LDP/abs/html/exitcodes.html
+    public const SUCCESS = 0;
+
+    public const FAILURE = 1;
+
+    public const INVALID = 2;
+
     /**
      * configure
      *
