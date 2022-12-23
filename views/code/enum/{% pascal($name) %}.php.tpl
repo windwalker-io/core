@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace {% $ns %};
 
 use MyCLabs\Enum\Enum;
+use Windwalker\Utilities\Enum\EnumSingleton;
 use Windwalker\Utilities\Enum\EnumTranslatableInterface;
 use Windwalker\Utilities\Enum\EnumTranslatableTrait;
 use Windwalker\Utilities\Contract\LanguageInterface;
@@ -21,23 +22,20 @@ use Windwalker\Utilities\Contract\LanguageInterface;
  *
  * @options Add options here.
  */
-class {% pascal($name) %} extends Enum implements EnumTranslatableInterface
+class {% pascal($name) %} extends EnumSingleton implements EnumTranslatableInterface
 {
     use EnumTranslatableTrait;
 
-    // public const OPTION = '';
+    // public const CASE = '';
 
     /**
-     * Creates a new value of some type
-     *
-     * @psalm-pure
+     * Unable to directly new this object.
      *
      * @param  mixed  $value
      *
-     * @psalm-param T $value
      * @throws \UnexpectedValueException if incompatible type is given.
      */
-    public function __construct(mixed $value)
+    protected function __construct(mixed $value)
     {
         parent::__construct($value);
     }
