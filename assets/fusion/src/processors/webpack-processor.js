@@ -54,6 +54,10 @@ export default class WebpackProcessor extends JsProcessor {
     return this.pipe(named())
       .pipe(
         webpackStream(options.webpack)
+          .on('error', () => {
+            // Must force webpack stream end
+            this.stream.emit('end');
+          })
       );
   }
 
