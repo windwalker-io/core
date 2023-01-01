@@ -22,24 +22,28 @@ interface ExporterInterface
      * Export to PSR7 stream.
      *
      * @param  StreamInterface  $stream
+     * @param  array            $options
      *
      * @return  void
      */
-    public function exportToPsrStream(StreamInterface $stream): void;
+    public function exportToPsrStream(StreamInterface $stream, array $options = []): void;
 
     /**
      * Export to stream resource.
      *
      * @param  resource  $resource
+     * @param  array     $options
      *
      * @return  void
      */
-    public function exportToStream($resource): void;
+    public function exportToStream($resource, array $options = []): void;
 
     /**
      * Export to SQL string.
      *
+     * @param  array  $options  *
+     *
      * @return  string
      */
-    public function exportToSQLString(): string;
+    public function exportToSQLString(array $options = []): string;
 }

@@ -68,6 +68,13 @@ class DbExportCommand implements CommandInterface
             InputOption::VALUE_REQUIRED,
             'Connection to export, default is: ' . ($default ?? 'local')
         );
+
+        $command->addOption(
+            'compress',
+            'z',
+            InputOption::VALUE_NONE,
+            'Output as gz format.'
+        );
     }
 
     /**
@@ -104,7 +111,12 @@ class DbExportCommand implements CommandInterface
 
         $databaseExportService = $this->app->make(DatabaseExportService::class);
 
-        $dest = $databaseExportService->exportTo($file, $io);
+        $compress = (bool) $io->getOption('compress');
+        $options = [
+            'compress' => $compress
+        ];
+
+        $dest = $databaseExportService->exportTo($file, $io, $options);
 
         $io->writeln("Exported to <info>{$dest->getPathname()}</info>");
 

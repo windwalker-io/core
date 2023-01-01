@@ -213,10 +213,15 @@ abstract class AbstractMigrationCommand implements CommandInterface
             $io->writeln('');
             $io->writeln('<fg=gray>Backing up SQL...</>');
 
+            $compress = env('DB_BACKUP_COMPRESS');
+            $options = [
+                'compress' => $compress
+            ];
+
             $dbExportService = $this->app->make(DatabaseExportService::class);
 
             try {
-                $dest = $dbExportService->export($io);
+                $dest = $dbExportService->export($io, $options);
 
                 $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
                 $io->style()->newLine();

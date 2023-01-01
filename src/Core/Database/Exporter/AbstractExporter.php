@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
+use Symfony\Component\Console\Command\Command;
+use Windwalker\Console\CommandWrapper;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
@@ -40,22 +42,24 @@ abstract class AbstractExporter implements ExporterInterface
      * Export to PSR7 stream.
      *
      * @param  StreamInterface  $stream
+     * @param  array            $options
      *
      * @return  void
      */
-    public function exportToPsrStream(StreamInterface $stream): void
+    public function exportToPsrStream(StreamInterface $stream, array $options = []): void
     {
-        $this->export($stream);
+        $this->export($stream, $options);
     }
 
     /**
      * Export to stream resource.
      *
      * @param  resource  $resource
+     * @param  array     $options
      *
      * @return  void
      */
-    public function exportToStream($resource): void
+    public function exportToStream($resource, array $options = []): void
     {
         $this->export(new Stream($resource));
     }
@@ -63,28 +67,34 @@ abstract class AbstractExporter implements ExporterInterface
     /**
      * Export to SQL string.
      *
+     * @param  array  $options  *
+     *
      * @return  string
      */
-    public function exportToSQLString(): string
+    public function exportToSQLString(array $options = []): string
     {
-        $this->export($stream = new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN));
+        $this->export(
+            $stream = new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN),
+            $options
+        );
 
         return $stream->getContents();
     }
 
-    protected function export(StreamInterface $stream): void
+    protected function export(StreamInterface $stream, array $options = []): void
     {
-        $this->doExport($stream);
+        $this->doExport($stream, $options);
     }
 
     /**
      * export
      *
      * @param  StreamInterface  $stream
+     * @param  array            $options
      *
      * @return void
      */
-    abstract protected function doExport(StreamInterface $stream): void;
+    abstract protected function doExport(StreamInterface $stream, array $options = []): void;
 
     /**
      * getCreateTable

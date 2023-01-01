@@ -18,6 +18,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Environment\PlatformHelper;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Stream\Stream;
 
 /**
  * The Exporter class.
@@ -30,21 +31,28 @@ class MySQLExporter extends AbstractExporter
      * export
      *
      * @param  StreamInterface  $stream
+     * @param  array            $options
      *
      * @return void
      */
-    protected function doExport(StreamInterface $stream): void
+    protected function doExport(StreamInterface $stream, array $options = []): void
     {
         $md = trim($this->findMysqldump());
 
-        $options = $this->db->getDriver()->getOptions();
+        $gzMode = $options['gz'] ?? null;
+
+        $dbOptions = $this->db->getDriver()->getOptions();
         $cmd = sprintf(
             '%s --defaults-extra-file=%s %s %s',
             $md,
-            $this->createPasswordCnfFile($options),
-            $options['dbname'],
+            $this->createPasswordCnfFile($dbOptions),
+            $dbOptions['dbname'],
             env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
         );
+
+        if ($gzMode === 'cli') {
+            $cmd .= ' | gzip';
+        }
 
         $process = $this->app->createProcess($cmd);
 

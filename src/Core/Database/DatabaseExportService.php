@@ -13,6 +13,7 @@ namespace Windwalker\Core\Database;
 
 use Exception;
 use SplFileInfo;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
@@ -22,9 +23,11 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
+use Windwalker\Stream\GzStream;
 use Windwalker\Stream\Stream;
 use Windwalker\Utilities\StrNormalize;
 
+use function Windwalker\tid;
 use function Windwalker\uid;
 
 /**
@@ -56,7 +59,7 @@ class DatabaseExportService
      *
      * @throws Exception
      */
-    public function export(?OutputInterface $output = null): FileObject
+    public function export(?OutputInterface $output = null, array $options = []): FileObject
     {
         $dir = $this->app->config('database.backup.dir') ?: '@temp/sql-backup';
         $dir = $this->app->path($dir);
@@ -66,17 +69,20 @@ class DatabaseExportService
             $dir,
             StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             gmdate('Y-m-d-H-i-s'),
-            uid()
+            tid()
         );
 
-        return $this->exportTo($dest, $output);
+        return $this->exportTo($dest, $output, $options);
     }
 
     public function exportTo(
         string|SplFileInfo $dest,
-        ?OutputInterface $output = null
+        ?OutputInterface $output = null,
+        array $options = [],
     ): FileObject {
+        $compress = $options['compress'] ?? false;
         $dest = FileObject::wrap($dest);
+
         $dest->getParent()->mkdir();
 
         $this->rotate($dest->getPath());
@@ -85,7 +91,23 @@ class DatabaseExportService
 
         $exporter->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output));
 
-        $exporter->exportToPsrStream($dest->getStream(Stream::MODE_READ_WRITE_RESET));
+        $streamClass = Stream::class;
+
+        if ($compress) {
+            $gzipCliExists = $this->checkGzipExists();
+            $dest = $dest->appendPath('.gz');
+
+            $options['gz'] = $gzipCliExists ? 'cli' : 'php';
+
+            if ($options['gz'] === 'php') {
+                $streamClass = GzStream::class;
+            }
+        }
+
+        $exporter->exportToPsrStream(
+            $dest->getStream(Stream::MODE_WRITE_ONLY_RESET, $streamClass),
+            $options
+        );
 
         return $dest;
     }
@@ -103,7 +125,7 @@ class DatabaseExportService
 
         rsort($files);
 
-        array_splice($files, 0, $this->app->config('database.backup.max') ?? 20);
+        array_splice($files, 0, ($this->app->config('database.backup.max') ?? 10) - 1);
 
         foreach ($files as $file) {
             Filesystem::delete($file);
@@ -129,5 +151,12 @@ class DatabaseExportService
         }
 
         return $table;
+    }
+
+    protected function checkGzipExists(): bool
+    {
+        $process = $this->app->runProcess('which gzip');
+
+        return $process->getExitCode() === Command::SUCCESS;
     }
 }

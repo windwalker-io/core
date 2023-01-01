@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Database\Exporter;
 
+use Psr\Http\Message\StreamInterface;
+
 /**
  * The Exporter class.
  *
@@ -18,39 +20,18 @@ namespace Windwalker\Core\Database\Exporter;
  */
 class PostgresqlExporter extends AbstractExporter
 {
-    /**
-     * export
-     *
-     * @param  string  $file
-     *
-     * @return mixed|string
-     */
-    public function doExport(string $file)
+    protected function doExport(StreamInterface $stream, array $options = []): void
     {
         echo 'Postgresql exporter not yet prepared.';
+    }
 
+    protected function getCreateTable(string $table): string
+    {
         return '';
     }
 
-    /**
-     * getCreateTable
-     *
-     * @param $table
-     *
-     * @return array|mixed|string
-     */
-    protected function getCreateTable($table)
+    protected function getInserts(string $table): string
     {
-    }
-
-    /**
-     * getInserts
-     *
-     * @param $table
-     *
-     * @return mixed|null|string
-     */
-    protected function getInserts($table)
-    {
+        return '';
     }
 }
