@@ -27,6 +27,7 @@ use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
+use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Str;
@@ -944,7 +945,7 @@ class AssetService implements EventAwareInterface
         }
 
         if ($path === 'root' && $uri[0] === '/') {
-            $uri = $this->systemUri->host($uri);
+            $uri = $this->systemUri::normalize($this->systemUri->toString(Uri::FULL_HOST) . $uri);
         }
 
         return $uri;
