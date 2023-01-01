@@ -19,6 +19,8 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Stream\Stream;
 use Windwalker\Uri\Uri;
 
+use const Windwalker\Stream\READ_WRITE_FROM_BEGIN;
+
 /**
  * The SefMiddleware class.
  */
@@ -42,7 +44,7 @@ class SefMiddleware implements MiddlewareInterface
         if ($this->enabled) {
             $newBody = $this->replaceRoutes((string) $response->getBody());
 
-            $stream = new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN);
+            $stream = new Stream('php://memory', READ_WRITE_FROM_BEGIN);
             $stream->write($newBody);
 
             $response = $response->withBody($stream);

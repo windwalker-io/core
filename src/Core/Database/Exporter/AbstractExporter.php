@@ -19,6 +19,8 @@ use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Stream\Stream;
 
+use const Windwalker\Stream\READ_WRITE_FROM_BEGIN;
+
 /**
  * The AbstractExporter class.
  *
@@ -74,7 +76,7 @@ abstract class AbstractExporter implements ExporterInterface
     public function exportToSQLString(array $options = []): string
     {
         $this->export(
-            $stream = new Stream('php://memory', Stream::MODE_READ_WRITE_FROM_BEGIN),
+            $stream = new Stream('php://memory', READ_WRITE_FROM_BEGIN),
             $options
         );
 

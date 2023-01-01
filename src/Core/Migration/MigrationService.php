@@ -30,6 +30,8 @@ use Windwalker\Stream\Stream;
 
 use function Windwalker\chronos;
 
+use const Windwalker\Stream\WRITE_ONLY_FROM_END;
+
 /**
  * The MigrationService class.
  */
@@ -355,7 +357,7 @@ class MigrationService implements EventAwareInterface
 
         Filesystem::mkdir(dirname($logFile));
 
-        $logStream = new Stream($logFile, Stream::MODE_WRITE_ONLY_FROM_END);
+        $logStream = new Stream($logFile, WRITE_ONLY_FROM_END);
 
         // Log query
         $this->on(

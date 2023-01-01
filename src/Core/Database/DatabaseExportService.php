@@ -30,6 +30,8 @@ use Windwalker\Utilities\StrNormalize;
 use function Windwalker\tid;
 use function Windwalker\uid;
 
+use const Windwalker\Stream\WRITE_ONLY_RESET;
+
 /**
  * The DatabaseExportService class.
  */
@@ -105,7 +107,7 @@ class DatabaseExportService
         }
 
         $exporter->exportToPsrStream(
-            $dest->getStream(Stream::MODE_WRITE_ONLY_RESET, $streamClass),
+            $dest->getStream(WRITE_ONLY_RESET, $streamClass),
             $options
         );
 
