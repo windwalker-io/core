@@ -5,13 +5,22 @@
  * @license    __LICENSE__
  */
 
-export function babelBasicOptions() {
+/**
+ * @param processorOptions {BabelProcessorOptions}
+ * @returns {BabelOptions}
+ */
+export function babelBasicOptions(processorOptions = {}) {
   const options = new BabelOptions();
+  let targets = '> 0.5%, last 3 versions, not dead';
+
+  if (processorOptions.ie) {
+    targets = 'last 3 version, safari 5, ie 10, not dead';
+  }
 
   options.addPreset(
     '@babel/preset-env',
     {
-      targets: 'last 3 version, safari 5, ie 10, not dead',
+      targets,
       modules: false
     }
   );

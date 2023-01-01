@@ -27,8 +27,12 @@ try {
 }
 
 export default class BabelProcessor extends JsProcessor {
+  /**
+   * @param options {BabelProcessorOptions}
+   * @returns {Promise<BabelOptions>}
+   */
   async prepareOptions(options) {
-    const babelOptions = babelBasicOptions();
+    const babelOptions = babelBasicOptions(options);
 
     options = merge(
       {

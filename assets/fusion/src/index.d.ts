@@ -3,6 +3,7 @@ import { Gulp } from 'gulp';
 import { Settings } from 'gulp-typescript';
 import * as vfs from 'vinyl-fs';
 import { WebpackOptionsNormalized } from 'webpack/types';
+import { BabelOptions } from './utilities/babel';
 
 declare namespace Fusion {
   export interface DestOptions {
@@ -42,14 +43,15 @@ declare namespace Fusion {
     minify?: MiniOptions;
   }
 
-  export interface BabelOptions extends JsOptions {
+  export interface BabelProcessorOptions extends JsOptions {
     targets?: string;
+    ie?: boolean;
     babel?: BabelOptions;
     module?: string | 'systemjs' | 'umd' | 'amd';
     version?: boolean | string
   }
 
-  export interface ModuleOptions extends BabelOptions {
+  export interface ModuleOptions extends BabelProcessorOptions {
     es5?: string | boolean;
   }
 
@@ -89,8 +91,8 @@ declare namespace Fusion {
   export const SassProcessor: Processor<CssPreProcessorOptions>;
   export const js: taskProcessor<JsOptions>;
   export const JsProcessor: Processor<JsOptions>;
-  export const babel: taskProcessor<BabelOptions>;
-  export const BabelProcessor: Processor<BabelOptions>;
+  export const babel: taskProcessor<BabelProcessorOptions>;
+  export const BabelProcessor: Processor<BabelProcessorOptions>;
   export const module: taskProcessor<ModuleOptions>;
   export const ModuleProcessor: Processor<ModuleOptions>;
   export const ts: taskProcessor<TsOptions>;
