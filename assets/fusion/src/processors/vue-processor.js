@@ -5,13 +5,16 @@
  * @license    __LICENSE__
  */
 
-import { clone } from 'lodash-es';
 import { webpackVue3Config } from '../utilities/webpack.js';
 import WebpackProcessor from './webpack-processor.js';
 import path from 'path';
 import fs from 'fs';
 
 export default class VueProcessor extends WebpackProcessor {
+  /**
+   * @param options {VueOptions}
+   * @returns {Promise<{excludeVue}|*>}
+   */
   async prepareOptions(options) {
     options = await super.prepareOptions(options);
 

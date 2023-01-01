@@ -73,6 +73,7 @@ declare namespace Fusion {
 
   export interface VueOptions extends WebpackOptions {
     root?: string;
+    excludeVue?: boolean;
   }
 
   export const src: SrcMethod;

@@ -10,6 +10,7 @@ import fs from 'fs';
 
 export function logError(handler = null) {
   return function (error) {
+    console.log('HHHHH');
     console.error(error.toString());
 
     if (handler) {
