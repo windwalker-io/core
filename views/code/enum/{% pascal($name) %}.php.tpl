@@ -20,7 +20,7 @@ use Windwalker\Utilities\Contract\LanguageInterface;
 /**
  * The {% pascal($name) %} enum class.
  *
- * @options Add options here.
+ * @cases Add cases here.
  */
 class {% pascal($name) %} extends EnumSingleton implements EnumTranslatableInterface
 {
