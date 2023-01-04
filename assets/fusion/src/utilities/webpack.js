@@ -16,6 +16,9 @@ export async function webpackBasicConfig() {
       filename: '[name].js',
       sourceMapFilename: '[name].js.map'
     },
+    experiments: {
+      topLevelAwait: true,
+    },
     devtool,
     stats: {
       all: false,
@@ -71,6 +74,9 @@ export async function webpackVue3Config() {
       errors: true,
       warnings: true,
       version: false,
+    },
+    experiments: {
+      topLevelAwait: true,
     },
     devtool,
     // ensure we are using the version of Vue that supports templates
@@ -149,7 +155,7 @@ export async function getVueLoader(version = 3) {
     console.error(chalk.red(e.message));
     console.error(
       `\nPlease run "${chalk.yellow('yarn add vue@^3.0 vue-loader@^16.0 vue-style-loader ' +
-      '@vue/compiler-sfc file-loader')}" first.\n`
+        '@vue/compiler-sfc file-loader')}" first.\n`
     );
     process.exit(255);
   }
