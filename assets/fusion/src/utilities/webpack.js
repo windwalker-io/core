@@ -6,143 +6,150 @@
  */
 
 import { babelBasicOptions } from './babel.js';
+import webpack from 'webpack';
+
+const majorVer = Number(webpack.version.split('.').shift());
 
 export async function webpackBasicConfig() {
   const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-cheap-module-source-map');
 
-  return {
-    mode: process.env.NODE_ENV || 'development',
-    output: {
-      filename: '[name].js',
-      sourceMapFilename: '[name].js.map'
-    },
-    experiments: {
-      topLevelAwait: true,
-    },
-    devtool,
-    stats: {
-      all: false,
-      errors: true,
-      warnings: true,
-      version: false,
-    },
-    module: {
-      rules: [
-        {
-          test: /\.scss$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            postCSSLoader(),
-            'sass-loader',
-          ],
-        },
-        {
-          test: /\.css$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            postCSSLoader()
-          ],
-        },
-        {
-          test: /\.m?js$/,
-          exclude: /(node_modules|bower_components)/,
-          use: [{
-            loader: 'babel-loader',
-            options: babelBasicOptions().get()
-          }, 'webpack-comment-remover-loader']
-        }
-      ]
-    },
-    plugins: []
-  };
+  return processByVersion(
+    {
+      mode: process.env.NODE_ENV || 'development',
+      output: {
+        filename: '[name].js',
+        sourceMapFilename: '[name].js.map'
+      },
+      experiments: {
+        topLevelAwait: true,
+      },
+      devtool,
+      stats: {
+        all: false,
+        errors: true,
+        warnings: true,
+        version: false,
+      },
+      module: {
+        rules: [
+          {
+            test: /\.scss$/,
+            use: [
+              'style-loader',
+              'css-loader',
+              postCSSLoader(),
+              'sass-loader',
+            ],
+          },
+          {
+            test: /\.css$/,
+            use: [
+              'style-loader',
+              'css-loader',
+              postCSSLoader()
+            ],
+          },
+          {
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            use: [{
+              loader: 'babel-loader',
+              options: babelBasicOptions().get()
+            }, 'webpack-comment-remover-loader']
+          }
+        ]
+      },
+      plugins: []
+    }
+  );
 }
 
 export async function webpackVue3Config() {
   const VueLoaderPlugin = await getVueLoader(3);
   const devtool = process.env.WEBPACK_DEVTOOL || (process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-cheap-source-map');
 
-  return {
-    mode: process.env.NODE_ENV || 'development',
-    output: {
-      filename: '[name].js',
-      sourceMapFilename: '[name].js.map'
-    },
-    stats: {
-      all: false,
-      errors: true,
-      warnings: true,
-      version: false,
-    },
-    experiments: {
-      topLevelAwait: true,
-    },
-    devtool,
-    // ensure we are using the version of Vue that supports templates
-    resolve: {
-      alias: {
-        'vue$': '@vue/runtime-dom',
-        'vuex': 'vuex/dist/vuex.esm-bundler',
-        '@': '.' // Will be overwrite when compile
+  return processByVersion(
+    {
+      mode: process.env.NODE_ENV || 'development',
+      output: {
+        filename: '[name].js',
+        sourceMapFilename: '[name].js.map'
       },
-      extensions: ['.js', '.vue', '.json', '.ts']
-    },
-    module: {
-      rules: [
-        {
-          test: /\.scss$/,
-          use: [
-            'vue-style-loader',
-            'css-loader',
-            postCSSLoader(),
-            'sass-loader'
-          ],
+      stats: {
+        all: false,
+        errors: true,
+        warnings: true,
+        version: false,
+      },
+      experiments: {
+        topLevelAwait: true,
+      },
+      devtool,
+      // ensure we are using the version of Vue that supports templates
+      resolve: {
+        alias: {
+          'vue$': '@vue/runtime-dom',
+          'vuex': 'vuex/dist/vuex.esm-bundler',
+          '@': '.' // Will be overwrite when compile
         },
-        {
-          test: /\.css$/,
-          use: [
-            'vue-style-loader',
-            'css-loader',
-            postCSSLoader()
-          ],
-        },
-        {
-          test: /\.vue$/,
-          loader: 'vue-loader',
-          options: {
-            compilerOptions: {
-              whitespace: 'preserve'
+        extensions: ['.js', '.vue', '.json', '.ts']
+      },
+      module: {
+        rules: [
+          {
+            test: /\.scss$/,
+            use: [
+              'vue-style-loader',
+              'css-loader',
+              postCSSLoader(),
+              'sass-loader'
+            ],
+          },
+          {
+            test: /\.css$/,
+            use: [
+              'vue-style-loader',
+              'css-loader',
+              postCSSLoader()
+            ],
+          },
+          {
+            test: /\.vue$/,
+            loader: 'vue-loader',
+            options: {
+              compilerOptions: {
+                whitespace: 'preserve'
+              }
             }
+          },
+          {
+            test: /\.(png|jpg|gif|svg)$/,
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]?[hash]'
+            }
+          },
+          {
+            test: /\.ts$/,
+            loader: "ts-loader",
+            exclude: /(node_modules|bower_components)/,
+            options:{
+              appendTsSuffixTo:[/\.vue/]
+            }
+          },
+          {
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            loader: 'babel-loader',
+            options: babelBasicOptions().get()
           }
-        },
-        {
-          test: /\.(png|jpg|gif|svg)$/,
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]?[hash]'
-          }
-        },
-        {
-          test: /\.ts$/,
-          loader: "ts-loader",
-          exclude: /(node_modules|bower_components)/,
-          options:{
-            appendTsSuffixTo:[/\.vue/]
-          }
-        },
-        {
-          test: /\.m?js$/,
-          exclude: /(node_modules|bower_components)/,
-          loader: 'babel-loader',
-          options: babelBasicOptions().get()
-        }
+        ]
+      },
+      plugins: [
+        new VueLoaderPlugin()
       ]
-    },
-    plugins: [
-      new VueLoaderPlugin()
-    ]
-  };
+    }
+  );
 }
 
 export async function getVueLoader(version = 3) {
@@ -171,4 +178,12 @@ function postCSSLoader() {
       },
     },
   };
+}
+
+function processByVersion(options) {
+  if (majorVer < 5) {
+    delete options.experiments;
+  }
+
+  return options;
 }

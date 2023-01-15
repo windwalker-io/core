@@ -23,7 +23,8 @@ export default class TsProcessor extends JsProcessor {
       {
         ts: {
           declaration: false,
-          target: 'es6'
+          target: 'es6',
+          moduleResolution: 'node'
         }
       },
       await super.prepareOptions(options)
