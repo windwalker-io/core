@@ -11,9 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
+use Whoops\Handler\CallbackHandler;
+use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
@@ -33,6 +38,9 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
      * @param  Container  $container
      *
      * @return  void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \ReflectionException
      */
     public function boot(Container $container): void
     {
@@ -83,5 +91,33 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
 
                 return $handler;
             });
+    }
+
+    public static function cliServerHandler(): ObjectBuilderDefinition
+    {
+        return create(
+            function (Container $container) {
+                return new CallbackHandler(
+                    function ($exception, $inspector, $run) use ($container) {
+                        $app = $container->get(ApplicationInterface::class);
+
+                        if (
+                            PHP_SAPI === 'cli'
+                            && $app->getClient() === ApplicationInterface::CLIENT_WEB
+                        ) {
+                            $textHandler = new PlainTextHandler();
+                            $textHandler->addPreviousToOutput(true);
+                            $textHandler->addTraceToOutput(true);
+                            $textHandler->setException($exception);
+                            $textHandler->setInspector($inspector);
+                            $textHandler->setRun($run);
+                            $message = $textHandler->generateResponse();
+
+                            echo $message;
+                        }
+                    }
+                );
+            }
+        );
     }
 }
