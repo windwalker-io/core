@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Renderer;
 
 use Closure;
-use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\DI\Container;
 use Windwalker\Renderer\CompositeRenderer;
 use Windwalker\Renderer\RendererInterface;
 use Windwalker\Renderer\TemplateFactoryInterface;
@@ -28,13 +28,13 @@ class RendererService
     /**
      * RendererService constructor.
      *
-     * @param  ApplicationInterface  $app
-     * @param  LayoutPathResolver    $resolver
-     * @param  array                 $globals
+     * @param  Container           $container
+     * @param  LayoutPathResolver  $pathResolver
+     * @param  array               $globals
      */
     public function __construct(
-        protected ApplicationInterface $app,
-        protected LayoutPathResolver $resolver,
+        protected Container $container,
+        protected LayoutPathResolver $pathResolver,
         protected array $globals = []
     ) {
     }
@@ -62,7 +62,7 @@ class RendererService
 
     public function createRenderer(array $paths = []): RendererInterface|TemplateFactoryInterface
     {
-        $renderer = $this->app->resolve(CompositeRenderer::class);
+        $renderer = $this->container->resolve(CompositeRenderer::class);
 
         foreach ($paths as $path) {
             $renderer->addPath($path);
@@ -73,7 +73,7 @@ class RendererService
 
     public function getRendererFactories(): array
     {
-        return $this->app->config('renderer.renderers') ?? [];
+        return $this->container->getParam('renderer.renderers') ?? [];
     }
 
     public function getSupportedExtensions(): array
@@ -109,7 +109,7 @@ class RendererService
 
     public function resolveLayout(string $layout): string
     {
-        return $this->resolver->resolveLayout($layout, $this->getSupportedExtensions());
+        return $this->pathResolver->resolveLayout($layout, $this->getSupportedExtensions());
     }
 
     protected function prepareGlobals(array $globals): array
@@ -150,14 +150,14 @@ class RendererService
         ?int $priority = PriorityQueue::ABOVE_NORMAL,
         string $ns = 'main'
     ): static {
-        $this->resolver->addPaths($paths, $priority, $ns);
+        $this->pathResolver->addPaths($paths, $priority, $ns);
 
         return $this;
     }
 
     public function getPaths(string $ns = 'main'): PriorityQueue
     {
-        return $this->resolver->getPathsBag($ns)->getClonedPaths();
+        return $this->pathResolver->getPathsBag($ns)->getClonedPaths();
     }
 
     public function dumpPaths(string $ns = 'main'): array
@@ -169,7 +169,7 @@ class RendererService
     {
         $paths = [];
 
-        foreach ($this->resolver->getPathsBags() as $name => $bag) {
+        foreach ($this->pathResolver->getPathsBags() as $name => $bag) {
             $paths[$name] = iterator_to_array(clone $bag->getPaths());
         }
 

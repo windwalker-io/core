@@ -29,6 +29,7 @@ use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -36,6 +37,8 @@ use Windwalker\Http\Output\Output;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
+
+use function Symfony\Component\String\s;
 
 /**
  * The WebApplication class.
@@ -99,8 +102,6 @@ class WebApplication implements WebApplicationInterface
 
         $this->booting($container->createChild());
 
-        $container->clearCache();
-
         $this->booted = true;
     }
 
@@ -134,15 +135,15 @@ class WebApplication implements WebApplicationInterface
     {
         $this->boot();
 
-        // Level 3
+        // Level 2
         $container = $this->getContainer();
+
+        // Level 3
+        $container = $container->createChild();
 
         if ($request !== null) {
             $container->share(ServerRequest::class, $request);
         }
-
-        // Level 3
-        $container = $container->createChild();
 
         $request ??= $container->get(ServerRequestInterface::class);
 

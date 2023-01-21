@@ -155,4 +155,14 @@ class Runtime
 
         exit('Forbidden');
     }
+
+    public static function sapi(): string
+    {
+        return PHP_SAPI;
+    }
+
+    public static function isCli(): bool
+    {
+        return static::sapi() === 'cli';
+    }
 }

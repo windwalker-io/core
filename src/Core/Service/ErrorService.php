@@ -139,15 +139,7 @@ class ErrorService
     public function exception(Throwable $exception): void
     {
         try {
-            foreach ($this->handlers as $handler) {
-                $this->app->call(
-                    $handler,
-                    [
-                        $exception,
-                        'exception' => $exception,
-                    ]
-                );
-            }
+            $this->handle($exception);
         } catch (Throwable $e) {
             $msg = "Infinity loop in exception & error handler. \nMessage:\n" . $e;
 
@@ -159,6 +151,19 @@ class ErrorService
         }
 
         exit();
+    }
+
+    public function handle(Throwable $exception): void
+    {
+        foreach ($this->handlers as $handler) {
+            $this->app->call(
+                $handler,
+                [
+                    $exception,
+                    'exception' => $exception,
+                ]
+            );
+        }
     }
 
     /**

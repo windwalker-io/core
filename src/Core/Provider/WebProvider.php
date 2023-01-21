@@ -32,6 +32,8 @@ use Windwalker\Utilities\Reflection\ReflectAccessor;
 
 /**
  * The RequestProvider class.
+ *
+ * @level 2
  */
 class WebProvider implements ServiceProviderInterface
 {
@@ -51,6 +53,8 @@ class WebProvider implements ServiceProviderInterface
      *
      * @return  void
      * @throws DefinitionException
+     *
+     * @level 2
      */
     public function register(Container $container): void
     {
@@ -101,13 +105,18 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(
             AppContext::class,
             function (AppContext $app, Container $container) {
+                if ($container->getLevel() === 2) {
+                    throw new \LogicException(
+                        'AppContext should not create in a level 2 Container.'
+                    );
+                }
+
                 $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
                 return $app->setAppRequest($this->createAppRequest($container))
                     ->setState($container->get(AppState::class));
             }
-        )
-            ->alias(ApplicationInterface::class, AppContext::class);
+        );
     }
 
     /**
@@ -135,7 +144,8 @@ class WebProvider implements ServiceProviderInterface
                 }
 
                 return ServerRequestFactory::createFromGlobals();
-            }
+            },
+            Container::ISOLATION
         )
             ->alias(ServerRequestInterface::class, ServerRequest::class);
 
@@ -146,11 +156,12 @@ class WebProvider implements ServiceProviderInterface
                 return $container->get(ProxyResolver::class)->handleProxyHost(
                     SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
                 );
-            }
+            },
+            Container::ISOLATION
         );
 
         // Proxy
-        $container->prepareSharedObject(ProxyResolver::class);
+        $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);
 
         // App Request
         $container->set(

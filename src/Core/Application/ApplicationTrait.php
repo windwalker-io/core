@@ -21,6 +21,7 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Runtime\Runtime;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -48,6 +49,29 @@ trait ApplicationTrait
     protected array $providers = [];
 
     protected ?EventDispatcherRegistry $dispatcherRegistry = null;
+
+    /**
+     * Get client type, will be: web, console and cli_web.
+     *
+     * If run in Apache, FastCGI, FPM, Nginx, this will be `web`.
+     * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
+     * If run as Windwalker console, this will be `console`.
+     *
+     * @return  string
+     */
+    public function getClientType(): string
+    {
+        if ($this->getClient() === ApplicationInterface::CLIENT_WEB) {
+            return $this->isCliRuntime() ? 'cli_web' : 'web';
+        }
+
+        return 'console';
+    }
+
+    public function isCliRuntime(): bool
+    {
+        return Runtime::isCli();
+    }
 
     public function getAppName(): string
     {

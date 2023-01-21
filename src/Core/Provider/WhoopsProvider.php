@@ -48,21 +48,21 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
             return;
         }
 
-        $error = $container->get(ErrorService::class);
-
-        $whoops = $container->get(Run::class);
-
-        foreach ($container->getParam('whoops.factories.handlers') as $handler) {
-            $whoops->pushHandler($container->resolve($handler));
-        }
-
-        $error->addHandler(
-            function (Throwable $e) use ($whoops) {
-                $whoops->allowQuit(false);
-                $whoops->handleException($e);
-            },
-            'default'
-        );
+        // $error = $container->get(ErrorService::class);
+        //
+        // $whoops = $container->get(Run::class);
+        //
+        // foreach ($container->getParam('whoops.factories.handlers') as $handler) {
+        //     $whoops->pushHandler($container->resolve($handler));
+        // }
+        //
+        // $error->addHandler(
+        //     function (Throwable $e) use ($whoops) {
+        //         $whoops->allowQuit(false);
+        //         $whoops->handleException($e);
+        //     },
+        //     'default'
+        // );
     }
 
     /**

@@ -13,10 +13,11 @@ namespace Windwalker\Core\Error;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Throwable;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
-use Windwalker\Http\Output\StreamOutput;
+use Windwalker\Http\Output\Output;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
@@ -33,7 +34,7 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      * @param  array  $options
      */
     public function __construct(
-        protected Container $container,
+        protected ApplicationInterface $app,
         array $options = []
     ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
@@ -58,18 +59,28 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      */
     public function __invoke(Throwable $e): void
     {
-        $renderer = $this->container->get(RendererService::class);
+        $renderer = $this->app->service(RendererService::class);
 
-        $html = $renderer->render(
-            $this->options['layout'],
-            ['exception' => $e]
-        );
+        try {
+            $html = $renderer->render(
+                $this->options['layout'],
+                [
+                    'app' => $this->app,
+                    'exception' => $e,
+                ]
+            );
+        } catch (\Throwable $e) {
+            echo $e;
+
+            return;
+        }
 
         $code = $e->getCode();
 
         $code = ErrorService::normalizeCode($code);
 
-        $output = new StreamOutput();
+        $output = $this->app->getContainer()->get(Output::class);
+
         $output->respond(HtmlResponse::fromString($html, $code));
     }
 }

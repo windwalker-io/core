@@ -98,9 +98,27 @@ interface ApplicationInterface extends
     ): void;
 
     /**
-     * Get App client.
+     * Get App client, currently only 'web' and 'console'.
      *
      * @return  string
      */
     public function getClient(): string;
+
+    /**
+     * Get client type, will be: web, console and cli_web.
+     *
+     * If run in Apache, FastCGI, FPM, Nginx, this will be `web`.
+     * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
+     * If run as Windwalker console, this will be `console`.
+     *
+     * @return  string
+     */
+    public function getClientType(): string;
+
+    /**
+     * Is current runtime run in cli?
+     *
+     * @return  bool
+     */
+    public function isCliRuntime(): bool;
 }

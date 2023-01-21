@@ -354,7 +354,7 @@ class DebuggerSubscriber
 
     public function __destruct()
     {
-        $this->finishCollected();
+        \Windwalker\go(fn () => $this->finishCollected());
     }
 
     public function getCollector(): Collection
