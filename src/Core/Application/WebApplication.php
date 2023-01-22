@@ -168,11 +168,9 @@ class WebApplication implements WebApplicationInterface
             );
         }
 
-        $runner = $container->newInstance(MiddlewareRunner::class);
-
-        $middlewares = $runner->compileMiddlewares(
+        $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
-            fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
+            static fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
                 ->dispatch($container->get(AppContext::class))
         );
 
@@ -206,8 +204,10 @@ class WebApplication implements WebApplicationInterface
         ServerRequestInterface $request,
         iterable $middlewares
     ): mixed {
+        $runner = $app->make(MiddlewareRunner::class);
+
         try {
-            return MiddlewareRunner::createRequestHandler($middlewares)
+            return $runner->createRequestHandler($middlewares)
                 ->handle($request);
         } catch (ValidateFailException | InvalidTokenException $e) {
             if ($app->isDebug()) {

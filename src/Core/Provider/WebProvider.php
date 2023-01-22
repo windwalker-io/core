@@ -14,7 +14,6 @@ namespace Windwalker\Core\Provider;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
@@ -26,9 +25,8 @@ use Windwalker\Core\State\AppState;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Http\Factory\ServerRequestFactory;
 use Windwalker\Http\Request\ServerRequest;
-use Windwalker\Http\Request\ServerRequestFactory;
-use Windwalker\Utilities\Reflection\ReflectAccessor;
 
 /**
  * The RequestProvider class.

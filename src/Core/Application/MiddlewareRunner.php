@@ -15,9 +15,8 @@ use Generator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use ReflectionException;
-use Relay\Relay;
 use Windwalker\DI\Container;
+use Windwalker\Http\Middleware\RequestRunner;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
 /**
@@ -39,9 +38,18 @@ class MiddlewareRunner
         iterable $middlewares,
         ?callable $last = null
     ): ResponseInterface {
-        $middlewares = $this->compileMiddlewares($middlewares, $last);
+        return $this->createRequestHandler(static::chainMiddlewares($middlewares, $last))->handle($request);
+    }
 
-        return static::createRequestHandler($middlewares)->handle($request);
+    public static function chainMiddlewares(iterable $middlewares, ?callable $last = null): Generator
+    {
+        foreach ($middlewares as $middleware) {
+            yield $middleware;
+        }
+
+        if ($last) {
+            yield static fn () => $last;
+        }
     }
 
     /**
@@ -51,8 +59,6 @@ class MiddlewareRunner
      * @param  callable|null  $last
      *
      * @return Generator
-     *
-     * @throws ReflectionException
      */
     public function compileMiddlewares(iterable $middlewares, ?callable $last = null): Generator
     {
@@ -86,8 +92,8 @@ class MiddlewareRunner
         return $this->container->resolve($middleware);
     }
 
-    public static function createRequestHandler(iterable $queue): RequestHandlerInterface
+    public function createRequestHandler(iterable $queue): RequestHandlerInterface
     {
-        return new Relay($queue);
+        return new RequestRunner($queue, [$this, 'resolveMiddleware']);
     }
 }

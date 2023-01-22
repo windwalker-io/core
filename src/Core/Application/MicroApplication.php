@@ -17,8 +17,8 @@ use Windwalker\Core\Middleware\RoutingMiddleware;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
+use Windwalker\Http\Factory\ServerRequestFactory;
 use Windwalker\Http\Output\Output;
-use Windwalker\Http\Request\ServerRequestFactory;
 
 /**
  * The MicroApplication class.

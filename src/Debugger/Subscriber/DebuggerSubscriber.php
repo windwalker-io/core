@@ -38,6 +38,8 @@ use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Http\Helper\HttpHelper;
+use Windwalker\Http\Output\Output;
+use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 
@@ -341,7 +343,7 @@ class DebuggerSubscriber
 
             // Debug console
             $debugConsole = $this->container->newInstance(DebugConsole::class);
-            $debugConsole->pushToPage($collector, $response);
+            $debugConsole->pushToPage($collector, $this->container->get(Output::class), $response);
 
             // Write new file
             $this->dashboardRepository->writeFile($id, $collector);

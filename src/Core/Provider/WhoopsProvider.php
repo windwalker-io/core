@@ -25,6 +25,10 @@ use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\DI\ServiceProviderInterface;
 
+use Windwalker\Http\Output\Output;
+
+use Windwalker\Http\Response\HtmlResponse;
+
 use function Windwalker\DI\create;
 
 /**
@@ -48,21 +52,33 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
             return;
         }
 
-        // $error = $container->get(ErrorService::class);
-        //
-        // $whoops = $container->get(Run::class);
-        //
-        // foreach ($container->getParam('whoops.factories.handlers') as $handler) {
-        //     $whoops->pushHandler($container->resolve($handler));
-        // }
-        //
-        // $error->addHandler(
-        //     function (Throwable $e) use ($whoops) {
-        //         $whoops->allowQuit(false);
-        //         $whoops->handleException($e);
-        //     },
-        //     'default'
-        // );
+        $error = $container->get(ErrorService::class);
+
+        $whoops = $container->get(Run::class);
+
+        foreach ($container->getParam('whoops.factories.handlers') as $handler) {
+            $whoops->pushHandler($container->resolve($handler));
+        }
+
+        $error->addHandler(
+            function (Throwable $e) use ($container, $whoops) {
+                $this->handleException($whoops, $e, $container);
+            },
+            'default'
+        );
+    }
+
+    public function handleException(Run $whoops, Throwable $e, Container $container): void
+    {
+        $whoops->allowQuit(false);
+
+        ob_start();
+        $whoops->handleException($e);
+
+        $html = ob_get_clean();
+
+        $output = $container->get(Output::class);
+        $output->respond(HtmlResponse::fromString($html));
     }
 
     /**
@@ -87,6 +103,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
                     }
                 }
 
+                $handler->handleUnconditionally(true);
                 $handler->setEditor($container->getParam('whoops.editor') ?? 'phpstorm');
 
                 return $handler;

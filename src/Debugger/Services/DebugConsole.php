@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Data\Collection;
+use Windwalker\Http\Output\OutputInterface;
 
 /**
  * The DebugConsole class.
@@ -30,22 +31,27 @@ class DebugConsole
     ) {
     }
 
-    public function pushToPage(Collection $collector, ?ResponseInterface $response = null): void
-    {
+    public function pushToPage(
+        Collection $collector,
+        OutputInterface $output,
+        ?ResponseInterface $response = null
+    ): void {
         $tmpl = 'console';
 
         if ($response) {
             $ct = $response->getHeaderLine('content-type');
 
             if (str_contains($ct, 'text/html') || str_contains($ct, 'text/plain')) {
-                echo $this->renderConsole($tmpl, $collector);
+                $console = $this->renderConsole($tmpl, $collector);
+                $output->write($console);
             }
 
             return;
         }
 
         if ($this->isHtmlPage()) {
-            echo $this->renderConsole($tmpl, $collector);
+            show($output);
+            $output->write($this->renderConsole($tmpl, $collector));
         }
     }
 
