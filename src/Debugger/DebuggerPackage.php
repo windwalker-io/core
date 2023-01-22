@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Debugger;
 
 use Composer\InstalledVersions;
-use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
@@ -37,18 +37,11 @@ use Windwalker\Utilities\Reflection\BacktraceHelper;
  * The DebuggerPackage class.
  */
 #[EventSubscriber]
-class DebuggerPackage extends AbstractPackage implements ServiceProviderInterface, BootableDeferredProviderInterface
+class DebuggerPackage extends AbstractPackage implements
+    ServiceProviderInterface,
+    BootableDeferredProviderInterface,
+    RequestBootableProviderInterface
 {
-    /**
-     * @var Collection|\Closure[]
-     */
-    protected Collection $collector;
-
-    /**
-     * @var Collection|\Closure[]
-     */
-    protected Collection $queue;
-
     public function register(Container $container): void
     {
         $container->mergeParameters(
@@ -58,22 +51,6 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
             ],
             Container::MERGE_OVERRIDE
         );
-
-        $container->share(
-            'debugger.collector',
-            $this->collector = new Collection()
-        );
-
-        $container->share(
-            'debugger.queue',
-            $this->queue = new Collection()
-        );
-
-        $app = $container->get(ApplicationInterface::class);
-
-        if ($app instanceof WebApplication) {
-            $app->subscribe($this);
-        }
     }
 
     /**
@@ -91,6 +68,17 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
         // $this->collectDatabase($container, $collector);
     }
 
+    public function bootBeforeRequest(Container $container): void
+    {
+        $container->share('debugger.collector', new Collection());
+
+        $container->share('debugger.queue', new Collection());
+
+        $app = $container->get(AppContext::class);
+
+        $app->subscribe($this);
+    }
+
     public function install(PackageInstaller $installer): void
     {
         //
@@ -103,7 +91,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
         // Collect DB
         if (InstalledVersions::isInstalled('windwalker/database')) {
-            $this->collectDatabase($container, $this->collector);
+            $this->collectDatabase($container, $container->get('debugger.collector'));
         }
     }
 
@@ -118,12 +106,14 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
     protected function collectDatabase(Container $container, Collection $collector): void
     {
         // $manager = $container->get(DatabaseManager::class);
+        $queue = $container->get('debugger.queue');
+
         $container->extend(
             DatabaseManager::class,
-            function (DatabaseManager $manager) use ($collector) {
+            function (DatabaseManager $manager) use ($queue, $collector) {
                 $manager->on(
                     InstanceCreatedEvent::class,
-                    function (InstanceCreatedEvent $event) use ($collector) {
+                    function (InstanceCreatedEvent $event) use ($queue, $collector) {
                         $name = $event->getInstanceName();
                         $dbCollector = $collector->proxy('db.queries.' . $name);
                         $startTime = null;
@@ -142,7 +132,14 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
                         $db->on(
                             QueryEndEvent::class,
-                            function (QueryEndEvent $event) use (&$startTime, $name, $dbCollector, &$memory, $db) {
+                            function (QueryEndEvent $event) use (
+                                $queue,
+                                &$startTime,
+                                $name,
+                                $dbCollector,
+                                &$memory,
+                                $db
+                            ) {
                                 if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
                                     return;
                                 }
@@ -152,7 +149,7 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
                                 $data['count'] = $event->getStatement()->countAffected();
                                 $backtrace = debug_backtrace();
 
-                                $this->queue->push(
+                                $queue->push(
                                     function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
                                         $data['raw_query'] = (string) $event->getQuery();
                                         $data['debug_query'] = $event->getDebugQueryString();

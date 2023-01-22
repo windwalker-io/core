@@ -79,13 +79,6 @@ class DebuggerSubscriber
         //
     }
 
-    #[ListenTo(TerminatingEvent::class)]
-    public function onTerminating(
-        TerminatingEvent $event
-    ): void {
-        //
-    }
-
     #[ListenTo(BeforeRequestEvent::class)]
     public function beforeRequest(BeforeRequestEvent $event): void
     {
@@ -368,6 +361,7 @@ class DebuggerSubscriber
 
     public function __destruct()
     {
+        show(__METHOD__);
         // Todo: Should always not called after page end, Try run in app end
         \Windwalker\go(fn () => $this->finishCollected());
     }

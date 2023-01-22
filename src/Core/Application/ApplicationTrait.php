@@ -57,7 +57,9 @@ trait ApplicationTrait
      * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
      * If run as Windwalker console, this will be `console`.
      *
-     * @return  string
+     * @return string
+     *
+     * @psalm-return "web"|"console"|"cli_web"
      */
     public function getClientType(): string
     {

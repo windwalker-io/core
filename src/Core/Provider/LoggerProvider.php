@@ -40,6 +40,6 @@ class LoggerProvider implements ServiceProviderInterface, RequestBootableProvide
 
     public function bootBeforeRequest(Container $container): void
     {
-        Logger::$service = $container->get(LoggerService::class);
+        Logger::setInstance($container->get(LoggerService::class));
     }
 }

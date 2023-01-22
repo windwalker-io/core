@@ -109,7 +109,7 @@ class WebProvider implements ServiceProviderInterface
                     );
                 }
 
-                $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
+                // $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
                 return $app->setAppRequest($this->createAppRequest($container))
                     ->setState($container->get(AppState::class));

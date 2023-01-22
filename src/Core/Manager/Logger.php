@@ -28,10 +28,20 @@ use Windwalker\Core\Service\LoggerService;
  */
 class Logger
 {
-    public static LoggerService|null $service = null;
+    public static \WeakReference|null $ref = null;
+
+    public static function getInstance(): ?LoggerService
+    {
+        return static::$ref?->get();
+    }
+
+    public static function setInstance(LoggerService $loggerService): void
+    {
+        static::$ref = \WeakReference::create($loggerService);
+    }
 
     public static function __callStatic(string $name, array $args): void
     {
-        static::$service?->$name(...$args);
+        static::getInstance()?->$name(...$args);
     }
 }

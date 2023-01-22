@@ -38,6 +38,8 @@ use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 
+use Windwalker\Session\Session;
+
 use function Symfony\Component\String\s;
 
 /**
@@ -78,9 +80,13 @@ class WebApplication implements WebApplicationInterface
             return;
         }
 
-        // Start profiler
-        $profilerFactory = new ProfilerFactory();
-        $profilerFactory->get('main')->mark('boot', ['system']);
+        // Start profiler for Web type
+        $profilerFactory = null;
+
+        if ($this->getClientType() === 'web') {
+            $profilerFactory = new ProfilerFactory();
+            $profilerFactory->get('main')->mark('boot', ['system']);
+        }
 
         $this->prepareBoot();
 
@@ -159,8 +165,6 @@ class WebApplication implements WebApplicationInterface
             compact('container', 'request')
         );
 
-        $request = $event->getRequest();
-
         if ($handler) {
             $container->modify(
                 AppContext::class,
@@ -168,13 +172,21 @@ class WebApplication implements WebApplicationInterface
             );
         }
 
+        $appContext = $container->get(AppContext::class);
+
+        // @event
+        $event = $appContext->emit(
+            BeforeRequestEvent::class,
+            ['container' => $container, 'request' => $event->getRequest()]
+        );
+
+        $request = $event->getRequest();
+
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
             static fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
                 ->dispatch($container->get(AppContext::class))
         );
-
-        $appContext = $container->get(AppContext::class);
 
         // @event
         $event = $appContext->emit(

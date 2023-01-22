@@ -21,6 +21,8 @@ use Windwalker\Event\EventEmitter;
 
 /**
  * The EventProvider class.
+ *
+ * @level 2
  */
 class EventProvider implements ServiceProviderInterface
 {
@@ -33,6 +35,8 @@ class EventProvider implements ServiceProviderInterface
      * EventProvider constructor.
      *
      * @param  ApplicationInterface  $app
+     *
+     * @level 2
      */
     public function __construct(ApplicationInterface $app)
     {

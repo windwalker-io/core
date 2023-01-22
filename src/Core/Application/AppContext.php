@@ -419,4 +419,9 @@ class AppContext implements WebApplicationInterface
 
         return $this->magicGet($name);
     }
+
+    public function __destruct()
+    {
+        show(__METHOD__);
+    }
 }

@@ -61,7 +61,7 @@ class AppProvider implements ServiceProviderInterface
         if ($this->profilerFactory) {
             $container->share(ProfilerFactory::class, $this->profilerFactory);
         } else {
-            $container->prepareSharedObject(ProfilerFactory::class);
+            $container->prepareSharedObject(ProfilerFactory::class, null, Container::ISOLATION);
         }
 
         $this->prepareEvents($container);

@@ -16,6 +16,8 @@ use Windwalker\Utilities\Reflection\ReflectionCallable;
 
 /**
  * The EventCollector class.
+ *
+ * @level 3
  */
 class EventCollector
 {
