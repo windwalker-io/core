@@ -43,6 +43,8 @@ use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 
+use Windwalker\Stream\Stream;
+
 use function Windwalker\uid;
 
 /**
@@ -343,7 +345,7 @@ class DebuggerSubscriber
 
             // Debug console
             $debugConsole = $this->container->newInstance(DebugConsole::class);
-            $debugConsole->pushToPage($collector, $this->container->get(Output::class), $response);
+            $debugConsole->pushToPage($collector, Stream::wrap('php://output'), $response);
 
             // Write new file
             $this->dashboardRepository->writeFile($id, $collector);
@@ -354,11 +356,6 @@ class DebuggerSubscriber
         $this->finished = true;
     }
 
-    public function __destruct()
-    {
-        \Windwalker\go(fn () => $this->finishCollected());
-    }
-
     public function getCollector(): Collection
     {
         return $this->collector ??= $this->container->get('debugger.collector');
@@ -367,5 +364,11 @@ class DebuggerSubscriber
     public function getQueue(): Collection
     {
         return $this->queue ??= $this->container->get('debugger.queue');
+    }
+
+    public function __destruct()
+    {
+        // Todo: Should always not called after page end, Try run in app end
+        \Windwalker\go(fn () => $this->finishCollected());
     }
 }

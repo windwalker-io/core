@@ -16,6 +16,7 @@ use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Data\Collection;
 use Windwalker\Http\Output\OutputInterface;
+use Windwalker\Stream\Stream;
 
 /**
  * The DebugConsole class.
@@ -33,7 +34,7 @@ class DebugConsole
 
     public function pushToPage(
         Collection $collector,
-        OutputInterface $output,
+        Stream $output,
         ?ResponseInterface $response = null
     ): void {
         $tmpl = 'console';
@@ -50,7 +51,6 @@ class DebugConsole
         }
 
         if ($this->isHtmlPage()) {
-            show($output);
             $output->write($this->renderConsole($tmpl, $collector));
         }
     }
