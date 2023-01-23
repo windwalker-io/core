@@ -116,7 +116,7 @@ class ConsoleApplication extends SymfonyApp implements ApplicationInterface
 
         $this->booting($container->createChild());
 
-        $container->clearCache();
+        // $container->clearCache();
 
         $this->booted = true;
     }

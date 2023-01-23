@@ -24,53 +24,14 @@ use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
 use Windwalker\Session\SessionInterface;
+use Windwalker\Session\SessionPackage;
 
 /**
  * The SessionProvider class.
+ *
+ * @deprecated
  */
-class SessionProvider implements ServiceProviderInterface
+class SessionProvider extends SessionPackage
 {
-    /**
-     * Registers the service provider with a DI container.
-     *
-     * @param  Container  $container  The DI container.
-     *
-     * @return  void
-     * @throws DefinitionException
-     */
-    public function register(Container $container): void
-    {
-        $container->prepareSharedObject(SessionManager::class);
-
-        // Cookies
-        $container->prepareSharedObject(Cookies::class);
-        $container->prepareObject(ArrayCookies::class);
-
-        $container->bindShared(Session::class, fn(SessionManager $manager) => $manager->get())
-            ->alias(SessionInterface::class, Session::class);
-        $container->prepareSharedObject(CsrfService::class);
-    }
-
-    public static function psrCookies(): callable
-    {
-        return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
-            $cookies = new ArrayCookies($request->getCookieParams());
-            $cookies->setOptions($params);
-
-            $app->getRootApp()->on(
-                'response',
-                function (ResponseEvent $event) use ($cookies) {
-                    $res = $event->getResponse();
-
-                    foreach ($cookies->getCookieHeaders() as $header) {
-                        $res = $res->withAddedHeader('Set-Cookie', $header);
-                    }
-
-                    $event->setResponse($res);
-                }
-            );
-
-            return $cookies;
-        };
-    }
+    //
 }

@@ -14,12 +14,14 @@ namespace Windwalker\Core\Manager;
 use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\Ref;
+use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\DI\Container;
-use Windwalker\Http\Event\ResponseEvent;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
+use Windwalker\Session\SessionInterface;
 
 /**
  * The SessionManager class.
@@ -36,13 +38,17 @@ class SessionManager extends AbstractManager
 
     public static function psrCookies(): callable
     {
-        return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
+        return static function (
+            ServerRequestInterface $request,
+            AppContext $app,
+            #[Ref('session.cookie_params')] $params
+        ) {
             $cookies = new ArrayCookies($request->getCookieParams());
             $cookies->setOptions($params);
 
-            $app->getRootApp()->on(
-                'response',
-                function (ResponseEvent $event) use ($cookies) {
+            $app->on(
+                AfterRequestEvent::class,
+                function (AfterRequestEvent $event) use ($cookies) {
                     $res = $event->getResponse();
 
                     foreach ($cookies->getCookieHeaders() as $header) {
@@ -59,7 +65,11 @@ class SessionManager extends AbstractManager
 
     public static function nativeCookies(): callable
     {
-        return function (ServerRequestInterface $request, AppContext $app, #[Ref('session.cookie_params')] $params) {
+        return static function (
+            ServerRequestInterface $request,
+            AppContext $app,
+            #[Ref('session.cookie_params')] $params
+        ) {
             $cookies = new Cookies();
             $cookies->setOptions($params);
 
@@ -73,7 +83,7 @@ class SessionManager extends AbstractManager
         string $cookies,
         array $options = []
     ): Closure {
-        return function (Container $container) use ($cookies, $handler, $bridge, $options) {
+        return static function (Container $container) use ($cookies, $handler, $bridge, $options) {
             $bridge = $container->resolve(
                 'session.factories.bridges.' . $bridge,
                 [
@@ -84,6 +94,13 @@ class SessionManager extends AbstractManager
             $ini = $container->getParam('session.ini');
 
             $options['ini'] = $ini;
+
+            $app = $container->get(ApplicationInterface::class);
+
+            if ($app->getClientType() === 'cli_web') {
+                // In cli web, disable shutdown function to save memory
+                $options[SessionInterface::OPTION_AUTO_COMMIT] = false;
+            }
 
             return new Session($options, $bridge, $cookies);
         };
