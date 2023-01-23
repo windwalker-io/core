@@ -18,8 +18,11 @@ use Psr\Http\Server\MiddlewareInterface;
 use Stringable;
 use Throwable;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\DI\ReleasableProviderInterface;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
+use Windwalker\Core\DI\RequestReleasableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
@@ -33,7 +36,10 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Http\Event\RequestEvent;
 use Windwalker\Http\Output\Output;
+use Windwalker\Http\Output\OutputInterface;
+use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
@@ -137,7 +143,7 @@ class WebApplication implements WebApplicationInterface
         return $this;
     }
 
-    public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
+    public function createContext(?ServerRequestInterface $request = null): AppContext
     {
         $this->boot();
 
@@ -151,13 +157,31 @@ class WebApplication implements WebApplicationInterface
             $container->share(ServerRequest::class, $request);
         }
 
-        $request ??= $container->get(ServerRequestInterface::class);
-
         $this->registerListeners($container);
 
-        // Boot after listeners registered to make sure no services been created
-        // before Container::extend()
         $this->bootProvidersBeforeRequest($container);
+
+        return $container->get(AppContext::class);
+    }
+
+    public function createContextFromServerEvent(RequestEvent $event): AppContext
+    {
+        $request = $event->getRequest();
+
+        $appContext = $this->createContext($request);
+
+        $container = $appContext->getContainer();
+        $container->share(OutputInterface::class, $event->getOutput());
+
+        $event->setAttribute('appContext', $appContext);
+
+        return $appContext;
+    }
+
+    public function runContext(AppContext $appContext, ?callable $handler = null): ResponseInterface
+    {
+        $container = $appContext->getContainer();
+        $request = $container->get(ServerRequestInterface::class);
 
         // @event
         $event = $this->emit(
@@ -166,13 +190,8 @@ class WebApplication implements WebApplicationInterface
         );
 
         if ($handler) {
-            $container->modify(
-                AppContext::class,
-                fn(AppContext $context): AppContext => $context->setController($handler)
-            );
+            $appContext->setController($handler);
         }
-
-        $appContext = $container->get(AppContext::class);
 
         // @event
         $event = $appContext->emit(
@@ -202,7 +221,52 @@ class WebApplication implements WebApplicationInterface
             compact('container', 'response')
         );
 
+        // @event
+        $event = $appContext->emit(
+            AfterRequestEvent::class,
+            ['container' => $container, 'response' => $event->getResponse()]
+        );
+
         return $event->getResponse();
+    }
+
+    public function executeServerEvent(RequestEvent $event): ResponseInterface
+    {
+        return $this->runContext(
+            $this->createContextFromServerEvent($event)
+        );
+    }
+
+    public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
+    {
+        $appContext = $this->createContext($request);
+
+        $container = $appContext->getContainer();
+        $container->bindShared(OutputInterface::class, fn () => new StreamOutput());
+
+        $response = $this->runContext($appContext);
+
+        register_shutdown_function(
+            fn () => $this->stopContext($appContext)
+        );
+
+        return $response;
+    }
+
+    public function stopContext(AppContext $appContext): void
+    {
+        $container = $appContext->getContainer();
+
+        $appContext->emit(
+            AfterRespondEvent::class,
+            compact('container')
+        );
+
+        foreach ($this->providers as $provider) {
+            if ($provider instanceof RequestReleasableProviderInterface) {
+                $provider->releaseAfterRequest($container);
+            }
+        }
     }
 
     /**
@@ -318,6 +382,15 @@ class WebApplication implements WebApplicationInterface
     {
         $container->registerServiceProvider(new RequestProvider($container));
 
+        foreach ($this->providers as $provider) {
+            if ($provider instanceof RequestBootableProviderInterface) {
+                $provider->bootBeforeRequest($container);
+            }
+        }
+    }
+
+    protected function releaseProviders(Container $container): void
+    {
         foreach ($this->providers as $provider) {
             if ($provider instanceof RequestBootableProviderInterface) {
                 $provider->bootBeforeRequest($container);

@@ -18,6 +18,8 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
 use Windwalker\Http\Output\Output;
+use Windwalker\Http\Output\OutputInterface;
+use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
@@ -79,7 +81,13 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
 
         $code = ErrorService::normalizeCode($code);
 
-        $output = $this->app->getContainer()->get(Output::class);
+        $container = $this->app->getContainer();
+
+        if ($container->has(OutputInterface::class)) {
+            $output = $container->get(OutputInterface::class);
+        } else {
+            $output = new StreamOutput();
+        }
 
         $output->respond(HtmlResponse::fromString($html, $code));
     }

@@ -34,7 +34,7 @@ class DebugConsole
 
     public function pushToPage(
         Collection $collector,
-        Stream $output,
+        OutputInterface $output,
         ?ResponseInterface $response = null
     ): void {
         $tmpl = 'console';

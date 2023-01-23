@@ -20,6 +20,7 @@ use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Event\EventCollector;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
@@ -224,14 +225,16 @@ class DebuggerSubscriber
                 $this->finishCollected($event->getResponse());
             }
         );
+    }
 
-        register_shutdown_function(
-            function () {
-                foreach ($this->getQueue() as $handler) {
-                    $handler();
-                }
-            }
-        );
+    #[ListenTo(AfterRespondEvent::class)]
+    public function afterRespond(AfterRespondEvent $event): void
+    {
+        $this->profiler->mark('AfterRequest', ['system']);
+
+        foreach ($this->getQueue() as $handler) {
+            $handler();
+        }
     }
 
     public function collectOthers(): void
@@ -309,7 +312,7 @@ class DebuggerSubscriber
             /** @var ApplicationInterface $app */
             $app = $this->container->get(ApplicationInterface::class);
 
-            if ($app->getClient() === ApplicationInterface::CLIENT_CONSOLE) {
+            if ($app->getClientType() === 'console') {
                 return;
             }
 
@@ -338,7 +341,8 @@ class DebuggerSubscriber
 
             // Debug console
             $debugConsole = $this->container->newInstance(DebugConsole::class);
-            $debugConsole->pushToPage($collector, Stream::wrap('php://output'), $response);
+            $output = $this->container->get(OutputInterface::class);
+            $debugConsole->pushToPage($collector, $output, $response);
 
             // Write new file
             $this->dashboardRepository->writeFile($id, $collector);
@@ -357,12 +361,5 @@ class DebuggerSubscriber
     public function getQueue(): Collection
     {
         return $this->queue ??= $this->container->get('debugger.queue');
-    }
-
-    public function __destruct()
-    {
-        show(__METHOD__);
-        // Todo: Should always not called after page end, Try run in app end
-        \Windwalker\go(fn () => $this->finishCollected());
     }
 }

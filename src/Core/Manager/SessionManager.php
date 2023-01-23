@@ -17,6 +17,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
+use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\DI\Container;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
@@ -84,6 +85,10 @@ class SessionManager extends AbstractManager
         array $options = []
     ): Closure {
         return static function (Container $container) use ($cookies, $handler, $bridge, $options) {
+            if ($container->getLevel() === 2) {
+                throw new \Exception();
+            }
+
             $bridge = $container->resolve(
                 'session.factories.bridges.' . $bridge,
                 [
@@ -102,7 +107,15 @@ class SessionManager extends AbstractManager
                 $options[SessionInterface::OPTION_AUTO_COMMIT] = false;
             }
 
-            return new Session($options, $bridge, $cookies);
+            $session = new Session($options, $bridge, $cookies);
+
+            $app->on(AfterRespondEvent::class, function (AfterRespondEvent $event) use ($session) {
+                if ($session->isStarted()) {
+                    $session->stop();
+                }
+            });
+
+            return $session;
         };
     }
 }

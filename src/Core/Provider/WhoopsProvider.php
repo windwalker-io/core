@@ -19,14 +19,18 @@ use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
+use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 
 use Windwalker\Http\Output\Output;
 
+use Windwalker\Http\Output\OutputInterface;
+use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Response\HtmlResponse;
 
 use function Windwalker\DI\create;
@@ -34,19 +38,36 @@ use function Windwalker\DI\create;
 /**
  * The WhoopsProvider class.
  */
-class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterface
+class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterface, RequestBootableProviderInterface
 {
+    public function boot(Container $container): void
+    {
+        $app = $container->get(ApplicationInterface::class);
+
+        if ($app->getClientType() === 'web') {
+            $this->replaceErrorHandler($container);
+        }
+    }
+
     /**
-     * boot
+     * bootBeforeRequest
      *
      * @param  Container  $container
      *
      * @return  void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws \ReflectionException
      */
-    public function boot(Container $container): void
+    public function bootBeforeRequest(Container $container): void
+    {
+        $app = $container->get(ApplicationInterface::class);
+
+        if ($app->getClientType() === 'cli_web') {
+            $this->replaceErrorHandler($container);
+        }
+    }
+
+    protected function replaceErrorHandler(Container $container): void
     {
         if (!$container->getParam('app.debug')) {
             return;
@@ -77,8 +98,13 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
 
         $html = ob_get_clean();
 
-        $output = $container->get(Output::class);
-        $output->respond(HtmlResponse::fromString($html));
+        if ($container->has(OutputInterface::class)) {
+            $output = $container->get(OutputInterface::class);
+        } else {
+            $output = new StreamOutput();
+        }
+
+        $output->respond(HtmlResponse::fromString($html, $e->getCode()));
     }
 
     /**
