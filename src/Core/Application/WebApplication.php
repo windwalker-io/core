@@ -244,13 +244,11 @@ class WebApplication implements WebApplicationInterface
         $container = $appContext->getContainer();
         $container->bindShared(OutputInterface::class, fn () => new StreamOutput());
 
-        $response = $this->runContext($appContext);
-
         register_shutdown_function(
             fn () => $this->stopContext($appContext)
         );
 
-        return $response;
+        return $this->runContext($appContext);
     }
 
     public function stopContext(AppContext $appContext): void
