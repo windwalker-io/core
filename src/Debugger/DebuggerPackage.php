@@ -11,10 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Debugger;
 
-use Composer\InstalledVersions;
-use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
-use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Package\AbstractPackage;
@@ -28,7 +26,6 @@ use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\EventSubscriber;
-use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Filesystem\Path;
 use Windwalker\Query\Query;
 use Windwalker\Utilities\Reflection\BacktraceHelper;
@@ -70,118 +67,20 @@ class DebuggerPackage extends AbstractPackage implements
 
     public function bootBeforeRequest(Container $container): void
     {
+        $rootApp = $container->get(RootApplicationInterface::class);
+
+        if ($rootApp->getClient() === $rootApp::CLIENT_CONSOLE) {
+            return;
+        }
+
         $container->share('debugger.collector', new Collection());
 
         $container->share('debugger.queue', new Collection());
-
-        $app = $container->get(AppContext::class);
-
-        $app->subscribe($this);
     }
 
     public function install(PackageInstaller $installer): void
     {
         //
-    }
-
-    #[ListenTo(BeforeRequestEvent::class)]
-    public function beforeRequest(BeforeRequestEvent $event): void
-    {
-        $container = $event->getContainer();
-
-        // Collect DB
-        if (InstalledVersions::isInstalled('windwalker/database')) {
-            $this->collectDatabase($container, $container->get('debugger.collector'));
-        }
-    }
-
-    /**
-     * collectDatabase
-     *
-     * @param  Container  $container
-     * @param  Collection  $collector
-     *
-     * @return  void
-     */
-    protected function collectDatabase(Container $container, Collection $collector): void
-    {
-        // $manager = $container->get(DatabaseManager::class);
-        $queue = $container->get('debugger.queue');
-
-        $container->extend(
-            DatabaseManager::class,
-            function (DatabaseManager $manager) use ($queue, $collector) {
-                $manager->on(
-                    InstanceCreatedEvent::class,
-                    function (InstanceCreatedEvent $event) use ($queue, $collector) {
-                        $name = $event->getInstanceName();
-                        $dbCollector = $collector->proxy('db.queries.' . $name);
-                        $startTime = null;
-                        $memory = null;
-
-                        /** @var DatabaseAdapter $db */
-                        $db = $event->getInstance();
-
-                        $db->on(
-                            QueryStartEvent::class,
-                            function (QueryStartEvent $event) use (&$startTime, &$memory) {
-                                $startTime = microtime(true);
-                                $memory = memory_get_usage(false);
-                            }
-                        );
-
-                        $db->on(
-                            QueryEndEvent::class,
-                            function (QueryEndEvent $event) use (
-                                $queue,
-                                &$startTime,
-                                $name,
-                                $dbCollector,
-                                &$memory,
-                                $db
-                            ) {
-                                if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
-                                    return;
-                                }
-
-                                $data['time'] = microtime(true) - $startTime;
-                                $data['memory'] = memory_get_usage(false) - $memory;
-                                $data['count'] = $event->getStatement()->countAffected();
-                                $backtrace = debug_backtrace();
-
-                                $queue->push(
-                                    function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
-                                        $data['raw_query'] = (string) $event->getQuery();
-                                        $data['debug_query'] = $event->getDebugQueryString();
-                                        $data['bounded'] = $event->getBounded();
-                                        $data['connection'] = $name;
-                                        $data['backtrace'] = BacktraceHelper::normalizeBacktraces($backtrace);
-
-                                        $query = $event->getQuery();
-
-                                        if (
-                                            $db->getPlatform()->getName() === AbstractPlatform::MYSQL
-                                            && $query instanceof Query
-                                            && $query->getType() === Query::TYPE_SELECT
-                                        ) {
-                                            $query = clone $query;
-                                            $query->prefix('EXPLAIN');
-                                            $data['explain'] = $db->prepare($query)->all();
-                                        }
-
-                                        $dbCollector->push($data);
-                                    }
-                                );
-
-                                $startTime = null;
-                            }
-                        );
-                    }
-                );
-
-                return $manager;
-            }
-        );
     }
 
     public static function getName(): string
