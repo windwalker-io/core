@@ -13,6 +13,7 @@ namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
+use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -53,7 +54,8 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
         $container->share(get_class($this->app), $this->app);
-        $container->share(get_parent_class($this->app), $this->app);
+        $container->share(get_parent_class($this->app), $this->app)
+            ->alias(RootApplicationInterface::class, get_parent_class($this->app));
         $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
         $container->prepareSharedObject(PackageRegistry::class);

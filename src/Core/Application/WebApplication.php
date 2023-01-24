@@ -18,7 +18,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Stringable;
 use Throwable;
 use Windwalker\Core\Controller\ControllerDispatcher;
-use Windwalker\Core\DI\ReleasableProviderInterface;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
@@ -32,7 +31,6 @@ use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
-use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -44,16 +42,12 @@ use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 
-use Windwalker\Session\Session;
-
-use function Symfony\Component\String\s;
-
 /**
  * The WebApplication class.
  *
  * @since  4.0
  */
-class WebApplication implements WebApplicationInterface
+class WebApplication implements WebApplicationInterface, RootApplicationInterface
 {
     use WebApplicationTrait;
 
@@ -242,10 +236,10 @@ class WebApplication implements WebApplicationInterface
         $appContext = $this->createContext($request);
 
         $container = $appContext->getContainer();
-        $container->bindShared(OutputInterface::class, fn () => new StreamOutput());
+        $container->bindShared(OutputInterface::class, fn() => new StreamOutput());
 
         register_shutdown_function(
-            fn () => $this->stopContext($appContext)
+            fn() => $this->stopContext($appContext)
         );
 
         return $this->runContext($appContext);
@@ -283,7 +277,7 @@ class WebApplication implements WebApplicationInterface
         try {
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
-        } catch (ValidateFailException | InvalidTokenException $e) {
+        } catch (ValidateFailException|InvalidTokenException $e) {
             if ($app->isDebug()) {
                 throw $e;
             }

@@ -29,6 +29,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
+use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
@@ -52,7 +53,7 @@ use function Windwalker\DI\create;
 /**
  * The ConsoleApplication class.
  */
-class ConsoleApplication extends SymfonyApp implements ApplicationInterface
+class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
 {
     use ApplicationTrait;
 

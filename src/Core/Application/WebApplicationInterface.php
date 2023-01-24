@@ -15,7 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Stringable;
 
 /**
- * Interface WebApplicationinterface
+ * Interface WebApplicationInterface
  */
 interface WebApplicationInterface extends ApplicationInterface
 {
