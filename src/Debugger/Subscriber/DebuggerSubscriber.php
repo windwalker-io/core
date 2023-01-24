@@ -26,7 +26,6 @@ use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
-use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Profiler\Profiler;
@@ -45,14 +44,10 @@ use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Http\Helper\HttpHelper;
-use Windwalker\Http\Output\Output;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Query\Query;
 use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
-
-use Windwalker\Stream\Stream;
-
 use Windwalker\Utilities\Reflection\BacktraceHelper;
 
 use function Windwalker\uid;
@@ -96,6 +91,7 @@ class DebuggerSubscriber
 
         if ($rootApp->getClient() === $rootApp::CLIENT_CONSOLE) {
             $this->disableCollection = true;
+
             return;
         }
 
@@ -106,84 +102,10 @@ class DebuggerSubscriber
 
         $container = $event->getContainer();
 
-        /** @var Collection $collector */
-        $collector = $container->get('debugger.collector');
-        $queue = $container->get('debugger.queue');
+        $container->share('debugger.collector', $collector = new Collection());
+        $container->share('debugger.queue', $queue = new Collection());
 
-        $container->extend(
-            DatabaseManager::class,
-            function (DatabaseManager $manager) use ($queue, $collector) {
-                $manager->on(
-                    InstanceCreatedEvent::class,
-                    function (InstanceCreatedEvent $event) use ($queue, $collector) {
-                        $name = $event->getInstanceName();
-                        $dbCollector = $collector->proxy('db.queries.' . $name);
-                        $startTime = null;
-                        $memory = null;
-
-                        /** @var DatabaseAdapter $db */
-                        $db = $event->getInstance();
-
-                        $db->on(
-                            QueryStartEvent::class,
-                            function (QueryStartEvent $event) use (&$startTime, &$memory) {
-                                $startTime = microtime(true);
-                                $memory = memory_get_usage(false);
-                            }
-                        );
-
-                        $db->on(
-                            QueryEndEvent::class,
-                            function (QueryEndEvent $event) use (
-                                $queue,
-                                &$startTime,
-                                $name,
-                                $dbCollector,
-                                &$memory,
-                                $db
-                            ) {
-                                if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
-                                    return;
-                                }
-
-                                $data['time'] = microtime(true) - $startTime;
-                                $data['memory'] = memory_get_usage(false) - $memory;
-                                $data['count'] = $event->getStatement()->countAffected();
-                                $backtrace = debug_backtrace();
-
-                                $queue->push(
-                                    function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
-                                        $data['raw_query'] = (string) $event->getQuery();
-                                        $data['debug_query'] = $event->getDebugQueryString();
-                                        $data['bounded'] = $event->getBounded();
-                                        $data['connection'] = $name;
-                                        $data['backtrace'] = BacktraceHelper::normalizeBacktraces($backtrace);
-
-                                        $query = $event->getQuery();
-
-                                        if (
-                                            $db->getPlatform()->getName() === AbstractPlatform::MYSQL
-                                            && $query instanceof Query
-                                            && $query->getType() === Query::TYPE_SELECT
-                                        ) {
-                                            $query = clone $query;
-                                            $query->prefix('EXPLAIN');
-                                            $data['explain'] = $db->prepare($query)->all();
-                                        }
-
-                                        $dbCollector->push($data);
-                                    }
-                                );
-
-                                $startTime = null;
-                            }
-                        );
-                    }
-                );
-
-                return $manager;
-            }
-        );
+        $this->collectDatabase($container, $queue, $collector);
     }
 
     #[ListenTo(AfterRoutingEvent::class)]
@@ -367,7 +289,7 @@ class DebuggerSubscriber
 
         $collector->setDeep('events', [
             'invoked' => $eventCollector->getInvokedListeners(),
-            'uninvoked' => $eventCollector->getUninvokedListeners()
+            'uninvoked' => $eventCollector->getUninvokedListeners(),
         ]);
 
         // Database
@@ -393,6 +315,91 @@ class DebuggerSubscriber
         }
 
         $collector->setDeep("db.connections", $dbConns);
+    }
+
+    /**
+     * @param  Container  $container
+     * @param  Collection  $queue
+     * @param  Collection  $collector
+     *
+     * @return  void
+     */
+    protected function collectDatabase(Container $container, Collection $queue, Collection $collector): void
+    {
+        $container->extend(
+            DatabaseManager::class,
+            function (DatabaseManager $manager) use ($queue, $collector) {
+                $manager->on(
+                    InstanceCreatedEvent::class,
+                    function (InstanceCreatedEvent $event) use ($queue, $collector) {
+                        $name = $event->getInstanceName();
+                        $dbCollector = $collector->proxy('db.queries.' . $name);
+                        $startTime = null;
+                        $memory = null;
+
+                        /** @var DatabaseAdapter $db */
+                        $db = $event->getInstance();
+
+                        $db->on(
+                            QueryStartEvent::class,
+                            function (QueryStartEvent $event) use (&$startTime, &$memory) {
+                                $startTime = microtime(true);
+                                $memory = memory_get_usage(false);
+                            }
+                        );
+
+                        $db->on(
+                            QueryEndEvent::class,
+                            function (QueryEndEvent $event) use (
+                                $queue,
+                                &$startTime,
+                                $name,
+                                $dbCollector,
+                                &$memory,
+                                $db
+                            ) {
+                                if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
+                                    return;
+                                }
+
+                                $data['time'] = microtime(true) - $startTime;
+                                $data['memory'] = memory_get_usage(false) - $memory;
+                                $data['count'] = $event->getStatement()->countAffected();
+                                $backtrace = debug_backtrace();
+
+                                $queue->push(
+                                    function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
+                                        $data['raw_query'] = (string) $event->getQuery();
+                                        $data['debug_query'] = $event->getDebugQueryString();
+                                        $data['bounded'] = $event->getBounded();
+                                        $data['connection'] = $name;
+                                        $data['backtrace'] = BacktraceHelper::normalizeBacktraces($backtrace);
+
+                                        $query = $event->getQuery();
+
+                                        if (
+                                            $db->getPlatform()->getName() === AbstractPlatform::MYSQL
+                                            && $query instanceof Query
+                                            && $query->getType() === Query::TYPE_SELECT
+                                        ) {
+                                            $query = clone $query;
+                                            $query->prefix('EXPLAIN');
+                                            $data['explain'] = $db->prepare($query)->all();
+                                        }
+
+                                        $dbCollector->push($data);
+                                    }
+                                );
+
+                                $startTime = null;
+                            }
+                        );
+                    }
+                );
+
+                return $manager;
+            }
+        );
     }
 
     protected function finishCollected(?ResponseInterface $response = null): void
