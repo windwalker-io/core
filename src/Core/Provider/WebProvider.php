@@ -103,11 +103,11 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(
             AppContext::class,
             function (AppContext $app, Container $container) {
-                if ($container->getLevel() === 2) {
-                    throw new \LogicException(
-                        'AppContext should not create in a level 2 Container.'
-                    );
-                }
+                // if ($container->getLevel() === 2) {
+                //     throw new \LogicException(
+                //         'AppContext should not create in a level 2 Container.'
+                //     );
+                // }
 
                 // $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 

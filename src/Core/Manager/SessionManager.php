@@ -85,10 +85,6 @@ class SessionManager extends AbstractManager
         array $options = []
     ): Closure {
         return static function (Container $container) use ($cookies, $handler, $bridge, $options) {
-            if ($container->getLevel() === 2) {
-                throw new \Exception();
-            }
-
             $bridge = $container->resolve(
                 'session.factories.bridges.' . $bridge,
                 [
