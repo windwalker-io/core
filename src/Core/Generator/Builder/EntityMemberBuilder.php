@@ -210,7 +210,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $default = [];
         } else {
             $type = $dt::getPhpType($dataType);
-            $default = TypeCast::try($default, $type);
+
+            if ($dbColumn->getIsNullable() && $default === 'NULL') {
+                $default = null;
+            } else {
+                $default = TypeCast::try($default, $type);
+            }
 
             if ($dbColumn->isAutoIncrement() || $dbColumn->getIsNullable()) {
                 if (str_contains($type, '|')) {
