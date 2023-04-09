@@ -6,13 +6,16 @@
  */
 
 import CssPreProcessor from './css-pre-processor.js';
-import { default as gulpSass } from 'gulp-sass'
+import { default as gulpSass } from 'gulp-sass';
+import sass from 'sass';
+
+const gulpSassInc = gulpSass(sass);
 
 export default class SassProcessor extends CssPreProcessor {
   compile(dest, options = {}) {
     this.pipe(
-      gulpSass({ style: 'expanded' })
-        .on('error', gulpSass.logError)
+      gulpSassInc({ style: 'expanded' })
+        .on('error', gulpSassInc.logError)
     );
     return this;
   }
