@@ -1,10 +1,14 @@
 {% $phpOpen %}
 
+declare(strict_types=1);
+
+namespace App\View;
+
 /**
  * Global variables
  * --------------------------------------------------------------
  * @var $app       AppContext      Application context.
- * @var $vm        object          The view model object.
+ * @var  $vm        {% pascal($name) %}View  The view model object.
  * @var $uri       SystemUri       System Uri information.
  * @var $chronos   ChronosService  The chronos datetime service.
  * @var $nav       Navigator       Navigator object to build route.
@@ -12,8 +16,7 @@
  * @var $lang      LangService     The language translation service.
  */
 
-declare(strict_types=1);
-
+use {% $ns %}\{% pascal($name) %}View;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\DateTime\ChronosService;

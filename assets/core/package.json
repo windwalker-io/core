@@ -1,6 +1,6 @@
 {
   "name": "@windwalker-io/core",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "type": "module",
   "description": "Windwalker Core JS package",
   "scripts": {
@@ -15,7 +15,7 @@
   "author": "Simon Asika",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.0||^1.0"
   },
   "devDependencies": {
     "dayjs": "^1.11.5",

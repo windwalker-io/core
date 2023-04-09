@@ -21,7 +21,7 @@ class Base64Url
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
-    public static function decode(string $data): string
+    public static function decode(string $data): string|false
     {
         return base64_decode(strtr($data, '-_', '+/'), true);
     }

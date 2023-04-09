@@ -145,7 +145,7 @@ class DashboardRepository
         $folder = $this->getCacheFolder()->appendPath('/' . $id);
 
         $folder->appendPath('/basic.json')->write(json_encode($basicData));
-        $folder->appendPath('/db.json')->write(json_encode($collector['db']));
+        $folder->appendPath('/db.json')->write(json_encode($collector['db'], JSON_INVALID_UTF8_SUBSTITUTE));
         $folder->appendPath('/system.json')->write(json_encode($collector['system']));
         $folder->appendPath('/routing.json')->write(json_encode($collector['routing']));
         $folder->appendPath('/http.json')->write(json_encode($collector['http']));
