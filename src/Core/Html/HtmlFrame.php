@@ -20,6 +20,7 @@ use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
 use function Windwalker\DOM\h;
+use function Windwalker\str;
 
 /**
  * The HtmlFrame class.
@@ -466,18 +467,24 @@ class HtmlFrame
         return $this;
     }
 
-    public function setDescription(string $text): static
+    public function setDescription(string $text, ?int $truncate = null): static
     {
-        $this->addMetadata('description', $text, true);
+        $t = str($text)->stripHtmlTags()->collapseWhitespaces();
+
+        if ($truncate) {
+            $t = $t->truncate($truncate, '...');
+        }
+
+        $this->addMetadata('description', $text = (string) $t, true);
         $this->addOpenGraph('og:description', $text, true);
 
         return $this;
     }
 
-    public function setDescriptionIfNotEmpty(?string $text): static
+    public function setDescriptionIfNotEmpty(?string $text, ?int $truncate = null): static
     {
         if ((string) $text !== '') {
-            $this->setDescription($text);
+            $this->setDescription($text, $truncate);
         }
 
         return $this;
