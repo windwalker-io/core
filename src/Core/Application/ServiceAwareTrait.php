@@ -65,7 +65,7 @@ trait ServiceAwareTrait
     /**
      * call
      *
-     * @param  callable     $callable
+     * @param  mixed        $callable
      * @param  array        $args
      * @param  object|null  $context
      * @param  int          $options
@@ -74,7 +74,7 @@ trait ServiceAwareTrait
      *
      * @throws ReflectionException
      */
-    public function call(callable $callable, array $args = [], ?object $context = null, int $options = 0): mixed
+    public function call(mixed $callable, array $args = [], ?object $context = null, int $options = 0): mixed
     {
         return $this->getContainer()->call($callable, $args, $context, $options);
     }
