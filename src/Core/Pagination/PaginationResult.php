@@ -102,7 +102,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
         $total = $pagination->getTotal();
         $current = $pagination->getCurrent();
 
-        if ($total === 0 || $pagination->getLimit() === 0 || $this->getPages() === 1) {
+        if ($total === 0 || $pagination->getLimit() === 0 || $pagination->getPages() === 1) {
             return;
         }
 
@@ -115,7 +115,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
             $neighbours = 1;
         } else {
             $neighbours = $current - $pagination->getNeighbours();
-            $neighbours = $neighbours < Pagination::BASE_PAGE ? Pagination::BASE_PAGE : $neighbours;
+            $neighbours = max($neighbours, Pagination::BASE_PAGE);
         }
 
         for ($i = $offset; $i >= $neighbours; $i--) {
@@ -136,7 +136,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
         // Higher
         $offset = $current + 1;
         $neighbours = $current + $pagination->getNeighbours();
-        $neighbours = $neighbours > $pages ? $pages : $neighbours;
+        $neighbours = min($neighbours, $pages);
 
         for ($i = $offset; $i <= $neighbours; $i++) {
             $this->highers[] = $this->getItem(Pagination::HIGHER, $i);

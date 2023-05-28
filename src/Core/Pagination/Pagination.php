@@ -366,7 +366,7 @@ class Pagination
         $route = $this->route;
 
         if ($route === null) {
-            return new RouteUri($this->systemUri->full, compact('page'), $this->navigator);
+            return $this->navigator->self()->page($page);
         }
 
         return $route->withVar('page', $page);
