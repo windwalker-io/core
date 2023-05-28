@@ -38,9 +38,9 @@ class CoreResponse extends Response
     /**
      * Create a new response.
      *
-     * @param  mixed     $body
+     * @param  mixed  $body
      * @param  int|null  $status  HTTP status code; defaults to 200
-     * @param  array     $headers
+     * @param  array  $headers
      *
      * @return Response
      */
@@ -84,14 +84,17 @@ class CoreResponse extends Response
         return new TextResponse($body, $status, $headers);
     }
 
-    public function redirect(string|Stringable $body, int $status = 303, array $headers = []): RedirectResponse
-    {
-        [$body, $status, $headers] = $this->prepare($body, $status, $headers);
+    public function redirect(
+        string|null|Stringable $uri,
+        int $status = 303,
+        array $headers = []
+    ): RedirectResponse {
+        [, $status, $headers] = $this->prepare($uri, $status, $headers);
 
-        return new RedirectResponse($body, $status, $headers);
+        return new RedirectResponse($uri, $status, $headers);
     }
 
-    public function attachment(mixed $body, ?int $status = null, array $headers = []): AttachmentResponse
+    public function attachment(mixed $body = null, ?int $status = null, array $headers = []): AttachmentResponse
     {
         [$body, $status, $headers] = $this->prepare($body, $status, $headers);
 
