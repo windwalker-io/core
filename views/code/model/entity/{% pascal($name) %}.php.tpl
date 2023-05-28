@@ -24,6 +24,7 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 * The {% pascal($name) %} class.
 */
 #[Table('{% plural(snake($name)) %}', '{% snake($name) %}')]
+#[\AllowDynamicProperties]
 class {% pascal($name) %} implements EntityInterface
 {
     use EntityTrait;
