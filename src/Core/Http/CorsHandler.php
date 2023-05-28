@@ -20,6 +20,8 @@ use Windwalker\Http\Response\Response;
  */
 class CorsHandler
 {
+    protected ResponseInterface $response;
+
     /**
      * create
      *
@@ -27,7 +29,7 @@ class CorsHandler
      *
      * @return  static
      */
-    public static function create(?ResponseInterface $response = null)
+    public static function create(?ResponseInterface $response = null): static
     {
         return new static($response ?? new Response());
     }
@@ -35,11 +37,11 @@ class CorsHandler
     /**
      * CorsHandler constructor.
      *
-     * @param ResponseInterface $response
+     * @param  ResponseInterface|null  $response
      */
-    public function __construct(protected ResponseInterface $response)
+    public function __construct(?ResponseInterface $response = null)
     {
-        //
+        $this->response = $response ?? new Response();
     }
 
     /**
@@ -142,6 +144,26 @@ class CorsHandler
         $this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
 
         return $this;
+    }
+
+    /**
+     * @template R
+     *
+     * @param  class-string<R>  $response
+     *
+     * @return  R
+     */
+    public function handle(ResponseInterface $response): ResponseInterface
+    {
+        $headers = $this->response->getHeaders();
+
+        foreach ($headers as $name => $values) {
+            foreach ($values as $value) {
+                $response = $response->withAddedHeader($name, $value);
+            }
+        }
+
+        return $response;
     }
 
     /**
