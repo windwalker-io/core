@@ -92,8 +92,12 @@ class ChronosService
         return $db->isNullDate($date);
     }
 
-    public function toServer(mixed $date, string|DateTimeZone $from = null): Chronos
+    public function toServer(mixed $date, string|DateTimeZone $from = null): ?Chronos
     {
+        if ($date === null || $date === '') {
+            return null;
+        }
+
         $from = $from ?? $this->getTimezone();
 
         return static::convert($date, $from, $this->getServerTimezone());
@@ -111,8 +115,12 @@ class ChronosService
         return $this->toServer($date, $from)->format($format);
     }
 
-    public function toLocal(mixed $date, string|DateTimeZone $to = null): Chronos
+    public function toLocal(mixed $date, string|DateTimeZone $to = null): ?Chronos
     {
+        if ($date === null || $date === '') {
+            return null;
+        }
+
         $to = $to ?? $this->getTimezone();
 
         return static::convert($date, $this->getServerTimezone(), $to);
