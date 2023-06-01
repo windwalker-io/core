@@ -184,6 +184,11 @@ class DelegatingController implements ControllerInterface
      */
     protected function logError(Throwable $e): void
     {
+        // Do not log 40x errors.
+        if ($e->getCode() >= 400 && $e->getCode() < 500) {
+            return;
+        }
+
         $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
 
         $this->app->service(LoggerService::class)
