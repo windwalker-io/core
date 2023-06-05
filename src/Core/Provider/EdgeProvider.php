@@ -3,7 +3,7 @@
 /**
  * Part of earth project.
  *
- * @copyright  Copyright (C) 2023 __ORGANIZATION__.
+ * @copyright  Copyright (C) 2023 LYRASOFT.
  * @license    MIT
  */
 

@@ -3,7 +3,7 @@
 /**
  * Part of amiko project.
  *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
+ * @copyright  Copyright (C) 2021 LYRASOFT.
  * @license    MIT
  */
 

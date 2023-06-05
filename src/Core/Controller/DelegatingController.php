@@ -3,7 +3,7 @@
 /**
  * Part of starter project.
  *
- * @copyright  Copyright (C) 2020 __ORGANIZATION__.
+ * @copyright  Copyright (C) 2020 LYRASOFT.
  * @license    MIT
  */
 

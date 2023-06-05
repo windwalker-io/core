@@ -3,8 +3,8 @@
 /**
  * Part of Windwalker project.
  *
- * @copyright  Copyright (C) 2022 __ORGANIZATION__.
- * @license    __LICENSE__
+ * @copyright  Copyright (C) 2022 LYRASOFT.
+ * @license    MIT
  */
 
 declare(strict_types=1);
