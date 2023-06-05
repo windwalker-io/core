@@ -147,8 +147,8 @@ HELP;
             $content = file_get_contents($file->getPathname());
 
             $content = str_replace(
-                ['{DEPLOY_VERSION}', '__DEPLOY_VERSION__', '__LICENSE__', '${ORGANIZATION}', '{ORGANIZATION}'],
-                [$version, $version, 'MIT', 'LYRASOFT', 'LYRASOFT'],
+                ['{DEPLOY_VERSION}', '__DEPLOY_VERSION__', '__LICENSE__', '${ORGANIZATION}', '{ORGANIZATION}', '__ORGANIZATION__'],
+                [$version, $version, 'MIT', 'LYRASOFT', 'LYRASOFT', 'LYRASOFT'],
                 $content
             );
 
