@@ -24,11 +24,7 @@ use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
-use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
-
-use Windwalker\Http\Output\Output;
-
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Response\HtmlResponse;
