@@ -190,7 +190,7 @@ class Route implements JsonSerializable
         $groups = $this->getGroups();
 
         // Set group data
-        $keys = ['methods', 'actions', 'variables', 'requirements', 'scheme', 'port', 'sslPort', 'hooks'];
+        $keys = ['methods', 'actions', 'variables', 'requirements', 'scheme', 'port', 'sslPort', 'hooks', 'hosts'];
 
         foreach ($groups as $groupData) {
             foreach ($keys as $i => $key) {

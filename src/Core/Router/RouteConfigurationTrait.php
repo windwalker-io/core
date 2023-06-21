@@ -383,10 +383,12 @@ trait RouteConfigurationTrait
         return $this;
     }
 
-    public function hosts(string ...$hosts): static
+    public function hosts(string|array ...$hosts): static
     {
+        $hosts = Arr::collapse($hosts);
+
         $this->options['hosts'] = array_merge(
-            $this->options['hosts'],
+            $this->options['hosts'] ?? [],
             array_values($hosts)
         );
 
