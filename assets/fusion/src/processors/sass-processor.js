@@ -7,7 +7,7 @@
 
 import CssPreProcessor from './css-pre-processor.js';
 import { default as gulpSass } from 'gulp-sass';
-import sass from 'sass';
+import * as sass from 'sass';
 
 const gulpSassInc = gulpSass(sass);
 
