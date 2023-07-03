@@ -12,13 +12,14 @@ declare(strict_types=1);
 namespace Windwalker\Core\Asset;
 
 use ArrayAccess;
-use Fig\Link\Link;
+use Windwalker\Core\Link\Link;
 use Windwalker\Utilities\Contract\AccessibleInterface;
 use Windwalker\Utilities\Options\OptionAccessTrait;
 
 /**
  * The AssetLink class.
  */
+#[\AllowDynamicProperties]
 class AssetLink extends Link
 {
     use OptionAccessTrait;

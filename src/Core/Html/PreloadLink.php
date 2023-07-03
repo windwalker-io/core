@@ -11,11 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Html;
 
-use Fig\Link\Link;
+use Windwalker\Core\Link\Link;
 
 /**
  * The PreloadLink class.
  */
+#[\AllowDynamicProperties]
 class PreloadLink extends Link
 {
     public function getType(): ?string

@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Html;
 
-use Fig\Link\Link;
 use JetBrains\PhpStorm\ExpectedValues;
 use Psr\Link\LinkInterface;
 use Stringable;
 use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Link\Link;
 use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
