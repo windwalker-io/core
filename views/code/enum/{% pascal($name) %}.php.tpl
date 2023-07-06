@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace {% $ns %};
 
-use MyCLabs\Enum\Enum;
 use Windwalker\Utilities\Enum\EnumSingleton;
 use Windwalker\Utilities\Enum\EnumTranslatableInterface;
 use Windwalker\Utilities\Enum\EnumTranslatableTrait;
@@ -19,26 +18,12 @@ use Windwalker\Utilities\Contract\LanguageInterface;
 
 /**
  * The {% pascal($name) %} enum class.
- *
- * @cases Add cases here.
  */
-class {% pascal($name) %} extends EnumSingleton implements EnumTranslatableInterface
+enum {% pascal($name) %} implements EnumTranslatableInterface
 {
     use EnumTranslatableTrait;
 
-    // public const CASE = '';
-
-    /**
-     * Unable to directly new this object.
-     *
-     * @param  mixed  $value
-     *
-     * @throws \UnexpectedValueException if incompatible type is given.
-     */
-    protected function __construct(mixed $value)
-    {
-        parent::__construct($value);
-    }
+    // case CASE = '';
 
     public function trans(LanguageInterface $lang, ...$args): string
     {
