@@ -63,7 +63,7 @@
         },
         "branch-alias": {
             "dev-master": "4.x-dev",
-            "dev-4.1": "next-dev"
+            "dev-4.1": "4.1.x-dev"
         }
     }
 }
