@@ -83,7 +83,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         // Start profiler for Web type
         $profilerFactory = null;
 
-        if ($this->getClientType() === 'web') {
+        if ($this->getType() === 'web') {
             $profilerFactory = new ProfilerFactory();
             $profilerFactory->get('main')->mark('boot', ['system']);
         }

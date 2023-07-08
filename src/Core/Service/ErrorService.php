@@ -424,11 +424,26 @@ class ErrorService
         return trim(explode("\n", $message)[0]);
     }
 
-    public static function getReportLevel(): int
+    public static function getReportLevel(array|int|null $errors = null): int
     {
-        return E_ALL
-            & ~E_USER_WARNING
-            & ~E_USER_DEPRECATED
-            & ~E_USER_NOTICE;
+        if ($errors === null) {
+            return E_ALL
+                & ~E_WARNING
+                & ~E_DEPRECATED
+                & ~E_NOTICE
+                & ~E_USER_WARNING
+                & ~E_USER_DEPRECATED
+                & ~E_USER_NOTICE;
+        }
+
+        $level = 0;
+
+        foreach ($errors as $error => $enabled) {
+            if ($enabled) {
+                $level |= $error;
+            }
+        }
+
+        return $level;
     }
 }

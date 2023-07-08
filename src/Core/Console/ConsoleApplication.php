@@ -27,6 +27,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\RootApplicationInterface;
@@ -367,9 +368,9 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     /**
      * @inheritDoc
      */
-    public function getClient(): string
+    public function getClient(): AppClient
     {
-        return static::CLIENT_CONSOLE;
+        return AppClient::CONSOLE;
     }
 
     protected function getProcessOutputCallback(?OutputInterface $output = null): callable

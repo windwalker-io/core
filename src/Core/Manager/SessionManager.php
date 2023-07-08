@@ -15,6 +15,7 @@ use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
@@ -98,7 +99,7 @@ class SessionManager extends AbstractManager
 
             $app = $container->get(ApplicationInterface::class);
 
-            if ($app->getClientType() === 'cli_web') {
+            if ($app->getType() === AppType::CLI_WEB) {
                 // In cli web, disable shutdown function to save memory
                 $options[SessionInterface::OPTION_AUTO_COMMIT] = false;
             }

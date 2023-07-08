@@ -24,7 +24,6 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
 use Windwalker\Uri\Uri;

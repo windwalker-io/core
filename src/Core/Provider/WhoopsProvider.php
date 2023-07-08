@@ -18,7 +18,9 @@ use Whoops\Handler\CallbackHandler;
 use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
@@ -40,7 +42,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
     {
         $app = $container->get(ApplicationInterface::class);
 
-        if ($app->getClientType() === 'web') {
+        if ($app->getType() === AppType::WEB) {
             $this->replaceErrorHandler($container);
         }
     }
@@ -58,7 +60,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
     {
         $app = $container->get(ApplicationInterface::class);
 
-        if ($app->getClientType() === 'cli_web') {
+        if ($app->getType() === AppType::CLI_WEB) {
             $this->replaceErrorHandler($container);
         }
     }
@@ -142,7 +144,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
 
                         if (
                             PHP_SAPI === 'cli'
-                            && $app->getClient() === ApplicationInterface::CLIENT_WEB
+                            && $app->getClient() === AppClient::WEB
                         ) {
                             $textHandler = new PlainTextHandler();
                             $textHandler->addPreviousToOutput(true);

@@ -33,7 +33,6 @@ use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\Event\PrepareDataEvent;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filesystem\Path;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;

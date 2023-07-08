@@ -24,7 +24,6 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Uri\Uri;

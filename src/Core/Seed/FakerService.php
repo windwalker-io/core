@@ -16,7 +16,6 @@ use Faker\Generator as FakerGenerator;
 use Psr\Cache\InvalidArgumentException;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**

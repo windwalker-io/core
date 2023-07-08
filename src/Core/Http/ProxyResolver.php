@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Http;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\IpHelper;

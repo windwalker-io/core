@@ -24,9 +24,9 @@ interface ApplicationInterface extends
     ServiceAwareInterface,
     ProcessRunnerInterface
 {
-    public const CLIENT_WEB = 'web';
+    public const CLIENT_WEB = AppClient::WEB;
 
-    public const CLIENT_CONSOLE = 'console';
+    public const CLIENT_CONSOLE = AppClient::CONSOLE;
 
     public function getAppName(): string;
 
@@ -100,9 +100,9 @@ interface ApplicationInterface extends
     /**
      * Get App client, currently only 'web' and 'console'.
      *
-     * @return  string
+     * @return  AppClient
      */
-    public function getClient(): string;
+    public function getClient(): AppClient;
 
     /**
      * Get client type, will be: web, console and cli_web.
@@ -111,9 +111,9 @@ interface ApplicationInterface extends
      * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
      * If run as Windwalker console, this will be `console`.
      *
-     * @return  string
+     * @return  AppType
      */
-    public function getClientType(): string;
+    public function getType(): AppType;
 
     /**
      * Is current runtime run in cli?

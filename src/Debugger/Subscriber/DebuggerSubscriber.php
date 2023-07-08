@@ -14,8 +14,10 @@ namespace Windwalker\Debugger\Subscriber;
 use Composer\InstalledVersions;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Event\EventCollector;
@@ -89,7 +91,7 @@ class DebuggerSubscriber
     {
         $rootApp = $this->container->get(RootApplicationInterface::class);
 
-        if ($rootApp->getClient() === $rootApp::CLIENT_CONSOLE) {
+        if ($rootApp->getClient() === AppClient::CONSOLE) {
             $this->disableCollection = true;
 
             return;
@@ -416,7 +418,7 @@ class DebuggerSubscriber
             /** @var ApplicationInterface $app */
             $app = $this->container->get(ApplicationInterface::class);
 
-            if ($app->getClientType() === 'console') {
+            if ($app->getType() === AppType::CONSOLE) {
                 return;
             }
 

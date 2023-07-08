@@ -33,8 +33,8 @@ trait WebApplicationTrait
         return headers_sent();
     }
 
-    public function getClient(): string
+    public function getClient(): AppClient
     {
-        return ApplicationInterface::CLIENT_WEB;
+        return AppClient::WEB;
     }
 }
