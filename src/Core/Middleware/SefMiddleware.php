@@ -125,7 +125,7 @@ class SefMiddleware implements MiddlewareInterface
 
         if ($this->flags & static::REPLACE_SRCSET && str_contains($buffer, 'srcset=')) {
             $regex  = '#\s+srcset="([^"]+)"#m';
-            $buffer = preg_replace_callback(
+            $buffer = (string) preg_replace_callback(
                 $regex,
                 static function ($match) use ($baseSrc, $protocols) {
                     preg_match_all('#(?:[^\s]+)\s*(?:[\d\.]+[wx])?(?:\,\s*)?#i', $match[1], $matches);
@@ -176,7 +176,7 @@ class SefMiddleware implements MiddlewareInterface
                 /** @var null|string $buffer */
                 $buffer = preg_replace_callback(
                     "'<style(.*?)>(.*?)</style>'is",
-                    function ($matches) use ($baseSrc, $regexUrl) {
+                    static function ($matches) use ($baseSrc, $regexUrl) {
                         $css = $matches[2];
 
                         if (str_contains($css, 'url')) {

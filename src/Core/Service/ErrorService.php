@@ -122,6 +122,14 @@ class ErrorService
             return;
         }
 
+        // Handle memory
+        if (str_contains($message, 'Allowed memory size')) {
+            sscanf($message, 'Allowed memory size of %d bytes %s', $bytes, $end);
+            $mb = $bytes / 1024 / 1024;
+            echo "[ERROR] Allowed memory size of $bytes bytes ($mb MB) $end, in $file:$line";
+            die;
+        }
+
         $content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
         throw new ErrorException($content, 500, $code, $file, $line);
