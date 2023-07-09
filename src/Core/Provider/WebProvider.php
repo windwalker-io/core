@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
@@ -72,6 +73,9 @@ class WebProvider implements ServiceProviderInterface
 
         // Renderer
         $this->extendRenderer($container);
+
+        // Security
+        $this->registerSecurityServices($container);
     }
 
     /**
@@ -191,5 +195,14 @@ class WebProvider implements ServiceProviderInterface
         //             ->addGlobal('nav', $container->get(Navigator::class));
         //     }
         // );
+    }
+
+    protected function registerSecurityServices(Container $container): void
+    {
+        $container->prepareSharedObject(
+            CspNonceService::class,
+            null,
+            Container::ISOLATION
+        );
     }
 }

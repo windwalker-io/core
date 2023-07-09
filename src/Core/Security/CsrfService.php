@@ -81,8 +81,6 @@ class CsrfService
     }
 
     /**
-     * createToken
-     *
      * @return  string
      *
      * @throws Exception

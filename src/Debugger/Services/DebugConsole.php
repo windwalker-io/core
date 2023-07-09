@@ -14,6 +14,7 @@ namespace Windwalker\Debugger\Services;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Renderer\RendererService;
+use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Data\Collection;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Stream\Stream;
@@ -28,6 +29,7 @@ class DebugConsole
      */
     public function __construct(
         protected RendererService $rendererService,
+        protected CspNonceService $cspNonceService,
         protected AssetService $assetService
     ) {
     }
@@ -89,6 +91,7 @@ class DebugConsole
                 'collector' => $collector,
                 'css' => $css,
                 'js' => $js,
+                'nonce' => $this->cspNonceService->getNonce()
             ]
         );
     }

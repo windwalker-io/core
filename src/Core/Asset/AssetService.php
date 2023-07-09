@@ -322,6 +322,8 @@ class AssetService implements EventAwareInterface
             [
                 'assetService' => $this,
                 'withInternal' => $withInternal,
+                'internalAttrs' => $internalAttrs,
+                'links' => $this->styles,
                 'html' => $html,
                 'type' => AssetBeforeRender::TYPE_CSS,
             ]
@@ -330,7 +332,7 @@ class AssetService implements EventAwareInterface
         $withInternal = $event->isWithInternal();
         $html = $event->getHtml();
 
-        foreach ($this->styles as $url => $style) {
+        foreach ($event->getLinks() as $url => $style) {
             $defaultAttrs = [
                 'href' => $style->getHref(),
                 'rel' => 'stylesheet',
@@ -353,7 +355,7 @@ class AssetService implements EventAwareInterface
         if ($withInternal && $this->internalStyles) {
             $html[] = (string) h(
                 'style',
-                $internalAttrs,
+                $event->getInternalAttrs(),
                 "\n" . $this->renderInternalCSS() . "\n" . $this->indents
             );
         }
@@ -378,6 +380,8 @@ class AssetService implements EventAwareInterface
             [
                 'assetService' => $this,
                 'withInternal' => $withInternal,
+                'internalAttrs' => $internalAttrs,
+                'links' => $this->scripts,
                 'html' => $html,
                 'type' => AssetBeforeRender::TYPE_JS,
             ]
@@ -386,7 +390,7 @@ class AssetService implements EventAwareInterface
         $withInternal = $event->isWithInternal();
         $html = $event->getHtml();
 
-        foreach ($this->scripts as $url => $script) {
+        foreach ($event->getLinks() as $url => $script) {
             $defaultAttrs = [
                 'src' => $script->getHref(),
             ];
@@ -415,7 +419,7 @@ class AssetService implements EventAwareInterface
         if ($withInternal && $this->internalScripts) {
             $html[] = (string) h(
                 'script',
-                $internalAttrs,
+                $event->getInternalAttrs(),
                 "\n" . $this->renderInternalJS() . "\n" . $this->indents
             );
         }
@@ -652,7 +656,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  array
      */
-    public function getInternalStyles(): array
+    public function &getInternalStyles(): array
     {
         return $this->internalStyles;
     }
@@ -676,7 +680,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  array
      */
-    public function getInternalScripts(): array
+    public function &getInternalScripts(): array
     {
         return $this->internalScripts;
     }

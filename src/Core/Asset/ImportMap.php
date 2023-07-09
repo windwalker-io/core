@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Asset;
 
 use JsonException;
+use Windwalker\DOM\DOMElement;
 
 /**
  * The ImportMap class.
@@ -22,6 +23,8 @@ class ImportMap
         'imports' => [],
         'scopes' => [],
     ];
+
+    protected string $cspNonce = '';
 
     /**
      * ImportMap constructor.
@@ -174,12 +177,13 @@ class ImportMap
      *
      * @param  string  $type
      * @param  int     $jsonFlags
+     * @param  array   $attrs
      *
      * @return  string
      *
      * @throws JsonException
      */
-    public function render(string $type = 'importmap', int $jsonFlags = 0): string
+    public function render(string $type = 'importmap', int $jsonFlags = 0, array $attrs = []): string
     {
         if ($this->data['imports'] === [] && $this->data['scopes'] === []) {
             return '';
@@ -191,8 +195,16 @@ class ImportMap
 
         $data = json_encode($this->data, JSON_THROW_ON_ERROR | JSON_FORCE_OBJECT | $jsonFlags);
 
+        $attrs['type'] = $type;
+
+        if ($this->getCspNonce()) {
+            $attrs['nonce'] = $this->getCspNonce();
+        }
+
+        $attrString = DOMElement::buildAttributes($attrs);
+
         return <<<SCRIPT
-        <script type="$type">
+        <script $attrString>
         $data
         </script>
         SCRIPT;
@@ -214,6 +226,26 @@ class ImportMap
     public function setIsDebug(bool $isDebug): static
     {
         $this->isDebug = $isDebug;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCspNonce(): string
+    {
+        return $this->cspNonce;
+    }
+
+    /**
+     * @param  string  $cspNonce
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setCspNonce(string $cspNonce): static
+    {
+        $this->cspNonce = $cspNonce;
 
         return $this;
     }

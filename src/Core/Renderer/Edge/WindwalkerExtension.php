@@ -71,6 +71,7 @@ class WindwalkerExtension implements
             // 'route' => [$this, 'route'],
             'formToken' => [$this, 'formToken'],
             'csrf' => [$this, 'formToken'],
+            'nonce' => [$this, 'cspNonce'],
 
             // Authorisation
             'can' => [$this, 'can'],
@@ -166,6 +167,16 @@ class WindwalkerExtension implements
     public function formToken(): string
     {
         return "<?php echo \$__edge->render('@csrf'); ?>";
+    }
+
+    /**
+     * formToken
+     *
+     * @return  string
+     */
+    public function cspNonce(): string
+    {
+        return "<?php echo \$app->service(\Windwalker\Core\Security\CspNonceService::class)?->attr(); ?>";
     }
 
     /**

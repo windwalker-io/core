@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset\Event;
 
+use Windwalker\Core\Asset\AssetLink;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Event\AbstractEvent;
 
@@ -28,6 +29,10 @@ class AssetBeforeRender extends AbstractEvent
     protected bool $withInternal = false;
 
     protected array $html = [];
+
+    protected array $links = [];
+
+    protected array $internalAttrs = [];
 
     protected string $type;
 
@@ -107,6 +112,46 @@ class AssetBeforeRender extends AbstractEvent
     public function setType(string $type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function &getInternalAttrs(): array
+    {
+        return $this->internalAttrs;
+    }
+
+    /**
+     * @param  array  $internalAttrs
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setInternalAttrs(array $internalAttrs): static
+    {
+        $this->internalAttrs = $internalAttrs;
+
+        return $this;
+    }
+
+    /**
+     * @return array<AssetLink>
+     */
+    public function &getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param  array  $links
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setLinks(array $links): static
+    {
+        $this->links = $links;
 
         return $this;
     }
