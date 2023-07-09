@@ -22,12 +22,12 @@ use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
+use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventListenableInterface;
 
 /**
@@ -125,7 +125,17 @@ trait ApplicationTrait
      */
     public function getMode(): string
     {
-        return $this->config('app.mode');
+        return (string) $this->config('app.mode');
+    }
+
+    /**
+     * getMode
+     *
+     * @return  string
+     */
+    public function getSecret(): string
+    {
+        return Base64Url::decode((string) $this->config('app.secret'));
     }
 
     /**

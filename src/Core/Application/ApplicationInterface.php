@@ -121,4 +121,11 @@ interface ApplicationInterface extends
      * @return  bool
      */
     public function isCliRuntime(): bool;
+
+    /**
+     * Get App Secret.
+     *
+     * @return  string
+     */
+    public function getSecret(): string;
 }

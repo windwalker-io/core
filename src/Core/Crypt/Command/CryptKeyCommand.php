@@ -42,7 +42,7 @@ class CryptKeyCommand implements CommandInterface
             'length',
             InputArgument::OPTIONAL,
             'The bytes length.',
-            '32'
+            '16'
         );
 
         $command->addOption(

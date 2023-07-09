@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Composer;
 
-use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use Exception;
 use Windwalker\Core\Utilities\Base64Url;
@@ -37,7 +36,6 @@ class StarterInstaller
 
         $io = $event->getIO();
 
-        static::genSecretCode($event);
         static::appName($event);
 
         static::noIgnoreLockFile($event);
@@ -67,32 +65,6 @@ class StarterInstaller
         file_put_contents($file, $content);
     }
 
-    /**
-     * Generate secret code.
-     *
-     * @param  Event  $event
-     *
-     * @return  void
-     * @throws Exception
-     */
-    public static function genSecretCode(Event $event): void
-    {
-        $io = $event->getIO();
-        $file = getcwd() . '/etc/conf/app.php';
-
-        $config = file_get_contents($file);
-
-        $config = str_replace(
-            '{{ REPLACE THIS AS RANDOM SECRET CODE }}',
-            Base64Url::encode(random_bytes(16)),
-            $config
-        );
-
-        file_put_contents($file, $config);
-
-        $io->write('Auto created secret key.');
-    }
-
     public static function noIgnoreLockFile(Event $event): void
     {
         $io = $event->getIO();
@@ -114,9 +86,10 @@ class StarterInstaller
     /**
      * Generate database config. will store in: etc/secret.yml.
      *
-     * @param  IOInterface  $io
+     * @param  Event  $event
      *
      * @return  void
+     * @throws Exception
      */
     public static function genEnv(Event $event): void
     {
@@ -135,9 +108,16 @@ class StarterInstaller
 
         $env = file_get_contents($dist);
 
-        if ($io->askConfirmation("\nDo you want to use database? [Y/n]: ", true)) {
-            $vars = [];
+        $vars = [];
 
+        $secret = $io->ask(
+            "\nEnter a custom secret [Leave empty to auto generate]: ",
+            ''
+        ) ?: static::genSecretCode();
+
+        $vars['APP_SECRET'] = $secret;
+
+        if ($io->askConfirmation("\nDo you want to use database? [Y/n]: ", true)) {
             $supportedDrivers = [
                 'pdo_mysql',
                 'mysqli',
@@ -166,10 +146,10 @@ class StarterInstaller
             $vars['DATABASE_NAME'] = $io->ask('Database name [acme]: ', 'acme');
             $vars['DATABASE_USER'] = $io->ask('Database user [root]: ', 'root');
             $vars['DATABASE_PASSWORD'] = $io->askAndHideAnswer('Database password: ');
+        }
 
-            foreach ($vars as $key => $value) {
-                $env = preg_replace('/' . $key . '=(.*)/', $key . '=' . $value, $env);
-            }
+        foreach ($vars as $key => $value) {
+            $env = static::injectEnvVar($env, $key, (string) $value);
         }
 
         file_put_contents($dest, $env);
@@ -177,5 +157,58 @@ class StarterInstaller
         $io->write('');
         $io->write('Database config setting complete.');
         $io->write('');
+    }
+
+    /**
+     * Generate secret code.
+     *
+     * Use length 16 to generate 128bit secret.
+     *
+     * @return string
+     * @throws Exception
+     */
+    public static function genSecretCode(): string
+    {
+        return Base64Url::encode(random_bytes(16));
+    }
+
+    /**
+     * @param  string  $env
+     * @param  string  $key
+     * @param  string  $value
+     * @param  bool    $prepend
+     *
+     * @return string
+     */
+    protected static function injectEnvVar(string $env, string $key, string $value, bool $prepend = true): string
+    {
+        $value = static::handleEnvVar($value);
+
+        if (str_contains($env, $key)) {
+            return preg_replace(
+                '/' . $key . '=(.*)/',
+                $key . '=' . $value,
+                $env
+            );
+        }
+
+        $var = "{$key}={$value}";
+
+        if ($prepend) {
+            return $var . "\n" . $env;
+        }
+
+        return $env . "\n" . $var;
+    }
+
+    public static function handleEnvVar(string $value): string
+    {
+        $value = addcslashes($value, '"');
+
+        if (preg_match('/\s|\$|\{|\}|\\|\*|;/', $value)) {
+            $value = '"' . $value . '"';
+        }
+
+        return $value;
     }
 }
