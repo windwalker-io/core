@@ -55,10 +55,21 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $options |= $this->options;
 
-        $to = $this->app->getServerRequest()->getServerParams()['HTTP_REFERER']
-            ?? $this->app->getSystemUri()->root();
+        $to = $this->localReferrer() ?? $this->app->getSystemUri()->root();
 
         return new RouteUri($to, null, $this, $options);
+    }
+
+    public function referrer(): ?string
+    {
+        return $this->app->getServerRequest()->getServerParams()['HTTP_REFERER'] ?? null;
+    }
+
+    public function localReferrer(): ?string
+    {
+        $referrer = $this->referrer();
+
+        return $this->isLocalUrl($referrer) ? $referrer : null;
     }
 
     public function self(int $options = self::TYPE_PATH): RouteUri
@@ -208,19 +219,24 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->redirect($this->self(), $code, $options);
     }
 
-    public function validateRedirectUrl(Stringable|string $uri): string
+    public function isLocalUrl(Stringable|string $uri): bool
     {
         $root = $this->app->getSystemUri()->root;
 
         if (str_starts_with((string) $uri, '/')) {
-            return (string) $uri;
+            return true;
         }
 
-        if (stripos((string) $uri, $root) !== 0) {
-            $uri = $root;
-        }
+        return stripos((string) $uri, $root) === 0;
+    }
 
-        return (string) $uri;
+    public function validateRedirectUrl(Stringable|string $uri): string
+    {
+        $root = $this->app->getSystemUri()->root;
+
+        $uri = (string) $uri;
+
+        return $this->isLocalUrl($uri) ? $uri : $root;
     }
 
     public function absolute(string $url, int $options = RouteUri::TYPE_PATH): string
