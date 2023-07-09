@@ -23,6 +23,7 @@ use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
@@ -1234,6 +1235,7 @@ class AssetService implements EventAwareInterface
      */
     protected function getAppSecret(): string
     {
-        return $this->cacheStorage['app.secret'] ??= (string) $this->config->getDeep('app.secret');
+        return $this->cacheStorage['app.secret']
+            ??= Base64Url::decode((string) $this->config->getDeep('app.secret'));
     }
 }
