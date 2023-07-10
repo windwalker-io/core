@@ -126,7 +126,9 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
             $this->less = $this->getItem(Pagination::LESS, $neighbours - 1);
         }
 
-        $this->previous = $this->getItem(Pagination::PREVIOUS, $current - 1);
+        if (($current - 1) > 0) {
+            $this->previous = $this->getItem(Pagination::PREVIOUS, $current - 1);
+        }
 
         // First
         if ($current - $pagination->getNeighbours() > Pagination::BASE_PAGE) {
@@ -234,6 +236,10 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     protected function getItem(string $name, ?int $page): ?PageItem
     {
+        if ($page <= 0) {
+            return null;
+        }
+
         if ($page === null) {
             return null;
         }
