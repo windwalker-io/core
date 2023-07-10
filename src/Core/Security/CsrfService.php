@@ -32,11 +32,14 @@ class CsrfService
 
     protected string $tokenKey = 'csrf-token';
 
+    protected string $inputName = 'anticsrf';
+
     /**
      * CsrfService constructor.
      *
-     * @param  Config   $config
-     * @param  Session  $session
+     * @param  Config       $config
+     * @param  Session      $session
+     * @param  LangService  $langService
      */
     public function __construct(
         protected Config $config,
@@ -56,9 +59,14 @@ class CsrfService
     public function input(array $attrs = []): DOMElement
     {
         $attrs['type'] = 'hidden';
-        $attrs['name'] = $this->getToken();
-        $attrs['value'] = 1;
-        $attrs['class'] = $attrs['class'] ?? 'anticsrf';
+
+        if ($this->inputName) {
+            $attrs['name'] = $this->getInputName();
+            $attrs['value'] = $this->getToken();
+        } else {
+            $attrs['name'] = $this->getToken();
+            $attrs['value'] = 1;
+        }
 
         return h('input', $attrs);
     }
@@ -95,6 +103,12 @@ class CsrfService
         $method ??= 'REQUEST';
 
         $token = $this->getToken();
+
+        $tokenValue = $request->inputWithMethod($method, $this->getInputName());
+
+        if ($tokenValue === $token) {
+            return true;
+        }
 
         $tokenValue = $request->inputWithMethod($method, $token);
 
@@ -133,5 +147,25 @@ class CsrfService
         $this->langService::checkLanguageInstalled();
 
         return $this->trans('windwalker.security.message.csrf.invalid');
+    }
+
+    /**
+     * @return string
+     */
+    public function getInputName(): string
+    {
+        return $this->inputName;
+    }
+
+    /**
+     * @param  string  $inputName
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setInputName(string $inputName): static
+    {
+        $this->inputName = $inputName;
+
+        return $this;
     }
 }
