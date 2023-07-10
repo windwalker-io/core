@@ -427,6 +427,8 @@ class ErrorService
     public static function getReportLevel(): int
     {
         return E_ALL
+            & ~E_WARNING
+            & ~E_DEPRECATED
             & ~E_USER_WARNING
             & ~E_USER_DEPRECATED
             & ~E_USER_NOTICE;
