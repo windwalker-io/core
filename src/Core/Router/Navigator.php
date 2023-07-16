@@ -69,7 +69,11 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $referrer = $this->referrer();
 
-        return $this->isLocalUrl($referrer) ? $referrer : null;
+        if ($referrer === null) {
+            return null;
+        }
+
+        return $this->isLocalUrl((string) $referrer) ? $referrer : null;
     }
 
     public function self(int $options = self::TYPE_PATH): RouteUri

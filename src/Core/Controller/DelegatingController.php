@@ -100,7 +100,11 @@ class DelegatingController implements ControllerInterface
 
             return $res;
         } catch (ValidateFailException $e) {
-            if ($this->app->isDebug()) {
+            if (
+                $this->app->isDebug()
+                // Todo: Research a way to detect API or AJAX
+                || str_contains($this->app->getAppRequest()->getHeader('content-type'), 'application/json')
+            ) {
                 throw $e;
             }
 
@@ -115,6 +119,8 @@ class DelegatingController implements ControllerInterface
                 $this->app->isDebug()
                 || strtoupper($this->app->getRequestMethod()) === 'GET'
                 || $this->app->getAppRequest()->isAcceptJson()
+                // Todo: Research a way to detect API or AJAX
+                || str_contains($this->app->getAppRequest()->getHeader('content-type'), 'application/json')
             ) {
                 throw $e;
             }
