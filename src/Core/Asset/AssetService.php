@@ -1236,6 +1236,6 @@ class AssetService implements EventAwareInterface
     protected function getAppSecret(): string
     {
         return $this->cacheStorage['app.secret']
-            ??= Base64Url::decode((string) $this->config->getDeep('app.secret'));
+            ??= (string) Base64Url::decode((string) $this->config->getDeep('app.secret'));
     }
 }
