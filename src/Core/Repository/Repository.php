@@ -23,6 +23,7 @@ use Windwalker\Structure\Structure;
  *
  * @since 1.0
  */
+#[\AllowDynamicProperties]
 class Repository implements \ArrayAccess
 {
     use BootableTrait;

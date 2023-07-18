@@ -115,7 +115,7 @@ class ErrorManager
      */
     public function error($code, $message, $file, $line, $context = null)
     {
-        if (error_reporting() === 0) {
+        if (!(error_reporting() & $code)) {
             return;
         }
 

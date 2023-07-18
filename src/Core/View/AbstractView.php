@@ -33,6 +33,7 @@ use Windwalker\Structure\Structure;
  *
  * @since  2.1.5.3
  */
+#[\AllowDynamicProperties]
 abstract class AbstractView implements \ArrayAccess
 {
     use BootableTrait;

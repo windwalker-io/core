@@ -52,6 +52,10 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     public function boot(Container $container)
     {
         error_reporting($this->config->get('system.error_reporting', 0));
+        
+        if ($this->config->get('system.debug')) {
+            ini_set('display_errors', 'on');
+        }
 
         /** @var ErrorManager $handler */
         $handler = $container->get(ErrorManager::class);
@@ -61,7 +65,16 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
             $this->config->get('error.engine', 'php')
         );
 
-        $handler->register(true, null, true);
+        $reportLevel = env('PHP82_COMPAT')
+            ? E_ALL
+                & ~ E_WARNING
+                & ~ E_NOTICE
+                & ~ E_DEPRECATED
+                & ~ E_USER_WARNING
+                & ~ E_USER_DEPRECATED
+            : null;
+
+        $handler->register(true, $reportLevel, true);
     }
 
     /**

@@ -33,8 +33,6 @@ class EventProvider implements ServiceProviderInterface
         $container->prepareSharedObject(
             EventDispatcher::class,
             function (EventDispatcher $dispatcher, Container $container) {
-                $dispatcher->foo = 'bar';
-
                 return $dispatcher->setDebug($container->get('config')->get('system.debug'));
             }
         )->bindShared(Dispatcher::class, EventDispatcher::class)
