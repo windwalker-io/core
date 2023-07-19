@@ -64,7 +64,7 @@ class ErrorHandler
 	 *
 	 * @see  http://php.net/manual/en/function.set-error-handler.php
 	 */
-	public static function error($code ,$message ,$file, $line, $context)
+	public static function error($code ,$message ,$file, $line, $context = null)
 	{
 		if (error_reporting() === 0)
 		{
@@ -222,4 +222,3 @@ class ErrorHandler
 		restore_exception_handler();
 	}
 }
- 

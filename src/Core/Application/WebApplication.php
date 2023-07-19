@@ -131,7 +131,14 @@ class WebApplication extends AbstractWebApplication implements WindwalkerApplica
 
 		if ($this->config->get('system.debug'))
 		{
-			ErrorHandler::register();
+			ErrorHandler::register(
+				true,
+				E_ERROR
+				& ~ E_WARNING
+				& ~ E_DEPRECATED
+				& ~ E_USER_WARNING
+				& ~ E_USER_DEPRECATED
+			);
 		}
 
 		$this->registerProviders($this->container);

@@ -203,8 +203,6 @@ class MigrationsModel extends DatabaseModel
 
 		$start = time();
 
-		$tran = $this->db->getTransaction()->start();
-
 		try
 		{
 			// Note: Mysql dose not support transaction of DDL, but PostgreSQL, Oracle, SQLServer and SQLite dose.
@@ -212,12 +210,8 @@ class MigrationsModel extends DatabaseModel
 		}
 		catch (\Exception $e)
 		{
-			$tran->rollback();
-
 			throw $e;
 		}
-
-		$tran->commit();
 
 		$end = time();
 

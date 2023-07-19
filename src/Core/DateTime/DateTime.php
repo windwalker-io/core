@@ -320,6 +320,7 @@ class DateTime extends \DateTime
 	 *
 	 * @since   2.1
 	 */
+	#[\ReturnTypeWillChange]
 	public function format($format, $local = false)
 	{
 		// If the returned time should not be local use GMT.
@@ -362,6 +363,7 @@ class DateTime extends \DateTime
 	 *
 	 * @since   2.1
 	 */
+	#[\ReturnTypeWillChange]
 	public function setTimezone($tz)
 	{
 		if (!$tz instanceof \DateTimeZone)
