@@ -18,8 +18,11 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Utilities\Base64Url;
+use Windwalker\Crypt\SecretToolkit;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
+
+use const Windwalker\Crypt\ENCODERS;
 
 /**
  * The CryptKeyCommand class.
@@ -27,7 +30,7 @@ use Windwalker\Filesystem\Path;
 #[CommandWrapper(
     description: 'Generate random key.'
 )]
-class CryptKeyCommand implements CommandInterface
+class CryptSecretCommand implements CommandInterface
 {
     /**
      * configure
@@ -56,7 +59,7 @@ class CryptKeyCommand implements CommandInterface
             'encode',
             'e',
             InputOption::VALUE_REQUIRED,
-            'How to encode this key.',
+            'How to encode this key. Allow list: ' . implode('|', ENCODERS),
             'base64url'
         );
 
@@ -80,15 +83,9 @@ class CryptKeyCommand implements CommandInterface
     {
         $length = $io->getArgument('length');
 
-        $str = random_bytes((int) $length);
-
         $encode = $io->getOption('encode');
 
-        $str = match ($encode) {
-            default => Base64Url::encode($str),
-            'base64' => base64_encode($str),
-            'hex' => bin2hex($str),
-        };
+        $str = SecretToolkit::genSecretString((int) $length, $encode);
 
         $prefix = $io->getOption('prefix');
         $str = $prefix . $str;

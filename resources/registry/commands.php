@@ -45,7 +45,7 @@ return [
     'build:enum' => \Windwalker\Core\Generator\Command\BuildEnumCommand::class,
 
     'lang:merge' => \Windwalker\Core\Command\LangMergeCommand::class,
-    'crypt:key' => \Windwalker\Core\Crypt\Command\CryptKeyCommand::class,
+    'crypt:secret' => \Windwalker\Core\Crypt\Command\CryptSecretCommand::class,
 
     'queue:worker' => \Windwalker\Core\Queue\Command\QueueWorkerCommand::class,
     'queue:restart' => \Windwalker\Core\Queue\Command\QueueRestartCommand::class,
