@@ -19,6 +19,8 @@ use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\DI\Container;
+use Windwalker\Session\Bridge\BridgeInterface;
+use Windwalker\Session\Bridge\PhpBridge;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
@@ -91,8 +93,17 @@ class SessionManager extends AbstractManager
                     'handler' => $container->resolve('session.factories.handlers.' . $handler),
                 ]
             );
+            /** @var BridgeInterface $bridge */
             $cookies = $container->resolve('session.factories.cookies.' . $cookies);
             $ini = $container->getParam('session.ini');
+
+            if ($bridge instanceof PhpBridge) {
+                $gcDivisor = $ini['gc_divisor'] ?? 1000;
+                $gcProbability = $ini['gc_probability'] ?? 1;
+
+                $bridge->setOption('gc_divisor', $gcDivisor);
+                $bridge->setOption('gc_probability', $gcProbability);
+            }
 
             $options['ini'] = $ini;
 
