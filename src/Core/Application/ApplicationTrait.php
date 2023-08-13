@@ -14,12 +14,12 @@ namespace Windwalker\Core\Application;
 use Closure;
 use OutOfRangeException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
-use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Utilities\Base64Url;
@@ -42,6 +42,8 @@ trait ApplicationTrait
     }
     use CoreEventAwareTrait;
     use ProcessRunnerTrait;
+
+    public LoggerInterface $logger;
 
     /**
      * @var array<ServiceProviderInterface>

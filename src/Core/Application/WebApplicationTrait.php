@@ -11,6 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
+use Windwalker\Core\Manager\LoggerManager;
+
 /**
  * Trait WebApplicationTrait
  */
@@ -36,5 +41,31 @@ trait WebApplicationTrait
     public function getClient(): AppClient
     {
         return AppClient::WEB;
+    }
+
+    public function log(string|\Stringable $message, array $context = [], string $level = LogLevel::INFO): static
+    {
+        $this->logger ??= $this->getLogger();
+
+        $this->logger->log($level, $message, $context);
+
+        return $this;
+    }
+
+    private function getLogger(): LoggerInterface
+    {
+        $manager = $this->container->get(LoggerManager::class);
+
+        $name = 'web';
+
+        if ($this->isCliRuntime()) {
+            $name = 'cli-web';
+        }
+
+        if (!$manager->has($name)) {
+            return new NullLogger();
+        }
+
+        return $manager->get($name);
     }
 }

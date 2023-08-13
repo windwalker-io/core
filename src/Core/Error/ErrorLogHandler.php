@@ -77,11 +77,11 @@ class ErrorLogHandler implements ErrorHandlerInterface
         $code = $e->getCode();
 
         if ($code < 400 || $code >= 500) {
-            $message = static::handleExceptionLogText($e, $this->config->get('@root'));
+            // $message = static::handleExceptionLogText($e, $this->config->get('@root'));
 
             $this->logger->error(
                 $this->config->getDeep('error.log_channel') ?? 'error',
-                $message,
+                $e->getMessage(),
                 ['exception' => $e]
             );
         }

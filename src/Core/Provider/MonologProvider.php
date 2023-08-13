@@ -48,20 +48,21 @@ class MonologProvider implements ServiceProviderInterface
     public static function logger(
         ?string $name = null,
         array $handlers = [],
-        array $processors = []
+        array $processors = [],
+        string $formatter = 'line_formatter'
     ): ObjectBuilderDefinition {
         return create(
-            static function (Container $container) use ($processors, $handlers, $name) {
+            static function (Container $container) use ($formatter, $processors, $handlers, $name) {
                 $logger = new Logger(
                     $name,
                     array_map(
-                        function ($handler) use ($container, $name) {
+                        static function ($handler) use ($formatter, $container, $name) {
                             /** @var HandlerInterface $handler */
                             $handler = $container->resolve($handler, ['instanceName' => $name]);
 
                             return $handler->setFormatter(
                                 $container->resolve(
-                                    $container->getParam('logs.factories.formatters.line_formatter')
+                                    $container->getParam('logs.factories.formatters.' . $formatter)
                                 )
                             );
                         },

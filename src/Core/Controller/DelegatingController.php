@@ -113,7 +113,9 @@ class DelegatingController implements ControllerInterface
 
             return $nav->back();
         } catch (Throwable $e) {
-            $this->logError($e);
+            if ($this->app->isCliRuntime()) {
+                $this->logError($e);
+            }
 
             if (
                 $this->app->isDebug()
@@ -195,12 +197,12 @@ class DelegatingController implements ControllerInterface
             return;
         }
 
-        $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
+        // $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
 
         $this->app->service(LoggerService::class)
             ->error(
                 $this->app->config('error.log_channel') ?? 'error',
-                $message,
+                $e->getMessage(),
                 ['exception' => $e]
             );
     }

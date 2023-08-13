@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
+use Psr\Log\LogLevel;
 use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventAwareInterface;
@@ -84,6 +85,8 @@ interface ApplicationInterface extends
     public function loadConfig(mixed $source, ?string $format = null, array $options = []): void;
 
     public function addMessage(string|array $messages, ?string $type = 'info'): static;
+
+    public function log(string|\Stringable $message, array $context = [], string $level = LogLevel::INFO): static;
 
     /**
      * Close this request.
