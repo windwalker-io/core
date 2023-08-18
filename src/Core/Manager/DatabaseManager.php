@@ -91,7 +91,7 @@ class DatabaseManager extends AbstractManager
 
     public static function createAdapter(string $instanceName): \Closure
     {
-        return function (Container $container) use ($instanceName) {
+        return static function (Container $container) use ($instanceName) {
             $factory = $container->newInstance(DatabaseFactory::class);
             $connConfig = $container->getParam('database.connections.' . $instanceName);
 
