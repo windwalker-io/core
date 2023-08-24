@@ -221,9 +221,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
             return new DateInterval($duration);
         }
 
-        $now = new static();
-
-        return $now->diff(new static($duration));
+        return DateInterval::createFromDateString($duration);
     }
 
     /**
@@ -248,6 +246,93 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
                 (30 * 24 * 60 * 60 * ($diff->m)) +
                 (365 * 24 * 60 * 60 * ($diff->y))
             ));
+    }
+
+    /**
+     * @param  string|int|DateTimeInterface  $start
+     * @param  string|int|DateInterval       $interval
+     * @param  string|int|DateTimeInterface  $end
+     * @param  int                           $options
+     *
+     * @return  \DatePeriod
+     *
+     * @throws Exception
+     */
+    public static function createPeriodBetween(
+        string|int|DateTimeInterface $start,
+        string|int|DateInterval $interval,
+        string|int|DateTimeInterface $end,
+        int $options = 0
+    ): \DatePeriod {
+        $start = static::wrap($start);
+        $end = static::wrap($end);
+
+        return new \DatePeriod(
+            $start,
+            static::createInterval($interval),
+            $end,
+            $options
+        );
+    }
+
+    /**
+     * @param  string|int|DateTimeInterface  $start
+     * @param  string|int|DateInterval       $interval
+     * @param  int                           $recurrences
+     * @param  int                           $options
+     *
+     * @return  \DatePeriod
+     *
+     * @throws Exception
+     */
+    public static function createPeriodRecurrences(
+        string|int|DateTimeInterface $start,
+        string|int|DateInterval $interval,
+        int $recurrences,
+        int $options = 0
+    ): \DatePeriod {
+        $start = static::wrap($start);
+
+        return new \DatePeriod(
+            $start,
+            static::createInterval($interval),
+            $recurrences,
+            $options
+        );
+    }
+
+    /**
+     * @param  string|int|DateTimeInterface  $end
+     * @param  string|int|DateInterval       $interval
+     * @param  int                           $options
+     *
+     * @return  \DatePeriod
+     *
+     * @throws Exception
+     */
+    public function getPeriodTo(
+        string|int|DateInterval $interval,
+        string|int|DateTimeInterface $end,
+        int $options = 0
+    ): \DatePeriod {
+        return static::createPeriodBetween($this, $interval, $end, $options);
+    }
+
+    /**
+     * @param  int                      $recurrences
+     * @param  string|int|DateInterval  $interval
+     * @param  int                      $options
+     *
+     * @return  \DatePeriod
+     *
+     * @throws Exception
+     */
+    public function getPeriodRecurrences(
+        string|int|DateInterval $interval,
+        int $recurrences,
+        int $options = 0
+    ): \DatePeriod {
+        return static::createPeriodRecurrences($this, $interval, $recurrences, $options);
     }
 
     /**
