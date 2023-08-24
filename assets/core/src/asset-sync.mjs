@@ -31,8 +31,8 @@ export function jsSync(source = 'src/Module', dest) {
 
   const sourceList = [];
 
-  sourceList.push(...findModules('**/assets/*.{js,mjs}'));
-  sourceList.push(source + '**/assets/*.{js,mjs}');
+  sourceList.push(...findModules('**/assets/*.{js,mjs,ts}'));
+  sourceList.push(source + '**/assets/*.{js,mjs,ts}');
 
   let stream = prepareStream(src(sourceList));
 
