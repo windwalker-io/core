@@ -41,6 +41,7 @@ declare namespace Fusion {
   export interface JsOptions {
     sourcemap?: boolean;
     minify?: MiniOptions;
+    rename: any;
   }
 
   export interface BabelProcessorOptions extends JsOptions {

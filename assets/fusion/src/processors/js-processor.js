@@ -31,7 +31,8 @@ export default class JsProcessor extends Processor {
       {
         sourcemap: true,
         minify: MinifyOption.DEFAULT,
-        version: true
+        version: true,
+        rename: null
       },
       options
     );
@@ -54,6 +55,7 @@ export default class JsProcessor extends Processor {
           .pipe(terserTask());
       })
       .pipeIf(options.sourcemap, () => sourcemaps.write('.'))
+      .pipeIf(options.rename, () => rename(options.rename))
       .pipe(toDest(dest.path))
 
       // Run terser to validate ES syntax

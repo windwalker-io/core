@@ -23,8 +23,9 @@ export default class TsProcessor extends JsProcessor {
       {
         ts: {
           declaration: false,
-          target: 'es6',
-          moduleResolution: 'node'
+          target: 'es2020',
+          moduleResolution: 'node',
+          allowJs: true,
         }
       },
       await super.prepareOptions(options)
@@ -53,9 +54,14 @@ export default class TsProcessor extends JsProcessor {
 
     this.compile(dest, options)
       .pipeIf(options.sourcemap, () => sourcemaps.write('.'))
+      .pipeIf(options.rename, () => rename(options.rename))
       .pipeIf(
         options.minify === MinifyOption.SAME_FILE,
-        () => terser().on('error', e => console.error(e))
+        () => {
+          this.pipe(filter('**/*.js'))
+            .pipe(stripComment())
+            .pipe(terser().on('error', e => console.error(e)));
+        }
       )
       .pipe(toDest(dest.path))
       .pipeIf(options.minify === MinifyOption.SEPARATE_FILE, () => {

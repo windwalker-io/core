@@ -5,10 +5,11 @@
  * @license    __LICENSE__
  */
 
-import { dest as toDest, src } from '@windwalker-io/fusion';
+import { dest as toDest, src, wait } from '@windwalker-io/fusion';
 import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
 import { loadJson } from './utils.mjs';
+import { deleteAsync } from 'del';
 import rename from 'gulp-rename';
 import path from 'path';
 
