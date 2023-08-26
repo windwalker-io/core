@@ -10,11 +10,11 @@ import rename from 'gulp-rename';
 import sourcemaps from 'gulp-sourcemaps';
 import stripComment from 'gulp-strip-comments';
 import terser from 'gulp-terser';
+import gulpTs from 'gulp-typescript';
 import { merge as lodashMerge } from 'lodash-es';
 import { dest as toDest } from '../base/base.js';
 import { MinifyOption } from '../config.js';
 import { merge } from '../utilities/utilities.js';
-import gulpTs from 'gulp-typescript';
 import JsProcessor from './js-processor.js';
 
 export default class TsProcessor extends JsProcessor {
@@ -26,7 +26,8 @@ export default class TsProcessor extends JsProcessor {
           target: 'es2020',
           moduleResolution: 'node',
           allowJs: true,
-        }
+        },
+        tsconfig: null
       },
       await super.prepareOptions(options)
     );
@@ -40,8 +41,20 @@ export default class TsProcessor extends JsProcessor {
 
   compile(dest, options) {
     const config = lodashMerge({}, options.ts);
+    let tsTask;
 
-    return this.pipe(gulpTs(config));
+    if (options.tsconfig) {
+      let tsconfig = options.tsconfig;
+      if (typeof tsconfig === 'function') {
+        tsconfig = tsconfig();
+      }
+
+      tsTask = gulpTs.createProject(tsconfig, config)();
+    } else {
+      tsTask = gulpTs(config);
+    }
+
+    return this.pipe(tsTask);
   }
 
   doProcess(dest, options = {}) {

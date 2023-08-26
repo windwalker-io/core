@@ -57,7 +57,8 @@ declare namespace Fusion {
   }
 
   export interface TsOptions extends JsOptions {
-    ts: Settings
+    ts?: Settings,
+    tsconfig?: string | Function;
   }
 
   export interface WebpackOptions extends JsOptions {
