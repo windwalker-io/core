@@ -11,6 +11,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\CliServer;
 
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
 use Windwalker\DI\Container;
 
 /**
@@ -24,12 +27,19 @@ class CliServerEngineFactory
     {
     }
 
-    public function create(string $name): CliServerEngineInterface
+    public function create(string $name, ?ConsoleOutputInterface $output = null): CliServerEngineInterface
     {
+        $output ??= new ConsoleOutput();
+
+        $args = [
+            ConsoleOutputInterface::class => $output,
+            'output' => $output
+        ];
+
         return match ($name) {
-            'php' => $this->container->newInstance(PhpCliServerEngine::class),
-            'swoole' => $this->container->newInstance(SwooleCliServerEngine::class),
-            default => $this->container->resolve($this->serverTypes[$name]),
+            'php' => $this->container->newInstance(PhpCliServerEngine::class, $args),
+            'swoole' => $this->container->newInstance(SwooleCliServerEngine::class, $args),
+            default => $this->container->resolve($this->serverTypes[$name], $args),
         };
     }
 

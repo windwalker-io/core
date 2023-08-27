@@ -13,8 +13,10 @@ namespace Windwalker\Core\CliServer;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
@@ -30,23 +32,21 @@ class PhpCliServerEngine implements CliServerEngineInterface
 {
     use OptionsResolverTrait;
 
-    public function __construct(protected ConsoleApplication $app, array $options = [])
-    {
+    public function __construct(
+        protected ConsoleApplication $app,
+        protected ConsoleOutputInterface $output,
+        array $options = []
+    ) {
         $this->resolveOptions($options, $this->configureOptions(...));
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define('main')
             ->allowedTypes('string', 'null');
 
         $resolver->define('docroot')
             ->allowedTypes('string', 'null');
-    }
-
-    public function isRunning(): bool
-    {
-        return false;
     }
 
     public static function isSupported(): bool
@@ -113,11 +113,9 @@ class PhpCliServerEngine implements CliServerEngineInterface
      */
     protected function getStyledOutput(): SymfonyStyle
     {
-        $output = new SymfonyStyle(
+        return new SymfonyStyle(
             new ArrayInput([]),
-            $this->app->getOutput()
+            $this->output
         );
-
-        return $output;
     }
 }

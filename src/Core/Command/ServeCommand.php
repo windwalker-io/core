@@ -57,9 +57,10 @@ class ServeCommand implements CommandInterface
             'localhost'
         );
 
-        $command->addArgument(
+        $command->addOption(
             'main',
-            InputArgument::OPTIONAL,
+            'm',
+            InputOption::VALUE_REQUIRED,
             'The server main file.',
         );
 
@@ -94,7 +95,7 @@ class ServeCommand implements CommandInterface
         );
 
         $command->addOption(
-            'works',
+            'workers',
             null,
             InputOption::VALUE_REQUIRED,
             'The number of workers.'
@@ -108,7 +109,7 @@ class ServeCommand implements CommandInterface
         );
 
         $command->addOption(
-            'max-request',
+            'max-requests',
             null,
             InputOption::VALUE_REQUIRED,
             'The max requests number before reload server.',
@@ -145,20 +146,39 @@ class ServeCommand implements CommandInterface
 
         return match ($engineName) {
             'php' => $this->runPhpServer($io, $domain, (int) $port),
-            // 'swoole' => $this->runPhpServer($io, $domain, (int) $port),
+            'swoole' => $this->runSwooleServer($io, $domain, (int) $port),
             default => $this->invalidEngine($io, $engineName)
         };
     }
 
     protected function runPhpServer(IOInterface $io, string $domain, int $port): int
     {
-        return $this->cliServerFactory->create('php')
+        return $this->cliServerFactory->create('php', $io->getOutput())
             ->run(
                 $domain,
                 $port,
                 [
-                    'main' => $io->getArgument('main'),
+                    'main' => $io->getOption('main'),
                     'docroot' => $io->getOption('docroot'),
+                ]
+            );
+    }
+
+    protected function runSwooleServer(IOInterface $io, ?string $domain, int $port): int
+    {
+        return $this->cliServerFactory->create('swoole', $io->getOutput())
+            ->run(
+                $domain,
+                $port,
+                [
+                    'process_name' => $this->app->getAppName(),
+                    'main' => $io->getOption('main'),
+                    'app' => $io->getOption('app'),
+                    'workers' => $io->getOption('workers'),
+                    'task_workers' => $io->getOption('task-workers'),
+                    'max_requests' => $io->getOption('max-requests'),
+                    'watch' => $io->getOption('watch'),
+                    'state_file' => $this->app->path('@temp/swoole/state.json')
                 ]
             );
     }

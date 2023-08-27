@@ -326,7 +326,7 @@ class IO implements IOInterface
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name): string|array|bool|null
+    public function getOption(string $name): mixed
     {
         return $this->input->getOption($name);
     }

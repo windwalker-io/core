@@ -29,6 +29,7 @@ trait ProcessRunnerTrait
      *
      * @return  Process
      *
+     * @throws \ReflectionException
      * @since  3.5.22
      */
     public function createProcess(string|array $script): Process

@@ -9,15 +9,13 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\CliServer;
+namespace Windwalker\Core\CliServer\Contracts;
 
 /**
  * Interface CliServerInterface
  */
 interface CliServerEngineInterface
 {
-    public function isRunning(): bool;
-
     public static function isSupported(): bool;
 
     public function run(string $host, int $port, array $options = []): int;
