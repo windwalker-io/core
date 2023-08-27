@@ -18,13 +18,15 @@ use Throwable;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\CliServer\CliServerEngineFactory;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\DI\Attributes\Autowire;
 
 /**
  * The ServeCommand class.
  */
 #[CommandWrapper(
-    description: 'Start PHP Dev Server.',
+    description: 'Start Windwalker Server.',
     aliases: ['dev:serve']
 )]
 class ServeCommand implements CommandInterface
@@ -32,8 +34,11 @@ class ServeCommand implements CommandInterface
     /**
      * ServeCommand constructor.
      */
-    public function __construct(protected ConsoleApplication $app)
-    {
+    public function __construct(
+        protected ConsoleApplication $app,
+        #[Autowire]
+        protected CliServerEngineFactory $cliServerFactory
+    ) {
     }
 
     /**
@@ -53,9 +58,17 @@ class ServeCommand implements CommandInterface
         );
 
         $command->addArgument(
-            'route',
+            'main',
             InputArgument::OPTIONAL,
-            'The server route file.',
+            'The server main file.',
+        );
+
+        $command->addOption(
+            'engine',
+            'e',
+            InputOption::VALUE_REQUIRED,
+            'The CLI Server engine, can be: php|swoole',
+            'php'
         );
 
         $command->addOption(
@@ -71,6 +84,43 @@ class ServeCommand implements CommandInterface
             InputOption::VALUE_REQUIRED,
             'The server port.'
         );
+
+        $command->addOption(
+            'app',
+            'a',
+            InputOption::VALUE_REQUIRED,
+            'The app name to run server.',
+            'main'
+        );
+
+        $command->addOption(
+            'works',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The number of workers.'
+        );
+
+        $command->addOption(
+            'task-workers',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The number of task workers.'
+        );
+
+        $command->addOption(
+            'max-request',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max requests number before reload server.',
+            500
+        );
+
+        $command->addOption(
+            'watch',
+            null,
+            InputOption::VALUE_NONE,
+            'Watch file changes and auto reload.'
+        );
     }
 
     /**
@@ -82,6 +132,7 @@ class ServeCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
+        $engineName = $io->getOption('engine');
         $host = $io->getArgument('host');
 
         [$domain, $port] = explode(':', $host) + [null, null];
@@ -92,47 +143,24 @@ class ServeCommand implements CommandInterface
             $port = $io->getOption('port');
         }
 
-        $host = $domain . ':' . $port;
+        return match ($engineName) {
+            'php' => $this->runPhpServer($io, $domain, (int) $port),
+            // 'swoole' => $this->runPhpServer($io, $domain, (int) $port),
+            default => $this->invalidEngine($io, $engineName)
+        };
+    }
 
-        $args = [];
-
-        $route = $io->getArgument('route');
-
-        if ($route) {
-            $args[] = $route;
-        } else {
-            $root = $io->getOption('docroot') ?? $this->app->path('@root') . '/www';
-            $args[] = '-t';
-            $args[] = $root;
-        }
-
-        $args = implode(' ', $args);
-
-        $io->style()->title('Windwalker Dev Server');
-        $io->writeln('Starting...');
-        $io->newLine();
-        $io->writeln('Index: http://' . $host);
-        $io->writeln('Dev: http://' . $host . '/dev.php');
-
-        $io->newLine(2);
-
-        $this->app->runProcess(
-            "php -S $host $args",
-            '',
-            function ($type, $buffer) use ($io) {
-                if (str_contains($buffer, '[404]')) {
-                    $buffer = "<fg=yellow>$buffer</>";
-                }
-
-                if (str_contains($buffer, '[500]')) {
-                    $buffer = "<fg=red>$buffer</>";
-                }
-
-                $io->write($buffer);
-            }
-        );
-
-        return 0;
+    protected function runPhpServer(IOInterface $io, string $domain, int $port): int
+    {
+        return $this->cliServerFactory->create('php')
+            ->run(
+                $domain,
+                $port,
+                [
+                    'main' => $io->getArgument('main'),
+                    'docroot' => $io->getOption('docroot'),
+                ]
+            );
     }
 
     protected function getUnusedPort(string $host, int $start = 8000): string
@@ -159,5 +187,12 @@ class ServeCommand implements CommandInterface
         } catch (Throwable $e) {
             return true;
         }
+    }
+
+    protected function invalidEngine(IOInterface $io, mixed $engineName): int
+    {
+        $io->errorStyle()->warning('Invalid server engine: ' . $engineName);
+
+        return Command::FAILURE;
     }
 }
