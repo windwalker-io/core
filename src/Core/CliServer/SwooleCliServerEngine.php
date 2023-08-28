@@ -31,7 +31,7 @@ use Windwalker\Utilities\Options\OptionsResolverTrait;
 use function Windwalker\swoole_installed;
 
 /**
- * The SwooleCliServer class.
+ * The SwooleCliServerEngine class.
  */
 class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessManageInterface
 {
@@ -113,6 +113,7 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
                 $this->serverStateManager->getFilePath(),
             ]
         );
+        $process->setTty(true);
 
         $process->setEnv(
             [
@@ -137,12 +138,9 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
         $output->title('Windwalker Swoole Server');
         $output->writeln('Starting...');
         $output->newLine();
-        $output->writeln('Local URL: http://' . $state->getHost() . ':' . $state->getPort());
-        $output->newLine(2);
-        $output->writeln('<fg=yellow>Press Ctrl+C to stop the server</>');
 
         while (true) {
-            usleep(1000000);
+            usleep(1000 * 500); // 0.5 seconds
 
             $output = $process->getIncrementalOutput();
             $errOutput = $process->getIncrementalErrorOutput();

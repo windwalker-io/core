@@ -12,8 +12,11 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\RootApplicationInterface;
+use Windwalker\Core\CliServer\CliServerClient;
+use Windwalker\Core\CliServer\CliServerStateManager;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -66,6 +69,10 @@ class AppProvider implements ServiceProviderInterface
             $container->prepareSharedObject(ProfilerFactory::class, null, Container::ISOLATION);
         }
 
+        if ($this->app->getType() === AppType::CLI_WEB) {
+            $this->prepareCliWeb($container);
+        }
+
         $this->prepareEvents($container);
 
         $this->prepareUtilities($container);
@@ -98,5 +105,10 @@ class AppProvider implements ServiceProviderInterface
         $container->prepareSharedObject(FilterFactory::class);
         $container->prepareSharedObject(FilterService::class);
         $container->prepareSharedObject(ScheduleService::class);
+    }
+
+    protected function prepareCliWeb(Container $container): void
+    {
+        $container->prepareSharedObject(CliServerClient::class);
     }
 }

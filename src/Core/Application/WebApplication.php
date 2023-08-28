@@ -12,11 +12,15 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Stringable;
 use Throwable;
+use Windwalker\Core\CliServer\CliServerClient;
+use Windwalker\Core\CliServer\RequestResult;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
@@ -32,6 +36,7 @@ use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
+use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Event\RequestEvent;
@@ -41,6 +46,8 @@ use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
+use Windwalker\Http\Server\HttpServerInterface;
+use Windwalker\Http\Server\ServerInterface;
 
 /**
  * The WebApplication class.
@@ -66,6 +73,17 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
     public function __construct(Container $container)
     {
         $this->container = $container;
+    }
+
+    public function bootForServer(ServerInterface $server): void
+    {
+        $container = $this->getContainer();
+
+        $container->share($server::class, $server)
+            ->alias(ServerInterface::class, $server::class)
+            ->alias(HttpServerInterface::class, $server::class);
+
+        $this->boot();
     }
 
     /**
@@ -158,6 +176,15 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $container->get(AppContext::class);
     }
 
+    /**
+     * Create an AppContext for every request.
+     *
+     * @param  RequestEvent  $event
+     *
+     * @return  AppContext
+     *
+     * @throws DefinitionException
+     */
     public function createContextFromServerEvent(RequestEvent $event): AppContext
     {
         $request = $event->getRequest();
@@ -172,6 +199,20 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $appContext;
     }
 
+    /**
+     * Run this appContext and return the response.
+     *
+     * NOTE: This method will not emit any content to output, you must emit response yourself.
+     *
+     * @param  AppContext     $appContext
+     * @param  callable|null  $handler
+     *
+     * @return  ResponseInterface
+     *
+     * @throws Throwable
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function runContext(AppContext $appContext, ?callable $handler = null): ResponseInterface
     {
         $container = $appContext->getContainer();
@@ -224,13 +265,68 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $event->getResponse();
     }
 
-    public function executeServerEvent(RequestEvent $event): ResponseInterface
+    public function runCliServerRequest(RequestEvent $event): RequestEvent
     {
-        return $this->runContext(
-            $this->createContextFromServerEvent($event)
-        );
+        $client = $this->service(CliServerClient::class);
+
+        $appContext = $this->createContextFromServerEvent($event);
+
+        $start = microtime(true);
+
+        try {
+            $response = $this->runContext($appContext);
+            $statusCode = $response->getStatusCode();
+
+            $event->setResponse($response);
+        } catch (\Throwable $e) {
+            $statusCode = $e->getCode();
+
+            try {
+                $error = $appContext->service(ErrorService::class);
+
+                $error->handle($e);
+            } catch (\Throwable $e) {
+                echo '[Infinite loop in error handling]: ' . $e->getMessage() . "\n";
+            }
+        } finally {
+            $event->setEndHandler(fn () => $this->stopContext($appContext));
+
+            $end = microtime(true);
+            $duration = round(($end - $start) * 1000);
+
+            $client->logRequestInfo(
+                $event->getRequest(),
+                $statusCode,
+                $duration
+            );
+
+            // Todo: Add RequestTerminateEvent
+            // $this->terminate();
+        }
+
+        return $event;
     }
 
+    public function executeServerEvent(RequestEvent $event): ResponseInterface
+    {
+        $appContext = $this->createContextFromServerEvent($event);
+
+        $event->setEndHandler(fn () => $this->stopContext($appContext));
+
+        return $this->runContext($appContext);
+    }
+
+    /**
+     * Run for classic Apache/FPM one time request.
+     *
+     * @param  ServerRequestInterface|null  $request
+     * @param  callable|null                $handler
+     *
+     * @return  ResponseInterface
+     * @throws Throwable
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
     {
         $appContext = $this->createContext($request);

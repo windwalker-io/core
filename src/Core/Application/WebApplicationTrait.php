@@ -14,6 +14,8 @@ namespace Windwalker\Core\Application;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use Windwalker\Core\CliServer\CliServerRuntime;
+use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\LoggerManager;
 
 /**
@@ -45,9 +47,13 @@ trait WebApplicationTrait
 
     public function log(string|\Stringable $message, array $context = [], string $level = LogLevel::INFO): static
     {
+        if ($this->isCliRuntime()) {
+            CliServerRuntime::logLine($message);
+        }
+
         $this->logger ??= $this->getLogger();
 
-        $this->logger->log($level, $message, $context);
+        $this->logger->log($level, (string) $message, $context);
 
         return $this;
     }
