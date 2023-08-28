@@ -28,7 +28,7 @@ use Windwalker\Utilities\Options\OptionsResolverTrait;
  *     docroot: string,
  * }
  */
-class PhpCliServerEngine implements CliServerEngineInterface
+class PhpNativeEngine implements CliServerEngineInterface
 {
     use OptionsResolverTrait;
 

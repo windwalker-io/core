@@ -19,7 +19,7 @@ use Windwalker\Data\ValueObject;
 class CliServerState extends ValueObject
 {
     public string $name = '';
-    public int $pid = 0;
+    public int $masterPid = 0;
     public string $host = '';
     public int $port = 0;
     public int $managerPid = 0;
@@ -56,9 +56,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
-    public function setPid(int $pid): static
+    public function setMasterPid(int $masterPid): static
     {
-        $this->pid = $pid;
+        $this->masterPid = $masterPid;
 
         return $this;
     }
@@ -82,9 +82,9 @@ class CliServerState extends ValueObject
         return $this->managerPid;
     }
 
-    public function getPid(): int
+    public function getMasterPid(): int
     {
-        return $this->pid;
+        return $this->masterPid;
     }
 
     public function getName(): string

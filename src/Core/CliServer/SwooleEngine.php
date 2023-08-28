@@ -31,14 +31,13 @@ use Windwalker\Utilities\Options\OptionsResolverTrait;
 use function Windwalker\swoole_installed;
 
 /**
- * The SwooleCliServerEngine class.
+ * The SwooleEngine class.
  */
-class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessManageInterface
+class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInterface
 {
     use InstanceCacheTrait;
     use OptionsResolverTrait;
-    use MessageOutputTrait;
-    use ProcessRunnerTrait;
+    use CliServerTrait;
 
     public function __construct(
         protected ConsoleApplication $app,
@@ -108,7 +107,7 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
 
         $process = $this->app->createProcess(
             [
-                $this->getPhpBinary(),
+                $this->getPhpBinary() ?: 'php',
                 $options['main'],
                 $this->serverStateManager->getFilePath(),
             ]
@@ -127,6 +126,7 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
 
     protected function runServerProcess(Process $process, CliServerState $state): int
     {
+        $options = $state->getManagerOptions();
         $process->start();
 
         while (!$process->isStarted()) {
@@ -139,9 +139,12 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
         $output->writeln('Starting...');
         $output->newLine();
 
-        while (true) {
-            usleep(1000 * 500); // 0.5 seconds
+        if ($options['watch'] ?? null) {
+            $watcher = $this->createFileWatcher($options['main']);
+            $watcher->listen();
+        }
 
+        while ($process->isRunning()) {
             $output = $process->getIncrementalOutput();
             $errOutput = $process->getIncrementalErrorOutput();
 
@@ -155,6 +158,14 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
             if ($errOutput) {
                 $this->output->write($errOutput);
             }
+
+            if (isset($watcher) && $watcher->hasChanged()) {
+                $this->output->writeln('File changes detected. Restarting server.');
+
+                $this->reloadServer();
+            }
+
+            usleep(1000 * 500); // 0.5 seconds
         }
 
         return 0;
@@ -163,18 +174,21 @@ class SwooleCliServerEngine implements CliServerEngineInterface, ServerProcessMa
     public function isRunning(): bool
     {
         $state = $this->serverStateManager->getState();
-        $pid = $state->getPid();
+        $masterPid = $state->getMasterPid();
         $managerPid = $state->getManagerPid();
 
         if ($managerPid) {
-            return $pid && $managerPid && $this->isAlive($managerPid);
+            return $masterPid && $managerPid && $this->isAlive($managerPid);
         }
 
-        return $pid && $this->isAlive($pid);
+        return $masterPid && $this->isAlive($masterPid);
     }
 
-    public function reloadServer(): bool
+    public function reloadServer(): void
     {
+        $state = $this->serverStateManager->getState();
+
+        static::signal($state->getMasterPid(), SIGUSR1);
     }
 
     public function stopServer(): bool

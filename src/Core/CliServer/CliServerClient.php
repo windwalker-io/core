@@ -39,6 +39,7 @@ class CliServerClient
 
         $method = $request->getMethod();
         $uri = $request->getUri()->getPath();
+        $pid = (string) getmypid();
         $memory = number_format(memory_get_usage() / 1024 / 1024, 2) . 'MB';
         $durationText = number_format($duration) . 'ms';
 
@@ -50,13 +51,14 @@ class CliServerClient
             default => 'white',
         };
 
-        $spaces = 25;
-        $length = $spaces + strlen($method . $statusCode . $uri . $memory . $durationText);
+        $spaces = 33;
+        $length = $spaces + strlen($method . $statusCode . $uri . $pid . $memory . $durationText);
 
-        $dots = str_repeat('.', $terminalWidth - $length);
+        $dots = str_repeat('.', max($terminalWidth - $length, 0));
 
         $log = sprintf(
-            '  [<fg=%s;options=bold>%s</>][%s] %s <fg=gray>%s</> [<fg=%s;options=bold>%s</>] %s - %s',
+            '  [<fg=%s;options=bold>%s</>][%s] %s <fg=gray>%s</> [<fg=%s;options=bold>%s</>] ' .
+            'pid: <fg=yellow>%s</> - %s - %s',
             $color,
             $method,
             $name,
@@ -64,6 +66,7 @@ class CliServerClient
             $dots,
             $color,
             $statusCode,
+            $pid,
             $memory,
             $durationText,
         );

@@ -20,15 +20,13 @@ use Windwalker\Filesystem\FileObject;
  */
 class CliServerRuntime
 {
-    protected static string $stateFilePath = '';
-
     protected static CliServerStateManager $cliServerStateManager;
 
     public static ConsoleOutput $output;
 
     public static function parseArgv(array $argv): CliServerState
     {
-        self::$stateFilePath = $stateFilePath = $argv[1] ?? '';
+        $stateFilePath = $argv[1] ?? '';
 
         $cliServerStateManager = new CliServerStateManager($stateFilePath);
 

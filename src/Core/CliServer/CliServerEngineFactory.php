@@ -37,8 +37,8 @@ class CliServerEngineFactory
         ];
 
         return match ($name) {
-            'php' => $this->container->newInstance(PhpCliServerEngine::class, $args),
-            'swoole' => $this->container->newInstance(SwooleCliServerEngine::class, $args),
+            'php' => $this->container->newInstance(PhpNativeEngine::class, $args),
+            'swoole' => $this->container->newInstance(SwooleEngine::class, $args),
             default => $this->container->resolve($this->serverTypes[$name], $args),
         };
     }
