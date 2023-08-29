@@ -116,8 +116,6 @@ class ServerStopCommand implements CommandInterface
             throw new \RuntimeException('Failed to stop server.');
         }
 
-        $engine->clearStateFile();
-
         return Command::SUCCESS;
     }
 }

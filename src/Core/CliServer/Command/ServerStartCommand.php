@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\CliServer\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
@@ -19,7 +20,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\CliServer\CliServerFactory;
-use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Utilities\TypeCast;
@@ -31,9 +31,11 @@ use Windwalker\Utilities\TypeCast;
     description: 'Start Windwalker Server.',
     aliases: ['dev:serve']
 )]
-class ServerStartCommand implements CommandInterface
+class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 {
     use ServerCommandTrait;
+
+    protected IOInterface $io;
 
     /**
      * ServeCommand constructor.
@@ -145,6 +147,8 @@ class ServerStartCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
+        $this->io = $io;
+
         $engineName = $io->getOption('engine');
         $host = $io->getArgument('host');
 
@@ -222,5 +226,22 @@ class ServerStartCommand implements CommandInterface
         } catch (Throwable $e) {
             return true;
         }
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        return [SIGINT, SIGTERM];
+    }
+
+    public function handleSignal(int $signal): void
+    {
+        $name = $this->io->getOption('name');
+        $engineName = $this->io->getOption('engine');
+
+        $engine = $this->createEngine($engineName, $name, $this->io);
+
+        $engine->stopServer();
+
+        exit(0);
     }
 }

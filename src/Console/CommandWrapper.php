@@ -15,6 +15,7 @@ use Attribute;
 use Closure;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
@@ -30,7 +31,7 @@ use Windwalker\Utilities\Assert\Assert;
  * The CommandWrapper class.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
-class CommandWrapper extends Command implements ContainerAttributeInterface
+class CommandWrapper extends Command implements ContainerAttributeInterface, SignalableCommandInterface
 {
     public const TEMP_NAME = 'windwalker-command-temp-name';
 
@@ -188,5 +189,23 @@ class CommandWrapper extends Command implements ContainerAttributeInterface
         );
 
         return $handler;
+    }
+
+    public function getSubscribedSignals(): array
+    {
+        if ($this->handler instanceof SignalableCommandInterface) {
+            return $this->handler->getSubscribedSignals();
+        }
+
+        return [];
+    }
+
+    public function handleSignal(int $signal): int|false
+    {
+        if ($this->handler instanceof SignalableCommandInterface) {
+            return $this->handler->handleSignal($signal);
+        }
+
+        return 0;
     }
 }

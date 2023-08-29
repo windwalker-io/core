@@ -245,6 +245,8 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
             self::signal((int) $pid, SIGKILL);
         }
 
+        $this->clearStateFile();
+
         return true;
     }
 
