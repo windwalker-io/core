@@ -134,7 +134,8 @@ export async function webpackVue3Config() {
             loader: "ts-loader",
             exclude: /(node_modules|bower_components)/,
             options:{
-              appendTsSuffixTo:[/\.vue/]
+              appendTsSuffixTo:[/\.vue/],
+              transpileOnly: true
             }
           },
           {
