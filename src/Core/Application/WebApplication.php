@@ -42,6 +42,7 @@ use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Event\RequestEvent;
+use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Output\Output;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Output\StreamOutput;
@@ -282,20 +283,23 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             $event->setResponse($response);
         } catch (\Throwable $e) {
             $statusCode = $e->getCode();
-            $output = CliServerRuntime::getStyledOutput();
+            
+            if (!ResponseHelper::isClientError($statusCode)) {
+                $output = CliServerRuntime::getStyledOutput();
 
-            try {
-                $output->error("({$e->getCode()}) " . $e->getMessage());
-                $output->writeln('  # File: ' . $e->getFile() . ':' . $e->getLine());
-                $output->newLine(2);
-                $error = $appContext->service(ErrorService::class);
+                try {
+                    $output->error("({$e->getCode()}) " . $e->getMessage());
+                    $output->writeln('  # File: ' . $e->getFile() . ':' . $e->getLine());
+                    $output->newLine(2);
+                    $error = $appContext->service(ErrorService::class);
 
-                $error->handle($e);
-            } catch (\Throwable $e) {
-                $this->log(
-                    '[Infinite loop in error handling]: ' . $e->getMessage(),
-                    level: LogLevel::ERROR
-                );
+                    $error->handle($e);
+                } catch (\Throwable $e) {
+                    $this->log(
+                               '[Infinite loop in error handling]: ' . $e->getMessage(),
+                        level: LogLevel::ERROR
+                    );
+                }
             }
         } finally {
             $event->setEndHandler(fn () => $this->stopContext($appContext));
