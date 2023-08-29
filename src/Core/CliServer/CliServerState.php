@@ -19,11 +19,15 @@ use Windwalker\Data\ValueObject;
 class CliServerState extends ValueObject
 {
     public string $name = '';
+    public string $serverName = '';
     public int $masterPid = 0;
+    public int $managerPid = 0;
     public string $host = '';
     public int $port = 0;
-    public int $managerPid = 0;
-    public array $managerOptions = [];
+    public int $workerNumber = 0;
+    public array $startupOptions = [];
+    public array $server = [];
+    public array $subServers = [];
 
     public function getHost(): string
     {
@@ -70,9 +74,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
-    public function setManagerOptions(array $managerOptions): static
+    public function setStartupOptions(array $startupOptions): static
     {
-        $this->managerOptions = $managerOptions;
+        $this->startupOptions = $startupOptions;
 
         return $this;
     }
@@ -92,8 +96,76 @@ class CliServerState extends ValueObject
         return $this->name;
     }
 
-    public function getManagerOptions(): array
+    public function getStartupOptions(): array
     {
-        return $this->managerOptions;
+        return $this->startupOptions;
+    }
+
+    public function getSubServers(): array
+    {
+        return $this->subServers;
+    }
+
+    /**
+     * @param  array  $subServers
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setSubServers(array $subServers): static
+    {
+        $this->subServers = $subServers;
+
+        return $this;
+    }
+
+    public function getServer(): array
+    {
+        return $this->server;
+    }
+
+    /**
+     * @param  array  $server
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setServer(array $server): static
+    {
+        $this->server = $server;
+
+        return $this;
+    }
+
+    public function getWorkerNumber(): int
+    {
+        return $this->workerNumber;
+    }
+
+    /**
+     * @param  int  $workerNumber
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setWorkerNumber(int $workerNumber): static
+    {
+        $this->workerNumber = $workerNumber;
+
+        return $this;
+    }
+
+    public function getServerName(): string
+    {
+        return $this->serverName;
+    }
+
+    /**
+     * @param  string  $serverName
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setServerName(string $serverName): static
+    {
+        $this->serverName = $serverName;
+
+        return $this;
     }
 }

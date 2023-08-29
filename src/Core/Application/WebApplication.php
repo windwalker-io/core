@@ -17,9 +17,11 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Log\LogLevel;
 use Stringable;
 use Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
+use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\CliServer\RequestResult;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
@@ -280,19 +282,25 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             $event->setResponse($response);
         } catch (\Throwable $e) {
             $statusCode = $e->getCode();
+            $output = CliServerRuntime::getStyledOutput();
 
             try {
+                $output->error("({$e->getCode()}) " . $e->getMessage());
+                $output->writeln('  # File: ' . $e->getFile() . ':' . $e->getLine());
+                $output->newLine(2);
                 $error = $appContext->service(ErrorService::class);
 
                 $error->handle($e);
             } catch (\Throwable $e) {
-                echo '[Infinite loop in error handling]: ' . $e->getMessage() . "\n";
+                $this->log(
+                    '[Infinite loop in error handling]: ' . $e->getMessage(),
+                    level: LogLevel::ERROR
+                );
             }
         } finally {
             $event->setEndHandler(fn () => $this->stopContext($appContext));
 
-            $end = microtime(true);
-            $duration = round(($end - $start) * 1000);
+            $duration = round((microtime(true) - $start) * 1000);
 
             $client->logRequestInfo(
                 $event->getRequest(),

@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Command;
+namespace Windwalker\Core\CliServer\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,9 +18,11 @@ use Throwable;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\CliServer\CliServerEngineFactory;
+use Windwalker\Core\CliServer\CliServerFactory;
+use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\DI\Attributes\Autowire;
+use Windwalker\Utilities\TypeCast;
 
 /**
  * The ServeCommand class.
@@ -29,15 +31,17 @@ use Windwalker\DI\Attributes\Autowire;
     description: 'Start Windwalker Server.',
     aliases: ['dev:serve']
 )]
-class ServeCommand implements CommandInterface
+class ServerStartCommand implements CommandInterface
 {
+    use ServerCommandTrait;
+
     /**
      * ServeCommand constructor.
      */
     public function __construct(
         protected ConsoleApplication $app,
         #[Autowire]
-        protected CliServerEngineFactory $cliServerFactory
+        protected CliServerFactory $serverFactory
     ) {
     }
 
@@ -58,10 +62,18 @@ class ServeCommand implements CommandInterface
         );
 
         $command->addOption(
+            'name',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The server name.',
+            'main'
+        );
+
+        $command->addOption(
             'main',
             'm',
             InputOption::VALUE_REQUIRED,
-            'The server main file.',
+            'The custom server main file.',
         );
 
         $command->addOption(
@@ -153,12 +165,14 @@ class ServeCommand implements CommandInterface
 
     protected function runPhpServer(IOInterface $io, string $domain, int $port): int
     {
-        return $this->cliServerFactory->create('php', $io->getOutput())
+        $name = $io->getOption('name');
+
+        return $this->createEngine('php', $name, $io)
             ->run(
                 $domain,
                 $port,
                 [
-                    'main' => $io->getOption('main'),
+                    'main' => $this->getMainFile($name, 'php', $name),
                     'docroot' => $io->getOption('docroot'),
                 ]
             );
@@ -166,19 +180,20 @@ class ServeCommand implements CommandInterface
 
     protected function runSwooleServer(IOInterface $io, ?string $domain, int $port): int
     {
-        return $this->cliServerFactory->create('swoole', $io->getOutput())
+        $name = $io->getOption('name');
+
+        return $this->createEngine('swoole', $name, $io)
             ->run(
                 $domain,
                 $port,
                 [
                     'process_name' => $this->app->getAppName(),
-                    'main' => $io->getOption('main'),
+                    'main' => $this->getMainFile($io, 'swoole', $name),
                     'app' => $io->getOption('app'),
-                    'workers' => $io->getOption('workers'),
-                    'task_workers' => $io->getOption('task-workers'),
-                    'max_requests' => $io->getOption('max-requests'),
+                    'workers' => TypeCast::safeInteger($io->getOption('workers')),
+                    'task_workers' => TypeCast::safeInteger($io->getOption('task-workers')),
+                    'max_requests' => TypeCast::safeInteger($io->getOption('max-requests')),
                     'watch' => $io->getOption('watch'),
-                    'state_file' => $this->app->path('@temp/swoole/state.json')
                 ]
             );
     }
@@ -207,12 +222,5 @@ class ServeCommand implements CommandInterface
         } catch (Throwable $e) {
             return true;
         }
-    }
-
-    protected function invalidEngine(IOInterface $io, mixed $engineName): int
-    {
-        $io->errorStyle()->warning('Invalid server engine: ' . $engineName);
-
-        return Command::FAILURE;
     }
 }

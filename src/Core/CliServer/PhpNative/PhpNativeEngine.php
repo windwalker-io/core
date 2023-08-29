@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\CliServer;
+namespace Windwalker\Core\CliServer\PhpNative;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -117,5 +117,10 @@ class PhpNativeEngine implements CliServerEngineInterface
             new ArrayInput([]),
             $this->output
         );
+    }
+
+    public function isRunning(): bool
+    {
+        return false;
     }
 }

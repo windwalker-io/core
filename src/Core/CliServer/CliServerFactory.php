@@ -14,38 +14,46 @@ namespace Windwalker\Core\CliServer;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
+use Windwalker\Core\CliServer\PhpNative\PhpNativeEngine;
+use Windwalker\Core\CliServer\Swoole\SwooleEngine;
 use Windwalker\DI\Container;
 
 /**
  * The CliServerFactory class.
  */
-class CliServerEngineFactory
+class CliServerFactory
 {
-    public array $serverTypes = [];
+    public array $engineTypes = [];
 
     public function __construct(protected Container $container)
     {
     }
 
-    public function create(string $name, ?ConsoleOutputInterface $output = null): CliServerEngineInterface
-    {
+    public function createEngine(
+        string $engine,
+        string $name,
+        array $options = [],
+        ?ConsoleOutputInterface $output = null
+    ): CliServerEngineInterface {
         $output ??= new ConsoleOutput();
 
         $args = [
             ConsoleOutputInterface::class => $output,
-            'output' => $output
+            'output' => $output,
+            'name' => $name,
+            'options' => $options
         ];
 
-        return match ($name) {
+        return match ($engine) {
             'php' => $this->container->newInstance(PhpNativeEngine::class, $args),
             'swoole' => $this->container->newInstance(SwooleEngine::class, $args),
-            default => $this->container->resolve($this->serverTypes[$name], $args),
+            default => $this->container->resolve($this->engineTypes[$engine], $args),
         };
     }
 
-    public function addServerType(string $name, mixed $serverFactory): static
+    public function addEngineType(string $name, mixed $factory): static
     {
-        $this->serverTypes[$name] = $serverFactory;
+        $this->engineTypes[$name] = $factory;
 
         return $this;
     }

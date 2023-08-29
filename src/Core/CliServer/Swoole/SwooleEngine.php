@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\CliServer;
+namespace Windwalker\Core\CliServer\Swoole;
 
 use Swoole\Process as SwooleProcess;
 use Symfony\Component\Console\Command\Command;
@@ -19,11 +19,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
+use Windwalker\Core\CliServer\CliServerState;
+use Windwalker\Core\CliServer\CliServerStateManager;
+use Windwalker\Core\CliServer\CliServerTrait;
 use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
 use Windwalker\Core\CliServer\Contracts\ServerProcessManageInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Console\Process\ProcessRunnerTrait;
-use Windwalker\Core\Events\Console\MessageOutputTrait;
+use Windwalker\Data\Collection;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
@@ -40,6 +42,7 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
     use CliServerTrait;
 
     public function __construct(
+        protected string $name,
         protected ConsoleApplication $app,
         protected ConsoleOutputInterface $output,
         #[Autowire]
@@ -47,6 +50,13 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         array $options = []
     ) {
         $this->resolveOptions($options, $this->configureOptions(...));
+
+        $this->serverStateManager->setFilePath($this->options['state_file']);
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
@@ -76,7 +86,7 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
 
         $resolver->define('state_file')
             ->allowedTypes('string')
-            ->default(fn(Options $options) => 'tmp/swoole/state.json');
+            ->default(fn(Options $options) => "tmp/servers/swoole-{$this->name}.json");
     }
 
     public static function isSupported(): bool
@@ -103,7 +113,15 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
             return Command::FAILURE;
         }
 
-        $state = $this->serverStateManager->createState($host, $port, $options);
+        $state = $this->serverStateManager->createState(
+            $host,
+            $port,
+            $options,
+            [
+                'name' => $options['process_name'],
+                'serverName' => $this->getName(),
+            ]
+        );
 
         $process = $this->app->createProcess(
             [
@@ -126,7 +144,7 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
 
     protected function runServerProcess(Process $process, CliServerState $state): int
     {
-        $options = $state->getManagerOptions();
+        $options = $state->getStartupOptions();
         $process->start();
 
         while (!$process->isStarted()) {
@@ -140,35 +158,53 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         $output->newLine();
 
         if ($options['watch'] ?? null) {
+            // Listen file changes
             $watcher = $this->createFileWatcher($options['main']);
             $watcher->listen();
         }
 
-        while ($process->isRunning()) {
-            $output = $process->getIncrementalOutput();
-            $errOutput = $process->getIncrementalErrorOutput();
+        try {
+            while ($process->isRunning()) {
+                // Pass server output to STDOUT
+                $this->displayServerOutput($process);
 
-            $process->clearOutput();
-            $process->clearErrorOutput();
+                // Check file changed
+                if (isset($watcher) && $watcher->hasChanged()) {
+                    $this->output->writeln('File changes detected. Restarting server.');
 
-            if ($output !== '') {
-                $this->output->write($output);
+                    $this->reloadServer();
+                }
+
+                // Wait 0.5 seconds
+                usleep(1000 * 500);
             }
-
-            if ($errOutput) {
-                $this->output->write($errOutput);
-            }
-
-            if (isset($watcher) && $watcher->hasChanged()) {
-                $this->output->writeln('File changes detected. Restarting server.');
-
-                $this->reloadServer();
-            }
-
-            usleep(1000 * 500); // 0.5 seconds
+        } finally {
+            $this->stopServer();
         }
 
         return 0;
+    }
+
+    /**
+     * @param  Process  $process
+     *
+     * @return  void
+     */
+    protected function displayServerOutput(Process $process): void
+    {
+        $output = $process->getIncrementalOutput();
+        $errOutput = $process->getIncrementalErrorOutput();
+
+        $process->clearOutput();
+        $process->clearErrorOutput();
+
+        if ($output !== '') {
+            $this->output->write($output);
+        }
+
+        if ($errOutput) {
+            $this->output->write($errOutput);
+        }
     }
 
     public function isRunning(): bool
@@ -184,15 +220,32 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         return $masterPid && $this->isAlive($masterPid);
     }
 
-    public function reloadServer(): void
+    public function reloadServer(): bool
     {
         $state = $this->serverStateManager->getState();
 
-        static::signal($state->getMasterPid(), SIGUSR1);
+        return static::signal($state->getMasterPid(), SIGUSR1);
     }
 
     public function stopServer(): bool
     {
+        $state = $this->serverStateManager->getState();
+        $masterId = $state->getMasterPid();
+        $managerId = $state->getManagerPid();
+
+        $workerPids = $this->app->runProcess('pgrep -P ' . $managerId)
+            ->getOutput();
+
+        $pids = Collection::explode("\n", $workerPids)
+            ->map('trim')
+            ->filter('strlen')
+            ->append($managerId, $masterId);
+
+        foreach ($pids as $pid) {
+            self::signal((int) $pid, SIGKILL);
+        }
+
+        return true;
     }
 
     public function isAlive(int $pid): bool
@@ -214,5 +267,12 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
             new ArrayInput([]),
             $this->output
         );
+    }
+
+    public function clearStateFile(): bool
+    {
+        $this->serverStateManager->clearState();
+
+        return true;
     }
 }

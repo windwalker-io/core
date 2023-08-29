@@ -60,14 +60,18 @@ class CliServerStateManager
         return CliServerState::wrap($state);
     }
 
-    public function createState(string $host, int $port, array $options): CliServerState
-    {
+    public function createState(
+        string $host,
+        int $port,
+        array $options,
+        array $data = [],
+    ): CliServerState {
         $state = $this->getState();
 
-        $state->setName($options['process_name']);
+        $state->fill($data);
         $state->setHost($host);
         $state->setPort($port);
-        $state->setManagerOptions($options);
+        $state->setStartupOptions($options);
 
         $this->writeState($state);
 
@@ -79,5 +83,10 @@ class CliServerStateManager
         return $this->getFile()->write(
             json_encode($state, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
         );
+    }
+
+    public function clearState(): bool
+    {
+        return $this->getFile()->deleteIfExists();
     }
 }

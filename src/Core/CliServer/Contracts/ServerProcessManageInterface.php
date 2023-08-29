@@ -15,7 +15,9 @@ interface ServerProcessManageInterface
 {
     public function isRunning(): bool;
 
-    public function reloadServer(): void;
-
     public function stopServer(): bool;
+
+    public function reloadServer(): bool;
+
+    public function clearStateFile(): bool;
 }
