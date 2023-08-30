@@ -267,7 +267,7 @@ class WsRootApplication implements WsRootApplicationInterface
     }
 
     /**
-     * @param  WsAppRequest               $app
+     * @param  WsAppContext               $app
      * @param  WebSocketRequestInterface  $request
      * @param  iterable                   $middlewares
      *

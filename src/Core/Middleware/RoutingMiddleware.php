@@ -133,10 +133,8 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     }
 
     /**
-     * findAction
-     *
-     * @param  ServerRequestInterface  $request
-     * @param  Route                   $route
+     * @param  string  $method
+     * @param  Route   $route
      *
      * @return  mixed
      */

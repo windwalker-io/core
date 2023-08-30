@@ -21,6 +21,7 @@ use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
+use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Utilities\Str;
 
 use function FastRoute\simpleDispatcher;
@@ -128,11 +129,14 @@ class Router implements EventAwareInterface
     {
         $uri = $request->getUri();
 
-        // Match methods
-        $methods = $route->getMethods();
+        // Only check methods in web env
+        if (!$request instanceof WebSocketRequestInterface) {
+            // Match methods
+            $methods = $route->getMethods();
 
-        if ($methods && !in_array(strtoupper($request->getMethod()), $methods, true)) {
-            return false;
+            if ($methods && !in_array(strtoupper($request->getMethod()), $methods, true)) {
+                return false;
+            }
         }
 
         // Match Hosts
