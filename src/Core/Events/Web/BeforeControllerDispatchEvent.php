@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Events\Web;
 
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\Context\RequestAppContextInterface;
 use Windwalker\Event\AbstractEvent;
 
 /**
@@ -21,7 +22,7 @@ class BeforeControllerDispatchEvent extends AbstractEvent
 {
     protected mixed $controller;
 
-    protected AppContext $app;
+    protected RequestAppContextInterface $app;
 
     /**
      * @return mixed
@@ -44,19 +45,19 @@ class BeforeControllerDispatchEvent extends AbstractEvent
     }
 
     /**
-     * @return AppContext
+     * @return RequestAppContextInterface
      */
-    public function getApp(): AppContext
+    public function getApp(): RequestAppContextInterface
     {
         return $this->app;
     }
 
     /**
-     * @param  AppContext  $app
+     * @param  RequestAppContextInterface  $app
      *
      * @return  static  Return self to support chaining.
      */
-    public function setApp(AppContext $app): static
+    public function setApp(RequestAppContextInterface $app): static
     {
         $this->app = $app;
 

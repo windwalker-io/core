@@ -22,7 +22,6 @@ use Stringable;
 use Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\CliServer\CliServerRuntime;
-use Windwalker\Core\CliServer\RequestResult;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
@@ -57,7 +56,7 @@ use Windwalker\Http\Server\ServerInterface;
  *
  * @since  4.0
  */
-class WebApplication implements WebApplicationInterface, RootApplicationInterface
+class WebApplication implements WebRootApplicationInterface
 {
     use WebApplicationTrait;
 
@@ -283,7 +282,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             $event->setResponse($response);
         } catch (\Throwable $e) {
             $statusCode = $e->getCode();
-            
+
             if (!ResponseHelper::isClientError($statusCode)) {
                 $output = CliServerRuntime::getStyledOutput();
 
@@ -296,7 +295,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
                     $error->handle($e);
                 } catch (\Throwable $e) {
                     $this->log(
-                               '[Infinite loop in error handling]: ' . $e->getMessage(),
+                        '[Infinite loop in error handling]: ' . $e->getMessage(),
                         level: LogLevel::ERROR
                     );
                 }
@@ -362,11 +361,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             compact('container')
         );
 
-        foreach ($this->providers as $provider) {
-            if ($provider instanceof RequestReleasableProviderInterface) {
-                $provider->releaseAfterRequest($container);
-            }
-        }
+        $this->releaseProviders($container);
     }
 
     /**
@@ -492,8 +487,8 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
     protected function releaseProviders(Container $container): void
     {
         foreach ($this->providers as $provider) {
-            if ($provider instanceof RequestBootableProviderInterface) {
-                $provider->bootBeforeRequest($container);
+            if ($provider instanceof RequestReleasableProviderInterface) {
+                $provider->releaseAfterRequest($container);
             }
         }
     }

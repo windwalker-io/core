@@ -14,6 +14,7 @@ namespace Windwalker\Core\Provider;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\Context\RequestAppContextInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Security\CspNonceService;
@@ -118,7 +119,8 @@ class WebProvider implements ServiceProviderInterface
                 return $app->setAppRequest($this->createAppRequest($container))
                     ->setState($container->get(AppState::class));
             }
-        );
+        )
+            ->alias(RequestAppContextInterface::class, AppContext::class);
     }
 
     /**

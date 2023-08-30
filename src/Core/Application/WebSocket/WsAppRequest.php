@@ -1,24 +1,23 @@
 <?php
 
 /**
- * Part of starter project.
+ * Part of cati project.
  *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
+ * @copyright  Copyright (C) 2023 __ORGANIZATION__.
+ * @license    __LICENSE__
  */
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Http;
+namespace Windwalker\Core\Application\WebSocket;
 
-use JetBrains\PhpStorm\Immutable;
-use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Http\Event\RequestGetValueEvent;
+use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
@@ -26,15 +25,16 @@ use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\Traits\FilterAwareTrait;
+use Windwalker\Reactor\WebSocket\WebSocketFrameInterface;
+use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Uri\Uri;
 
 use function Windwalker\collect;
 
 /**
- * The AppRequest class.
+ * The WebSocketAppRequest class.
  */
-#[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
-class AppRequest implements JsonSerializable, EventAwareInterface
+class WsAppRequest implements \JsonSerializable, EventAwareInterface, WebSocketFrameInterface
 {
     use CoreEventAwareTrait;
     use FilterAwareTrait;
@@ -46,15 +46,24 @@ class AppRequest implements JsonSerializable, EventAwareInterface
     /**
      * AppRequest constructor.
      *
-     * @param  ServerRequestInterface  $request
-     * @param  SystemUri               $systemUri
+     * @param  WebSocketRequestInterface  $request
+     * @param  ProxyResolver              $proxyResolver
      */
     public function __construct(
-        protected ServerRequestInterface $request,
-        protected SystemUri $systemUri,
+        protected WebSocketRequestInterface $request,
         protected ProxyResolver $proxyResolver
     ) {
         //
+    }
+
+    public function getFd(): int
+    {
+        return $this->request->getFd();
+    }
+
+    public function getData(): string
+    {
+        return $this->request->getData();
     }
 
     public function getClientIP(): string
@@ -69,22 +78,22 @@ class AppRequest implements JsonSerializable, EventAwareInterface
 
         return $this->request->getServerParams()['REMOTE_ADDR'] ?? '';
     }
+    // public function getMethod(): string
+    // {
+    //     return $this->request->getMethod();
+    // }
+    //
+    // public function getOverrideMethod(): string
+    // {
+    //     return $this->request->getHeaderLine('X-Http-Method-Override')
+    //         ?: $this->getRequest()->getParsedBody()['_method']
+    //         ?? $this->getUri()->getQueryValues()['_method']
+    //         ?? $this->request->getMethod();
 
-    public function getMethod(): string
-    {
-        return $this->request->getMethod();
-    }
-
-    public function getOverrideMethod(): string
-    {
-        return $this->request->getHeaderLine('X-Http-Method-Override')
-            ?: $this->getRequest()->getParsedBody()['_method']
-            ?? $this->getUri()->getQueryValues()['_method']
-                ?? $this->request->getMethod();
-    }
+    // }
 
     /**
-     * @return UriInterface
+     * @return Uri
      */
     public function getUri(): UriInterface
     {
@@ -92,7 +101,7 @@ class AppRequest implements JsonSerializable, EventAwareInterface
     }
 
     /**
-     * @param  UriInterface|null  $uri
+     * @param  UriInterface  $uri
      *
      * @return  static  Return self to support chaining.
      */
@@ -100,7 +109,6 @@ class AppRequest implements JsonSerializable, EventAwareInterface
     {
         $new = clone $this;
         $new->request = $new->request->withUri($uri);
-        $this->input = null;
 
         return $new;
     }
@@ -230,34 +238,7 @@ class AppRequest implements JsonSerializable, EventAwareInterface
     }
 
     /**
-     * inputWithMethod
-     *
-     * @param  string  $method
-     * @param  mixed   ...$fields
-     *
-     * @return  mixed|Collection
-     */
-    public function inputWithMethod(string $method = 'REQUEST', ...$fields): mixed
-    {
-        if ($method === '' || strtoupper($method) === 'REQUEST') {
-            $input = $this->compileInput();
-        } elseif (strtoupper($method) === 'GET') {
-            $input = $this->getQueryValues();
-        } else {
-            $input = $this->getBodyValues();
-        }
-
-        if ($fields === []) {
-            return $input;
-        }
-
-        return $this->fetchInputFields($input, $fields);
-    }
-
-    /**
-     * fetchInputFields
-     *
-     * @param  array  $data
+     * @param  array  $input
      * @param  array  $fields
      *
      * @return  mixed|Collection
@@ -293,96 +274,31 @@ class AppRequest implements JsonSerializable, EventAwareInterface
         return collect($data);
     }
 
-    /**
-     * file
-     *
-     * @param  mixed  ...$fields
-     *
-     * @return  UploadedFileInterface[]|UploadedFileInterface|array
-     */
-    public function file(...$fields): mixed
-    {
-        $files = $this->getRequest()->getUploadedFiles();
-
-        if ($fields === []) {
-            return $files;
-        }
-
-        $data = [];
-
-        foreach ($fields as $field) {
-            $data[$field] = $files[$field] ?? null;
-        }
-
-        if (\Windwalker\count($fields) === 1) {
-            return array_shift($data);
-        }
-
-        return collect($data);
-    }
-
     protected function compileInput(): array
     {
-        return $this->input ??= array_merge(
-            $this->getQueryValues(),
-            $this->getBodyValues()
-        );
+        return $this->input = json_decode($this->request->getData(), true);
     }
 
     /**
-     * @return ServerRequestInterface
+     * @return WebSocketRequestInterface
      */
-    public function getRequest(): ServerRequestInterface
+    public function getRequest(): WebSocketRequestInterface
     {
         return $this->request;
     }
 
     /**
-     * @param  ServerRequestInterface  $request
+     * @param  WebSocketRequestInterface  $request
      *
      * @return  static  Return self to support chaining.
      */
-    public function withRequest(ServerRequestInterface $request): static
+    public function withRequest(WebSocketRequestInterface $request): static
     {
         $new = clone $this;
         $new->request = $request;
         $this->input = null;
 
         return $new;
-    }
-
-    /**
-     * @return SystemUri
-     */
-    public function getSystemUri(): SystemUri
-    {
-        return $this->systemUri;
-    }
-
-    /**
-     * @param  SystemUri  $uri
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function withSystemUri(SystemUri $uri): static
-    {
-        $new = clone $this;
-        $new->systemUri = $uri;
-
-        return $new;
-    }
-
-    public function isAccept(string $type): bool
-    {
-        return str_contains(
-            $this->getRequest()->getHeaderLine('accept'),
-            $type
-        );
-    }
-
-    public function isAcceptJson(): bool
-    {
-        return $this->isAccept('application/json');
     }
 
     /**
@@ -419,12 +335,7 @@ class AppRequest implements JsonSerializable, EventAwareInterface
         $req = FormatRegistry::makeDumpable($this->getRequest());
         $req['stream'] = null;
 
-        return array_merge(
-            $req,
-            [
-                'systemUri' => $this->getSystemUri(),
-            ]
-        );
+        return $req;
     }
 
     /**

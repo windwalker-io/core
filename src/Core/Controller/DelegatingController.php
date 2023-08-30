@@ -15,13 +15,15 @@ use LogicException;
 use ReflectionException;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Error\ErrorLogHandler;
+use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
+use Windwalker\DI\Exception\DefinitionException;
 
 /**
  * The DelegatingController class.
@@ -35,11 +37,11 @@ class DelegatingController implements ControllerInterface
     /**
      * DelegatingController constructor.
      *
-     * @param  AppContext  $app
-     * @param  object      $controller
+     * @param  RequestAppContextInterface  $app
+     * @param  object                      $controller
      */
     public function __construct(
-        protected AppContext $app,
+        protected RequestAppContextInterface $app,
         protected object $controller
     ) {
         //
@@ -52,7 +54,7 @@ class DelegatingController implements ControllerInterface
      * @param  array   $args
      *
      * @return mixed
-     * @throws ReflectionException
+     * @throws Throwable
      */
     public function execute(string $task, array $args = []): mixed
     {
@@ -87,6 +89,10 @@ class DelegatingController implements ControllerInterface
             }
 
             $handler = [$this, 'renderView'];
+        }
+
+        if ($this->app instanceof WsApplicationInterface) {
+            return $this->app->call($handler, $args);
         }
 
         try {
