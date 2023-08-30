@@ -19,6 +19,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Application\WebApplicationTrait;
+use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
@@ -373,5 +374,35 @@ class WsRootApplication implements WsRootApplicationInterface
     public function addMessage(array|string $messages, ?string $type = 'info'): static
     {
         return $this;
+    }
+
+    public function openConnection(WebSocketRequestInterface $request): void
+    {
+        $start = microtime(true);
+
+        $this->opening($request);
+
+        $client = $this->service(CliServerClient::class);
+        $client->logWebSocketOpen($request, (microtime(true) - $start) * 1000);
+    }
+
+    public function closeConnection(WebSocketRequestInterface $request): void
+    {
+        $start = microtime(true);
+
+        $this->closing($request);
+
+        $client = $this->service(CliServerClient::class);
+        $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);
+    }
+
+    protected function opening(WebSocketRequestInterface $request): void
+    {
+        //
+    }
+
+    protected function closing(WebSocketRequestInterface $request): void
+    {
+        //
     }
 }

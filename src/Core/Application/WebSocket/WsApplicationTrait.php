@@ -18,8 +18,20 @@ use Windwalker\Reactor\WebSocket\MessageEmitterInterface;
  */
 trait WsApplicationTrait
 {
-    public function push(int $fd, string $data): bool
+    public function pushTo(int $fd, mixed ...$args): bool
+    {
+        $data = $this->getWebSocketClient()->formatMessage(...$args);
+
+        return $this->pushRawTo($fd, $data);
+    }
+
+    public function pushRawTo(int $fd, string $data): bool
     {
         return $this->getContainer()->get(MessageEmitterInterface::class)->emit($fd, $data);
+    }
+
+    public function getWebSocketClient(): WsClientAdapterInterface
+    {
+        return $this->service(WsClientAdapterInterface::class);
     }
 }

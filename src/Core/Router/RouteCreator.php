@@ -304,6 +304,12 @@ class RouteCreator
         return $this->any($name, $pattern, $options)->methods('DELETE');
     }
 
+
+    public function ws(string $pattern, array $options = []): Route
+    {
+        return $this->any($pattern, $pattern, $options);
+    }
+
     /**
      * prefix
      *

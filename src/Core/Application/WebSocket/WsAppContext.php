@@ -52,9 +52,14 @@ class WsAppContext implements WsApplicationInterface, RequestAppContextInterface
         return $this->getAppRequest()->getData();
     }
 
-    public function pushSelf(string $data): bool
+    public function pushSelf(mixed ...$args): bool
     {
-        return $this->push($this->getFd(), $data);
+        return $this->pushTo($this->getFd(), ...$args);
+    }
+
+    public function pushSelfRaw(string $data): bool
+    {
+        return $this->pushRawTo($this->getFd(), $data);
     }
 
     /**

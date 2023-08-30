@@ -12,11 +12,9 @@ declare(strict_types=1);
 namespace Windwalker\Core\CliServer;
 
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Terminal;
 use Windwalker\Core\Application\ApplicationInterface;
-
-use function Windwalker\chronos;
+use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 
 /**
  * The CliServerClient class.
@@ -69,6 +67,98 @@ class CliServerClient
             $pid,
             $memory,
             $durationText,
+        );
+
+        CliServerRuntime::logLine($log);
+    }
+
+    public function logWebSocketOpen(
+        WebSocketRequestInterface $request,
+        float $duration
+    ): void {
+        $name = $this->app->getAppName();
+
+        // $terminalWidth = $this->getTerminalWidth();
+
+        $uri = $request->getUri()->getPath();
+        $pid = (string) getmypid();
+        $memory = number_format(memory_get_usage() / 1024 / 1024, 2) . 'MB';
+        $durationText = number_format($duration) . 'ms';
+
+        $log = sprintf(
+            '  [OPEN][%s] (fd: %s) %s - pid: %s - %s - %s',
+            $name,
+            $request->getFd(),
+            $uri,
+            $pid,
+            $memory,
+            $durationText
+        );
+
+        CliServerRuntime::logLine($log);
+    }
+
+    public function logWebSocketClose(
+        WebSocketRequestInterface $request,
+        float $duration
+    ): void {
+        $name = $this->app->getAppName();
+
+        // $terminalWidth = $this->getTerminalWidth();
+
+        $uri = $request->getUri()->getPath();
+        $pid = (string) getmypid();
+        $memory = number_format(memory_get_usage() / 1024 / 1024, 2) . 'MB';
+        $durationText = number_format($duration) . 'ms';
+
+        $log = sprintf(
+            '  [CLOSE][%s] (fd: %s) %s - pid: %s - %s - %s',
+            $name,
+            $request->getFd(),
+            $uri,
+            $pid,
+            $memory,
+            $durationText
+        );
+
+        CliServerRuntime::logLine($log);
+    }
+
+    public function logWebSocketMessageStart(WebSocketRequestInterface $request): void {
+        $name = $this->app->getAppName();
+
+        // $terminalWidth = $this->getTerminalWidth();
+
+        $uri = $request->getUri()->getPath();
+        $pid = (string) getmypid();
+
+        $log = sprintf(
+            '  [MSG START][%s] (fd: %s) %s - pid: %s',
+            $name,
+            $request->getFd(),
+            $uri,
+            $pid,
+        );
+
+        CliServerRuntime::logLine($log);
+    }
+
+    public function logWebSocketMessageEnd(WebSocketRequestInterface $request, int $duration): void {
+        $name = $this->app->getAppName();
+
+        // $terminalWidth = $this->getTerminalWidth();
+
+        $pid = (string) getmypid();
+        $memory = number_format(memory_get_usage() / 1024 / 1024, 2) . 'MB';
+        $durationText = number_format($duration) . 'ms';
+
+        $log = sprintf(
+            '  [MSG END][%s] (fid: %s) - pid: %s - %s - %s',
+            $name,
+            $request->getFd(),
+            $pid,
+            $durationText,
+            $memory
         );
 
         CliServerRuntime::logLine($log);

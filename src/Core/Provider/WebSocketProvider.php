@@ -11,15 +11,21 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\WebSocket\SocketIOAdapter;
 use Windwalker\Core\Application\WebSocket\WsAppContext;
 use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
 use Windwalker\Core\Application\WebSocket\WsAppRequest;
+use Windwalker\Core\Application\WebSocket\WsClientAdapterInterface;
 use Windwalker\Core\Application\WebSocket\WsRootApplicationInterface;
+use Windwalker\Core\CliServer\Swoole\RequestRegistry;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
@@ -64,6 +70,9 @@ class WebSocketProvider implements ServiceProviderInterface
             fn (Container $container) => $container->get(WebSocketServerInterface::class)->getMessageEmitter()
         );
 
+        $container->prepareSharedObject(SocketIOAdapter::class)
+            ->alias(WsClientAdapterInterface::class, SocketIOAdapter::class);
+
         $this->registerRequestObject($container);
 
         // App Context
@@ -89,11 +98,14 @@ class WebSocketProvider implements ServiceProviderInterface
      * @param  Container  $container
      *
      * @return  WsAppRequest
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function createAppRequest(Container $container): WsAppRequest
     {
         return $container->newInstance(WsAppRequest::class)
-            ->withRequest($container->get(WebSocketRequest::class));
+            ->withRequest($container->get(WebSocketRequest::class))
+            ->withSystemUri($container->get(SystemUri::class));
     }
 
     /**
@@ -138,25 +150,20 @@ class WebSocketProvider implements ServiceProviderInterface
     protected function registerRequestObject(Container $container): void
     {
         // Request
-        $container->share(
-            WebSocketRequest::class,
-            fn() => new WebSocketRequest(),
-            Container::ISOLATION
-        )
-            ->alias(ServerRequestInterface::class, WebSocketRequest::class)
+        $container->alias(ServerRequestInterface::class, WebSocketRequest::class)
             ->alias(WebSocketRequestInterface::class, WebSocketRequest::class)
             ->alias(ServerRequest::class, WebSocketRequest::class);
 
         // System Uri
-        // $container->share(
-        //     SystemUri::class,
-        //     function (Container $container) {
-        //         return $container->get(ProxyResolver::class)->handleProxyHost(
-        //             SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
-        //         );
-        //     },
-        //     Container::ISOLATION
-        // );
+        $container->share(
+            SystemUri::class,
+            function (Container $container) {
+                return $container->get(ProxyResolver::class)->handleProxyHost(
+                    SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
+                );
+            },
+            Container::ISOLATION
+        );
 
         // Proxy
         $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);
