@@ -13,7 +13,7 @@ namespace Windwalker\Core\Events\Web;
 
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Event\AbstractEvent;
 
 /**
@@ -23,7 +23,7 @@ class AfterControllerDispatchEvent extends AbstractEvent
 {
     protected ResponseInterface $response;
 
-    protected RequestAppContextInterface $app;
+    protected AppContextInterface $app;
 
     /**
      * @return ResponseInterface
@@ -46,19 +46,19 @@ class AfterControllerDispatchEvent extends AbstractEvent
     }
 
     /**
-     * @return RequestAppContextInterface
+     * @return AppContextInterface
      */
-    public function getApp(): RequestAppContextInterface
+    public function getApp(): AppContextInterface
     {
         return $this->app;
     }
 
     /**
-     * @param  RequestAppContextInterface  $app
+     * @param  AppContextInterface  $app
      *
      * @return  static  Return self to support chaining.
      */
-    public function setApp(RequestAppContextInterface $app): static
+    public function setApp(AppContextInterface $app): static
     {
         $this->app = $app;
 

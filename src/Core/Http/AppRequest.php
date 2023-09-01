@@ -15,6 +15,7 @@ use JetBrains\PhpStorm\Immutable;
 use JsonSerializable;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\Context\AppRequestTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Http\Event\RequestGetValueEvent;
@@ -23,13 +24,15 @@ use Windwalker\Data\Collection;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 
+use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
+
 use function Windwalker\collect;
 
 /**
  * The AppRequest class.
  */
 #[Immutable(Immutable::PRIVATE_WRITE_SCOPE)]
-class AppRequest implements JsonSerializable, EventAwareInterface
+class AppRequest implements AppRequestInterface, JsonSerializable
 {
     use CoreEventAwareTrait;
     use FilterAwareTrait;
@@ -58,9 +61,23 @@ class AppRequest implements JsonSerializable, EventAwareInterface
     public function getOverrideMethod(): string
     {
         return $this->request->getHeaderLine('X-Http-Method-Override')
-            ?: $this->getRequest()->getParsedBody()['_method']
+            ?: $this->getServerRequest()->getParsedBody()['_method']
             ?? $this->getUri()->getQueryValues()['_method']
             ?? $this->request->getMethod();
+    }
+
+    /**
+     * @param  ServerRequestInterface  $request
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function withRequest(ServerRequestInterface $request): static
+    {
+        $new = clone $this;
+        $new->request = $request;
+        $this->input = null;
+
+        return $new;
     }
 
     /**

@@ -22,7 +22,7 @@ use Windwalker\DI\Parameters;
 /**
  * Trait RequestAppContextTrait
  */
-trait RequestAppContextTrait
+trait AppContextTrait
 {
     use WebApplicationTrait {
         __get as magicGet;

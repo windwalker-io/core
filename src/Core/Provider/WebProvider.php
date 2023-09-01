@@ -14,7 +14,8 @@ namespace Windwalker\Core\Provider;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Security\CspNonceService;
@@ -72,9 +73,6 @@ class WebProvider implements ServiceProviderInterface
             fn(Navigator $nav, Container $container) => $nav->addEventDealer($container->get(AppContext::class))
         );
 
-        // Renderer
-        $this->extendRenderer($container);
-
         // Security
         $this->registerSecurityServices($container);
     }
@@ -120,7 +118,7 @@ class WebProvider implements ServiceProviderInterface
                     ->setState($container->get(AppState::class));
             }
         )
-            ->alias(RequestAppContextInterface::class, AppContext::class);
+            ->alias(AppContextInterface::class, AppContext::class);
     }
 
     /**
@@ -171,32 +169,14 @@ class WebProvider implements ServiceProviderInterface
         $container->set(
             AppRequest::class,
             fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
-        );
+        )
+            ->alias(AppRequestInterface::class, AppRequest::class);
 
         // Browser Agent Detect
         $container->share(
             Browser::class,
             fn(Container $container) => Browser::fromRequest($container->get(ServerRequest::class))
         );
-    }
-
-    /**
-     * extendRenderer
-     *
-     * @param  Container  $container
-     *
-     * @return  void
-     */
-    protected function extendRenderer(Container $container): void
-    {
-        // $container->extend(
-        //     RendererService::class,
-        //     function (RendererService $service, Container $container) {
-        //         return $service->addGlobal('app', $app = $container->get(AppContext::class))
-        //             ->addGlobal('uri', $app->getSystemUri())
-        //             ->addGlobal('nav', $container->get(Navigator::class));
-        //     }
-        // );
     }
 
     protected function registerSecurityServices(Container $container): void

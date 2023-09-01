@@ -23,7 +23,7 @@ use Windwalker\DI\Parameters;
 /**
  * Interface RequestAppContextInterface
  */
-interface RequestAppContextInterface
+interface AppContextInterface
 {
     public function getRootApp(): RootApplicationInterface;
 

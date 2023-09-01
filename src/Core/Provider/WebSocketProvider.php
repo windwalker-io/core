@@ -14,19 +14,19 @@ namespace Windwalker\Core\Provider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
-use Windwalker\Core\Application\WebSocket\SocketIOAdapter;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebSocket\WsAppContext;
 use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
 use Windwalker\Core\Application\WebSocket\WsAppRequest;
-use Windwalker\Core\Application\WebSocket\WsClientAdapterInterface;
 use Windwalker\Core\Application\WebSocket\WsRootApplicationInterface;
-use Windwalker\Core\CliServer\Swoole\RequestRegistry;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
+use Windwalker\Core\WebSocket\SimpleMessageParser;
+use Windwalker\Core\WebSocket\WebSocketParserInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
@@ -70,8 +70,7 @@ class WebSocketProvider implements ServiceProviderInterface
             fn (Container $container) => $container->get(WebSocketServerInterface::class)->getMessageEmitter()
         );
 
-        $container->prepareSharedObject(SocketIOAdapter::class)
-            ->alias(WsClientAdapterInterface::class, SocketIOAdapter::class);
+        $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
 
         $this->registerRequestObject($container);
 
@@ -80,18 +79,6 @@ class WebSocketProvider implements ServiceProviderInterface
 
         // Controller Dispatcher
         $container->prepareSharedObject(ControllerDispatcher::class);
-
-        // // Navigator
-        // $container->prepareSharedObject(
-        //     Navigator::class,
-        //     fn(Navigator $nav, Container $container) => $nav->addEventDealer($container->get(AppContext::class))
-        // );
-
-        // Renderer
-        // $this->extendRenderer($container);
-
-        // Security
-        // $this->registerSecurityServices($container);
     }
 
     /**
@@ -135,7 +122,7 @@ class WebSocketProvider implements ServiceProviderInterface
                     ->setState($container->get(AppState::class));
             }
         )
-            ->alias(RequestAppContextInterface::class, WsAppContext::class);
+            ->alias(AppContextInterface::class, WsAppContext::class);
     }
 
     /**
@@ -170,9 +157,10 @@ class WebSocketProvider implements ServiceProviderInterface
 
         // App Request
         $container->set(
-            WsAppContext::class,
+            WsAppRequest::class,
             fn(Container $container) => $container->get(WsAppContext::class)->getAppRequest()
-        );
+        )
+            ->alias(AppRequestInterface::class, WsAppRequest::class);
 
         // Browser Agent Detect
         $container->share(

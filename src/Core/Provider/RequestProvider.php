@@ -13,7 +13,7 @@ namespace Windwalker\Core\Provider;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Event\EventCollector;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
@@ -40,7 +40,7 @@ class RequestProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
-        $container->alias(ApplicationInterface::class, RequestAppContextInterface::class);
+        $container->alias(ApplicationInterface::class, AppContextInterface::class);
         $container->alias(ServerRequestInterface::class, ServerRequest::class);
 
         $container->share(

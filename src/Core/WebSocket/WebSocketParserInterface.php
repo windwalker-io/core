@@ -9,18 +9,18 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\Core\WebSocket;
 
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 
 /**
  * Interface WsDispatcherInterface
  */
-interface WsClientAdapterInterface
+interface WebSocketParserInterface
 {
-    public function parseMessage(string $data): mixed;
+    public function parse(string $data): mixed;
 
-    public function formatMessage(mixed ...$args): string;
+    public function format(mixed ...$args): string;
 
     public function handleRequest(WebSocketRequestInterface $request): WebSocketRequestInterface;
 }

@@ -15,7 +15,7 @@ use LogicException;
 use ReflectionException;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
@@ -37,11 +37,11 @@ class DelegatingController implements ControllerInterface
     /**
      * DelegatingController constructor.
      *
-     * @param  RequestAppContextInterface  $app
-     * @param  object                      $controller
+     * @param  AppContextInterface  $app
+     * @param  object               $controller
      */
     public function __construct(
-        protected RequestAppContextInterface $app,
+        protected AppContextInterface $app,
         protected object $controller
     ) {
         //

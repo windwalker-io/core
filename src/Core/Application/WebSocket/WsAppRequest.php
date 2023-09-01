@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application\WebSocket;
 
+use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\Context\AppRequestTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Reactor\WebSocket\WebSocketFrameInterface;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
@@ -23,7 +23,7 @@ use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 /**
  * The WebSocketAppRequest class.
  */
-class WsAppRequest implements \JsonSerializable, EventAwareInterface, WebSocketFrameInterface
+class WsAppRequest implements AppRequestInterface, \JsonSerializable, WebSocketFrameInterface
 {
     use CoreEventAwareTrait;
     use FilterAwareTrait;
@@ -56,7 +56,7 @@ class WsAppRequest implements \JsonSerializable, EventAwareInterface, WebSocketF
 
     protected function compileInput(): mixed
     {
-        return $this->input = $this->request->getParsedData();
+        return $this->input ??= $this->request->getParsedData();
     }
 
     protected function getUriQueryValues(): array
@@ -71,5 +71,24 @@ class WsAppRequest implements \JsonSerializable, EventAwareInterface, WebSocketF
         }
 
         return $this->matchedRoute->getVars();
+    }
+
+    /**
+     * @param  WebSocketRequestInterface  $request
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function withServerRequest(WebSocketRequestInterface $request): static
+    {
+        $new = clone $this;
+        $new->request = $request;
+        $this->input = null;
+
+        return $new;
+    }
+
+    public function getServerRequest(): WebSocketRequestInterface
+    {
+        return $this->request;
     }
 }

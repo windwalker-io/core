@@ -17,8 +17,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Stringable;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
-use Windwalker\Core\Application\Context\RequestAppContextTrait;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -36,10 +36,10 @@ use Windwalker\Session\Session;
  * @property-read AppState $state
  */
 #[Immutable(Immutable::PROTECTED_WRITE_SCOPE)]
-class AppContext implements WebApplicationInterface, RequestAppContextInterface
+class AppContext implements WebApplicationInterface, AppContextInterface
 {
     use FilterAwareTrait;
-    use RequestAppContextTrait;
+    use AppContextTrait;
 
     protected ?AppRequest $appRequest = null;
 

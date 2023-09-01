@@ -13,7 +13,7 @@ namespace Windwalker\Core\Attributes;
 
 use Attribute;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
@@ -58,7 +58,7 @@ class Controller implements ContainerAttributeInterface
         }
 
         return fn(...$args): DelegatingController => (new DelegatingController(
-            $container->get(RequestAppContextInterface::class),
+            $container->get(AppContextInterface::class),
             $handler(...$args)
         ))
             ->setModule($this->module)

@@ -85,7 +85,7 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
 
     protected function handleByClient(WebSocketRequestInterface $request): WebSocketRequestInterface
     {
-        return $this->app->getWebSocketClient()->handleRequest($request);
+        return $this->app->getParser()->handleRequest($request);
     }
 
     protected function findController(Route $route): mixed

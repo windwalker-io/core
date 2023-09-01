@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application\Context;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Http\ProxyResolver;
@@ -149,7 +150,7 @@ trait AppRequestTrait
      *
      * @return  mixed|Collection
      */
-    public function input(...$fields): mixed
+    public function input(mixed ...$fields): mixed
     {
         $input = $this->compileInput();
 
@@ -202,28 +203,6 @@ trait AppRequestTrait
     }
 
     abstract protected function compileInput(): mixed;
-
-    /**
-     * @return WebSocketRequestInterface
-     */
-    public function getRequest(): WebSocketRequestInterface
-    {
-        return $this->request;
-    }
-
-    /**
-     * @param  WebSocketRequestInterface  $request
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function withRequest(WebSocketRequestInterface $request): static
-    {
-        $new = clone $this;
-        $new->request = $request;
-        $this->input = null;
-
-        return $new;
-    }
 
     /**
      * @return SystemUri
@@ -294,5 +273,20 @@ trait AppRequestTrait
     public function getProxyResolver(): ProxyResolver
     {
         return $this->proxyResolver;
+    }
+
+    /**
+     * @return ServerRequestInterface
+     *
+     * @deprecated  Use getServerRequest() instead.
+     */
+    public function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    public function getServerRequest(): ServerRequestInterface
+    {
+        return $this->request;
     }
 }

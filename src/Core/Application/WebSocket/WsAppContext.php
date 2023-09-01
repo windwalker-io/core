@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application\WebSocket;
 
 use JetBrains\PhpStorm\NoReturn;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
-use Windwalker\Core\Application\Context\RequestAppContextTrait;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Application\WebRootApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\Reactor\WebSocket\WebSocketFrameInterface;
@@ -25,9 +25,9 @@ use function Swoole\Coroutine\Http\request;
  *
  * @method WebRootApplicationInterface getRootApp()
  */
-class WsAppContext implements WsApplicationInterface, RequestAppContextInterface, WebSocketFrameInterface
+class WsAppContext implements WsApplicationInterface, AppContextInterface, WebSocketFrameInterface
 {
-    use RequestAppContextTrait;
+    use AppContextTrait;
     use WsApplicationTrait;
 
     protected WsAppRequest $appRequest;

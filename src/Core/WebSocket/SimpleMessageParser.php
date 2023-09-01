@@ -9,24 +9,24 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\Core\WebSocket;
 
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Uri\Uri;
 
 /**
- * The SocketIOAdapter class.
+ * The SampleMessageParser class.
  */
-class SocketIOAdapter implements WsClientAdapterInterface
+class SimpleMessageParser implements WebSocketParserInterface
 {
-    public function parseMessage(string $data): array
+    public function parse(string $data): array
     {
         [$name, $payload] = json_decode($data, true, 512, JSON_THROW_ON_ERROR) + ['', ''];
 
         return compact('name', 'payload');
     }
 
-    public function formatMessage(...$args): string
+    public function format(...$args): string
     {
         $name = (string) ($args['name'] ?? $args[0] ?? '');
         $payload = $args['payload'] ?? $args[1] ?? null;
@@ -39,7 +39,7 @@ class SocketIOAdapter implements WsClientAdapterInterface
         [
             'name' => $name,
             'payload' => $payload,
-        ] = $this->parseMessage($request->getData());
+        ] = $this->parse($request->getData());
 
         return $request->withUri((new Uri())->withPath($name))
             ->withParsedData($payload);

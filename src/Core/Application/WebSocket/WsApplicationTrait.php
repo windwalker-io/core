@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application\WebSocket;
 
+use Windwalker\Core\WebSocket\WebSocketParserInterface;
 use Windwalker\Reactor\WebSocket\MessageEmitterInterface;
 
 /**
@@ -20,7 +21,7 @@ trait WsApplicationTrait
 {
     public function pushTo(int $fd, mixed ...$args): bool
     {
-        $data = $this->getWebSocketClient()->formatMessage(...$args);
+        $data = $this->getParser()->format(...$args);
 
         return $this->pushRawTo($fd, $data);
     }
@@ -30,8 +31,8 @@ trait WsApplicationTrait
         return $this->getContainer()->get(MessageEmitterInterface::class)->emit($fd, $data);
     }
 
-    public function getWebSocketClient(): WsClientAdapterInterface
+    public function getParser(): WebSocketParserInterface
     {
-        return $this->service(WsClientAdapterInterface::class);
+        return $this->service(WebSocketParserInterface::class);
     }
 }

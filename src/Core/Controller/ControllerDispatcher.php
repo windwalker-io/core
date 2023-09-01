@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
-use Windwalker\Core\Application\Context\RequestAppContextInterface;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
@@ -47,7 +47,7 @@ class ControllerDispatcher
         //
     }
 
-    public function dispatch(RequestAppContextInterface $app): ResponseInterface
+    public function dispatch(AppContextInterface $app): ResponseInterface
     {
         $controller = $app->getController();
 
@@ -77,7 +77,7 @@ class ControllerDispatcher
         if (is_array($controller)) {
             $controller = $this->prepareArrayCallable($controller, $app);
         } else {
-            $controller = fn(RequestAppContextInterface $app): mixed
+            $controller = fn(AppContextInterface $app): mixed
                 => $this->container->call($controller, $app->getUrlVars());
         }
 
@@ -112,7 +112,7 @@ class ControllerDispatcher
         return $task;
     }
 
-    protected function prepareArrayCallable(array $handler, RequestAppContextInterface $app): Closure
+    protected function prepareArrayCallable(array $handler, AppContextInterface $app): Closure
     {
         if (\Windwalker\count($handler) !== 2) {
             throw new LogicException(
@@ -127,7 +127,7 @@ class ControllerDispatcher
         $handler[0] = $this->container->createObject($class);
 
         if ($handler[0] instanceof ControllerInterface) {
-            return function (RequestAppContextInterface $app) use ($handler): mixed {
+            return function (AppContextInterface $app) use ($handler): mixed {
                 [$object, $task] = $handler;
 
                 return $this->container->call(
@@ -141,12 +141,12 @@ class ControllerDispatcher
             throw new ControllerDispatchException('Controller is not callable.');
         }
 
-        return function (RequestAppContextInterface $app) use ($handler) {
+        return function (AppContextInterface $app) use ($handler) {
             $this->container->call($handler, $app->getUrlVars());
         };
     }
 
-    protected function processTaskMapping(string $class, ?string $task, RequestAppContextInterface $app): ?string
+    protected function processTaskMapping(string $class, ?string $task, AppContextInterface $app): ?string
     {
         $mapping = AttributesAccessor::getFirstAttributeInstance(
             $class,
