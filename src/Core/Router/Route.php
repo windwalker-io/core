@@ -136,8 +136,6 @@ class Route implements JsonSerializable
     }
 
     /**
-     * groups
-     *
      * @param  array  $groups
      *
      * @return  static
@@ -152,8 +150,6 @@ class Route implements JsonSerializable
     }
 
     /**
-     * getGroups
-     *
      * @return  array
      *
      * @since  3.5
@@ -173,6 +169,17 @@ class Route implements JsonSerializable
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function isGroup(string ...$groups): bool
+    {
+        foreach ($groups as $group) {
+            if (array_key_exists($group, $this->groups)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

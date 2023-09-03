@@ -20,7 +20,6 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Filter\Exception\ValidateException;
-use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Uri\Uri;
 
 use function Windwalker\collect;
