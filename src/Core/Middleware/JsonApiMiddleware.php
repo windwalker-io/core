@@ -15,6 +15,7 @@ use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Throwable;
+use Windwalker\Core\Http\Exception\ApiException;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
@@ -94,6 +95,9 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 
     protected function handleException(Throwable $e): Response
     {
+        $apiException = ApiException::wrap($e);
+        $e = $apiException->getPrevious() ?? $apiException;
+
         $data = [];
 
         if ($this->app->isDebug()) {
@@ -124,11 +128,11 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         );
 
         $buffer = new JsonBuffer($message, $data, false, $e->getCode());
-        $buffer->status = ErrorService::normalizeCode($e->getCode());
+        $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());
 
         return (new JsonResponse($buffer))
             ->withStatus(
-                ErrorService::normalizeCode($e->getCode())
+                ErrorService::normalizeCode($apiException->getStatusCode())
             );
     }
 
