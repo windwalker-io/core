@@ -24,6 +24,8 @@ use Windwalker\Stream\Stream;
  */
 class DebugConsole
 {
+    public static bool $disabled = false;
+
     /**
      * DebugConsole constructor.
      */
@@ -34,11 +36,20 @@ class DebugConsole
     ) {
     }
 
+    public static function disable(): void
+    {
+        static::$disabled = true;
+    }
+
     public function pushToPage(
         Collection $collector,
         OutputInterface $output,
         ?ResponseInterface $response = null
     ): void {
+        if (static::$disabled) {
+            return;
+        }
+
         $tmpl = 'console';
 
         if ($response) {
