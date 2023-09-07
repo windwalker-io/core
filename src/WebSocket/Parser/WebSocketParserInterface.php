@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\WebSocket;
+namespace Windwalker\WebSocket\Parser;
 
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 

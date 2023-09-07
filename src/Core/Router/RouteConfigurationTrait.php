@@ -21,14 +21,6 @@ use function Windwalker\DI\create;
 
 /**
  * Trait RouteConfigurationTrait
- *
- * @method $this getHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this postHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this putHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this patchHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this deleteHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this headHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this optionsHandler(callable|array|string|null $handler, ?string $task = null)
  */
 trait RouteConfigurationTrait
 {
@@ -463,8 +455,6 @@ trait RouteConfigurationTrait
     }
 
     /**
-     * __call
-     *
      * @param  string  $name
      * @param  array   $args
      *

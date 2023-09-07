@@ -9,16 +9,16 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\WebSocket\Application;
 
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Application\WebApplicationTrait;
+use Windwalker\Core\Application\WebSocket\Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
@@ -31,7 +31,6 @@ use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
-use Windwalker\Core\Provider\WebSocketProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Http\Server\HttpServerInterface;
@@ -41,6 +40,7 @@ use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Reactor\WebSocket\WebSocketServerInterface;
 use Windwalker\Uri\Uri;
+use Windwalker\WebSocket\Provider\WebSocketProvider;
 
 /**
  * The WebSocketApplication class.

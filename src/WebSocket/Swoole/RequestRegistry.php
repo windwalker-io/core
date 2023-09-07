@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\CliServer\Swoole;
+namespace Windwalker\WebSocket\Swoole;
 
 use Swoole\Table;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;

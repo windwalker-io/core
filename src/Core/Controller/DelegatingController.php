@@ -16,14 +16,13 @@ use ReflectionException;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\Context\AppContextInterface;
-use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
 use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
-use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\WebSocket\Application\WsApplicationInterface;
 
 /**
  * The DelegatingController class.

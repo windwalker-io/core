@@ -9,24 +9,19 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Provider;
+namespace Windwalker\WebSocket\Provider;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppRequestInterface;
-use Windwalker\Core\Application\WebSocket\WsAppContext;
-use Windwalker\Core\Application\WebSocket\WsApplicationInterface;
-use Windwalker\Core\Application\WebSocket\WsAppRequest;
-use Windwalker\Core\Application\WebSocket\WsRootApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
+use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
-use Windwalker\Core\WebSocket\SimpleMessageParser;
-use Windwalker\Core\WebSocket\WebSocketParserInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
@@ -35,6 +30,13 @@ use Windwalker\Reactor\WebSocket\MessageEmitterInterface;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Reactor\WebSocket\WebSocketServerInterface;
+use Windwalker\WebSocket\Application\WsAppContext;
+use Windwalker\WebSocket\Application\WsApplicationInterface;
+use Windwalker\WebSocket\Application\WsAppRequest;
+use Windwalker\WebSocket\Application\WsRootApplicationInterface;
+use Windwalker\WebSocket\Parser\SimpleMessageParser;
+use Windwalker\WebSocket\Parser\WebSocketParserInterface;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The WebSocketProvider class.
@@ -71,6 +73,15 @@ class WebSocketProvider implements ServiceProviderInterface
         );
 
         $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
+
+        // Router
+        $container->prepareSharedObject(
+            WsRouter::class,
+            function (WsRouter $router, Container $container) {
+                return $router->register($container->getParam('routing.routes'));
+            }
+        )
+            ->alias(Router::class, WsRouter::class);
 
         $this->registerRequestObject($container);
 

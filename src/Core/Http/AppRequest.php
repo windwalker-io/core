@@ -21,10 +21,7 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Http\Event\RequestGetValueEvent;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
-use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filter\Traits\FilterAwareTrait;
-
-use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 
 use function Windwalker\collect;
 

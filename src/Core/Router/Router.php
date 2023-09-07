@@ -20,7 +20,6 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Utilities\Str;
 
@@ -57,7 +56,7 @@ class Router implements EventAwareInterface
         return $this;
     }
 
-    public static function createRouteCreator(): RouteCreator
+    public static function createRouteCreator(): RouteCreatorInterface
     {
         return new RouteCreator();
     }
@@ -283,7 +282,7 @@ class Router implements EventAwareInterface
     }
 
     /**
-     * @param  string
+     * @param  string  $regex
      *
      * @return bool
      */

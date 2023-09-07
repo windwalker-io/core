@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\WebSocket\Application;
 
 use JetBrains\PhpStorm\NoReturn;
 use Windwalker\Core\Application\Context\AppContextInterface;
@@ -17,8 +17,6 @@ use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Application\WebRootApplicationInterface;
 use Windwalker\DI\Container;
 use Windwalker\Reactor\WebSocket\WebSocketFrameInterface;
-
-use function Swoole\Coroutine\Http\request;
 
 /**
  * The WsAppContext class.

@@ -30,6 +30,7 @@ use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The RoutingMiddleware class.
@@ -45,9 +46,9 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * RoutingMiddleware constructor.
      *
      * @param  AppContext  $app
-     * @param  Router      $router
+     * @param  WsRouter    $router
      */
-    public function __construct(protected AppContext $app, protected Router $router)
+    public function __construct(protected AppContext $app, protected WsRouter $router)
     {
         //
     }
@@ -63,7 +64,6 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * @param  RequestHandlerInterface  $handler
      *
      * @return ResponseInterface
-     * @throws DefinitionException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

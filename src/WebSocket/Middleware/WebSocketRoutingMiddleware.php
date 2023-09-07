@@ -9,21 +9,19 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Middleware\WebSocket;
+namespace Windwalker\WebSocket\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\MiddlewareRunner;
-use Windwalker\Core\Application\WebSocket\WsAppContext;
-use Windwalker\Core\Application\WebSocket\WsAppRequest;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
-use Windwalker\Uri\Uri;
+use Windwalker\WebSocket\Application\WsAppContext;
 
 /**
  * The WebSocketRoutingMiddleware class.

@@ -9,10 +9,10 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\WebSocket\Application;
 
-use Windwalker\Core\WebSocket\WebSocketParserInterface;
 use Windwalker\Reactor\WebSocket\MessageEmitterInterface;
+use Windwalker\WebSocket\Parser\WebSocketParserInterface;
 
 /**
  * Trait WebSocketApplicationTrait

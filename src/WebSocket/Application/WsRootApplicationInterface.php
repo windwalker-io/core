@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Application\WebSocket;
+namespace Windwalker\WebSocket\Application;
 
 use Windwalker\Core\Application\RootApplicationInterface;
 
