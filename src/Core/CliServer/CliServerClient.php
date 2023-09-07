@@ -15,6 +15,7 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Console\Terminal;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
+use Windwalker\Utilities\Str;
 
 /**
  * The CliServerClient class.
@@ -124,7 +125,8 @@ class CliServerClient
         CliServerRuntime::logLine($log);
     }
 
-    public function logWebSocketMessageStart(WebSocketRequestInterface $request): void {
+    public function logWebSocketMessageStart(WebSocketRequestInterface $request): void
+    {
         $name = $this->app->getAppName();
 
         // $terminalWidth = $this->getTerminalWidth();
@@ -133,17 +135,19 @@ class CliServerClient
         $pid = (string) getmypid();
 
         $log = sprintf(
-            '  [MSG START][%s] (fd: %s) %s - pid: %s',
+            '    [MSG START][%s] (fd: %s) %s "%s" - pid: %s',
             $name,
             $request->getFd(),
             $uri,
+            Str::truncate($request->getData(), 100, '...'),
             $pid,
         );
 
         CliServerRuntime::logLine($log);
     }
 
-    public function logWebSocketMessageEnd(WebSocketRequestInterface $request, int $duration): void {
+    public function logWebSocketMessageEnd(WebSocketRequestInterface $request, int $duration): void
+    {
         $name = $this->app->getAppName();
 
         // $terminalWidth = $this->getTerminalWidth();
@@ -157,8 +161,8 @@ class CliServerClient
             $name,
             $request->getFd(),
             $pid,
+            $memory,
             $durationText,
-            $memory
         );
 
         CliServerRuntime::logLine($log);

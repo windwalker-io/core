@@ -201,8 +201,13 @@ class WsRootApplication implements WsRootApplicationInterface
      */
     public function runContext(WsAppContext $appContext, ?callable $handler = null): ResponseInterface
     {
+        $start = microtime(true);
+
         $container = $appContext->getContainer();
         $request = $container->get(WebSocketRequestInterface::class);
+
+        $client = $appContext->service(CliServerClient::class);
+        $client->logWebSocketMessageStart($request);
 
         // @event
         $event = $this->emit(
@@ -246,6 +251,11 @@ class WsRootApplication implements WsRootApplicationInterface
         $event = $appContext->emit(
             AfterRequestEvent::class,
             ['container' => $container, 'response' => $event->getResponse()]
+        );
+
+        $client->logWebSocketMessageEnd(
+            $request,
+            (int) round((microtime(true) - $start) * 1000)
         );
 
         return $event->getResponse();
@@ -396,12 +406,12 @@ class WsRootApplication implements WsRootApplicationInterface
         $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);
     }
 
-    protected function opening(WebSocketRequestInterface $request): void
+    protected function opening(WebSocketRequestInterface $request)
     {
         //
     }
 
-    protected function closing(WebSocketRequestInterface $request): void
+    protected function closing(WebSocketRequestInterface $request)
     {
         //
     }

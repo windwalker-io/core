@@ -161,6 +161,10 @@ trait AppRequestTrait
             return $input;
         }
 
+        if (!is_array($input)) {
+            return $input;
+        }
+
         return $this->fetchInputFields($input, $fields);
     }
 

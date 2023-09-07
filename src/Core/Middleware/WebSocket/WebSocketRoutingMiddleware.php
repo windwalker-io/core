@@ -23,6 +23,7 @@ use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
+use Windwalker\Uri\Uri;
 
 /**
  * The WebSocketRoutingMiddleware class.
@@ -45,7 +46,7 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
         }
 
         $request = $this->handleByClient($request);
-        $route = $request->getUri()->getPath();
+        $route = $request->getRequestTarget();
 
         $matched = $router->match($request, $route);
 
@@ -57,7 +58,8 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
             WsAppContext::class,
             function (WsAppContext $context) use ($request, $controller, $matched) {
                 $appRequest = $context->getAppRequest()
-                    ->withRequest($request);
+                    ->withServerRequest($request)
+                    ->withMatchedRoute($matched);
 
                 return $context->setController($controller)
                     ->setMatchedRoute($matched)

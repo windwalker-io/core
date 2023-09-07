@@ -51,7 +51,7 @@ class ChainingArgumentsParer implements WebSocketParserInterface
             'args' => $args,
         ] = $this->parse($request->getData());
 
-        return $request->withUri((new Uri())->withPath($name))
+        return $request->withRequestTarget($name)
             ->withParsedData($args);
     }
 }

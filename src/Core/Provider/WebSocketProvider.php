@@ -91,7 +91,7 @@ class WebSocketProvider implements ServiceProviderInterface
     protected function createAppRequest(Container $container): WsAppRequest
     {
         return $container->newInstance(WsAppRequest::class)
-            ->withRequest($container->get(WebSocketRequest::class))
+            ->withServerRequest($container->get(WebSocketRequest::class))
             ->withSystemUri($container->get(SystemUri::class));
     }
 

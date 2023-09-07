@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
@@ -44,7 +45,7 @@ class SessionManager extends AbstractManager
     {
         return static function (
             ServerRequestInterface $request,
-            AppContext $app,
+            AppContextInterface $app,
             #[Ref('session.cookie_params')] $params
         ) {
             $cookies = new ArrayCookies($request->getCookieParams());
@@ -71,7 +72,7 @@ class SessionManager extends AbstractManager
     {
         return static function (
             ServerRequestInterface $request,
-            AppContext $app,
+            AppContextInterface $app,
             #[Ref('session.cookie_params')] $params
         ) {
             $cookies = new Cookies();

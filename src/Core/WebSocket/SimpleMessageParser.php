@@ -41,7 +41,7 @@ class SimpleMessageParser implements WebSocketParserInterface
             'payload' => $payload,
         ] = $this->parse($request->getData());
 
-        return $request->withUri((new Uri())->withPath($name))
+        return $request->withRequestTarget($name)
             ->withParsedData($payload);
     }
 }

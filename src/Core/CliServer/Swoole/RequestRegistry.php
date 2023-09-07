@@ -21,7 +21,7 @@ use Windwalker\Uri\Uri;
  */
 class RequestRegistry
 {
-    protected Table $table;
+    public Table $table;
 
     public readonly int $size;
 
@@ -29,7 +29,7 @@ class RequestRegistry
     {
         // Default size is same as `ulimit -n`,
         // @see https://wiki.swoole.com/#/server/setting?id=max_conn-max_connection
-        $this->size = $size?? 100000;
+        $this->size = $size ?? 100000;
 
         $this->table = new Table($this->size);
 
@@ -47,7 +47,7 @@ class RequestRegistry
         $uri = (string) $request->getUri();
         $attributes = $request->getAttributes();
         $headers = $request->getHeaders();
-        $cookies = $request->getCookieParams();
+        $cookies = []; // $request->getCookieParams();
 
         $data = json_encode(
             compact('uri', 'attributes', 'headers', 'cookies'),
@@ -64,6 +64,7 @@ class RequestRegistry
     public function get(int $fd, ?WebSocketRequestInterface $request = null)
     {
         $item = $this->table->get((string) $fd);
+
         $data = $item['data'];
 
         [
