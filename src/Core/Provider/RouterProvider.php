@@ -11,16 +11,23 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\WebSocket\Application\WsRootApplicationInterface;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The RouterProvider class.
  */
 class RouterProvider implements ServiceProviderInterface, BootableProviderInterface
 {
+    public function __construct(protected RootApplicationInterface $app)
+    {
+    }
+
     /**
      * @inheritDoc
      */
@@ -43,11 +50,21 @@ class RouterProvider implements ServiceProviderInterface, BootableProviderInterf
      */
     public function register(Container $container): void
     {
-        $container->prepareSharedObject(
-            Router::class,
-            function (Router $router, Container $container) {
-                return $router->register($container->getParam('routing.routes'));
-            }
-        );
+        if ($this->app instanceof WsRootApplicationInterface) {
+            $container->prepareSharedObject(
+                WsRouter::class,
+                function (WsRouter $router, Container $container) {
+                    return $router->register($container->getParam('routing.routes'));
+                }
+            )
+                ->alias(Router::class, WsRouter::class);
+        } else {
+            $container->prepareSharedObject(
+                Router::class,
+                function (Router $router, Container $container) {
+                    return $router->register($container->getParam('routing.routes'));
+                }
+            );
+        }
     }
 }

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
+use Windwalker\Data\Collection;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\TypeCast;
 
@@ -21,6 +22,35 @@ use function Windwalker\glob_all;
  */
 trait RouteCreatorTrait
 {
+    /**
+     * @var Collection<Route>
+     */
+    protected Collection $routes;
+
+    /**
+     * Property groups.
+     *
+     * @var  array
+     */
+    protected array $groups = [];
+
+    /**
+     * Property preparedGroups.
+     *
+     * @var  Collection
+     */
+    protected Collection $preparedGroups;
+    /**
+     * RouteCreator constructor.
+     *
+     * @param  string  $group
+     */
+    public function __construct(protected string $group = 'root')
+    {
+        $this->routes = new Collection();
+        $this->preparedGroups = new Collection();
+    }
+
     /**
      * @param  string                $name
      * @param  string|callable|null  $pattern
@@ -138,7 +168,7 @@ trait RouteCreatorTrait
 
         foreach ($parents as $parent) {
             if (!isset($this->preparedGroups[$parent])) {
-                throw new LogicException(
+                throw new \LogicException(
                     sprintf(
                         'Unable to find parent group: %s for route group: %s',
                         $parent,
@@ -217,7 +247,7 @@ trait RouteCreatorTrait
     /**
      * @param  string|array  $paths
      *
-     * @return  RouteCreator
+     * @return  static
      *
      * @since  3.5
      */

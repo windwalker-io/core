@@ -29,45 +29,6 @@ class RouteCreator implements RouteCreatorInterface
     use RouteCreatorTrait;
 
     /**
-     * @var Route[]|Collection
-     */
-    protected ?Collection $routes = null;
-
-    /**
-     * Property groups.
-     *
-     * @var  array
-     */
-    protected array $groups = [];
-
-    /**
-     * Property preparedGroups.
-     *
-     * @var  ?Collection
-     */
-    protected ?Collection $preparedGroups = null;
-
-    /**
-     * Property group.
-     *
-     * @var  string
-     */
-    protected string $group;
-
-    /**
-     * RouteCreator constructor.
-     *
-     * @param  string  $group
-     */
-    public function __construct(string $group = 'root')
-    {
-        $this->group = $group;
-
-        $this->routes = new Collection();
-        $this->preparedGroups = new Collection();
-    }
-
-    /**
      * @param  string       $name
      * @param  string|null  $pattern
      * @param  array        $options

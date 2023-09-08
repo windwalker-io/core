@@ -74,15 +74,6 @@ class WebSocketProvider implements ServiceProviderInterface
 
         $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
 
-        // Router
-        $container->prepareSharedObject(
-            WsRouter::class,
-            function (WsRouter $router, Container $container) {
-                return $router->register($container->getParam('routing.routes'));
-            }
-        )
-            ->alias(Router::class, WsRouter::class);
-
         $this->registerRequestObject($container);
 
         // App Context
