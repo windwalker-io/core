@@ -27,9 +27,7 @@ use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\DICreateTrait;
-use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\WebSocket\Router\WsRouter;
 
 /**
@@ -48,7 +46,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * @param  AppContext  $app
      * @param  WsRouter    $router
      */
-    public function __construct(protected AppContext $app, protected WsRouter $router)
+    public function __construct(protected AppContext $app, protected Router $router)
     {
         //
     }

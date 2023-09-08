@@ -18,10 +18,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
-use Windwalker\Core\Router\Router;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\WebSocket\Application\WsAppContext;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The WebSocketRoutingMiddleware class.
@@ -30,7 +30,7 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
 {
     public function __construct(
         protected WsAppContext $app,
-        protected Router $router
+        protected WsRouter $router
     ) {
         //
     }
