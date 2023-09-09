@@ -5,6 +5,7 @@
  * @license    __LICENSE__
  */
 
+import { EsbuildPlugin } from 'esbuild-loader';
 import { babelBasicOptions } from './babel.js';
 import webpack from 'webpack';
 
@@ -130,24 +131,42 @@ export async function webpackVue3Config() {
             }
           },
           {
-            test: /\.ts$/,
-            loader: "ts-loader",
-            exclude: /(node_modules|bower_components)/,
-            options:{
-              appendTsSuffixTo:[/\.vue/],
-              transpileOnly: true
+            // Match `.js`, `.jsx`, `.ts` or `.tsx` files
+            test: /\.[jt]sx?$/,
+            loader: 'esbuild-loader',
+            options: {
+              // JavaScript version to compile to
+              target: 'esnext',
+              loader: 'ts',
+              // appendTsSuffixTo:[/\.vue/],
             }
           },
-          {
-            test: /\.m?js$/,
-            exclude: /(node_modules|bower_components)/,
-            loader: 'babel-loader',
-            options: babelBasicOptions().get()
-          }
+          // {
+          //   test: /\.ts$/,
+          //   loader: "ts-loader",
+          //   exclude: /(node_modules|bower_components)/,
+          //   options:{
+          //     appendTsSuffixTo:[/\.vue/],
+          //     transpileOnly: true
+          //   }
+          // },
+          // {
+          //   test: /\.m?js$/,
+          //   exclude: /(node_modules|bower_components)/,
+          //   loader: 'babel-loader',
+          //   options: babelBasicOptions().get()
+          // }
+        ]
+      },
+      optimization: {
+        minimizer: [
+          new EsbuildPlugin({
+            target: 'esnext'
+          })
         ]
       },
       plugins: [
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
       ]
     }
   );
