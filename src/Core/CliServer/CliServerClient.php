@@ -157,7 +157,7 @@ class CliServerClient
         $durationText = number_format($duration) . 'ms';
 
         $log = sprintf(
-            '  [MSG END][%s] (fid: %s) - pid: %s - %s - %s',
+            '    [MSG END][%s] (fid: %s) - pid: %s - %s - %s',
             $name,
             $request->getFd(),
             $pid,

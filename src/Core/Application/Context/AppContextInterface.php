@@ -12,18 +12,16 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application\Context;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\RootApplicationInterface;
-use Windwalker\Core\Application\WebApplication;
-use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\State\AppState;
 use Windwalker\Data\Collection;
-use Windwalker\DI\Parameters;
 
 /**
  * Interface RequestAppContextInterface
  */
-interface AppContextInterface
+interface AppContextInterface extends ApplicationInterface
 {
     public function getRootApp(): RootApplicationInterface;
 
