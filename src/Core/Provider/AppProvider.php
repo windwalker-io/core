@@ -58,13 +58,13 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
         $container->share($this->app::class, $this->app)
-            ->alias(RootApplicationInterface::class, $this->app::class);
+            ->alias(RootApplicationInterface::class, $this->app::class)
+            ->alias(ApplicationInterface::class, $this->app::class);
 
         if ($parentClass = get_parent_class($this->app)) {
             $container->alias($parentClass, $this->app::class);
         }
 
-        $container->share(ApplicationInterface::class, $this->app);
         $container->prepareSharedObject(PathResolver::class);
         $container->prepareSharedObject(PackageRegistry::class);
 
