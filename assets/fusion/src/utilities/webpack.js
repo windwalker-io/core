@@ -130,32 +130,32 @@ export async function webpackVue3Config() {
               name: '[name].[ext]?[hash]'
             }
           },
-          {
-            // Match `.js`, `.jsx`, `.ts` or `.tsx` files
-            test: /\.[jt]sx?$/,
-            loader: 'esbuild-loader',
-            options: {
-              // JavaScript version to compile to
-              target: 'esnext',
-              loader: 'ts',
-              // appendTsSuffixTo:[/\.vue/],
-            }
-          },
           // {
-          //   test: /\.ts$/,
-          //   loader: "ts-loader",
-          //   exclude: /(node_modules|bower_components)/,
-          //   options:{
-          //     appendTsSuffixTo:[/\.vue/],
-          //     transpileOnly: true
+          //   // Match `.js`, `.jsx`, `.ts` or `.tsx` files
+          //   test: /\.[jt]sx?$/,
+          //   loader: 'esbuild-loader',
+          //   options: {
+          //     // JavaScript version to compile to
+          //     target: 'esnext',
+          //     loader: 'ts',
+          //     // appendTsSuffixTo:[/\.vue/],
           //   }
           // },
-          // {
-          //   test: /\.m?js$/,
-          //   exclude: /(node_modules|bower_components)/,
-          //   loader: 'babel-loader',
-          //   options: babelBasicOptions().get()
-          // }
+          {
+            test: /\.ts$/,
+            loader: "ts-loader",
+            exclude: /(node_modules|bower_components)/,
+            options:{
+              appendTsSuffixTo:[/\.vue/],
+              transpileOnly: true
+            }
+          },
+          {
+            test: /\.m?js$/,
+            exclude: /(node_modules|bower_components)/,
+            loader: 'babel-loader',
+            options: babelBasicOptions().get()
+          }
         ]
       },
       optimization: {
