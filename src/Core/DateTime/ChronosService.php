@@ -150,7 +150,11 @@ class ChronosService
             return Chronos::wrap($date);
         }
 
-        $date = Chronos::wrap($date, $from);
+        if (is_string($date) && str_contains($date, '+')) {
+            $date = Chronos::wrap($date);
+        } else {
+            $date = Chronos::wrap($date, $from);
+        }
 
         $date = $date->setTimezone($to);
 

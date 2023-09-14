@@ -58,7 +58,14 @@ class DatabaseManager extends AbstractManager
         /** @var DatabaseAdapter $db */
         $db = parent::create($name, ...$args);
 
-        $db->orm()->setAttributesResolver($this->container->getAttributesResolver());
+        $orm = $db->orm();
+
+        $orm->setAttributesResolver($this->container->getAttributesResolver());
+
+        $orm->getCaster()
+            ->setDbTimezone(
+                $this->container->getParam('app.server_timezone') ?: 'UTC'
+            );
 
         $platform = $db->getPlatform();
 
