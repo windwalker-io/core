@@ -19,10 +19,16 @@ use function Windwalker\chronos;
  * The ChronosCast class.
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-class ChronosCast implements CastInterface
+class ServerTimeCast implements CastInterface
 {
-    public function __construct(protected ?ChronosService $chronosService = null)
-    {
+    public const HYDRATE_TO_LOCAL = 1 << 3;
+    public const EXTRACT_TO_SERVER = 1 << 4;
+
+    public function __construct(
+        protected ?ChronosService $chronosService = null,
+        public int $options = self::EXTRACT_TO_SERVER
+    ) {
+        //
     }
 
     public function hydrate(mixed $value): ?Chronos
@@ -33,7 +39,10 @@ class ChronosCast implements CastInterface
 
         $value = chronos($value);
 
-        if ($this->chronosService) {
+        if (
+            $this->chronosService
+            && ($this->options & static::HYDRATE_TO_LOCAL)
+        ) {
             $value = $this->chronosService->toServer($value);
         }
 
@@ -47,9 +56,15 @@ class ChronosCast implements CastInterface
         }
 
         if ($value instanceof \DateTimeInterface) {
-            $format = $this->chronosService
-                ? $this->chronosService->getSqlFormat()
-                : Chronos::FORMAT_YMD_HIS;
+            if ($this->chronosService) {
+                if ($this->options & static::EXTRACT_TO_SERVER) {
+                    $value = $this->chronosService->toServer($value);
+                }
+
+                $format = $this->chronosService->getSqlFormat();
+            } else {
+                $format = Chronos::FORMAT_YMD_HIS;
+            }
 
             $value = $value->format($format);
         }
