@@ -37,6 +37,8 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
     protected IOInterface $io;
 
+    protected string $name = '';
+
     /**
      * ServeCommand constructor.
      */
@@ -57,10 +59,10 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
     public function configure(Command $command): void
     {
         $command->addArgument(
-            'host',
+            'server',
             InputArgument::OPTIONAL,
-            'The server host.',
-            'localhost'
+            'The server name with {engine:name} format.',
+            'php:main'
         );
 
         $command->addOption(
@@ -91,6 +93,14 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
             't',
             InputOption::VALUE_REQUIRED,
             'The docroot dir path.'
+        );
+
+        $command->addOption(
+            'host',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The server host.',
+            'localhost'
         );
 
         $command->addOption(
@@ -149,8 +159,14 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
     {
         $this->io = $io;
 
-        $engineName = $io->getOption('engine');
-        $host = $io->getArgument('host');
+        $serverName = $io->getArgument('server');
+
+        [$engineName, $name] = explode(':', $serverName) + ['', ''];
+
+        $this->name = $name;
+
+        $engineName = $engineName ?: $io->getOption('engine');
+        $host = $io->getOption('host');
 
         [$domain, $port] = explode(':', $host) + [null, null];
 
@@ -169,7 +185,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
     protected function runPhpServer(IOInterface $io, string $domain, int $port): int
     {
-        $name = $io->getOption('name');
+        $name = $this->name ?: $io->getOption('name');
 
         return $this->createEngine('php', $name, $io)
             ->run(
@@ -184,7 +200,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
     protected function runSwooleServer(IOInterface $io, ?string $domain, int $port): int
     {
-        $name = $io->getOption('name');
+        $name = $this->name ?: $io->getOption('name');
 
         return $this->createEngine('swoole', $name, $io)
             ->run(
@@ -223,7 +239,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
             }
 
             return true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return true;
         }
     }
@@ -235,7 +251,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
     public function handleSignal(int $signal): void
     {
-        $name = $this->io->getOption('name');
+        $name = $this->name ?: $this->io->getOption('name');
         $engineName = $this->io->getOption('engine');
 
         $engine = $this->createEngine($engineName, $name, $this->io);
