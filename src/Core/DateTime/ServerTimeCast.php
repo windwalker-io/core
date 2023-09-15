@@ -43,7 +43,7 @@ class ServerTimeCast implements CastInterface
             $this->chronosService
             && ($this->options & static::HYDRATE_TO_LOCAL)
         ) {
-            $value = $this->chronosService->toServer($value);
+            $value = $this->chronosService->toLocal($value);
         }
 
         return $value;
