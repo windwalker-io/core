@@ -74,7 +74,9 @@ export async function webpackVue3Config() {
       mode: process.env.NODE_ENV || 'development',
       output: {
         filename: '[name].js',
-        sourceMapFilename: '[name].js.map'
+        chunkFilename: '[name]-[chunkhash].js',
+        sourceMapFilename: '[name].js.map',
+        clean: true
       },
       stats: {
         all: false,
