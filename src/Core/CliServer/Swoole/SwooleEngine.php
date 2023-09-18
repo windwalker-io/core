@@ -130,7 +130,10 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
                 $this->serverStateManager->getFilePath(),
             ]
         );
-        $process->setTty(true);
+
+        if ($process::isTtySupported()) {
+            $process->setTty(true);
+        }
 
         $process->setEnv(
             [
