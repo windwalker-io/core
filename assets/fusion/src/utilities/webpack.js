@@ -79,10 +79,7 @@ export async function webpackVue3Config() {
         clean: true
       },
       stats: {
-        all: false,
-        errors: true,
-        warnings: true,
-        version: false,
+        all: true,
       },
       experiments: {
         topLevelAwait: true,
@@ -160,13 +157,13 @@ export async function webpackVue3Config() {
           }
         ]
       },
-      optimization: {
-        minimizer: [
-          new EsbuildPlugin({
-            target: 'esnext'
-          })
-        ]
-      },
+      // optimization: {
+      //   minimizer: [
+      //     new EsbuildPlugin({
+      //       target: 'esnext'
+      //     })
+      //   ]
+      // },
       plugins: [
         new VueLoaderPlugin(),
       ]
