@@ -68,8 +68,8 @@ function findVendors(composerVendors = []) {
     .concat(Object.keys(pkgJson.dependencies || {}))
     .map(id => `node_modules/${id}/package.json`)
     .map((file) => loadJson(file))
-    .filter(pkgJson => pkgJson.windwalker != null)
-    .map(pkgJson => pkgJson.windwalker.vendors || [])
+    .filter(pkgJson => pkgJson?.windwalker != null)
+    .map(pkgJson => pkgJson?.windwalker.vendors || [])
     .flat();
 
   composerVendors.forEach((cv) => {

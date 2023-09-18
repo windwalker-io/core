@@ -79,7 +79,10 @@ export async function webpackVue3Config() {
         clean: true
       },
       stats: {
-        all: true,
+        all: false,
+        errors: true,
+        warnings: true,
+        version: false,
       },
       experiments: {
         topLevelAwait: true,
