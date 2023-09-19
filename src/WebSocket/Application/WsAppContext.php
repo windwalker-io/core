@@ -55,7 +55,7 @@ class WsAppContext implements WsApplicationInterface, AppContextInterface, WebSo
         return $this->pushTo($this->getFd(), ...$args);
     }
 
-    public function pushSelfRaw(string $data): bool
+    public function pushRawSelf(string $data): bool
     {
         return $this->pushRawTo($this->getFd(), $data);
     }

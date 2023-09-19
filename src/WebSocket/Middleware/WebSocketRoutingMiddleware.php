@@ -43,7 +43,7 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
             throw new \InvalidArgumentException(static::class . ' must use on websocket environment.');
         }
 
-        $request = $this->handleByClient($request);
+        $request = $this->handleByParser($request);
         $route = $request->getRequestTarget();
 
         $matched = $router->match($request, $route);
@@ -83,7 +83,7 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
             );
     }
 
-    protected function handleByClient(WebSocketRequestInterface $request): WebSocketRequestInterface
+    protected function handleByParser(WebSocketRequestInterface $request): WebSocketRequestInterface
     {
         return $this->app->getParser()->handleRequest($request);
     }
