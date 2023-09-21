@@ -66,6 +66,13 @@ trait ServerCommandTrait
             $main = $servers[$name] ?? '';
         }
 
+        return $main;
+    }
+
+    protected function mustGetMainFile(IOInterface $io, string $engine, string $name): string
+    {
+        $main = $this->getMainFile($io, $engine, $name);
+
         if (!$main || !is_file($main)) {
             throw new \InvalidArgumentException(
                 sprintf(

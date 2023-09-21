@@ -33,6 +33,7 @@ class PhpNativeEngine implements CliServerEngineInterface
     use OptionsResolverTrait;
 
     public function __construct(
+        protected string $name,
         protected ConsoleApplication $app,
         protected ConsoleOutputInterface $output,
         array $options = []
@@ -47,6 +48,8 @@ class PhpNativeEngine implements CliServerEngineInterface
 
         $resolver->define('docroot')
             ->allowedTypes('string', 'null');
+
+        $resolver->setDefined(['state_file']);
     }
 
     public static function isSupported(): bool
@@ -122,5 +125,10 @@ class PhpNativeEngine implements CliServerEngineInterface
     public function isRunning(): bool
     {
         return false;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

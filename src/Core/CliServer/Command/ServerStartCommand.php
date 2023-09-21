@@ -20,6 +20,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\CliServer\CliServerFactory;
+use Windwalker\Core\CliServer\Contracts\ServerProcessManageInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Utilities\TypeCast;
@@ -192,7 +193,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
                 $domain,
                 $port,
                 [
-                    'main' => $this->getMainFile($name, 'php', $name),
+                    'main' => $this->getMainFile($io, 'php', $name),
                     'docroot' => $io->getOption('docroot'),
                 ]
             );
@@ -208,7 +209,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
                 $port,
                 [
                     'process_name' => $this->app->getAppName(),
-                    'main' => $this->getMainFile($io, 'swoole', $name),
+                    'main' => $this->mustGetMainFile($io, 'swoole', $name),
                     'app' => $io->getOption('app'),
                     'workers' => TypeCast::safeInteger($io->getOption('workers')),
                     'task_workers' => TypeCast::safeInteger($io->getOption('task-workers')),
@@ -256,7 +257,9 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
         $engine = $this->createEngine($engineName, $name, $this->io);
 
-        $engine->stopServer();
+        if ($engine instanceof ServerProcessManageInterface) {
+            $engine->stopServer();
+        }
 
         exit(0);
     }
