@@ -76,7 +76,6 @@ export async function webpackVue3Config() {
         filename: '[name].js',
         chunkFilename: '[name]-[chunkhash].js',
         sourceMapFilename: '[name].js.map',
-        clean: true
       },
       stats: {
         all: false,
