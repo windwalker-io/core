@@ -38,7 +38,7 @@ function storeNewTasks(tasks) {
 }
 
 gulp.on('stop', () => {
-  if (cliInput['watch']) {
+  if (cliInput['watch'] || cliInput['watching']) {
     watching.tasks.forEach((watchTask) => {
       if (watchTask && !watching.start[watchTask.task]) {
         gulp.watch(...watchTask.args);

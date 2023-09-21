@@ -21,7 +21,7 @@ export function watch(glob, opt, fn) {
   ) {
     const task = findCurrentTask(new Error());
 
-    if (cliInput['watch'] && !watching.start[task]) {
+    if ((cliInput['watch'] || cliInput['watching']) && !watching.start[task]) {
       const fn = gulp._registry._tasks[task];
 
       if (!fn) {
