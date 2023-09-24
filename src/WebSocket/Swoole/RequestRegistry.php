@@ -25,6 +25,9 @@ class RequestRegistry
 
     public readonly int $size;
 
+    protected ?\Closure $serializer = null;
+    protected ?\Closure $unSerializer = null;
+
     public function __construct(?int $size = null, protected readonly int $dataSize = 2048)
     {
         // Default size is same as `ulimit -n`,
@@ -44,15 +47,18 @@ class RequestRegistry
      */
     public function store(int $fd, WebSocketRequestInterface $request): bool
     {
-        $uri = (string) $request->getUri();
-        $attributes = $request->getAttributes();
-        $headers = $request->getHeaders();
-        $cookies = []; // $request->getCookieParams();
+        if ($serializer = $this->getSerializer()) {
+            $data = (string) $serializer($request);
+        } else {
+            $uri = (string) $request->getUri();
+            $attributes = $request->getAttributes();
+            $headers = $request->getHeaders();
 
-        $data = json_encode(
-            compact('uri', 'attributes', 'headers', 'cookies'),
-            JSON_THROW_ON_ERROR
-        );
+            $data = json_encode(
+                compact('uri', 'attributes', 'headers'),
+                JSON_THROW_ON_ERROR
+            );
+        }
 
         if (strlen($data) > $this->dataSize) {
             throw new \RuntimeException('Too large request');
@@ -67,20 +73,22 @@ class RequestRegistry
 
         $data = $item['data'];
 
-        [
-            'uri' => $uri,
-            'attributes' => $attributes,
-            'headers' => $headers,
-            'cookies' => $cookies,
-        ] = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
+        if ($unSerializer = $this->getUnSerializer()) {
+            $request = $unSerializer($data);
+        } else {
+            [
+                'uri' => $uri,
+                'attributes' => $attributes,
+                'headers' => $headers,
+            ] = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
 
-        $request ??= new WebSocketRequest();
-        $request = $request->withUri(new Uri($uri))
-            ->withAttributes($attributes)
-            ->withCookieParams($cookies);
+            $request ??= new WebSocketRequest();
+            $request = $request->withUri(new Uri($uri))
+                ->withAttributes($attributes);
 
-        foreach ($headers as $header => $values) {
-            $request = $request->withHeader($header, $values);
+            foreach ($headers as $header => $values) {
+                $request = $request->withHeader($header, $values);
+            }
         }
 
         return $request;
@@ -112,5 +120,39 @@ class RequestRegistry
     public function remove(int $fd): bool
     {
         return $this->table->delete((string) $fd);
+    }
+
+    public function getSerializer(): ?\Closure
+    {
+        return $this->serializer;
+    }
+
+    /**
+     * @param  \Closure|null  $serializer
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setSerializer(?\Closure $serializer): static
+    {
+        $this->serializer = $serializer;
+
+        return $this;
+    }
+
+    public function getUnSerializer(): ?\Closure
+    {
+        return $this->unSerializer;
+    }
+
+    /**
+     * @param  \Closure|null  $unSerializer
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setUnSerializer(?\Closure $unSerializer): static
+    {
+        $this->unSerializer = $unSerializer;
+
+        return $this;
     }
 }

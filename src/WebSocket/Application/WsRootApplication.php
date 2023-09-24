@@ -406,6 +406,26 @@ class WsRootApplication implements WsRootApplicationInterface
         $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);
     }
 
+    public function initialize(): void
+    {
+        $this->init();
+    }
+
+    protected function init(): void
+    {
+        //
+    }
+
+    public function start(): void
+    {
+        $this->started();
+    }
+
+    protected function started(): void
+    {
+        //
+    }
+
     protected function opening(WebSocketRequestInterface $request)
     {
         //
