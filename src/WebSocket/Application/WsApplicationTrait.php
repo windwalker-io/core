@@ -19,16 +19,24 @@ use Windwalker\WebSocket\Parser\WebSocketParserInterface;
  */
 trait WsApplicationTrait
 {
-    public function pushTo(int $fd, mixed ...$args): bool
+    public function pushTo(int|array $fds, mixed ...$args): bool
     {
         $data = $this->getParser()->format(...$args);
 
-        return $this->pushRawTo($fd, $data);
+        return $this->pushRawTo($fds, $data);
     }
 
-    public function pushRawTo(int $fd, string $data): bool
+    public function pushRawTo(int|array $fds, string $data): bool
     {
-        return $this->getContainer()->get(MessageEmitterInterface::class)->emit($fd, $data);
+        $emitter = $this->getContainer()->get(MessageEmitterInterface::class);
+
+        $return = true;
+
+        foreach ((array) $fds as $fd) {
+            $return = $return && $emitter->emit($fd, $data);
+        }
+
+        return $return;
     }
 
     public function getParser(): WebSocketParserInterface

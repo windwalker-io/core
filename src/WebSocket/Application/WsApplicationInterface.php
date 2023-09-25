@@ -18,7 +18,7 @@ use Windwalker\Core\Application\ApplicationInterface;
  */
 interface WsApplicationInterface extends ApplicationInterface
 {
-    public function pushTo(int $fd, mixed ...$args): bool;
+    public function pushTo(int|array $fds, mixed ...$args): bool;
 
-    public function pushRawTo(int $fd, string $data): bool;
+    public function pushRawTo(int|array $fds, string $data): bool;
 }
