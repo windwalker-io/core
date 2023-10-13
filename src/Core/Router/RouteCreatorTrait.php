@@ -65,16 +65,17 @@ trait RouteCreatorTrait
         $groups = $this->groups;
         $handler = null;
 
+        $groupNames = array_keys($groups);
+        $groupNames[] = $name;
+
         if ($pattern === null || is_callable($pattern)) {
             $handler = $pattern;
             $pattern = $name;
-            $name = md5($pattern);
+
+            $name = md5(implode(':', $groupNames) . ':' . $pattern);
         }
 
         $route = new Route($name, $pattern);
-
-        $groupNames = array_keys($groups);
-        $groupNames[] = $name;
 
         $this->routes[implode('.', $groupNames)] = $route;
 

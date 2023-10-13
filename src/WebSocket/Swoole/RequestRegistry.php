@@ -71,6 +71,10 @@ class RequestRegistry
     {
         $item = $this->table->get((string) $fd);
 
+        if ($item === false) {
+            throw new \UnexpectedValueException("Request of: $fd not found.");
+        }
+
         $data = $item['data'];
 
         if ($unSerializer = $this->getUnSerializer()) {
