@@ -18,6 +18,7 @@ use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\Uri\Uri;
+use Windwalker\Utilities\Classes\FlowControlTrait;
 
 /**
  * The Route class.
@@ -25,6 +26,7 @@ use Windwalker\Uri\Uri;
 class Route implements JsonSerializable
 {
     use RouteConfigurationTrait;
+    use FlowControlTrait;
 
     protected array $groups = [];
 
