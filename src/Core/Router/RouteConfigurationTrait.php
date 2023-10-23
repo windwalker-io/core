@@ -14,6 +14,7 @@ namespace Windwalker\Core\Router;
 use BadMethodCallException;
 use Windwalker\DI\Definition\DefinitionInterface;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Classes\FlowControlTrait;
 use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\Utilities\Str;
 
@@ -24,6 +25,7 @@ use function Windwalker\DI\create;
  */
 trait RouteConfigurationTrait
 {
+    use FlowControlTrait;
     use OptionAccessTrait;
 
     /**
