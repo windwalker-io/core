@@ -23,7 +23,7 @@ class ProfilerFactory
      */
     protected array $instances = [];
 
-    public function get(string $name, ?Stopwatch $stopwatch = null): Profiler
+    public function get(string $name = 'main', ?Stopwatch $stopwatch = null): Profiler
     {
         return $this->instances[$name] ??= $this->create($name, $stopwatch);
     }

@@ -15,12 +15,15 @@ use Closure;
 use RuntimeException;
 use Windwalker\Core\Renderer\LayoutPathResolver;
 use Windwalker\Edge\Component\DynamicComponent;
+use Windwalker\Utilities\Cache\RuntimeCacheTrait;
 
 /**
  * The XComponent class.
  */
 class XComponent extends DynamicComponent
 {
+    use RuntimeCacheTrait;
+
     /**
      * XComponent constructor.
      */
@@ -36,11 +39,16 @@ class XComponent extends DynamicComponent
     public function render(): Closure|string
     {
         try {
-            $this->is = $this->pathResolver->resolveLayout($this->is);
+            $this->is = $this->resolveLayout($this->is);
         } catch (RuntimeException $e) {
             //
         }
 
         return parent::render();
+    }
+
+    protected function resolveLayout(string $is): string
+    {
+        return static::$cacheStorage['layout:' . $is] ??= $this->pathResolver->resolveLayout($this->is);
     }
 }
