@@ -14,6 +14,7 @@ namespace Windwalker\Core\Provider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
+use Whoops\Exception\Inspector;
 use Whoops\Handler\CallbackHandler;
 use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
@@ -23,6 +24,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Service\ErrorService;
+use Windwalker\Database\Exception\DatabaseQueryException;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
@@ -129,6 +131,21 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
 
                 $handler->handleUnconditionally(true);
                 $handler->setEditor($container->getParam('whoops.editor') ?? 'phpstorm');
+
+                $handler->addDataTableCallback(
+                    'Database',
+                    function (Inspector $inspector) {
+                        $e = $inspector->getException();
+
+                        if ($e instanceof DatabaseQueryException) {
+                            return [
+                                'SQL' => $e->getDebugSql()
+                            ];
+                        }
+
+                        return null;
+                    }
+                );
 
                 return $handler;
             });

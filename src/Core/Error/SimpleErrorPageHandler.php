@@ -64,6 +64,8 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      */
     public function __invoke(Throwable $e): void
     {
+        // Todo: error provider is early than renderer provider, sometimes
+        // RendererService may not exists here.
         $renderer = $this->app->service(RendererService::class);
 
         try {
