@@ -14,11 +14,14 @@ namespace Windwalker\Core\Application;
 use JetBrains\PhpStorm\Immutable;
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Stringable;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppContextTrait;
+use Windwalker\Core\Application\Context\AppRequestInterface;
+use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -51,6 +54,39 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     public function __construct(Container $container)
     {
         $this->container = $container;
+    }
+
+    public function runSubController(
+        string|array|callable $controller,
+        array|ServerRequestInterface $data
+    ): ResponseInterface {
+        $controllerOrigin = $this->getController();
+        $this->setController($controller);
+
+        $appReq = $this->getAppRequest();
+
+        if ($data instanceof AppRequestInterface) {
+            $appReqNew = $data;
+        } elseif ($data instanceof ServerRequestInterface) {
+            $appReqNew = $appReq->withRequest($data);
+        } else {
+            $req = $appReq->getServerRequest();
+            $req = $req->withQueryParams([]);
+            $req = $req->withParsedBody($data);
+
+            $appReqNew = $appReq->withRequest($req);
+        }
+
+        $this->setAppRequest($appReqNew);
+
+        // Todo: Converting response move to app layer.
+        $result = $this->get(ControllerDispatcher::class)
+            ->dispatch($this);
+
+        $this->setController($controllerOrigin);
+        $this->setAppRequest($appReq);
+
+        return $result;
     }
 
     public function getRequestRawMethod(): string
