@@ -17,6 +17,7 @@ use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Environment\Environment;
 use Windwalker\Filter\FilterFactory;
 
 /**
@@ -36,6 +37,7 @@ class RuntimeProvider implements ServiceProviderInterface
 
         $loader = include Runtime::getRootDir() . '/vendor/autoload.php';
         $container->share(ClassLoader::class, $loader);
+        $container->prepareSharedObject(Environment::class);
 
         $this->registerFilters($container);
     }

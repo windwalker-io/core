@@ -13,7 +13,7 @@ namespace Windwalker\Core\Seed;
 
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Migration\Migration;
-use Windwalker\Environment\PlatformHelper;
+use Windwalker\Environment\Environment;
 
 /**
  * The CountingOutputTrait class.
@@ -43,7 +43,7 @@ trait CountingOutputTrait
         }
 
         // @see  https://gist.github.com/asika32764/19956edcc5e893b2cbe3768e91590cf1
-        if (PlatformHelper::isWindows()) {
+        if (Environment::isWindows()) {
             $loading = ['|', '/', '-', '\\'];
         } else {
             $loading = ['◐', '◓', '◑', '◒'];

@@ -23,7 +23,7 @@ use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Inject;
-use Windwalker\Environment\PlatformHelper;
+use Windwalker\Environment\Environment;
 
 /**
  * The AbstractMigrationCommand class.
@@ -270,7 +270,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
      */
     public function getEnvCmd(string $env = 'APP_ENV', string $value = 'dev'): string
     {
-        $prefix = PlatformHelper::isWindows()
+        $prefix = Environment::isWindows()
             ? 'set'
             : 'export';
 

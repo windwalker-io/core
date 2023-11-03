@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\IOInterface;
-use Windwalker\Environment\PlatformHelper;
+use Windwalker\Environment\Environment;
 
 /**
  * Trait ProcessRunnerTrait
@@ -45,7 +45,7 @@ trait ProcessRunnerTrait
         $phpPath = dirname($this->getPhpBinary() ?: '/use/local/bin');
 
         $path = implode(
-            PlatformHelper::isWindows() ? ';' : ':',
+            Environment::isWindows() ? ';' : ':',
             [
                 $phpPath,
                 $this->path('@root/vendor/bin'),
@@ -57,7 +57,7 @@ trait ProcessRunnerTrait
         $env = $process->getEnv();
         $env['PATH'] = $path;
 
-        if (PlatformHelper::isWindows()) {
+        if (Environment::isWindows()) {
             $env['Path'] = $path;
         }
 

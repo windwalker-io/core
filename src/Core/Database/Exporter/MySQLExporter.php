@@ -16,9 +16,8 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
-use Windwalker\Environment\PlatformHelper;
+use Windwalker\Environment\Environment;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Stream\Stream;
 
 /**
  * The Exporter class.
@@ -142,11 +141,11 @@ CNF;
 
         $pos = [];
 
-        if (PlatformHelper::isWindows()) {
+        if (Environment::isWindows()) {
             $pos = [
                 'C:\xampp\mysql\bin\mysqldump.exe',
             ];
-        } elseif (PlatformHelper::isUnix()) {
+        } elseif (Environment::isUnix()) {
             $pos = [
                 '/Applications/XAMPP/xamppfiles/bin/mysqldump',
                 '/Applications/AMPPS/bin/mysqldump',
