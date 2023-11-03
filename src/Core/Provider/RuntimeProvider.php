@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Composer\Autoload\ClassLoader;
+use Windwalker\Core\Application\AppLayer;
 use Windwalker\Core\Application\Offline\OfflineManager;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;

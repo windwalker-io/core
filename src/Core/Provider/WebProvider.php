@@ -11,9 +11,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\AppLayer;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
@@ -47,6 +51,15 @@ class WebProvider implements ServiceProviderInterface
     {
     }
 
+    public function canProvide(): \Closure
+    {
+        if ($this->parentApp->getType() === AppType::CONSOLE) {
+            return static fn (int $level) => $level > AppLayer::APP;
+        }
+
+        return static fn (int $level) => $level > AppLayer::REQUEST;
+    }
+
     /**
      * Registers the service provider with a DI container.
      *
@@ -65,24 +78,25 @@ class WebProvider implements ServiceProviderInterface
         $this->registerAppContext($container);
 
         // Controller Dispatcher
-        $container->prepareSharedObject(ControllerDispatcher::class);
+        $container->prepareSharedObject(ControllerDispatcher::class)
+            ->providedIn($this->canProvide(...));
 
         // Navigator
         $container->prepareSharedObject(
             Navigator::class,
             fn(Navigator $nav, Container $container) => $nav->addEventDealer($container->get(AppContext::class))
-        );
+        )->providedIn($this->canProvide(...));
 
         // Security
         $this->registerSecurityServices($container);
     }
 
     /**
-     * createAppRequest
-     *
      * @param  Container  $container
      *
      * @return  AppRequest
+     * @throws ContainerExceptionInterface
+     * @throws \ReflectionException
      */
     protected function createAppRequest(Container $container): AppRequest
     {
@@ -118,7 +132,8 @@ class WebProvider implements ServiceProviderInterface
                     ->setState($container->get(AppState::class));
             }
         )
-            ->alias(AppContextInterface::class, AppContext::class);
+            ->alias(AppContextInterface::class, AppContext::class)
+            ->providedIn($this->canProvide(...));
     }
 
     /**
@@ -170,7 +185,8 @@ class WebProvider implements ServiceProviderInterface
             AppRequest::class,
             fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
         )
-            ->alias(AppRequestInterface::class, AppRequest::class);
+            ->alias(AppRequestInterface::class, AppRequest::class)
+            ->providedIn($this->canProvide(...));
 
         // Browser Agent Detect
         $container->share(

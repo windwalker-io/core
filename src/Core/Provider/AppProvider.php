@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Application\AppLayer;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\PathResolver;
@@ -59,7 +60,8 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Container::class, $container);
         $container->share($this->app::class, $this->app)
             ->alias(RootApplicationInterface::class, $this->app::class)
-            ->alias(ApplicationInterface::class, $this->app::class);
+            ->alias(ApplicationInterface::class, $this->app::class)
+            ->providedIn(AppLayer::APP);
 
         if ($parentClass = get_parent_class($this->app)) {
             $container->alias($parentClass, $this->app::class);
@@ -102,14 +104,15 @@ class AppProvider implements ServiceProviderInterface
         $container->share(
             EventDispatcherRegistry::class,
             fn () => new EventDispatcherRegistry($this->app)
-        );
+        )
+            ->providedIn(AppLayer::REQUEST);
     }
 
     protected function prepareUtilities(Container $container): void
     {
-        $container->prepareSharedObject(FilterFactory::class);
-        $container->prepareSharedObject(FilterService::class);
-        $container->prepareSharedObject(ScheduleService::class);
+        $container->prepareSharedObject(FilterFactory::class, options: Container::ISOLATION);
+        $container->prepareSharedObject(FilterService::class, options: Container::ISOLATION);
+        $container->prepareSharedObject(ScheduleService::class, options: Container::ISOLATION);
     }
 
     protected function prepareCliWeb(Container $container): void
