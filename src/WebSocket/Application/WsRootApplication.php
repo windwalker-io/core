@@ -18,7 +18,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\Core\Application\WebApplicationTrait;
-use Windwalker\Core\Application\WebSocket\Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
@@ -190,7 +189,7 @@ class WsRootApplication implements WsRootApplicationInterface
      *
      * NOTE: This method will not emit any content to output, you must emit response yourself.
      *
-     * @param  WsAppContext  $appContext
+     * @param  WsAppContext   $appContext
      * @param  callable|null  $handler
      *
      * @return  ResponseInterface

@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\CliServer\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
@@ -30,6 +31,8 @@ use Windwalker\DI\Attributes\Autowire;
 class ServerStopCommand implements CommandInterface
 {
     use ServerCommandTrait;
+
+    protected string $name = '';
 
     /**
      * ServeCommand constructor.
@@ -50,6 +53,13 @@ class ServerStopCommand implements CommandInterface
      */
     public function configure(Command $command): void
     {
+        $command->addArgument(
+            'server',
+            InputArgument::OPTIONAL,
+            'The server name with {engine:name} format.',
+            'php:main'
+        );
+
         $command->addOption(
             'name',
             null,
@@ -83,7 +93,13 @@ class ServerStopCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        $engineName = $io->getOption('engine');
+        $serverName = $io->getArgument('server');
+
+        [$engineName, $name] = explode(':', $serverName) + ['', ''];
+
+        $this->name = $name;
+
+        $engineName = $engineName ?: $io->getOption('engine');
 
         return match ($engineName) {
             'swoole' => $this->stopSwooleServer($io),
@@ -100,7 +116,7 @@ class ServerStopCommand implements CommandInterface
 
     protected function stopSwooleServer(IOInterface $io): int
     {
-        $name = $io->getOption('name');
+        $name = $this->name ?: $io->getOption('name');
 
         $engine = $this->createEngine('swoole', $name, $io);
 

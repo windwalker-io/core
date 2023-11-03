@@ -58,11 +58,8 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
         switch ($this->app->getClient()) {
             case AppClient::WEB:
             default:
-                if ($this->app->isCliRuntime()) {
-                    // Runtime CLI do not restore exception handler, let console app handle it.
-                    $error->registerErrors($this->config->get('restore') ?? true);
-                    $error->registerShutdown();
-                } else {
+                // Runtime CLI do not restore exception handler, let console app handle it.
+                if (!$this->app->isCliRuntime()) {
                     $error->register(
                         (bool) ($this->config->get('restore') ?? true),
                         (int) ($this->config->get('report_level') ?? E_ALL | E_STRICT),
@@ -73,8 +70,8 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
 
             case AppClient::CONSOLE:
                 // Console do not restore exception handler, let console app handle it.
-                $error->registerErrors($this->config->get('restore') ?? true);
-                $error->registerShutdown();
+                // $error->registerErrors($this->config->get('restore') ?? true);
+                // $error->registerShutdown();
                 break;
         }
     }
