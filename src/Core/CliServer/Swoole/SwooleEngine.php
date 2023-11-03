@@ -84,6 +84,10 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         $resolver->define('watch')
             ->allowedTypes('bool');
 
+        $resolver->define('verbosity')
+            ->allowedTypes('int')
+            ->default(0);
+
         $resolver->define('state_file')
             ->allowedTypes('string')
             ->default(fn(Options $options) => "tmp/servers/swoole-{$this->name}.json");
@@ -120,6 +124,7 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
             [
                 'name' => $options['process_name'],
                 'serverName' => $this->getName(),
+                'verbosity' => (int) $options['verbosity']
             ]
         );
 

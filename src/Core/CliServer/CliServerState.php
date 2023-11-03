@@ -20,6 +20,7 @@ class CliServerState extends ValueObject
 {
     public string $name = '';
     public string $serverName = '';
+    public int $verbosity = 0;
     public int $masterPid = 0;
     public int $managerPid = 0;
     public string $host = '';
@@ -165,6 +166,23 @@ class CliServerState extends ValueObject
     public function setServerName(string $serverName): static
     {
         $this->serverName = $serverName;
+
+        return $this;
+    }
+
+    public function getVerbosity(): int
+    {
+        return $this->verbosity;
+    }
+
+    /**
+     * @param  int  $verbosity
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setVerbosity(int $verbosity): static
+    {
+        $this->verbosity = $verbosity;
 
         return $this;
     }

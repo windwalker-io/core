@@ -215,6 +215,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
                     'task_workers' => TypeCast::safeInteger($io->getOption('task-workers')),
                     'max_requests' => TypeCast::safeInteger($io->getOption('max-requests')),
                     'watch' => $io->getOption('watch'),
+                    'verbosity' => $io->getVerbosity()
                 ]
             );
     }
