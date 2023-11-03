@@ -11,8 +11,14 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use NunoMaduro\Collision\Writer;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Whoops\Exception\Inspector;
 use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Console\Collision\SolutionRepository;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
@@ -69,9 +75,21 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                 break;
 
             case AppClient::CONSOLE:
-                // Console do not restore exception handler, let console app handle it.
-                // $error->registerErrors($this->config->get('restore') ?? true);
-                // $error->registerShutdown();
+                if (class_exists(Writer::class)) {
+                    $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) {
+                        $error = $event->getError();
+
+                        if ($error instanceof ExceptionInterface) {
+                            return;
+                        }
+
+                        $writer = new Writer(
+                            new SolutionRepository(),
+                            $event->getOutput()
+                        );
+                        $writer->write(new Inspector($error));
+                    });
+                }
                 break;
         }
     }

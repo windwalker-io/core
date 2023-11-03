@@ -35,6 +35,9 @@
         "windwalker/http": "^4.0",
         "windwalker/test": "^4.0"
     },
+    "require-dev": {
+        "nunomaduro/collision": "^7.8"
+    },
     "suggest": {
         "dragonmantank/cron-expression": "Install ^3.1 to support schedule runner.",
         "symfony/mailer": "Install ^5.2||^6.0 to send mail.",

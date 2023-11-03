@@ -81,8 +81,6 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
             'Windwalker Console',
             InstalledVersions::getPrettyVersion('windwalker/core')
         );
-
-        $this->setDispatcher(new SymfonyDispatcherWrapper($this->getEventDispatcher()));
     }
 
     /**
@@ -99,6 +97,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         }
 
         $this->prepareBoot();
+
+        $this->setDispatcher(new SymfonyDispatcherWrapper($this->getEventDispatcher()));
 
         // Prepare child
         $container = $this->getContainer();
