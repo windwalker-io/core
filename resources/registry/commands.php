@@ -13,6 +13,8 @@ return [
     'server:start' => \Windwalker\Core\CliServer\Command\ServerStartCommand::class,
     'server:stop' => \Windwalker\Core\CliServer\Command\ServerStopCommand::class,
     'server:dumper' => \Windwalker\Core\Command\DumpServerCommand::class,
+    'site:down' => \Windwalker\Core\Command\SiteDownCommand::class,
+    'site:up' => \Windwalker\Core\Command\SiteUpCommand::class,
 
     'cache:clear' => \Windwalker\Core\Command\CacheClearCommand::class,
 
