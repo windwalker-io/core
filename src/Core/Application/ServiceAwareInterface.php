@@ -17,8 +17,16 @@ namespace Windwalker\Core\Application;
 interface ServiceAwareInterface
 {
     /**
-     * make
+     * @template T
      *
+     * @param  class-string<T>  $id
+     * @param  bool             $forceNew
+     *
+     * @return T
+     */
+    public function get(string $id, bool $forceNew = false): mixed;
+
+    /**
      * @template T
      *
      * @param  class-string<T>  $class
@@ -30,8 +38,6 @@ interface ServiceAwareInterface
     public function make(string $class, array $args = [], int $options = 0): object;
 
     /**
-     * service
-     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -43,8 +49,6 @@ interface ServiceAwareInterface
     public function service(string $class, array $args = [], int $options = 0): object;
 
     /**
-     * call
-     *
      * @param  callable     $callable
      * @param  array        $args
      * @param  object|null  $context
@@ -55,8 +59,6 @@ interface ServiceAwareInterface
     public function call(callable $callable, array $args = [], ?object $context = null, int $options = 0): mixed;
 
     /**
-     * bind
-     *
      * @param  string  $id
      * @param  mixed   $value
      * @param  int     $options
@@ -66,8 +68,6 @@ interface ServiceAwareInterface
     public function bind(string $id, mixed $value, int $options = 0): mixed;
 
     /**
-     * resolve
-     *
      * @template T
      *
      * @param  mixed|class-string<T>  $source

@@ -11,9 +11,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\DI\Exception;
+use Windwalker\DI\Exception\DefinitionResolveException;
 
 /**
  * Trait ServiceAwareTrait
@@ -23,8 +26,21 @@ trait ServiceAwareTrait
     use ContainerAwareTrait;
 
     /**
-     * make
+     * @template T
      *
+     * @param  class-string<T>  $id
+     * @param  bool             $forceNew
+     *
+     * @return T
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function get(string $id, bool $forceNew = false): mixed
+    {
+        return $this->getContainer()->get($id, $forceNew);
+    }
+
+    /**
      * @template T
      *
      * @param  class-string<T>  $class
@@ -32,15 +48,15 @@ trait ServiceAwareTrait
      * @param  int              $options
      *
      * @return  T
+     * @throws DefinitionResolveException
+     * @throws ReflectionException
      */
-    public function make($class, array $args = [], int $options = 0): object
+    public function make(string $class, array $args = [], int $options = 0): object
     {
         return $this->getContainer()->newInstance($class, $args, $options);
     }
 
     /**
-     * service
-     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -49,7 +65,7 @@ trait ServiceAwareTrait
      *
      * @return  T
      *
-     * @throws Exception\DefinitionException
+     * @throws ContainerExceptionInterface
      */
     public function service(string $class, array $args = [], int $options = 0): object
     {
@@ -63,8 +79,6 @@ trait ServiceAwareTrait
     }
 
     /**
-     * call
-     *
      * @param  mixed        $callable
      * @param  array        $args
      * @param  object|null  $context
@@ -73,6 +87,7 @@ trait ServiceAwareTrait
      * @return  mixed
      *
      * @throws ReflectionException
+     * @throws ContainerExceptionInterface
      */
     public function call(mixed $callable, array $args = [], ?object $context = null, int $options = 0): mixed
     {
@@ -80,8 +95,6 @@ trait ServiceAwareTrait
     }
 
     /**
-     * bind
-     *
      * @param  string  $id
      * @param  mixed   $value
      * @param  int     $options
@@ -98,8 +111,6 @@ trait ServiceAwareTrait
     }
 
     /**
-     * resolve
-     *
      * @template T
      *
      * @param  mixed|class-string<T>  $source
@@ -107,8 +118,8 @@ trait ServiceAwareTrait
      * @param  int                    $options
      *
      * @return mixed|T
-     *
-     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function resolve(mixed $source, array $args = [], int $options = 0): mixed
     {

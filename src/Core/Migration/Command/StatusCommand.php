@@ -16,6 +16,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
@@ -64,6 +65,9 @@ class StatusCommand extends AbstractMigrationCommand
             static::TOGGLE_CONNECTION
             | static::CREATE_DATABASE
         );
+
+        /** @var ConsoleApplication $app */
+        $app = $this->app;
 
         $migrationService = $this->app->make(MigrationService::class);
         $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));
