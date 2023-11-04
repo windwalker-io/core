@@ -481,6 +481,7 @@ class View implements EventAwareInterface
     protected function preparePaths(ViewModelInterface $vm, string $ns = 'main'): void
     {
         // Prepare App view override
+        // ROOT/views/{stage}/{view}
         $this->addPath($this->getAppTemplatePath($vm));
 
         // Prepare route override paths
@@ -493,6 +494,7 @@ class View implements EventAwareInterface
         }
 
         // Prepare Self view paths
+        // `Module/{View}/views`
         $dir = $this->getTemplatePath($vm);
 
         if (class_exists(Language::class)) {
