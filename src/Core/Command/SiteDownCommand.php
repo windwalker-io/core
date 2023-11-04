@@ -17,8 +17,8 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Application\Offline\OfflineConfig;
-use Windwalker\Core\Application\Offline\OfflineManager;
+use Windwalker\Core\Application\Offline\MaintenanceConfig;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -32,7 +32,7 @@ class SiteDownCommand implements CommandInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app, protected OfflineManager $offlineManager)
+    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager)
     {
     }
 
@@ -72,11 +72,11 @@ class SiteDownCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        if ($this->offlineManager->isOffline()) {
+        if ($this->offlineManager->isDown()) {
             $io->writeln('This site is already offline. Update offline config.');
         }
 
-        $config = new OfflineConfig();
+        $config = new MaintenanceConfig();
 
         $allowedIps = (string) $io->getOption('allow-ips');
         $allowedIps = Arr::explodeAndClear(',', $allowedIps);
@@ -86,7 +86,7 @@ class SiteDownCommand implements CommandInterface
         $config->setSecret((string) $io->getOption('secret'));
         $config->setTemplate((string) $io->getOption('template'));
 
-        $this->offlineManager->makeOffline($config);
+        $this->offlineManager->down($config);
 
         $io->writeln('Site offline success.');
 

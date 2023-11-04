@@ -13,7 +13,7 @@ namespace Windwalker\Core\Provider;
 
 use Composer\Autoload\ClassLoader;
 use Windwalker\Core\Application\AppLayer;
-use Windwalker\Core\Application\Offline\OfflineManager;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Service\FilterService;
@@ -43,7 +43,7 @@ class RuntimeProvider implements ServiceProviderInterface
 
         $this->registerFilters($container);
 
-        $container->prepareSharedObject(OfflineManager::class);
+        $container->prepareSharedObject(MaintenanceManager::class);
     }
 
     protected function registerFilters(Container $container): void

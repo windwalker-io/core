@@ -82,10 +82,10 @@ class DelegatingController implements ControllerInterface
 
     public function renderView(string $view, AppContext $app): mixed
     {
-        /** @var View $vm */
-        $vm = $app->make($view);
-
-        return $vm->render();
+        return $app->renderView(
+            $view,
+            options: ['is_child' => false]
+        );
     }
 
     /**

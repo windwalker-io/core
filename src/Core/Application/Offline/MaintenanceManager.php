@@ -16,37 +16,37 @@ use Windwalker\Filesystem\FileObject;
 use function Windwalker\fs;
 
 /**
- * The OfflineManager class.
+ * The MaintenanceManager class.
  */
-class OfflineManager
+class MaintenanceManager
 {
-    public function makeOffline(OfflineConfig|array $config): void
+    public function down(MaintenanceConfig|array $config): void
     {
-        $config = OfflineConfig::wrap($config);
+        $config = MaintenanceConfig::wrap($config);
 
         $this->getFile()->write(
             json_encode($config, JSON_PRETTY_PRINT)
         );
     }
 
-    public function makeOnline(): void
+    public function up(): void
     {
         $this->getFile()->deleteIfExists();
     }
 
-    public function isOffline(): bool
+    public function isDown(): bool
     {
         return $this->getFile()->isFile();
     }
 
-    public function getPayload(): OfflineConfig
+    public function getConfig(): MaintenanceConfig
     {
-        return OfflineConfig::wrap($this->getFile()->readAndParse('json'));
+        return MaintenanceConfig::wrap($this->getFile()->readAndParse('json'));
     }
 
     public function getFilePath(): string
     {
-        return WINDWALKER_TEMP . '/offline.json';
+        return WINDWALKER_TEMP . '/down.json';
     }
 
     public function getFile(): FileObject

@@ -16,7 +16,7 @@ use Windwalker\Data\ValueObject;
 /**
  * The OfflineConfig class.
  */
-class OfflineConfig extends ValueObject
+class MaintenanceConfig extends ValueObject
 {
     public array $allowedIps = [];
 

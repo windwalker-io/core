@@ -13,6 +13,7 @@ namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Log\LogLevel;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Console\Process\ProcessRunnerInterface;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventAwareInterface;
@@ -131,4 +132,11 @@ interface ApplicationInterface extends
      * @return  string
      */
     public function getSecret(): string;
+
+    /**
+     * Is this application under maintenance.
+     *
+     * @return  bool
+     */
+    public function isMaintenance(): bool;
 }

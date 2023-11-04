@@ -26,6 +26,8 @@ use Windwalker\Core\Http\AjaxInspector;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
+use Windwalker\Core\View\View;
+use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
@@ -100,8 +102,34 @@ class AppContext implements WebApplicationInterface, AppContextInterface
             $this->setController($controller);
         }
 
-        return $this->get(ControllerDispatcher::class)
+        return $this->inject(ControllerDispatcher::class)
             ->dispatch($this);
+    }
+
+    public function renderView(string|object $view, array $data = [], array $options = []): ResponseInterface
+    {
+        if (is_string($view)) {
+            $view = $this->make($view);
+        }
+
+        if ($view instanceof ViewModelInterface) {
+            $view = $this->make(
+                View::class,
+                [
+                    'viewModel' => $view,
+                    'options' => $options
+                ]
+            );
+        }
+
+        $options = [
+            ...$view->getOptions(),
+            ...$options
+        ];
+
+        $view->setOptions($options);
+
+        return $view->render($data);
     }
 
     public function getRequestRawMethod(): string
@@ -261,7 +289,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     {
         $request ??= $this->getAppRequest()->getServerRequest();
 
-        return $this->get(AjaxInspector::class)->isAjax($request);
+        return $this->inject(AjaxInspector::class)->isAjax($request);
     }
 
     /**

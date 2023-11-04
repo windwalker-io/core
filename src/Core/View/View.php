@@ -116,6 +116,9 @@ class View implements EventAwareInterface
             ->default('layout')
             ->allowedTypes('string');
 
+        $resolver->define('layout')
+            ->allowedTypes('string');
+
         $resolver->define('module')
             ->allowedTypes(ModuleInterface::class, 'null')
             ->default(null);
@@ -135,6 +138,10 @@ class View implements EventAwareInterface
         $resolver->define('headers')
             ->allowedTypes('null', 'array')
             ->default([]);
+
+        $resolver->define('is_child')
+            ->allowedTypes('bool')
+            ->default(false);
 
         $resolver->define('vmAttr')
             ->allowedTypes(ViewModel::class, 'null')
@@ -168,7 +175,7 @@ class View implements EventAwareInterface
             $this->subscribe($vm);
         }
 
-        $layout = $this->resolveLayout();
+        $layout = $this->layout ?: $this->resolveLayout();
 
         // @event Before Prepare Data
         $event = $this->emit(
@@ -314,7 +321,7 @@ class View implements EventAwareInterface
             return $layout['default'] ?? '';
         }
 
-        return (string) $layout;
+        return (string) $layout ?: $this->options['layout'];
     }
 
     protected function injectData(object $vm, array $data): void
@@ -340,7 +347,10 @@ class View implements EventAwareInterface
         $asset = $this->asset;
         $name = strtolower(ltrim($this->guessName($vm), '\\/'));
         $vmName = Path::clean($name, '/');
-        $this->addBodyClass($vm::class);
+
+        if (!$this->isChild()) {
+            $this->addBodyClass($vm::class);
+        }
 
         $cssList = $this->getOption('css');
         $jsList = $this->getOption('js');
@@ -385,6 +395,7 @@ class View implements EventAwareInterface
                 'js' => $jsList,
                 'modules' => $modules,
                 'className' => $vm::class,
+                'isChild' => $this->isChild(),
             ]
         );
     }
@@ -620,5 +631,10 @@ class View implements EventAwareInterface
     public function dumpPaths(): array
     {
         return $this->rendererService->dumpPaths();
+    }
+
+    public function isChild(): bool
+    {
+        return $this->options['is_child'];
     }
 }

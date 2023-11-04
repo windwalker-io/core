@@ -13,10 +13,13 @@ namespace Windwalker\Core\Application;
 
 use Closure;
 use OutOfRangeException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
@@ -130,14 +133,14 @@ trait ApplicationTrait
         return (string) $this->config('app.mode');
     }
 
-    /**
-     * getMode
-     *
-     * @return  string
-     */
     public function getSecret(): string
     {
         return Base64Url::decode((string) $this->config('app.secret'));
+    }
+
+    public function isMaintenance(): bool
+    {
+        return $this->inject(MaintenanceManager::class)->isDown();
     }
 
     /**

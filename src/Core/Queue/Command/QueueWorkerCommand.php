@@ -196,7 +196,7 @@ class QueueWorkerCommand implements CommandInterface
         return $this->app->call($job);
     }
 
-    protected function listenToWorker(Worker $worker, IOInterface $io, string $connection)
+    protected function listenToWorker(Worker $worker, IOInterface $io, string $connection): void
     {
         $worker->on(
             BeforeJobRunEvent::class,
@@ -248,20 +248,19 @@ class QueueWorkerCommand implements CommandInterface
                 function (LoopStartEvent $event) {
                     $worker = $event->getWorker();
 
-                    // Todo: Support offline and pause
-                    // switch ($worker->getState()) {
-                    //     case $worker::STATE_ACTIVE:
-                    //         if ($this->app->isOffline()) {
-                    //             $worker->setState($worker::STATE_PAUSE);
-                    //         }
-                    //         break;
-                    //
-                    //     case $worker::STATE_PAUSE:
-                    //         if ($this->app->isOffline()) {
-                    //             $worker->setState($worker::STATE_ACTIVE);
-                    //         }
-                    //         break;
-                    // }
+                    switch ($worker->getState()) {
+                        case $worker::STATE_ACTIVE:
+                            if ($this->app->isMaintenance()) {
+                                $worker->setState($worker::STATE_PAUSE);
+                            }
+                            break;
+
+                        case $worker::STATE_PAUSE:
+                            if (!$this->app->isMaintenance()) {
+                                $worker->setState($worker::STATE_ACTIVE);
+                            }
+                            break;
+                    }
                 }
             )
             ->on(

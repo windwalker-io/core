@@ -21,7 +21,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Application\Offline\OfflineManager;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Mailer\MailerInterface;
 use Windwalker\Core\Manager\MailerManager;
 
@@ -31,7 +31,7 @@ use Windwalker\Core\Manager\MailerManager;
 #[CommandWrapper(description: 'Make site online.')]
 class SiteUpCommand implements CommandInterface
 {
-    public function __construct(protected ApplicationInterface $app, protected OfflineManager $offlineManager)
+    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager)
     {
     }
 
@@ -48,12 +48,12 @@ class SiteUpCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        if (!$this->offlineManager->isOffline()) {
+        if (!$this->offlineManager->isDown()) {
             $io->writeln('No actions. This site is currently online.');
             return 1;
         }
 
-        $this->offlineManager->makeOnline();
+        $this->offlineManager->up();
 
         $io->writeln('Site online success.');
 
