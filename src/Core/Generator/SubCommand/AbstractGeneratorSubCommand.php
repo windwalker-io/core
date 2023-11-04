@@ -192,7 +192,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             return null;
         }
 
-        $package = $this->app->inject(PackageRegistry::class)->getPackage($pkg);
+        $package = $this->app->retrieve(PackageRegistry::class)->getPackage($pkg);
 
         if ($package) {
             $this->destPackage = $package;

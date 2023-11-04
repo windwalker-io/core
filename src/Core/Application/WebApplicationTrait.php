@@ -85,7 +85,7 @@ trait WebApplicationTrait
 
     public function getNav(): Navigator
     {
-        return $this->inject(Navigator::class);
+        return $this->retrieve(Navigator::class);
     }
 
     /**
@@ -99,7 +99,7 @@ trait WebApplicationTrait
      */
     public function respond(ResponseInterface $response): void
     {
-        $this->inject(OutputInterface::class)->respond($response);
+        $this->retrieve(OutputInterface::class)->respond($response);
     }
 
     /**

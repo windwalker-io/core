@@ -41,8 +41,8 @@ class MaintenanceMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($this->app->isMaintenance()) {
-            $maintenanceManager = $this->app->inject(MaintenanceManager::class);
-            $appRequest = $this->app->inject(AppRequestInterface::class);
+            $maintenanceManager = $this->app->retrieve(MaintenanceManager::class);
+            $appRequest = $this->app->retrieve(AppRequestInterface::class);
 
             $clientIp = $appRequest->getClientIP();
 
@@ -69,7 +69,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
             $template = $config->getTemplate() ?: 'maintenance';
             $status = 503;
 
-            $appContext = $this->app->inject(AppContext::class);
+            $appContext = $this->app->retrieve(AppContext::class);
             /** @var View $view */
             $view = $appContext->make(BaseVM::class);
             $view->setLayout($template);
@@ -92,7 +92,7 @@ class MaintenanceMiddleware implements MiddlewareInterface
 
     protected function checkSessionHaaSecret(string $secret, ServerRequestInterface $request): bool
     {
-        $session = $this->app->inject(Session::class);
+        $session = $this->app->retrieve(Session::class);
 
         $userSecret = $session->get('maintenance_secret');
 

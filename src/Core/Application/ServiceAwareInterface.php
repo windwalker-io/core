@@ -17,6 +17,8 @@ namespace Windwalker\Core\Application;
 interface ServiceAwareInterface
 {
     /**
+     * Get object from Container.
+     *
      * @template T
      *
      * @param  class-string<T>  $id
@@ -24,9 +26,11 @@ interface ServiceAwareInterface
      *
      * @return T
      */
-    public function inject(string $id, bool $forceNew = false): mixed;
+    public function retrieve(string $id, bool $forceNew = false): mixed;
 
     /**
+     * Create a single use object.
+     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -38,6 +42,8 @@ interface ServiceAwareInterface
     public function make(string $class, array $args = [], int $options = 0): object;
 
     /**
+     * Get object or create if not exists, and save it as singleton.
+     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -49,6 +55,8 @@ interface ServiceAwareInterface
     public function service(string $class, array $args = [], int $options = 0): object;
 
     /**
+     * Call a function or method.
+     *
      * @param  callable     $callable
      * @param  array        $args
      * @param  object|null  $context
@@ -59,6 +67,8 @@ interface ServiceAwareInterface
     public function call(callable $callable, array $args = [], ?object $context = null, int $options = 0): mixed;
 
     /**
+     * Bind a value or object to Container.
+     *
      * @param  string  $id
      * @param  mixed   $value
      * @param  int     $options
@@ -68,6 +78,8 @@ interface ServiceAwareInterface
     public function bind(string $id, mixed $value, int $options = 0): mixed;
 
     /**
+     * Resolve a definition of DI.
+     *
      * @template T
      *
      * @param  mixed|class-string<T>  $source

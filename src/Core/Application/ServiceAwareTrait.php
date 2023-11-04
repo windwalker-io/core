@@ -26,6 +26,8 @@ trait ServiceAwareTrait
     use ContainerAwareTrait;
 
     /**
+     * Get object from Container.
+     *
      * @template T
      *
      * @param  class-string<T>  $id
@@ -35,12 +37,14 @@ trait ServiceAwareTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function inject(string $id, bool $forceNew = false): mixed
+    public function retrieve(string $id, bool $forceNew = false): mixed
     {
         return $this->getContainer()->get($id, $forceNew);
     }
 
     /**
+     * Create a single use object.
+     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -57,6 +61,8 @@ trait ServiceAwareTrait
     }
 
     /**
+     * Get object or create if not exists, and save it as singleton.
+     *
      * @template T
      *
      * @param  class-string<T>  $class
@@ -79,6 +85,8 @@ trait ServiceAwareTrait
     }
 
     /**
+     *  Call a function or method.
+     *
      * @param  mixed        $callable
      * @param  array        $args
      * @param  object|null  $context
@@ -95,6 +103,8 @@ trait ServiceAwareTrait
     }
 
     /**
+     * Bind a value or object to Container.
+     *
      * @param  string  $id
      * @param  mixed   $value
      * @param  int     $options
@@ -111,6 +121,8 @@ trait ServiceAwareTrait
     }
 
     /**
+     * Resolve a definition of DI.
+     *
      * @template T
      *
      * @param  mixed|class-string<T>  $source
