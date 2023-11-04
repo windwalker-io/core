@@ -61,19 +61,6 @@ class DelegatingController implements ControllerInterface
             $args['view'] = $this->viewMap[$args['view']] ?? $args['view'];
         }
 
-        // Prepare Module
-        // Todo: Remove module system
-        if ($this->module) {
-            /** @var ModuleInterface $module */
-            $module = $this->app->make($this->module);
-
-            $this->app->getContainer()
-                ->share($this->module, $module)
-                ->alias(ModuleInterface::class, $this->module);
-
-            $args[AppState::class] = $module->getState();
-        }
-
         $handler = [$this->controller, $task];
 
         if (!method_exists($this->controller, $task)) {
@@ -90,53 +77,7 @@ class DelegatingController implements ControllerInterface
             $handler = [$this, 'renderView'];
         }
 
-        if ($this->app instanceof WsApplicationInterface) {
-            return $this->app->call($handler, $args);
-        }
-
-        try {
-            $res = $this->app->call($handler, $args);
-
-            // Todo: Remove module system
-            if ($this->module) {
-                $this->app->getContainer()->remove($this->module)
-                    ->removeAlias(ModuleInterface::class);
-            }
-
-            return $res;
-        } catch (ValidateFailException $e) {
-            if (
-                $this->app->isDebug()
-                // Todo: Research a way to detect API or AJAX
-                || str_contains($this->app->getAppRequest()->getHeader('content-type'), 'application/json')
-            ) {
-                throw $e;
-            }
-
-            $this->app->addMessage($e->getMessage(), 'warning');
-            $nav = $this->app->service(Navigator::class);
-
-            return $nav->back();
-        } catch (Throwable $e) {
-            if ($this->app->isCliRuntime()) {
-                $this->logError($e);
-            }
-
-            if (
-                $this->app->isDebug()
-                || strtoupper($this->app->getRequestMethod()) === 'GET'
-                || $this->app->getAppRequest()->isAcceptJson()
-                // Todo: Research a way to detect API or AJAX
-                || str_contains($this->app->getAppRequest()->getHeader('content-type'), 'application/json')
-            ) {
-                throw $e;
-            }
-
-            $this->app->addMessage($e->getMessage(), 'warning');
-            $nav = $this->app->service(Navigator::class);
-
-            return $nav->back();
-        }
+        return $this->app->call($handler, $args);
     }
 
     public function renderView(string $view, AppContext $app): mixed

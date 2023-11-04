@@ -22,6 +22,7 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Http\AjaxInspector;
 use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
@@ -176,6 +177,9 @@ class WebProvider implements ServiceProviderInterface
             },
             Container::ISOLATION
         );
+
+        // AjaxInspector
+        $container->prepareSharedObject(AjaxInspector::class);
 
         // Proxy
         $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);

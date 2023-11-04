@@ -11,12 +11,16 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\CliServer\CliServerRuntime;
-use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\LoggerManager;
+use Windwalker\Core\Router\RouteUri;
+use Windwalker\Http\Response\RedirectResponse;
+use Windwalker\Http\Response\Response;
 
 /**
  * Trait WebApplicationTrait
@@ -73,5 +77,34 @@ trait WebApplicationTrait
         }
 
         return $manager->get($name);
+    }
+
+    /**
+     * @param  mixed  $res
+     *
+     * @return ResponseInterface
+     *
+     * @throws \JsonException
+     * @since  4.0
+     */
+    public static function anyToResponse(mixed $res): ResponseInterface
+    {
+        if ($res instanceof RouteUri) {
+            return $res->toResponse();
+        }
+
+        if ($res instanceof UriInterface) {
+            return new RedirectResponse($res);
+        }
+
+        if (!$res instanceof ResponseInterface) {
+            if (is_array($res) || is_object($res)) {
+                return Response::fromString(json_encode($res, JSON_THROW_ON_ERROR));
+            }
+
+            return Response::fromString((string) $res);
+        }
+
+        return $res;
     }
 }

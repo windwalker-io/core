@@ -21,24 +21,24 @@ use Windwalker\Event\AbstractEvent;
  */
 class AfterControllerDispatchEvent extends AbstractEvent
 {
-    protected ResponseInterface $response;
+    protected mixed $response;
 
     protected AppContextInterface $app;
 
     /**
-     * @return ResponseInterface
+     * @return mixed
      */
-    public function getResponse(): ResponseInterface
+    public function getResponse(): mixed
     {
         return $this->response;
     }
 
     /**
-     * @param  ResponseInterface  $response
+     * @param  mixed  $response
      *
      * @return  static  Return self to support chaining.
      */
-    public function setResponse(ResponseInterface $response): static
+    public function setResponse(mixed $response): static
     {
         $this->response = $response;
 

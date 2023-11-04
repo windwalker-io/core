@@ -47,7 +47,7 @@ class ControllerDispatcher
         //
     }
 
-    public function dispatch(AppContextInterface $app): ResponseInterface
+    public function dispatch(AppContextInterface $app): mixed
     {
         $controller = $app->getController();
 
@@ -81,7 +81,7 @@ class ControllerDispatcher
                 => $this->container->call($controller, $app->getUrlVars());
         }
 
-        $response = static::anyToResponse($controller($app));
+        $response = $controller($app);
 
         $event = $app->emit(
             AfterControllerDispatchEvent::class,
@@ -155,36 +155,5 @@ class ControllerDispatcher
         );
 
         return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
-    }
-
-    /**
-     * handleResponse
-     *
-     * @param  mixed  $res
-     *
-     * @return ResponseInterface
-     *
-     * @throws JsonException
-     * @since  4.0
-     */
-    public static function anyToResponse(mixed $res): ResponseInterface
-    {
-        if ($res instanceof RouteUri) {
-            return $res->toResponse();
-        }
-
-        if ($res instanceof UriInterface) {
-            return new RedirectResponse($res);
-        }
-
-        if (!$res instanceof ResponseInterface) {
-            if (is_array($res) || is_object($res)) {
-                return Response::fromString(json_encode($res, JSON_THROW_ON_ERROR));
-            }
-
-            return Response::fromString((string) $res);
-        }
-
-        return $res;
     }
 }

@@ -22,6 +22,7 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Http\AjaxInspector;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -30,6 +31,8 @@ use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Session\Session;
+
+use function Swoole\Coroutine\Http\get;
 
 /**
  * The Context class.
@@ -56,37 +59,49 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         $this->container = $container;
     }
 
-    public function runSubController(
+    public function dispatchWithInput(
         string|array|callable $controller,
-        array|ServerRequestInterface $data
-    ): ResponseInterface {
+        ServerRequestInterface|array|null $data = null
+    ): mixed {
         $controllerOrigin = $this->getController();
-        $this->setController($controller);
 
         $appReq = $this->getAppRequest();
 
-        if ($data instanceof AppRequestInterface) {
-            $appReqNew = $data;
-        } elseif ($data instanceof ServerRequestInterface) {
-            $appReqNew = $appReq->withRequest($data);
-        } else {
-            $req = $appReq->getServerRequest();
-            $req = $req->withQueryParams([]);
-            $req = $req->withParsedBody($data);
+        if ($data !== null) {
+            if ($data instanceof AppRequestInterface) {
+                $appReqNew = $data;
+            } elseif ($data instanceof ServerRequestInterface) {
+                $appReqNew = $appReq->withRequest($data);
+            } else {
+                $req = $appReq->getServerRequest();
+                $req = $req->withQueryParams([]);
+                $req = $req->withParsedBody($data);
 
-            $appReqNew = $appReq->withRequest($req);
+                $appReqNew = $appReq->withRequest($req);
+            }
+
+            $this->setAppRequest($appReqNew);
         }
 
-        $this->setAppRequest($appReqNew);
-
-        // Todo: Converting response move to app layer.
-        $result = $this->get(ControllerDispatcher::class)
-            ->dispatch($this);
+        $result = $this->dispatchController($controller);
 
         $this->setController($controllerOrigin);
-        $this->setAppRequest($appReq);
+
+        if ($data !== null) {
+            $this->setAppRequest($appReq);
+        }
 
         return $result;
+    }
+
+    public function dispatchController(mixed $controller = null): mixed
+    {
+        if ($controller) {
+            $this->setController($controller);
+        }
+
+        return $this->get(ControllerDispatcher::class)
+            ->dispatch($this);
     }
 
     public function getRequestRawMethod(): string
@@ -240,6 +255,13 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         }
 
         return (string) $matched->getExtraValue('namespace');
+    }
+
+    public function isAjax(?ServerRequestInterface $request = null): bool
+    {
+        $request ??= $this->getAppRequest()->getServerRequest();
+
+        return $this->get(AjaxInspector::class)->isAjax($request);
     }
 
     /**

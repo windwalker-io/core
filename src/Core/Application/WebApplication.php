@@ -31,6 +31,7 @@ use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Form\Exception\ValidateFailException;
+use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
@@ -240,8 +241,9 @@ class WebApplication implements WebRootApplicationInterface
 
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
-            static fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
-                ->dispatch($container->get(AppContext::class))
+            fn(ServerRequestInterface $request) => static::anyToResponse(
+                $this->dispatchController($container)
+            )
         );
 
         // @event
@@ -362,6 +364,42 @@ class WebApplication implements WebRootApplicationInterface
         );
 
         $this->releaseProviders($container);
+    }
+
+    protected function dispatchController(Container $container)
+    {
+        $appContext = $container->get(AppContext::class);
+
+        try {
+            return $appContext->dispatchController();
+        } catch (ValidateFailException $e) {
+            if ($this->isDebug() || $appContext->isAjax()) {
+                throw $e;
+            }
+
+            $appContext->addMessage($e->getMessage(), 'warning');
+            $nav = $appContext->service(Navigator::class);
+
+            return $nav->back();
+        } catch (Throwable $e) {
+            if ($appContext->isCliRuntime()) {
+                $appContext->logError($e);
+            }
+
+            if (
+                $appContext->isDebug()
+                || strtoupper($appContext->getRequestMethod()) === 'GET'
+                || $appContext->getAppRequest()->isAcceptJson()
+                || $appContext->isAjax()
+            ) {
+                throw $e;
+            }
+
+            $appContext->addMessage($e->getMessage(), 'warning');
+            $nav = $appContext->service(Navigator::class);
+
+            return $nav->back();
+        }
     }
 
     /**
