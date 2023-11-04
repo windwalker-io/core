@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
@@ -18,7 +20,9 @@ use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Manager\LoggerManager;
+use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
+use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 
@@ -77,6 +81,25 @@ trait WebApplicationTrait
         }
 
         return $manager->get($name);
+    }
+
+    public function getNav(): Navigator
+    {
+        return $this->inject(Navigator::class);
+    }
+
+    /**
+     * Emit this response.
+     *
+     * @param  ResponseInterface  $response
+     *
+     * @return  void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function respond(ResponseInterface $response): void
+    {
+        $this->inject(OutputInterface::class)->respond($response);
     }
 
     /**
