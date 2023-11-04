@@ -47,7 +47,7 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => Str::ensureRight($name, 'View'),
                     'name' => Str::removeRight($name, 'View'),
-                    'ns' => $this->getNamesapce($io, 'View'),
+                    'ns' => $this->getNamespace($io, 'View'),
                 ],
                 $force
             );

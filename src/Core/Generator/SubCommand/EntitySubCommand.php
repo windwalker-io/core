@@ -23,9 +23,9 @@ use Windwalker\Console\IOInterface;
 )]
 class EntitySubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'App\\Entity';
+    protected string $defaultNamespace = 'Entity';
 
-    protected string $defaultDir = 'src/Entity';
+    protected string $defaultDir = 'Entity';
 
     /**
      * Executes the current command.
@@ -51,7 +51,7 @@ class EntitySubCommand extends AbstractGeneratorSubCommand
                 $this->getDestPath($io),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

@@ -47,7 +47,7 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
                 $this->app->path('src/Repository'),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );
@@ -65,7 +65,7 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
                 $this->app->path('src/Entity'),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

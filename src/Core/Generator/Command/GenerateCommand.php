@@ -58,6 +58,13 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
             InputArgument::IS_ARRAY,
             'The generate task.',
         );
+
+        $command->addOption(
+            'about',
+            'a',
+            InputOption::VALUE_NONE,
+            'Describe this task.',
+        );
     }
 
     public function configureSubCommand(Command $command, InputInterface $input): void
@@ -140,6 +147,11 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
             return 0;
         }
 
+        if ($io->getOption('about') && $command = $this->getSubCommand($task)) {
+            $this->aboutTask($io, $task, $command);
+            return 0;
+        }
+
         /** @var Command $subCommand */
         $subCommand = $this->resolveSubCommand($task, $this->getSubCommand($task));
 
@@ -155,6 +167,15 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
         include_once __DIR__ . '/../generator-helpers.php';
 
         return $subCommand->run(new ArgvInput($argv, $definition), $io->getOutput());
+    }
+
+    protected function aboutTask(IOInterface $io, string $task, mixed $command): void
+    {
+        $command = $this->resolveSubCommand($task, $command);
+
+
+        $helper = new DescriptorHelper();
+        $helper->describe($io->getOutput(), $command);
     }
 
     protected function showList(IOInterface $io): void

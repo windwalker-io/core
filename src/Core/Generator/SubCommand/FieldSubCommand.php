@@ -25,9 +25,9 @@ class FieldSubCommand extends AbstractGeneratorSubCommand
 {
     protected bool $requireDest = false;
 
-    protected string $defaultNamespace = 'App\\Field';
+    protected string $defaultNamespace = 'Field';
 
-    protected string $defaultDir = 'src/Field';
+    protected string $defaultDir = 'Field';
 
     /**
      * Executes the current command.
@@ -53,7 +53,7 @@ class FieldSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => Str::ensureRight($name, 'Field'),
                     'name' => Str::removeRight($name, 'Field'),
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

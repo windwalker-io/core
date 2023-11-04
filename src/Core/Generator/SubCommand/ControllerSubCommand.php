@@ -60,7 +60,7 @@ class ControllerSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => Str::ensureRight($name, 'Controller'),
                     'name' => Str::removeRight($name, 'Controller'),
-                    'ns' => $ns = $this->getNamesapce($io, 'Controller'),
+                    'ns' => $ns = $this->getNamespace($io, 'Controller'),
                 ],
                 $force
             );

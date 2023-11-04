@@ -79,10 +79,6 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                     $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) {
                         $error = $event->getError();
 
-                        if ($error instanceof ExceptionInterface) {
-                            return;
-                        }
-
                         $writer = new Writer(
                             new SolutionRepository(),
                             $event->getOutput()
@@ -90,6 +86,9 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                         $writer->write(new Inspector($error));
                     });
                 }
+
+                // To hide default uncaught errors and backtraces.
+                $error->register(false, E_ALL | E_STRICT, true);
                 break;
         }
     }

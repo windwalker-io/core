@@ -27,9 +27,9 @@ use Windwalker\Utilities\Str;
 #[CommandWrapper(description: 'Generate Windwalker command class.')]
 class CommandSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'App\\Command';
+    protected string $defaultNamespace = 'Command';
 
-    protected string $defaultDir = 'src/Command';
+    protected string $defaultDir = 'Command';
 
     protected bool $requireDest = false;
 
@@ -102,7 +102,7 @@ class CommandSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => $className = Str::ensureRight($name, 'Command'),
                     'name' => Str::removeRight($name, 'Command'),
-                    'ns' => $ns = $this->getNamesapce($io),
+                    'ns' => $ns = $this->getNamespace($io),
                     'desc' => $io->getOption('desc'),
                 ],
                 $force

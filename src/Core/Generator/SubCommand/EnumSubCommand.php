@@ -24,9 +24,9 @@ use Windwalker\Console\IOInterface;
 )]
 class EnumSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'App\\Enum';
+    protected string $defaultNamespace = 'Enum';
 
-    protected string $defaultDir = 'src/Enum';
+    protected string $defaultDir = 'Enum';
 
     protected bool $requireDest = false;
 
@@ -71,7 +71,7 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
                 $this->getDestPath($io),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

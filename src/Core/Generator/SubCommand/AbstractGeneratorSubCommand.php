@@ -19,8 +19,11 @@ use Windwalker\Console\InteractInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Generator\CodeGenerator;
+use Windwalker\Core\Package\AbstractPackage;
+use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Filesystem\Path;
+use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -34,11 +37,17 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     #[Inject]
     protected ConsoleApplication $app;
 
-    protected string $defaultNamespace = 'App\\Module';
+    protected string $baseNamespace = 'App\\';
 
-    protected string $defaultDir = 'src/Module';
+    protected string $baseDir = 'src/';
+
+    protected string $defaultNamespace = 'Module';
+
+    protected string $defaultDir = 'Module';
 
     protected bool $requireDest = true;
+
+    protected AbstractPackage|false|null $destPackage = null;
 
     /**
      * configure
@@ -64,7 +73,6 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             'd',
             InputOption::VALUE_REQUIRED,
             'Root dir.',
-            $this->defaultDir
         );
 
         $command->addOption(
@@ -72,7 +80,13 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             null,
             InputOption::VALUE_REQUIRED,
             'Namespace.',
-            $this->defaultNamespace
+        );
+
+        $command->addOption(
+            'pkg',
+            'p',
+            InputOption::VALUE_REQUIRED,
+            'The package name to auto detect dir and namespace.'
         );
 
         $command->addOption(
@@ -92,8 +106,6 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
      */
     public function interact(IOInterface $io): void
     {
-        $dir = $io->getOption('dir');
-
         if (!$io->getArgument('name')) {
             $io->setArgument('name', $io->ask('Controller name (camel case): '));
         }
@@ -103,10 +115,12 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         // }
     }
 
-    protected function getNamesapce(IOInterface $io, ?string $suffix = null): string
+    protected function getNamespace(IOInterface $io, ?string $suffix = null): string
     {
+        $this->resolvePackage($io);
+
         [$dest] = $this->getNameParts($io, $suffix);
-        $ns = $io->getOption('ns');
+        $ns = $io->getOption('ns') ?: $this->getDefaultNamespace();
 
         $ns .= '\\' . $dest;
 
@@ -115,8 +129,11 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
     protected function getDestPath(IOInterface $io, ?string $suffix = null): string
     {
+        $this->resolvePackage($io);
+
         [$dest] = $this->getNameParts($io, $suffix);
-        $dir = $io->getOption('dir');
+
+        $dir = $io->getOption('dir') ?: $this->getDefaultDir();
 
         return Path::normalize($this->app->path($dir . '/' . $dest));
     }
@@ -159,5 +176,41 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         array_pop($paths);
 
         return implode('/', $paths);
+    }
+
+    protected function resolvePackage(IOInterface $io): ?AbstractPackage
+    {
+        if ($this->destPackage) {
+            return $this->destPackage;
+        }
+
+        $pkg = $io->getOption('pkg');
+
+        $packages = $this->app->inject(PackageRegistry::class)->getPackages();
+
+        foreach ($packages as $package) {
+            if ($package::getName() === $pkg) {
+                $this->destPackage = $package;
+
+                $this->baseNamespace = $package::namespace();
+                $this->baseDir = $package::dir();
+
+                return $this->destPackage;
+            }
+        }
+
+        $this->destPackage = false;
+
+        return null;
+    }
+
+    public function getDefaultNamespace(): string
+    {
+        return $this->baseNamespace . $this->defaultNamespace;
+    }
+
+    public function getDefaultDir(): string
+    {
+        return Str::ensureRight($this->baseDir, '/') . $this->defaultDir;
     }
 }

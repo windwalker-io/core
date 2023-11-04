@@ -24,9 +24,9 @@ use Windwalker\Console\IOInterface;
 )]
 class MiddlewareSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'App\\Middleware';
+    protected string $defaultNamespace = 'Middleware';
 
-    protected string $defaultDir = 'src/Middleware';
+    protected string $defaultDir = 'Middleware';
 
     protected bool $requireDest = false;
 
@@ -65,7 +65,7 @@ class MiddlewareSubCommand extends AbstractGeneratorSubCommand
                 $this->getDestPath($io),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

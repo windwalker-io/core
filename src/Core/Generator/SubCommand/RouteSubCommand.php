@@ -65,7 +65,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
                 [
                     'name' => StrNormalize::toKebabCase($name),
                     'ns' => StrNormalize::toClassNamespace(
-                        $this->getNamesapce($io) . '/' . StrNormalize::toPascalCase($name)
+                        $this->getNamespace($io) . '/' . StrNormalize::toPascalCase($name)
                     ),
                 ],
                 $force
