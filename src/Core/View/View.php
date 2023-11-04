@@ -518,7 +518,7 @@ class View implements EventAwareInterface
         }
     }
 
-    public function addViewPath(string|object $view, int $priority = 100, string $ns = 'main'): static
+    public function addViewPath(string|object $view, int $priority = PriorityQueue::LOW, string $ns = 'main'): static
     {
         if (is_object($view)) {
             $view = $view::class;
@@ -531,7 +531,7 @@ class View implements EventAwareInterface
         return $this;
     }
 
-    public function addParentViewPath(int $priority = 100, string $ns = 'main'): static
+    public function addParentViewPath(int $priority = PriorityQueue::LOW, string $ns = 'main'): static
     {
         $this->addViewPath(get_parent_class($this->getViewModel()), $priority, $ns);
 
