@@ -128,4 +128,15 @@ class PackageRegistry
 
         return $this;
     }
+
+    public function getPackage(string $name): ?AbstractPackage
+    {
+        foreach ($this->getPackages() as $package) {
+            if ($package::getName() === $name) {
+                return $package;
+            }
+        }
+
+        return null;
+    }
 }

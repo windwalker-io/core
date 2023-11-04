@@ -120,9 +120,9 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         $this->resolvePackage($io);
 
         [$dest] = $this->getNameParts($io, $suffix);
-        $ns = $io->getOption('ns') ?: $this->getDefaultNamespace();
+        $ns = Str::ensureRight($io->getOption('ns') ?: $this->getDefaultNamespace(), '\\');
 
-        $ns .= '\\' . $dest;
+        $ns .= $dest;
 
         return StrNormalize::toClassNamespace($ns);
     }
@@ -186,17 +186,21 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
         $pkg = $io->getOption('pkg');
 
-        $packages = $this->app->inject(PackageRegistry::class)->getPackages();
+        if (!$pkg) {
+            $this->destPackage = false;
 
-        foreach ($packages as $package) {
-            if ($package::getName() === $pkg) {
-                $this->destPackage = $package;
+            return null;
+        }
 
-                $this->baseNamespace = $package::namespace();
-                $this->baseDir = $package::dir();
+        $package = $this->app->inject(PackageRegistry::class)->getPackage($pkg);
 
-                return $this->destPackage;
-            }
+        if ($package) {
+            $this->destPackage = $package;
+
+            $this->baseNamespace = $package::namespace() . '\\';
+            $this->baseDir = $package::dir() . DIRECTORY_SEPARATOR;
+
+            return $this->destPackage;
         }
 
         $this->destPackage = false;
@@ -206,7 +210,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
     public function getDefaultNamespace(): string
     {
-        return $this->baseNamespace . $this->defaultNamespace;
+        return Str::ensureRight($this->baseNamespace . $this->defaultNamespace, '\\');
     }
 
     public function getDefaultDir(): string

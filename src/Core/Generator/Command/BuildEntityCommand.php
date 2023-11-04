@@ -18,8 +18,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Command\CommandPackageResolveTrait;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
+use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
@@ -34,6 +37,8 @@ use Windwalker\Utilities\StrNormalize;
 #[CommandWrapper(description: 'Build entity getters/setters and sync properties with database.')]
 class BuildEntityCommand implements CommandInterface
 {
+    use CommandPackageResolveTrait;
+
     private IOInterface $io;
 
     /**
@@ -42,7 +47,7 @@ class BuildEntityCommand implements CommandInterface
     public function __construct(
         #[Autowire] protected ClassFinder $classFinder,
         protected ConsoleApplication $app,
-        protected ?ORM $orm = null,
+        protected DatabaseManager $databaseManager,
     ) {
     }
 
@@ -59,6 +64,13 @@ class BuildEntityCommand implements CommandInterface
             'ns',
             InputArgument::REQUIRED,
             'The entity class or namespace.'
+        );
+
+        $command->addOption(
+            'pkg',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The package name to find namespace.'
         );
 
         $command->addOption(
@@ -80,6 +92,13 @@ class BuildEntityCommand implements CommandInterface
             'd',
             InputOption::VALUE_NONE,
             'Do not replace origin file.'
+        );
+
+        $command->addOption(
+            'connection',
+            'c',
+            InputOption::VALUE_REQUIRED,
+            'This database connection name.'
         );
 
         // phpcs:disable
@@ -110,36 +129,40 @@ class BuildEntityCommand implements CommandInterface
         $this->io = $io;
 
         $ns = $io->getArgument('ns');
+        $connection = $io->getOption('connection');
 
         if (str_contains($ns, '*')) {
             $ns = Str::removeRight($ns, '\\*');
             $ns = StrNormalize::toClassNamespace($ns);
             $classes = $this->classFinder->findClasses($ns);
-            $this->handleClasses($classes);
+            $this->handleClasses($classes, $connection);
 
             return 0;
         }
 
         if (!class_exists($ns)) {
-            $ns = 'App\\Entity\\' . $ns;
+            $baseNs = $this->getPackageNamespace($io, 'Entity') ?? 'App\\Entity\\';
+            $ns = $baseNs . $ns;
         }
 
         if (!class_exists($ns)) {
             $classes = $this->classFinder->findClasses($io->getArgument('ns'));
-            $this->handleClasses($classes);
+            $this->handleClasses($classes, $connection);
 
             return 0;
         }
 
         $classes = [$ns];
 
-        $this->handleClasses($classes);
+        $this->handleClasses($classes, $connection);
 
         return 0;
     }
 
-    protected function handleClasses(iterable $classes): void
+    protected function handleClasses(iterable $classes, ?string $connection): void
     {
+        $orm = $this->databaseManager->get($connection)->orm();
+
         foreach ($classes as $class) {
             if (!class_exists($class)) {
                 continue;
@@ -155,7 +178,7 @@ class BuildEntityCommand implements CommandInterface
                 $props = true;
             }
 
-            $builder = new EntityMemberBuilder($meta = $this->orm->getEntityMetadata($class));
+            $builder = new EntityMemberBuilder($meta = $orm->getEntityMetadata($class));
             $builder->addEventDealer($this->app);
             $newCode = $builder->process(
                 compact('props', 'methods'),
