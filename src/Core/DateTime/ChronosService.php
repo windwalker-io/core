@@ -192,8 +192,8 @@ class ChronosService
         string|DateTimeInterface $date2,
         ?string $operator = null
     ): bool|int {
-        $date1 = $date1 instanceof DateTimeInterface ? $date1 : new DateTime($date1);
-        $date2 = $date2 instanceof DateTimeInterface ? $date2 : new DateTime($date2);
+        $date1 = $date1 instanceof DateTimeInterface ? $date1 : new DateTime($date1, 'UTC');
+        $date2 = $date2 instanceof DateTimeInterface ? $date2 : new DateTime($date2, 'UTC');
 
         if ($operator === null) {
             return $date1 <=> $date2;
