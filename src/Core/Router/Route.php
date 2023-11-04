@@ -185,8 +185,6 @@ class Route implements JsonSerializable
     }
 
     /**
-     * compile
-     *
      * @return  Route
      *
      * @since  3.5
@@ -199,7 +197,17 @@ class Route implements JsonSerializable
         $groups = $this->getGroups();
 
         // Set group data
-        $keys = ['methods', 'actions', 'variables', 'requirements', 'scheme', 'port', 'sslPort', 'hooks', 'hosts'];
+        $keys = [
+            'methods',
+            'actions',
+            'variables',
+            'requirements',
+            'scheme',
+            'port',
+            'sslPort',
+            'hooks',
+            'hosts',
+        ];
 
         foreach ($groups as $groupData) {
             foreach ($keys as $i => $key) {
@@ -209,6 +217,10 @@ class Route implements JsonSerializable
                     unset($groupData[$key]);
                 }
             }
+
+            $new->layoutPaths(
+                ...($groupData['layoutPaths'] ?? [])
+            );
 
             if (isset($groupData['extra'])) {
                 $new->extraValues($groupData['extra']);
