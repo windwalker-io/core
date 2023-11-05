@@ -33,7 +33,7 @@ class PageItem implements JsonSerializable
 
     public function toLink(): string
     {
-        return (string) $this->route;
+        return (string) $this->route->full();
     }
 
     public function __toString(): string
