@@ -139,4 +139,15 @@ interface ApplicationInterface extends
      * @return  bool
      */
     public function isMaintenance(): bool;
+
+    /**
+     * Disable the debugger profiler.
+     *
+     * @param  bool  $disabled
+     *
+     * @return  void
+     */
+    public function disableDebugProfiler(bool $disabled = true): void;
+
+    public function isDebugProfilerDisabled(): bool;
 }

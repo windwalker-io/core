@@ -144,6 +144,23 @@ trait ApplicationTrait
     }
 
     /**
+     * Disable the debugger profiler.
+     *
+     * @param  bool  $disabled
+     *
+     * @return  void
+     */
+    public function disableDebugProfiler(bool $disabled = true): void
+    {
+        $this->config->setDeep('app.debug_profiler.disabled', $disabled);
+    }
+
+    public function isDebugProfilerDisabled(): bool
+    {
+        return (bool) $this->config->getDeep('app.debug_profiler.disabled');
+    }
+
+    /**
      * Method to get property Container
      *
      * @return  Container

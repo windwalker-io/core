@@ -134,10 +134,15 @@ class DebuggerSubscriber
             return;
         }
 
-        $this->profiler->mark('BeforeAppDispatch', ['system']);
-
         $container = $event->getContainer();
         $app = $container->get(AppContext::class);
+
+        if ($app->isDebugProfilerDisabled()) {
+            return;
+        }
+
+        $this->profiler->mark('BeforeAppDispatch', ['system']);
+
         $collector = $this->getCollector();
 
         $chronosService = $app->service(ChronosService::class);
@@ -157,12 +162,23 @@ class DebuggerSubscriber
             return;
         }
 
+        $app = $event->getApp();
+
+        if ($app->isDebugProfilerDisabled()) {
+            return;
+        }
+
         $this->profiler->mark('BeforeControllerDispatch');
 
         $this->getQueue()->push(
             function () use ($event) {
                 /** @var AppContext $app */
                 $app = $this->container->get(AppContext::class);
+
+                if ($app->isDebugProfilerDisabled()) {
+                    return;
+                }
+
                 $collector = $this->getCollector();
 
                 $routing['matched'] = $app->getMatchedRoute();
@@ -179,6 +195,10 @@ class DebuggerSubscriber
         AfterControllerDispatchEvent $event
     ): void {
         if ($this->disableCollection) {
+            return;
+        }
+
+        if ($event->getApp()->isDebugProfilerDisabled()) {
             return;
         }
 
@@ -270,6 +290,11 @@ class DebuggerSubscriber
 
         /** @var AppContext $app */
         $app = $this->container->get(AppContext::class);
+
+        if ($app->isDebugProfilerDisabled()) {
+            return;
+        }
+
         $session = $this->container->get(Session::class);
 
         /** @var Collection $collector */
@@ -332,12 +357,14 @@ class DebuggerSubscriber
      */
     protected function collectDatabase(Container $container, Collection $queue, Collection $collector): void
     {
+        $app = $container->get(AppContext::class);
+
         $container->extend(
             DatabaseManager::class,
-            function (DatabaseManager $manager) use ($queue, $collector) {
+            function (DatabaseManager $manager) use ($app, $queue, $collector) {
                 $manager->on(
                     InstanceCreatedEvent::class,
-                    function (InstanceCreatedEvent $event) use ($queue, $collector) {
+                    function (InstanceCreatedEvent $event) use ($app, $queue, $collector) {
                         $name = $event->getInstanceName();
                         $dbCollector = $collector->proxy('db.queries.' . $name);
                         $startTime = null;
@@ -348,8 +375,12 @@ class DebuggerSubscriber
 
                         $db->on(
                             QueryStartEvent::class,
-                            function (QueryStartEvent $event) use (&$startTime, &$memory) {
+                            function (QueryStartEvent $event) use ($app, &$startTime, &$memory) {
                                 if ($this->disableCollection) {
+                                    return;
+                                }
+
+                                if ($app->isDebugProfilerDisabled()) {
                                     return;
                                 }
 
@@ -361,6 +392,7 @@ class DebuggerSubscriber
                         $db->on(
                             QueryEndEvent::class,
                             function (QueryEndEvent $event) use (
+                                $app,
                                 $queue,
                                 &$startTime,
                                 $name,
@@ -369,6 +401,10 @@ class DebuggerSubscriber
                                 $db
                             ) {
                                 if ($this->disableCollection) {
+                                    return;
+                                }
+
+                                if ($app->isDebugProfilerDisabled()) {
                                     return;
                                 }
 
@@ -434,10 +470,14 @@ class DebuggerSubscriber
                 return;
             }
 
-            $this->collectOthers();
-
             /** @var AppContext $app */
             $app = $this->container->get(AppContext::class);
+
+            if ($app->isDebugProfilerDisabled()) {
+                return;
+            }
+
+            $this->collectOthers();
 
             $matched = $app->getMatchedRoute();
 
@@ -479,17 +519,5 @@ class DebuggerSubscriber
     public function getQueue(): Collection
     {
         return $this->queue ??= $this->container->get('debugger.queue');
-    }
-
-    /**
-     * @param  bool  $disabled
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function disable(bool $disabled = true): static
-    {
-        $this->disableCollection = $disabled;
-
-        return $this;
     }
 }
