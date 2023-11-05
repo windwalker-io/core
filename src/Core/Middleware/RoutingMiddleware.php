@@ -43,11 +43,15 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     /**
      * RoutingMiddleware constructor.
      *
-     * @param  AppContext  $app
-     * @param  WsRouter    $router
+     * @param  AppContext     $app
+     * @param  WsRouter       $router
+     * @param  \Closure|null  $fallback
      */
-    public function __construct(protected AppContext $app, protected Router $router)
-    {
+    public function __construct(
+        protected AppContext $app,
+        protected Router $router,
+        protected ?\Closure $fallback = null
+    ) {
         //
     }
 
@@ -81,7 +85,22 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         );
 
         try {
-            $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+            try {
+                $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+            } catch (RouteNotFoundException $e) {
+                if ($this->fallback) {
+                    $matched = $this->app->call(
+                        $this->fallback,
+                        [
+                            'request' => $request,
+                            ServerRequestInterface::class => $request,
+                            'route' => $route
+                        ]
+                    );
+                } else {
+                    throw $e;
+                }
+            }
         } catch (RouteNotFoundException $e) {
             $event = $this->emit(
                 RoutingNotMatchedEvent::class,
