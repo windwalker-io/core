@@ -1,10 +1,4 @@
 <?php
-/**
- * Part of Simple Console project.
- *
- * @copyright  Copyright (C) 2017 Simon Asika.
- * @license    MIT
- */
 
 namespace Asika\SimpleConsole;
 
