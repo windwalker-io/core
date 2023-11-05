@@ -127,6 +127,18 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return StrNormalize::toClassNamespace($ns);
     }
 
+    protected function getCustomNamespace(IOInterface $io, string $nsSuffix, ?string $suffix = null): string
+    {
+        $this->resolvePackage($io);
+
+        [$dest] = $this->getNameParts($io, $suffix);
+        $ns = Str::ensureRight($io->getOption('ns') ?: $this->getDefaultNamespace(), '\\');
+
+        $ns .= $nsSuffix . '\\' . $dest;
+
+        return StrNormalize::toClassNamespace($ns);
+    }
+
     protected function getDestPath(IOInterface $io, ?string $suffix = null): string
     {
         $this->resolvePackage($io);
@@ -138,9 +150,28 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return Path::normalize($this->app->path($dir . '/' . $dest));
     }
 
+    protected function getCustomDestPath(IOInterface $io, string $subFolder, ?string $suffix = null): string
+    {
+        $this->resolvePackage($io);
+
+        [$dest] = $this->getNameParts($io, $suffix);
+
+        $dest = $subFolder . '/' . $dest;
+
+        $dir = $io->getOption('dir') ?: $this->getDefaultDir();
+
+        return Path::normalize($this->app->path($dir . '/' . $dest));
+    }
+
     protected function getNameParts(IOInterface $io, ?string $suffix = null): array
     {
         $name = $io->getArgument('name');
+
+        return static::splitNameParts($name, $suffix);
+    }
+
+    public static function splitNameParts(string $name, ?string $suffix = null): array
+    {
         $names = preg_split('/\/|\\\\/', $name);
         $name = $names[array_key_last($names)];
 
