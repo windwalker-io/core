@@ -19,6 +19,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleEvent;
 use Windwalker\Core\Schedule\ScheduleService;
@@ -97,7 +98,10 @@ class ScheduleRunCommand implements CommandInterface
     {
         $schedule = $this->scheduleService->getSchedule();
 
+        Logger::info('schedule', 'Run schedule');
+
         foreach ($this->getAvailableEvents($schedule, $io) as $event) {
+            Logger::info('schedule', '  [Event] ' . $event->getName());
             $this->runEvent($event);
         }
 
