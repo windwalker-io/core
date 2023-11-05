@@ -31,6 +31,7 @@ use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventEmitter;
 use Windwalker\Event\EventListenableInterface;
 
 /**
@@ -207,11 +208,7 @@ trait ApplicationTrait
 
     protected function prepareBoot(): void
     {
-        $this->dispatcherRegistry ??= new EventDispatcherRegistry($this);
-
-        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
-
-        $this->container->share(EventDispatcherRegistry::class, $this->dispatcherRegistry);
+        $this->dispatcher = new EventEmitter();
     }
 
     protected function registerListeners(Container $container): void

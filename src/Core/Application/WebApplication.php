@@ -41,6 +41,7 @@ use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Http\Event\RequestEvent;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Output\Output;
@@ -451,6 +452,8 @@ class WebApplication implements WebRootApplicationInterface
      * @param  bool               $instant
      *
      * @return  ResponseInterface
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     public function redirect(string|Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
     {
