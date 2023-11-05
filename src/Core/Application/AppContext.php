@@ -102,7 +102,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
             $this->setController($controller);
         }
 
-        return $this->inject(ControllerDispatcher::class)
+        return $this->retrieve(ControllerDispatcher::class)
             ->dispatch($this);
     }
 
@@ -289,7 +289,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     {
         $request ??= $this->getAppRequest()->getServerRequest();
 
-        return $this->inject(AjaxInspector::class)->isAjax($request);
+        return $this->retrieve(AjaxInspector::class)->isAjax($request);
     }
 
     /**

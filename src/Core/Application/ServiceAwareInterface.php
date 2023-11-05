@@ -24,7 +24,7 @@ interface ServiceAwareInterface
      *
      * @return T
      */
-    public function inject(string $id, bool $forceNew = false): mixed;
+    public function retrieve(string $id, bool $forceNew = false): mixed;
 
     /**
      * @template T

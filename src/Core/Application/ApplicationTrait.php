@@ -140,7 +140,7 @@ trait ApplicationTrait
 
     public function isMaintenance(): bool
     {
-        return $this->inject(MaintenanceManager::class)->isDown();
+        return $this->retrieve(MaintenanceManager::class)->isDown();
     }
 
     /**

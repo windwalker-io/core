@@ -35,7 +35,7 @@ trait ServiceAwareTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function inject(string $id, bool $forceNew = false): mixed
+    public function retrieve(string $id, bool $forceNew = false): mixed
     {
         return $this->getContainer()->get($id, $forceNew);
     }
