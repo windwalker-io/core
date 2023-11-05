@@ -20,6 +20,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Command\CommandPackageResolveTrait;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Package\PackageRegistry;
@@ -37,6 +38,7 @@ use Windwalker\Utilities\StrNormalize;
 #[CommandWrapper(description: 'Build entity getters/setters and sync properties with database.')]
 class BuildEntityCommand implements CommandInterface
 {
+    use CommandDatabaseTrait;
     use CommandPackageResolveTrait;
 
     private IOInterface $io;
@@ -47,7 +49,6 @@ class BuildEntityCommand implements CommandInterface
     public function __construct(
         #[Autowire] protected ClassFinder $classFinder,
         protected ConsoleApplication $app,
-        protected DatabaseManager $databaseManager,
     ) {
     }
 
@@ -94,12 +95,7 @@ class BuildEntityCommand implements CommandInterface
             'Do not replace origin file.'
         );
 
-        $command->addOption(
-            'connection',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'This database connection name.'
-        );
+        $this->configureDatabaseOptions($command);
 
         // phpcs:disable
         $command->setHelp(

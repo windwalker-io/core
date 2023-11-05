@@ -17,6 +17,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Seed\SeedService;
 use Windwalker\DI\Attributes\Service;
+use Windwalker\Utilities\Str;
 
 /**
  * The CreateCommand class.
@@ -63,6 +64,8 @@ class SeedCreateCommand extends AbstractSeedCommand
     public function execute(IOInterface $io): int
     {
         $name = $io->getArgument('name');
+
+        $name = Str::removeRight($name, '-seeder');
 
         $this->seedService->copySeedFile(
             $this->getSeederFolder($io),

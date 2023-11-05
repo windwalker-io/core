@@ -19,6 +19,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
@@ -30,6 +31,8 @@ use Windwalker\Environment\Environment;
  */
 abstract class AbstractMigrationCommand implements CommandInterface
 {
+    use CommandDatabaseTrait;
+
     public const AUTO_BACKUP = 1;
 
     public const NO_TIME_LIMIT = 1 << 1;
@@ -40,9 +43,6 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
     #[Inject]
     protected ?ApplicationInterface $app = null;
-
-    #[Inject]
-    protected ?DatabaseManager $databaseManager = null;
 
     /**
      * @inheritDoc
@@ -63,12 +63,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
         //     'The target package migrations.'
         // );
 
-        $command->addOption(
-            'connection',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'The database connection name.'
-        );
+        $this->configureDatabaseOptions($command);
 
         $command->addOption(
             'force',
