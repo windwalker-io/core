@@ -102,7 +102,21 @@ class ScheduleRunCommand implements CommandInterface
 
         foreach ($this->getAvailableEvents($schedule, $io) as $event) {
             Logger::info('schedule', '  [Event] ' . $event->getName());
-            $this->runEvent($event);
+
+            try {
+                $this->runEvent($event);
+            } catch (\Throwable $e) {
+                Logger::error(
+                    'schedule',
+                    sprintf(
+                        "  [Error %s] %s - %s:%s",
+                        $e->getCode(),
+                        $e->getMessage(),
+                        $e->getFile(),
+                        $e->getCode()
+                    )
+                );
+            }
         }
 
         return 0;
