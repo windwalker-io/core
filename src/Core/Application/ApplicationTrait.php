@@ -153,12 +153,12 @@ trait ApplicationTrait
      */
     public function disableDebugProfiler(bool $disabled = true): void
     {
-        $this->config->setDeep('app.debug_profiler.disabled', $disabled);
+        $this->config->setDeep('debugger.profiler_disabled', $disabled);
     }
 
     public function isDebugProfilerDisabled(): bool
     {
-        return (bool) $this->config->getDeep('app.debug_profiler.disabled');
+        return (bool) $this->config->getDeep('debugger.profiler_disabled');
     }
 
     /**
