@@ -46,4 +46,10 @@ interface ProcessRunnerInterface
         ?string $input = null,
         bool|callable|OutputInterface $output = true
     ): Process;
+
+    public function mustRunProcess(
+        string|array|Process $process,
+        mixed $input = null,
+        bool|callable|OutputInterface $output = false
+    ): Process;
 }
