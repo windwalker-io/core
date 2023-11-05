@@ -20,6 +20,7 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\Session\Bridge\BridgeInterface;
 use Windwalker\Session\Bridge\PhpBridge;
@@ -34,6 +35,7 @@ use Windwalker\Session\SessionInterface;
  * @method Session create(?string $name = null, ...$args)
  * @method Session get(?string $name = null, ...$args)
  */
+#[Isolation]
 class SessionManager extends AbstractManager
 {
     public function getConfigPrefix(): string

@@ -13,6 +13,7 @@ namespace Windwalker\Core\Manager;
 
 use Closure;
 use Windwalker\Cache\CachePool;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 
@@ -22,6 +23,7 @@ use Windwalker\DI\Definition\ObjectBuilderDefinition;
  * @method CachePool get(?string $name = null, ...$args)
  * @method CachePool create(?string $name = null, ...$args)
  */
+#[Isolation]
 class CacheManager extends AbstractManager
 {
     public function getConfigPrefix(): string

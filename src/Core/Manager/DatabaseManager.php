@@ -14,6 +14,7 @@ namespace Windwalker\Core\Manager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Platform\MySQLPlatform;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\ORM\ORM;
 
@@ -22,6 +23,7 @@ use Windwalker\ORM\ORM;
  *
  * @method DatabaseAdapter get(?string $name = null, ...$args)
  */
+#[Isolation]
 class DatabaseManager extends AbstractManager
 {
     public function getConfigPrefix(): string

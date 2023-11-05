@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -24,6 +25,7 @@ use Windwalker\Utilities\Arr;
  *
  * @method Mailer get(?string $name = null, ...$args)
  */
+#[Isolation]
 class MailerManager extends AbstractManager
 {
     public function getConfigPrefix(): string

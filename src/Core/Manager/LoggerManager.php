@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Psr\Log\LoggerInterface;
+use Windwalker\DI\Attributes\Isolation;
 
 /**
  * The LoggerManager class.
@@ -19,6 +20,7 @@ use Psr\Log\LoggerInterface;
  * @method LoggerInterface create(?string $name = null, ...$args)
  * @method LoggerInterface get(?string $name = null, ...$args)
  */
+#[Isolation]
 class LoggerManager extends AbstractManager
 {
     public function getConfigPrefix(): string
