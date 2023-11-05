@@ -18,6 +18,7 @@ return [
     'route' => \Windwalker\Core\Generator\SubCommand\RouteSubCommand::class,
     'enum' => \Windwalker\Core\Generator\SubCommand\EnumSubCommand::class,
     'field' => \Windwalker\Core\Generator\SubCommand\FieldSubCommand::class,
+    'policy' => \Windwalker\Core\Generator\SubCommand\PolicySubCommand::class,
     'middleware' => \Windwalker\Core\Generator\SubCommand\MiddlewareSubCommand::class,
     'command' => \Windwalker\Core\Generator\SubCommand\CommandSubCommand::class,
 ];
