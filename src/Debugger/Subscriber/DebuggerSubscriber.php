@@ -97,6 +97,10 @@ class DebuggerSubscriber
             return;
         }
 
+        if ($this->disableCollection) {
+            return;
+        }
+
         $profilerFactory = $this->container->get(ProfilerFactory::class);
         $this->profiler = $profilerFactory->get('main');
 
@@ -345,6 +349,10 @@ class DebuggerSubscriber
                         $db->on(
                             QueryStartEvent::class,
                             function (QueryStartEvent $event) use (&$startTime, &$memory) {
+                                if ($this->disableCollection) {
+                                    return;
+                                }
+
                                 $startTime = microtime(true);
                                 $memory = memory_get_usage(false);
                             }
@@ -360,6 +368,10 @@ class DebuggerSubscriber
                                 &$memory,
                                 $db
                             ) {
+                                if ($this->disableCollection) {
+                                    return;
+                                }
+
                                 if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
                                     return;
                                 }
@@ -467,5 +479,17 @@ class DebuggerSubscriber
     public function getQueue(): Collection
     {
         return $this->queue ??= $this->container->get('debugger.queue');
+    }
+
+    /**
+     * @param  bool  $disabled
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function disable(bool $disabled = true): static
+    {
+        $this->disableCollection = $disabled;
+
+        return $this;
     }
 }
