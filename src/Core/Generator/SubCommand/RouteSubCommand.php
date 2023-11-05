@@ -27,7 +27,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
 {
     protected bool $requireDest = false;
 
-    protected string $defaultDir = '@routes';
+    protected string $defaultDir = '../routes/';
 
     /**
      * configure
@@ -72,14 +72,5 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
             );
 
         return 0;
-    }
-
-    protected function getDestPath(IOInterface $io, ?string $suffix = null): string
-    {
-        [$dest] = $this->getNameParts($io, $suffix);
-        $dest = StrNormalize::toKebabCase($dest);
-        $dir = $io->getOption('dir');
-
-        return Path::normalize($this->app->path($dir . '/' . $dest));
     }
 }
