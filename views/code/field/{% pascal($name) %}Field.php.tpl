@@ -20,8 +20,6 @@ use Windwalker\Form\Field\AbstractField;
 class {% pascal($name) %}Field extends AbstractField
 {
     /**
-     * prepareInput
-     *
      * @param  DOMElement  $input
      *
      * @return  DOMElement
@@ -32,8 +30,6 @@ class {% pascal($name) %}Field extends AbstractField
     }
 
     /**
-     * getAccessors
-     *
      * @return  array
      */
     protected function getAccessors(): array

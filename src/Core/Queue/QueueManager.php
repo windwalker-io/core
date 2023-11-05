@@ -15,6 +15,7 @@ use Closure;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Core\Manager\AbstractManager;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
@@ -24,6 +25,7 @@ use Windwalker\Queue\QueueMessage;
  *
  * @method Queue get(?string $name = null, ...$args)
  */
+#[Isolation]
 class QueueManager extends AbstractManager
 {
     public function getConfigPrefix(): string

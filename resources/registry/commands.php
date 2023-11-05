@@ -37,6 +37,8 @@ return [
 
     'schedule:run' => \Windwalker\Core\Schedule\Command\ScheduleRunCommand::class,
     'schedule:show' => \Windwalker\Core\Schedule\Command\ScheduleShowCommand::class,
+    'schedule:install' => \Windwalker\Core\Schedule\Command\ScheduleInstallCommand::class,
+    'schedule:uninstall' => \Windwalker\Core\Schedule\Command\ScheduleUninstallCommand::class,
 
     'asset:version' => \Windwalker\Core\Asset\Command\AssetVersionCommand::class,
 

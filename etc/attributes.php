@@ -19,19 +19,11 @@ use Windwalker\Core\Attributes\Module;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Attributes\AttributeType;
-use Windwalker\DI\Attributes\Autowire;
-use Windwalker\DI\Attributes\Decorator;
-use Windwalker\DI\Attributes\Inject;
-use Windwalker\DI\Attributes\Service;
-use Windwalker\DI\Attributes\Setup;
+use Windwalker\DI\Container;
 
 return [
     // Declaration
-    Decorator::class => AttributeType::CLASSES,
-    Autowire::class => AttributeType::CLASSES | AttributeType::CALLABLE | AttributeType::PARAMETERS,
-    Inject::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
-    Setup::class => AttributeType::METHODS,
-    Service::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
+    ...Container::getDefaultAttributes(),
     Ref::class => AttributeType::PARAMETERS,
 
     // Decorators

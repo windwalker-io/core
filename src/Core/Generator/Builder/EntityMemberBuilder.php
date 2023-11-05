@@ -268,7 +268,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     ): array {
         $added = [];
         $factory = $this->createNodeFactory();
-        $ref = $this->metadata->getReflector();
         $type = $prop->type;
         $tbManager = $this->getTableManager();
 

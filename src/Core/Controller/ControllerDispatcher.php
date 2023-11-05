@@ -12,10 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Controller;
 
 use Closure;
-use JsonException;
 use LogicException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\Context\AppContextInterface;
@@ -24,10 +21,7 @@ use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Http\AppRequest;
-use Windwalker\Core\Router\RouteUri;
 use Windwalker\DI\Container;
-use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -77,8 +71,10 @@ class ControllerDispatcher
         if (is_array($controller)) {
             $controller = $this->prepareArrayCallable($controller, $app);
         } else {
-            $controller = fn(AppContextInterface $app): mixed
-                => $this->container->call($controller, $app->getUrlVars());
+            $controller = fn(AppContextInterface $app): mixed => $this->container->call(
+                $controller,
+                $app->getUrlVars()
+            );
         }
 
         $response = $controller($app);

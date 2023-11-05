@@ -19,15 +19,15 @@ use Windwalker\Utilities\Str;
  * The GenViewSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker form field.'
+    description: 'Generate Windwalker ACL policy.'
 )]
-class FieldSubCommand extends AbstractGeneratorSubCommand
+class PolicySubCommand extends AbstractGeneratorSubCommand
 {
     protected bool $requireDest = false;
 
-    protected string $defaultNamespace = 'Field';
+    protected string $defaultNamespace = 'Policy';
 
-    protected string $defaultDir = 'Field';
+    protected string $defaultDir = 'Policy';
 
     /**
      * Executes the current command.
@@ -42,17 +42,17 @@ class FieldSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No field name');
+            $io->errorStyle()->error('No policy name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('field/**/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('policy/**/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'className' => Str::ensureRight($name, 'Field'),
-                    'name' => Str::removeRight($name, 'Field'),
+                    'className' => Str::ensureRight($name, 'Policy'),
+                    'name' => Str::removeRight($name, 'Policy'),
                     'ns' => $this->getNamespace($io),
                 ],
                 $force

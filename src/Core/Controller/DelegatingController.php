@@ -109,26 +109,6 @@ class DelegatingController implements ControllerInterface
     }
 
     /**
-     * @return string|null
-     */
-    public function getModule(): ?string
-    {
-        return $this->module;
-    }
-
-    /**
-     * @param  string|null  $module
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setModule(?string $module): static
-    {
-        $this->module = $module;
-
-        return $this;
-    }
-
-    /**
      * @param  Throwable  $e
      *
      * @return  void

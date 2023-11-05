@@ -111,4 +111,18 @@ class RouteCreator implements RouteCreatorInterface
     {
         return $this->any($name, $pattern, $options)->methods('DELETE');
     }
+
+    public function controller(string $handler): static
+    {
+        $this->options['extra']['default_controller'] = $handler;
+
+        return $this;
+    }
+
+    public function view(string $view): static
+    {
+        $this->options['extra']['default_view'] = $view;
+
+        return $this;
+    }
 }

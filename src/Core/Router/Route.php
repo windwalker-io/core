@@ -269,6 +269,14 @@ class Route implements JsonSerializable
 
         $new->setOptions($options);
 
+        if ($options['extra']['default_controller'] ?? null) {
+            $new->controller($options['extra']['default_controller']);
+        }
+
+        if ($options['extra']['default_view'] ?? null) {
+            $new->view($options['extra']['default_view']);
+        }
+
         return $new;
     }
 

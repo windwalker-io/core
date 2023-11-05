@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Console\Process;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\IOInterface;
@@ -111,6 +112,20 @@ trait ProcessRunnerTrait
         }
 
         $process->run($output);
+
+        return $process;
+    }
+
+    public function mustRunProcess(
+        string|array|Process $process,
+        mixed $input = null,
+        bool|callable|OutputInterface $output = false
+    ): Process {
+        $process = $this->runProcess($process, $input, $output);
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
 
         return $process;
     }

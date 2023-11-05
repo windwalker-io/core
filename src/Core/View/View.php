@@ -233,6 +233,13 @@ class View implements EventAwareInterface
 
             $response = $this->getResponse();
             $response->getBody()->write($content);
+        } elseif (is_string($response)) {
+            $content = $response;
+
+            $this->prepareHtmlFrame($vm);
+
+            $response = $this->getResponse();
+            $response->getBody()->write($content);
         } else {
             $data['vm'] = $vm;
 
@@ -255,7 +262,7 @@ class View implements EventAwareInterface
         return $event->getResponse();
     }
 
-    protected function handleVMResponse(mixed $data): array|ResponseInterface
+    protected function handleVMResponse(mixed $data): array|string|ResponseInterface
     {
         if ($data instanceof WrapperInterface) {
             $data = $data($this);
@@ -273,7 +280,7 @@ class View implements EventAwareInterface
             return new RedirectResponse($data);
         }
 
-        if (!is_array($data)) {
+        if (!is_array($data) && !is_string($data)) {
             throw new UnexpectedValueException(
                 sprintf(
                     'ViewModel return value not support for: %s',

@@ -31,6 +31,7 @@ use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
+use Windwalker\Event\EventEmitter;
 use Windwalker\Event\EventListenableInterface;
 
 /**
@@ -144,6 +145,23 @@ trait ApplicationTrait
     }
 
     /**
+     * Disable the debugger profiler.
+     *
+     * @param  bool  $disabled
+     *
+     * @return  void
+     */
+    public function disableDebugProfiler(bool $disabled = true): void
+    {
+        $this->config->setDeep('debugger.profiler_disabled', $disabled);
+    }
+
+    public function isDebugProfilerDisabled(): bool
+    {
+        return (bool) $this->config->getDeep('debugger.profiler_disabled');
+    }
+
+    /**
      * Method to get property Container
      *
      * @return  Container
@@ -190,11 +208,7 @@ trait ApplicationTrait
 
     protected function prepareBoot(): void
     {
-        $this->dispatcherRegistry ??= new EventDispatcherRegistry($this);
-
-        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
-
-        $this->container->share(EventDispatcherRegistry::class, $this->dispatcherRegistry);
+        $this->dispatcher = new EventEmitter();
     }
 
     protected function registerListeners(Container $container): void
