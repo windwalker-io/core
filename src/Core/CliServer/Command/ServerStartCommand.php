@@ -23,6 +23,7 @@ use Windwalker\Core\CliServer\CliServerFactory;
 use Windwalker\Core\CliServer\Contracts\ServerProcessManageInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\DI\Attributes\Autowire;
+use Windwalker\Environment\Environment;
 use Windwalker\Utilities\TypeCast;
 
 /**
@@ -248,6 +249,10 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
 
     public function getSubscribedSignals(): array
     {
+        if (Environment::isWindows()) {
+            return [];
+        }
+
         return [SIGINT, SIGTERM];
     }
 
