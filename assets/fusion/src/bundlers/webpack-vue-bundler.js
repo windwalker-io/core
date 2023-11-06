@@ -32,6 +32,7 @@ export async function webpackVueBundle(file, dest, override = null) {
   config.output.path = path.dirname(path.resolve(dest));
   config.output.filename = path.basename(dest);
   config.output.uniqueName = file;
+  config.output.clean = true;
   config.output.libraryTarget = 'umd';
   config.resolve.modules = ['node_modules'];
 
