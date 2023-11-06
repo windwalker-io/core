@@ -2,8 +2,16 @@
 
 // Custom
 
+$dark-primary: #252F3FFF;
+$dark-primary-rgb: rgb(37, 47, 63);
+
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
+
+$theme-colors: map-merge($theme-colors, (
+  "dark-primary": $dark-primary
+));
+
 @import "bootstrap/scss/mixins";
 @import "bootstrap/scss/maps";

@@ -1,6 +1,6 @@
 <template>
   <div class="c-main-wrapper">
-    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark"
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark-primary"
       style="height: 60px">
       <div class="container-fluid">
         <!-- Logo -->
