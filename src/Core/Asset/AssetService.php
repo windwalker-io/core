@@ -1059,7 +1059,7 @@ class AssetService implements EventAwareInterface
                 }
             }
 
-            return $this->path . '/' . $uri;
+            return $this->addAssetBase($uri, 'path');
         }
 
         return UriNormalizer::ensureDir($this->path);
@@ -1091,7 +1091,7 @@ class AssetService implements EventAwareInterface
                 }
             }
 
-            return $this->root . '/' . $uri;
+            return $this->addAssetBase($uri, 'root');
         }
 
         return UriNormalizer::ensureDir($this->root);
