@@ -39,6 +39,11 @@ class DelegatingController implements ControllerInterface
         //
     }
 
+    public function __invoke(string $task, array $args = []): mixed
+    {
+        return $this->execute($task, $args);
+    }
+
     /**
      * execute
      *
@@ -99,5 +104,10 @@ class DelegatingController implements ControllerInterface
         $this->viewMap = $viewMap;
 
         return $this;
+    }
+
+    public function __call(string $name, array $args): mixed
+    {
+        return $this->execute($name, $args);
     }
 }
