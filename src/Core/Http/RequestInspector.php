@@ -7,15 +7,15 @@ namespace Windwalker\Core\Http;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * The AjaxInspector class.
+ * The RequestInspector class.
  */
-class AjaxInspector
+class RequestInspector
 {
-    protected ?\Closure $detector = null;
+    protected ?\Closure $apiCallDetector = null;
 
-    public function isAjax(ServerRequestInterface $request): bool
+    public function isApiCall(ServerRequestInterface $request): bool
     {
-        return (bool) $this->getDetector()($request);
+        return (bool) $this->getApiCallDetector()($request);
     }
 
     protected function getDefaultDetector(): \Closure
@@ -45,20 +45,28 @@ class AjaxInspector
         };
     }
 
-    public function getDetector(): ?\Closure
+    public function getApiCallDetector(): ?\Closure
     {
-        return $this->detector ??= $this->getDefaultDetector();
+        return $this->apiCallDetector ??= $this->getDefaultDetector();
     }
 
     /**
-     * @param  \Closure|null  $detector
+     * @param  \Closure|null  $apiCallDetector
      *
      * @return  static  Return self to support chaining.
      */
-    public function setDetector(?\Closure $detector): static
+    public function setApiCallDetector(?\Closure $apiCallDetector): static
     {
-        $this->detector = $detector;
+        $this->apiCallDetector = $apiCallDetector;
 
         return $this;
+    }
+
+    public function isAccept(ServerRequestInterface $request, string $type): bool
+    {
+        return str_contains(
+            $request->getHeaderLine('accept'),
+            $type
+        );
     }
 }

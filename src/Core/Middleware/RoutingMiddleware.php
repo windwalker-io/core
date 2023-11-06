@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -20,7 +21,9 @@ use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\DICreateTrait;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Event\EventAwareInterface;
+use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\WebSocket\Router\WsRouter;
 
 /**
@@ -28,6 +31,7 @@ use Windwalker\WebSocket\Router\WsRouter;
  */
 class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
 {
+    use OptionAccessTrait;
     use CoreEventAwareTrait;
     use DICreateTrait;
 
@@ -39,13 +43,20 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * @param  AppContext     $app
      * @param  WsRouter       $router
      * @param  \Closure|null  $fallback
+     * @param  array          $options
      */
     public function __construct(
         protected AppContext $app,
         protected Router $router,
-        protected ?\Closure $fallback = null
+        protected ?\Closure $fallback = null,
+        array $options = []
     ) {
-        //
+        $this->prepareOptions(
+            [
+                'method_override' => true,
+            ],
+            $options
+        );
     }
 
     /**
@@ -55,10 +66,13 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
      *
-     * @param  ServerRequestInterface  $request
+     * @param  ServerRequestInterface   $request
      * @param  RequestHandlerInterface  $handler
      *
      * @return ResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -118,7 +132,13 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ]
         );
 
-        $controller = $this->findController($this->app->getRequestMethod(), $matched = $event->getMatched());
+        $override = (bool) $this->getOption('method_override');
+
+        $method = $override
+            ? $this->app->getRequestMethod()
+            : $this->app->getRequestRawMethod();
+
+        $controller = $this->findController($method, $matched = $event->getMatched());
 
         $this->app->getContainer()->modify(
             AppContext::class,

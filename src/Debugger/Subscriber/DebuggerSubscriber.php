@@ -238,7 +238,7 @@ class DebuggerSubscriber
                     'version' => $req->getProtocolVersion(),
                     'target' => $req->getRequestTarget(),
                     'env' => $_ENV ?? [],
-                    'ajax' => $app->isAjax() || $appReq->isAcceptJson()
+                    'ajax' => $app->isApiCall() || $appReq->isAcceptJson()
                 ];
                 $http['systemUri'] = $appReq->getSystemUri();
                 $http['overrideMethod'] = $appReq->getOverrideMethod();

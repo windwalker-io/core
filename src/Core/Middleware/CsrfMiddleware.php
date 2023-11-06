@@ -50,12 +50,18 @@ class CsrfMiddleware implements MiddlewareInterface
                 'delete',
             ];
 
-        $method = strtolower($this->app->getAppRequest()->getOverrideMethod());
+        $method = strtolower($this->app->getRequestMethod());
 
         if (in_array($method, $methods, true)) {
+            // If is api call, we only allow CSRF at header or query values
+            // Otherwise you can set input_method as false to only allow header.
+            $inputMethod = $this->app->isApiCall()
+                ? 'GET'
+                : $this->getOption('input_method');
+
             $this->csrfService->validate(
                 $this->app->getAppRequest(),
-                $this->getOption('input_method'),
+                $inputMethod,
                 $this->getOption('invalid_message'),
             );
         }

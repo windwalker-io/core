@@ -42,7 +42,7 @@ class CsrfService
         //
     }
 
-    public function validate(AppRequest $request, ?string $method = null, ?string $message = null): void
+    public function validate(AppRequest $request, string|false|null $method = null, ?string $message = null): void
     {
         if (!$this->checkToken($request, $method)) {
             throw new InvalidTokenException($message ?? $this->getInvalidMessage(), 403);
@@ -91,11 +91,19 @@ class CsrfService
         return Base64Url::encode(random_bytes(32));
     }
 
-    public function checkToken(AppRequest $request, ?string $method = null): bool
+    public function checkToken(AppRequest $request, string|false|null $method = null): bool
     {
-        $method ??= 'REQUEST';
-
         $token = $this->getToken();
+
+        if ($request->getHeader('X-CSRF-Token') === $token) {
+            return true;
+        }
+
+        if ($method === false) {
+            return false;
+        }
+
+        $method ??= 'REQUEST';
 
         $tokenValue = $request->inputWithMethod($method, $this->getInputName());
 
@@ -105,11 +113,7 @@ class CsrfService
 
         $tokenValue = $request->inputWithMethod($method, $token);
 
-        if ($tokenValue !== null) {
-            return true;
-        }
-
-        return $request->getHeader('X-CSRF-Token') === $token;
+        return $tokenValue !== null;
     }
 
     /**

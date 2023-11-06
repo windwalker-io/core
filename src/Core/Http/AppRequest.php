@@ -34,11 +34,13 @@ class AppRequest implements AppRequestInterface, JsonSerializable
      * @param  ServerRequestInterface  $request
      * @param  SystemUri               $systemUri
      * @param  ProxyResolver           $proxyResolver
+     * @param  RequestInspector        $requestInspector
      */
     public function __construct(
         protected ServerRequestInterface $request,
         protected SystemUri $systemUri,
-        protected ProxyResolver $proxyResolver
+        protected ProxyResolver $proxyResolver,
+        protected RequestInspector $requestInspector
     ) {
         //
     }
@@ -104,7 +106,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
      */
     public function file(...$fields): mixed
     {
-        $files = $this->getRequest()->getUploadedFiles();
+        $files = $this->getServerRequest()->getUploadedFiles();
 
         if ($fields === []) {
             return $files;
@@ -166,7 +168,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
 
     public function getBodyValues(): array
     {
-        $values = $this->getRequest()->getParsedBody();
+        $values = $this->getServerRequest()->getParsedBody();
 
         $appRequest = $this;
         $type = RequestGetValueEvent::TYPE_BODY;
@@ -181,14 +183,16 @@ class AppRequest implements AppRequestInterface, JsonSerializable
 
     public function isAccept(string $type): bool
     {
-        return str_contains(
-            $this->getRequest()->getHeaderLine('accept'),
-            $type
-        );
+        return $this->requestInspector->isAccept($this->getServerRequest(), $type);
     }
 
     public function isAcceptJson(): bool
     {
         return $this->isAccept('application/json');
+    }
+
+    public function isApiCall(): bool
+    {
+        return $this->requestInspector->isApiCall($this->getServerRequest());
     }
 }

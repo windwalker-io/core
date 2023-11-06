@@ -15,7 +15,7 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
-use Windwalker\Core\Http\AjaxInspector;
+use Windwalker\Core\Http\RequestInspector;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -132,6 +132,10 @@ class AppContext implements WebApplicationInterface, AppContextInterface
 
     public function getRequestMethod(): string
     {
+        if ($this->isApiCall()) {
+            return $this->getRequestRawMethod();
+        }
+
         return $this->appRequest->getOverrideMethod();
     }
 
@@ -278,11 +282,9 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         return (string) $matched->getExtraValue('namespace');
     }
 
-    public function isAjax(?ServerRequestInterface $request = null): bool
+    public function isApiCall(): bool
     {
-        $request ??= $this->getAppRequest()->getServerRequest();
-
-        return $this->retrieve(AjaxInspector::class)->isAjax($request);
+        return $this->getAppRequest()->isApiCall();
     }
 
     /**

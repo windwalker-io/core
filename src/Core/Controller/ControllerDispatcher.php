@@ -8,6 +8,7 @@ use Closure;
 use LogicException;
 use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
+use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
@@ -57,7 +58,7 @@ class ControllerDispatcher
             if (str_contains($controller, '::')) {
                 $controller = explode('::', $controller, 2);
             } elseif (class_exists($controller)) {
-                $controller = [$controller, $this->getDefaultTask($app->getAppRequest())];
+                $controller = [$controller, $this->getDefaultTask($app)];
             }
         }
 
@@ -80,9 +81,9 @@ class ControllerDispatcher
         return $event->getResponse();
     }
 
-    protected function getDefaultTask(AppRequest $request): string
+    protected function getDefaultTask(AppContext $app): string
     {
-        $task = strtolower($request->getOverrideMethod());
+        $task = strtolower($app->getRequestMethod());
 
         $map = [
             'get' => 'index',

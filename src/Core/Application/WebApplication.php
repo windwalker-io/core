@@ -385,7 +385,7 @@ class WebApplication implements WebRootApplicationInterface
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
         } catch (ValidateFailException | InvalidTokenException $e) {
-            if ($app->isDebug() || $app->isAjax()) {
+            if ($app->isDebug() || $app->isApiCall()) {
                 throw $e;
             }
 
@@ -402,7 +402,7 @@ class WebApplication implements WebRootApplicationInterface
                 $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
                 || $app->getAppRequest()->isAcceptJson()
-                || $app->isAjax()
+                || $app->isApiCall()
             ) {
                 throw $e;
             }
