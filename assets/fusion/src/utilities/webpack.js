@@ -5,7 +5,6 @@
  * @license    __LICENSE__
  */
 
-import { EsbuildPlugin } from 'esbuild-loader';
 import { babelBasicOptions } from './babel.js';
 import webpack from 'webpack';
 

@@ -6,7 +6,7 @@ import { loadJson } from './utils.mjs';
 import path from 'path';
 import fs from 'fs';
 
-export async function installVendors(npmVendors, composerVendors = [], to = 'www/assets/vendor') {
+export async function installVendors(npmVendors = [], composerVendors = [], to = 'www/assets/vendor') {
   const root = to;
   let vendors = npmVendors;
   const action = process.env.INSTALL_VENDOR === 'hard' ? 'Copy' : 'Link';
@@ -25,7 +25,13 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
     deleteExists(dir);
   });
 
-  vendors = findVendors(composerVendors).concat(vendors);
+  const composerJsons = getInstalledComposerVendors(composerVendors)
+    .map((cv) => `vendor/${cv}/composer.json`)
+    .map((file) => loadJson(file))
+    .filter((composerJson) => composerJson?.extra?.windwalker != null);
+
+  // Install npm vendors
+  vendors = findNpmVendors(composerJsons).concat(vendors);
   vendors = [...new Set(vendors)];
 
   vendors.forEach((vendor) => {
@@ -35,13 +41,27 @@ export async function installVendors(npmVendors, composerVendors = [], to = 'www
     }
   });
 
-  composerVendors.forEach((vendor) => {
-    if (fs.existsSync(`vendor/${vendor}/assets`)) {
-      console.log(`[${action} Composer] vendor/${vendor}/assets => ${root}/${vendor}/`);
-      doInstall(`vendor/${vendor}/assets/`, `${root}/${vendor}/`);
+  // Install composer packages assets
+  composerJsons.forEach((composerJson) => {
+    const vendorName = composerJson.name;
+
+    let assets = composerJson?.extra?.windwalker?.assets?.link;
+
+    if (!assets) {
+      return;
+    }
+
+    if (!assets.endsWith('/')) {
+      assets += '/';
+    }
+
+    if (fs.existsSync(`vendor/${vendorName}/${assets}`)) {
+      console.log(`[${action} Composer] vendor/${vendorName}/${assets} => ${root}/${vendorName}/`);
+      doInstall(`vendor/${vendorName}/${assets}`, `${root}/${vendorName}/`);
     }
   });
 
+  // Install local saved vendors
   console.log(`[${action} Local] resources/assets/vendor/**/* => ${root}/`);
   doInstall('resources/assets/vendor/*', `${root}/`);
 }
@@ -54,9 +74,8 @@ function doInstall(source, dest) {
   }
 }
 
-function findVendors(composerVendors = []) {
+function findNpmVendors(composerJsons = []) {
   const pkg = path.resolve(process.cwd(), 'package.json');
-
   const pkgJson = loadJson(pkg);
 
   let vendors = Object.keys(pkgJson.devDependencies || {})
@@ -67,14 +86,29 @@ function findVendors(composerVendors = []) {
     .map(pkgJson => pkgJson?.windwalker.vendors || [])
     .flat();
 
-  composerVendors.forEach((cv) => {
-    const composerManifest = `vendor/${cv}/composer.json`;
-    const composerJson = loadJson(composerManifest);
+  const vendorsFromComposer = composerJsons
+    .map((composerJson) => composerJson?.extra?.windwalker?.assets?.vendors || {})
+    .map((vendors) => Object.keys(vendors))
+    .flat();
 
-    vendors = vendors.concat(composerJson?.windwalker?.asset_vendors || []);
-  });
+  return [ ...new Set(vendors.concat(vendorsFromComposer)) ];
+}
 
-  return [ ...new Set(vendors) ];
+function injectNpmPackages(composerVendors = []) {
+
+}
+
+function getInstalledComposerVendors(composerVendors = []) {
+  const composerFile = path.resolve(process.cwd(), 'composer.json');
+  const composerJson = loadJson(composerFile);
+  
+  return [
+    ...new Set(
+      Object.keys(composerJson['require'] || {})
+        .concat(Object.keys(composerJson['require-dev'] || {}))
+        .concat(composerVendors)
+    )
+  ];
 }
 
 function deleteExists(dir) {

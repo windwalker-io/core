@@ -33,7 +33,8 @@
         "windwalker/filesystem": "^4.0",
         "windwalker/filter": "^4.0",
         "windwalker/http": "^4.0",
-        "windwalker/test": "^4.0"
+        "windwalker/test": "^4.0",
+        "composer/semver": "^3.4"
     },
     "require-dev": {
         "nunomaduro/collision": "^7.8"
