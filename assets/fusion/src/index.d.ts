@@ -67,7 +67,7 @@ declare namespace Fusion {
 
   export interface WebpackOptions extends JsOptions {
     webpack?: WebpackOptionsNormalized;
-    override?: WebpackOptionsNormalized | Function;
+    override?: WebpackOptionsNormalized | ((config: WebpackOptionsNormalized) => any);
     merge?: WebpackOptionsNormalized;
   }
 
@@ -112,8 +112,8 @@ declare namespace Fusion {
   export const VueProcessor: Processor<VueOptions>;
 
   // Bundlers
-  export const webpackBundle: (file: string, dest: string, options: (config: WebpackOptions) => any) => Promise<any>;
-  export const webpackVueBundle: (file: string, dest: string, options: (config: WebpackOptions) => any) => Promise<any>;
+  export const webpackBundle: (file: string, dest: string, override: (config: WebpackOptionsNormalized) => any) => Promise<any>;
+  export const webpackVueBundle: (file: string, dest: string, override: (config: WebpackOptionsNormalized) => any) => Promise<any>;
 
   // Gulp
   export const parallel: typeof gulpParallel;

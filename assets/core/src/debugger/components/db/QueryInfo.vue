@@ -35,7 +35,7 @@
 
       <div class="">
         <pre style="word-break: break-all; white-space: pre-wrap;"
-          class="bg-light p-4"
+          class="border p-4"
           v-html="formatQuery(item.debug_query)"
           ></pre>
       </div>
@@ -143,8 +143,8 @@
 
 <script>
 import { format } from 'sql-formatter';
-import { stateColor } from '../../services/utilities.js';
-import { goToLast } from '../../services/nav.js';
+import { stateColor } from '../../services/utilities';
+import { goToLast } from '../../services/nav';
 
 export default {
   name: 'query-info',

@@ -90,7 +90,7 @@
     <section class="l-section l-section--routes mt-5">
       <h3 class="mb-3">Routes</h3>
 
-      <table class="table table-bordered">
+      <table class="table table-dark table-bordered">
         <thead>
           <tr>
             <th>
@@ -113,7 +113,7 @@
 
         <tbody>
         <tr v-for="(route, name) of data.routing.routes"
-          :class="{ 'table-success': data.routing.matched?.name === route.name }">
+          :class="{ 'table-primary': data.routing.matched?.name === route.name }">
           <td>
             <code>{{ route.name }}</code>
           </td>

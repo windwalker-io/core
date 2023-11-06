@@ -30,7 +30,7 @@
       <tbody>
       <tr v-for="item of items">
         <td>
-          <a href="#" @click.prevent="selectId(item.id)" class="link-secondary">
+          <a href="#" @click.prevent="selectId(item.id)" class="">
             {{ item.id }}
           </a>
         </td>
@@ -67,43 +67,34 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import * as dayjs from 'dayjs';
-import { onMounted, reactive, toRefs } from 'vue';
-import router from '@/routes.js';
-import $http from '@/services/http.js';
-import { currentId } from '@/services/store.js';
+import { onMounted, reactive, ref, toRefs } from 'vue';
+import router from '../routes.js';
+import $http from '../services/http.js';
+import { currentId } from '../services/store.js';
 
-export default {
-  name: 'Dashboard',
-  setup() {
-    const state = reactive({
-      items: [],
-    });
+const state = reactive({
+  items: [],
+});
 
-    onMounted(async () => {
-      const res = await $http.get('ajax/history');
+const items = ref([]);
 
-      state.items = res.data.data;
-    });
+onMounted(async () => {
+  const res = await $http.get('ajax/history');
 
-    function selectId(id) {
-        currentId.value = id;
+  items.value = res.data.data;
+});
 
-        router.push('/system/' + id);
-    }
+function selectId(id) {
+  currentId.value = id;
 
-    function dateFormat(ts) {
-      return dayjs.unix(ts).format('YYYY-MM-DD HH:mm:ssZ');
-    }
+  router.push('/system/' + id);
+}
 
-    return {
-      ...toRefs(state),
-      selectId,
-      dateFormat,
-    };
-  }
-};
+function dateFormat(ts) {
+  return dayjs.unix(ts).format('YYYY-MM-DD HH:mm:ssZ');
+}
 </script>
 
 <style scoped>

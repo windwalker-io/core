@@ -1,9 +1,4 @@
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 import { src, symlink, copy } from '@windwalker-io/fusion';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';

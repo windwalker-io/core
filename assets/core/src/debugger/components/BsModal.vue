@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import Modal from 'bootstrap/js/src/modal.js';
+import Modal from 'bootstrap/js/src/modal';
 import { onMounted, reactive, ref, toRefs, watch } from 'vue';
 
 export default {

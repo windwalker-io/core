@@ -22,6 +22,10 @@ export async function webpackBundle(file, dest, override = null) {
 
   const config = await webpackBasicConfig();
 
+  if (dest.endsWith('/')) {
+    dest += path.basename(file);
+  }
+
   config.entry = path.resolve(file);
   config.output.path = path.dirname(path.resolve(dest));
   config.output.filename = path.basename(dest);

@@ -27,7 +27,7 @@ $data = [
 ];
 
 ?><!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <base href="{{ $uri->root() }}" />
     <meta charset="UTF-8">
@@ -45,6 +45,6 @@ $data = [
     <script>
         window.externalPublicPath = '{{ $asset->handleUri('@core/debugger/') }}'
     </script>
-    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/debugger.js')) }}"></script>
+    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/index.js')) }}"></script>
 </body>
 </html>

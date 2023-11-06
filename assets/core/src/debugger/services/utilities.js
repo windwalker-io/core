@@ -1,9 +1,4 @@
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2022 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 export function stateColor(value, avg) {
   if (value > (avg * 2)) {

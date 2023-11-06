@@ -1,9 +1,4 @@
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2022 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 /* import the fontawesome core */
 import { library } from '@fortawesome/fontawesome-svg-core'

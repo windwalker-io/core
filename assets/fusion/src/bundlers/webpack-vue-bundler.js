@@ -24,13 +24,16 @@ export async function webpackVueBundle(file, dest, override = null) {
 
   const config = await webpackVue3Config();
 
+  if (dest.endsWith('/')) {
+    dest += path.basename(file);
+  }
+
   config.entry = path.resolve(file);
   config.output.path = path.dirname(path.resolve(dest));
   config.output.filename = path.basename(dest);
   config.output.uniqueName = file;
   config.output.libraryTarget = 'umd';
   config.resolve.modules = ['node_modules'];
-  config.externals = { vue: 'Vue' };
 
   if (override) {
     override(config);

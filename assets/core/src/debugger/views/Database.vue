@@ -35,12 +35,14 @@
               Count: <span class="badge bg-info">{{ data?.queries[instance]?.length || 0 }}</span>
               -
               Time:
-              <span class="badge" :class="`bg-${stateColor(totalTime(instance), 15 * (data?.queries[instance]?.length || 0))}`">
+              <span class="badge"
+                :class="`bg-${stateColor(totalTime(instance), 15 * (data?.queries[instance]?.length || 0))}`">
             {{ round(totalTime(instance)) }}ms
           </span>
               -
               Memory:
-              <span class="badge" :class="`bg-${stateColor(totalMemory(instance), 0.05 * (data?.queries[instance]?.length || 0))}`">
+              <span class="badge"
+                :class="`bg-${stateColor(totalMemory(instance), 0.05 * (data?.queries[instance]?.length || 0))}`">
             {{ round(totalMemory(instance)) }}MB
           </span>
             </div>
@@ -81,87 +83,62 @@
   </defaultLayout>
 </template>
 
-<script>
+<script setup>
 import { computed, ref } from 'vue';
-import BsModal from '@/components/BsModal.vue';
-import QueryInfo from '@/components/db/QueryInfo.vue';
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import $http from '@/services/http.js';
+import { onBeforeRouteUpdate } from 'vue-router';
+import BsModal from '../components/BsModal.vue';
+import QueryInfo from '../components/db/QueryInfo.vue';
+import DefaultLayout from '../layouts/DefaultLayout.vue';
+import $http from '../services/http.js';
 import { stateColor } from '../services/utilities.js';
 
-export default {
-  name: 'Database',
-  components: { BsModal, QueryInfo, DefaultLayout },
-  async beforeRouteEnter(to, from ,next) {
-    next(async (vm) => {
-      const res = await $http.get('ajax/data?path=db');
-      vm.data = res.data.data;
-    });
-  },
-  async beforeRouteUpdate(to, from ,next) {
-    const res = await $http.get('ajax/data?path=db');
-    this.data = res.data.data;
-  },
-  setup() {
-    const data = ref(null);
+const data = ref(null);
 
-    function totalTime(instance) {
-      return data.value?.queries[instance]?.reduce((sum, query) => {
-        return sum + query.time;
-      }, 0) * 1000;
-    }
+async function updateData() {
+  const res = await $http.get('ajax/data?path=db');
+  data.value = res.data.data;
+}
 
-    function totalMemory(instance) {
-      return data.value?.queries[instance]?.reduce((sum, query) => {
-        return sum + query.memory;
-      }, 0) / 1024 / 1024;
-    }
+function totalTime(instance) {
+  return data.value?.queries[instance]?.reduce((sum, query) => {
+    return sum + query.time;
+  }, 0) * 1000;
+}
 
-    const showBacktraceModal = ref(false);
-    const backtrace = ref([]);
-    const backtraceIndex = ref(0);
+function totalMemory(instance) {
+  return data.value?.queries[instance]?.reduce((sum, query) => {
+    return sum + query.memory;
+  }, 0) / 1024 / 1024;
+}
 
-    function openBacktrace(trace, i) {
-      backtrace.value = trace;
-      backtraceIndex.value = i;
-      showBacktraceModal.value = true;
-    }
+const showBacktraceModal = ref(false);
+const backtrace = ref([]);
+const backtraceIndex = ref(0);
 
-    const editor = document.__data.editor;
-    const sysPath = document.__data.systemPath;
+function openBacktrace(trace, i) {
+  backtrace.value = trace;
+  backtraceIndex.value = i;
+  showBacktraceModal.value = true;
+}
 
-    function getEditorLink(trace) {
-      return `${editor}://open?file=${trace.pathname}&line=${trace.line}`;
-    }
+const editor = document.__data.editor;
+const sysPath = document.__data.systemPath;
 
-    function replaceRoot(path) {
-      return path.replace(sysPath, 'ROOT');
-    }
+function getEditorLink(trace) {
+  return `${editor}://open?file=${trace.pathname}&line=${trace.line}`;
+}
 
-    const instances = computed(() => data.value.connections.map((conn) => conn.name));
+function replaceRoot(path) {
+  return path.replace(sysPath, 'ROOT');
+}
 
-    return {
-      data,
-      totalTime,
-      totalMemory,
-      showBacktraceModal,
-      backtrace,
-      backtraceIndex,
-      instances,
-
-      openBacktrace,
-      getEditorLink,
-
-      stateColor,
-      round,
-      replaceRoot,
-    }
-  }
-};
+const instances = computed(() => data.value.connections.map((conn) => conn.name));
 
 function round(num) {
   return Math.round(num * 100) / 100;
 }
+
+await updateData();
 </script>
 
 <style scoped>
