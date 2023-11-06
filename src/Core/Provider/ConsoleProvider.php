@@ -40,6 +40,10 @@ class ConsoleProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
+        if (ConsoleApplication::class !== $this->app::class) {
+            $container->alias(ConsoleApplication::class, $this->app::class);
+        }
+
         $container->mergeParameters(
             'commands',
             require __DIR__ . '/../../../resources/registry/commands.php'
