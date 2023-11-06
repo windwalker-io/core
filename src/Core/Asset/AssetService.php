@@ -63,14 +63,14 @@ class AssetService implements EventAwareInterface
     /**
      * Property internalStyles.
      *
-     * @var  array
+     * @var  AssetItem[]
      */
     protected array $internalStyles = [];
 
     /**
      * Property internalScripts.
      *
-     * @var  array
+     * @var  AssetItem[]
      */
     protected array $internalScripts = [];
 
@@ -135,8 +135,6 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * addStyle
-     *
      * @param  string  $url
      * @param  array   $options
      * @param  array   $attrs
@@ -148,9 +146,14 @@ class AssetService implements EventAwareInterface
         return $this->addLink('styles', $url, $options, $attrs);
     }
 
+    public function footerCSS(string $url, array $options = [], array $attrs = []): AssetLink
+    {
+        $options['footer'] = true;
+
+        return $this->addLink('styles', $url, $options, $attrs);
+    }
+
     /**
-     * addScript
-     *
      * @param  string  $url
      * @param  array   $options
      * @param  array   $attrs
@@ -227,29 +230,34 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * internalStyle
-     *
      * @param  string  $content
+     * @param  array   $options
      *
      * @return  static
      */
-    public function internalCSS(string $content): static
+    public function internalCSS(string $content, array $options = []): static
     {
-        $this->internalStyles[] = $content;
+        $this->internalStyles[] = new AssetItem($content, $options);
 
         return $this;
     }
 
+    public function footerInternalCSS(string $content, array $options = []): static
+    {
+        $options['footer'] = true;
+
+        return $this->internalCSS($content, $options);
+    }
+
     /**
-     * internalStyle
-     *
      * @param  string  $content
+     * @param  array   $options
      *
      * @return  static
      */
-    public function internalJS(string $content): static
+    public function internalJS(string $content, array $options = []): static
     {
-        $this->internalScripts[] = $content;
+        $this->internalScripts[] = new AssetItem($content, $options);
 
         return $this;
     }
@@ -299,15 +307,14 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * renderStyles
-     *
      * @param  bool   $withInternal
      * @param  array  $internalAttrs
+     * @param  bool   $footer
      *
      * @return string
      * @throws Exception
      */
-    public function renderCSS(bool $withInternal = false, array $internalAttrs = []): string
+    public function renderCSS(bool $withInternal = false, array $internalAttrs = [], bool $footer = false): string
     {
         $html = [];
 
@@ -327,6 +334,10 @@ class AssetService implements EventAwareInterface
         $html = $event->getHtml();
 
         foreach ($event->getLinks() as $url => $style) {
+            if ($style->isFooter() !== $footer) {
+                continue;
+            }
+
             $defaultAttrs = [
                 'href' => $style->getHref(),
                 'rel' => 'stylesheet',
@@ -350,7 +361,7 @@ class AssetService implements EventAwareInterface
             $html[] = (string) h(
                 'style',
                 $event->getInternalAttrs(),
-                "\n" . $this->renderInternalCSS() . "\n" . $this->indents
+                "\n" . $this->renderInternalCSS($footer) . "\n" . $this->indents
             );
         }
 
@@ -422,13 +433,18 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * renderInternalStyles
+     * @param  bool  $footer
      *
      * @return  string
      */
-    public function renderInternalCSS(): string
+    public function renderInternalCSS(bool $footer = false): string
     {
-        return implode("\n\n", $this->internalStyles);
+        $styles = array_filter(
+            $this->internalStyles,
+            static fn (AssetItem $item) => $item->isFooter() === $footer
+        );
+
+        return implode("\n\n", $styles);
     }
 
     /**

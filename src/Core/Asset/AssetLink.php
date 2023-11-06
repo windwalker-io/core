@@ -67,4 +67,9 @@ class AssetLink extends Link
 
         return $this;
     }
+
+    public function isFooter(): bool
+    {
+        return (bool) ($this->options['footer'] ?? false);
+    }
 }
