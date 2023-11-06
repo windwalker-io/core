@@ -193,7 +193,7 @@ class Route implements JsonSerializable
         $keys = [
             'methods',
             'actions',
-            'variables',
+            'vars',
             'requirements',
             'scheme',
             'port',
