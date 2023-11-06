@@ -166,6 +166,9 @@ class MigrationService implements EventAwareInterface
         // ];
 
         $this->storeVersion($migration, $direction, $start, $end);
+
+        // Reset Tables
+        $db->getSchema()->cacheReset();
     }
 
     /**
