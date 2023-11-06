@@ -9,3 +9,4 @@ export * from './base/base.js';
 export * from './config.js';
 export * from './lifecycles.js';
 export * from './processors.js';
+export * from './bundlers.js';

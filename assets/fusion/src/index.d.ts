@@ -5,6 +5,10 @@ import * as vfs from 'vinyl-fs';
 import { WebpackOptionsNormalized } from 'webpack/types';
 import { BabelOptions } from './utilities/babel';
 
+declare module "@windwalker-io/fusion" {
+
+}
+
 declare namespace Fusion {
   export interface DestOptions {
     merge: boolean;
@@ -106,6 +110,10 @@ declare namespace Fusion {
   export const RollupProcessor: Processor<RollupOptions>;
   export const vue: taskProcessor<VueOptions>;
   export const VueProcessor: Processor<VueOptions>;
+
+  // Bundlers
+  export const webpackBundle: (file: string, dest: string, options: (config: WebpackOptions) => any) => Promise<any>;
+  export const webpackVueBundle: (file: string, dest: string, options: (config: WebpackOptions) => any) => Promise<any>;
 
   // Gulp
   export const parallel: typeof gulpParallel;
