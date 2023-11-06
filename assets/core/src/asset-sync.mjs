@@ -5,13 +5,16 @@
  * @license    __LICENSE__
  */
 
-import { dest as toDest, src, wait } from '@windwalker-io/fusion';
+import { babel, dest as toDest, src, ts, wait } from '@windwalker-io/fusion';
 import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
 import { loadJson } from './utils.mjs';
 import rename from 'gulp-rename';
 import path from 'path';
 
+/**
+ * @deprecated
+ */
 export function jsSync(source = 'src/Module', dest) {
   // const root = source + '/**/assets/';
 
@@ -61,6 +64,51 @@ export function jsSync(source = 'src/Module', dest) {
       resolve(data);
     });
   });
+}
+
+export function syncModuleScripts(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
+  const jsOptions = options.js || {};
+  const tsOptions = options.ts || {};
+
+  return [
+    syncModuleJS(source, dest, jsOptions),
+    syncModuleTS(source, dest, tsOptions),
+  ];
+}
+
+export function syncModuleJS(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
+  return babel(
+    [
+      `${source}/**/*.{js,mjs}`,
+      ...findModules('**/assets/*.{js,mjs}')
+    ],
+    dest,
+    {
+      module: 'systemjs',
+      rename: (path) => {
+        path.dirname = path.dirname.replace(/assets$/, '').toLowerCase();
+      },
+      ...options
+    }
+  );
+}
+
+export function syncModuleTS(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
+  return ts(
+    [
+      `${source}/**/*.ts`,
+      'node_modules/@windwalker-io/core/types/**.d.ts',
+      ...findModules('**/assets/*.ts')
+    ],
+    dest,
+    {
+      tsconfig: path.resolve('tsconfig.js.json'),
+      rename: (path) => {
+        path.dirname = path.dirname.replace(/assets$/, '').toLowerCase();
+      },
+      ...options
+    }
+  );
 }
 
 export function findModules(suffix = '') {

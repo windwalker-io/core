@@ -1,0 +1,15 @@
+{
+    "include": [
+        "types/index.d.ts"
+    ],
+    "exclude": [
+        "node_modules/**/*"
+    ],
+    "compilerOptions": {
+        "allowJs": true,
+        "module": "system",
+        "moduleResolution": "node",
+        "target": "es2020",
+        "skipLibCheck": true
+    }
+}
