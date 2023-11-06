@@ -38,6 +38,8 @@ interface AppRequestInterface extends EventAwareInterface
 
     public function getHeader(string $name): string;
 
+    public function getHeaders(bool $asString = true): array;
+
     /**
      * @param  mixed  ...$fields
      *
