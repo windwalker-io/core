@@ -133,6 +133,7 @@ class DashboardRepository
             'response' => $collector->getDeep('http.response'),
             'time' => microtime(true),
             'ip' => $collector->getDeep('http.remoteIP'),
+            'ajax' => $collector->getDeep('http.request.ajax'),
         ];
 
         $folder = $this->getCacheFolder()->appendPath('/' . $id);

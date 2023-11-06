@@ -45,9 +45,16 @@
           {{ item.ip }}
         </td>
         <td>
-          {{ item.method }}
+          <div>
+            {{ item.method }}
+          </div>
+          <div>
+            <span v-if="item.ajax" class="badge bg-danger">
+              AJAX | API
+            </span>
+          </div>
         </td>
-        <td>
+        <td style="word-break: break-all">
           <a :href="item.url"
             target="_blank"
             class="link-secondary">
@@ -59,7 +66,9 @@
           {{ dateFormat(item.time) }}
         </td>
         <td>
-          {{ item.response?.status }}
+          <span class="badge" :class="`bg-${httpStatusColor(item.response?.status || 0)}`">
+            {{ item.response?.status }}
+          </span>
         </td>
       </tr>
       </tbody>
@@ -73,6 +82,7 @@ import { onMounted, reactive, ref, toRefs } from 'vue';
 import router from '../routes.js';
 import $http from '../services/http.js';
 import { currentId } from '../services/store.js';
+import { httpStatusColor } from '../services/utilities.js';
 
 const state = reactive({
   items: [],
@@ -87,8 +97,6 @@ onMounted(async () => {
 });
 
 function selectId(id) {
-  currentId.value = id;
-
   router.push('/system/' + id);
 }
 

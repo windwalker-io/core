@@ -21,25 +21,12 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { useRoute } from 'vue-router';
 import { goToLast } from '../services/nav';
 import { currentData, currentId } from '../services/store';
 
-export default {
-  name: 'DefaultLayout',
-  setup() {
-    const route = useRoute();
-    
-    return {
-      currentId,
-      currentData,
-      route,
-
-      goToLast
-    };
-  }
-};
+const route = useRoute();
 </script>
 
 <style scoped>

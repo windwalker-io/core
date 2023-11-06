@@ -100,29 +100,4 @@ class DelegatingController implements ControllerInterface
 
         return $this;
     }
-
-    /**
-     * @param  Throwable  $e
-     *
-     * @return  void
-     *
-     * @throws ReflectionException
-     * @throws \Windwalker\DI\Exception\DefinitionException
-     */
-    protected function logError(Throwable $e): void
-    {
-        // Do not log 40x errors.
-        if ($e->getCode() >= 400 && $e->getCode() < 500) {
-            return;
-        }
-
-        // $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
-
-        $this->app->service(LoggerService::class)
-            ->error(
-                $this->app->config('error.log_channel') ?? 'error',
-                $e->getMessage(),
-                ['exception' => $e]
-            );
-    }
 }

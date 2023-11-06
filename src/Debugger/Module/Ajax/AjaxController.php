@@ -22,7 +22,7 @@ class AjaxController
     #[JsonApi]
     public function history(#[Autowire] DashboardRepository $repository): array
     {
-        return $repository->getItems(100, false);
+        return array_values($repository->getItems(100, false));
     }
 
     #[JsonApi]

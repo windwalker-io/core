@@ -85,7 +85,6 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { onBeforeRouteUpdate } from 'vue-router';
 import BsModal from '../components/BsModal.vue';
 import QueryInfo from '../components/db/QueryInfo.vue';
 import DefaultLayout from '../layouts/DefaultLayout.vue';

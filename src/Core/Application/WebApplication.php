@@ -11,6 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LogLevel;
+use ReflectionException;
 use Stringable;
 use Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
@@ -32,6 +33,7 @@ use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\Core\Service\ErrorService;
+use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionResolveException;
@@ -235,8 +237,8 @@ class WebApplication implements WebRootApplicationInterface
 
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
-            fn(ServerRequestInterface $request) => static::anyToResponse(
-                $this->dispatchController($container)
+            static fn(ServerRequestInterface $request) => static::anyToResponse(
+                $container->get(AppContext::class)->dispatchController()
             )
         );
 
@@ -360,47 +362,17 @@ class WebApplication implements WebRootApplicationInterface
         $this->releaseProviders($container);
     }
 
-    protected function dispatchController(Container $container)
-    {
-        $appContext = $container->get(AppContext::class);
-
-        try {
-            return $appContext->dispatchController();
-        } catch (ValidateFailException $e) {
-            if ($this->isDebug() || $appContext->isAjax()) {
-                throw $e;
-            }
-
-            $appContext->addMessage($e->getMessage(), 'warning');
-            $nav = $appContext->service(Navigator::class);
-
-            return $nav->back();
-        } catch (Throwable $e) {
-            if ($appContext->isCliRuntime()) {
-                $appContext->logError($e);
-            }
-
-            if (
-                $appContext->isDebug()
-                || strtoupper($appContext->getRequestMethod()) === 'GET'
-                || $appContext->getAppRequest()->isAcceptJson()
-                || $appContext->isAjax()
-            ) {
-                throw $e;
-            }
-
-            $appContext->addMessage($e->getMessage(), 'warning');
-            $nav = $appContext->service(Navigator::class);
-
-            return $nav->back();
-        }
-    }
-
     /**
+     * @param  AppContext              $app
      * @param  ServerRequestInterface  $request
      * @param  iterable                $middlewares
      *
      * @return ResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
+     * @throws DefinitionResolveException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     protected function dispatch(
         AppContext $app,
@@ -413,7 +385,7 @@ class WebApplication implements WebRootApplicationInterface
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
         } catch (ValidateFailException | InvalidTokenException $e) {
-            if ($app->isDebug()) {
+            if ($app->isDebug() || $app->isAjax()) {
                 throw $e;
             }
 
@@ -422,10 +394,15 @@ class WebApplication implements WebRootApplicationInterface
 
             return $this->redirect($nav->back());
         } catch (Throwable $e) {
+            if ($app->isCliRuntime()) {
+                $this->logError($e);
+            }
+
             if (
                 $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
                 || $app->getAppRequest()->isAcceptJson()
+                || $app->isAjax()
             ) {
                 throw $e;
             }
@@ -435,6 +412,31 @@ class WebApplication implements WebRootApplicationInterface
 
             return $this->redirect($nav->back());
         }
+    }
+
+    /**
+     * @param  Throwable  $e
+     *
+     * @return  void
+     *
+     * @throws ReflectionException
+     * @throws \Windwalker\DI\Exception\DefinitionException
+     */
+    protected function logError(Throwable $e): void
+    {
+        // Do not log 40x errors.
+        if ($e->getCode() >= 400 && $e->getCode() < 500) {
+            return;
+        }
+
+        // $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
+
+        $this->retrieve(LoggerService::class)
+            ->error(
+                $this->app->config('error.log_channel') ?? 'error',
+                $e->getMessage(),
+                ['exception' => $e]
+            );
     }
 
     /**
