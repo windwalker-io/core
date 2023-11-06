@@ -1148,7 +1148,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + "-" + {"src_debugger_views_Dashboard_vue":"d38ff04d7cd9d915b641","src_debugger_views_System_vue":"da8233a75b4a8b2863ec","src_debugger_views_Request_vue":"06bd5335f0c8515d9c43","src_debugger_views_Routing_vue":"e91986bd3a05a8756aa4","src_debugger_views_Timeline_vue":"e9fbedca7953c42b8e65","src_debugger_views_Events_vue":"be64e6d235c5c875cc28","vendors-node_modules_bootstrap_js_src_modal_js-node_modules_sql-formatter_lib_index_js":"ca0f2725a87fe24caf87","src_debugger_views_Database_vue":"406370ad0c240a66a078"}[chunkId] + ".js";
+/******/ 			return "" + chunkId + "-" + {"src_debugger_views_Dashboard_vue":"d38ff04d7cd9d915b641","src_debugger_views_System_vue":"da8233a75b4a8b2863ec","src_debugger_views_Request_vue":"06bd5335f0c8515d9c43","src_debugger_views_Routing_vue":"e91986bd3a05a8756aa4","src_debugger_views_Timeline_vue":"e9fbedca7953c42b8e65","src_debugger_views_Events_vue":"be64e6d235c5c875cc28","vendors-node_modules_bootstrap_js_src_modal_js-node_modules_sql-formatter_lib_index_js":"ca0f2725a87fe24caf87","src_debugger_views_Database_vue":"0e07f4d6f46286c1784a"}[chunkId] + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	

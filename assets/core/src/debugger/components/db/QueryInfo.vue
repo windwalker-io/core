@@ -1,5 +1,6 @@
 <template>
-  <div :id="`query-${i}`" class="card rounded-3 border border-1 border-primary">
+  <div :id="`query-${i}`" class="card rounded-3 border border-1"
+    :class="`border-${stateColor(item.time * 1000, 15)}`">
     <div class="card-header d-flex justify-content-between">
       <h4 class="m-0">
         Query: {{ i }}
