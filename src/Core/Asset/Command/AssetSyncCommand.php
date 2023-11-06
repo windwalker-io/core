@@ -122,9 +122,13 @@ class AssetSyncCommand implements CommandInterface
 
         if ($override) {
             $packageJsonFile->write(
-                json_encode($packageJson, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+                json_encode(
+                    $packageJson,
+                    JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                ) . "\n"
             );
 
+            $io->newLine();
             $io->writeln('package.json file modified.');
         } else {
             $io->writeln('package.json not changed.');
