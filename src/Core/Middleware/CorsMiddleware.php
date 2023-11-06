@@ -37,7 +37,7 @@ class CorsMiddleware implements MiddlewareInterface
             ->default(env('CORS_ALLOW_ORIGINS') ?: null);
 
         $resolver->define('configure')
-            ->allowedTypes('callable')
+            ->allowedTypes('callable', 'null')
             ->default(null);
 
         $resolver->define('send_instantly')
