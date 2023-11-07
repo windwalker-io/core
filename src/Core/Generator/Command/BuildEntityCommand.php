@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\Command;
 
 use DomainException;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,6 +20,7 @@ use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Utilities\ClassFinder;
+use Windwalker\Data\Collection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\Filesystem;
@@ -25,11 +28,14 @@ use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
+use function Windwalker\arr;
+use function Windwalker\collect;
+
 /**
  * The BuildEntityCommand class.
  */
 #[CommandWrapper(description: 'Build entity getters/setters and sync properties with database.')]
-class BuildEntityCommand implements CommandInterface
+class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
 {
     use CommandDatabaseTrait;
     use CommandPackageResolveTrait;
@@ -135,7 +141,7 @@ class BuildEntityCommand implements CommandInterface
         }
 
         if (!class_exists($ns)) {
-            $classes = $this->classFinder->findClasses($io->getArgument('ns'));
+            $classes = $this->classFinder->findClasses($ns);
             $this->handleClasses($classes, $connection);
 
             return 0;
@@ -199,5 +205,28 @@ class BuildEntityCommand implements CommandInterface
                 }
             }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'ns') {
+            $classes = iterator_to_array($this->classFinder->findClasses('App\\Entity\\'));
+
+            return collect($classes)
+                ->map(fn (string $className) => (string) Collection::explode('\\', $className)->pop())
+                ->dump();
+        }
+
+        return null;
     }
 }

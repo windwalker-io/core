@@ -7,6 +7,8 @@ namespace Windwalker\Console;
 use Attribute;
 use Closure;
 use LogicException;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +26,10 @@ use Windwalker\Utilities\Assert\Assert;
  * The CommandWrapper class.
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
-class CommandWrapper extends Command implements ContainerAttributeInterface, SignalableCommandInterface
+class CommandWrapper extends Command implements
+    ContainerAttributeInterface,
+    SignalableCommandInterface,
+    CompletionAwareInterface
 {
     public const TEMP_NAME = 'windwalker-command-temp-name';
 
@@ -200,5 +205,29 @@ class CommandWrapper extends Command implements ContainerAttributeInterface, Sig
         }
 
         return 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+        if ($this->handler instanceof CompletionAwareInterface) {
+            return $this->handler->completeOptionValues($optionName, $context);
+        }
+
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($this->handler instanceof CompletionAwareInterface) {
+            return $this->handler->completeArgumentValues($argumentName, $context);
+        }
+
+        return null;
     }
 }

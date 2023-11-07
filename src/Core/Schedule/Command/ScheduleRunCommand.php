@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Schedule\Command;
 
 use Generator;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,7 +26,7 @@ use Windwalker\Utilities\Arr;
  * @since  3.5.3
  */
 #[CommandWrapper(description: 'Run CRON schedule')]
-class ScheduleRunCommand implements CommandInterface
+class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
 {
     /**
      * ScheduleCommand constructor.
@@ -148,6 +150,31 @@ class ScheduleRunCommand implements CommandInterface
             }
 
             yield $name => $event;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'names') {
+            $schedule = $this->scheduleService->getSchedule();
+
+            $events = iterator_to_array($schedule->getEvents());
+            $events = array_map(
+                static fn (ScheduleEvent $event) => $event->getName(),
+                $events
+            );
+
+            return $events;
         }
     }
 }
