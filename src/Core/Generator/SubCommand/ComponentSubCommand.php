@@ -15,11 +15,11 @@ use Windwalker\Console\IOInterface;
 #[CommandWrapper(
     description: 'Generate Windwalker enum.'
 )]
-class EnumSubCommand extends AbstractGeneratorSubCommand
+class ComponentSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'Enum';
+    protected string $defaultNamespace = 'Component';
 
-    protected string $defaultDir = 'Enum';
+    protected string $defaultDir = 'Component';
 
     protected bool $requireDest = false;
 
@@ -54,12 +54,12 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No enum name');
+            $io->errorStyle()->error('No component name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('enum/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('component/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
