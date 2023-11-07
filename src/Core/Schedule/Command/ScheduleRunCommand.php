@@ -94,8 +94,6 @@ class ScheduleRunCommand implements CommandInterface
         Logger::info('schedule', 'Run schedule');
 
         foreach ($this->getAvailableEvents($schedule, $io) as $event) {
-            show((string) $event->getExpression());;
-
             Logger::info('schedule', '  [Event] ' . $event->getName());
 
             try {
