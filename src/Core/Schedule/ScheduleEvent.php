@@ -146,7 +146,6 @@ class ScheduleEvent
     public function everyWeeks(?int $every = null, ?int $from = null, ?int $to = 12): static
     {
         return $this->setPart(static::WEEK_POSITION, static::every($every, $from, $to))
-            ->dayOfWeek(1)
             ->hourOfDay(0)
             ->minuteOfHour(0);
     }
