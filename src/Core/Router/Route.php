@@ -306,7 +306,7 @@ class Route implements JsonSerializable
             }
         }
 
-        foreach ($properties['options']['middlewares'] as &$middleware) {
+        foreach ($properties['options']['middlewares'] ?? [] as &$middleware) {
             if ($middleware instanceof ObjectBuilderDefinition) {
                 $middleware = $middleware->getClass();
             } elseif (is_object($middleware)) {
