@@ -105,6 +105,8 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
                 } catch (RuntimeException) {
                     // No actions that validation will run later
                 }
+            } else {
+                throw new \InvalidArgumentException("Generate task `$task` not found");
             }
         } else {
             $definition = $command->getDefinition();

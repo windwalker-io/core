@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Builder;
 
+use MyCLabs\Enum\Enum;
 use PhpParser\Node;
 use ReflectionAttribute;
 use ReflectionProperty;
@@ -29,6 +30,7 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
+use Windwalker\Utilities\Enum\EnumMetaInterface;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Symbol;
 use Windwalker\Utilities\TypeCast;
@@ -284,6 +286,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $typeNode = $typeNode->type;
         }
 
+        $className = $this->findFQCN((string) $typeNode);
+
         if ($typeNode instanceof Node\UnionType) {
             $isBool = in_array('bool', $typeNode->types, true);
         } elseif ($typeNode instanceof Node\Identifier) {
@@ -340,11 +344,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $methods[] = $event->getMethod();
         }
 
+        // Setter
         if (!$ref->hasMethod($setter)) {
             $added[] = $setter;
 
             if ($specialSetter && method_exists($this, $specialSetter)) {
-                $method = $this->$specialSetter($setter, $propName, $type);
+                $method = $this->$specialSetter($setter, $propName, $type, $column);
             } else {
                 $method = $factory->method($setter)
                     ->makePublic()
@@ -380,6 +385,48 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 ]
             );
 
+            // Enum accept pure value
+            if ($className && class_exists($className) && $this->isEnum($className)) {
+                if ($column) {
+                    $subType = $column->isNumeric() ? 'int' : 'string';
+                } else {
+                    $subType = 'int|string';
+                }
+
+                $subType .= '|' . $type;
+
+                $method->params[0] = $factory->param($propName)
+                    ->setType($subType)
+                    ->getNode();
+
+                if (is_a($className, EnumMetaInterface::class, true)) {
+                    $enum = $factory->staticCall(
+                        new Node\Name($type),
+                        'wrap',
+                        [
+                            new Node\Expr\Variable($propName),
+                        ]
+                    );
+                } else {
+                    $enum = $factory->new(
+                        new Node\Name($type),
+                        [
+                            new Node\Expr\Variable($propName),
+                        ]
+                    );
+                }
+
+                $method->stmts[0] = new Node\Stmt\Expression(
+                    new Node\Expr\Assign(
+                        $factory->propertyFetch(
+                            new Node\Expr\Variable('this'),
+                            $propName
+                        ),
+                        $enum
+                    )
+                );
+            }
+
             $methods[] = $event->getMethod();
         }
 
@@ -392,6 +439,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     public function getMetadata(): EntityMetadata
     {
         return $this->metadata;
+    }
+
+    protected function isEnum(string $className): bool
+    {
+        return is_a($className, Enum::class, true)
+            || is_a($className, \UnitEnum::class, true);
     }
 
     protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
