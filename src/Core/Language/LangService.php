@@ -6,6 +6,7 @@ namespace Windwalker\Core\Language;
 
 use DomainException;
 use Windwalker\Core\Application\PathResolver;
+use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
@@ -152,6 +153,11 @@ class LangService implements LanguageInterface
 
     public function loadAllFromVendor(string $vendor, string $format, ?string $locale = null): static
     {
+        /** @var class-string<AbstractPackage> $vendor */
+        if (is_a($vendor, AbstractPackage::class, true)) {
+            $vendor = $vendor::getName();
+        }
+
         $path = "@vendor/{$vendor}/resources/languages";
 
         return $this->loadAllFromPath($path, $format, $locale);
