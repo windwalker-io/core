@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\CliServer\Command;
 
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,7 +23,7 @@ use Windwalker\DI\Attributes\Autowire;
 #[CommandWrapper(
     description: 'Stop Windwalker Server.',
 )]
-class ServerStopCommand implements CommandInterface
+class ServerStopCommand implements CommandInterface, CompletionAwareInterface
 {
     use ServerCommandTrait;
 
@@ -126,5 +128,36 @@ class ServerStopCommand implements CommandInterface
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'server') {
+            $mainFiles = $this->getServerFiles();
+
+            if ($context->getCurrentWord()) {
+                foreach ($mainFiles as $engine => $files) {
+                    if (str_starts_with($engine, $context->getCurrentWord())) {
+                        $result = [];
+
+                        foreach ($files as $file) {
+                            $result[] = $engine . ':' . $file;
+                        }
+
+                        return $result;
+                    }
+                }
+            }
+        }
     }
 }

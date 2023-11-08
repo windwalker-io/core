@@ -37,15 +37,23 @@ trait ServerCommandTrait
 
     protected function getServerMainFiles(string $engine): array
     {
+        $registry = $this->getServerFiles();
+
+        return $registry[$engine] ?? [];
+    }
+
+    /**
+     * @return  string[][]
+     */
+    protected function getServerFiles(): array
+    {
         $registryFile = WINDWALKER_RESOURCES . '/registry/servers.php';
 
         if (!is_file($registryFile)) {
             return [];
         }
 
-        $registry = include $registryFile;
-
-        return $registry[$engine] ?? [];
+        return (include $registryFile) ?: [];
     }
 
     /**

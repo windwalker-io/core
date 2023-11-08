@@ -12,3 +12,9 @@
 html {
   padding-bottom: 50px;
 }
+
+.ww-debug-console {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

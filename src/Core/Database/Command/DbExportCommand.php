@@ -63,6 +63,13 @@ class DbExportCommand implements CommandInterface
         );
 
         $command->addOption(
+            'dir',
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'The export dest dir.'
+        );
+
+        $command->addOption(
             'compress',
             'z',
             InputOption::VALUE_NONE,
@@ -90,8 +97,10 @@ class DbExportCommand implements CommandInterface
 
         $appName = $this->app->config('app.name') ?? 'windwalker';
 
+        $dir = $io->getOption('dir') ?: '@temp/sql-export';
+
         $dest = $io->getArgument('dest') ?: sprintf(
-            $this->app->path('@temp/sql-export/%s-sql-%s-%s.sql'),
+            $this->app->path($dir . '/%s-sql-%s-%s.sql'),
             StrNormalize::toKebabCase(Path::makeUtf8Safe($appName)),
             $conn ?? $databaseManager->getDefaultName(),
             $now->format('Y-m-d-H-i-s')

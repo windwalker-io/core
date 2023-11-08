@@ -13,6 +13,7 @@ use UnexpectedValueException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Attributes\ViewMetadata;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Html\HtmlFrame;
@@ -37,13 +38,17 @@ use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
 
+use function Windwalker\has_attributes;
+
 /**
  * The ViewModel class.
  */
-class View implements EventAwareInterface
+class View implements EventAwareInterface, \ArrayAccess
 {
     use OptionsResolverTrait;
     use CoreEventAwareTrait;
+
+    protected bool $booted = false;
 
     protected string|array|null $layoutMap = null;
 
@@ -51,7 +56,7 @@ class View implements EventAwareInterface
 
     protected ?ResponseInterface $response = null;
 
-    protected bool $booted = false;
+    protected array $data = [];
 
     /**
      * View constructor.
@@ -151,6 +156,8 @@ class View implements EventAwareInterface
     public function render(array $data = []): ResponseInterface
     {
         $this->boot();
+
+        $data = [...$this->data, ...$data];
 
         $vm = $this->getViewModel();
 
@@ -350,6 +357,21 @@ class View implements EventAwareInterface
 
         if (!$this->isChild()) {
             $this->addBodyClass($vm::class);
+
+            $methods = (new ReflectionClass($vm))->getMethods();
+
+            foreach ($methods as $method) {
+                if (has_attributes($method, ViewMetadata::class)) {
+                    $this->app->call(
+                        $method->getClosure($vm),
+                        [
+                            self::class => $this,
+                            'view' => $this,
+                            ...$this->data
+                        ]
+                    );
+                }
+            }
         }
 
         $cssList = $this->getOption('css');
@@ -638,5 +660,54 @@ class View implements EventAwareInterface
     public function isChild(): bool
     {
         return $this->options['is_child'];
+    }
+
+    public function set(string $id, mixed $value): static
+    {
+        $this->data[$id] = $value;
+
+        return $this;
+    }
+
+    public function bind(string $id, mixed $value): static
+    {
+        return $this->set($id, $value);
+    }
+
+    public function get(string $id): mixed
+    {
+        return $this->data[$id] ?? null;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->data[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->data[$offset]);
     }
 }
