@@ -8,6 +8,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\FieldDefinitionInterface;
 use Windwalker\Form\Form;
+use Windwalker\Form\FormDefinitionWrapper;
 use Windwalker\Form\Renderer\FormRendererInterface;
 
 /**
@@ -26,7 +27,7 @@ class FormFactory
         //
     }
 
-    public function create(FieldDefinitionInterface|string|null $definition = null, ...$args): Form
+    public function create(object|string|null $definition = null, ...$args): Form
     {
         $form = $this->app->make(Form::class, $args);
 
@@ -49,21 +50,24 @@ class FormFactory
     /**
      * createDefinition
      *
-     * @param  FieldDefinitionInterface|string|null  $definition
-     * @param                                        ...$args
+     * @param  object|string|null  $definition
+     * @param  mixed               ...$args
      *
      * @return  FieldDefinitionInterface
      *
      * @psalm-template T
-     * @psalm-param T                                $definition
-     *
-     * @psalm-return T
      */
     public function createDefinition(
-        FieldDefinitionInterface|string|null $definition = null,
-        ...$args
+        object|string|null $definition = null,
+        mixed ...$args
     ): FieldDefinitionInterface {
-        return $this->app->make($definition, $args);
+        $definitionObject =  $this->app->make($definition, $args);
+
+        if (!$definitionObject instanceof FieldDefinitionInterface) {
+            $definitionObject = new FormDefinitionWrapper($definitionObject);
+        }
+
+        return $definitionObject;
     }
 
     /**

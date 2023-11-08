@@ -32,6 +32,7 @@ export async function webpackBundle(file, dest, override = null) {
   config.output.uniqueName = file;
   config.output.libraryTarget = 'umd';
 
+  config.resolve = config.resolve || {};
   config.resolve.modules = ['node_modules'];
 
   if (override) {

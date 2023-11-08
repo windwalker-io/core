@@ -10,6 +10,7 @@ use ReflectionProperty;
 use Unicorn\Enum\BasicState;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
 use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
@@ -538,10 +539,11 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         if ($type === '?Chronos') {
             $this->addUse(CastNullable::class);
             $prop->setAttribute('fullType', Chronos::class);
+            $prop->setAttribute('fullType', ServerTimeCast::class);
             $prop->attrGroups[] = $this->attributeGroup(
                 $this->attribute(
                     'CastNullable',
-                    new Node\Expr\ClassConstFetch(new Node\Name('Chronos'), 'class')
+                    new Node\Expr\ClassConstFetch(new Node\Name('ServerTimeCast'), 'class')
                 ),
             );
         }

@@ -52,6 +52,5 @@
         "vendors": [
             "@windwalker-io/core"
         ]
-    },
-    "dependencies": {}
+    }
 }
