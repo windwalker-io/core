@@ -43,63 +43,69 @@ class PackageInstaller
         return $this->children[$name] ??= new static($name, $this->app);
     }
 
-    public function installConfig(string|array $path, string|array $tags = []): static
+    public function installConfig(string|array $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'config',
             Filesystem::globAll($path),
             $this->app->path('@etc/packages/'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
-    public function installMigrations(string $path, string|array $tags = []): static
+    public function installMigrations(string $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'migrations',
             Filesystem::globAll($path),
             $this->app->path('@migrations'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
-    public function installLanguages(string $path, string|array $tags = []): static
+    public function installLanguages(string $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'languages',
             Filesystem::globAll($path),
             $this->app->path('@languages'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
-    public function installRoutes(string $path, string|array $tags = []): static
+    public function installRoutes(string $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'routes',
             Filesystem::globAll($path),
             $this->app->path('@routes/packages/'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
-    public function installFiles(string $path, string $dest, string|array $tags = []): static
+    public function installFiles(string $path, string $dest, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'files',
             Filesystem::globAll($path),
             $this->app->path('@root/' . $dest),
-            $tags
+            $tags,
+            $callback
         );
     }
 
-    public function installViews(string $path, string|array $tags = []): static
+    public function installViews(string $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'views',
             Filesystem::globAll($path),
             $this->app->path('@views/packages/'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
@@ -107,6 +113,7 @@ class PackageInstaller
         array $paths,
         array $replaces = [],
         string|array $tags = [],
+        callable $callback = null
     ): static {
         foreach ($paths as $src => $dest) {
             $this->installResource(
@@ -114,12 +121,14 @@ class PackageInstaller
                 Filesystem::globAll($src),
                 $this->app->path($dest),
                 $tags,
-                function ($src, $dest) use ($replaces) {
+                function ($src, $dest) use ($callback, $replaces) {
                     $content = (string) Filesystem::read($dest);
 
                     $content = strtr($content, $replaces);
 
                     Filesystem::write($dest, $content);
+
+                    $callback($src, $dest);
                 }
             );
         }
@@ -127,13 +136,14 @@ class PackageInstaller
         return $this;
     }
 
-    public function installSeeders(string $path, string|array $tags = []): static
+    public function installSeeders(string $path, string|array $tags = [], callable $callback = null): static
     {
         return $this->installResource(
             'seeders',
             Filesystem::globAll($path),
             $this->app->path('@seeders'),
-            $tags
+            $tags,
+            $callback
         );
     }
 
