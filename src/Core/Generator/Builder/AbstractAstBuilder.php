@@ -20,6 +20,8 @@ use PhpParser\PrettyPrinter\Standard;
  */
 abstract class AbstractAstBuilder
 {
+    protected Emulative $lexer;
+
     private ?Parser $parser = null;
 
     protected ?Closure $handler = null;
@@ -94,9 +96,7 @@ abstract class AbstractAstBuilder
         $traverser->addVisitor($this->createVisitor($enterNode, $leaveNode));
         $newAst = $traverser->traverse($oldAst);
 
-        $prettyPrinter = new Standard();
-
-        return $prettyPrinter->printFormatPreserving($newAst, $oldAst, $oldTokens);
+        return (new Standard())->printFormatPreserving($newAst, $oldAst, $oldTokens);
     }
 
     protected function createVisitor(?Closure $enterNode, ?Closure $leaveNode): NodeVisitorAbstract
