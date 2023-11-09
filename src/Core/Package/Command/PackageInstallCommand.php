@@ -182,7 +182,18 @@ class PackageInstallCommand implements CommandInterface
                             }
 
                             foreach ($callbacks as $callback) {
-                                $callback($src, $dest, $force);
+                                $this->app->call(
+                                    $callback,
+                                    [
+                                        'src' => $src,
+                                        'dest' => $dest,
+                                        'force' => $force,
+                                        'io' => $this->io,
+                                        IOInterface::class => $this->io,
+                                        'command' => $this,
+                                        Command::class => $this,
+                                    ]
+                                );
                             }
                         }
                     }

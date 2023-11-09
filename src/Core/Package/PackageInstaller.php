@@ -147,6 +147,13 @@ class PackageInstaller
         );
     }
 
+    public function installCallback(
+        string|array $tags = [],
+        callable $callback = null
+    ): static {
+        return $this->addResources('callbacks', [], $tags, $callback);
+    }
+
     protected function installResource(
         string $name,
         iterable $files,

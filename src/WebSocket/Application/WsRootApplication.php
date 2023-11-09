@@ -25,6 +25,7 @@ use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Http\Server\HttpServerInterface;
 use Windwalker\Http\Server\ServerInterface;
 use Windwalker\Reactor\WebSocket\WebSocketFrame;
@@ -187,7 +188,7 @@ class WsRootApplication implements WsRootApplicationInterface
      *
      * @return  ResponseInterface
      *
-     * @throws Throwable
+     * @throws \Throwable
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
@@ -253,20 +254,9 @@ class WsRootApplication implements WsRootApplicationInterface
         return $event->getResponse();
     }
 
-    public function stopContext(WsAppContext $appContext): void
+    public function runContextByRequest(WebSocketRequestInterface $request): ResponseInterface
     {
-        $container = $appContext->getContainer();
-
-        $appContext->emit(
-            AfterRespondEvent::class,
-            compact('container')
-        );
-
-        foreach ($this->providers as $provider) {
-            if ($provider instanceof RequestReleasableProviderInterface) {
-                $provider->releaseAfterRequest($container);
-            }
-        }
+        return $this->runContext($this->createContext($request));
     }
 
     /**
@@ -275,6 +265,8 @@ class WsRootApplication implements WsRootApplicationInterface
      * @param  iterable                   $middlewares
      *
      * @return ResponseInterface
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     protected function dispatch(
         WsAppContext $app,
@@ -283,36 +275,8 @@ class WsRootApplication implements WsRootApplicationInterface
     ): mixed {
         $runner = $app->make(MiddlewareRunner::class);
 
-        // Todo: Handle errors
         return $runner->createRequestHandler($middlewares)
             ->handle($request);
-
-        // try {
-        //     return $runner->createRequestHandler($middlewares)
-        //         ->handle($request);
-        // } catch (ValidateFailException | InvalidTokenException $e) {
-        //     if ($app->isDebug()) {
-        //         throw $e;
-        //     }
-        //
-        //     $app->addMessage($e->getMessage(), 'warning');
-        //     $nav = $app->service(Navigator::class);
-        //
-        //     return $this->redirect($nav->back());
-        // } catch (\Throwable $e) {
-        //     if (
-        //         $app->isDebug()
-        //         || strtoupper($app->getRequestMethod()) === 'GET'
-        //         || $app->getAppRequest()->isAcceptJson()
-        //     ) {
-        //         throw $e;
-        //     }
-        //
-        //     $app->addMessage($e->getMessage(), 'warning');
-        //     $nav = $app->service(Navigator::class);
-        //
-        //     return $this->redirect($nav->back());
-        // }
     }
 
     /**
