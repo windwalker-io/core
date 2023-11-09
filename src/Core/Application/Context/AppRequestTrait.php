@@ -38,19 +38,6 @@ trait AppRequestTrait
 
         return $this->request->getServerParams()['REMOTE_ADDR'] ?? '';
     }
-    // public function getMethod(): string
-    // {
-    //     return $this->request->getMethod();
-    // }
-    //
-    // public function getOverrideMethod(): string
-    // {
-    //     return $this->request->getHeaderLine('X-Http-Method-Override')
-    //         ?: $this->getRequest()->getParsedBody()['_method']
-    //         ?? $this->getUri()->getQueryValues()['_method']
-    //         ?? $this->request->getMethod();
-
-    // }
 
     /**
      * @return Uri
@@ -133,6 +120,18 @@ trait AppRequestTrait
     public function getHeader(string $name): string
     {
         return $this->request->getHeaderLine($name);
+    }
+
+    public function getHeaders(bool $asString = true): array
+    {
+        if (!$asString) {
+            return $this->request->getHeaders();
+        }
+
+        return array_map(
+            static fn (array $values) => implode(',', $values),
+            $this->request->getHeaders(),
+        );
     }
 
     /**
