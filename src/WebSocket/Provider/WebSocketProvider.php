@@ -9,16 +9,21 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppRequestInterface;
+use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
+use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
+use Windwalker\Reactor\Memory\MemoryTableFactory;
+use Windwalker\Reactor\Swoole\Room\RoomMapping;
+use Windwalker\Reactor\Swoole\Room\UserFdMapping;
 use Windwalker\Reactor\WebSocket\MessageEmitterInterface;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
@@ -30,13 +35,14 @@ use Windwalker\WebSocket\Application\WsRootApplicationInterface;
 use Windwalker\WebSocket\Parser\SimpleMessageParser;
 use Windwalker\WebSocket\Parser\WebSocketParserInterface;
 use Windwalker\WebSocket\Router\WsRouter;
+use Windwalker\WebSocket\Swoole\RequestRegistry;
 
 /**
  * The WebSocketProvider class.
  *
  * @level 2
  */
-class WebSocketProvider implements ServiceProviderInterface
+class WebSocketProvider implements ServiceProviderInterface, BootableProviderInterface
 {
     /**
      * RequestProvider constructor.
@@ -45,6 +51,23 @@ class WebSocketProvider implements ServiceProviderInterface
      */
     public function __construct(protected WsApplicationInterface $parentApp)
     {
+    }
+
+    /**
+     * Create mapping object that can share cross processes.
+     *
+     * @param  Container  $container
+     *
+     * @return  void
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function boot(Container $container): void
+    {
+        $container->get(UserFdMapping::class);
+        $container->get(RoomMapping::class);
+        $container->get(RequestRegistry::class);
     }
 
     /**
@@ -74,6 +97,9 @@ class WebSocketProvider implements ServiceProviderInterface
 
         // Controller Dispatcher
         $container->prepareSharedObject(ControllerDispatcher::class);
+
+        // Memory Tables
+        $this->registerMemoryTables($container);
     }
 
     /**
@@ -161,6 +187,43 @@ class WebSocketProvider implements ServiceProviderInterface
         $container->share(
             Browser::class,
             fn(Container $container) => Browser::fromRequest($container->get(ServerRequest::class))
+        );
+    }
+
+    protected function registerMemoryTables(Container $container): void
+    {
+        $container->prepareSharedObject(MemoryTableFactory::class);
+        $container->share(
+            UserFdMapping::class,
+            fn(Container $container) => $container->get(MemoryTableFactory::class)
+                ->createUserFdMapping(
+                    $this->parentApp->config('reactor.user_mapping.size') ?? 1024,
+                    $this->parentApp->config('reactor.user_mapping.length') ?? 32768,
+                )
+        );
+        $container->share(
+            RoomMapping::class,
+            fn(Container $container) => $container->get(MemoryTableFactory::class)
+                ->createRoomMapping(
+                    $container->get(UserFdMapping::class),
+                    $this->parentApp->config('reactor.user_mapping.size') ?? 1024,
+                    $this->parentApp->config('reactor.user_mapping.length') ?? 32768,
+                )
+        );
+        $container->share(
+            RequestRegistry::class,
+            function (Container $container) {
+                $options = CliServerRuntime::getServerState()->getStartupOptions();
+
+                return new RequestRegistry(
+                    $container->get(MemoryTableFactory::class)->createMemoryTable(
+                        // Default size is same as `ulimit -n`,
+                        // @see https://wiki.swoole.com/#/server/setting?id=max_conn-max_connection
+                        $options['max_requests'] ?? 100000
+                    ),
+                    $this->parentApp->config('reactor.request_registry_length') ?? 2048
+                );
+            }
         );
     }
 }

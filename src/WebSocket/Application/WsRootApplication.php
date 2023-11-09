@@ -28,12 +28,15 @@ use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Http\Server\HttpServerInterface;
 use Windwalker\Http\Server\ServerInterface;
+use Windwalker\Reactor\Swoole\Room\RoomMapping;
+use Windwalker\Reactor\Swoole\Room\UserFdMapping;
 use Windwalker\Reactor\WebSocket\WebSocketFrame;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Reactor\WebSocket\WebSocketServerInterface;
 use Windwalker\Uri\Uri;
 use Windwalker\WebSocket\Provider\WebSocketProvider;
+use Windwalker\WebSocket\Swoole\RequestRegistry;
 
 /**
  * The WebSocketApplication class.
@@ -222,8 +225,10 @@ class WsRootApplication implements WsRootApplicationInterface
 
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
-            static fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
-                ->dispatch($container->get(WsAppContext::class))
+            static fn(ServerRequestInterface $request) => static::anyToResponse(
+                $container->get(ControllerDispatcher::class)
+                    ->dispatch($container->get(WsAppContext::class))
+            )
         );
 
         // @event
@@ -357,6 +362,9 @@ class WsRootApplication implements WsRootApplicationInterface
         $start = microtime(true);
 
         $this->closing($request);
+
+        $this->retrieve(RoomMapping::class)->leaveAllRooms($request->getFd());
+        $this->retrieve(UserFdMapping::class)->removeFd($request->getFd());
 
         $client = $this->service(CliServerClient::class);
         $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\WebSocket\Swoole;
 
 use Swoole\Table;
+use Windwalker\Reactor\Memory\MemoryTableInterface;
 use Windwalker\Reactor\WebSocket\WebSocketRequest;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Uri\Uri;
@@ -14,23 +15,17 @@ use Windwalker\Uri\Uri;
  */
 class RequestRegistry
 {
-    public Table $table;
-
-    public readonly int $size;
-
     protected ?\Closure $serializer = null;
     protected ?\Closure $unSerializer = null;
 
-    public function __construct(?int $size = null, protected readonly int $dataSize = 2048)
+    public function __construct(protected MemoryTableInterface $table, protected int $dataSize = 2048)
     {
         // Default size is same as `ulimit -n`,
         // @see https://wiki.swoole.com/#/server/setting?id=max_conn-max_connection
-        $this->size = $size ?? 100000;
+        // $this->size = $size ?? 100000;
 
-        $this->table = new Table($this->size);
-
-        $this->table->column('fd', Table::TYPE_INT);
-        $this->table->column('data', Table::TYPE_STRING, $dataSize);
+        $this->table->column('fd', MemoryTableInterface::TYPE_INT);
+        $this->table->column('data', MemoryTableInterface::TYPE_STRING, $dataSize);
 
         $this->table->create();
     }
@@ -38,8 +33,10 @@ class RequestRegistry
     /**
      * @throws \JsonException
      */
-    public function store(int $fd, WebSocketRequestInterface $request): bool
+    public function store(WebSocketRequestInterface $request, ?int $fd = null): bool
     {
+        $fd ??= $request->getFd();
+
         if ($serializer = $this->getSerializer()) {
             $data = (string) $serializer($request);
         } else {
@@ -60,7 +57,7 @@ class RequestRegistry
         return $this->table->set((string) $fd, compact('fd', 'data'));
     }
 
-    public function get(int $fd, ?WebSocketRequestInterface $request = null)
+    public function get(int $fd, ?WebSocketRequestInterface $request = null): WebSocketRequestInterface
     {
         $item = $this->table->get((string) $fd);
 
