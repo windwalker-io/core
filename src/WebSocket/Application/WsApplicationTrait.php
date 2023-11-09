@@ -39,7 +39,7 @@ trait WsApplicationTrait
         return $this->service(WebSocketParserInterface::class);
     }
 
-    public function storeRequest(WebSocketRequestInterface $request, ?int $fd = null): bool
+    public function rememberRequest(WebSocketRequestInterface $request, ?int $fd = null): bool
     {
         return $this->retrieve(RequestRegistry::class)->store($request, $fd);
     }
@@ -49,7 +49,7 @@ trait WsApplicationTrait
         return $this->retrieve(RequestRegistry::class)->get($fd, $request);
     }
 
-    public function removeRequest(int $fd)
+    public function forgetRequest(int $fd)
     {
         return $this->retrieve(RequestRegistry::class)->remove($fd);
     }

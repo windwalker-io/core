@@ -16,9 +16,9 @@ interface WsApplicationInterface extends ApplicationInterface
 
     public function pushRawTo(int|array $fds, string $data): bool;
 
-    public function storeRequest(WebSocketRequestInterface $request, ?int $fd = null): bool;
+    public function rememberRequest(WebSocketRequestInterface $request, ?int $fd = null): bool;
 
     public function getRequest(int $fd, ?WebSocketRequestInterface $request = null);
 
-    public function removeRequest(int $fd);
+    public function forgetRequest(int $fd);
 }
