@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Package\Command;
 
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,7 +26,7 @@ use Windwalker\Filesystem\Path;
  * The PackageInstallCommand class.
  */
 #[CommandWrapper(description: 'Install package resources.')]
-class PackageInstallCommand implements CommandInterface
+class PackageInstallCommand implements CommandInterface, CompletionAwareInterface
 {
     /**
      * @var IOInterface
@@ -291,6 +293,38 @@ class PackageInstallCommand implements CommandInterface
                     throw new InvalidArgumentException("Package: $package has no tag: $tag.");
                 }
             }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+        if ($optionName === 'tag') {
+            $registry = $this->app->make(PackageRegistry::class);
+
+            $installer = $registry->prepareInstall();
+
+            $tags = [];
+
+            foreach ($registry->getPackages() as $package) {
+                $tags[] = array_keys($installer->getChild($package::getName())->tags);
+            }
+
+            return array_unique(array_merge(...$tags));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'packages') {
+            $registry = $this->app->make(PackageRegistry::class);
+
+            return array_map(static fn (AbstractPackage $pkg) => $pkg::getName(), $registry->getPackages());
         }
     }
 }
