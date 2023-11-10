@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
@@ -14,13 +7,17 @@ namespace Windwalker\Core\Provider;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Throwable;
+use Whoops\Exception\Inspector;
 use Whoops\Handler\CallbackHandler;
 use Whoops\Handler\PlainTextHandler;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Service\ErrorService;
+use Windwalker\Database\Exception\DatabaseQueryException;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
@@ -40,7 +37,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
     {
         $app = $container->get(ApplicationInterface::class);
 
-        if ($app->getClientType() === 'web') {
+        if ($app->getType() === AppType::WEB) {
             $this->replaceErrorHandler($container);
         }
     }
@@ -58,7 +55,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
     {
         $app = $container->get(ApplicationInterface::class);
 
-        if ($app->getClientType() === 'cli_web') {
+        if ($app->getType() === AppType::CLI_WEB) {
             $this->replaceErrorHandler($container);
         }
     }
@@ -128,6 +125,21 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
                 $handler->handleUnconditionally(true);
                 $handler->setEditor($container->getParam('whoops.editor') ?? 'phpstorm');
 
+                $handler->addDataTableCallback(
+                    'Database',
+                    function (Inspector $inspector) {
+                        $e = $inspector->getException();
+
+                        if ($e instanceof DatabaseQueryException) {
+                            return [
+                                'SQL' => $e->getDebugSql()
+                            ];
+                        }
+
+                        return null;
+                    }
+                );
+
                 return $handler;
             });
     }
@@ -142,7 +154,7 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
 
                         if (
                             PHP_SAPI === 'cli'
-                            && $app->getClient() === ApplicationInterface::CLIENT_WEB
+                            && $app->getClient() === AppClient::WEB
                         ) {
                             $textHandler = new PlainTextHandler();
                             $textHandler->addPreviousToOutput(true);

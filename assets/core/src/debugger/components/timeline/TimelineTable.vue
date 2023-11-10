@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { stateColor } from '../../services/utilities.js';
+import { stateColor } from '../../services/utilities';
 
 export default {
   name: 'TimelineTable',

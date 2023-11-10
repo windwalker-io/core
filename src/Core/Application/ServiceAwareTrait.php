@@ -1,19 +1,15 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\DI\Exception;
+use Windwalker\DI\Exception\DefinitionResolveException;
 
 /**
  * Trait ServiceAwareTrait
@@ -23,7 +19,24 @@ trait ServiceAwareTrait
     use ContainerAwareTrait;
 
     /**
-     * make
+     * Get object from Container.
+     *
+     * @template T
+     *
+     * @param  class-string<T>  $id
+     * @param  bool             $forceNew
+     *
+     * @return T
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function retrieve(string $id, bool $forceNew = false): mixed
+    {
+        return $this->getContainer()->get($id, $forceNew);
+    }
+
+    /**
+     * Create a single use object.
      *
      * @template T
      *
@@ -32,14 +45,16 @@ trait ServiceAwareTrait
      * @param  int              $options
      *
      * @return  T
+     * @throws DefinitionResolveException
+     * @throws ReflectionException
      */
-    public function make($class, array $args = [], int $options = 0): object
+    public function make(string $class, array $args = [], int $options = 0): object
     {
         return $this->getContainer()->newInstance($class, $args, $options);
     }
 
     /**
-     * service
+     * Get object or create if not exists, and save it as singleton.
      *
      * @template T
      *
@@ -49,7 +64,7 @@ trait ServiceAwareTrait
      *
      * @return  T
      *
-     * @throws Exception\DefinitionException
+     * @throws ContainerExceptionInterface
      */
     public function service(string $class, array $args = [], int $options = 0): object
     {
@@ -63,7 +78,7 @@ trait ServiceAwareTrait
     }
 
     /**
-     * call
+     *  Call a function or method.
      *
      * @param  mixed        $callable
      * @param  array        $args
@@ -73,6 +88,7 @@ trait ServiceAwareTrait
      * @return  mixed
      *
      * @throws ReflectionException
+     * @throws ContainerExceptionInterface
      */
     public function call(mixed $callable, array $args = [], ?object $context = null, int $options = 0): mixed
     {
@@ -80,7 +96,7 @@ trait ServiceAwareTrait
     }
 
     /**
-     * bind
+     * Bind a value or object to Container.
      *
      * @param  string  $id
      * @param  mixed   $value
@@ -98,7 +114,7 @@ trait ServiceAwareTrait
     }
 
     /**
-     * resolve
+     * Resolve a definition of DI.
      *
      * @template T
      *
@@ -107,8 +123,8 @@ trait ServiceAwareTrait
      * @param  int                    $options
      *
      * @return mixed|T
-     *
-     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function resolve(mixed $source, array $args = [], int $options = 0): mixed
     {

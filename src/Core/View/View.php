@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\View;
@@ -20,6 +13,7 @@ use UnexpectedValueException;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
+use Windwalker\Core\Attributes\ViewMetadata;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Html\HtmlFrame;
@@ -33,7 +27,6 @@ use Windwalker\Core\View\Event\BeforeRenderEvent;
 use Windwalker\Core\View\Event\PrepareDataEvent;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Filesystem\Path;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
@@ -45,13 +38,17 @@ use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Wrapper\WrapperInterface;
 
+use function Windwalker\has_attributes;
+
 /**
  * The ViewModel class.
  */
-class View implements EventAwareInterface
+class View implements EventAwareInterface, \ArrayAccess
 {
     use OptionsResolverTrait;
     use CoreEventAwareTrait;
+
+    protected bool $booted = false;
 
     protected string|array|null $layoutMap = null;
 
@@ -59,7 +56,7 @@ class View implements EventAwareInterface
 
     protected ?ResponseInterface $response = null;
 
-    protected bool $booted = false;
+    protected array $data = [];
 
     /**
      * View constructor.
@@ -117,6 +114,9 @@ class View implements EventAwareInterface
             ->default('layout')
             ->allowedTypes('string');
 
+        $resolver->define('layout')
+            ->allowedTypes('string');
+
         $resolver->define('module')
             ->allowedTypes(ModuleInterface::class, 'null')
             ->default(null);
@@ -137,6 +137,10 @@ class View implements EventAwareInterface
             ->allowedTypes('null', 'array')
             ->default([]);
 
+        $resolver->define('is_child')
+            ->allowedTypes('bool')
+            ->default(false);
+
         $resolver->define('vmAttr')
             ->allowedTypes(ViewModel::class, 'null')
             ->default(null);
@@ -152,6 +156,8 @@ class View implements EventAwareInterface
     public function render(array $data = []): ResponseInterface
     {
         $this->boot();
+
+        $data = [...$this->data, ...$data];
 
         $vm = $this->getViewModel();
 
@@ -169,7 +175,7 @@ class View implements EventAwareInterface
             $this->subscribe($vm);
         }
 
-        $layout = $this->resolveLayout();
+        $layout = $this->layout ?: $this->resolveLayout();
 
         // @event Before Prepare Data
         $event = $this->emit(
@@ -227,6 +233,13 @@ class View implements EventAwareInterface
 
             $response = $this->getResponse();
             $response->getBody()->write($content);
+        } elseif (is_string($response)) {
+            $content = $response;
+
+            $this->prepareHtmlFrame($vm);
+
+            $response = $this->getResponse();
+            $response->getBody()->write($content);
         } else {
             $data['vm'] = $vm;
 
@@ -249,7 +262,7 @@ class View implements EventAwareInterface
         return $event->getResponse();
     }
 
-    protected function handleVMResponse(mixed $data): array|ResponseInterface
+    protected function handleVMResponse(mixed $data): array|string|ResponseInterface
     {
         if ($data instanceof WrapperInterface) {
             $data = $data($this);
@@ -267,7 +280,7 @@ class View implements EventAwareInterface
             return new RedirectResponse($data);
         }
 
-        if (!is_array($data)) {
+        if (!is_array($data) && !is_string($data)) {
             throw new UnexpectedValueException(
                 sprintf(
                     'ViewModel return value not support for: %s',
@@ -315,7 +328,7 @@ class View implements EventAwareInterface
             return $layout['default'] ?? '';
         }
 
-        return (string) $layout;
+        return (string) $layout ?: $this->options['layout'];
     }
 
     protected function injectData(object $vm, array $data): void
@@ -341,7 +354,25 @@ class View implements EventAwareInterface
         $asset = $this->asset;
         $name = strtolower(ltrim($this->guessName($vm), '\\/'));
         $vmName = Path::clean($name, '/');
-        $this->addBodyClass($vm::class);
+
+        if (!$this->isChild()) {
+            $this->addBodyClass($vm::class);
+
+            $methods = (new ReflectionClass($vm))->getMethods();
+
+            foreach ($methods as $method) {
+                if (has_attributes($method, ViewMetadata::class)) {
+                    $this->app->call(
+                        $method->getClosure($vm),
+                        [
+                            self::class => $this,
+                            'view' => $this,
+                            ...$this->data
+                        ]
+                    );
+                }
+            }
+        }
 
         $cssList = $this->getOption('css');
         $jsList = $this->getOption('js');
@@ -386,6 +417,7 @@ class View implements EventAwareInterface
                 'js' => $jsList,
                 'modules' => $modules,
                 'className' => $vm::class,
+                'isChild' => $this->isChild(),
             ]
         );
     }
@@ -471,6 +503,7 @@ class View implements EventAwareInterface
     protected function preparePaths(ViewModelInterface $vm, string $ns = 'main'): void
     {
         // Prepare App view override
+        // ROOT/views/{stage}/{view}
         $this->addPath($this->getAppTemplatePath($vm));
 
         // Prepare route override paths
@@ -483,6 +516,7 @@ class View implements EventAwareInterface
         }
 
         // Prepare Self view paths
+        // `Module/{View}/views`
         $dir = $this->getTemplatePath($vm);
 
         if (class_exists(Language::class)) {
@@ -506,7 +540,7 @@ class View implements EventAwareInterface
         }
     }
 
-    public function addViewPath(string|object $view, int $priority = 100, string $ns = 'main'): static
+    public function addViewPath(string|object $view, int $priority = PriorityQueue::LOW, string $ns = 'main'): static
     {
         if (is_object($view)) {
             $view = $view::class;
@@ -519,7 +553,7 @@ class View implements EventAwareInterface
         return $this;
     }
 
-    public function addParentViewPath(int $priority = 100, string $ns = 'main'): static
+    public function addParentViewPath(int $priority = PriorityQueue::LOW, string $ns = 'main'): static
     {
         $this->addViewPath(get_parent_class($this->getViewModel()), $priority, $ns);
 
@@ -621,5 +655,59 @@ class View implements EventAwareInterface
     public function dumpPaths(): array
     {
         return $this->rendererService->dumpPaths();
+    }
+
+    public function isChild(): bool
+    {
+        return $this->options['is_child'];
+    }
+
+    public function set(string $id, mixed $value): static
+    {
+        $this->data[$id] = $value;
+
+        return $this;
+    }
+
+    public function bind(string $id, mixed $value): static
+    {
+        return $this->set($id, $value);
+    }
+
+    public function get(string $id): mixed
+    {
+        return $this->data[$id] ?? null;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
+    public function setData(array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->data[$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->data[$offset]);
     }
 }

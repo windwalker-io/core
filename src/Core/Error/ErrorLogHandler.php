@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of Windwalker project.
- *
- * @copyright  Copyright (C) 2016 LYRASOFT. All rights reserved.
- * @license    GNU General Public License version 2 or later.
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Error;
@@ -77,11 +70,11 @@ class ErrorLogHandler implements ErrorHandlerInterface
         $code = $e->getCode();
 
         if ($code < 400 || $code >= 500) {
-            $message = static::handleExceptionLogText($e, $this->config->get('@root'));
+            // $message = static::handleExceptionLogText($e, $this->config->get('@root'));
 
             $this->logger->error(
                 $this->config->getDeep('error.log_channel') ?? 'error',
-                $message,
+                $e->getMessage(),
                 ['exception' => $e]
             );
         }

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
@@ -20,7 +13,7 @@ use Windwalker\DI\Container;
  */
 trait IniSetterTrait
 {
-    public function setINI(string $key, $value, Container $container): void
+    public static function setINI(string $key, $value, Container $container): void
     {
         if (is_callable($value)) {
             $container->call($value, [$container]);
@@ -29,10 +22,10 @@ trait IniSetterTrait
         }
     }
 
-    protected function setINIValues(array $values, Container $container): void
+    protected static function setINIValues(array $values, Container $container): void
     {
         foreach ($values as $key => $value) {
-            $this->setINI($key, $value, $container);
+            static::setINI($key, $value, $container);
         }
     }
 }

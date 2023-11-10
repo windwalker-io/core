@@ -1,19 +1,16 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Application\AppLayer;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\RootApplicationInterface;
+use Windwalker\Core\CliServer\CliServerClient;
+use Windwalker\Core\CliServer\CliServerStateManager;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -39,6 +36,7 @@ class AppProvider implements ServiceProviderInterface
      * AppProvider constructor.
      *
      * @param  ApplicationInterface  $app
+     * @param  ProfilerFactory|null  $profilerFactory
      */
     public function __construct(ApplicationInterface $app, protected ?ProfilerFactory $profilerFactory = null)
     {
@@ -53,10 +51,15 @@ class AppProvider implements ServiceProviderInterface
     {
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
-        $container->share(get_class($this->app), $this->app);
-        $container->share(get_parent_class($this->app), $this->app)
-            ->alias(RootApplicationInterface::class, get_parent_class($this->app));
-        $container->share(ApplicationInterface::class, $this->app);
+        $container->share($this->app::class, $this->app)
+            ->alias(RootApplicationInterface::class, $this->app::class)
+            ->alias(ApplicationInterface::class, $this->app::class)
+            ->providedIn(AppLayer::APP);
+
+        if ($parentClass = get_parent_class($this->app)) {
+            $container->alias($parentClass, $this->app::class);
+        }
+
         $container->prepareSharedObject(PathResolver::class);
         $container->prepareSharedObject(PackageRegistry::class);
 
@@ -64,6 +67,10 @@ class AppProvider implements ServiceProviderInterface
             $container->share(ProfilerFactory::class, $this->profilerFactory);
         } else {
             $container->prepareSharedObject(ProfilerFactory::class, null, Container::ISOLATION);
+        }
+
+        if ($this->app->getType() === AppType::CLI_WEB) {
+            $this->prepareCliWeb($container);
         }
 
         $this->prepareEvents($container);
@@ -90,13 +97,19 @@ class AppProvider implements ServiceProviderInterface
         $container->share(
             EventDispatcherRegistry::class,
             fn () => new EventDispatcherRegistry($this->app)
-        );
+        )
+            ->providedIn(AppLayer::REQUEST);
     }
 
     protected function prepareUtilities(Container $container): void
     {
-        $container->prepareSharedObject(FilterFactory::class);
-        $container->prepareSharedObject(FilterService::class);
-        $container->prepareSharedObject(ScheduleService::class);
+        $container->prepareSharedObject(FilterFactory::class, options: Container::ISOLATION);
+        $container->prepareSharedObject(FilterService::class, options: Container::ISOLATION);
+        $container->prepareSharedObject(ScheduleService::class, options: Container::ISOLATION);
+    }
+
+    protected function prepareCliWeb(Container $container): void
+    {
+        $container->prepareSharedObject(CliServerClient::class);
     }
 }

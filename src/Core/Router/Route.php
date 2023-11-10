@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
@@ -18,6 +11,7 @@ use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\Uri\Uri;
+use Windwalker\Utilities\Classes\FlowControlTrait;
 
 /**
  * The Route class.
@@ -25,6 +19,7 @@ use Windwalker\Uri\Uri;
 class Route implements JsonSerializable
 {
     use RouteConfigurationTrait;
+    use FlowControlTrait;
 
     protected array $groups = [];
 
@@ -136,8 +131,6 @@ class Route implements JsonSerializable
     }
 
     /**
-     * groups
-     *
      * @param  array  $groups
      *
      * @return  static
@@ -152,8 +145,6 @@ class Route implements JsonSerializable
     }
 
     /**
-     * getGroups
-     *
      * @return  array
      *
      * @since  3.5
@@ -175,9 +166,18 @@ class Route implements JsonSerializable
         return $this->name;
     }
 
+    public function isGroup(string ...$groups): bool
+    {
+        foreach ($groups as $group) {
+            if (array_key_exists($group, $this->groups)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
-     * compile
-     *
      * @return  Route
      *
      * @since  3.5
@@ -190,7 +190,17 @@ class Route implements JsonSerializable
         $groups = $this->getGroups();
 
         // Set group data
-        $keys = ['methods', 'actions', 'variables', 'requirements', 'scheme', 'port', 'sslPort', 'hooks', 'hosts'];
+        $keys = [
+            'methods',
+            'actions',
+            'vars',
+            'requirements',
+            'scheme',
+            'port',
+            'sslPort',
+            'hooks',
+            'hosts',
+        ];
 
         foreach ($groups as $groupData) {
             foreach ($keys as $i => $key) {
@@ -200,6 +210,10 @@ class Route implements JsonSerializable
                     unset($groupData[$key]);
                 }
             }
+
+            $new->layoutPaths(
+                ...($groupData['layoutPaths'] ?? [])
+            );
 
             if (isset($groupData['extra'])) {
                 $new->extraValues($groupData['extra']);
@@ -248,6 +262,14 @@ class Route implements JsonSerializable
 
         $new->setOptions($options);
 
+        if ($options['extra']['default_controller'] ?? null) {
+            $new->controller($options['extra']['default_controller']);
+        }
+
+        if ($options['extra']['default_view'] ?? null) {
+            $new->view($options['extra']['default_view']);
+        }
+
         return $new;
     }
 
@@ -284,7 +306,7 @@ class Route implements JsonSerializable
             }
         }
 
-        foreach ($properties['options']['middlewares'] as &$middleware) {
+        foreach ($properties['options']['middlewares'] ?? [] as &$middleware) {
             if ($middleware instanceof ObjectBuilderDefinition) {
                 $middleware = $middleware->getClass();
             } elseif (is_object($middleware)) {

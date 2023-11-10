@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
@@ -15,6 +8,7 @@ use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\ControllerDispatcher;
 
 /**
@@ -31,7 +25,7 @@ trait AttributeMiddlewareTrait
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return ControllerDispatcher::anyToResponse(
+        return AppContext::anyToResponse(
             $this->run(
                 $request,
                 fn(ServerRequestInterface $request): ResponseInterface => $handler->handle($request)

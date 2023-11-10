@@ -1,20 +1,14 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
-use RuntimeException;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
-use Windwalker\Database\Platform\AbstractPlatform;
+use Windwalker\Database\Platform\MySQLPlatform;
+use Windwalker\DI\Attributes\Isolation;
+use Windwalker\DI\Container;
 use Windwalker\ORM\ORM;
 
 /**
@@ -22,6 +16,7 @@ use Windwalker\ORM\ORM;
  *
  * @method DatabaseAdapter get(?string $name = null, ...$args)
  */
+#[Isolation]
 class DatabaseManager extends AbstractManager
 {
     public function getConfigPrefix(): string
@@ -30,6 +25,17 @@ class DatabaseManager extends AbstractManager
     }
 
     protected function getFactoryPath(string $name): string
+    {
+        $path =  'connections.' . $name . '.factory';
+
+        if (!$this->config->hasDeep($path)) {
+            $path =  'connections.' . $name;
+        }
+
+        return $path;
+    }
+
+    protected function getLegacyFactoryPath(string $name): string
     {
         return 'connections.' . $name;
     }
@@ -47,13 +53,30 @@ class DatabaseManager extends AbstractManager
         /** @var DatabaseAdapter $db */
         $db = parent::create($name, ...$args);
 
-        $db->orm()->setAttributesResolver($this->container->getAttributesResolver());
+        $db->getDriver()->setOption('debug', WINDWALKER_DEBUG);
 
-        if ($db->getPlatform()->getName() === AbstractPlatform::MYSQL) {
+        $orm = $db->orm();
+
+        $orm->setAttributesResolver($this->container->getAttributesResolver());
+
+        $orm->getCaster()
+            ->setDbTimezone(
+                $this->container->getParam('app.server_timezone') ?: 'UTC'
+            );
+
+        $platform = $db->getPlatform();
+
+        if ($platform instanceof MySQLPlatform && $platform->getName() === $platform::MYSQL) {
             $options = $db->getOptions();
 
-            if ($options['strict'] ?? true) {
-                $this->strictMode($db, $options);
+            try {
+                if ($options['strict'] ?? true) {
+                    $platform->enableStrictMode($options['modes'] ?? null);
+                } elseif ($options['modes'] ?? null) {
+                    $platform->setModes($options['modes'] ?? []);
+                }
+            } catch (\RuntimeException $e) {
+                // No actions
             }
         }
 
@@ -70,21 +93,27 @@ class DatabaseManager extends AbstractManager
         return $this->container->resolve(DatabaseFactory::class);
     }
 
-    protected function strictMode(DatabaseAdapter $db, array $options): void
+    public static function createAdapter(string $instanceName): \Closure
     {
-        $modes = $options['modes'] ?? [
-                'ONLY_FULL_GROUP_BY',
-                'STRICT_TRANS_TABLES',
-                'ERROR_FOR_DIVISION_BY_ZERO',
-                'NO_ENGINE_SUBSTITUTION',
-                'NO_ZERO_IN_DATE',
-                'NO_ZERO_DATE',
-            ];
+        return static function (Container $container) use ($instanceName) {
+            $factory = $container->newInstance(DatabaseFactory::class);
+            $connConfig = $container->getParam('database.connections.' . $instanceName);
 
-        try {
-            $db->execute("SET @@SESSION.sql_mode = '" . implode(',', $modes) . "';");
-        } catch (RuntimeException $e) {
-            // If not success, hide error.
-        }
+            $driverKey = 'database.connection.driver.' . $instanceName;
+
+            if ($container->has($driverKey)) {
+                $driver = $container->get($driverKey);
+
+                return $factory->create(
+                    $driver,
+                    $connConfig['options'] ?? [],
+                );
+            }
+
+            return $factory->create(
+                $connConfig['driver'],
+                $connConfig['options'] ?? [],
+            );
+        };
     }
 }

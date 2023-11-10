@@ -1,17 +1,11 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Web;
 
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Event\AbstractEvent;
 
 /**
@@ -21,7 +15,7 @@ class BeforeControllerDispatchEvent extends AbstractEvent
 {
     protected mixed $controller;
 
-    protected AppContext $app;
+    protected AppContextInterface $app;
 
     /**
      * @return mixed
@@ -44,19 +38,19 @@ class BeforeControllerDispatchEvent extends AbstractEvent
     }
 
     /**
-     * @return AppContext
+     * @return AppContextInterface
      */
-    public function getApp(): AppContext
+    public function getApp(): AppContextInterface
     {
         return $this->app;
     }
 
     /**
-     * @param  AppContext  $app
+     * @param  AppContextInterface  $app
      *
      * @return  static  Return self to support chaining.
      */
-    public function setApp(AppContext $app): static
+    public function setApp(AppContextInterface $app): static
     {
         $this->app = $app;
 

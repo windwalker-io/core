@@ -1,9 +1,4 @@
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 import { createRouter, createWebHashHistory } from 'vue-router';
 import $http from './services/http.js';

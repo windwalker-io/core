@@ -54,7 +54,7 @@
       <div class="mt-5">
         <h4>Config</h4>
 
-        <pre class="bg-light p-3"><code>{{ JSON.stringify(data.config, null, 2) }}</code></pre>
+        <pre class="border rounded p-3"><code>{{ JSON.stringify(data.config, null, 2) }}</code></pre>
       </div>
     </div>
   </DefaultLayout>

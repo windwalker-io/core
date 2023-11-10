@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\SubCommand;
@@ -24,9 +17,9 @@ use Windwalker\Console\IOInterface;
 )]
 class MiddlewareSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'App\\Middleware';
+    protected string $defaultNamespace = 'Middleware';
 
-    protected string $defaultDir = 'src/Middleware';
+    protected string $defaultDir = 'Middleware';
 
     protected bool $requireDest = false;
 
@@ -65,7 +58,7 @@ class MiddlewareSubCommand extends AbstractGeneratorSubCommand
                 $this->getDestPath($io),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

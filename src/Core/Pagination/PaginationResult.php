@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of Windwalker project.
- *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU Lesser General Public License version 3 or later.
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
@@ -101,32 +94,37 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     {
         $total = $pagination->getTotal();
         $current = $pagination->getCurrent();
+        $pages = $pagination->getPages();
+        $limit = $pagination->getLimit();
+        $simple = $pagination->isSimple();
 
-        if ($total === 0 || $pagination->getLimit() === 0 || $pagination->getPages() === 1) {
+        if ($total === 0 || $limit === 0 || $pages === 1) {
             return;
         }
 
         // Lower
         $offset = $current - 1;
-        $pages = $pagination->getPages();
 
-        // -1 is simple pagination
-        if ($total === -1) {
+        if ($simple) {
+            // Simple pagination
             $neighbours = 1;
         } else {
+            // Basic pagination
             $neighbours = $current - $pagination->getNeighbours();
             $neighbours = max($neighbours, Pagination::BASE_PAGE);
+
+            for ($i = $offset; $i >= $neighbours; $i--) {
+                $this->lowers[] = $this->getItem(Pagination::LOWER, $i);
+            }
+
+            if ($neighbours - Pagination::BASE_PAGE >= 2) {
+                $this->less = $this->getItem(Pagination::LESS, $neighbours - 1);
+            }
         }
 
-        for ($i = $offset; $i >= $neighbours; $i--) {
-            $this->lowers[] = $this->getItem(Pagination::LOWER, $i);
+        if (($current - 1) > 0) {
+            $this->previous = $this->getItem(Pagination::PREVIOUS, $current - 1);
         }
-
-        if ($neighbours - Pagination::BASE_PAGE >= 2) {
-            $this->less = $this->getItem(Pagination::LESS, $neighbours - 1);
-        }
-
-        $this->previous = $this->getItem(Pagination::PREVIOUS, $current - 1);
 
         // First
         if ($current - $pagination->getNeighbours() > Pagination::BASE_PAGE) {
@@ -134,25 +132,27 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
         }
 
         // Higher
-        $offset = $current + 1;
-        $neighbours = $current + $pagination->getNeighbours();
-        $neighbours = min($neighbours, $pages);
+        if (!$simple) {
+            $offset = $current + 1;
+            $neighbours = $current + $pagination->getNeighbours();
+            $neighbours = min($neighbours, $pages);
 
-        for ($i = $offset; $i <= $neighbours; $i++) {
-            $this->highers[] = $this->getItem(Pagination::HIGHER, $i);
-        }
+            for ($i = $offset; $i <= $neighbours; $i++) {
+                $this->highers[] = $this->getItem(Pagination::HIGHER, $i);
+            }
 
-        if (($pages - $neighbours) > 0) {
-            $this->more = $this->getItem(Pagination::MORE, $neighbours + 1);
+            if (($pages - $neighbours) > 0) {
+                $this->more = $this->getItem(Pagination::MORE, $neighbours + 1);
+            }
         }
 
         // Show next button if not last page or for simple pagination
-        if ($total === -1 || $current !== $pages) {
+        if ($simple || $current !== $pages) {
             $this->next = $this->getItem(Pagination::NEXT, $current + 1);
         }
 
         // Last
-        if ($current + $pagination->getNeighbours() < $pages) {
+        if (!$simple && $current + $pagination->getNeighbours() < $pages) {
             $this->last = $this->getItem(Pagination::LAST, $pages);
         }
 
@@ -234,6 +234,10 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     protected function getItem(string $name, ?int $page): ?PageItem
     {
+        if ($page <= 0) {
+            return null;
+        }
+
         if ($page === null) {
             return null;
         }
@@ -303,7 +307,44 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
         ksort($all);
 
-        return $all;
+        return array_values($all);
+    }
+
+    /**
+     * @return  array<PageItem>
+     */
+    public function navs(): array
+    {
+        $links = [];
+
+        if ($first = $this->getFirst()) {
+            $links['first'] = $first;
+        }
+
+        if ($previous = $this->getPrevious()) {
+            $links['previous'] = $previous;
+        }
+
+        if ($next = $this->getNext()) {
+            $links['next'] = $next;
+        }
+
+        if ($last = $this->getLast()) {
+            $links['last'] = $last;
+        }
+
+        return $links;
+    }
+
+    public function navLinks(): array
+    {
+        $links = [];
+
+        foreach ($this->navs() as $type => $link) {
+            $links[$type] = $link->toLink();
+        }
+
+        return $links;
     }
 
     /**

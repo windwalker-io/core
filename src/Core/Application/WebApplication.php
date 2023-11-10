@@ -1,22 +1,21 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
 use JetBrains\PhpStorm\NoReturn;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Log\LogLevel;
+use ReflectionException;
 use Stringable;
 use Throwable;
+use Windwalker\Core\CliServer\CliServerClient;
+use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
@@ -26,28 +25,35 @@ use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Form\Exception\ValidateFailException;
+use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
 use Windwalker\Core\Provider\WebProvider;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
+use Windwalker\Core\Service\ErrorService;
+use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Http\Event\RequestEvent;
+use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Output\Output;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
+use Windwalker\Http\Server\HttpServerInterface;
+use Windwalker\Http\Server\ServerInterface;
 
 /**
  * The WebApplication class.
  *
  * @since  4.0
  */
-class WebApplication implements WebApplicationInterface, RootApplicationInterface
+class WebApplication implements WebRootApplicationInterface
 {
     use WebApplicationTrait;
 
@@ -68,6 +74,17 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         $this->container = $container;
     }
 
+    public function bootForServer(ServerInterface $server): void
+    {
+        $container = $this->getContainer();
+
+        $container->share($server::class, $server)
+            ->alias(ServerInterface::class, $server::class)
+            ->alias(HttpServerInterface::class, $server::class);
+
+        $this->boot();
+    }
+
     /**
      * boot
      *
@@ -83,7 +100,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         // Start profiler for Web type
         $profilerFactory = null;
 
-        if ($this->getClientType() === 'web') {
+        if ($this->getType() === AppType::WEB) {
             $profilerFactory = new ProfilerFactory();
             $profilerFactory->get('main')->mark('boot', ['system']);
         }
@@ -158,6 +175,15 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $container->get(AppContext::class);
     }
 
+    /**
+     * Create an AppContext for every request.
+     *
+     * @param  RequestEvent  $event
+     *
+     * @return  AppContext
+     *
+     * @throws DefinitionException
+     */
     public function createContextFromServerEvent(RequestEvent $event): AppContext
     {
         $request = $event->getRequest();
@@ -172,6 +198,20 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $appContext;
     }
 
+    /**
+     * Run this appContext and return the response.
+     *
+     * NOTE: This method will not emit any content to output, you must emit response yourself.
+     *
+     * @param  AppContext     $appContext
+     * @param  callable|null  $handler
+     *
+     * @return  ResponseInterface
+     *
+     * @throws Throwable
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function runContext(AppContext $appContext, ?callable $handler = null): ResponseInterface
     {
         $container = $appContext->getContainer();
@@ -197,8 +237,9 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
 
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
-            static fn(ServerRequestInterface $request) => $container->get(ControllerDispatcher::class)
-                ->dispatch($container->get(AppContext::class))
+            static fn(ServerRequestInterface $request) => static::anyToResponse(
+                $container->get(AppContext::class)->dispatchController()
+            )
         );
 
         // @event
@@ -224,13 +265,77 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
         return $event->getResponse();
     }
 
-    public function executeServerEvent(RequestEvent $event): ResponseInterface
+    public function runCliServerRequest(RequestEvent $event): RequestEvent
     {
-        return $this->runContext(
-            $this->createContextFromServerEvent($event)
-        );
+        $client = $this->service(CliServerClient::class);
+
+        $appContext = $this->createContextFromServerEvent($event);
+
+        $start = microtime(true);
+
+        try {
+            $response = $this->runContext($appContext);
+            $statusCode = $response->getStatusCode();
+
+            $event->setResponse($response);
+        } catch (\Throwable $e) {
+            $statusCode = $e->getCode();
+
+            if (!ResponseHelper::isClientError($statusCode)) {
+                $output = CliServerRuntime::getStyledOutput();
+
+                try {
+                    $output->error("({$e->getCode()}) " . $e->getMessage());
+                    $output->writeln('  # File: ' . $e->getFile() . ':' . $e->getLine());
+                    $output->newLine(2);
+                    $error = $appContext->service(ErrorService::class);
+
+                    $error->handle($e);
+                } catch (\Throwable $e) {
+                    $this->log(
+                        '[Infinite loop in error handling]: ' . $e->getMessage(),
+                        level: LogLevel::ERROR
+                    );
+                }
+            }
+        } finally {
+            $event->setEndHandler(fn () => $this->stopContext($appContext));
+
+            $duration = round((microtime(true) - $start) * 1000);
+
+            $client->logRequestInfo(
+                $event->getRequest(),
+                $statusCode,
+                $duration
+            );
+
+            // Todo: Add RequestTerminateEvent
+            // $this->terminate();
+        }
+
+        return $event;
     }
 
+    public function executeServerEvent(RequestEvent $event): ResponseInterface
+    {
+        $appContext = $this->createContextFromServerEvent($event);
+
+        $event->setEndHandler(fn () => $this->stopContext($appContext));
+
+        return $this->runContext($appContext);
+    }
+
+    /**
+     * Run for classic Apache/FPM one time request.
+     *
+     * @param  ServerRequestInterface|null  $request
+     * @param  callable|null                $handler
+     *
+     * @return  ResponseInterface
+     * @throws Throwable
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
     {
         $appContext = $this->createContext($request);
@@ -254,18 +359,20 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             compact('container')
         );
 
-        foreach ($this->providers as $provider) {
-            if ($provider instanceof RequestReleasableProviderInterface) {
-                $provider->releaseAfterRequest($container);
-            }
-        }
+        $this->releaseProviders($container);
     }
 
     /**
+     * @param  AppContext              $app
      * @param  ServerRequestInterface  $request
      * @param  iterable                $middlewares
      *
      * @return ResponseInterface
+     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
+     * @throws DefinitionResolveException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     protected function dispatch(
         AppContext $app,
@@ -278,7 +385,7 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
         } catch (ValidateFailException | InvalidTokenException $e) {
-            if ($app->isDebug()) {
+            if ($app->isDebug() || $app->isApiCall()) {
                 throw $e;
             }
 
@@ -287,10 +394,15 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
 
             return $this->redirect($nav->back());
         } catch (Throwable $e) {
+            if ($app->isCliRuntime()) {
+                $this->logError($e);
+            }
+
             if (
                 $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
                 || $app->getAppRequest()->isAcceptJson()
+                || $app->isApiCall()
             ) {
                 throw $e;
             }
@@ -303,6 +415,31 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
     }
 
     /**
+     * @param  Throwable  $e
+     *
+     * @return  void
+     *
+     * @throws ReflectionException
+     * @throws \Windwalker\DI\Exception\DefinitionException
+     */
+    protected function logError(Throwable $e): void
+    {
+        // Do not log 40x errors.
+        if ($e->getCode() >= 400 && $e->getCode() < 500) {
+            return;
+        }
+
+        // $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
+
+        $this->retrieve(LoggerService::class)
+            ->error(
+                $this->app->config('error.log_channel') ?? 'error',
+                $e->getMessage(),
+                ['exception' => $e]
+            );
+    }
+
+    /**
      * Redirect to another URL.
      *
      * @param  string|Stringable  $url
@@ -310,6 +447,8 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
      * @param  bool               $instant
      *
      * @return  ResponseInterface
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     public function redirect(string|Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
     {
@@ -384,8 +523,8 @@ class WebApplication implements WebApplicationInterface, RootApplicationInterfac
     protected function releaseProviders(Container $container): void
     {
         foreach ($this->providers as $provider) {
-            if ($provider instanceof RequestBootableProviderInterface) {
-                $provider->bootBeforeRequest($container);
+            if ($provider instanceof RequestReleasableProviderInterface) {
+                $provider->releaseAfterRequest($container);
             }
         }
     }

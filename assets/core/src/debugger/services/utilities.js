@@ -1,9 +1,4 @@
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2022 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 export function stateColor(value, avg) {
   if (value > (avg * 2)) {
@@ -15,4 +10,20 @@ export function stateColor(value, avg) {
   } else {
     return 'info';
   }
+}
+
+export function httpStatusColor(status) {
+  if (status >= 300 && status < 400) {
+    return 'info';
+  }
+
+  if (status >= 400 && status < 500) {
+    return 'warning';
+  }
+
+  if (status >= 200 && status < 300) {
+    return 'success';
+  }
+
+  return 'danger';
 }

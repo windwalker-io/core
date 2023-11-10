@@ -1,19 +1,14 @@
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
+
 
 import router from '../routes.js';
 import $http from './http.js';
 
-export async function goToLast(currentRoute = null) {
+export async function goToLast(currentRoute = undefined) {
   const res = await $http.get('ajax/last');
   let route = '';
 
   if (currentRoute) {
-    route = currentRoute += '/' + res.data.data;
+    route = currentRoute + '/' + res.data.data;
   } else {
     route = '/system/' + res.data.data;
   }

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
@@ -47,17 +40,16 @@ class MigrationService implements EventAwareInterface
      */
     public function __construct(protected ApplicationInterface $app, protected ?DatabaseAdapter $db = null)
     {
-        $this->db?->addEventDealer($this->getEventDispatcher());
+        // $this->db?->addEventDealer($this->getEventDispatcher());
     }
 
     /**
-     * migrate
-     *
-     * @param  string  $path
+     * @param  string       $path
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
      * @return  int
+     * @throws Exception
      */
     public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): int
     {
@@ -174,6 +166,9 @@ class MigrationService implements EventAwareInterface
         // ];
 
         $this->storeVersion($migration, $direction, $start, $end);
+
+        // Reset Tables
+        $db->getSchema()->cacheReset();
     }
 
     /**
@@ -360,7 +355,7 @@ class MigrationService implements EventAwareInterface
         $logStream = new Stream($logFile, WRITE_ONLY_FROM_END);
 
         // Log query
-        $this->on(
+        $this->db->on(
             QueryEndEvent::class,
             function (QueryEndEvent $event) use ($logStream) {
                 $logStream->write($event->getDebugQueryString() . ";\n\n");
@@ -368,7 +363,7 @@ class MigrationService implements EventAwareInterface
         );
 
         // Log failed
-        $this->on(
+        $this->db->on(
             QueryFailedEvent::class,
             function (QueryFailedEvent $event) use ($logStream) {
                 $e = $event->getException();

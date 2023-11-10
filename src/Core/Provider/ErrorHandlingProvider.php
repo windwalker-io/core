@@ -1,19 +1,18 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use NunoMaduro\Collision\Writer;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Whoops\Exception\Inspector;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Console\Collision\SolutionRepository;
 use Windwalker\Core\Runtime\Config;
-use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
@@ -49,32 +48,44 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
      */
     public function boot(Container $container): void
     {
-        $iniValues = $this->config->get('ini') ?? [];
+        if (!$this->app->getType()->isCliWeb()) {
+            $iniValues = $this->config->get('ini') ?? [];
 
-        $this->setINIValues($iniValues, $container);
+            static::setINIValues($iniValues, $container);
+        }
 
         $error = $container->get(ErrorService::class);
 
         switch ($this->app->getClient()) {
-            case ApplicationInterface::CLIENT_WEB:
+            case AppClient::WEB:
             default:
-                if ($this->app->isCliRuntime()) {
-                    // Runtime CLI do not restore exception handler, let console app handle it.
-                    $error->registerErrors($this->config->get('restore') ?? true);
-                    $error->registerShutdown();
-                } else {
+                // Runtime CLI do not restore exception handler, let console app handle it.
+                if (!$this->app->isCliRuntime()) {
+                    ini_set('display_errors', 'stderr');
+
                     $error->register(
-                        $this->config->get('restore') ?? true,
-                        $this->config->get('report_level') ?? E_ALL | E_STRICT,
-                        $this->config->get('register_shutdown') ?? true
+                        (bool) ($this->config->get('restore') ?? true),
+                        (int) ($this->config->get('report_level') ?? E_ALL | E_STRICT),
+                        (bool) ($this->config->get('register_shutdown') ?? true)
                     );
                 }
                 break;
 
-            case ApplicationInterface::CLIENT_CONSOLE:
-                // Console do not restore exception handler, let console app handle it.
-                $error->registerErrors($this->config->get('restore') ?? true);
-                $error->registerShutdown();
+            case AppClient::CONSOLE:
+                if (class_exists(Writer::class)) {
+                    $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) {
+                        $error = $event->getError();
+
+                        $writer = new Writer(
+                            new SolutionRepository(),
+                            $event->getOutput()
+                        );
+                        $writer->write(new Inspector($error));
+                    });
+                }
+
+                // To hide default uncaught errors and backtraces.
+                $error->register(false, E_ALL | E_STRICT, true);
                 break;
         }
     }
@@ -85,7 +96,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     public function register(Container $container): void
     {
         $container->prepareSharedObject(ErrorService::class, function (ErrorService $error, Container $container) {
-            foreach ($this->config->getDeep('handlers.' . $this->app->getClientType()) ?? [] as $key => $handler) {
+            foreach ($this->config->getDeep('handlers.' . $this->app->getType()->name) ?? [] as $key => $handler) {
                 $handler = $container->resolve($handler);
 
                 $error->addHandler($handler, is_numeric($key) ? null : $key);

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\SubCommand;
@@ -47,7 +40,7 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => Str::ensureRight($name, 'View'),
                     'name' => Str::removeRight($name, 'View'),
-                    'ns' => $this->getNamesapce($io, 'View'),
+                    'ns' => $this->getNamespace($io, 'View'),
                 ],
                 $force
             );

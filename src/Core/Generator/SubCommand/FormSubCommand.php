@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\SubCommand;
@@ -47,7 +40,7 @@ class FormSubCommand extends AbstractGeneratorSubCommand
                 [
                     'className' => Str::ensureRight($name, 'Form'),
                     'name' => Str::removeRight($name, 'Form'),
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getNamespace($io),
                 ],
                 $force
             );

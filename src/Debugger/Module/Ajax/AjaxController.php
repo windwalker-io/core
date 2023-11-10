@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Debugger\Module\Ajax;
@@ -29,7 +22,7 @@ class AjaxController
     #[JsonApi]
     public function history(#[Autowire] DashboardRepository $repository): array
     {
-        return $repository->getItems(100, false);
+        return array_values($repository->getItems(100, false));
     }
 
     #[JsonApi]

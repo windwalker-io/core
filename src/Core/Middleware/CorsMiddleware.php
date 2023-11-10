@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of Windwalker project.
- *
- * @copyright  Copyright (C) 2022 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
@@ -44,7 +37,8 @@ class CorsMiddleware implements MiddlewareInterface
             ->default(env('CORS_ALLOW_ORIGINS') ?: null);
 
         $resolver->define('configure')
-            ->allowedTypes('callable');
+            ->allowedTypes('callable', 'null')
+            ->default(null);
 
         $resolver->define('send_instantly')
             ->allowedTypes('bool')
@@ -67,17 +61,21 @@ class CorsMiddleware implements MiddlewareInterface
         }
 
         if ($enabled) {
-            if ($request->getMethod() === 'OPTIONS') {
-                return Response::fromString('');
-            }
-
             $cors = $this->getCorsHandler($request);
 
             if ($this->options['send_instantly']) {
                 $this->sendInstantly($cors);
+
+                if ($request->getMethod() === 'OPTIONS') {
+                    return Response::fromString('');
+                }
             } else {
                 try {
-                    $res = $handler->handle($request);
+                    if ($request->getMethod() === 'OPTIONS') {
+                        $res = Response::fromString('');
+                    } else {
+                        $res = $handler->handle($request);
+                    }
 
                     return $cors->handle($res);
                 } catch (\Throwable $e) {

@@ -1,16 +1,10 @@
 <?php
 
-/**
- * Part of Windwalker project.
- *
- * @copyright  Copyright (C) 2014 - 2016 LYRASOFT. All rights reserved.
- * @license    GNU Lesser General Public License version 3 or later.
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
 
+use Closure;
 use InvalidArgumentException;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
@@ -77,9 +71,9 @@ class Pagination
     /**
      * Total Items
      *
-     * @var int|callable|null
+     * @var int|null|Closure
      */
-    protected $total = null;
+    protected int|null|Closure $total = null;
 
     /**
      * Number of the current page
@@ -123,6 +117,8 @@ class Pagination
      */
     protected RouteUri|null $route = null;
 
+    protected bool $simple = false;
+
     /**
      * Pagination constructor.
      *
@@ -155,8 +151,12 @@ class Pagination
      */
     public function getTotal(): int
     {
+        if ($this->isSimple()) {
+            return -1;
+        }
+
         if (!is_int($this->total)) {
-            $this->total = ($this->total)();
+            $this->total = ($this->total)($this);
         }
 
         return $this->total;
@@ -165,11 +165,11 @@ class Pagination
     /**
      * Method to set property total
      *
-     * @param  int|callable  $total
+     * @param  int|Closure  $total
      *
      * @return  static  Return self to support chaining.
      */
-    public function total(int|callable $total): static
+    public function total(int|Closure $total): static
     {
         $this->total = $total;
 
@@ -195,11 +195,9 @@ class Pagination
      */
     public function currentPage(int $current): static
     {
-        $this->current = (int) $current;
+        $this->current = $current;
 
-        if ($this->current < self::BASE_PAGE) {
-            $this->current = self::BASE_PAGE;
-        }
+        $this->positiveCurrentPage();
 
         return $this;
     }
@@ -370,5 +368,32 @@ class Pagination
         }
 
         return $route->withVar('page', $page);
+    }
+
+    public function isSimple(): bool
+    {
+        return $this->simple;
+    }
+
+    /**
+     * @param  bool  $simple
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function simple(bool $simple = true): static
+    {
+        $this->simple = $simple;
+
+        return $this;
+    }
+
+    /**
+     * @return  void
+     */
+    protected function positiveCurrentPage(): void
+    {
+        if (is_int($this->current) && $this->current < self::BASE_PAGE) {
+            $this->current = self::BASE_PAGE;
+        }
     }
 }

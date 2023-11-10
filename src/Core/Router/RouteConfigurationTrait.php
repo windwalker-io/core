@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
@@ -14,6 +7,7 @@ namespace Windwalker\Core\Router;
 use BadMethodCallException;
 use Windwalker\DI\Definition\DefinitionInterface;
 use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\Classes\FlowControlTrait;
 use Windwalker\Utilities\Options\OptionAccessTrait;
 use Windwalker\Utilities\Str;
 
@@ -21,17 +15,10 @@ use function Windwalker\DI\create;
 
 /**
  * Trait RouteConfigurationTrait
- *
- * @method $this getHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this postHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this putHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this patchHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this deleteHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this headHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this optionsHandler(callable|array|string|null $handler, ?string $task = null)
  */
 trait RouteConfigurationTrait
 {
+    use FlowControlTrait;
     use OptionAccessTrait;
 
     /**
@@ -400,6 +387,11 @@ trait RouteConfigurationTrait
         return $this->options['hosts'] ?? [];
     }
 
+    public function getNamespace(): string
+    {
+        return $this->getExtraValue('namespace') ?? '';
+    }
+
     /**
      * extra
      *
@@ -463,8 +455,6 @@ trait RouteConfigurationTrait
     }
 
     /**
-     * __call
-     *
      * @param  string  $name
      * @param  array   $args
      *

@@ -1,6 +1,6 @@
 <template>
 <div v-if="currentData">
-  <div class="p-3" style="background-color: var(--bs-gray-200);">
+  <div class="p-3 mt-3 mx-4 rounded-3" style="background-color: var(--bs-gray-800);">
     <h1 class="text-xl font-bold text-gray-800">
       <slot name="title"></slot>
     </h1>
@@ -21,25 +21,12 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import { useRoute } from 'vue-router';
-import { goToLast } from '../services/nav.js';
-import { currentData, currentId } from '../services/store.js';
+import { goToLast } from '../services/nav';
+import { currentData, currentId } from '../services/store';
 
-export default {
-  name: 'DefaultLayout',
-  setup() {
-    const route = useRoute();
-    
-    return {
-      currentId,
-      currentData,
-      route,
-
-      goToLast
-    };
-  }
-};
+const route = useRoute();
 </script>
 
 <style scoped>

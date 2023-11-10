@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Pagination;
@@ -33,7 +26,7 @@ class PageItem implements JsonSerializable
 
     public function toLink(): string
     {
-        return (string) $this->route;
+        return (string) $this->route->full();
     }
 
     public function __toString(): string

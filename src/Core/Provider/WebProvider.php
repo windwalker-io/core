@@ -1,21 +1,22 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\AppLayer;
+use Windwalker\Core\Application\AppType;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Http\RequestInspector;
+use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
@@ -44,6 +45,15 @@ class WebProvider implements ServiceProviderInterface
     {
     }
 
+    public function canProvide(): \Closure
+    {
+        if ($this->parentApp->getType() === AppType::CONSOLE) {
+            return static fn (int $level) => $level > AppLayer::APP;
+        }
+
+        return static fn (int $level) => $level > AppLayer::REQUEST;
+    }
+
     /**
      * Registers the service provider with a DI container.
      *
@@ -62,24 +72,25 @@ class WebProvider implements ServiceProviderInterface
         $this->registerAppContext($container);
 
         // Controller Dispatcher
-        $container->prepareSharedObject(ControllerDispatcher::class);
+        $container->prepareSharedObject(ControllerDispatcher::class)
+            ->providedIn($this->canProvide(...));
 
         // Navigator
         $container->prepareSharedObject(
             Navigator::class,
             fn(Navigator $nav, Container $container) => $nav->addEventDealer($container->get(AppContext::class))
-        );
+        )->providedIn($this->canProvide(...));
 
-        // Renderer
-        $this->extendRenderer($container);
+        // Security
+        $this->registerSecurityServices($container);
     }
 
     /**
-     * createAppRequest
-     *
      * @param  Container  $container
      *
      * @return  AppRequest
+     * @throws ContainerExceptionInterface
+     * @throws \ReflectionException
      */
     protected function createAppRequest(Container $container): AppRequest
     {
@@ -114,7 +125,9 @@ class WebProvider implements ServiceProviderInterface
                 return $app->setAppRequest($this->createAppRequest($container))
                     ->setState($container->get(AppState::class));
             }
-        );
+        )
+            ->alias(AppContextInterface::class, AppContext::class)
+            ->providedIn($this->canProvide(...));
     }
 
     /**
@@ -158,6 +171,9 @@ class WebProvider implements ServiceProviderInterface
             Container::ISOLATION
         );
 
+        // AjaxInspector
+        $container->prepareSharedObject(RequestInspector::class);
+
         // Proxy
         $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);
 
@@ -165,7 +181,9 @@ class WebProvider implements ServiceProviderInterface
         $container->set(
             AppRequest::class,
             fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
-        );
+        )
+            ->alias(AppRequestInterface::class, AppRequest::class)
+            ->providedIn($this->canProvide(...));
 
         // Browser Agent Detect
         $container->share(
@@ -174,22 +192,12 @@ class WebProvider implements ServiceProviderInterface
         );
     }
 
-    /**
-     * extendRenderer
-     *
-     * @param  Container  $container
-     *
-     * @return  void
-     */
-    protected function extendRenderer(Container $container): void
+    protected function registerSecurityServices(Container $container): void
     {
-        // $container->extend(
-        //     RendererService::class,
-        //     function (RendererService $service, Container $container) {
-        //         return $service->addGlobal('app', $app = $container->get(AppContext::class))
-        //             ->addGlobal('uri', $app->getSystemUri())
-        //             ->addGlobal('nav', $container->get(Navigator::class));
-        //     }
-        // );
+        $container->prepareSharedObject(
+            CspNonceService::class,
+            null,
+            Container::ISOLATION
+        );
     }
 }

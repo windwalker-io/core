@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Debugger\Module\Dashboard;
@@ -140,6 +133,7 @@ class DashboardRepository
             'response' => $collector->getDeep('http.response'),
             'time' => microtime(true),
             'ip' => $collector->getDeep('http.remoteIP'),
+            'ajax' => $collector->getDeep('http.request.ajax'),
         ];
 
         $folder = $this->getCacheFolder()->appendPath('/' . $id);

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
@@ -20,11 +13,13 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
+use Windwalker\Data\Collection;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
+use Windwalker\Utilities\TypeCast;
 
 /**
  * The Navigator class.
@@ -55,16 +50,31 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $options |= $this->options;
 
-        $to = $this->app->getServerRequest()->getServerParams()['HTTP_REFERER']
-            ?? $this->app->getSystemUri()->root();
+        $to = $this->localReferrer() ?? $this->getSystemUri()->root();
 
         return new RouteUri($to, null, $this, $options);
+    }
+
+    public function referrer(): ?string
+    {
+        return $this->app->getServerRequest()->getServerParams()['HTTP_REFERER'] ?? null;
+    }
+
+    public function localReferrer(): ?string
+    {
+        $referrer = $this->referrer();
+
+        if ($referrer === null) {
+            return null;
+        }
+
+        return $this->isLocalUrl((string) $referrer) ? $referrer : null;
     }
 
     public function self(int $options = self::TYPE_PATH): RouteUri
     {
         $route = $this->getMatchedRoute();
-        $to = $route?->getName() ?? $this->app->getSystemUri()->current();
+        $to = $route?->getName() ?? $this->getSystemUri()->current();
 
         $vars = [];
         $withoutVars = (bool) ($options & static::WITHOUT_VARS);
@@ -148,7 +158,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
                         $url = $event->getUrl();
                     }
 
-                    $systemUri = $this->app->getSystemUri();
+                    $systemUri = $this->getSystemUri();
 
                     if ($systemUri->script && $systemUri->script !== 'index.php') {
                         $url = $systemUri->script . '/' . $url;
@@ -208,24 +218,29 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->redirect($this->self(), $code, $options);
     }
 
-    public function validateRedirectUrl(Stringable|string $uri): string
+    public function isLocalUrl(Stringable|string $uri): bool
     {
-        $root = $this->app->getSystemUri()->root;
+        $root = $this->getSystemUri()->root;
 
         if (str_starts_with((string) $uri, '/')) {
-            return (string) $uri;
+            return true;
         }
 
-        if (stripos((string) $uri, $root) !== 0) {
-            $uri = $root;
-        }
+        return stripos((string) $uri, $root) === 0;
+    }
 
-        return (string) $uri;
+    public function validateRedirectUrl(Stringable|string $uri): string
+    {
+        $root = $this->getSystemUri()->root;
+
+        $uri = (string) $uri;
+
+        return $this->isLocalUrl($uri) ? $uri : $root;
     }
 
     public function absolute(string $url, int $options = RouteUri::TYPE_PATH): string
     {
-        $systemUri = $this->app->getSystemUri();
+        $systemUri = $this->getSystemUri();
 
         // if (!$systemUri) {
         //     return Str::ensureLeft($url, '/');
@@ -286,6 +301,111 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->app->getMatchedRoute();
     }
 
+    public function getRouteName(): ?string
+    {
+        return $this->getMatchedRoute()?->getName();
+    }
+
+    public function isActive(string|array $path, Closure|array|null $query = null, string $menu = 'mainmenu'): bool
+    {
+        if (is_array($path)) {
+            foreach ($path as $item) {
+                if ($this->isActive($item)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        $matched = $this->getMatchedRoute();
+
+        if (!$matched) {
+            return false;
+        }
+
+        $routeName = $matched->getName();
+        $shortName = Collection::explode('::', $matched->getName())->last();
+
+        // Step (1): Match route with wildcards
+        if (str_contains($path, '*')) {
+            $path2 = ltrim($path, '/');
+
+            $hasMatch = fnmatch($path2, $routeName)
+                || fnmatch($path2, $shortName)
+                || fnmatch($path2, $this->getSystemUri()->route());
+
+            if ($hasMatch) {
+                return true;
+            }
+        }
+
+        // Step (2): Match ns::route
+        if ($path === $routeName && str_contains($path, '::') && $this->matchVars($query)) {
+            return true;
+        }
+
+        // Step (3): Match route without ns
+        if ($path === $shortName && $this->matchVars($query)) {
+            return true;
+        }
+
+        $menuDirect = $matched->getExtraValue('menu')[$menu] ?? null;
+
+        // Step (4): If route not matched, we match extra values from routing.
+        if ($menuDirect) {
+            if ($menuDirect === $path && $this->matchVars($query)) {
+                return true;
+            }
+
+            if (str_contains($path, '::')) {
+                $path2 = explode('::', $path, 2);
+
+                if (array_pop($path2) === $menuDirect && $this->matchVars($query)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function inGroup(string|array $groups, array|null $query = null): bool
+    {
+        $groups = TypeCast::toArray($groups);
+
+        $matched = $this->getMatchedRoute();
+
+        if (!$matched) {
+            return false;
+        }
+
+        $currentGroups = array_keys($matched->getExtraValue('groups') ?? []);
+
+        $active = array_intersect($groups, $currentGroups) !== [];
+
+        return $active && $this->matchVars($query);
+    }
+
+    protected function matchVars(array|null $query = [], ?array $vars = null): bool
+    {
+        if ($query === null) {
+            return true;
+        }
+
+        $requests = $this->app->getAppRequest()->inputWithMethod();
+
+        $vars ??= $this->self()->getQueryValues();
+
+        foreach ($requests as $key => &$request) {
+            if (is_array($request) && in_array($key, $vars, true)) {
+                $request = implode('/', $request);
+            }
+        }
+
+        return !empty(Arr::query([$requests], $query));
+    }
+
     /**
      * findRoute
      *
@@ -320,5 +440,13 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         }
 
         return $routeObject;
+    }
+
+    /**
+     * @return  SystemUri
+     */
+    public function getSystemUri(): SystemUri
+    {
+        return $this->app->getSystemUri();
     }
 }

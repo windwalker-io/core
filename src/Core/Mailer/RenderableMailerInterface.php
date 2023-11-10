@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of unicorn project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Mailer;

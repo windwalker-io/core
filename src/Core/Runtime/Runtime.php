@@ -1,19 +1,15 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Runtime;
 
+use Windwalker\Core\Http\ProxyResolver;
+use Windwalker\Core\Provider\IniSetterTrait;
 use Windwalker\Core\Provider\RuntimeProvider;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
+use Windwalker\Http\Helper\IpHelper;
 use Windwalker\Utilities\Arr;
 
 /**
@@ -23,6 +19,8 @@ use Windwalker\Utilities\Arr;
  */
 class Runtime
 {
+    use IniSetterTrait;
+
     protected static string $rootDir = '';
 
     protected static string $workDir = '';
@@ -47,6 +45,10 @@ class Runtime
             $container = static::getContainer();
 
             $container->registerServiceProvider(new RuntimeProvider());
+
+            $ini = $container->getParam('ini') ?? [];
+
+            self::setINIValues($ini, $container);
         }
 
         static::$booted = true;
@@ -72,7 +74,7 @@ class Runtime
      *
      * @return  mixed
      */
-    public static function &config(string $name, string $delimiter = '.')
+    public static function &config(string $name, string $delimiter = '.'): mixed
     {
         return static::$container->getParameters()->getDeep($name, $delimiter);
     }
@@ -133,6 +135,13 @@ class Runtime
         $clientIp = $_SERVER['REMOTE_ADDR'] ?? null;
         $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
 
+        if (
+            isset($httpForwardedFor)
+            && !static::isTrusted($httpForwardedFor, $remoteAddr)
+        ) {
+            static::forbidden();
+        }
+
         // Get allow remote ips from config.
         if (!in_array($remoteAddr, $allowIps, true)) {
             static::forbidden();
@@ -142,11 +151,14 @@ class Runtime
             static::forbidden();
         }
 
-        if (isset($httpForwardedFor) && $httpForwardedFor !== $remoteAddr) {
-            static::forbidden();
-        }
-
         // Allow
+    }
+
+    private static function isTrusted(string $remoteAttr): bool
+    {
+        $trustedProxies = ProxyResolver::handleTrustedProxies(env('PROXY_TRUSTED_IPS') ?? '', $remoteAttr);
+
+        return IpHelper::checkIp($remoteAttr, $trustedProxies);
     }
 
     private static function forbidden(): void

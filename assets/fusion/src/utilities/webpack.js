@@ -73,7 +73,8 @@ export async function webpackVue3Config() {
       mode: process.env.NODE_ENV || 'development',
       output: {
         filename: '[name].js',
-        sourceMapFilename: '[name].js.map'
+        chunkFilename: '[name]-[chunkhash].js',
+        sourceMapFilename: '[name].js.map',
       },
       stats: {
         all: false,
@@ -129,12 +130,24 @@ export async function webpackVue3Config() {
               name: '[name].[ext]?[hash]'
             }
           },
+          // {
+          //   // Match `.js`, `.jsx`, `.ts` or `.tsx` files
+          //   test: /\.[jt]sx?$/,
+          //   loader: 'esbuild-loader',
+          //   options: {
+          //     // JavaScript version to compile to
+          //     target: 'esnext',
+          //     loader: 'ts',
+          //     // appendTsSuffixTo:[/\.vue/],
+          //   }
+          // },
           {
             test: /\.ts$/,
             loader: "ts-loader",
             exclude: /(node_modules|bower_components)/,
             options:{
-              appendTsSuffixTo:[/\.vue/]
+              appendTsSuffixTo:[/\.vue/],
+              transpileOnly: true
             }
           },
           {
@@ -145,8 +158,15 @@ export async function webpackVue3Config() {
           }
         ]
       },
+      // optimization: {
+      //   minimizer: [
+      //     new EsbuildPlugin({
+      //       target: 'esnext'
+      //     })
+      //   ]
+      // },
       plugins: [
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
       ]
     }
   );

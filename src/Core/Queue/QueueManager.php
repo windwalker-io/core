@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of amiko project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Queue;
@@ -15,6 +8,7 @@ use Closure;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Core\Manager\AbstractManager;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
@@ -24,6 +18,7 @@ use Windwalker\Queue\QueueMessage;
  *
  * @method Queue get(?string $name = null, ...$args)
  */
+#[Isolation]
 class QueueManager extends AbstractManager
 {
     public function getConfigPrefix(): string

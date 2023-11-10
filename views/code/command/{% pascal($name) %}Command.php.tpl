@@ -1,12 +1,5 @@
 {% $phpOpen %}
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
-
 declare(strict_types=1);
 
 namespace {% $ns %};
@@ -16,9 +9,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 
-/**
- * The {% pascal($name) %}Command class.
- */
 #[CommandWrapper(
     description: '{% $desc %}'
 )]

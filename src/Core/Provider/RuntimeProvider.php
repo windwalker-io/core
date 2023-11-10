@@ -1,22 +1,18 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
 use Composer\Autoload\ClassLoader;
+use Windwalker\Core\Application\AppLayer;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
+use Windwalker\Environment\Environment;
 use Windwalker\Filter\FilterFactory;
 
 /**
@@ -36,8 +32,11 @@ class RuntimeProvider implements ServiceProviderInterface
 
         $loader = include Runtime::getRootDir() . '/vendor/autoload.php';
         $container->share(ClassLoader::class, $loader);
+        $container->prepareSharedObject(Environment::class);
 
         $this->registerFilters($container);
+
+        $container->prepareSharedObject(MaintenanceManager::class);
     }
 
     protected function registerFilters(Container $container): void

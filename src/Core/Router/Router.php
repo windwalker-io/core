@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
@@ -20,7 +13,7 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
+use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Utilities\Str;
 
 use function FastRoute\simpleDispatcher;
@@ -56,7 +49,7 @@ class Router implements EventAwareInterface
         return $this;
     }
 
-    public static function createRouteCreator(): RouteCreator
+    public static function createRouteCreator(): RouteCreatorInterface
     {
         return new RouteCreator();
     }
@@ -66,7 +59,7 @@ class Router implements EventAwareInterface
         return $this->createRouteDispatcher(
             function (RouteCollector $router) use ($request) {
                 foreach ($this->routes as $name => $route) {
-                    if (!$this->checkRoute($request, $route)) {
+                    if (!$this->filterRoute($request, $route)) {
                         continue;
                     }
 
@@ -124,7 +117,7 @@ class Router implements EventAwareInterface
         }
     }
 
-    public function checkRoute(ServerRequestInterface $request, Route $route): bool
+    public function filterRoute(ServerRequestInterface $request, Route $route): bool
     {
         $uri = $request->getUri();
 
@@ -148,6 +141,28 @@ class Router implements EventAwareInterface
         return !($scheme && $scheme !== $uri->getScheme());
     }
 
+    public function matchPattern(string $pattern, string $routeString, ?array &$variables = null): bool
+    {
+        $variables = [];
+
+        $hostRegexes = $this->patternToRegex($pattern);
+
+        foreach ($hostRegexes as [$hostRegex, $varNames]) {
+            preg_match('~' . $hostRegex . '~', $routeString, $matches);
+
+            if ($matches !== []) {
+                $variables = array_intersect_key(
+                    $matches,
+                    array_flip($varNames),
+                );
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * matchHost
      *
@@ -160,7 +175,6 @@ class Router implements EventAwareInterface
     protected function matchHost(ServerRequestInterface $request, array $hosts, Route $route): bool
     {
         $currentHost = $request->getUri()->getHost();
-        $found = false;
 
         foreach ($hosts as $host) {
             $hostRegexes = $this->patternToRegex($host);
@@ -169,19 +183,19 @@ class Router implements EventAwareInterface
                 preg_match('~' . $hostRegex . '~', $currentHost, $matches);
 
                 if ($matches !== []) {
-                    $found = true;
+                    $variables = array_intersect_key(
+                        $matches,
+                        array_flip($varNames),
+                    );
+
+                    $route->vars($variables);
+
+                    return true;
                 }
-
-                $variables = array_intersect_key(
-                    $matches,
-                    array_flip($varNames),
-                );
-
-                $route->vars($variables);
             }
         }
 
-        return $found !== false;
+        return false;
     }
 
     public function getRoute(string $name): ?Route
@@ -279,7 +293,7 @@ class Router implements EventAwareInterface
     }
 
     /**
-     * @param  string
+     * @param  string  $regex
      *
      * @return bool
      */

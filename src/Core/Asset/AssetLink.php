@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
@@ -73,5 +66,10 @@ class AssetLink extends Link
         $this->options[$name] = $value;
 
         return $this;
+    }
+
+    public function isFooter(): bool
+    {
+        return (bool) ($this->options['footer'] ?? false);
     }
 }

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Command;
@@ -19,17 +12,20 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Inject;
-use Windwalker\Environment\PlatformHelper;
+use Windwalker\Environment\Environment;
 
 /**
  * The AbstractMigrationCommand class.
  */
 abstract class AbstractMigrationCommand implements CommandInterface
 {
+    use CommandDatabaseTrait;
+
     public const AUTO_BACKUP = 1;
 
     public const NO_TIME_LIMIT = 1 << 1;
@@ -40,9 +36,6 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
     #[Inject]
     protected ?ApplicationInterface $app = null;
-
-    #[Inject]
-    protected ?DatabaseManager $databaseManager = null;
 
     /**
      * @inheritDoc
@@ -63,12 +56,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
         //     'The target package migrations.'
         // );
 
-        $command->addOption(
-            'connection',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'The database connection name.'
-        );
+        $this->configureDatabaseOptions($command);
 
         $command->addOption(
             'force',
@@ -270,7 +258,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
      */
     public function getEnvCmd(string $env = 'APP_ENV', string $value = 'dev'): string
     {
-        $prefix = PlatformHelper::isWindows()
+        $prefix = Environment::isWindows()
             ? 'set'
             : 'export';
 

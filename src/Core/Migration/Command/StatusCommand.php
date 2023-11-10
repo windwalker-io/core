@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Command;
@@ -16,6 +9,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
@@ -64,6 +58,9 @@ class StatusCommand extends AbstractMigrationCommand
             static::TOGGLE_CONNECTION
             | static::CREATE_DATABASE
         );
+
+        /** @var ConsoleApplication $app */
+        $app = $this->app;
 
         $migrationService = $this->app->make(MigrationService::class);
         $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));

@@ -27,12 +27,14 @@ $data = [
 ];
 
 ?><!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
-    <base href="{{ $uri->root() }}" />
+    <base href="{{ $uri->base() }}" />
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon"
+        href="{{ $asset->path('@vendor/@windwalker-io/core/images/debugger-icon.png') }}" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Windwalker Debugger</title>
     <script>
@@ -45,6 +47,6 @@ $data = [
     <script>
         window.externalPublicPath = '{{ $asset->handleUri('@core/debugger/') }}'
     </script>
-    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/debugger.js')) }}"></script>
+    <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/index.js')) }}"></script>
 </body>
 </html>

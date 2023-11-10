@@ -11,16 +11,17 @@
         "fig/link-util": "^1.2",
         "filp/whoops": "^2.1",
         "jenssegers/agent": "^2.6",
-        "monolog/monolog": "^2.0",
+        "monolog/monolog": "^2.0||^3.0",
         "nikic/fast-route": "^1.0",
         "nikic/php-parser": "^4.10",
-        "asika/symfony-console-completion": "^0.12.0",
+        "stecman/symfony-console-completion": "^0.12.0",
         "symfony/console": "^5.2||^6.0",
-        "symfony/dotenv": "^5.0||^6.0",
-        "symfony/event-dispatcher-contracts": "^2.4",
+        "symfony/dotenv": "^5.2||^6.0",
+        "symfony/event-dispatcher-contracts": "^2.0||^3.0",
         "symfony/options-resolver": "^5.0||^6.0",
         "symfony/polyfill-php81": "^1.0",
         "symfony/polyfill-php82": "^1.27",
+        "symfony/polyfill-php83": "^1.0",
         "symfony/process": "^5.2||^6.0",
         "symfony/stopwatch": "^5.0||^6.0",
         "webmozart/glob": "^4.0",
@@ -32,11 +33,15 @@
         "windwalker/filesystem": "^4.0",
         "windwalker/filter": "^4.0",
         "windwalker/http": "^4.0",
-        "windwalker/test": "^4.0"
+        "windwalker/test": "^4.0",
+        "composer/semver": "^3.4"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^7.8"
     },
     "suggest": {
         "dragonmantank/cron-expression": "Install ^3.1 to support schedule runner.",
-        "symfony/mailer": "Install ^5.2 to send mail.",
+        "symfony/mailer": "Install ^5.2||^6.0 to send mail.",
         "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
     "archive": {
@@ -63,7 +68,7 @@
         },
         "branch-alias": {
             "dev-master": "4.x-dev",
-            "dev-4.1": "4.1.x-dev"
+            "dev-next": "4.1.x-dev"
         }
     }
 }

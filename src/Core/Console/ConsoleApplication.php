@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Console;
@@ -16,6 +9,9 @@ use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
@@ -27,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\RootApplicationInterface;
@@ -36,6 +33,7 @@ use Windwalker\Core\Event\SymfonyDispatcherWrapper;
 use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Events\Console\MessageOutputEvent;
+use Windwalker\Core\Manager\LoggerManager;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\ConsoleProvider;
 use Windwalker\Core\Provider\WebProvider;
@@ -76,8 +74,6 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
             'Windwalker Console',
             InstalledVersions::getPrettyVersion('windwalker/core')
         );
-
-        $this->setDispatcher(new SymfonyDispatcherWrapper($this->getEventDispatcher()));
     }
 
     /**
@@ -94,6 +90,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         }
 
         $this->prepareBoot();
+
+        $this->setDispatcher(new SymfonyDispatcherWrapper($this->getEventDispatcher()));
 
         // Prepare child
         $container = $this->getContainer();
@@ -367,9 +365,9 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     /**
      * @inheritDoc
      */
-    public function getClient(): string
+    public function getClient(): AppClient
     {
-        return static::CLIENT_CONSOLE;
+        return AppClient::CONSOLE;
     }
 
     protected function getProcessOutputCallback(?OutputInterface $output = null): callable
@@ -398,5 +396,25 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
                 $provider->bootBeforeRequest($container);
             }
         }
+    }
+
+    public function log(\Stringable|string $message, array $context = [], string $level = LogLevel::INFO): static
+    {
+        $this->logger ??= $this->getLogger();
+
+        $this->logger->log($level, $message, $context);
+
+        return $this;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        $manager = $this->container->get(LoggerManager::class);
+
+        if ($manager->has('console')) {
+            return $manager->get('console');
+        }
+
+        return new NullLogger();
     }
 }

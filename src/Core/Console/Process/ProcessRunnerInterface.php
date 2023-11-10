@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Console\Process;
@@ -45,5 +38,11 @@ interface ProcessRunnerInterface
         string|array $script,
         ?string $input = null,
         bool|callable|OutputInterface $output = true
+    ): Process;
+
+    public function mustRunProcess(
+        string|array|Process $process,
+        mixed $input = null,
+        bool|callable|OutputInterface $output = false
     ): Process;
 }

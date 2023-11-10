@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Debugger\Services;
@@ -14,6 +7,7 @@ namespace Windwalker\Debugger\Services;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Renderer\RendererService;
+use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Data\Collection;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Stream\Stream;
@@ -23,13 +17,21 @@ use Windwalker\Stream\Stream;
  */
 class DebugConsole
 {
+    public static bool $disabled = false;
+
     /**
      * DebugConsole constructor.
      */
     public function __construct(
         protected RendererService $rendererService,
+        protected CspNonceService $cspNonceService,
         protected AssetService $assetService
     ) {
+    }
+
+    public static function disable(): void
+    {
+        static::$disabled = true;
     }
 
     public function pushToPage(
@@ -37,6 +39,10 @@ class DebugConsole
         OutputInterface $output,
         ?ResponseInterface $response = null
     ): void {
+        if (static::$disabled) {
+            return;
+        }
+
         $tmpl = 'console';
 
         if ($response) {
@@ -89,6 +95,7 @@ class DebugConsole
                 'collector' => $collector,
                 'css' => $css,
                 'js' => $js,
+                'nonce' => $this->cspNonceService->getNonce()
             ]
         );
     }

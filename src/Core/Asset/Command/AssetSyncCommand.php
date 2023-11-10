@@ -1,16 +1,13 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Asset\Command;
 
+use Composer\Semver\Constraint\MultiConstraint;
+use Composer\Semver\Intervals;
+use Composer\Semver\Semver;
+use Composer\Semver\VersionParser;
 use JsonException;
 use ReflectionAttribute;
 use ReflectionClass;
@@ -23,25 +20,29 @@ use Windwalker\Console\Input\InputOption;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Attributes\ViewModel;
+use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Str;
 
+use function Windwalker\fs;
+
 /**
  * The AssetSyncCommand class.
- *
- * @deprecated No use now.
  */
-#[CommandWrapper(description: 'Asset sync helpers', hidden: true)]
+#[CommandWrapper(description: 'Sync vendor assets dependencies to package.json', hidden: true)]
 class AssetSyncCommand implements CommandInterface
 {
     /**
      * AssetSyncCommand constructor.
      *
      * @param  ApplicationInterface  $app
+     * @param  PackageRegistry       $packageRegistry
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
+    public function __construct(
+        protected ApplicationInterface $app,
+        protected PackageRegistry $packageRegistry,
+    ) {
     }
 
     /**
@@ -53,37 +54,7 @@ class AssetSyncCommand implements CommandInterface
      */
     public function configure(Command $command): void
     {
-        $command->addArgument(
-            'dir',
-            InputArgument::OPTIONAL,
-            'Where to find views.'
-        );
-        // $command->addArgument(
-        //     'dest',
-        //     InputArgument::OPTIONAL,
-        //     'Where to copy files.'
-        // );
-        $command->addOption(
-            'ns',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'The namespace start from this path.',
-            $this->app->config('asset.namespace_base')
-        );
-        $command->addOption(
-            'pretty',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'JSON pretty print.',
-            false
-        );
-        // $command->addOption(
-        //     'type',
-        //     null,
-        //     InputOption::VALUE_REQUIRED,
-        //     'css | js',
-        //     'js'
-        // );
+        //
     }
 
     /**
@@ -96,68 +67,73 @@ class AssetSyncCommand implements CommandInterface
      */
     public function execute(IOInterface $io): int
     {
-        $dir = $io->getArgument('dir') ?? '@source/Module';
-        $dir = $this->app->path($dir);
+        $packages = $this->packageRegistry->getPackages();
+        $packageJsonFile = fs(WINDWALKER_ROOT . '/package.json');
 
-        // $dest = $io->getArgument('dest');
-
-        // if (!$dest) {
-        //     throw new InvalidArgumentException('Please provide dest path.');
-        // }
-
-        // $this->dest = $this->app->path($dest);
-        // $this->ns = $ns = (string) $io->getOption('ns');
-        // $this->type = (string) $io->getOption('type');
-
-        $map = [];
-
-        AttributesAccessor::scanDirAndRunAttributes(
-            ViewModel::class,
-            $dir,
-            (string) $io->getOption('ns'),
-            handler: function (ViewModel $vm, string $className, FileObject $file) use ($io, &$map) {
-                $this->handleAssets($vm, $className, $file, $io, $map);
-            },
-            options: ReflectionAttribute::IS_INSTANCEOF
-        );
-
-        $flags = JSON_THROW_ON_ERROR;
-
-        if ($io->getOption('pretty') !== false) {
-            $flags |= JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+        if (!$packageJsonFile->isFile()) {
+            throw new \RuntimeException('package.json not exists to sync.');
         }
 
-        $io->writeln(json_encode($map, $flags));
+        $io->style()->title('Sync package.json Versions');
+
+        $packageJson = $packageJsonFile->readAndParse('json');
+
+        $versionParser = new VersionParser();
+
+        $override = false;
+
+        foreach ($packages as $package) {
+            $json = $package::composerJson();
+
+            if (!$json) {
+                continue;
+            }
+
+            $vendors = $json['extra']['windwalker']['assets']['vendors'] ?? [];
+
+            foreach ($vendors as $vendor => $versions) {
+                $constraints = $versionParser->parseConstraints($versions);
+
+                if ($currentVersions = $packageJson->getDeep('dependencies.' . $vendor)) {
+                    $currentConstraints = $versionParser->parseConstraints($currentVersions);
+
+                    if (!Intervals::isSubsetOf($constraints, $currentConstraints)) {
+                        $packageJson->setDeep(
+                            'dependencies.' . $vendor,
+                            $newVersion = $currentVersions . '|' . $versions
+                        );
+
+                        $override = true;
+
+                        $io->writeln("Replace: <info>\"$vendor\"</info> version to \"$newVersion\"");
+                    }
+                } else {
+                    $packageJson->setDeep(
+                        'dependencies.' . $vendor,
+                        $versions
+                    );
+
+                    $override = true;
+
+                    $io->writeln("Add: <info>\"$vendor\"</info>: \"$versions\"");
+                }
+            }
+        }
+
+        if ($override) {
+            $packageJsonFile->write(
+                json_encode(
+                    $packageJson,
+                    JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+                ) . "\n"
+            );
+
+            $io->newLine();
+            $io->writeln('package.json file modified.');
+        } else {
+            $io->writeln('package.json not changed.');
+        }
 
         return 0;
-    }
-
-    public function handleAssets(ViewModel $vm, string $className, FileObject $file, IOInterface $io, array &$map): void
-    {
-        $dir = $file->getPath();
-        $ns = (string) $io->getOption('ns');
-
-        $src = $dir . '/assets/**/*.{js,mjs}';
-        $src = Path::relative($this->app->path('@root') . '/', $src);
-        $dest = Path::clean(
-            strtolower(ltrim($vm->getModuleName() ?? $this->guessName($className, $ns), '/\\'))
-        ) . DIRECTORY_SEPARATOR;
-
-        $map['js'][$src] = $dest;
-
-        foreach ($vm->css as $cssFile) {
-            $src = $dir . '/asset/' . $cssFile;
-            $src = Path::relative($this->app->path('@root') . '/', $src);
-
-            $map['css'][] = $src;
-        }
-    }
-
-    protected function guessName(string $class, string $nsBase): string
-    {
-        $ref = new ReflectionClass($class);
-        $ns = $ref->getNamespaceName();
-
-        return Str::removeLeft($ns, $nsBase);
     }
 }

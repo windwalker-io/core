@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2022 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Profiler;
@@ -23,7 +16,7 @@ class ProfilerFactory
      */
     protected array $instances = [];
 
-    public function get(string $name, ?Stopwatch $stopwatch = null): Profiler
+    public function get(string $name = 'main', ?Stopwatch $stopwatch = null): Profiler
     {
         return $this->instances[$name] ??= $this->create($name, $stopwatch);
     }

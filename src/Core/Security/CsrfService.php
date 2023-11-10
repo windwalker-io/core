@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Security;
@@ -32,11 +25,14 @@ class CsrfService
 
     protected string $tokenKey = 'csrf-token';
 
+    protected string $inputName = 'anticsrf';
+
     /**
      * CsrfService constructor.
      *
-     * @param  Config   $config
-     * @param  Session  $session
+     * @param  Config       $config
+     * @param  Session      $session
+     * @param  LangService  $langService
      */
     public function __construct(
         protected Config $config,
@@ -46,7 +42,7 @@ class CsrfService
         //
     }
 
-    public function validate(AppRequest $request, ?string $method = null, ?string $message = null): void
+    public function validate(AppRequest $request, string|false|null $method = null, ?string $message = null): void
     {
         if (!$this->checkToken($request, $method)) {
             throw new InvalidTokenException($message ?? $this->getInvalidMessage(), 403);
@@ -56,9 +52,14 @@ class CsrfService
     public function input(array $attrs = []): DOMElement
     {
         $attrs['type'] = 'hidden';
-        $attrs['name'] = $this->getToken();
-        $attrs['value'] = 1;
-        $attrs['class'] = $attrs['class'] ?? 'anticsrf';
+
+        if ($this->inputName) {
+            $attrs['name'] = $this->getInputName();
+            $attrs['value'] = $this->getToken();
+        } else {
+            $attrs['name'] = $this->getToken();
+            $attrs['value'] = 1;
+        }
 
         return h('input', $attrs);
     }
@@ -81,8 +82,6 @@ class CsrfService
     }
 
     /**
-     * createToken
-     *
      * @return  string
      *
      * @throws Exception
@@ -92,19 +91,29 @@ class CsrfService
         return Base64Url::encode(random_bytes(32));
     }
 
-    public function checkToken(AppRequest $request, ?string $method = null): bool
+    public function checkToken(AppRequest $request, string|false|null $method = null): bool
     {
-        $method ??= 'REQUEST';
-
         $token = $this->getToken();
 
-        $tokenValue = $request->inputWithMethod($method, $token);
-
-        if ($tokenValue !== null) {
+        if ($request->getHeader('X-CSRF-Token') === $token) {
             return true;
         }
 
-        return $request->getHeader('X-CSRF-Token') === $token;
+        if ($method === false) {
+            return false;
+        }
+
+        $method ??= 'REQUEST';
+
+        $tokenValue = $request->inputWithMethod($method, $this->getInputName());
+
+        if ($tokenValue === $token) {
+            return true;
+        }
+
+        $tokenValue = $request->inputWithMethod($method, $token);
+
+        return $tokenValue !== null;
     }
 
     /**
@@ -135,5 +144,25 @@ class CsrfService
         $this->langService::checkLanguageInstalled();
 
         return $this->trans('windwalker.security.message.csrf.invalid');
+    }
+
+    /**
+     * @return string
+     */
+    public function getInputName(): string
+    {
+        return $this->inputName;
+    }
+
+    /**
+     * @param  string  $inputName
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setInputName(string $inputName): static
+    {
+        $this->inputName = $inputName;
+
+        return $this;
     }
 }

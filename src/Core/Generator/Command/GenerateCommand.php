@@ -1,16 +1,11 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Command;
 
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -26,6 +21,8 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
 use Windwalker\DI\Exception\DefinitionException;
 
+use function Symfony\Component\String\s;
+
 /**
  * The GenerateCommand class.
  */
@@ -33,7 +30,7 @@ use Windwalker\DI\Exception\DefinitionException;
     description: 'Generate files.',
     aliases: 'g'
 )]
-class GenerateCommand implements CommandInterface, SubCommandAwareInterface
+class GenerateCommand implements CommandInterface, SubCommandAwareInterface, CompletionAwareInterface
 {
     protected ?array $subCommands = null;
 
@@ -57,6 +54,13 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
             'options',
             InputArgument::IS_ARRAY,
             'The generate task.',
+        );
+
+        $command->addOption(
+            'about',
+            'a',
+            InputOption::VALUE_NONE,
+            'Describe this task.',
         );
     }
 
@@ -101,6 +105,8 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
                 } catch (RuntimeException) {
                     // No actions that validation will run later
                 }
+            } else {
+                throw new \InvalidArgumentException("Generate task `$task` not found");
             }
         } else {
             $definition = $command->getDefinition();
@@ -140,6 +146,11 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
             return 0;
         }
 
+        if ($io->getOption('about') && $command = $this->getSubCommand($task)) {
+            $this->aboutTask($io, $task, $command);
+            return 0;
+        }
+
         /** @var Command $subCommand */
         $subCommand = $this->resolveSubCommand($task, $this->getSubCommand($task));
 
@@ -155,6 +166,15 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
         include_once __DIR__ . '/../generator-helpers.php';
 
         return $subCommand->run(new ArgvInput($argv, $definition), $io->getOutput());
+    }
+
+    protected function aboutTask(IOInterface $io, string $task, mixed $command): void
+    {
+        $command = $this->resolveSubCommand($task, $command);
+
+
+        $helper = new DescriptorHelper();
+        $helper->describe($io->getOutput(), $command);
     }
 
     protected function showList(IOInterface $io): void
@@ -222,5 +242,22 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface
     protected function getSubCommands(): array
     {
         return $this->subCommands ??= $this->app->config('generator.commands');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'options' && $context->getWordIndex() === 2) {
+            return array_keys($this->getSubCommands());
+        }
     }
 }

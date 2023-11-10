@@ -10,11 +10,11 @@ import rename from 'gulp-rename';
 import sourcemaps from 'gulp-sourcemaps';
 import stripComment from 'gulp-strip-comments';
 import terser from 'gulp-terser';
+import gulpTs from 'gulp-typescript';
 import { merge as lodashMerge } from 'lodash-es';
 import { dest as toDest } from '../base/base.js';
 import { MinifyOption } from '../config.js';
 import { merge } from '../utilities/utilities.js';
-import gulpTs from 'gulp-typescript';
 import JsProcessor from './js-processor.js';
 
 export default class TsProcessor extends JsProcessor {
@@ -23,9 +23,11 @@ export default class TsProcessor extends JsProcessor {
       {
         ts: {
           declaration: false,
-          target: 'es6',
-          moduleResolution: 'node'
-        }
+          target: 'es2020',
+          moduleResolution: 'node',
+          allowJs: true,
+        },
+        tsconfig: null
       },
       await super.prepareOptions(options)
     );
@@ -39,8 +41,20 @@ export default class TsProcessor extends JsProcessor {
 
   compile(dest, options) {
     const config = lodashMerge({}, options.ts);
+    let tsTask;
 
-    return this.pipe(gulpTs(config));
+    if (options.tsconfig) {
+      let tsconfig = options.tsconfig;
+      if (typeof tsconfig === 'function') {
+        tsconfig = tsconfig();
+      }
+
+      tsTask = gulpTs.createProject(tsconfig, config)();
+    } else {
+      tsTask = gulpTs(config);
+    }
+
+    return this.pipe(tsTask);
   }
 
   doProcess(dest, options = {}) {
@@ -53,9 +67,14 @@ export default class TsProcessor extends JsProcessor {
 
     this.compile(dest, options)
       .pipeIf(options.sourcemap, () => sourcemaps.write('.'))
+      .pipeIf(options.rename, () => rename(options.rename))
       .pipeIf(
         options.minify === MinifyOption.SAME_FILE,
-        () => terser().on('error', e => console.error(e))
+        () => {
+          this.pipe(filter('**/*.js'))
+            .pipe(stripComment())
+            .pipe(terser().on('error', e => console.error(e)));
+        }
       )
       .pipe(toDest(dest.path))
       .pipeIf(options.minify === MinifyOption.SEPARATE_FILE, () => {

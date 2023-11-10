@@ -1,12 +1,5 @@
 {% $phpOpen %}
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
-
 declare(strict_types=1);
 
 namespace {% $ns %};
@@ -14,14 +7,9 @@ namespace {% $ns %};
 use Windwalker\DOM\DOMElement;
 use Windwalker\Form\Field\AbstractField;
 
-/**
- * The {% pascal($name) %}Field class.
- */
 class {% pascal($name) %}Field extends AbstractField
 {
     /**
-     * prepareInput
-     *
      * @param  DOMElement  $input
      *
      * @return  DOMElement
@@ -32,8 +20,6 @@ class {% pascal($name) %}Field extends AbstractField
     }
 
     /**
-     * getAccessors
-     *
      * @return  array
      */
     protected function getAccessors(): array

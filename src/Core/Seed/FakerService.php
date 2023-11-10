@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2019 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Seed;
@@ -16,7 +9,6 @@ use Faker\Generator as FakerGenerator;
 use Psr\Cache\InvalidArgumentException;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\SubCommand;
@@ -22,6 +15,10 @@ use Windwalker\Console\IOInterface;
 )]
 class ModelSubCommand extends AbstractGeneratorSubCommand
 {
+    protected string $defaultNamespace = '';
+
+    protected string $defaultDir = '';
+
     /**
      * Executes the current command.
      *
@@ -44,10 +41,10 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('model/repo/*.tpl'))
             ->replaceTo(
-                $this->app->path('src/Repository'),
+                $this->getCustomDestPath($io, 'Repository'),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getCustomNamespace($io, 'Repository'),
                 ],
                 $force
             );
@@ -62,10 +59,10 @@ class ModelSubCommand extends AbstractGeneratorSubCommand
 
         $this->codeGenerator->from($this->getViewPath('model/entity/*.tpl'))
             ->replaceTo(
-                $this->app->path('src/Entity'),
+                $this->getCustomDestPath($io, 'Entity'),
                 [
                     'name' => $name,
-                    'ns' => $this->getNamesapce($io),
+                    'ns' => $this->getCustomNamespace($io, 'Entity'),
                 ],
                 $force
             );

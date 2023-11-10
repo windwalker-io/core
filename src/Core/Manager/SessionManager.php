@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
@@ -15,9 +8,12 @@ use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Application\AppType;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
+use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\Session\Bridge\BridgeInterface;
 use Windwalker\Session\Bridge\PhpBridge;
@@ -32,6 +28,7 @@ use Windwalker\Session\SessionInterface;
  * @method Session create(?string $name = null, ...$args)
  * @method Session get(?string $name = null, ...$args)
  */
+#[Isolation]
 class SessionManager extends AbstractManager
 {
     public function getConfigPrefix(): string
@@ -43,7 +40,7 @@ class SessionManager extends AbstractManager
     {
         return static function (
             ServerRequestInterface $request,
-            AppContext $app,
+            AppContextInterface $app,
             #[Ref('session.cookie_params')] $params
         ) {
             $cookies = new ArrayCookies($request->getCookieParams());
@@ -70,7 +67,7 @@ class SessionManager extends AbstractManager
     {
         return static function (
             ServerRequestInterface $request,
-            AppContext $app,
+            AppContextInterface $app,
             #[Ref('session.cookie_params')] $params
         ) {
             $cookies = new Cookies();
@@ -95,21 +92,28 @@ class SessionManager extends AbstractManager
             );
             /** @var BridgeInterface $bridge */
             $cookies = $container->resolve('session.factories.cookies.' . $cookies);
-            $ini = $container->getParam('session.ini');
+            $sessionOptions = $container->getParam('session.session_options');
+
+            $options = [
+                ...$options,
+                ...$sessionOptions
+            ];
 
             if ($bridge instanceof PhpBridge) {
-                $gcDivisor = $ini['gc_divisor'] ?? 1000;
-                $gcProbability = $ini['gc_probability'] ?? 1;
+                $gcDivisor = $sessionOptions['gc_divisor'] ?? 1000;
+                $gcProbability = $sessionOptions['gc_probability'] ?? 1;
 
                 $bridge->setOption('gc_divisor', $gcDivisor);
                 $bridge->setOption('gc_probability', $gcProbability);
             }
 
-            $options['ini'] = $ini;
+            if ($sessionOptions['name'] ?? null) {
+                $bridge->setSessionName($sessionOptions['name']);
+            }
 
             $app = $container->get(ApplicationInterface::class);
 
-            if ($app->getClientType() === 'cli_web') {
+            if ($app->getType() === AppType::CLI_WEB) {
                 // In cli web, disable shutdown function to save memory
                 $options[SessionInterface::OPTION_AUTO_COMMIT] = false;
             }

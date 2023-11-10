@@ -1,33 +1,21 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Controller;
 
 use Closure;
-use JsonException;
 use LogicException;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Http\AppRequest;
-use Windwalker\Core\Router\RouteUri;
 use Windwalker\DI\Container;
-use Windwalker\Http\Response\RedirectResponse;
-use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -47,7 +35,7 @@ class ControllerDispatcher
         //
     }
 
-    public function dispatch(AppContext $app): ResponseInterface
+    public function dispatch(AppContextInterface $app): mixed
     {
         $controller = $app->getController();
 
@@ -70,17 +58,20 @@ class ControllerDispatcher
             if (str_contains($controller, '::')) {
                 $controller = explode('::', $controller, 2);
             } elseif (class_exists($controller)) {
-                $controller = [$controller, $this->getDefaultTask($app->getAppRequest())];
+                $controller = [$controller, $this->getDefaultTask($app)];
             }
         }
 
         if (is_array($controller)) {
             $controller = $this->prepareArrayCallable($controller, $app);
         } else {
-            $controller = fn(AppContext $app): mixed => $this->container->call($controller, $app->getUrlVars());
+            $controller = fn(AppContextInterface $app): mixed => $this->container->call(
+                $controller,
+                $app->getUrlVars()
+            );
         }
 
-        $response = static::anyToResponse($controller($app));
+        $response = $controller($app);
 
         $event = $app->emit(
             AfterControllerDispatchEvent::class,
@@ -90,9 +81,9 @@ class ControllerDispatcher
         return $event->getResponse();
     }
 
-    protected function getDefaultTask(AppRequest $request): string
+    protected function getDefaultTask(AppContext $app): string
     {
-        $task = strtolower($request->getOverrideMethod());
+        $task = strtolower($app->getRequestMethod());
 
         $map = [
             'get' => 'index',
@@ -111,7 +102,7 @@ class ControllerDispatcher
         return $task;
     }
 
-    protected function prepareArrayCallable(array $handler, AppContext $app): Closure
+    protected function prepareArrayCallable(array $handler, AppContextInterface $app): Closure
     {
         if (\Windwalker\count($handler) !== 2) {
             throw new LogicException(
@@ -126,7 +117,7 @@ class ControllerDispatcher
         $handler[0] = $this->container->createObject($class);
 
         if ($handler[0] instanceof ControllerInterface) {
-            return function (AppContext $app) use ($handler): mixed {
+            return function (AppContextInterface $app) use ($handler): mixed {
                 [$object, $task] = $handler;
 
                 return $this->container->call(
@@ -140,12 +131,12 @@ class ControllerDispatcher
             throw new ControllerDispatchException('Controller is not callable.');
         }
 
-        return function (AppContext $app) use ($handler) {
+        return function (AppContextInterface $app) use ($handler) {
             $this->container->call($handler, $app->getUrlVars());
         };
     }
 
-    protected function processTaskMapping(string $class, ?string $task, AppContext $app): ?string
+    protected function processTaskMapping(string $class, ?string $task, AppContextInterface $app): ?string
     {
         $mapping = AttributesAccessor::getFirstAttributeInstance(
             $class,
@@ -154,36 +145,5 @@ class ControllerDispatcher
         );
 
         return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
-    }
-
-    /**
-     * handleResponse
-     *
-     * @param  mixed  $res
-     *
-     * @return ResponseInterface
-     *
-     * @throws JsonException
-     * @since  4.0
-     */
-    public static function anyToResponse(mixed $res): ResponseInterface
-    {
-        if ($res instanceof RouteUri) {
-            return $res->toResponse();
-        }
-
-        if ($res instanceof UriInterface) {
-            return new RedirectResponse($res);
-        }
-
-        if (!$res instanceof ResponseInterface) {
-            if (is_array($res) || is_object($res)) {
-                return Response::fromString(json_encode($res, JSON_THROW_ON_ERROR));
-            }
-
-            return Response::fromString((string) $res);
-        }
-
-        return $res;
     }
 }

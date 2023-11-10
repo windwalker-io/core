@@ -1,10 +1,4 @@
 <?php
-/**
- * Part of cli project.
- *
- * @copyright  Copyright (C) 2019 ${ORGANIZATION}.
- * @license    __LICENSE__
- */
 
 // phpcs:disable
 

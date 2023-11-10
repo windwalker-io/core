@@ -1,18 +1,10 @@
 <?php
 
-/**
- * Part of earth project.
- *
- * @copyright  Copyright (C) 2022 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Http;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\IpHelper;
@@ -104,17 +96,7 @@ class ProxyResolver
             function () {
                 $trustedProxies = $this->config['trusted_proxies'] ?? '';
 
-                if (is_string($trustedProxies)) {
-                    $trustedProxies = Arr::explodeAndClear(',', $trustedProxies);
-                }
-
-                foreach ($trustedProxies as &$trustedProxy) {
-                    if ($trustedProxy === 'REMOTE_ADDR') {
-                        $trustedProxy = $this->getRemoteAddr();
-                    }
-                }
-
-                return $trustedProxies;
+                return static::handleTrustedProxies($trustedProxies, $this->getRemoteAddr());
             }
         );
     }
@@ -158,5 +140,26 @@ class ProxyResolver
         $this->headerPrefix = $headerPrefix;
 
         return $this;
+    }
+
+    /**
+     * @param  mixed   $trustedProxies
+     * @param  string  $remoteAddr
+     *
+     * @return array
+     */
+    public static function handleTrustedProxies(string|array $trustedProxies, string $remoteAddr = ''): array
+    {
+        if (is_string($trustedProxies)) {
+            $trustedProxies = Arr::explodeAndClear(',', $trustedProxies);
+        }
+
+        foreach ($trustedProxies as &$trustedProxy) {
+            if ($trustedProxy === 'REMOTE_ADDR' && $remoteAddr) {
+                $trustedProxy = $remoteAddr;
+            }
+        }
+
+        return $trustedProxies;
     }
 }

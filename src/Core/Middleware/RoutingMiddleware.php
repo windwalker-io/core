@@ -1,16 +1,10 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Middleware;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -27,15 +21,17 @@ use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\DICreateTrait;
-use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
+use Windwalker\Utilities\Options\OptionAccessTrait;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The RoutingMiddleware class.
  */
 class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
 {
+    use OptionAccessTrait;
     use CoreEventAwareTrait;
     use DICreateTrait;
 
@@ -44,12 +40,23 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     /**
      * RoutingMiddleware constructor.
      *
-     * @param  AppContext  $app
-     * @param  Router      $router
+     * @param  AppContext     $app
+     * @param  WsRouter       $router
+     * @param  \Closure|null  $fallback
+     * @param  array          $options
      */
-    public function __construct(protected AppContext $app, protected Router $router)
-    {
-        //
+    public function __construct(
+        protected AppContext $app,
+        protected Router $router,
+        protected ?\Closure $fallback = null,
+        array $options = []
+    ) {
+        $this->prepareOptions(
+            [
+                'method_override' => true,
+            ],
+            $options
+        );
     }
 
     /**
@@ -59,11 +66,13 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * If unable to produce the response itself, it may delegate to the provided
      * request handler to do so.
      *
-     * @param  ServerRequestInterface  $request
+     * @param  ServerRequestInterface   $request
      * @param  RequestHandlerInterface  $handler
      *
      * @return ResponseInterface
-     * @throws DefinitionException
+     * @throws ContainerExceptionInterface
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -83,7 +92,22 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         );
 
         try {
-            $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+            try {
+                $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+            } catch (RouteNotFoundException $e) {
+                if ($this->fallback) {
+                    $matched = $this->app->call(
+                        $this->fallback,
+                        [
+                            'request' => $request,
+                            ServerRequestInterface::class => $request,
+                            'route' => $route
+                        ]
+                    );
+                } else {
+                    throw $e;
+                }
+            }
         } catch (RouteNotFoundException $e) {
             $event = $this->emit(
                 RoutingNotMatchedEvent::class,
@@ -108,7 +132,13 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ]
         );
 
-        $controller = $this->findController($this->app->getRequestMethod(), $matched = $event->getMatched());
+        $override = (bool) $this->getOption('method_override');
+
+        $method = $override
+            ? $this->app->getRequestMethod()
+            : $this->app->getRequestRawMethod();
+
+        $controller = $this->findController($method, $matched = $event->getMatched());
 
         $this->app->getContainer()->modify(
             AppContext::class,
@@ -133,10 +163,8 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     }
 
     /**
-     * findAction
-     *
-     * @param  ServerRequestInterface  $request
-     * @param  Route                   $route
+     * @param  string  $method
+     * @param  Route   $route
      *
      * @return  mixed
      */

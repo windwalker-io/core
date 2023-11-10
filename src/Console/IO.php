@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Console;
@@ -326,7 +319,7 @@ class IO implements IOInterface
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name): string|array|bool|null
+    public function getOption(string $name): mixed
     {
         return $this->input->getOption($name);
     }

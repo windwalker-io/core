@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
@@ -17,7 +10,19 @@ namespace Windwalker\Core\Application;
 interface ServiceAwareInterface
 {
     /**
-     * make
+     * Get object from Container.
+     *
+     * @template T
+     *
+     * @param  class-string<T>  $id
+     * @param  bool             $forceNew
+     *
+     * @return T
+     */
+    public function retrieve(string $id, bool $forceNew = false): mixed;
+
+    /**
+     * Create a single use object.
      *
      * @template T
      *
@@ -30,7 +35,7 @@ interface ServiceAwareInterface
     public function make(string $class, array $args = [], int $options = 0): object;
 
     /**
-     * service
+     * Get object or create if not exists, and save it as singleton.
      *
      * @template T
      *
@@ -43,7 +48,7 @@ interface ServiceAwareInterface
     public function service(string $class, array $args = [], int $options = 0): object;
 
     /**
-     * call
+     * Call a function or method.
      *
      * @param  callable     $callable
      * @param  array        $args
@@ -55,7 +60,7 @@ interface ServiceAwareInterface
     public function call(callable $callable, array $args = [], ?object $context = null, int $options = 0): mixed;
 
     /**
-     * bind
+     * Bind a value or object to Container.
      *
      * @param  string  $id
      * @param  mixed   $value
@@ -66,7 +71,7 @@ interface ServiceAwareInterface
     public function bind(string $id, mixed $value, int $options = 0): mixed;
 
     /**
-     * resolve
+     * Resolve a definition of DI.
      *
      * @template T
      *

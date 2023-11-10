@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Utilities;
@@ -17,6 +10,7 @@ use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
 use Windwalker\Utilities\Str;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The ClassFinder class.
@@ -56,25 +50,36 @@ class ClassFinder
      *
      * @return  iterable<FileObject>
      */
-    public function findFiles(string $ns): iterable
+    public function findFiles(string $ns, bool $recursive = false): iterable
     {
         $dirs = $this->findDirsFromNamespace($ns);
+
         $dirs = array_map(
-            fn($dir) => $dir . '/*.php',
+            static fn($dir) => $recursive
+                ? $dir . '/**/*.php'
+                : $dir . '/*.php',
             $dirs
         );
 
         return Filesystem::globAll($dirs);
     }
 
-    public function findClasses(string $ns): iterable
+    public function findClasses(string $ns, bool $recursive = false): iterable
     {
-        $files = $this->findFiles($ns);
+        $files = $this->findFiles($ns, $recursive);
 
         foreach ($files as $file) {
-            $class = $file->getBasename('.php');
+            if (str_contains($file->getFilename(), '.blade.')) {
+                continue;
+            }
 
-            yield $ns . '\\' . $class;
+            if ($recursive) {
+                $class = Path::stripExtension($file->getRelativePathname());
+            } else {
+                $class = $file->getBasename('.php');
+            }
+
+            yield StrNormalize::toClassNamespace($ns . '\\' . $class);
         }
     }
 }

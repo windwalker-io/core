@@ -1,0 +1,21 @@
+{
+    "extends": [
+        "@vue/tsconfig/tsconfig.dom.json"
+    ],
+    "include": [
+        "src/**/*.ts",
+        "types/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules/**/*"
+    ],
+    "types": ["reflect-metadata"],
+    "compilerOptions": {
+        "allowJs": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "paths": {
+            "@/*": ["./src/*"],
+        }
+    }
+}

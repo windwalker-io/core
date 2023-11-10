@@ -1,33 +1,30 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
 use Closure;
 use OutOfRangeException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Windwalker\Attributes\AttributesAccessor;
+use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
-use Windwalker\Core\Event\CoreEventEmitter;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
+use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
+use Windwalker\Event\EventEmitter;
 use Windwalker\Event\EventListenableInterface;
 
 /**
@@ -43,6 +40,8 @@ trait ApplicationTrait
     use CoreEventAwareTrait;
     use ProcessRunnerTrait;
 
+    public LoggerInterface $logger;
+
     /**
      * @var array<ServiceProviderInterface>
      */
@@ -57,17 +56,15 @@ trait ApplicationTrait
      * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
      * If run as Windwalker console, this will be `console`.
      *
-     * @return string
-     *
-     * @psalm-return "web"|"console"|"cli_web"
+     * @return AppType
      */
-    public function getClientType(): string
+    public function getType(): AppType
     {
-        if ($this->getClient() === ApplicationInterface::CLIENT_WEB) {
-            return $this->isCliRuntime() ? 'cli_web' : 'web';
+        if ($this->getClient() === AppClient::WEB) {
+            return $this->isCliRuntime() ? AppType::CLI_WEB : AppType::WEB;
         }
 
-        return 'console';
+        return AppType::CONSOLE;
     }
 
     public function isCliRuntime(): bool
@@ -127,7 +124,34 @@ trait ApplicationTrait
      */
     public function getMode(): string
     {
-        return $this->config('app.mode');
+        return (string) $this->config('app.mode');
+    }
+
+    public function getSecret(): string
+    {
+        return Base64Url::decode((string) $this->config('app.secret'));
+    }
+
+    public function isMaintenance(): bool
+    {
+        return $this->retrieve(MaintenanceManager::class)->isDown();
+    }
+
+    /**
+     * Disable the debugger profiler.
+     *
+     * @param  bool  $disabled
+     *
+     * @return  void
+     */
+    public function disableDebugProfiler(bool $disabled = true): void
+    {
+        $this->config->setDeep('debugger.profiler_disabled', $disabled);
+    }
+
+    public function isDebugProfilerDisabled(): bool
+    {
+        return (bool) $this->config->getDeep('debugger.profiler_disabled');
     }
 
     /**
@@ -177,11 +201,7 @@ trait ApplicationTrait
 
     protected function prepareBoot(): void
     {
-        $this->dispatcherRegistry ??= new EventDispatcherRegistry($this);
-
-        $this->dispatcher = $this->dispatcherRegistry->getRootDispatcher();
-
-        $this->container->share(EventDispatcherRegistry::class, $this->dispatcherRegistry);
+        $this->dispatcher = new EventEmitter();
     }
 
     protected function registerListeners(Container $container): void

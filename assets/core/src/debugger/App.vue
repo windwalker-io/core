@@ -1,12 +1,11 @@
 <template>
   <div class="c-main-wrapper">
-    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark"
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark-primary"
       style="height: 60px">
       <div class="container-fluid">
         <!-- Logo -->
         <div class="navbar-brand">
-          <img src="assets/vendor/@windwalker-io/core/dist/images/windwalker-logo-h-w.svg" alt="logo"
-            style="height: 30px">
+          <img :src="logo" alt="logo" style="height: 30px">
         </div>
 
         <!-- Header  -->
@@ -19,9 +18,9 @@
     <!-- Body -->
     <div class="d-flex flex-column flex-md-row" style="margin-top: 60px;">
       <!-- Sidebar -->
-      <div class="h-w-sidebar bg-light">
-        <div class="nav flex-column bg-light position-sticky"
-          style="min-width: 200px; top: 60px">
+      <div class="h-w-sidebar" style="background-color: var(--bs-gray-800)">
+        <div class="nav flex-column position-sticky"
+          style="min-width: 200px; top: 60px; background-color: var(--bs-gray-800)">
           <div class="nav-item nav-item--dashboard">
             <router-link to="/"
               class="c-sidebar-menu-item nav-link"
@@ -76,7 +75,15 @@
 
       <!-- Content Body -->
       <div class="flex-grow-1">
-        <router-view></router-view>
+        <router-view v-slot="{ Component }">
+          <Transition name="fade" mode="out-in" :key="route.fullPath">
+            <Suspense>
+              <div>
+                <component :is="Component" />
+              </div>
+            </Suspense>
+          </Transition>
+        </router-view>
       </div>
     </div>
 
@@ -84,27 +91,14 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import logo from './images/windwalker-logo-h-w.svg';
 import { computed } from 'vue';
 import { RouterLink, RouterView, useRoute } from 'vue-router';
 import Store from './Store.vue';
 
-export default {
-  name: 'App',
-  components: {
-    Store,
-    RouterLink,
-    RouterView
-  },
-  setup() {
-    const route = useRoute();
-    const currentRoute = computed(() => route.name);
-
-    return {
-      currentRoute
-    };
-  }
-};
+const route = useRoute();
+const currentRoute = computed(() => route.name);
 </script>
 
 <style scoped lang="scss">

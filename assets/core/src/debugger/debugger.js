@@ -1,18 +1,13 @@
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2021 __ORGANIZATION__.
- * @license    __LICENSE__
- */
 
 import 'regenerator-runtime';
-import App from '@/App.vue';
-import { createApp } from 'vue';
-import router from './routes.js';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import './font-awesome.js';
 
+import App from '@/App.vue';
+import '@asika32764/vue-animate/dist/vue-animate.min.css';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { createApp } from 'vue';
 import '../../scss/debugger.scss';
+import './font-awesome.js';
+import router from './routes.js';
 
 const app = createApp(App)
   .use(router)

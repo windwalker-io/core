@@ -1,18 +1,12 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
 use Attribute;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Controller\DelegatingController;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
@@ -27,12 +21,10 @@ class Controller implements ContainerAttributeInterface
      * Controller constructor.
      *
      * @param  string|null  $config
-     * @param  string|null  $module
      * @param  array        $views
      */
     public function __construct(
         public ?string $config = null,
-        public ?string $module = null,
         public array $views = []
     ) {
     }
@@ -57,10 +49,9 @@ class Controller implements ContainerAttributeInterface
         }
 
         return fn(...$args): DelegatingController => (new DelegatingController(
-            $container->get(AppContext::class),
+            $container->get(AppContextInterface::class),
             $handler(...$args)
         ))
-            ->setModule($this->module)
             ->setViewMap($this->views);
     }
 }

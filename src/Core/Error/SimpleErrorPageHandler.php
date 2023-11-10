@@ -1,16 +1,11 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 LYRASOFT.
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Error;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
@@ -33,7 +28,8 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
     /**
      * SimpleErrorPageHandler constructor.
      *
-     * @param  array  $options
+     * @param  ApplicationInterface  $app
+     * @param  array                 $options
      */
     public function __construct(
         protected ApplicationInterface $app,
@@ -53,14 +49,16 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
     }
 
     /**
-     * __invoke
-     *
      * @param  Throwable  $e
      *
      * @return  void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __invoke(Throwable $e): void
     {
+        // Todo: error provider is early than renderer provider, sometimes
+        // RendererService may not exists here.
         $renderer = $this->app->service(RendererService::class);
 
         try {
