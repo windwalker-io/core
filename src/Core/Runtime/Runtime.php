@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Runtime;
 
 use Windwalker\Core\Http\ProxyResolver;
+use Windwalker\Core\Provider\IniSetterTrait;
 use Windwalker\Core\Provider\RuntimeProvider;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
@@ -18,6 +19,8 @@ use Windwalker\Utilities\Arr;
  */
 class Runtime
 {
+    use IniSetterTrait;
+
     protected static string $rootDir = '';
 
     protected static string $workDir = '';
@@ -42,6 +45,10 @@ class Runtime
             $container = static::getContainer();
 
             $container->registerServiceProvider(new RuntimeProvider());
+
+            $ini = $container->getParam('ini') ?? [];
+
+            self::setINIValues($ini, $container);
         }
 
         static::$booted = true;
@@ -67,7 +74,7 @@ class Runtime
      *
      * @return  mixed
      */
-    public static function &config(string $name, string $delimiter = '.')
+    public static function &config(string $name, string $delimiter = '.'): mixed
     {
         return static::$container->getParameters()->getDeep($name, $delimiter);
     }

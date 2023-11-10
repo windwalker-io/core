@@ -48,9 +48,11 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
      */
     public function boot(Container $container): void
     {
-        $iniValues = $this->config->get('ini') ?? [];
+        if (!$this->app->getType()->isCliWeb()) {
+            $iniValues = $this->config->get('ini') ?? [];
 
-        $this->setINIValues($iniValues, $container);
+            static::setINIValues($iniValues, $container);
+        }
 
         $error = $container->get(ErrorService::class);
 
@@ -59,6 +61,8 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
             default:
                 // Runtime CLI do not restore exception handler, let console app handle it.
                 if (!$this->app->isCliRuntime()) {
+                    ini_set('display_errors', 'stderr');
+
                     $error->register(
                         (bool) ($this->config->get('restore') ?? true),
                         (int) ($this->config->get('report_level') ?? E_ALL | E_STRICT),

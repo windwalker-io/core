@@ -73,6 +73,14 @@ class CliServerRuntime
         return self::$cliServerStateManager->writeState(self::$state);
     }
 
+    public static function registerErrorReporting(int $defaultErrorReporting = 0, int $devErrorReporting = -1): void
+    {
+        ini_set('display_errors', 'stderr');
+        error_reporting(
+            static::isDev() ? -1 : $defaultErrorReporting
+        );
+    }
+
     public static function log(string|iterable $message, bool $newline = false): void
     {
         self::getOutput()->write($message, $newline);

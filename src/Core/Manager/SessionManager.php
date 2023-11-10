@@ -92,17 +92,24 @@ class SessionManager extends AbstractManager
             );
             /** @var BridgeInterface $bridge */
             $cookies = $container->resolve('session.factories.cookies.' . $cookies);
-            $ini = $container->getParam('session.ini');
+            $sessionOptions = $container->getParam('session.session_options');
+
+            $options = [
+                ...$options,
+                ...$sessionOptions
+            ];
 
             if ($bridge instanceof PhpBridge) {
-                $gcDivisor = $ini['gc_divisor'] ?? 1000;
-                $gcProbability = $ini['gc_probability'] ?? 1;
+                $gcDivisor = $sessionOptions['gc_divisor'] ?? 1000;
+                $gcProbability = $sessionOptions['gc_probability'] ?? 1;
 
                 $bridge->setOption('gc_divisor', $gcDivisor);
                 $bridge->setOption('gc_probability', $gcProbability);
             }
 
-            $options['ini'] = $ini;
+            if ($sessionOptions['name'] ?? null) {
+                $bridge->setSessionName($sessionOptions['name']);
+            }
 
             $app = $container->get(ApplicationInterface::class);
 
