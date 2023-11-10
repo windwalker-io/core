@@ -26,7 +26,7 @@ use Windwalker\Utilities\TypeCast;
  */
 #[CommandWrapper(
     description: 'Start Windwalker Server.',
-    aliases: ['dev:serve']
+    aliases: ['server:run']
 )]
 class ServerStartCommand implements CommandInterface, SignalableCommandInterface, CompletionAwareInterface
 {
@@ -280,13 +280,17 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
         if ($argumentName === 'server') {
             $mainFiles = $this->getServerFiles();
 
-            if ($context->getCurrentWord()) {
+            $currentWord = $context->getCurrentWord();
+
+            if ($currentWord) {
+                $currentWord = explode(':', $currentWord)[0] ?? '';
+
                 foreach ($mainFiles as $engine => $files) {
-                    if (str_starts_with($engine, $context->getCurrentWord())) {
+                    if (str_starts_with($engine, $currentWord)) {
                         $result = [];
 
-                        foreach ($files as $file) {
-                            $result[] = $engine . ':' . $file;
+                        foreach ($files as $name => $file) {
+                            $result[] = $engine . ':' . $name;
                         }
 
                         return $result;

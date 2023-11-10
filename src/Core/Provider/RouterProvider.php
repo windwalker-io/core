@@ -27,14 +27,15 @@ class RouterProvider implements ServiceProviderInterface, BootableProviderInterf
     public function boot(Container $container): void
     {
         /*
-         * Pre-load Router here to cache it, that every child process will not crate new one.
+         * Pre-load Router here to cache it, that every child process will not create new one.
          *
          * Since PHP has a memory leak bug on declaring anonymous function in included files.
          * Loading our routes files will cause memory usage higher and higher. So we load router here
          * to preload all routes and cache them.
          *
-         * This BUG sill exists in PHP 8.1. @see https://bugs.php.net/bug.php?id=76982
+         * This BUG still exists in PHP 8.1. @see https://bugs.php.net/bug.php?id=76982
          */
+        // Todo: Remove this line after PHP totally fix it.
         $container->get(Router::class);
     }
 

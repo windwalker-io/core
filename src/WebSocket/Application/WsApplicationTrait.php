@@ -44,12 +44,12 @@ trait WsApplicationTrait
         return $this->retrieve(RequestRegistry::class)->store($request, $fd);
     }
 
-    public function getRequest(int $fd, ?WebSocketRequestInterface $request = null)
+    public function getRequest(int $fd, ?WebSocketRequestInterface $request = null): WebSocketRequestInterface
     {
         return $this->retrieve(RequestRegistry::class)->get($fd, $request);
     }
 
-    public function forgetRequest(int $fd)
+    public function forgetRequest(int $fd): bool
     {
         return $this->retrieve(RequestRegistry::class)->remove($fd);
     }

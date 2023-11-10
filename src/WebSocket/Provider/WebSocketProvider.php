@@ -34,7 +34,6 @@ use Windwalker\WebSocket\Application\WsAppRequest;
 use Windwalker\WebSocket\Application\WsRootApplicationInterface;
 use Windwalker\WebSocket\Parser\SimpleMessageParser;
 use Windwalker\WebSocket\Parser\WebSocketParserInterface;
-use Windwalker\WebSocket\Router\WsRouter;
 use Windwalker\WebSocket\Swoole\RequestRegistry;
 
 /**
@@ -197,8 +196,8 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
             UserFdMapping::class,
             fn(Container $container) => $container->get(MemoryTableFactory::class)
                 ->createUserFdMapping(
-                    $this->parentApp->config('reactor.user_mapping.size') ?? 1024,
-                    $this->parentApp->config('reactor.user_mapping.length') ?? 32768,
+                    $this->parentApp->config('reactor.websocket.user_mapping.size') ?? 1024,
+                    $this->parentApp->config('reactor.websocket.user_mapping.length') ?? 32768,
                 )
         );
         $container->share(
@@ -206,8 +205,8 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
             fn(Container $container) => $container->get(MemoryTableFactory::class)
                 ->createRoomMapping(
                     $container->get(UserFdMapping::class),
-                    $this->parentApp->config('reactor.user_mapping.size') ?? 1024,
-                    $this->parentApp->config('reactor.user_mapping.length') ?? 32768,
+                    $this->parentApp->config('reactor.websocket.user_mapping.size') ?? 1024,
+                    $this->parentApp->config('reactor.websocket.user_mapping.length') ?? 32768,
                 )
         );
         $container->share(
@@ -219,9 +218,10 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
                     $container->get(MemoryTableFactory::class)->createMemoryTable(
                         // Default size is same as `ulimit -n`,
                         // @see https://wiki.swoole.com/#/server/setting?id=max_conn-max_connection
-                        $options['max_requests'] ?? 100000
+                        $this->parentApp->config('reactor.websocket.request_registry.size')
+                            ?? $options['max_requests'] ?? 100000
                     ),
-                    $this->parentApp->config('reactor.request_registry_length') ?? 2048
+                    $this->parentApp->config('reactor.websocket.request_registry.length') ?? 2048
                 );
             }
         );

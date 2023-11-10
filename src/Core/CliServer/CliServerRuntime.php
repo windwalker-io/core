@@ -18,6 +18,7 @@ use Symfony\Component\Console\Terminal;
 use Whoops\Run;
 use Windwalker\Core\CliServer\Swoole\SwooleInspector;
 use Windwalker\Filesystem\FileObject;
+use Windwalker\Http\Helper\ResponseHelper;
 
 /**
  * The CliServerRuntime class.
@@ -138,6 +139,19 @@ class CliServerRuntime
 
     public static function handleThrowable(\Throwable $e): void
     {
+        if (ResponseHelper::isClientError($e->getCode())) {
+            $output = self::getStyledOutput();
+            $output->error("({$e->getCode()}) " . $e->getMessage());
+            $output->writeln('  # File: ' . $e->getFile() . ':' . $e->getLine());
+            $output->newLine(2);
+
+            if (static::getOutput()->isVerbose()) {
+                static::renderThrowable($e, static::getOutput());
+            }
+
+            return;
+        }
+
         static::createErrorHandler()($e);
     }
 

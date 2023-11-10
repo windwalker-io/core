@@ -39,7 +39,10 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
         $request = $this->handleByParser($request);
         $route = $request->getRequestTarget();
 
-        $matched = $router->match($request, $route);
+        // We must set app first because Router will initial before app register to container.
+        // {@see RouterProvider}
+        $matched = $router->setApp($this->app)
+            ->match($request, $route);
 
         $controller = $this->findController($matched);
 

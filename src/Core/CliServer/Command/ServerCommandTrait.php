@@ -7,6 +7,7 @@ namespace Windwalker\Core\CliServer\Command;
 use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\CliServer\Contracts\CliServerEngineInterface;
+use Windwalker\Filesystem\Path;
 
 /**
  * Trait ServerCommandTrait
@@ -72,7 +73,7 @@ trait ServerCommandTrait
             $main = $servers[$name] ?? '';
         }
 
-        return $main;
+        return Path::realpath($main);
     }
 
     protected function mustGetMainFile(IOInterface $io, string $engine, string $name): string

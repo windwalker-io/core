@@ -387,6 +387,11 @@ trait RouteConfigurationTrait
         return $this->options['hosts'] ?? [];
     }
 
+    public function getNamespace(): string
+    {
+        return $this->getExtraValue('namespace') ?? '';
+    }
+
     /**
      * extra
      *
