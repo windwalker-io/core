@@ -35,7 +35,7 @@ class WsRouter extends Router
 
         if ($ns) {
             /** @var WebSocketRequestInterface $request */
-            $rootRequest = $this->app->getRequest($request->getFd());
+            $rootRequest = $this->app->getRememberedRequest($request->getFd());
 
             $path = $rootRequest->getUri()->getPath();
 

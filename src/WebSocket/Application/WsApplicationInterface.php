@@ -18,7 +18,10 @@ interface WsApplicationInterface extends ApplicationInterface
 
     public function rememberRequest(WebSocketRequestInterface $request, ?int $fd = null): bool;
 
-    public function getRequest(int $fd, ?WebSocketRequestInterface $request = null): WebSocketRequestInterface;
+    public function getRememberedRequest(
+        int $fd,
+        ?WebSocketRequestInterface $request = null
+    ): WebSocketRequestInterface;
 
     public function forgetRequest(int $fd): bool;
 }

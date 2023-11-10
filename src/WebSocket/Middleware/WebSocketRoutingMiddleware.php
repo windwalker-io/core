@@ -81,6 +81,10 @@ class WebSocketRoutingMiddleware implements MiddlewareInterface
 
     protected function handleByParser(WebSocketRequestInterface $request): WebSocketRequestInterface
     {
+        if ($request->getMethod() !== 'MESSAGE') {
+            return $request->withRequestTarget($request->getUri()->getPath());
+        }
+
         return $this->app->getParser()->handleRequest($request);
     }
 

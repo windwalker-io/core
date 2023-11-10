@@ -121,14 +121,11 @@ class Router implements EventAwareInterface
     {
         $uri = $request->getUri();
 
-        // Only check methods in web env
-        if (!$request instanceof WebSocketRequestInterface) {
-            // Match methods
-            $methods = $route->getMethods();
+        // Match methods
+        $methods = $route->getMethods();
 
-            if ($methods && !in_array(strtoupper($request->getMethod()), $methods, true)) {
-                return false;
-            }
+        if ($methods && !in_array(strtoupper($request->getMethod()), $methods, true)) {
+            return false;
         }
 
         // Match Hosts

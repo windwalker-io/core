@@ -44,8 +44,10 @@ trait WsApplicationTrait
         return $this->retrieve(RequestRegistry::class)->store($request, $fd);
     }
 
-    public function getRequest(int $fd, ?WebSocketRequestInterface $request = null): WebSocketRequestInterface
-    {
+    public function getRememberedRequest(
+        int $fd,
+        ?WebSocketRequestInterface $request = null
+    ): WebSocketRequestInterface {
         return $this->retrieve(RequestRegistry::class)->get($fd, $request);
     }
 

@@ -16,13 +16,13 @@ use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
-use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
+use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionResolveException;
@@ -36,7 +36,7 @@ use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Reactor\WebSocket\WebSocketServerInterface;
 use Windwalker\Uri\Uri;
 use Windwalker\WebSocket\Provider\WebSocketProvider;
-use Windwalker\WebSocket\Swoole\RequestRegistry;
+use Windwalker\WebSocket\Router\WsRouter;
 
 /**
  * The WebSocketApplication class.
@@ -223,21 +223,7 @@ class WsRootApplication implements WsRootApplicationInterface
 
         $request = $event->getRequest();
 
-        $middlewares = MiddlewareRunner::chainMiddlewares(
-            $this->middlewares,
-            static fn(ServerRequestInterface $request) => static::anyToResponse(
-                $container->get(ControllerDispatcher::class)
-                    ->dispatch($container->get(WsAppContext::class))
-            )
-        );
-
-        // @event
-        $event = $appContext->emit(
-            BeforeAppDispatchEvent::class,
-            compact('container', 'middlewares', 'request')
-        );
-
-        $response = $this->dispatch($appContext, $event->getRequest(), $event->getMiddlewares());
+        $response = $this->dispatchContext($appContext, $request);
 
         // @event
         $event = $this->emit(
@@ -262,6 +248,27 @@ class WsRootApplication implements WsRootApplicationInterface
     public function runContextByRequest(WebSocketRequestInterface $request): ResponseInterface
     {
         return $this->runContext($this->createContext($request));
+    }
+
+    protected function dispatchContext(WsAppContext $appContext, WebSocketRequestInterface $request)
+    {
+        $container = $appContext->getContainer();
+
+        $middlewares = MiddlewareRunner::chainMiddlewares(
+            $this->middlewares,
+            static fn(ServerRequestInterface $request) => static::anyToResponse(
+                $container->get(ControllerDispatcher::class)
+                    ->dispatch($container->get(WsAppContext::class))
+            )
+        );
+
+        // @event
+        $event = $appContext->emit(
+            BeforeAppDispatchEvent::class,
+            compact('container', 'middlewares', 'request')
+        );
+
+        return $this->dispatch($appContext, $event->getRequest(), $event->getMiddlewares());
     }
 
     /**
@@ -347,27 +354,68 @@ class WsRootApplication implements WsRootApplicationInterface
         return $this;
     }
 
+    protected function hasRouteWithMethod(string $method): bool
+    {
+        if (!$this->container->has(WsRouter::class)) {
+            return false;
+        }
+
+        $router = $this->retrieve(WsRouter::class);
+
+        foreach ($router->getRoutes() as $route) {
+            if (in_array(strtoupper($method), $route->getMethods(), true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function openConnection(WebSocketRequestInterface $request): void
     {
         $start = microtime(true);
 
-        $this->opening($request);
+        try {
+            $this->opening($request);
 
-        $client = $this->service(CliServerClient::class);
-        $client->logWebSocketOpen($request, (microtime(true) - $start) * 1000);
+            if ($this->hasRouteWithMethod('OPEN')) {
+                $appContext = $this->createContext($request);
+
+                try {
+                    $this->dispatchContext($appContext, $request);
+                } catch (RouteNotFoundException) {
+                    // No actions
+                }
+            }
+        } finally {
+            $client = $this->service(CliServerClient::class);
+            $client->logWebSocketOpen($request, (microtime(true) - $start) * 1000);
+        }
     }
 
     public function closeConnection(WebSocketRequestInterface $request): void
     {
         $start = microtime(true);
 
-        $this->closing($request);
+        try {
+            $this->closing($request);
 
-        $this->retrieve(RoomMapping::class)->leaveAllRooms($request->getFd());
-        $this->retrieve(UserFdMapping::class)->removeFd($request->getFd());
+            if ($this->hasRouteWithMethod('CLOSE')) {
+                $appContext = $this->createContext($request);
 
-        $client = $this->service(CliServerClient::class);
-        $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);
+                try {
+                    $this->dispatchContext($appContext, $request);
+                } catch (RouteNotFoundException) {
+                    // No actions
+                }
+            }
+        } finally {
+            $this->retrieve(RoomMapping::class)->leaveAllRooms($request->getFd());
+            $this->retrieve(UserFdMapping::class)->removeFd($request->getFd());
+
+            $client = $this->service(CliServerClient::class);
+            $client->logWebSocketClose($request, (microtime(true) - $start) * 1000);
+        }
     }
 
     public function initialize(): void
