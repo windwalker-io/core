@@ -53,6 +53,8 @@ class DatabaseManager extends AbstractManager
         /** @var DatabaseAdapter $db */
         $db = parent::create($name, ...$args);
 
+        $db->getDriver()->setOption('debug', WINDWALKER_DEBUG);
+
         $orm = $db->orm();
 
         $orm->setAttributesResolver($this->container->getAttributesResolver());
