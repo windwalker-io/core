@@ -58,7 +58,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
 
         $command->addOption(
             'about',
-            'a',
+            null,
             InputOption::VALUE_NONE,
             'Describe this task.',
         );
