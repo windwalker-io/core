@@ -97,7 +97,8 @@ export function syncModuleTS(source = 'src/Module', dest = 'www/assets/js/view/'
   return ts(
     [
       `${source}/**/*.ts`,
-      'node_modules/@windwalker-io/core/types/**.d.ts',
+      // Todo: Research if tsconfig.json can replace this line
+      'resources/assets/src/**/*.d.ts',
       ...findModules('**/assets/*.ts')
     ],
     dest,

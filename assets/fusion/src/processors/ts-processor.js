@@ -42,7 +42,7 @@ export default class TsProcessor extends JsProcessor {
   compile(dest, options) {
     const config = lodashMerge({}, options.ts);
     let tsTask;
-
+    
     if (options.tsconfig) {
       let tsconfig = options.tsconfig;
       if (typeof tsconfig === 'function') {
