@@ -26,6 +26,7 @@
         "symfony/stopwatch": "^5.0||^6.0",
         "webmozart/glob": "^4.0",
         "windwalker/attributes": "^4.0",
+        "windwalker/crypt": "^4.0",
         "windwalker/data": "^4.0",
         "windwalker/di": "^4.0",
         "windwalker/environment": "^4.0",
