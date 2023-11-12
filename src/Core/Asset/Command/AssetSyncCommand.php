@@ -94,13 +94,14 @@ class AssetSyncCommand implements CommandInterface
             foreach ($vendors as $vendor => $versions) {
                 $constraints = $versionParser->parseConstraints($versions);
 
-                if ($currentVersions = $packageJson->getDeep('dependencies.' . $vendor)) {
+                if ($currentVersions = $packageJson->getDeep('dependencies#' . $vendor, '#')) {
                     $currentConstraints = $versionParser->parseConstraints($currentVersions);
 
                     if (!Intervals::isSubsetOf($constraints, $currentConstraints)) {
                         $packageJson->setDeep(
-                            'dependencies.' . $vendor,
-                            $newVersion = $currentVersions . '|' . $versions
+                            'dependencies#' . $vendor,
+                            $newVersion = $currentVersions . '|' . $versions,
+                            '#'
                         );
 
                         $override = true;
@@ -109,8 +110,9 @@ class AssetSyncCommand implements CommandInterface
                     }
                 } else {
                     $packageJson->setDeep(
-                        'dependencies.' . $vendor,
-                        $versions
+                        'dependencies#' . $vendor,
+                        $versions,
+                        '#'
                     );
 
                     $override = true;
