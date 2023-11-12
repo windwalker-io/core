@@ -87,8 +87,12 @@ function findNpmVendors(composerJsons = []) {
     .flat();
 
   const vendorsFromComposer = composerJsons
-    .map((composerJson) => composerJson?.extra?.windwalker?.assets?.vendors || {})
-    .map((vendors) => Object.keys(vendors))
+    .map((composerJson) => {
+      return [
+        ...composerJson?.extra?.windwalker?.asset_vendors || [],
+        ...Object.keys(composerJson?.extra?.windwalker?.assets?.vendors || {})
+      ]
+    })
     .flat();
 
   return [ ...new Set(vendors.concat(vendorsFromComposer)) ];
