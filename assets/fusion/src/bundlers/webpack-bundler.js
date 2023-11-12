@@ -1,7 +1,6 @@
 import path from 'path';
 import { postTask } from '@windwalker-io/fusion';
 import { cliInput } from '@windwalker-io/fusion/src/utilities/cli.js';
-import { webpackBasicConfig } from '../utilities/webpack.js';
 
 export async function webpackBundle(file, dest, override = null) {
 
@@ -19,6 +18,8 @@ export async function webpackBundle(file, dest, override = null) {
     process.exit(255);
     return;
   }
+
+  const { webpackBasicConfig } = await import('../utilities/webpack.js');
 
   const config = await webpackBasicConfig();
 

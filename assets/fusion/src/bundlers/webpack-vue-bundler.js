@@ -1,7 +1,6 @@
 import path from 'path';
 import { postTask } from '@windwalker-io/fusion';
 import { cliInput } from '@windwalker-io/fusion/src/utilities/cli.js';
-import { webpackVue3Config } from '../utilities/webpack.js';
 
 export async function webpackVueBundle(file, dest, override = null) {
 
@@ -22,6 +21,7 @@ export async function webpackVueBundle(file, dest, override = null) {
 
   const { DefinePlugin } = webpack;
 
+  const { webpackVue3Config } = await import('../utilities/webpack.js');
   const config = await webpackVue3Config();
 
   if (dest.endsWith('/')) {
