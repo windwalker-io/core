@@ -128,7 +128,9 @@ class PackageInstaller
 
                     Filesystem::write($dest, $content);
 
-                    $callback($src, $dest);
+                    if ($callback) {
+                        $callback($src, $dest);
+                    }
                 }
             );
         }
