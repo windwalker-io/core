@@ -92,7 +92,7 @@ class SessionManager extends AbstractManager
             );
             /** @var BridgeInterface $bridge */
             $cookies = $container->resolve('session.factories.cookies.' . $cookies);
-            $sessionOptions = $container->getParam('session.session_options');
+            $sessionOptions = $container->getParam('session.session_options') ?? [];
 
             $options = [
                 ...$options,
