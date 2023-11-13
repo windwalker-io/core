@@ -5,7 +5,7 @@
     "license": "MIT",
     "minimum-stability": "beta",
     "require": {
-        "php": ">=8.0.0",
+        "php": ">=8.2",
         "ext-json": "*",
         "fakerphp/faker": "^1.0",
         "fig/link-util": "^1.2",
