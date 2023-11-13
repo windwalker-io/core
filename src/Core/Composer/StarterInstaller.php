@@ -7,6 +7,7 @@ namespace Windwalker\Core\Composer;
 use Composer\Script\Event;
 use Exception;
 use Windwalker\Core\Utilities\Base64Url;
+use Windwalker\Crypt\SecretToolkit;
 
 /**
  * The StarterInstaller class.
@@ -162,7 +163,11 @@ class StarterInstaller
      */
     public static function genSecretCode(): string
     {
-        return Base64Url::encode(random_bytes(16));
+        if (class_exists(SecretToolkit::class)) {
+            return SecretToolkit::genSecret();
+        }
+
+        return 'base64url:' . Base64Url::encode(random_bytes(16));
     }
 
     /**
