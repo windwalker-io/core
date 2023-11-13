@@ -19,8 +19,6 @@
         "symfony/dotenv": "^5.2||^6.0",
         "symfony/event-dispatcher-contracts": "^2.0||^3.0",
         "symfony/options-resolver": "^5.0||^6.0",
-        "symfony/polyfill-php81": "^1.0",
-        "symfony/polyfill-php82": "^1.27",
         "symfony/polyfill-php83": "^1.0",
         "symfony/process": "^5.2||^6.0",
         "symfony/stopwatch": "^5.0||^6.0",
@@ -60,6 +58,11 @@
         "files": [
             "src/bootstrap.php"
         ]
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
     },
     "extra": {
         "windwalker": {
