@@ -23,8 +23,8 @@ export function syncModuleScripts(source = 'src/Module', dest = 'www/assets/js/v
 export function syncModuleJS(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
   return babel(
     [
-      `${source}/**/*.{js,mjs}`,
       ...findModules('**/assets/*.{js,mjs}')
+      `${source}/**/*.{js,mjs}`,
     ],
     dest,
     {

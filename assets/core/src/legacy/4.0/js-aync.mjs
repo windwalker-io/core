@@ -56,9 +56,9 @@ export function jsSync(source = 'src/Module', dest, options = {}) {
     // Legacy mode
     ts(
       [
-        `${source}/**/*.ts`,
+        ...findModules('**/assets/*.ts'),
         'node_modules/@windwalker-io/unicorn/src/types/*.d.ts',
-        ...findModules('**/assets/*.ts')
+        `${source}/**/*.ts`,
       ],
       dest,
       {
