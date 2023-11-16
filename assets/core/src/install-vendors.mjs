@@ -90,6 +90,7 @@ function findNpmVendors(composerJsons = []) {
     .map((composerJson) => {
       return [
         ...composerJson?.extra?.windwalker?.asset_vendors || [],
+        ...composerJson?.extra?.windwalker?.assets?.exposes || [],
         ...Object.keys(composerJson?.extra?.windwalker?.assets?.vendors || {})
       ]
     })

@@ -1,9 +1,3 @@
-/**
- * Part of funclass project.
- *
- * @copyright  Copyright (C) 2021 LYRASOFT.
- * @license    __LICENSE__
- */
 
 import { babel, ts } from '@windwalker-io/fusion';
 import path from 'path';
