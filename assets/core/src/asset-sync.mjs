@@ -23,7 +23,7 @@ export function syncModuleScripts(source = 'src/Module', dest = 'www/assets/js/v
 export function syncModuleJS(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
   return babel(
     [
-      ...findModules('**/assets/*.{js,mjs}')
+      ...findModules('**/assets/*.{js,mjs}'),
       `${source}/**/*.{js,mjs}`,
     ],
     dest,
@@ -40,10 +40,10 @@ export function syncModuleJS(source = 'src/Module', dest = 'www/assets/js/view/'
 export function syncModuleTS(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
   return ts(
     [
-      `${source}/**/*.ts`,
       // Todo: Research if tsconfig.json can replace this line
       'resources/assets/src/**/*.d.ts',
-      ...findModules('**/assets/*.ts')
+      ...findModules('**/assets/*.ts'),
+      `${source}/**/*.ts`,
     ],
     dest,
     {

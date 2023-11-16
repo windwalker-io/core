@@ -19,6 +19,7 @@ use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Core\Utilities\Base64Url;
+use Windwalker\Crypt\SecretToolkit;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\ServiceProviderInterface;
@@ -129,7 +130,7 @@ trait ApplicationTrait
 
     public function getSecret(): string
     {
-        return Base64Url::decode((string) $this->config('app.secret'));
+        return (string) SecretToolkit::decode((string) $this->config('app.secret'));
     }
 
     public function isMaintenance(): bool
