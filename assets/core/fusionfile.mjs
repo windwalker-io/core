@@ -15,7 +15,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 export async function debuggers() {
   return webpackVueBundle(
     'src/debugger/debugger.js',
-    'dist/debugger/index.js',
+    'dist/debugger/debugger.js',
     (config) => {
       config.resolve.alias = {
         '@': path.resolve(path.resolve(), './src/debugger/') // Will be overwrite when compile
