@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\View;
+namespace Windwalker\Core\View\Contract;
 
 interface SortableViewModelInterface
 {
