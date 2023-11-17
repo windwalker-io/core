@@ -48,17 +48,7 @@ abstract class AbstractAstBuilder
 
     protected function getLexer(): Emulative
     {
-        return $this->lexer ??= new Emulative(
-            [
-                'usedAttributes' => [
-                    'comments',
-                    'startLine',
-                    'endLine',
-                    'startTokenPos',
-                    'endTokenPos',
-                ],
-            ]
-        );
+        return $this->lexer ??= new Emulative();
     }
 
     public function createNodeFactory(): BuilderFactory
@@ -91,7 +81,7 @@ abstract class AbstractAstBuilder
 
         $parser = $this->getParser();
         $oldAst = $parser->parse($code);
-        $oldTokens = $this->getLexer()->getTokens();
+        $oldTokens = $parser->getTokens();
 
         $traverser->addVisitor($this->createVisitor($enterNode, $leaveNode));
         $newAst = $traverser->traverse($oldAst);

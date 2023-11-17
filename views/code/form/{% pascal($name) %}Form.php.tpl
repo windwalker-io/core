@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace {% $ns %};
 
+use Windwalker\Form\Attributes\Fieldset;
 use Windwalker\Form\Field\HiddenField;
 use Windwalker\Form\Attributes\FormDefine;
 use Windwalker\Form\Form;

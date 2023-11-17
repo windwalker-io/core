@@ -591,6 +591,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         if ($type === '?Chronos') {
             $this->addUse(CastNullable::class);
+            $this->addUse(ServerTimeCast::class);
             $prop->setAttribute('fullType', Chronos::class);
             $prop->setAttribute('fullType', ServerTimeCast::class);
             $prop->attrGroups[] = $this->attributeGroup(
