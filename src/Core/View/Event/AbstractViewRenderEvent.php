@@ -47,7 +47,7 @@ class AbstractViewRenderEvent extends AbstractEvent
     /**
      * @return array
      */
-    public function getData(): array
+    public function &getData(): array
     {
         return $this->data;
     }
@@ -87,7 +87,7 @@ class AbstractViewRenderEvent extends AbstractEvent
     /**
      * @return string
      */
-    public function getLayout(): string
+    public function &getLayout(): string
     {
         return $this->layout;
     }
