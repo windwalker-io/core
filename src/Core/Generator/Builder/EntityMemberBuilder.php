@@ -13,6 +13,7 @@ use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Core\Event\CoreEventAwareTrait;
+use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
 use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
 use Windwalker\Database\Manager\TableManager;
@@ -40,6 +41,7 @@ use Windwalker\Utilities\TypeCast;
  */
 class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterface
 {
+    use MessageOutputTrait;
     use CoreEventAwareTrait;
     use InstanceCacheTrait;
 
@@ -281,6 +283,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $isBool = false;
         $specialSetter = null;
         $typeNode = $type;
+
+        if ($typeNode instanceof Node\UnionType) {
+            $this->emitMessage(
+                "The property `$propName` uses union type, " .
+                "currently we don't support union type on entity property, ignore it.",
+                true
+            );
+            return [];
+        }
 
         if ($typeNode instanceof Node\NullableType) {
             $typeNode = $typeNode->type;
