@@ -14,6 +14,8 @@ use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriHelper;
 
+use function Windwalker\unwrap_enum;
+
 /**
  * The RouteUri class.
  */
@@ -176,7 +178,7 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function var(string $name, mixed $value): static
     {
-        return $this->withVar($name, $value);
+        return $this->withVar($name, unwrap_enum($value));
     }
 
     /**
