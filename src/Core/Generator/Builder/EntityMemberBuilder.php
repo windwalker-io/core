@@ -284,20 +284,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $specialSetter = null;
         $typeNode = $type;
 
-        if ($typeNode instanceof Node\UnionType) {
-            $this->emitMessage(
-                "The property `$propName` uses union type, " .
-                "currently we don't support union type on entity property, ignore it.",
-                true
-            );
-            return [];
-        }
-
         if ($typeNode instanceof Node\NullableType) {
             $typeNode = $typeNode->type;
         }
-
-        $className = $this->findFQCN((string) $typeNode);
 
         if ($typeNode instanceof Node\UnionType) {
             $isBool = in_array('bool', $typeNode->types, true);
@@ -396,46 +385,50 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 ]
             );
 
-            // Enum accept pure value
-            if ($className && class_exists($className) && $this->isEnum($className)) {
-                if ($column) {
-                    $subType = $column->isNumeric() ? 'int' : 'string';
-                } else {
-                    $subType = 'int|string';
-                }
+            if (!$typeNode instanceof Node\UnionType) {
+                $className = $this->findFQCN((string) $typeNode);
 
-                $subType .= '|' . $type;
+                // Enum accept pure value
+                if ($className && class_exists($className) && $this->isEnum($className)) {
+                    if ($column) {
+                        $subType = $column->isNumeric() ? 'int' : 'string';
+                    } else {
+                        $subType = 'int|string';
+                    }
 
-                $method->params[0] = $factory->param($propName)
-                    ->setType($subType)
-                    ->getNode();
+                    $subType .= '|' . $type;
 
-                if (is_a($className, EnumMetaInterface::class, true)) {
-                    $enum = $factory->staticCall(
-                        new Node\Name($type),
-                        'wrap',
-                        [
-                            new Node\Expr\Variable($propName),
-                        ]
+                    $method->params[0] = $factory->param($propName)
+                        ->setType($subType)
+                        ->getNode();
+
+                    if (is_a($className, EnumMetaInterface::class, true)) {
+                        $enum = $factory->staticCall(
+                            new Node\Name($type),
+                            'wrap',
+                            [
+                                new Node\Expr\Variable($propName),
+                            ]
+                        );
+                    } else {
+                        $enum = $factory->new(
+                            new Node\Name($type),
+                            [
+                                new Node\Expr\Variable($propName),
+                            ]
+                        );
+                    }
+
+                    $method->stmts[0] = new Node\Stmt\Expression(
+                        new Node\Expr\Assign(
+                            $factory->propertyFetch(
+                                new Node\Expr\Variable('this'),
+                                $propName
+                            ),
+                            $enum
+                        )
                     );
-                } else {
-                    $enum = $factory->new(
-                        new Node\Name($type),
-                        [
-                            new Node\Expr\Variable($propName),
-                        ]
-                    );
                 }
-
-                $method->stmts[0] = new Node\Stmt\Expression(
-                    new Node\Expr\Assign(
-                        $factory->propertyFetch(
-                            new Node\Expr\Variable('this'),
-                            $propName
-                        ),
-                        $enum
-                    )
-                );
             }
 
             $methods[] = $event->getMethod();

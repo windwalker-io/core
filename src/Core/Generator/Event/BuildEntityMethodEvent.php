@@ -210,6 +210,16 @@ class BuildEntityMethodEvent extends AbstractEvent
             $type = $type->type;
         }
 
+        if ($type instanceof Node\UnionType) {
+            $typeNames = [];
+
+            foreach ($type->types as $type) {
+                $typeNames[] = (string) $type;
+            }
+
+            return implode('|', $typeNames);
+        }
+
         return (string) $type;
     }
 }
