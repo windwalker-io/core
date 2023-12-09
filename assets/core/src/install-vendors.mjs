@@ -6,7 +6,7 @@ import { loadJson } from './utils.mjs';
 import path from 'path';
 import fs from 'fs';
 
-export async function installVendors(npmVendors = [], composerVendors = [], to = 'www/assets/vendor') {
+export async function installVendors(npmVendors = [], legacyComposerVendors = [], to = 'www/assets/vendor') {
   const root = to;
   let vendors = npmVendors;
   const action = process.env.INSTALL_VENDOR === 'hard' ? 'Copy' : 'Link';
@@ -25,7 +25,7 @@ export async function installVendors(npmVendors = [], composerVendors = [], to =
     deleteExists(dir);
   });
 
-  const composerJsons = getInstalledComposerVendors(composerVendors)
+  const composerJsons = getInstalledComposerVendors()
     .map((cv) => `vendor/${cv}/composer.json`)
     .map((file) => loadJson(file))
     .filter((composerJson) => composerJson?.extra?.windwalker != null);
@@ -58,6 +58,15 @@ export async function installVendors(npmVendors = [], composerVendors = [], to =
     if (fs.existsSync(`vendor/${vendorName}/${assets}`)) {
       console.log(`[${action} Composer] vendor/${vendorName}/${assets} => ${root}/${vendorName}/`);
       doInstall(`vendor/${vendorName}/${assets}`, `${root}/${vendorName}/`);
+    }
+  });
+
+  // Install legacy packages assets
+  legacyComposerVendors.forEach((vendorName) => {
+    console.log(vendorName, fs.existsSync(`vendor/${vendorName}/assets`));
+    if (fs.existsSync(`vendor/${vendorName}/assets`)) {
+      console.log(`[${action} Composer] vendor/${vendorName}/assets/ => ${root}/${vendorName}/`);
+      doInstall(`vendor/${vendorName}/assets/`, `${root}/${vendorName}/`);
     }
   });
 
@@ -103,7 +112,7 @@ function injectNpmPackages(composerVendors = []) {
 
 }
 
-function getInstalledComposerVendors(composerVendors = []) {
+function getInstalledComposerVendors() {
   const composerFile = path.resolve(process.cwd(), 'composer.json');
   const composerJson = loadJson(composerFile);
   
@@ -111,7 +120,6 @@ function getInstalledComposerVendors(composerVendors = []) {
     ...new Set(
       Object.keys(composerJson['require'] || {})
         .concat(Object.keys(composerJson['require-dev'] || {}))
-        .concat(composerVendors)
     )
   ];
 }
