@@ -71,7 +71,7 @@ class DatabaseManager extends AbstractManager
 
             try {
                 if ($options['strict'] ?? true) {
-                    $platform->enableStrictMode($options['modes'] ?? null);
+                    $platform->enableStrictMode($options['modes'] ?? null ?: null);
                 } elseif ($options['modes'] ?? null) {
                     $platform->setModes($options['modes'] ?? []);
                 }

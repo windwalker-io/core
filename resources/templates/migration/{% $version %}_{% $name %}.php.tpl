@@ -1,12 +1,5 @@
 {% $phpOpen %}
 
-/**
- * Part of Windwalker project.
- *
- * @copyright  Copyright (C) {% $year %}.
- * @license    __LICENSE__
- */
-
 declare(strict_types=1);
 
 namespace App\Migration;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace {% $ns %};
 
-use Windwalker\Utilities\Enum\EnumSingleton;
 use Windwalker\Utilities\Enum\EnumTranslatableInterface;
 use Windwalker\Utilities\Enum\EnumTranslatableTrait;
 use Windwalker\Utilities\Contract\LanguageInterface;
