@@ -13,9 +13,6 @@ use Windwalker\Utilities\Str;
 
 use function Windwalker\DI\create;
 
-/**
- * Trait RouteConfigurationTrait
- */
 trait RouteConfigurationTrait
 {
     use FlowControlTrait;

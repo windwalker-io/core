@@ -12,9 +12,6 @@ use Windwalker\Utilities\TypeCast;
 
 use function Windwalker\glob_all;
 
-/**
- * The RouteCreator class.
- */
 class RouteCreator implements RouteCreatorInterface
 {
     use RouteConfigurationTrait;
