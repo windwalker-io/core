@@ -129,10 +129,26 @@ namespace Windwalker {
          * @param  string|DateTimeZone|null  $tz
          *
          * @return Chronos|null
+         * @deprecated Use try_chronos()
          */
         function chronosOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?Chronos
         {
             return Chronos::wrapOrNull($date, $tz);
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_chronos')) {
+        /**
+         * try_chronos
+         *
+         * @param  mixed|string              $date
+         * @param  string|DateTimeZone|null  $tz
+         *
+         * @return Chronos|null
+         */
+        function try_chronos(mixed $date = 'now', string|DateTimeZone $tz = null): ?Chronos
+        {
+            return Chronos::tryWrap($date, $tz);
         }
     }
 

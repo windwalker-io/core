@@ -70,6 +70,11 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
 
     public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?static
     {
+        return static::tryWrap($date, $tz);
+    }
+
+    public static function tryWrap(mixed $date = 'now', string|DateTimeZone $tz = null): ?static
+    {
         if ($date === null || $date === '') {
             return null;
         }
