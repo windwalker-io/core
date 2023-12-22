@@ -145,6 +145,8 @@ trait AppRequestTrait
     {
         $input = $this->compileInput();
 
+        $fields = array_filter($fields);
+
         if ($fields === []) {
             if (is_array($input) || is_object($input)) {
                 return collect($input);
