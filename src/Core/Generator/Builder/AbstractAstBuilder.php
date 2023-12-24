@@ -40,7 +40,7 @@ abstract class AbstractAstBuilder
         if (!$this->parser) {
             $lexer = $this->getLexer();
 
-            $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $lexer);
+            $this->parser = (new ParserFactory())->createForNewestSupportedVersion();
         }
 
         return $this->parser;
