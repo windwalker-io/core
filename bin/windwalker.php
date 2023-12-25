@@ -13,4 +13,4 @@ $container = Runtime::getContainer();
 /** @var ConsoleApplication $console */
 $console = $container->resolve('factories.console');
 
-$console->run();
+exit($console->run());
