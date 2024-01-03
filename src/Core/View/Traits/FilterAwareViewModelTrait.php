@@ -13,7 +13,9 @@ trait FilterAwareViewModelTrait
         }
 
         foreach ($filter as $value) {
-            if ($value !== null && (string) $value !== '') {
+            if (is_array($value) && $value !== []) {
+                return true;
+            } elseif ((string) $value !== '') {
                 return true;
             }
         }
