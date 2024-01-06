@@ -12,5 +12,6 @@ $container = Runtime::getContainer();
 
 /** @var ConsoleApplication $console */
 $console = $container->resolve('factories.console');
+$console->setCatchErrors(true);
 
-$console->run();
+exit($console->run());
