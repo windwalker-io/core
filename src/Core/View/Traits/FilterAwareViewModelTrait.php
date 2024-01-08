@@ -13,8 +13,12 @@ trait FilterAwareViewModelTrait
         }
 
         foreach ($filter as $value) {
-            if ($value !== null && (string) $value !== '') {
-                return true;
+            if ($value !== null) {
+                if (is_array($value) && $value !== []) {
+                    return true;
+                } elseif ((string) $value !== '') {
+                    return true;
+                }
             }
         }
 
