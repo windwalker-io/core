@@ -198,6 +198,8 @@ class AssetService implements EventAwareInterface
 
     public function addLink(string $type, string $url, array $options = [], array $attrs = []): AssetLink
     {
+        $url = $this->handleUri($url);
+
         // Cache same url and options to enhance performance
         $key = "$type:$url";
 
@@ -214,7 +216,7 @@ class AssetService implements EventAwareInterface
             function () use ($options, $url, $attrs, $type) {
                 $alias = $this->resolveRawAlias($url);
 
-                $link = $alias ?? new AssetLink($this->handleUri($url), $options);
+                $link = $alias ?? new AssetLink($url, $options);
 
                 $link = $link->withOptions($options);
 

@@ -151,6 +151,15 @@ class QueueWorkerCommand implements CommandInterface
         if ($io->getOption('once')) {
             $file = $io->getOption('file');
 
+            $worker->getEventDispatcher()->on(
+                JobFailureEvent::class,
+                function (JobFailureEvent $event) {
+                    $code = $event->getException()->getCode();
+
+                    exit($code === 0 ? 1 : $code);
+                }
+            );
+
             if ($file) {
                 /** @var QueueMessage $message */
                 $message = unserialize(file_get_contents($file));
