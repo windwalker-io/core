@@ -12,6 +12,7 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
 use Windwalker\Core\Http\ProxyResolver;
+use Windwalker\Core\Http\RequestInspector;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Security\CspNonceService;
@@ -78,7 +79,11 @@ class ConsoleProvider implements ServiceProviderInterface
         $container->prepareSharedObject(Browser::class);
         $container->prepareSharedObject(CspNonceService::class);
         $container->prepareSharedObject(AppState::class);
-        $container->prepareSharedObject(AppContext::class)
+        $container->prepareSharedObject(RequestInspector::class);
+        $container->prepareSharedObject(
+            AppContext::class,
+            fn(AppContext $app, Container $container) => $app->setAppRequest(WebProvider::createAppRequest($container))
+        )
             ->alias(AppContextInterface::class, AppContext::class);
 
         $container->share(

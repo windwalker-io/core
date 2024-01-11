@@ -92,7 +92,7 @@ class WebProvider implements ServiceProviderInterface
      * @throws ContainerExceptionInterface
      * @throws \ReflectionException
      */
-    protected function createAppRequest(Container $container): AppRequest
+    public static function createAppRequest(Container $container): AppRequest
     {
         return $container->newInstance(AppRequest::class)
             ->withRequest($container->get(ServerRequestInterface::class))
@@ -122,7 +122,7 @@ class WebProvider implements ServiceProviderInterface
 
                 // $this->parentApp->getEventDispatcher()->addDealer($app->getEventDispatcher());
 
-                return $app->setAppRequest($this->createAppRequest($container))
+                return $app->setAppRequest(static::createAppRequest($container))
                     ->setState($container->get(AppState::class));
             }
         )
