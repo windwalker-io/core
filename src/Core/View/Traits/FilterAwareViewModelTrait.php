@@ -12,16 +12,17 @@ trait FilterAwareViewModelTrait
             return true;
         }
 
-        foreach ($filter as $value) {
-            if ($value !== null) {
-                if (is_array($value) && $value !== []) {
-                    return true;
-                } elseif ((string) $value !== '') {
-                    return true;
+        $showFilterBar = false;
+
+        array_walk_recursive(
+            $filter,
+            static function ($v) use (&$showFilterBar) {
+                if ((string) $v !== '') {
+                    $showFilterBar = true;
                 }
             }
-        }
+        );
 
-        return false;
+        return $showFilterBar;
     }
 }
