@@ -608,7 +608,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  static  Return self to support chaining.
      */
-    public function setVersion(string $version): string
+    public function setVersion(string $version): static
     {
         $this->version = $version;
 
