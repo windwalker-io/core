@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Command;
 
 use Closure;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,7 +25,7 @@ use function Windwalker\cmd;
  * The RunCommand class.
  */
 #[CommandWrapper(description: 'Run custom scripts.')]
-class RunCommand implements CommandInterface
+class RunCommand implements CommandInterface, CompletionAwareInterface
 {
     /**
      * RunCommand constructor.
@@ -182,5 +184,24 @@ class RunCommand implements CommandInterface
         }
 
         return $cmd;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        if ($argumentName === 'names') {
+            return array_keys((array) $this->app->config('scripts'));
+        }
+
+        return null;
     }
 }
