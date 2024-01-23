@@ -10,8 +10,9 @@
       <ul class="nav nav-pills" id="profilers-tab" role="tablist">
         <li class="nav-item" role="presentation"
           v-for="(instance, i) of instances">
-          <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
-            :data-bs-target="`tab-${instance}`"
+          <button class="nav-link" id="home-tab" data-bs-toggle="tab"
+            :data-bs-target="`#tab-${instance}`"
+            :class="[ i === 0 ? 'active' : '' ]"
             type="button"
             role="tab"
             aria-selected="true">
