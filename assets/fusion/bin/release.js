@@ -40,7 +40,7 @@ try {
 
 const branch = cliInput['b'] || 'master';
 
-console.log('>>> Push to git', { stdio: 'inherit' });
+console.log('>>> Push to git');
 
 exec(`git push origin ${branch}`);
 // exec(`git checkout ${branch}`);
