@@ -442,6 +442,11 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $routeObject;
     }
 
+    public function has(string $route): bool
+    {
+        return $this->findRoute($route) !== null;
+    }
+
     /**
      * @return  SystemUri
      */

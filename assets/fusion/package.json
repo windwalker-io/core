@@ -13,6 +13,7 @@
     "@babel/plugin-proposal-decorators": "^7.14.5",
     "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@babel/plugin-syntax-top-level-await": "^7.14.5",
+    "@babel/plugin-transform-class-properties": "^7.23.3",
     "@babel/preset-env": "^7.14.5",
     "@types/gulp": "^4.0.8",
     "chalk": "^4.1.0",

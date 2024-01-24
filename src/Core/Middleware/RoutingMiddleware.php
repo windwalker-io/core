@@ -57,6 +57,8 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ],
             $options
         );
+
+        $this->getEventDispatcher()->addDealer($app->getEventDispatcher());
     }
 
     /**

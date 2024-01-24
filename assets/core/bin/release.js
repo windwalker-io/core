@@ -1,10 +1,3 @@
-/**
- * Part of fusion project.
- *
- * @copyright  Copyright (C) 2018 Asikart.
- * @license    MIT
- */
-
 import minimist from 'minimist';
 import { execSync as exec } from 'child_process';
 
@@ -27,16 +20,18 @@ if (cliInput['help'] || cliInput['h']) {
   process.exit(0);
 }
 
-console.log(`>>> yarn build:prod`);
-exec(`yarn build:prod`, { stdio: 'inherit' });
+// console.log(`>>> yarn build:prod`);
+// exec(`yarn build:prod`, { stdio: 'inherit' });
 
 console.log(`>>> npm version ${args.join(' ')}`);
-exec(`npm version ${args.join(' ')}`, { stdio: 'inherit' });
+const buffer = exec(`npm version ${args.join(' ')}`);
+
+const ver = buffer.toString().split("\n")[1];
 
 console.log('>>> Git commit all');
 exec(`git add .`, { stdio: 'inherit' });
 try {
-  exec(`git commit -am "Prepare release @windwalker-io/core."`, { stdio: 'inherit' });
+  exec(`git commit -am "Prepare release JS @windwalker-io/core ${ver}."`, { stdio: 'inherit' });
 } catch (e) {
   console.log(e.message);
 }

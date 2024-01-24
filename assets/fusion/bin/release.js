@@ -26,23 +26,25 @@ if (cliInput['help'] || cliInput['h']) {
 }
 
 console.log(`>>> npm version ${args.join(' ')}`);
-exec(`npm version ${args.join(' ')}`);
+const buffer = exec(`npm version ${args.join(' ')}`, { stdio: 'inherit' });
+
+const ver = buffer.toString().split("\n")[1];
 
 console.log('>>> Git commit all');
-exec(`git add .`);
+exec(`git add .`, { stdio: 'inherit' });
 try {
-  exec(`git commit -am "Prepare release @windwalker-io/fusion."`);
+  exec(`git commit -am "Prepare release @windwalker-io/fusion. ${ver}"`);
 } catch (e) {
   console.log(e.message);
 }
 
 const branch = cliInput['b'] || 'master';
 
-console.log('>>> Push to git');
+console.log('>>> Push to git', { stdio: 'inherit' });
 
 exec(`git push origin ${branch}`);
 // exec(`git checkout ${branch}`);
 
 console.log('>> Publish to npm');
 
-exec(`npm publish`);
+exec(`npm publish`, { stdio: 'inherit' });

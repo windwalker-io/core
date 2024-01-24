@@ -8,13 +8,11 @@ include_once __DIR__ . '/Console.php';
 
 class Build extends Console
 {
-    /**
-     * Property help.
-     *
-     * @var  string
-     */
     protected $help = <<<HELP
-[Usage] php release.php <version> <next_version>
+[Usage] php release.php <version>
+
+[Arguments]
+    version    major|minor|patch or direct a version string, keep empty will be "patch".
 
 [Options]
     h | help   Show help information
@@ -22,26 +20,22 @@ class Build extends Console
     --dry-run  Dry run without git push or commit.
 HELP;
 
-    /**
-     * doExecute
-     *
-     * @return  bool|mixed
-     *
-     * @since  __DEPLOY_VERSION__
-     */
-    protected function doExecute()
-    {
-        $currentVersion = trim(file_get_contents(__DIR__ . '/../VERSION'));
-        $targetVersion = $this->getArgument(0);
+    protected array $scripts = [];
 
-        if (!$targetVersion) {
-            $targetVersion = static::versionPlus($currentVersion, 1);
+    protected function doExecute(): true
+    {
+        foreach ($this->scripts as $script) {
+            $this->exec($script);
         }
+
+        $currentVersion = trim(file_get_contents(__DIR__ . '/../VERSION'));
+        $targetVersion = (string) $this->getArgument(0);
+
+        $targetVersion = static::versionPlus($currentVersion, $targetVersion);
 
         $this->out('Release version: ' . $targetVersion);
 
         static::writeVersion($targetVersion);
-        $this->replaceDocblockTags($targetVersion);
 
         $this->exec(sprintf('git commit -am "Release version: %s"', $targetVersion));
         $this->exec(sprintf('git tag %s', $targetVersion));
@@ -52,115 +46,64 @@ HELP;
         return true;
     }
 
-    /**
-     * writeVersion
-     *
-     * @param string $version
-     *
-     * @return  bool|int
-     *
-     * @since  __DEPLOY_VERSION__
-     */
     protected static function writeVersion(string $version)
     {
         return file_put_contents(static::versionFile(), $version . "\n");
     }
 
-    /**
-     * versionFile
-     *
-     * @return  string
-     *
-     * @since  __DEPLOY_VERSION__
-     */
     protected static function versionFile(): string
     {
         return __DIR__ . '/../VERSION';
     }
 
-    /**
-     * versionPlus
-     *
-     * @param string $version
-     * @param int    $offset
-     * @param string $suffix
-     *
-     * @return  string
-     *
-     * @since  __DEPLOY_VERSION__
-     */
-    protected static function versionPlus(string $version, int $offset, string $suffix = ''): string
-    {
-        [$version] = explode('-', $version, 2);
+    protected static function versionPlus(
+        string $currentVersion,
+        string $targetVersion,
+        string $suffix = ''
+    ): string {
+        [$currentVersion] = explode('-', $currentVersion, 2) + ['', ''];
 
-        $numbers = explode('.', $version);
+        [$major, $minor, $patch] = explode('.', $currentVersion, 3) + ['', '0', '0'];
+        $major = (int) $major;
+        $minor = (int) $minor;
+        $patch = (int) $patch;
 
-        if (!isset($numbers[2])) {
-            $numbers[2] = 0;
+        switch ($targetVersion) {
+            case 'major':
+                $major++;
+                $minor = $patch = 0;
+                break;
+
+            case 'minor':
+                $minor++;
+                $patch = 0;
+                break;
+
+            case 'patch':
+            case '':
+                $patch++;
+                break;
+
+            default:
+                return $targetVersion . '-' . $suffix;
         }
 
-        $numbers[2] += $offset;
-
-        if ($numbers[2] === 0) {
-            unset($numbers[2]);
-        }
-
-        $version = implode('.', $numbers);
+        $currentVersion = $major . '.' . $minor . '.' . $patch;
 
         if ($suffix) {
-            $version .= '-' . $suffix;
+            $currentVersion .= '-' . $suffix;
         }
 
-        return $version;
+        return $currentVersion;
     }
 
-    /**
-     * replaceDocblockTags
-     *
-     * @param string $version
-     *
-     * @return  void
-     */
-    protected function replaceDocblockTags(string $version): void
+    public function addScript(string $script): static
     {
-        $this->out('Replacing Docblock...');
+        $this->scripts[] = $script;
 
-        $files = new RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
-                __DIR__ . '/../src',
-                \FilesystemIterator::SKIP_DOTS
-            )
-        );
-
-        /** @var \SplFileInfo $file */
-        foreach ($files as $file) {
-            if ($file->isDir() || $file->getExtension() !== 'php') {
-                continue;
-            }
-
-            $content = file_get_contents($file->getPathname());
-
-            $content = str_replace(
-                ['{DEPLOY_VERSION}', '__DEPLOY_VERSION__', '__LICENSE__', '${ORGANIZATION}', '{ORGANIZATION}', '__ORGANIZATION__'],
-                [$version, $version, 'MIT', 'LYRASOFT', 'LYRASOFT', 'LYRASOFT'],
-                $content
-            );
-
-            file_put_contents($file->getPathname(), $content);
-        }
-
-        $this->exec('git checkout master');
-        $this->exec(sprintf('git commit -am "Prepare for %s release."', $version));
-        $this->exec('git push origin master');
+        return $this;
     }
 
-    /**
-     * exec
-     *
-     * @param   string $command
-     *
-     * @return  static
-     */
     protected function exec($command)
     {
         $this->out('>> ' . $command);
