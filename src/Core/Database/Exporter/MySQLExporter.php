@@ -35,7 +35,7 @@ class MySQLExporter extends AbstractExporter
 
         $dbOptions = $this->db->getDriver()->getOptions();
         $cmd = sprintf(
-            '%s --no-tablespaces --defaults-extra-file=%s %s %s',
+            '%s --defaults-extra-file=%s --no-tablespaces %s %s',
             $md,
             $this->createPasswordCnfFile($dbOptions),
             $dbOptions['dbname'],
