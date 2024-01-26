@@ -29,10 +29,14 @@ class RuntimeProvider implements ServiceProviderInterface
 
         $container->share(Config::class, $config);
         $container->share(Container::class, $container);
-
-        $loader = include Runtime::getRootDir() . '/vendor/autoload.php';
-        $container->share(ClassLoader::class, $loader);
         $container->prepareSharedObject(Environment::class);
+
+        $autoloadFile = Runtime::getRootDir() . '/vendor/autoload.php';
+
+        if (is_file($autoloadFile)) {
+            $loader = include $autoloadFile;
+            $container->share(ClassLoader::class, $loader);
+        }
 
         $this->registerFilters($container);
 

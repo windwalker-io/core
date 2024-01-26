@@ -130,7 +130,7 @@ trait ApplicationTrait
 
     public function getSecret(): string
     {
-        return (string) SecretToolkit::decode((string) $this->config('app.secret'));
+        return (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
     }
 
     public function isMaintenance(): bool
