@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Schedule\AlwaysExpression;
 use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Utilities\Arr;
@@ -116,12 +115,6 @@ class ScheduleShowCommand implements CommandInterface
             sort($tags);
 
             $expr = $event->getExpression();
-            $expression = $expr->getExpression();
-
-            if ($expr instanceof AlwaysExpression) {
-                $expression = '* * * * *';
-            }
-
             $nextDue0 = $expr->getNextRunDate($time, 0, false, $tz);
             $nextDue1 = $expr->getNextRunDate($time, 1, false, $tz);
             $nextDue2 = $expr->getNextRunDate($time, 2, false, $tz);
@@ -133,8 +126,8 @@ class ScheduleShowCommand implements CommandInterface
             $table->addRow(
                 [
                     '<fg=cyan>' . $event->getName() . '</>',
-                    $expression,
-                    $canDescribe ? CronTranslator::translate($expression) : '-',
+                    (string) $event,
+                    $canDescribe ? CronTranslator::translate($expr->getExpression()) : '-',
                     $expr->isDue($time, $tz) ? '<info>v</info>' : '',
                     $nextDue0->format('Y-m-d H:i:s')
                     . "\n" . $nextDue1->format('Y-m-d H:i:s')

@@ -300,8 +300,10 @@ class ScheduleEvent
     public function setExpression(CronExpression|string $expression): static
     {
         if ($expression === '@always') {
-            $expression = new AlwaysExpression($expression);
-        } elseif (is_string($expression)) {
+            $expression = '* * * * *';
+        }
+
+        if (is_string($expression)) {
             $expression = new CronExpression($expression);
         }
 
