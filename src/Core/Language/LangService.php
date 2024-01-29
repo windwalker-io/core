@@ -193,6 +193,7 @@ class LangService implements LanguageInterface
     public function __clone(): void
     {
         $this->paths = clone $this->paths;
+        $this->language = clone $this->language;
     }
 
     /**
@@ -251,6 +252,14 @@ class LangService implements LanguageInterface
         $new = clone $this;
         $new->setLanguage($this->getLanguage()->extract($namespace));
         $new->parent = $this;
+
+        return $new;
+    }
+
+    public function cloneForLocale(string $locale): static
+    {
+        $new = clone $this;
+        $new->setLocale($locale);
 
         return $new;
     }
