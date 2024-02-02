@@ -67,7 +67,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
     {
         $new = clone $this;
         $new->request = $request;
-        $this->input = null;
+        $new->input = null;
 
         return $new;
     }
