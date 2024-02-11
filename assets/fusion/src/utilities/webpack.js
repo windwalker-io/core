@@ -20,6 +20,9 @@ export async function webpackBasicConfig() {
         filename: '[name].js',
         sourceMapFilename: '[name].js.map'
       },
+      resolve: {
+        extensions: ['.js', '.vue', '.json', '.ts']
+      },
       experiments: {
         topLevelAwait: true,
       },
@@ -48,6 +51,15 @@ export async function webpackBasicConfig() {
               'css-loader',
               postCSSLoader()
             ],
+          },
+          {
+            test: /\.ts$/,
+            loader: "ts-loader",
+            exclude: /(node_modules|bower_components)/,
+            options:{
+              // appendTsSuffixTo:[/\.vue/],
+              transpileOnly: true
+            }
           },
           {
             test: /\.m?js$/,
