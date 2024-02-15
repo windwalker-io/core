@@ -21,7 +21,7 @@ export async function webpackBasicConfig() {
         sourceMapFilename: '[name].js.map'
       },
       resolve: {
-        extensions: ['.js', '.vue', '.json', '.ts']
+        extensions: ['.js', '.vue', '.json', '.ts', '.d.ts']
       },
       experiments: {
         topLevelAwait: true,
