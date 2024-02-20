@@ -111,7 +111,8 @@ class WsRootApplication implements WsRootApplicationInterface
         }
 
         // Request provider
-        $container->registerServiceProvider(new WebSocketProvider($this));
+        $container->registerServiceProvider($wsProvider = new WebSocketProvider($this));
+        $wsProvider->boot($container);
 
         $this->booting($container->createChild());
 
