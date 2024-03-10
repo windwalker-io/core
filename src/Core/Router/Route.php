@@ -11,6 +11,7 @@ use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\Uri\Uri;
+use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Classes\FlowControlTrait;
 
 /**
@@ -295,7 +296,7 @@ class Route implements JsonSerializable
      */
     public static function sanitize(string $pattern): string
     {
-        return '/' . trim(parse_url($pattern, PHP_URL_PATH), ' /');
+        return '/' . trim(parse_url(UriNormalizer::cleanPath($pattern), PHP_URL_PATH), ' /');
     }
 
     /**
