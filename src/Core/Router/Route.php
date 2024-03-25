@@ -278,6 +278,8 @@ class Route implements JsonSerializable
                     ];
                 }
             }
+            
+            unset($handler);
         }
 
         if ($options['extra']['default_view'] ?? null) {
