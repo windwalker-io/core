@@ -11,12 +11,11 @@ use OutOfRangeException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Runtime\Config;
-use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
@@ -112,21 +111,13 @@ class AssetService implements EventAwareInterface
      */
     protected ?ImportMap $importMap = null;
 
-    /**
-     * AssetManager constructor.
-     *
-     * @param  Config        $config
-     * @param  SystemUri     $systemUri
-     * @param  PathResolver  $pathResolver
-     * @param  EventEmitter  $dispatcher
-     */
     public function __construct(
-        protected Config $config,
+        protected ApplicationInterface $app,
         protected SystemUri $systemUri,
         protected PathResolver $pathResolver,
         EventEmitter $dispatcher
     ) {
-        $folder = $config->getDeep('asset.folder') ?? 'assets';
+        $folder = $this->app->config('asset.folder') ?? 'assets';
 
         $this->path = $options['uri'] ?? $this->systemUri->path($folder);
         $this->root = $options['uri'] ?? $this->systemUri->root($folder);
@@ -475,7 +466,7 @@ class AssetService implements EventAwareInterface
             return $this->version = uid();
         }
 
-        $versionFile = $this->cacheStorage['version.file'] ??= $this->config->getDeep('asset.version_file');
+        $versionFile = $this->cacheStorage['version.file'] ??= $this->app->config('asset.version_file');
 
         $sumFile = $this->pathResolver->resolve($versionFile);
 
@@ -1106,7 +1097,7 @@ class AssetService implements EventAwareInterface
      */
     public function getAssetFolder(): string
     {
-        return $this->cacheStorage['asset.folder'] ??= ($this->config->getDeep('asset.folder') ?? 'assets');
+        return $this->cacheStorage['asset.folder'] ??= ($this->app->config('asset.folder') ?? 'assets');
     }
 
     /**
@@ -1160,7 +1151,7 @@ class AssetService implements EventAwareInterface
      */
     public function isDebug(): bool
     {
-        return $this->cacheStorage['debug'] ??= $this->config->getDeep('app.debug');
+        return $this->cacheStorage['debug'] ??= $this->app->isDebug();
     }
 
     public function startTeleport(string $name, array $data = [], string $profile = 'main'): static
@@ -1205,7 +1196,7 @@ class AssetService implements EventAwareInterface
      */
     public function getImportMap(): ImportMap
     {
-        return $this->importMap ??= new ImportMap($this->config->getDeep('app.debug'));
+        return $this->importMap ??= new ImportMap($this->app->isDebug());
     }
 
     /**
@@ -1247,6 +1238,6 @@ class AssetService implements EventAwareInterface
     protected function getAppSecret(): string
     {
         return $this->cacheStorage['app.secret']
-            ??= (string) Base64Url::decode((string) $this->config->getDeep('app.secret'));
+            ??= $this->app->getSecret();
     }
 }
