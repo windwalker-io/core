@@ -6,6 +6,7 @@ namespace Windwalker\Core\Generator\Builder;
 
 use MyCLabs\Enum\Enum;
 use PhpParser\Node;
+use Ramsey\Uuid\UuidInterface;
 use ReflectionAttribute;
 use ReflectionProperty;
 use Unicorn\Enum\BasicState;
@@ -20,12 +21,12 @@ use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column as DbColumn;
 use Windwalker\Database\Schema\Ddl\Constraint;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\ORM\Attributes\AutoIncrement;
 use Windwalker\ORM\Attributes\Cast;
 use Windwalker\ORM\Attributes\CastNullable;
 use Windwalker\ORM\Attributes\Column;
 use Windwalker\ORM\Attributes\PK;
+use Windwalker\ORM\Attributes\UUIDBin;
 use Windwalker\ORM\Cast\JsonCast;
 use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
@@ -69,7 +70,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         // $props = $this->metadata->getProperties();
         /** @var ReflectionProperty $lastProp */
         // $lastProp = $props[array_key_last($props)];
-        [$create, $delete, $keep] = $this->getColumnsDiff($class);
+        [$create, $delete, $keep] = $this->getColumnsDiff();
 
         $addedMembers = [
             'properties' => [],
@@ -203,6 +204,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         } elseif ($dataType === 'tinyint' && $len === '1') {
             $type = 'bool';
             $default = TypeCast::try($default, $type);
+        } elseif ($dataType === 'binary' && $len === '16') {
+            $type = '?UuidInterface';
+            $default = null;
+            $this->addUse(UuidInterface::class);
         } elseif ($this->isJsonType($dbColumn)) {
             $type = 'array';
             $default = [];
@@ -451,6 +456,36 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             || is_a($className, \UnitEnum::class, true);
     }
 
+    protected function buildUuidInterfaceSetter(string $setter, string $propName, Node $type): Node
+    {
+        $factory = $this->createNodeFactory();
+
+        return $factory->method($setter)
+            ->makePublic()
+            ->addParam(
+                $factory->param($propName)
+                    ->setType('UuidInterface|string|null')
+            )
+            ->addStmt(
+                new Node\Expr\Assign(
+                    $factory->propertyFetch(
+                        new Node\Expr\Variable('this'),
+                        $propName
+                    ),
+                    $factory->staticCall(
+                        new Node\Name('UUIDBin'),
+                        'tryWrap',
+                        [
+                            new Node\Expr\Variable($propName),
+                        ]
+                    ),
+                )
+            )
+            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
+            ->setReturnType('static')
+            ->getNode();
+    }
+
     protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
     {
         $factory = $this->createNodeFactory();
@@ -469,7 +504,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     ),
                     $factory->staticCall(
                         new Node\Name('Chronos'),
-                        'wrapOrNull',
+                        'tryWrap',
                         [
                             new Node\Expr\Variable($propName),
                         ]
@@ -501,19 +536,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     }
 
     /**
-     * getColumnsDiff
-     *
-     * @param  string  $table
-     *
-     * @return  array<array>
+     * @return  array{ 0: string[], 1: string[], 2: string[] }
      */
-    protected function getColumnsDiff(string $table): array
+    protected function getColumnsDiff(): array
     {
         $classColumns = array_map(
             fn(Column $column) => $column->getName(),
             $this->metadata->getColumns()
         );
-        $dbColumns = $this->getTableColumns($table);
+        $dbColumns = $this->getTableColumns();
 
         $diffCreate = array_diff($dbColumns, $classColumns);
         $diffDelete = array_diff($classColumns, $dbColumns);
@@ -522,7 +553,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         return [$diffCreate, $diffDelete, $diffKeep];
     }
 
-    protected function getTableColumns(string $table): array
+    /**
+     * @return  string[]
+     */
+    protected function getTableColumns(): array
     {
         return $this->getTableManager()->getColumnNames(true);
     }
@@ -533,18 +567,21 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     }
 
     /**
-     * createPropertyStatement
-     *
-     * @param  mixed  $createColumn
+     * @param  string  $createColumn
      *
      * @return  Node\Stmt\Property
      */
-    protected function createPropertyStatement(mixed $createColumn): Node\Stmt\Property
+    protected function createPropertyStatement(string $createColumn): Node\Stmt\Property
     {
         $factory = $this->createNodeFactory();
 
         $tbManager = $this->getTableManager();
         $dbColumn = $tbManager->getColumn($createColumn);
+
+        if (!$dbColumn) {
+            throw new \RuntimeException("Column: {$createColumn} not found.");
+        }
+
         $propName = StrNormalize::toCamelCase($createColumn);
 
         [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
@@ -590,6 +627,23 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     new Node\Scalar\String_('bool'),
                     new Node\Scalar\String_('int'),
                 ),
+            );
+        }
+
+        // UUID binary(16)
+        if ($type === '?UuidInterface') {
+            $this->addUse(CastNullable::class);
+            $this->addUse(UUIDBin::class);
+            $prop->setAttribute('fullType', UuidInterface::class);
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'CastNullable',
+                    new Node\Scalar\String_('uuid_bin'),
+                    new Node\Scalar\String_('uuid_bin'),
+                ),
+            );
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute('UUIDBin')
             );
         }
 
