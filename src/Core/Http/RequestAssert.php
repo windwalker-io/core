@@ -14,49 +14,88 @@ use Windwalker\Utilities\Assert\RuntimeAssert;
  */
 class RequestAssert extends RuntimeAssert
 {
+    /**
+     * @template T
+     *
+     * @param  T              $assertion
+     * @param  string         $message
+     * @param  mixed|null     $value
+     * @param  callable|null  $exception
+     *
+     * @return  T
+     */
     public static function assertBadRequest(
         mixed $assertion,
         string $message = 'Bad Request',
         mixed $value = null,
         ?callable $exception = null
-    ): void {
+    ): mixed {
         $exception ??= static fn (string $message) => new HttpRequestException($message, 400);
 
-        static::assert($assertion, $message, $value, $exception);
+        return static::assert($assertion, $message, $value, $exception);
     }
 
+    /**
+     * @template T
+     *
+     * @param  T              $assertion
+     * @param  string         $message
+     * @param  mixed|null     $value
+     * @param  callable|null  $exception
+     *
+     * @return  T
+     */
     public static function assertUnauthorized(
         mixed $assertion,
         string $message = 'Unauthorized',
         mixed $value = null,
         ?callable $exception = null
-    ): void {
+    ): mixed {
         $exception ??= static fn (string $message) => new UnauthorizedException($message, 401);
 
-        static::assert($assertion, $message, $value, $exception);
+        return static::assert($assertion, $message, $value, $exception);
     }
 
+    /**
+     * @template T
+     *
+     * @param  T              $assertion
+     * @param  string         $message
+     * @param  mixed|null     $value
+     * @param  callable|null  $exception
+     *
+     * @return  T
+     */
     public static function assertForbidden(
         mixed $assertion,
         string $message = 'Forbidden',
         mixed $value = null,
         ?callable $exception = null
-    ): void {
+    ): mixed {
         $exception ??= static fn (string $message) => new UnauthorizedException($message, 403);
 
-        static::assert($assertion, $message, $value, $exception);
+        return static::assert($assertion, $message, $value, $exception);
     }
 
-
+    /**
+     * @template T
+     *
+     * @param  T              $assertion
+     * @param  string         $message
+     * @param  mixed|null     $value
+     * @param  callable|null  $exception
+     *
+     * @return  T
+     */
     public static function assertNotFound(
         mixed $assertion,
         string $message = 'Not found',
         mixed $value = null,
         ?callable $exception = null
-    ): void {
+    ): mixed {
         $exception ??= fn (string $message) => new RouteNotFoundException($message, 404);
 
-        static::assert($assertion, $message, $value, $exception);
+        return static::assert($assertion, $message, $value, $exception);
     }
 
     protected static function exception(): callable
