@@ -197,7 +197,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $default = null;
 
             $this->addUse(Chronos::class);
-        } elseif ($dbColumn->columnName === 'state' && $dataType === 'tinyint') {
+        } elseif ($dbColumn->columnName === 'state' && $dataType === 'tinyint' && enum_exists(BasicState::class)) {
+            // Todo: This should move to unicorn package
             $type = 'BasicState';
             $default = Symbol::none();
             $this->addUse(BasicState::class);
