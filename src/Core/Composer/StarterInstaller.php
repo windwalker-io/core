@@ -87,6 +87,8 @@ class StarterInstaller
      */
     public static function genEnv(Event $event): void
     {
+        $composer = $_SERVER['COMPOSER_BINARY'] ?? null ?: 'composer';
+
         include getcwd() . '/vendor/autoload.php';
 
         $io = $event->getIO();
@@ -110,6 +112,8 @@ class StarterInstaller
         ) ?: static::genSecretCode();
 
         $vars['APP_SECRET'] = $secret;
+
+        $installDb = false;
 
         if ($io->askConfirmation("\nDo you want to use database? [Y/n]: ", true)) {
             $supportedDrivers = [
@@ -140,6 +144,8 @@ class StarterInstaller
             $vars['DATABASE_NAME'] = $io->ask('Database name [acme]: ', 'acme');
             $vars['DATABASE_USER'] = $io->ask('Database user [root]: ', 'root');
             $vars['DATABASE_PASSWORD'] = $io->askAndHideAnswer('Database password: ');
+
+            $installDb = true;
         }
 
         foreach ($vars as $key => $value) {
@@ -148,8 +154,12 @@ class StarterInstaller
 
         file_put_contents($dest, $env);
 
+        if ($installDb) {
+            exec($composer . ' require windwalker/orm:^4.0');
+        }
+
         $io->write('');
-        $io->write('Database config setting complete.');
+        $io->write('Env setting complete.');
         $io->write('');
     }
 
