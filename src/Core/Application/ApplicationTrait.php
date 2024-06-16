@@ -237,7 +237,10 @@ trait ApplicationTrait
                 if ($listener instanceof Closure) {
                     // Closure with ListenTo() attribute
                     $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
-                    $event->listen($dispatcher, $listener);
+                    $event->listen(
+                        $dispatcher,
+                        fn (...$args) => $container->call($listener, $args)
+                    );
                 } else {
                     // Simply listener class name.
                     $dispatcher->subscribe($container->resolve($listener));

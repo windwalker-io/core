@@ -17,6 +17,8 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Queue\Driver\DatabaseQueueDriver;
+use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
@@ -212,6 +214,17 @@ class QueueWorkerCommand implements CommandInterface
                 );
             }
         )
+            ->on(
+                AfterJobRunEvent::class,
+                function (AfterJobRunEvent $event) {
+                    $this->app->addMessage(
+                        sprintf(
+                            'Job Message: <info>%s</info> END',
+                            $event->getMessage()->getId()
+                        )
+                    );
+                }
+            )
             ->on(
                 JobFailureEvent::class,
                 function (JobFailureEvent $event) use ($io, $connection) {
