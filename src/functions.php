@@ -230,28 +230,28 @@ namespace Windwalker {
     }
 
     if (!function_exists('\Windwalker\log')) {
-        function log(string|array $channel, string|int $level, string|array $message, array $context = []): void
+        function log(string|array $channel, string|int $level, mixed $message, array $context = []): void
         {
             Logger::log($channel, $level, $message, $context);
         }
     }
 
     if (!function_exists('\Windwalker\log_info')) {
-        function log_info(string|array $channel, string|array $message, array $context = []): void
+        function log_info(string|array $channel, mixed $message, array $context = []): void
         {
             Logger::log($channel, LogLevel::INFO, $message, $context);
         }
     }
 
     if (!function_exists('\Windwalker\log_debug')) {
-        function log_debug(string|array $channel, string|array $message, array $context = []): void
+        function log_debug(string|array $channel, mixed $message, array $context = []): void
         {
             Logger::log($channel, LogLevel::DEBUG, $message, $context);
         }
     }
 
     if (!function_exists('\Windwalker\log_notice')) {
-        function log_notice(string|array $channel, string|array $message, array $context = []): void
+        function log_notice(string|array $channel, mixed $message, array $context = []): void
         {
             Logger::log($channel, LogLevel::NOTICE, $message, $context);
         }
