@@ -6,23 +6,12 @@ namespace Windwalker\Core\Schedule\Command;
 
 use Lorisleiva\CronTranslator\CronTranslator;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Environment\Environment;
-use Windwalker\Utilities\Arr;
-
-use Windwalker\Utilities\Str;
-
-use function Windwalker\fs;
 
 /**
  * The ScheduleShowCommand class.
