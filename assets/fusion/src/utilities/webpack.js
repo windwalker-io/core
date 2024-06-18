@@ -67,7 +67,7 @@ export async function webpackBasicConfig() {
             use: [{
               loader: 'babel-loader',
               options: babelBasicOptions().get()
-            }, 'webpack-comment-remover-loader']
+            }]
           }
         ]
       },
