@@ -35,7 +35,7 @@ class LoggerService
      * System is unusable.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -55,7 +55,7 @@ class LoggerService
      * trigger the SMS alerts and wake you up.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -74,7 +74,7 @@ class LoggerService
      * Example: Application component unavailable, unexpected exception.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -92,7 +92,7 @@ class LoggerService
      * be logged and monitored.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -112,7 +112,7 @@ class LoggerService
      * that are not necessarily wrong.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -129,7 +129,7 @@ class LoggerService
      * Normal but significant events.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -148,7 +148,7 @@ class LoggerService
      * Example: User logs in, SQL logs.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -165,7 +165,7 @@ class LoggerService
      * Detailed debug information.
      *
      * @param  string|array  $channel
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -183,7 +183,7 @@ class LoggerService
      *
      * @param  string|array  $channel
      * @param  string|int    $level
-     * @param  string|array  $message
+     * @param  mixed         $message
      * @param  array         $context
      *
      * @return static
@@ -205,6 +205,11 @@ class LoggerService
             }
 
             return $this;
+        }
+
+        if ($message instanceof \Throwable) {
+            $context = ['exception' => $message];
+            $message = $message->getMessage();
         }
 
         $this->getLogger($channel)->log($level, $message, $context);

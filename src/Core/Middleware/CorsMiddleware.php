@@ -33,7 +33,7 @@ class CorsMiddleware implements MiddlewareInterface
             ->default(true);
 
         $resolver->define('allow_origins')
-            ->allowedTypes('string', 'array')
+            ->allowedTypes('string', 'array', 'null')
             ->default(env('CORS_ALLOW_ORIGINS') ?: null);
 
         $resolver->define('configure')

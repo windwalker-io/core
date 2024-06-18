@@ -278,7 +278,7 @@ class Route implements JsonSerializable
                     ];
                 }
             }
-            
+
             unset($handler);
         }
 

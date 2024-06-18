@@ -9,15 +9,15 @@ use Windwalker\Core\Service\LoggerService;
 /**
  * The Logger class.
  *
- * @method static void log(string|array $channel, string|int $level, string|array $message, array $context = [])
- * @method static void emergency(string|array $channel, string|array $message, array $context = [])
- * @method static void alert(string|array $channel, string|array $message, array $context = [])
- * @method static void critical(string|array $channel, string|array $message, array $context = [])
- * @method static void error(string|array $channel, string|array $message, array $context = [])
- * @method static void warning(string|array $channel, string|array $message, array $context = [])
- * @method static void notice(string|array $channel, string|array $message, array $context = [])
- * @method static void info(string|array $channel, string|array $message, array $context = [])
- * @method static void debug(string|array $channel, string|array $message, array $context = [])
+ * @method static void log(string|array $channel, string|int $level, mixed $message, array $context = [])
+ * @method static void emergency(string|array $channel, mixed $message, array $context = [])
+ * @method static void alert(string|array $channel, mixed $message, array $context = [])
+ * @method static void critical(string|array $channel, mixed $message, array $context = [])
+ * @method static void error(string|array $channel, mixed $message, array $context = [])
+ * @method static void warning(string|array $channel, mixed $message, array $context = [])
+ * @method static void notice(string|array $channel, mixed $message, array $context = [])
+ * @method static void info(string|array $channel, mixed $message, array $context = [])
+ * @method static void debug(string|array $channel, mixed $message, array $context = [])
  */
 class Logger
 {

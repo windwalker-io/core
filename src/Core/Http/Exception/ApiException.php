@@ -32,7 +32,7 @@ class ApiException extends \RuntimeException
         return new static($e->getMessage(), $e->getCode(), $statusCode, $e);
     }
 
-    public static function fromEnum(\UnitEnum $enum, ?string $message = null): static
+    public static function fromEnum(\UnitEnum $enum, ?string $message = null, ?\Throwable $previous = null): static
     {
         static::checkBackedEnumType($enum);
 
@@ -40,7 +40,7 @@ class ApiException extends \RuntimeException
 
         [$code, $statusCode] = static::getStatusCodeFromEnum($enum);
 
-        return new static($message, (int) $code, $statusCode);
+        return new static($message, (int) $code, $statusCode, $previous);
     }
 
     public static function wrap(\Throwable $e): static

@@ -11,13 +11,13 @@ use JetBrains\PhpStorm\NoReturn;
  */
 trait ApiErrorCodeTrait
 {
-    public function exception(?string $message = null): ApiException
+    public function exception(?string $message = null, ?\Throwable $previous = null): ApiException
     {
-        return ApiException::fromEnum($this, $message);
+        return ApiException::fromEnum($this, $message, $previous);
     }
 
-    public function throw(?string $message = null): never
+    public function throw(?string $message = null, ?\Throwable $previous = null): never
     {
-        throw $this->exception($message);
+        throw $this->exception($message, $previous);
     }
 }
