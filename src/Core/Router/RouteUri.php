@@ -57,6 +57,9 @@ class RouteUri extends Uri implements NavConstantInterface
         }
 
         $this->options = $options;
+
+        $this->host = null;
+        $this->port = null;
     }
 
     /**
@@ -324,7 +327,7 @@ class RouteUri extends Uri implements NavConstantInterface
                 return $this->handleError($e);
             }
 
-            if ($this->scheme !== null) {
+            if ($this->scheme) {
                 $uri->scheme = $this->scheme;
             }
 
@@ -332,11 +335,11 @@ class RouteUri extends Uri implements NavConstantInterface
                 $uri->host = $this->host;
             }
 
-            if ($this->user !== null) {
+            if ($this->user) {
                 $uri->user = $this->user;
             }
 
-            if ($this->pass !== null) {
+            if ($this->pass) {
                 $uri->pass = $this->pass;
             }
 

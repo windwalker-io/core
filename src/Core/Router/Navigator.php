@@ -160,7 +160,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                     $systemUri = $this->getSystemUri();
 
-                    if ($systemUri->script && $systemUri->script !== 'index.php') {
+                    if (!$systemUri::isAbsoluteUrl($url) && $systemUri->script && $systemUri->script !== 'index.php') {
                         $url = $systemUri->script . '/' . $url;
                     }
 

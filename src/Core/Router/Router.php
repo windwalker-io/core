@@ -260,7 +260,7 @@ class Router implements EventAwareInterface
 
         foreach ($routeData as $part) {
             if (is_string($part)) {
-                $regex .= preg_quote($part, '~');
+                $regex .= $part;
                 continue;
             }
 
