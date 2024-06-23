@@ -328,7 +328,7 @@ class View implements EventAwareInterface, \ArrayAccess
             return $layout['default'] ?? '';
         }
 
-        return (string) $layout ?: $this->options['layout'];
+        return (string) ($layout ?: $this->options['layout'] ?? '');
     }
 
     protected function injectData(object $vm, array $data): void
