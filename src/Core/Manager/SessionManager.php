@@ -11,6 +11,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\Ref;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
 use Windwalker\DI\Attributes\Isolation;
@@ -19,8 +20,11 @@ use Windwalker\Session\Bridge\BridgeInterface;
 use Windwalker\Session\Bridge\PhpBridge;
 use Windwalker\Session\Cookie\ArrayCookies;
 use Windwalker\Session\Cookie\Cookies;
+use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 use Windwalker\Session\SessionInterface;
+
+use function Windwalker\chronos;
 
 /**
  * The SessionManager class.
@@ -93,6 +97,7 @@ class SessionManager extends AbstractManager
             /** @var BridgeInterface $bridge */
             $cookies = $container->resolve('session.factories.cookies.' . $cookies);
             $sessionOptions = $container->getParam('session.session_options') ?? [];
+            $cookieParams = $container->getParam('session.cookie_params') ?? [];
 
             $options = [
                 ...$options,
@@ -102,9 +107,16 @@ class SessionManager extends AbstractManager
             if ($bridge instanceof PhpBridge) {
                 $gcDivisor = $sessionOptions['gc_divisor'] ?? 1000;
                 $gcProbability = $sessionOptions['gc_probability'] ?? 1;
+                $gcMaxlifetime = $sessionOptions['gc_maxlifetime'] ?? null;
+
+                if (!$gcMaxlifetime && $cookieParams['expires'] ?? null) {
+                    $expires = chronos($cookieParams['expires']);
+                    $gcMaxlifetime = Chronos::intervalToSeconds(chronos('now')->diff($expires));
+                }
 
                 $bridge->setOption('gc_divisor', $gcDivisor);
                 $bridge->setOption('gc_probability', $gcProbability);
+                $bridge->setOption('gc_maxlifetime', $gcMaxlifetime);
             }
 
             if ($sessionOptions['name'] ?? null) {
