@@ -31,11 +31,13 @@ class ComponentFinder
 
     public function find(): array
     {
+        $cachePool = $this->getCache();
+
         if ($this->app->isDebug()) {
-            $this->rebuildCaches();
+            $this->clearCaches();
         }
 
-        $caches = $this->getCache()
+        $caches = $cachePool
             ->call(
                 'caches.json',
                 fn () => $this->scan()
@@ -44,13 +46,9 @@ class ComponentFinder
         return (array) $caches;
     }
 
-    protected function rebuildCaches(): array
+    protected function clearCaches(): bool
     {
-        $found = $this->scan();
-
-        $this->getCache()->set('caches.json', $this->scan());
-
-        return $found;
+        return $this->getCache()->delete('caches.json');
     }
 
     public function getCache(): CachePool
