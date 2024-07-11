@@ -43,7 +43,11 @@ class ComponentFinder
                 fn () => $this->scan()
             );
 
-        return (array) $caches;
+        if (!is_array($caches) || array_is_list($caches)) {
+            throw new \RuntimeException('The class component list should be assoc array.');
+        }
+
+        return $caches;
     }
 
     protected function clearCaches(): bool
