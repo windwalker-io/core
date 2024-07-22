@@ -31,32 +31,24 @@ class ComponentFinder
 
     public function find(): array
     {
-        $cachePool = $this->getCache();
-
         if ($this->app->isDebug()) {
-            $this->clearCaches();
+            return $this->removeCacheAndScan();
         }
 
-        $caches = $cachePool
+        $caches = $this->getCache()
             ->call(
                 'caches.json',
                 fn () => $this->scan()
             );
 
-        if ($caches === []) {
-            return $caches;
-        }
-
-        if ((!is_array($caches) || array_is_list($caches))) {
-            throw new \RuntimeException('The class component list should be assoc array.');
-        }
-
-        return $caches;
+        return (array) $caches;
     }
 
-    protected function clearCaches(): bool
+    protected function removeCacheAndScan(): array
     {
-        return $this->getCache()->delete('caches.json');
+        $this->getCache()->delete('caches.json');
+
+        return $this->scan();
     }
 
     public function getCache(): CachePool
@@ -66,6 +58,7 @@ class ComponentFinder
                 $this->getCachePath(),
                 [
                     'deny_access' => true,
+                    'deny_code' => "<" . "?php defined('WINDWALKER_ROOT') or die; ?>",
                     'extension' => '.php',
                     'expiration_format' => null,
                 ]
