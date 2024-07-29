@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Renderer;
 
 use RuntimeException;
+use Windwalker\Core\Application\PathResolver;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\Renderer\CompositeRenderer;
@@ -25,11 +26,15 @@ class LayoutPathResolver
     /**
      * LayoutPathResolver constructor.
      *
-     * @param  Container   $container
-     * @param  array|null  $aliases
+     * @param  Container     $container
+     * @param  PathResolver  $pathResolver
+     * @param  array|null    $aliases
      */
-    public function __construct(protected Container $container, ?array $aliases = null)
-    {
+    public function __construct(
+        protected Container $container,
+        protected PathResolver $pathResolver,
+        ?array $aliases = null
+    ) {
         $this->aliases = $aliases ?? $this->container->getParam('renderer.aliases') ?? [];
 
         $this->addPaths($this->container->getParam('renderer.paths') ?? []);
@@ -165,6 +170,13 @@ class LayoutPathResolver
         $priority ??= PriorityQueue::ABOVE_NORMAL;
 
         $bag = $this->getPathsBag($ns);
+
+        $paths = (array) $paths;
+
+        foreach ($paths as $k => $path) {
+            $paths[$k] = $this->pathResolver->resolve($path);
+        }
+
         $bag->addPath($paths, $priority);
 
         return $this;
