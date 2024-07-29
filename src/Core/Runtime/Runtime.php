@@ -112,14 +112,14 @@ class Runtime
         return self::$workDir;
     }
 
-    public static function ipBlock(array|string|null $forEnv, string|array|null $allowIps): void
+    public static function shouldBlock(array|string|null $forEnv, string|array|null $allowIps): bool
     {
         if (!$forEnv) {
-            return;
+            return false;
         }
 
         if (!in_array((string) env('APP_ENV'), (array) $forEnv, true)) {
-            return;
+            return false;
         }
 
         if (!is_array($allowIps)) {
@@ -127,7 +127,7 @@ class Runtime
         }
 
         if (in_array('all', $allowIps, true) || in_array('REMOTE_ADDR', $allowIps, true)) {
-            return;
+            return false;
         }
 
         $allowIps = array_merge(['127.0.0.1', 'fe80::1', '::1'], $allowIps);
@@ -139,19 +139,26 @@ class Runtime
             isset($httpForwardedFor)
             && !static::isTrusted($httpForwardedFor, $remoteAddr)
         ) {
-            static::forbidden();
+            return true;
         }
 
         // Get allow remote ips from config.
         if (!in_array($remoteAddr, $allowIps, true)) {
-            static::forbidden();
+            return true;
         }
 
         if (isset($clientIp) && $clientIp !== $remoteAddr) {
-            static::forbidden();
+            return true;
         }
 
-        // Allow
+        return false;
+    }
+
+    public static function ipBlock(array|string|null $forEnv, string|array|null $allowIps): void
+    {
+        if (static::shouldBlock($forEnv, $allowIps)) {
+            static::forbidden();
+        }
     }
 
     private static function isTrusted(string $remoteAttr): bool
@@ -161,9 +168,14 @@ class Runtime
         return IpHelper::checkIp($remoteAttr, $trustedProxies);
     }
 
-    private static function forbidden(): void
+    public static function forbidden(array $headers = []): never
     {
         header('HTTP/1.1 403 Forbidden');
+        header('X-Robots-Tag: noindex');
+
+        foreach ($headers as $header) {
+            header($header);
+        }
 
         exit('Forbidden');
     }
