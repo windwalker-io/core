@@ -151,8 +151,11 @@ class HtmlFrame
         return $this;
     }
 
-    public function addLink(string|LinkInterface $relOrLink, string $href = '', array $attrs = []): DOMElement
-    {
+    public function addLink(
+        string|Stringable|LinkInterface $relOrLink,
+        string|Stringable $href = '',
+        array $attrs = []
+    ): DOMElement {
         if (is_string($relOrLink)) {
             $link = new Link($relOrLink, $href);
         } else {
@@ -172,12 +175,22 @@ class HtmlFrame
 
     public function addHreflang(
         string $hreflang,
-        string $href,
+        string|Stringable $href,
         array $attrs = [],
     ): DOMElement {
         $link = new Link('alternate');
         $link = $link->withHref($href)
             ->withAttribute('hreflang', $hreflang);
+
+        return $this->addLink($link, attrs: $attrs);
+    }
+
+    public function addCanonical(
+        string|Stringable $href,
+        array $attrs = [],
+    ): DOMElement {
+        $link = new Link('canonical');
+        $link = $link->withHref($href);
 
         return $this->addLink($link, attrs: $attrs);
     }
@@ -200,7 +213,7 @@ class HtmlFrame
             ]
         )]
         string $as,
-        string $href,
+        string|Stringable $href,
         array $attrs = [],
         ?string $type = null,
         ?string $media = null,
@@ -483,12 +496,12 @@ class HtmlFrame
         return $this;
     }
 
-    public function setCoverImages(string ...$images): static
+    public function setCoverImages(string|Stringable ...$images): static
     {
         $this->getMetadata()->removeOpenGraph('og:image');
 
         foreach ($images as $image) {
-            $image = $this->asset->addAssetBase($image, 'root');
+            $image = $this->asset->addAssetBase((string) $image, 'root');
 
             $this->addOpenGraph('og:image', $image);
         }
@@ -496,7 +509,7 @@ class HtmlFrame
         return $this;
     }
 
-    public function setCoverImagesIfNotEmpty(string ...$images): static
+    public function setCoverImagesIfNotEmpty(string|Stringable ...$images): static
     {
         $images = array_filter($images);
 
