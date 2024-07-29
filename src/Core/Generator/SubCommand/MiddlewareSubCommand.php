@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Utilities\Str;
 
 /**
  * The GenEnumSubCommand class.
@@ -57,7 +58,8 @@ class MiddlewareSubCommand extends AbstractGeneratorSubCommand
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'name' => $name,
+                    'className' => Str::ensureRight($name, 'Middleware'),
+                    'name' => Str::removeRight($name, 'Middleware'),
                     'ns' => $this->getNamespace($io),
                 ],
                 $force
