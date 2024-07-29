@@ -11,6 +11,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Environment\Environment;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Path;
 
 /**
  * The Exporter class.
@@ -29,32 +30,36 @@ class MySQLExporter extends AbstractExporter
      */
     protected function doExport(StreamInterface $stream, array $options = []): void
     {
-        $md = trim($this->findMysqldump());
-
-        $gzMode = $options['gz'] ?? null;
-
-        $dbOptions = $this->db->getDriver()->getOptions();
-        $cmd = sprintf(
-            '%s --defaults-extra-file=%s --no-tablespaces %s %s',
-            $md,
-            $this->createPasswordCnfFile($dbOptions),
-            $dbOptions['dbname'],
-            env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
-        );
-
-        if ($gzMode === 'cli') {
-            $cmd .= ' | gzip';
-        }
-
-        $process = $this->app->createProcess($cmd);
-
         try {
+            $md = trim((string) $this->findMysqldump());
+
+            if (!$md) {
+                throw new \DomainException('Mysqldump executable not found.');
+            }
+
+            $gzMode = $options['gz'] ?? null;
+
+            $dbOptions = $this->db->getDriver()->getOptions();
+            $cmd = sprintf(
+                '%s --defaults-extra-file="%s" --no-tablespaces %s %s',
+                $md,
+                $this->createPasswordCnfFile($dbOptions),
+                $dbOptions['dbname'],
+                env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
+            );
+
+            if ($gzMode === 'cli') {
+                $cmd .= ' | gzip';
+            }
+
+            $process = $this->app->createProcess($cmd);
+
             $process->mustRun(
                 function ($type, $buffer) use ($stream) {
                     $stream->write($buffer);
                 }
             );
-        } catch (ProcessFailedException $e) {
+        } catch (ProcessFailedException | \DomainException $e) {
             $this->emitMessage(
                 [
                     'Error: ' . $e->getMessage(),
@@ -87,7 +92,7 @@ class MySQLExporter extends AbstractExporter
 
     protected function createPasswordCnfFile(array $options): string
     {
-        $tmpFile = $this->app->path('@temp/.md.cnf');
+        $tmpFile = Path::normalize($this->app->path('@temp/.md.cnf'), '/');
 
         $user = addslashes($options['user'] ?? 'root');
         $password = addslashes($options['password'] ?? '');
