@@ -8,12 +8,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Utilities\StrNormalize;
 
 /**
- * The GenEnumSubCommand class.
+ * The ComponentSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker enum.'
+    description: 'Generate Edge component.'
 )]
 class ComponentSubCommand extends AbstractGeneratorSubCommand
 {
@@ -39,6 +40,13 @@ class ComponentSubCommand extends AbstractGeneratorSubCommand
             'o',
             InputOption::VALUE_OPTIONAL
         );
+
+        $command->addOption(
+            'tmpl',
+            't',
+            InputOption::VALUE_NEGATABLE,
+            'Should or n not add component template file.'
+        );
     }
 
     /**
@@ -59,15 +67,39 @@ class ComponentSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('component/*.tpl'))
+        $tmplDest = $this->getRawDestPath($io);
+        $tmpl = '';
+
+        $addTmpl = $io->getOption('tmpl') ?? $io->askConfirmation('Add template file? [Y/n]');
+
+        if ($addTmpl) {
+            $tmpl = StrNormalize::toKebabCase($tmplDest) . '.' . StrNormalize::toKebabCase($name);
+        }
+
+        $this->codeGenerator->from($this->getViewPath('component/*Component.php.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
+                    'tmpl' => $tmpl,
                     'name' => $name,
                     'ns' => $this->getNamespace($io),
                 ],
                 $force
             );
+
+        if ($addTmpl) {
+            $tmplDest = $this->getRootDir($io) . '/views/components/' . StrNormalize::toKebabCase($tmplDest);
+
+            $this->codeGenerator->from($this->getViewPath('component/*.blade.php.tpl'))
+                ->replaceTo(
+                    $tmplDest,
+                    [
+                        'name' => $name,
+                        'ns' => $this->getNamespace($io),
+                    ],
+                    $force
+                );
+        }
 
         return 0;
     }

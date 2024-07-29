@@ -156,6 +156,33 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return Path::normalize($this->app->path($dir . '/' . $dest));
     }
 
+    protected function getRawDestPath(IOInterface $io, string $subFolder = '', ?string $suffix = null): string
+    {
+        [$dest] = $this->getNameParts($io, $suffix);
+
+        return trim(
+            Str::ensureRight($subFolder, '/') . $dest,
+            '/'
+        );
+    }
+
+    protected function getRootDir(IOInterface $io): string
+    {
+        $this->resolvePackage($io);
+
+        $dir = $io->getOption('dir');
+
+        if ($dir) {
+            return $dir;
+        }
+
+        if ($this->destPackage) {
+            return $this->destPackage::root();
+        }
+
+        return $this->app->path('@root');
+    }
+
     protected function getNameParts(IOInterface $io, ?string $suffix = null): array
     {
         $name = $io->getArgument('name');

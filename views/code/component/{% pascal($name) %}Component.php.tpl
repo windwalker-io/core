@@ -13,6 +13,10 @@ class {% pascal($name) %}Component extends AbstractComponent
 {
     public function render(): Closure|string
     {
+<?php if ($tmpl): ?>
+        return 'components.{% $tmpl %}';
+<?php else: ?>
         return fn () => '';
+<?php endif; ?>
     }
 }

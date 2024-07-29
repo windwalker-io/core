@@ -21,8 +21,6 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
 use Windwalker\DI\Exception\DefinitionException;
 
-use function Symfony\Component\String\s;
-
 /**
  * The GenerateCommand class.
  */
@@ -60,7 +58,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
             'about',
             null,
             InputOption::VALUE_NONE,
-            'Describe this task.',
+            'Describe the task.',
         );
     }
 
@@ -69,7 +67,8 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
         $command->addOption(
             'f',
             null,
-            InputOption::VALUE_OPTIONAL
+            InputOption::VALUE_OPTIONAL,
+            'Force override existing files.'
         );
 
         $argv = $_SERVER['argv'];
@@ -148,6 +147,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
 
         if ($io->getOption('about') && $command = $this->getSubCommand($task)) {
             $this->aboutTask($io, $task, $command);
+
             return 0;
         }
 
@@ -172,7 +172,6 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
     {
         $command = $this->resolveSubCommand($task, $command);
 
-
         $helper = new DescriptorHelper();
         $helper->describe($io->getOutput(), $command);
     }
@@ -181,6 +180,12 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
     {
         $subApp = $this->getSubApp();
         $subApp->addCommands($this->resolveAllSubCommands());
+
+        $inputDefinition = $io->getWrapperCommand()->getDefinition();
+        $appDefinition = $subApp->getDefinition();
+        $appDefinition->addOption($inputDefinition->getOption('about'));
+        $appDefinition->addOption($inputDefinition->getOption('f'));
+
         $helper = new DescriptorHelper();
         $helper->describe($io->getOutput(), $subApp);
     }
