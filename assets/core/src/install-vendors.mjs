@@ -81,7 +81,7 @@ export async function installVendors(npmVendors = [], legacyComposerVendors = []
       for (const subVendor of subVendors) {
         const subVendorName = staticVendor + '/' + subVendor;
         console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
-        doInstall(staticVendorDir + subVendorName, `${root}/${subVendorName}/`);
+        doInstall(staticVendorDir + subVendorName + '/', `${root}/${subVendorName}/`);
       }
     } else {
       console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
