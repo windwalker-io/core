@@ -71,8 +71,23 @@ export async function installVendors(npmVendors = [], legacyComposerVendors = []
   });
 
   // Install local saved vendors
-  console.log(`[${action} Local] resources/assets/vendor/**/* => ${root}/`);
-  doInstall('resources/assets/vendor/*', `${root}/`);
+  const staticVendorDir = 'resources/assets/vendor/';
+  const staticVendors = fs.readdirSync(staticVendorDir);
+
+  for (const staticVendor of staticVendors) {
+    if (staticVendor.startsWith('@')) {
+      const subVendors = fs.readdirSync(staticVendorDir + staticVendor);
+
+      for (const subVendor of subVendors) {
+        const subVendorName = staticVendor + '/' + subVendor;
+        console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
+        doInstall(staticVendorDir + subVendorName, `${root}/${subVendorName}/`);
+      }
+    } else {
+      console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
+      doInstall(staticVendorDir + staticVendor, `${root}/${staticVendor}/`);
+    }
+  }
 }
 
 function doInstall(source, dest) {
@@ -115,7 +130,7 @@ function injectNpmPackages(composerVendors = []) {
 function getInstalledComposerVendors() {
   const composerFile = path.resolve(process.cwd(), 'composer.json');
   const composerJson = loadJson(composerFile);
-  
+
   return [
     ...new Set(
       Object.keys(composerJson['require'] || {})
