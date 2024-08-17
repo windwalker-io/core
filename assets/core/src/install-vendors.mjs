@@ -72,20 +72,23 @@ export async function installVendors(npmVendors = [], legacyComposerVendors = []
 
   // Install local saved vendors
   const staticVendorDir = 'resources/assets/vendor/';
-  const staticVendors = fs.readdirSync(staticVendorDir);
 
-  for (const staticVendor of staticVendors) {
-    if (staticVendor.startsWith('@')) {
-      const subVendors = fs.readdirSync(staticVendorDir + staticVendor);
+  if (fs.existsSync(staticVendorDir)) {
+    const staticVendors = fs.readdirSync(staticVendorDir);
 
-      for (const subVendor of subVendors) {
-        const subVendorName = staticVendor + '/' + subVendor;
-        console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
-        doInstall(staticVendorDir + subVendorName + '/', `${root}/${subVendorName}/`);
+    for (const staticVendor of staticVendors) {
+      if (staticVendor.startsWith('@')) {
+        const subVendors = fs.readdirSync(staticVendorDir + staticVendor);
+
+        for (const subVendor of subVendors) {
+          const subVendorName = staticVendor + '/' + subVendor;
+          console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
+          doInstall(staticVendorDir + subVendorName + '/', `${root}/${subVendorName}/`);
+        }
+      } else {
+        console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
+        doInstall(staticVendorDir + staticVendor, `${root}/${staticVendor}/`);
       }
-    } else {
-      console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
-      doInstall(staticVendorDir + staticVendor, `${root}/${staticVendor}/`);
     }
   }
 }
