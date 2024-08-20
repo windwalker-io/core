@@ -767,7 +767,7 @@ class AssetService implements EventAwareInterface
 
         $this->normalizeUri($uri, $name);
 
-        return $this->resolveRawAlias($uri)['alias'] ?? $uri;
+        return $this->resolveRawAlias($uri)?->getHref() ?? $uri;
     }
 
     protected function resolveMapAlias(string $uri): string
