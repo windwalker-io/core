@@ -48,6 +48,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
     public function __construct(
         protected AppContext $app,
         protected Router $router,
+        protected ?\Closure $preMatch = null,
         protected ?\Closure $fallback = null,
         array $options = []
     ) {
@@ -93,35 +94,58 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ]
         );
 
+        $matched = null;
+
         try {
-            try {
+            if ($this->preMatch) {
+                $matched = $this->app->call(
+                    $this->fallback,
+                    [
+                        'request' => $request,
+                        ServerRequestInterface::class => $request,
+                        'router' => $router,
+                        Router::class => $router,
+                        'route' => $route,
+                    ]
+                );
+            }
+
+            if (!$matched) {
                 $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
-            } catch (RouteNotFoundException $e) {
-                if ($this->fallback) {
-                    $matched = $this->app->call(
-                        $this->fallback,
-                        [
-                            'request' => $request,
-                            ServerRequestInterface::class => $request,
-                            'route' => $route
-                        ]
-                    );
-                } else {
-                    throw $e;
-                }
             }
         } catch (RouteNotFoundException $e) {
-            $event = $this->emit(
-                RoutingNotMatchedEvent::class,
-                [
-                    'route' => $route,
-                    'request' => $request,
-                    'systemUri' => $event->getSystemUri(),
-                    'exception' => $e,
-                ]
-            );
+            if (!$this->fallback) {
+                throw $e;
+            }
 
-            throw $event->getException();
+            try {
+                $matched = $this->app->call(
+                    $this->fallback,
+                    [
+                        'request' => $request,
+                        ServerRequestInterface::class => $request,
+                        'router' => $router,
+                        Router::class => $router,
+                        'route' => $route,
+                    ]
+                );
+            } catch (RouteNotFoundException $e2) {
+                $e = $e2;
+            }
+
+            if (!$matched) {
+                $event = $this->emit(
+                    RoutingNotMatchedEvent::class,
+                    [
+                        'route' => $route,
+                        'request' => $request,
+                        'systemUri' => $event->getSystemUri(),
+                        'exception' => $e,
+                    ]
+                );
+
+                throw $event->getException();
+            }
         }
 
         $event = $this->emit(
