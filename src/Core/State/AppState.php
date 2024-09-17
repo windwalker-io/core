@@ -131,6 +131,30 @@ class AppState implements JsonSerializable
         return $this->remember($key, $inputValue, $driver);
     }
 
+    public function rememberMergeRequest(
+        string $key,
+        ?string $inputField = null,
+        mixed $driver = null
+    ): mixed {
+        $inputField ??= $key;
+
+        $driver = $this->resolvePersistDriver($driver);
+
+        $inputValue = $this->getRequest()->input($inputField);
+
+        if ($inputValue === null) {
+            return $this->get($key, $driver);
+        }
+
+        $remembered = $this->get($key, $driver);
+
+        if (is_array($inputValue) && is_array($remembered)) {
+            $inputValue = array_merge($remembered, $inputValue);
+        }
+
+        return $this->remember($key, $inputValue, $driver);
+    }
+
     public function remember(string $key, mixed $value, mixed $driver = null): mixed
     {
         $key = $this->getKeyName($key);

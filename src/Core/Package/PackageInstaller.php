@@ -103,7 +103,7 @@ class PackageInstaller
         return $this->installResource(
             'views',
             Filesystem::globAll($path),
-            $this->app->path('@views/packages/'),
+            $this->app->path('@views/'),
             $tags,
             $callback
         );
