@@ -195,6 +195,24 @@ class HtmlFrame
         return $this->addLink($link, attrs: $attrs);
     }
 
+    public function setRobotsMeta(
+        array|string $content = '',
+        $name = 'robots'
+    ): static {
+        $content = implode(',', (array) $content);
+
+        return $this->addMetadata(
+            $name,
+            $content,
+            true
+        );
+    }
+
+    public function setNoindex($name = 'robots'): static
+    {
+        return $this->setRobotsMeta('noindex', $name);
+    }
+
     public function addPreload(
         #[ExpectedValues(
             [
