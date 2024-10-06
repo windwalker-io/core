@@ -13,6 +13,7 @@ use Windwalker\Core\Http\CorsHandler;
 use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\Response;
+use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 /**
@@ -94,37 +95,36 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $origin = $request->getHeaderLine('origin');
 
-        $allows = (array) $this->options['allow_origins'];
+        $allows = $this->options['allow_origins'];
+        $allows = Arr::explodeAndClear(',', $allows);
+
+        $allowOrigin = $origin;
 
         if (!$origin) {
             // If old browser not support origin header in request,
             // Must allow all.
-            $origin = '*';
+            $allowOrigin = '*';
         } else {
             if (count($allows) === 1) {
                 // If only 1 allows, always send this as allow origin
-
-                // If allow is not wildcards, set as the only 1 allow
-                if ($allows[0] !== '*') {
-                    $origin = $allows[0];
+                if ($allows[0] !== 'ORIGIN') {
+                    $allowOrigin = $allows[0];
                 }
-
-                // If allow is wildcards, keep the request origin
             } elseif (count($allows) > 1) {
                 // Is has multiple allow, check origin in allow list
                 if (!in_array($origin, $allows, true)) {
-                    $origin = null;
+                    $allowOrigin = '';
                 }
             } else {
                 // No matched, do not allow any.
-                $origin = '';
+                $allowOrigin = '';
             }
         }
 
         $cors = CorsHandler::create();
 
-        if ($origin) {
-            $cors->allowOrigin($origin);
+        if ($allowOrigin) {
+            $cors->allowOrigin($allowOrigin);
         }
 
         $configure = $this->options['configure'];
