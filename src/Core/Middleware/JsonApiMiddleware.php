@@ -52,7 +52,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             if ($response instanceof JsonResponse) {
                 $buffer = new JsonBuffer(
                     $message,
-                    json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR)
+                    json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR)
                 );
 
                 $buffer->status = $response->getStatusCode();
@@ -67,7 +67,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
                     $response = (string) $response->getBody();
 
                     if (is_json($response)) {
-                        $response = json_decode($response, true);
+                        $response = json_decode($response, false);
                     }
                 }
 
