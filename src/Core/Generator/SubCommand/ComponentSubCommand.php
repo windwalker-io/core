@@ -73,7 +73,7 @@ class ComponentSubCommand extends AbstractGeneratorSubCommand
         $addTmpl = $io->getOption('tmpl') ?? $io->askConfirmation('Add template file? [Y/n]');
 
         if ($addTmpl) {
-            $tmpl = StrNormalize::toKebabCase($tmplDest) . '.' . StrNormalize::toKebabCase($name);
+            $tmpl = trim(StrNormalize::toKebabCase($tmplDest) . '.' . StrNormalize::toKebabCase($name), '.');
         }
 
         $this->codeGenerator->from($this->getViewPath('component/*Component.php.tpl'))
