@@ -96,9 +96,14 @@ class CorsMiddleware implements MiddlewareInterface
         $origin = $request->getHeaderLine('origin');
 
         $allows = $this->options['allow_origins'];
-        $allows = Arr::explodeAndClear(',', $allows);
 
-        $allowOrigin = $origin;
+        if (is_string($allows)) {
+            $allows = Arr::explodeAndClear(',', $allows);
+        }
+
+        $allows = (array) $allows;
+
+        $allowOrigin = '';
 
         if (!$origin) {
             // If old browser not support origin header in request,
@@ -107,17 +112,16 @@ class CorsMiddleware implements MiddlewareInterface
         } else {
             if (count($allows) === 1) {
                 // If only 1 allows, always send this as allow origin
-                if ($allows[0] !== 'ORIGIN') {
+                if ($allows[0] === 'ORIGIN') {
+                    $allowOrigin = $origin;
+                } else {
                     $allowOrigin = $allows[0];
                 }
             } elseif (count($allows) > 1) {
                 // Is has multiple allow, check origin in allow list
-                if (!in_array($origin, $allows, true)) {
-                    $allowOrigin = '';
+                if (in_array($origin, $allows, true)) {
+                    $allowOrigin = $origin;
                 }
-            } else {
-                // No matched, do not allow any.
-                $allowOrigin = '';
             }
         }
 
