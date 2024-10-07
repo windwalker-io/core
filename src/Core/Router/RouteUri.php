@@ -199,6 +199,8 @@ class RouteUri extends Uri implements NavConstantInterface
     {
         $return ??= $this->navigator->getAppContext()->getSystemUri()->full();
 
+        $return = Uri::wrap($return)->withoutVar('return');
+
         $returnBase64 = Base64Url::encode((string) $return);
 
         return $this->var($var, $returnBase64);
