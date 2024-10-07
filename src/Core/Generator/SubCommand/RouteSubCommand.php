@@ -66,4 +66,21 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
 
         return 0;
     }
+
+    public static function splitNameParts(string $name, ?string $suffix = null): array
+    {
+        $names = preg_split('/\/|\\\\/', $name);
+
+        $names = array_map(StrNormalize::toKebabCase(...), $names);
+
+        $name = $names[array_key_last($names)];
+
+        if (($suffix && str_ends_with($name, $suffix)) || !$suffix) {
+            array_pop($names);
+        }
+
+        $dest = implode('/', $names);
+
+        return [$dest, $name];
+    }
 }
