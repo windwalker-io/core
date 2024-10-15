@@ -7,6 +7,7 @@ namespace Windwalker\Core\Router;
 use Closure;
 use JetBrains\PhpStorm\ArrayShape;
 use Psr\Http\Message\ResponseInterface;
+use Ramsey\Uuid\UuidInterface;
 use Stringable;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Utilities\Base64Url;
@@ -178,6 +179,10 @@ class RouteUri extends Uri implements NavConstantInterface
      */
     public function var(string $name, mixed $value): static
     {
+        if ($value instanceof UuidInterface) {
+            $value = (string) $value;
+        }
+
         return $this->withVar($name, unwrap_enum($value));
     }
 
