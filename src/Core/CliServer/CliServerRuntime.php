@@ -25,6 +25,8 @@ use Windwalker\Http\Helper\ResponseHelper;
  */
 class CliServerRuntime
 {
+    public static int $gcThrottle = 50;
+
     protected static SwooleInspector $inspector;
 
     protected static CliServerStateManager $cliServerStateManager;
@@ -309,5 +311,18 @@ class CliServerRuntime
         mb_convert_variables($encoding, 'utf8', $lines);
 
         return $lines;
+    }
+
+    public static function gc(): void
+    {
+        static $i = 0;
+
+        if ($i >= static::$gcThrottle) {
+            gc_collect_cycles();
+            $i = 0;
+            return;
+        }
+
+        $i++;
     }
 }
