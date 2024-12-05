@@ -43,7 +43,7 @@ class PackageInstaller
         return $this->children[$name] ??= new static($name, $this->app);
     }
 
-    public function installConfig(string|array $path, string|array $tags = [], callable $callback = null): static
+    public function installConfig(string|array $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'config',
@@ -54,7 +54,7 @@ class PackageInstaller
         );
     }
 
-    public function installMigrations(string $path, string|array $tags = [], callable $callback = null): static
+    public function installMigrations(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'migrations',
@@ -65,7 +65,7 @@ class PackageInstaller
         );
     }
 
-    public function installLanguages(string $path, string|array $tags = [], callable $callback = null): static
+    public function installLanguages(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'languages',
@@ -76,7 +76,7 @@ class PackageInstaller
         );
     }
 
-    public function installRoutes(string $path, string|array $tags = [], callable $callback = null): static
+    public function installRoutes(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'routes',
@@ -87,7 +87,7 @@ class PackageInstaller
         );
     }
 
-    public function installFiles(string $path, string $dest, string|array $tags = [], callable $callback = null): static
+    public function installFiles(string $path, string $dest, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'files',
@@ -98,7 +98,7 @@ class PackageInstaller
         );
     }
 
-    public function installViews(string $path, string|array $tags = [], callable $callback = null): static
+    public function installViews(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'views',
@@ -113,7 +113,7 @@ class PackageInstaller
         array $paths,
         array $replaces = [],
         string|array $tags = [],
-        callable $callback = null
+        ?callable $callback = null
     ): static {
         foreach ($paths as $src => $dest) {
             $this->installResource(
@@ -138,7 +138,7 @@ class PackageInstaller
         return $this;
     }
 
-    public function installSeeders(string $path, string|array $tags = [], callable $callback = null): static
+    public function installSeeders(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
             'seeders',
@@ -151,7 +151,7 @@ class PackageInstaller
 
     public function installCallback(
         string|array $tags = [],
-        callable $callback = null
+        ?callable $callback = null
     ): static {
         return $this->addResources('callbacks', [], $tags, $callback);
     }
@@ -161,7 +161,7 @@ class PackageInstaller
         iterable $files,
         string|callable $dest,
         string|array $tags = [],
-        callable $callback = null
+        ?callable $callback = null
     ): static {
         $items = [];
 

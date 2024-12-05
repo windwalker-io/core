@@ -47,15 +47,15 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * wrap
      *
-     * @param  mixed  $date
-     * @param  mixed  $tz
+     * @param  mixed                     $date
+     * @param  string|DateTimeZone|null  $tz
      *
      * @return  static
      *
      * @throws Exception
      * @since  3.5.19
      */
-    public static function wrap(mixed $date = 'now', string|DateTimeZone $tz = null): static
+    public static function wrap(mixed $date = 'now', string|DateTimeZone|null $tz = null): static
     {
         if ($date instanceof static) {
             return $date;
@@ -68,12 +68,12 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         return static::create($date, $tz);
     }
 
-    public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?static
+    public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?static
     {
         return static::tryWrap($date, $tz);
     }
 
-    public static function tryWrap(mixed $date = 'now', string|DateTimeZone $tz = null): ?static
+    public static function tryWrap(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?static
     {
         if ($date === null || $date === '') {
             return null;
@@ -85,13 +85,13 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * Constructor.
      *
-     * @param  string  $date  String in a format accepted by strtotime(), defaults to "now".
-     * @param  mixed   $tz    Time zone to be used for the date. Might be a string or a DateTimeZone object.
+     * @param  string                    $date  String in a format accepted by strtotime(), defaults to "now".
+     * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date. Might be a string or a DateTimeZone object.
      *
      * @throws Exception
      * @since   2.1
      */
-    public function __construct(mixed $date = 'now', string|DateTimeZone $tz = null)
+    public function __construct(mixed $date = 'now', string|DateTimeZone|null $tz = null)
     {
         $tz = static::wrapTimezoneObject($tz);
 
@@ -106,7 +106,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         parent::__construct($date, $tz);
     }
 
-    public static function wrapTimezoneObject(string|DateTimeZone $tz = null): ?DateTimeZone
+    public static function wrapTimezoneObject(string|DateTimeZone|null $tz = null): ?DateTimeZone
     {
         if (is_string($tz)) {
             $tz = new DateTimeZone($tz);
@@ -144,7 +144,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @return  string
      * @throws Exception
      */
-    public static function now(string $format = self::FORMAT_YMD_HIS, string|DateTimeZone $tz = null): string
+    public static function now(string $format = self::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
         return (new static('now', $tz))->format($format, $tz);
     }
@@ -152,15 +152,15 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * Proxy for new DateTime.
      *
-     * @param  string  $date  String in a format accepted by strtotime(), defaults to "now".
-     * @param  mixed   $tz    Time zone to be used for the date.
+     * @param  string                    $date  String in a format accepted by strtotime(), defaults to "now".
+     * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date.
      *
      * @return  static
      *
      * @throws Exception
      * @since   2.1
      */
-    public static function create(mixed $date = 'now', string|DateTimeZone $tz = null): static
+    public static function create(mixed $date = 'now', string|DateTimeZone|null $tz = null): static
     {
         return new static($date, $tz);
     }
@@ -336,7 +336,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * @inheritDoc
      */
-    public function format($format, string|DateTimeZone $tz = null): string
+    public function format($format, string|DateTimeZone|null $tz = null): string
     {
         if (!$tz) {
             return parent::format($format);
@@ -498,7 +498,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @link    http://www.ietf.org/rfc/rfc3339.txt
      * @since   2.1
      */
-    public function toISO8601(bool $micro = false, string|DateTimeZone $tz = null): string
+    public function toISO8601(bool $micro = false, string|DateTimeZone|null $tz = null): string
     {
         return $this->format($micro ? static::RFC3339_EXTENDED : static::RFC3339, $tz);
     }
@@ -512,7 +512,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @link    http://www.ietf.org/rfc/rfc2822.txt
      * @since   2.1
      */
-    public function toRFC822(string|DateTimeZone $tz = null): string
+    public function toRFC822(string|DateTimeZone|null $tz = null): string
     {
         return $this->format(static::RFC2822, $tz);
     }

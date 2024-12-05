@@ -21,7 +21,7 @@ class Profiler implements \JsonSerializable
 
     protected ?StopwatchEvent $currentEvent = null;
 
-    public function __construct(protected string $name, Stopwatch $stopwatch = null)
+    public function __construct(protected string $name, ?Stopwatch $stopwatch = null)
     {
         $this->stopwatch = $stopwatch ?? new Stopwatch(true);
     }

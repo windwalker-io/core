@@ -31,8 +31,8 @@ class MailMessage extends Email
      */
     public function __construct(
         protected ?MailerInterface $mailer = null,
-        Headers $headers = null,
-        AbstractPart $body = null
+        ?Headers $headers = null,
+        ?AbstractPart $body = null
     ) {
         parent::__construct($headers, $body);
     }

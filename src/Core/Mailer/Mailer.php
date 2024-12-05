@@ -60,7 +60,7 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
     /**
      * @inheritDoc
      */
-    public function send(MailMessage|RawMessage $message, Envelope $envelope = null, int $flags = 0): SentMessage
+    public function send(MailMessage|RawMessage $message, ?Envelope $envelope = null, int $flags = 0): SentMessage
     {
         $envelope ??= $this->envelop;
 
@@ -128,8 +128,8 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
 
     public function createMessage(
         ?string $subject = null,
-        Headers $headers = null,
-        AbstractPart $body = null
+        ?Headers $headers = null,
+        ?AbstractPart $body = null
     ): MailMessage {
         $message = new MailMessage($this, $headers, $body);
 

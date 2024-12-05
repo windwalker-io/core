@@ -90,7 +90,7 @@ class FileWatcher extends Watch
         return $process;
     }
 
-    public function stop(int $timeout = 10, int $signal = null): ?int
+    public function stop(int $timeout = 10, ?int $signal = null): ?int
     {
         return $this->getRunningProcess()->stop($timeout, $signal);
     }

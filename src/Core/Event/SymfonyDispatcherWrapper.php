@@ -24,7 +24,7 @@ class SymfonyDispatcherWrapper implements EventDispatcherInterface
     /**
      * @inheritDoc
      */
-    public function dispatch(object $event, string $eventName = null): object
+    public function dispatch(object $event, ?string $eventName = null): object
     {
         return $this->dispatcher->dispatch($event);
     }

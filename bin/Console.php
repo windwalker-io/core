@@ -79,11 +79,11 @@ class Console
     /**
      * execute
      *
-     * @param \Closure|null $callback
+     * @param  \Closure|null  $callback
      *
      * @return  int
      */
-    public function execute(\Closure $callback = null)
+    public function execute(?\Closure $callback = null)
     {
         try {
             if ($this->getOption($this->helpOptions)) {

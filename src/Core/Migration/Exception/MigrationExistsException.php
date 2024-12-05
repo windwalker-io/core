@@ -19,9 +19,9 @@ class MigrationExistsException extends RuntimeException
      *
      * @param  string          $message   [optional] The Exception message to throw.
      * @param  int             $code      [optional] The Exception code.
-     * @param  null|Throwable  $previous  [optional] The previous throwable used for the exception chaining.
+     * @param  Throwable|null  $previous  [optional] The previous throwable used for the exception chaining.
      */
-    public function __construct(protected Migration $migration, $message = "", $code = 0, Throwable $previous = null)
+    public function __construct(protected Migration $migration, $message = "", $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

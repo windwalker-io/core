@@ -23,8 +23,8 @@ interface MailerInterface
 
     public function createMessage(
         ?string $subject = null,
-        Headers $headers = null,
-        AbstractPart $body = null
+        ?Headers $headers = null,
+        ?AbstractPart $body = null
     ): MailMessage;
 
     /**
@@ -35,5 +35,5 @@ interface MailerInterface
      * @return SentMessage
      * @throws TransportExceptionInterface
      */
-    public function send(MailMessage $message, Envelope $envelope = null, int $flags = 0): SentMessage;
+    public function send(MailMessage $message, ?Envelope $envelope = null, int $flags = 0): SentMessage;
 }

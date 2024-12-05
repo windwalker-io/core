@@ -27,7 +27,7 @@ class EventDispatcherRegistry
 
     public function createDispatcher(
         EventCollector $collector,
-        ListenerProviderInterface $provider = null
+        ?ListenerProviderInterface $provider = null
     ): CoreEventEmitter {
         $dispatcher = new CoreEventEmitter($collector, $provider);
 

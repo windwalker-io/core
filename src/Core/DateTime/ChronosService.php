@@ -85,7 +85,7 @@ class ChronosService
         return $db->isNullDate($date);
     }
 
-    public function toServer(mixed $date, string|DateTimeZone $from = null): ?Chronos
+    public function toServer(mixed $date, string|DateTimeZone|null $from = null): ?Chronos
     {
         if ($date === null || $date === '') {
             return null;
@@ -99,7 +99,7 @@ class ChronosService
     public function toServerFormat(
         mixed $date,
         string $format = Chronos::FORMAT_YMD_HIS,
-        string|DateTimeZone $from = null
+        string|DateTimeZone|null $from = null
     ): string {
         if ($date === null || $date === '') {
             return '';
@@ -108,7 +108,7 @@ class ChronosService
         return $this->toServer($date, $from)->format($format);
     }
 
-    public function toLocal(mixed $date, string|DateTimeZone $to = null): ?Chronos
+    public function toLocal(mixed $date, string|DateTimeZone|null $to = null): ?Chronos
     {
         if ($date === null || $date === '') {
             return null;
@@ -122,7 +122,7 @@ class ChronosService
     public function toLocalFormat(
         mixed $date,
         string $format = Chronos::FORMAT_YMD_HIS,
-        string|DateTimeZone $to = null
+        string|DateTimeZone|null $to = null
     ): string {
         if ($date === null || $date === '') {
             return '';
@@ -216,15 +216,15 @@ class ChronosService
 
     public function createLocal(
         string $date = 'now',
-        string|DateTimeZone $tz = null,
-        string|DateTimeZone $to = null
+        string|DateTimeZone|null $tz = null,
+        string|DateTimeZone|null $to = null
     ): Chronos {
         $chronos = static::create($date, $tz);
 
         return $this->toLocal($chronos, $to);
     }
 
-    public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone $tz = null): string
+    public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
         return $this->createLocal('now', $tz)->format($format);
     }
@@ -254,7 +254,7 @@ class ChronosService
      * @return  string
      * @throws Exception
      */
-    public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone $tz = null): string
+    public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
         return static::create('now', $tz)->format($format);
     }
@@ -262,15 +262,15 @@ class ChronosService
     /**
      * Proxy for new DateTime.
      *
-     * @param  string  $date  String in a format accepted by strtotime(), defaults to "now".
-     * @param  mixed   $tz    Time zone to be used for the date.
+     * @param  string                    $date  String in a format accepted by strtotime(), defaults to "now".
+     * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date.
      *
      * @return  Chronos
      *
      * @throws Exception
      * @since   2.1
      */
-    public static function create(string $date = 'now', string|DateTimeZone $tz = null): Chronos
+    public static function create(string $date = 'now', string|DateTimeZone|null $tz = null): Chronos
     {
         return Chronos::create($date, $tz);
     }
@@ -278,9 +278,9 @@ class ChronosService
     /**
      * Parse a string into a new DateTime object according to the specified format
      *
-     * @param  string  $format    Format accepted by date().
-     * @param  string  $time      String representing the time.
-     * @param  mixed   $timezone  A DateTimeZone object representing the desired time zone.
+     * @param  string                    $format    Format accepted by date().
+     * @param  string                    $time      String representing the time.
+     * @param  string|DateTimeZone|null  $timezone  A DateTimeZone object representing the desired time zone.
      *
      * @return static|bool
      * @throws Exception
@@ -288,7 +288,7 @@ class ChronosService
     public static function createFromFormat(
         string $format,
         string $time,
-        string|DateTimeZone $timezone = null
+        string|DateTimeZone|null $timezone = null
     ): Chronos {
         return Chronos::createFromFormat($format, $time, $timezone);
     }

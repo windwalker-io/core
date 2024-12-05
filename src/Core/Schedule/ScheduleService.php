@@ -23,12 +23,12 @@ class ScheduleService
         return (array) $this->app->config('schedules');
     }
 
-    public function getSchedule(string|array $routes = null): Schedule
+    public function getSchedule(string|array|null $routes = null): Schedule
     {
         return $this->cacheStorage['instance'] ??= $this->createSchedule($routes);
     }
 
-    public function createSchedule(string|array $routes = null): Schedule
+    public function createSchedule(string|array|null $routes = null): Schedule
     {
         $routes = $routes ?? $this->getScheduleRoutes();
         $routes = (array) $routes;
