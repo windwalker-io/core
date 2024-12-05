@@ -41,7 +41,7 @@
     "minimist": "^1.2.5",
     "node-notifier": "^9.0.1",
     "plugin-error": "^1.0.1",
-    "postcss": "^8.0",
+    "postcss": "^8.4.31",
     "sass": "^1.61.0",
     "terser": "^5.6.0",
     "through2": "^4.0.2"
@@ -75,5 +75,13 @@
     "webpack": "^4.0||^5.68.0",
     "webpack-comment-remover-loader": "^0.0.3",
     "webpack-stream": "^6.0||^7.0.0"
+  },
+  "overrides": {
+    "glob-watcher": {
+      "chokidar": "^3.0||^4.0"
+    }
+  },
+  "resolutions": {
+    "chokidar": "^4.0"
   }
 }
