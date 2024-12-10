@@ -567,7 +567,7 @@ class HtmlFrame
 
     public function bodyAttributes(): string
     {
-        return HTMLElement::buildAttributes($this->body);
+        return DOMElement::buildAttributes($this->body);
     }
 
     /**
@@ -597,6 +597,6 @@ class HtmlFrame
 
     public function htmlAttributes(): string
     {
-        return HTMLElement::buildAttributes($this->html);
+        return DOMElement::buildAttributes($this->html);
     }
 }
