@@ -6,6 +6,7 @@ namespace Windwalker\Core\Form;
 
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DOM\DOMElement;
+use Windwalker\DOM\HTMLElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Renderer\FormRendererInterface;
 
@@ -27,12 +28,12 @@ class FormRenderer implements FormRendererInterface
      * renderField
      *
      * @param  AbstractField  $field
-     * @param  DOMElement     $wrapper
+     * @param  HTMLElement    $wrapper
      * @param  array          $options
      *
      * @return string
      */
-    public function renderField(AbstractField $field, DOMElement $wrapper, array $options = []): string
+    public function renderField(AbstractField $field, HTMLElement $wrapper, array $options = []): string
     {
         $renderer = $this;
 
@@ -46,12 +47,12 @@ class FormRenderer implements FormRendererInterface
      * renderLabel
      *
      * @param  AbstractField  $field
-     * @param  DOMElement     $label
+     * @param  HTMLElement    $label
      * @param  array          $options
      *
      * @return string
      */
-    public function renderLabel(AbstractField $field, DOMElement $label, array $options = []): string
+    public function renderLabel(AbstractField $field, HTMLElement $label, array $options = []): string
     {
         $renderer = $this;
 
@@ -65,12 +66,12 @@ class FormRenderer implements FormRendererInterface
      * renderInput
      *
      * @param  AbstractField  $field
-     * @param  DOMElement     $input
+     * @param  HTMLElement    $input
      * @param  array          $options
      *
      * @return string
      */
-    public function renderInput(AbstractField $field, DOMElement $input, array $options = []): string
+    public function renderInput(AbstractField $field, HTMLElement $input, array $options = []): string
     {
         $renderer = $this;
 

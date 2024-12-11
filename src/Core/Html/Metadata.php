@@ -7,6 +7,8 @@ namespace Windwalker\Core\Html;
 use Stringable;
 use Windwalker\DOM\DOMElement;
 
+use Windwalker\DOM\HTMLElement;
+
 use function Windwalker\DOM\h;
 
 /**
@@ -62,7 +64,7 @@ class Metadata
      *
      * @return  DOMElement
      */
-    protected function createMetadataTag(string $name, mixed $content): DOMElement
+    protected function createMetadataTag(string $name, mixed $content): HTMLElement
     {
         return h('meta', [
             'name' => $this->escape($name),
@@ -112,7 +114,7 @@ class Metadata
         return $this;
     }
 
-    public function createOpenGraphTag(string $type, string $content): DOMElement
+    public function createOpenGraphTag(string $type, string $content): HTMLElement
     {
         return h('meta', [
             'property' => $this->escape($type),

@@ -12,6 +12,7 @@ use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\DOM\DOMElement;
+use Windwalker\DOM\HTMLElement;
 use Windwalker\Session\Session;
 
 use function Windwalker\DOM\h;
@@ -49,7 +50,7 @@ class CsrfService
         }
     }
 
-    public function input(array $attrs = []): DOMElement
+    public function input(array $attrs = []): HTMLElement
     {
         $attrs['type'] = 'hidden';
 
