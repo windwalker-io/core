@@ -102,6 +102,11 @@ class AssetService implements EventAwareInterface
     protected string $root = '';
 
     /**
+     * @var string
+     */
+    protected string $folder = '';
+
+    /**
      * @var Teleport[]
      */
     protected array $teleports = [];
@@ -121,6 +126,7 @@ class AssetService implements EventAwareInterface
 
         $this->path = $options['uri'] ?? $this->systemUri->path($folder);
         $this->root = $options['uri'] ?? $this->systemUri->root($folder);
+        $this->folder = $folder;
 
         $this->dispatcher = $dispatcher;
     }
@@ -947,6 +953,13 @@ class AssetService implements EventAwareInterface
     public function addAssetBase(string $uri, string $path = 'path'): string
     {
         if (!static::isAbsoluteUrl($uri)) {
+            $folderPath = $this->folderPath();
+
+            // Handle `assets/xxx`
+            if (str_starts_with($uri, $folderPath)) {
+                $uri = Str::removeLeft($uri, $folderPath);
+            }
+
             $uri = $this->systemUri::normalize($this->$path . '/' . $uri);
         }
 
@@ -1239,5 +1252,28 @@ class AssetService implements EventAwareInterface
     {
         return $this->cacheStorage['app.secret']
             ??= $this->app->getSecret();
+    }
+
+    public function folderPath(?string $uri = null, string|bool $version = false): string
+    {
+        if ($version === true) {
+            $version = $this->getVersion();
+        }
+
+        if ($uri !== null) {
+            $uri = $this->resolveAlias($uri);
+
+            if ($version) {
+                if (str_contains($uri, '?')) {
+                    $uri .= '&' . $version;
+                } else {
+                    $uri .= '?' . $version;
+                }
+            }
+
+            return UriNormalizer::ensureDir($this->folder . '/' . $uri);
+        }
+
+        return UriNormalizer::ensureDir($this->folder);
     }
 }
