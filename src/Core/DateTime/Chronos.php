@@ -291,9 +291,13 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     ): \DatePeriod {
         $start = static::wrap($start);
 
+        if (!$interval instanceof DateInterval) {
+            $interval = static::createInterval($interval);
+        }
+
         return new \DatePeriod(
             $start,
-            static::createInterval($interval),
+            $interval,
             $recurrences,
             $options
         );
