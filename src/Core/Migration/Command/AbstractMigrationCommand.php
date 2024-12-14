@@ -16,6 +16,7 @@ use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\Environment;
 
@@ -112,9 +113,10 @@ abstract class AbstractMigrationCommand implements CommandInterface
         $db = $this->databaseManager->get($conn);
         $db->disconnect();
 
-        $options = $db->getOptions();
+        $options = DatabaseManager::mergeDsnToOptions($db->getOptions());
 
         $dbname = $options['dbname'];
+
         $options['dbname'] = null;
 
         $dbPreset = $factory->create(
