@@ -110,7 +110,7 @@ class Router implements EventAwareInterface
 
                 /** @var Route $route */
                 $route = clone $route;
-                $vars = array_merge(array_map('urldecode', $vars), $route->getVars());
+                $vars = array_merge($route->getVars(), array_map('urldecode', $vars));
                 $route->vars($vars);
 
                 return $route;

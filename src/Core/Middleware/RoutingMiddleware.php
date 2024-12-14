@@ -42,6 +42,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      *
      * @param  AppContext     $app
      * @param  WsRouter       $router
+     * @param  \Closure|null  $preMatch
      * @param  \Closure|null  $fallback
      * @param  array          $options
      */
