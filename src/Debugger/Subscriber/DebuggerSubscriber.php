@@ -223,7 +223,7 @@ class DebuggerSubscriber
 
                 $http = [];
 
-                $req = $appReq->getRequest();
+                $req = $appReq->getServerRequest();
 
                 $http['request'] = [
                     'headers' => $req->getHeaders(),
