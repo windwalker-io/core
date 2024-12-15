@@ -16,10 +16,10 @@ trait IniSetterTrait
     public static function setINI(string $key, $value, Container $container): void
     {
         if (is_callable($value)) {
-            $container->call($value, [$container]);
-        } else {
-            ini_set($key, (string) $value);
+            $value = $container->call($value, [$container]);
         }
+
+        ini_set($key, (string) $value);
     }
 
     protected static function setINIValues(array $values, Container $container): void
