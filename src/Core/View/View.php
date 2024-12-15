@@ -171,7 +171,7 @@ class View implements EventAwareInterface, \ArrayAccess
             );
         }
 
-        if (AttributesAccessor::getFirstAttribute($vm, EventSubscriber::class)) {
+        if (EventSubscriber::isSubscriber($vm)) {
             $this->subscribe($vm);
         }
 
