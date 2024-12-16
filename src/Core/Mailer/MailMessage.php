@@ -69,6 +69,17 @@ class MailMessage extends Email
         return $this;
     }
 
+    public function debugPrintBody(bool $die = false): static
+    {
+        echo $this->getHtmlBody();
+
+        if ($die) {
+            die;
+        }
+
+        return $this;
+    }
+
     /**
      * @return AssetService|null
      */
