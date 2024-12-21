@@ -72,17 +72,19 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                 break;
 
             case AppClient::CONSOLE:
-                if (class_exists(Writer::class)) {
-                    $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) {
-                        $error = $event->getError();
+                $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) use ($error) {
+                    $t = $event->getError();
 
+                    if (class_exists(Writer::class)) {
                         $writer = new Writer(
                             new SolutionRepository(),
                             $event->getOutput()
                         );
-                        $writer->write(new Inspector($error));
-                    });
-                }
+                        $writer->write(new Inspector($t));
+                    }
+
+                    $error->handle($t);
+                });
 
                 // To hide default uncaught errors and backtraces.
                 $error->register(false, E_ALL | E_STRICT, true);

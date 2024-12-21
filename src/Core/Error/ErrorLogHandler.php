@@ -51,7 +51,8 @@ class ErrorLogHandler implements ErrorHandlerInterface
         $resolver->setDefaults(
             [
                 'enabled' => false,
-                'channel' => 'error',
+                'channel' => $this->config->getDeep('error.log_channel') ?: 'error',
+                'ignore_40x' => false,
             ]
         );
     }
@@ -69,11 +70,13 @@ class ErrorLogHandler implements ErrorHandlerInterface
         // Do not log 4xx errors
         $code = $e->getCode();
 
-        if ($code < 400 || $code >= 500) {
-            // $message = static::handleExceptionLogText($e, $this->config->get('@root'));
+        $ignore40x = (bool) $this->options['ignore_40x'];
 
+        if (
+            $code < 400 || $code >= 500 || !$ignore40x
+        ) {
             $this->logger->error(
-                $this->config->getDeep('error.log_channel') ?? 'error',
+                $this->options['channel'],
                 $e->getMessage(),
                 ['exception' => $e]
             );

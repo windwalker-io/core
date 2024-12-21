@@ -14,6 +14,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Exception\DefinitionException;
@@ -238,6 +239,8 @@ class QueueWorkerCommand implements CommandInterface
                 function (JobFailureEvent $event) use ($io, $connection) {
                     $message = $event->getMessage();
                     $e = $event->getException();
+
+                    Logger::error('queue-error', $e);
 
                     $this->app->addMessage(
                         sprintf(
