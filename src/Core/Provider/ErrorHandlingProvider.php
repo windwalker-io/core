@@ -65,7 +65,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
 
                     $error->register(
                         (bool) ($this->config->get('restore') ?? true),
-                        (int) ($this->config->get('report_level') ?? E_ALL | E_STRICT),
+                        (int) ($this->config->get('report_level') ?? E_ALL),
                         (bool) ($this->config->get('register_shutdown') ?? true)
                     );
                 }
@@ -87,7 +87,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                 });
 
                 // To hide default uncaught errors and backtraces.
-                $error->register(false, E_ALL | E_STRICT, true);
+                $error->register(false, E_ALL, true);
                 break;
         }
     }

@@ -264,7 +264,7 @@ class ErrorService
      * @param  int   $type
      * @param  bool  $shutdown
      */
-    public function register(bool $restore = true, int $type = E_ALL | E_STRICT, bool $shutdown = false): void
+    public function register(bool $restore = true, int $type = E_ALL, bool $shutdown = false): void
     {
         $this->registerErrors($restore, $type);
         $this->registerExceptions($restore);
@@ -274,7 +274,7 @@ class ErrorService
         }
     }
 
-    public function registerErrors(bool $restore = true, int $type = E_ALL | E_STRICT): void
+    public function registerErrors(bool $restore = true, int $type = E_ALL): void
     {
         if ($restore) {
             restore_error_handler();
