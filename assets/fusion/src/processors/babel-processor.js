@@ -20,7 +20,7 @@ try {
   console.error(
     `\nPlease run ${chalk.yellow("yarn add gulp-babel @babel/core core-js@3 " +
       "@babel/plugin-proposal-class-properties @babel/plugin-proposal-decorators " +
-      "@babel/plugin-proposal-optional-chaining @babel/preset-env " +
+      "@babel/plugin-transform-optional-chaining @babel/preset-env " +
       "@babel/plugin-syntax-top-level-await")} first.`
   );
   process.exit(255);

@@ -28,7 +28,7 @@ export function babelBasicOptions(processorOptions = {}) {
   options.addPlugin('@babel/plugin-transform-class-properties');
 
   options.addPlugin('@babel/plugin-proposal-decorators', { decoratorsBeforeExport: true });
-  options.addPlugin('@babel/plugin-proposal-optional-chaining');
+  options.addPlugin('@babel/plugin-transform-optional-chaining');
   options.addPlugin('@babel/plugin-syntax-top-level-await');
 
   return options;
