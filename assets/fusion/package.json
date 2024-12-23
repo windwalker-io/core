@@ -21,7 +21,7 @@
     "core-js": "3",
     "cross-env": "^7.0.3",
     "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^7.0.1",
+    "gulp-autoprefixer": "^7.0||^8.0||^9.0||^10.0",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-cli": "^2.3.0",
