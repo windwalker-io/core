@@ -43,7 +43,10 @@ export function syncModuleTS(source = 'src/Module', dest = 'www/assets/js/view/'
     {
       tsconfig: path.resolve('tsconfig.json'),
       rename: (path) => {
-        path.dirname = path.dirname.replace(/\/assets/, '').toLowerCase();
+
+        path.dirname = path.dirname.replace(/\\/g, '/')
+          .replace(/\/assets/, '')
+          .toLowerCase();
       },
       ...options
     }
