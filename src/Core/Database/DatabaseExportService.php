@@ -142,7 +142,7 @@ class DatabaseExportService
      *
      * @return  string
      */
-    public static function stripPrefix(string $table, string $prefix = null): string
+    public static function stripPrefix(string $table, ?string $prefix = null): string
     {
         $prefix = (string) $prefix;
 

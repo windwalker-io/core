@@ -122,7 +122,7 @@ namespace Windwalker {
          *
          * @return Chronos
          */
-        function chronos(mixed $date = 'now', string|DateTimeZone $tz = null): Chronos
+        function chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): Chronos
         {
             return Chronos::wrap($date, $tz);
         }
@@ -137,7 +137,7 @@ namespace Windwalker {
          *
          * @return Chronos|null
          */
-        function chronosOrNull(mixed $date = 'now', string|DateTimeZone $tz = null): ?Chronos
+        function chronosOrNull(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?Chronos
         {
             return Chronos::wrapOrNull($date, $tz);
         }
@@ -154,7 +154,7 @@ namespace Windwalker {
          *
          * @throws Exception
          */
-        function now(string $format, string|DateTimeZone $tz = null): string
+        function now(string $format, string|DateTimeZone|null $tz = null): string
         {
             return Chronos::now($format, $tz);
         }

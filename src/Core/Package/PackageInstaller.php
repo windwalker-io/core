@@ -149,7 +149,7 @@ class PackageInstaller
         iterable $files,
         string|callable $dest,
         string|array $tags = [],
-        callable $callback = null
+        ?callable $callback = null
     ): static {
         $items = [];
 

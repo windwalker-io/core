@@ -264,7 +264,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     protected function createAccessorsIfNotExists(
         string $propName,
         Node\Stmt\Property $prop,
-        array &$added = null
+        ?array &$added = null
     ): array {
         $added = [];
         $factory = $this->createNodeFactory();

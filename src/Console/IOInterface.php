@@ -71,7 +71,7 @@ interface IOInterface extends InputInterface, OutputInterface
      *
      * @return  mixed
      */
-    public function extract(array|InputInterface $input = null, ?OutputInterface $output = null): static;
+    public function extract(array|InputInterface|null $input = null, ?OutputInterface $output = null): static;
 
     /**
      * ask

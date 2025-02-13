@@ -83,7 +83,7 @@ class HtmlFrame
      */
     public function __construct(
         protected AssetService $asset,
-        Metadata $metadata = null
+        ?Metadata $metadata = null
     ) {
         $this->body = HTMLElement::create('body');
         $this->html = HTMLElement::create('html');

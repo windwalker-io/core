@@ -23,7 +23,7 @@ class CoreEventEmitter extends EventEmitter
     /**
      * @inheritDoc
      */
-    public function __construct(protected EventCollector $collector, ListenerProviderInterface $provider = null)
+    public function __construct(protected EventCollector $collector, ?ListenerProviderInterface $provider = null)
     {
         if (!$provider instanceof CoreCompositeProvider) {
             $provider = new CoreCompositeProvider($provider);

@@ -41,7 +41,7 @@ class AuthService
         //
     }
 
-    public function authenticate(array $credential, ResultSet &$resultSet = null): false|AuthResult
+    public function authenticate(array $credential, ?ResultSet &$resultSet = null): false|AuthResult
     {
         $resultSet = $this->getAuthentication()->authenticate($credential);
 

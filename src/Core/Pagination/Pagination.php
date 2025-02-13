@@ -225,7 +225,7 @@ class Pagination
      */
     public function render(
         ?PaginationResult $result = null,
-        callable|string $template = null,
+        callable|string|null $template = null,
         array $options = []
     ): string {
         $result ??= $this->compile();
