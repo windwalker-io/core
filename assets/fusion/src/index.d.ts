@@ -94,8 +94,8 @@ declare namespace Fusion {
 
   export const css: taskProcessor<CssOptions>;
   export const CssProcessor: Processor<CssOptions>;
-  export const sass: taskProcessor<CssPreProcessorOptions>;
-  export const SassProcessor: Processor<CssPreProcessorOptions>;
+  export const sass: taskProcessor<CssPreProcessorOptions & { sass: any }>;
+  export const SassProcessor: Processor<CssPreProcessorOptions & { sass: any }>;
   export const js: taskProcessor<JsOptions>;
   export const JsProcessor: Processor<JsOptions>;
   export const babel: taskProcessor<BabelProcessorOptions>;

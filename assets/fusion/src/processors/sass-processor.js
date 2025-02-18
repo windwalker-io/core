@@ -13,8 +13,10 @@ const gulpSassInc = gulpSass(sass);
 
 export default class SassProcessor extends CssPreProcessor {
   compile(dest, options = {}) {
+    const sassOptions = options.sass || {};
+
     this.pipe(
-      gulpSassInc({ style: 'expanded' })
+      gulpSassInc({ style: 'expanded', ...sassOptions })
         .on('error', gulpSassInc.logError)
     );
     return this;
