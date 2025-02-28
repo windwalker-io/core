@@ -244,10 +244,10 @@ class QueueWorkerCommand implements CommandInterface
 
                     $this->app->addMessage(
                         sprintf(
-                            'Job %s failed: %s (%s)',
+                            'Job %s failed - ID: <info>%s</info> - %s',
                             get_debug_type($event->getJob()),
+                            $message->getId(),
                             $event->getException()->getMessage(),
-                            $message->getId()
                         ),
                         'error'
                     );
