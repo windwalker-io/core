@@ -4,36 +4,85 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration;
 
-use Windwalker\Core\Generator\Builder\AbstractAstBuilder;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Database\Schema\Ddl\Constraint;
 use Windwalker\Database\Schema\Ddl\Index;
+use Windwalker\Utilities\Arr;
 
 use function Windwalker\collect;
 
-class MigrationSquashBuilder extends AbstractAstBuilder
+class MigrationSquashBuilder
 {
     protected array $uses = [];
 
-    public function __construct(protected DatabaseAdapter $db, protected TableManager $tableManager)
+    public function __construct(protected DatabaseAdapter $db)
     {
     }
 
-    public function process(array $options = []): string
+    /**
+     * @param  TableManager  $tableManager
+     *
+     * @return  string[]
+     */
+    public function build(TableManager $tableManager): array
     {
-        $version = $options['version'];
-        $name = $options['name'];
+        $tableName = $tableManager->getName();
+        $columns = $tableManager->getColumns(true);
+        $indexes = $tableManager->getIndexes();
+        $constraints = $tableManager->getConstraints();
 
-        [$upCode, $downCode] = $this->buildMigrateCode($this->tableManager);
+        $this->syncKeyColumns($indexes, $columns);
+        $this->syncKeyColumns($constraints, $columns);
 
-        return static::buildMigrationTemplate(
-            $name,
-            $upCode,
-            $downCode,
-            $version,
+        $schemaLines = collect();
+
+        foreach ($columns as $column) {
+            $schemaLines[] = $this->buildColumnCode($column);
+        }
+
+        $schemaLines[] = '';
+
+        foreach ($constraints as $constraint) {
+            $schemaLines[] = $this->buildConstraintCode($constraint);
+        }
+
+        foreach ($indexes as $index) {
+            if ($this->isColumnsSame($index, $constraints)) {
+                continue;
+            }
+
+            $schemaLines[] = $this->buildIndexCode($index);
+        }
+
+        $schemaCode = $schemaLines->filter(fn($line) => $line !== null)
+            ->map(
+                function ($line) {
+                    if ((string) $line === '') {
+                        return '';
+                    }
+
+                    return str_repeat('    ', 4) . $line;
+                }
+            )
+            ->implode("\n")
+            ->trim();
+
+        $upCode = <<<PHP
+        \$mig->createTable(
+            '$tableName',
+            function (Schema \$schema) {
+                $schemaCode
+            }
         );
+PHP;
+
+        $downCode = <<<PHP
+        \$mig->dropTables('$tableName');
+PHP;
+
+        return [$upCode, $downCode];
     }
 
     protected function buildColumnCode(Column $column): string
@@ -48,22 +97,13 @@ class MigrationSquashBuilder extends AbstractAstBuilder
         $name = $column->columnName;
         $method = static::typeToMethod($type);
 
-        // if ($column->isPrimary()) {
-        //     if ($column->isAutoIncrement()) {
-        //         if (($type === 'int' || $type === 'integer')) {
-        //             $segments[] = "primary('$name')";
-        //         } elseif ($type === 'string') {
-        //             $segments[] = "bigintPrimary('$name')";
-        //         } else {
-        //             $method = static::typeToMethod($type);
-        //             $segments[] = "$method('$name')";
-        //             $segments[] = "primary(true)";
-        //             $segments[] = "autoIncrement(true)";
-        //         }
-        //     } elseif ($type === 'varchar') {
-        //         $se
-        //     }
-        // }
+        if ($column->isPrimary() && $column->isAutoIncrement()) {
+            if (($type === 'int' || $type === 'integer')) {
+                $method = "primary";
+            } elseif ($type === 'bigint') {
+                $method = "bigintPrimary";
+            }
+        }
 
         $length = $column->getErratas()['custom_length'] ?? $column->getLengthExpression();
 
@@ -74,10 +114,6 @@ class MigrationSquashBuilder extends AbstractAstBuilder
         }
 
         $segments[] = "$method('$name')";
-
-        if ($column->isAutoIncrement()) {
-            $segments[] = 'autoIncrement(true)';
-        }
 
         if ($length && !static::ignoreLength($column)) {
             if (!str_contains((string) $length, ',')) {
@@ -90,6 +126,16 @@ class MigrationSquashBuilder extends AbstractAstBuilder
 
         if ($column->getIsNullable()) {
             $segments[] = 'nullable(true)';
+        }
+
+        $def = $column->getColumnDefault();
+
+        if ($def === null) {
+            $segments[] = 'defaultValue(null)';
+        } elseif (is_numeric($def)) {
+            $segments[] = "defaultValue($def)";
+        } elseif (is_string($def)) {
+            $segments[] = "defaultValue('$def')";
         }
 
         if ($comment = $column->getComment()) {
@@ -110,6 +156,12 @@ class MigrationSquashBuilder extends AbstractAstBuilder
             ->implode(', ');
 
         if ($constraint->isPrimary()) {
+            $isAI = $constraint->columnsCount() === 1 && $constraint->getFirstColumn()->isAutoIncrement();
+
+            if ($isAI) {
+                return null;
+            }
+
             if ($constraint->columnsCount() > 1) {
                 $segments[] = "addPrimaryKey([$names])";
             } else {
@@ -163,7 +215,7 @@ class MigrationSquashBuilder extends AbstractAstBuilder
 
     protected static function ignoreLength(Column $column): bool
     {
-        if ($column->getErratas()['custom_length'] ?? null) {
+        if (!($column->getErratas()['custom_length'] ?? null)) {
             return true;
         }
 
@@ -198,119 +250,54 @@ class MigrationSquashBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @param  array<Constraint>  $constraints
+     * @param  array<Constraint|Index>  $keys
+     * @param  array<Column>            $realColumns
      *
-     * @return  string[]
+     * @return  void
      */
-    protected function findPrimaryKeys(array $constraints): array
+    protected function syncKeyColumns(array $keys, array $realColumns): void
     {
-        $keys = [];
+        foreach ($keys as $key) {
+            foreach ($key->columns as $column) {
+                $key->columns[$column->columnName] = $realColumn = $realColumns[$column->columnName];
 
-        foreach ($constraints as $constraint) {
-            if ($constraint->constraintType === 'PRIMARY KEY') {
-                foreach ($constraint->columns as $column) {
-                    $keys[] = $column->columnName;
-                }
-
-                return $keys;
-            }
-        }
-
-        return $keys;
-    }
-
-    protected function findUniqueKeys(array $constraints): array
-    {
-        $keys = [];
-
-        foreach ($constraints as $constraint) {
-            if ($constraint->constraintType === 'UNIQUE') {
-                foreach ($constraint->columns as $column) {
-                    $keys[] = $column->columnName;
+                if ($key instanceof Constraint && $key->isPrimary()) {
+                    $realColumn->primary(true);
                 }
             }
         }
-
-        return $keys;
     }
 
     /**
-     * @param  TableManager  $tableManager
+     * @param  Index              $index
+     * @param  array<Constraint>  $constraints
      *
-     * @return  string[]
+     * @return  bool
      */
-    public function buildMigrateCode(TableManager $tableManager): array
+    protected function isColumnsSame(Index $index, array $constraints): bool
     {
-        $tableName = $tableManager->getName();
-        $columns = $tableManager->getColumns(true);
-        $indexes = $tableManager->getIndexes();
-        $constraints = $tableManager->getConstraints();
-
-        $pks = $this->findPrimaryKeys($constraints);
-        $uks = $this->findUniqueKeys($constraints);
-
-        $schemaLines = collect();
-
-        foreach ($columns as $column) {
-            if (in_array($column->columnName, $pks, true)) {
-                $column->primary(true);
-            }
-
-            $schemaLines[] = $this->buildColumnCode($column);
-        }
-
-        $schemaLines[] = '';
-
         foreach ($constraints as $constraint) {
-            $schemaLines[] = $this->buildConstraintCode($constraint);
-        }
-
-        foreach ($indexes as $index) {
-            if ($index->columnsCount() === 1) {
-                $colName = $index->getFirstColumn()->columnName;
-
-                if (in_array($colName, $pks, true) || in_array($colName, $uks, true)) {
-                    continue;
-                }
+            if (!$constraint->isUnique() && !$constraint->isPrimary()) {
+                continue;
             }
 
-            $schemaLines[] = $this->buildIndexCode($index);
+            $uniqCols = array_column($constraint->columns, 'columnName');
+            $idxCols = array_column($index->columns, 'columnName');
+
+            if (Arr::arrayEquals($uniqCols, $idxCols)) {
+                return true;
+            }
         }
 
-        $schemaCode = $schemaLines->filter(fn($line) => $line !== null)
-            ->map(
-                function ($line) {
-                    if ((string) $line === '') {
-                        return '';
-                    }
-
-                    return '            ' . $line;
-                }
-            )
-            ->implode(', ');
-
-        $upCode = <<<PHP
-        \$mig->createTable(
-            '$tableName',
-            function (Schema \$schema) {
-                $schemaCode
-            }
-        );
-PHP;
-
-        $downCode = <<<PHP
-        \$mig->dropTables('$tableName');
-PHP;
-
-        return [$upCode, $downCode];
+        return false;
     }
 
-    protected static function buildMigrationTemplate(
+    public static function buildMigrationTemplate(
         string $name,
         string $createTableCode,
         string $dropTableCode,
         string $version
-    ) {
+    ): string {
         return <<<PHP
 <?php
 
@@ -329,7 +316,7 @@ use Windwalker\Database\Schema\Schema;
  * @var ConsoleApplication \$app
  */
 \$mig->up(
-    static function () use (\$mig) {
+    function () use (\$mig) {
 $createTableCode
     }
 );
@@ -343,6 +330,60 @@ $dropTableCode
     }
 );
 
+PHP;
+    }
+
+    public static function buildSquashMigrationCode(string $name, string $version, array $versions): string
+    {
+        $squashCode = static::buildSquashActionCode($versions);
+
+        return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\Migration;
+
+use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Migration\Migration;
+
+/**
+ * Migration UP: {$version}_{$name}.
+ *
+ * @var Migration \$mig
+ * @var ConsoleApplication \$app
+ */
+\$mig->up(
+    function () {
+        $squashCode
+    }
+);
+
+PHP;
+    }
+
+    /**
+     * @param  array  $versions
+     *
+     * @return  string
+     */
+    public static function buildSquashActionCode(array $versions): string
+    {
+        $versionsCode = (string) collect($versions)
+            ->map(fn($v) => "'$v'")
+            ->implode(",\n" . str_repeat('    ', 4));
+
+        if (!trim($versionsCode)) {
+            $versionsCode = '//';
+        }
+
+        return <<<PHP
+        /** @var \Windwalker\Core\Migration\MigrationService \$this */
+        \$this->squashIfNotFresh(
+            ignoreVersions: [
+                $versionsCode
+            ]
+        );
 PHP;
     }
 }

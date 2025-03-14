@@ -31,10 +31,18 @@ class MigSquashCommand extends AbstractMigrationCommand
         parent::configure($command);
 
         $command->addOption(
-            'one-file',
-            '0',
+            'one',
+            'o',
             InputOption::VALUE_NONE,
             'Squash to only one file.',
+        );
+
+        $command->addOption(
+            'group',
+            'g',
+            InputOption::VALUE_NEGATABLE,
+            'Group tables with first part of name.',
+            true,
         );
 
         $command->addOption(
@@ -71,9 +79,14 @@ class MigSquashCommand extends AbstractMigrationCommand
         $squashService = $this->app->make(MigrationSquashService::class);
         $squashService->addEventDealer($this->app);
 
+        $group = $io->getOption('group');
+        $one = $io->getOption('one');
+
         $squashService->squash(
-            $db,
-            $this->getMigrationFolder($io)
+            db: $db,
+            path: $this->getMigrationFolder($io),
+            group: $group,
+            one: $one
         );
 
         return 0;

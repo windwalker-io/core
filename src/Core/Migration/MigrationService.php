@@ -32,6 +32,8 @@ class MigrationService implements EventAwareInterface
 {
     use MessageOutputTrait;
 
+    protected array $ignoreVersions = [];
+
     /**
      * MigrationService constructor.
      *
@@ -128,6 +130,24 @@ class MigrationService implements EventAwareInterface
         $orm = $db->orm();
         $app = $this->app;
 
+        $start = chronos();
+
+        // Ignore if squashing
+        if (in_array($migration->version, $this->ignoreVersions, true)) {
+            $this->emitMessage(
+                sprintf(
+                    '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
+                    $migration->version,
+                    $migration->name,
+                    'gray',
+                    'IGNORE'
+                ),
+                true
+            );
+            $this->endMigration($migration, $direction, $start);
+            return;
+        }
+
         include $migration->file->getPathname();
 
         $handler = $migration->get($direction);
@@ -135,8 +155,6 @@ class MigrationService implements EventAwareInterface
         if (!$handler) {
             return;
         }
-
-        $start = chronos();
 
         $this->emitMessage(
             sprintf(
@@ -157,18 +175,23 @@ class MigrationService implements EventAwareInterface
 
         $this->emitMessage('<fg=bright-green>Success</>', true);
 
-        $end = chronos();
-
         // $this['log.' . $versionInfo['id']] = [
         //     'id' => $versionInfo['id'],
         //     'direction' => $direction,
         //     'name' => $versionInfo['name'],
         // ];
 
+        $this->endMigration($migration, $direction, $start);
+    }
+
+    public function endMigration(Migration $migration, string $direction, DateTimeImmutable $start): void
+    {
+        $end = chronos();
+
         $this->storeVersion($migration, $direction, $start, $end);
 
         // Reset Tables
-        $db->getSchema()->cacheReset();
+        $this->db->getSchema()->cacheReset();
     }
 
     /**
@@ -382,5 +405,25 @@ class MigrationService implements EventAwareInterface
         } while (in_array($version, $versions, true));
 
         return $version;
+    }
+
+    public function ignores(array $ignoreVersions): void
+    {
+        $this->ignoreVersions = $ignoreVersions;
+    }
+
+    public function squashIfNotFresh(array $ignoreVersions): void
+    {
+        // Check is fresh or not
+        $currentVersion = $this->getCurrentVersion();
+
+        if ($currentVersion !== '0') {
+            // Let's clear log tables
+            $db = $this->app->retrieve(DatabaseAdapter::class);
+            $db->getTable($this->getLogTable())
+                ->truncate();
+
+            $this->ignores($ignoreVersions);
+        }
     }
 }
