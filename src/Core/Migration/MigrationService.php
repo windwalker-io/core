@@ -44,7 +44,7 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
@@ -316,15 +316,9 @@ class MigrationService implements EventAwareInterface
         }
 
         $format = $options['version_format'] ?? 'YmdHi%04d';
-        $i = 1;
         $date = new DateTimeImmutable('now');
         $entity = $options['entity'] ?? 'Table';
-
-        do {
-            $dateFormat = sprintf($format, $i);
-            $version = $date->format($dateFormat);
-            $i++;
-        } while (in_array($version, $versions, true));
+        $version = static::generateVersion($date, $versions, $format);
 
         $year = $date->format('Y');
 
@@ -370,5 +364,23 @@ class MigrationService implements EventAwareInterface
                 $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->getDebugQueryString()}\n\n");
             }
         );
+    }
+
+    public static function generateVersion(
+        DateTimeInterface|string $date,
+        array $versions = [],
+        string $format = 'YmdHi%04d'
+    ): string {
+        $date = chronos($date);
+
+        $i = 1;
+
+        do {
+            $dateFormat = sprintf($format, $i);
+            $version = $date->format($dateFormat);
+            $i++;
+        } while (in_array($version, $versions, true));
+
+        return $version;
     }
 }
