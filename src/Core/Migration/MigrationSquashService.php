@@ -115,8 +115,11 @@ class MigrationSquashService
     {
         $versions = $this->migrationService->getVersions();
 
-        $squashVersion = MigrationService::generateVersion('now', $versions);
-        $versions[] = $squashVersion;
+        if (!$one) {
+            $squashVersion = MigrationService::generateVersion('now', $versions);
+            $versions[] = $squashVersion;
+        }
+
         $newVersions = [];
 
         foreach ($migrateCodes as $groupName => $codes) {
@@ -144,7 +147,7 @@ class MigrationSquashService
             $downs = array_column($codes, 1);
 
             if ($one) {
-                $squashCode = MigrationSquashBuilder::buildSquashActionCode($versions);
+                $squashCode = MigrationSquashBuilder::buildSquashActionCode($newVersions);
 
                 array_unshift($ups, $squashCode);
             }

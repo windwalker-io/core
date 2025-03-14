@@ -155,6 +155,8 @@ PHP;
             ->map(fn($name) => "'$name'")
             ->implode(', ');
 
+        $constraintName = $constraint->constraintName;
+
         if ($constraint->isPrimary()) {
             $isAI = $constraint->columnsCount() === 1 && $constraint->getFirstColumn()->isAutoIncrement();
 
@@ -169,9 +171,9 @@ PHP;
             }
         } elseif ($constraint->isUnique()) {
             if ($constraint->columnsCount() > 1) {
-                $segments[] = "addUniqueKey([$names])";
+                $segments[] = "addUniqueKey([$names], '$constraintName')";
             } else {
-                $segments[] = "addUniqueKey($names)";
+                $segments[] = "addUniqueKey($names, '$constraintName')";
             }
         } else {
             trigger_error(
@@ -185,7 +187,7 @@ PHP;
         return implode('->', $segments) . ';';
     }
 
-    protected function buildIndexCode(Index $index)
+    protected function buildIndexCode(Index $index): string
     {
         $segments = [
             '$schema',
@@ -195,10 +197,12 @@ PHP;
             ->map(fn($name) => "'$name'")
             ->implode(', ');
 
+        $indexName = $index->indexName;
+
         if ($index->columnsCount() > 1) {
-            $segments[] = "addIndex([$names])";
+            $segments[] = "addIndex([$names], '$indexName')";
         } else {
-            $segments[] = "addIndex($names)";
+            $segments[] = "addIndex($names, '$indexName')";
         }
 
         return implode('->', $segments) . ';';
