@@ -251,7 +251,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
         return [SIGINT, SIGTERM];
     }
 
-    public function handleSignal(int $signal): void
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): false|int
     {
         $name = $this->name ?: $this->io->getOption('name');
         $engineName = $this->io->getOption('engine');
@@ -262,7 +262,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
             $engine->stopServer();
         }
 
-        exit(0);
+        return 0;
     }
 
     /**

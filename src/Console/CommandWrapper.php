@@ -99,7 +99,7 @@ class CommandWrapper extends Command implements
     /**
      * @inheritDoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = $this->getIO($input, $output);
 
@@ -198,7 +198,7 @@ class CommandWrapper extends Command implements
         return [];
     }
 
-    public function handleSignal(int $signal): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         if ($this->handler instanceof SignalableCommandInterface) {
             return $this->handler->handleSignal($signal);
