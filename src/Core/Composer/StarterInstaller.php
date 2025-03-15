@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Composer;
 
+use Composer\InstalledVersions;
 use Composer\Script\Event;
 use Exception;
 use Windwalker\Core\Utilities\Base64Url;
@@ -155,7 +156,11 @@ class StarterInstaller
         file_put_contents($dest, $env);
 
         if ($installDb) {
-            exec($composer . ' require windwalker/orm:^4.0');
+            $isInstalled = InstalledVersions::isInstalled('windwalker/orm');
+
+            if ($isInstalled) {
+                exec($composer . ' require windwalker/orm:^4.0');
+            }
         }
 
         $io->write('');
