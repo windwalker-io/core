@@ -35,7 +35,6 @@ class MigrationSquashService
         $this->writeMigrationFiles(
             $path,
             $this->generateMigrationCodes(db: $db, one: $one, group: $group),
-            $one
         );
     }
 
@@ -107,18 +106,15 @@ class MigrationSquashService
     /**
      * @param  string                          $path
      * @param  array<string, array<string[]>>  $migrateCodes
-     * @param  bool                            $one
      *
      * @return  void
      */
-    protected function writeMigrationFiles(string $path, array $migrateCodes, bool $one = false): void
+    protected function writeMigrationFiles(string $path, array $migrateCodes): void
     {
         $versions = $this->migrationService->getVersions();
 
-        if (!$one) {
-            $squashVersion = MigrationService::generateVersion('now', $versions);
-            $versions[] = $squashVersion;
-        }
+        $squashVersion = MigrationService::generateVersion('now', $versions);
+        $versions[] = $squashVersion;
 
         $newVersions = [];
 
@@ -129,15 +125,13 @@ class MigrationSquashService
             $migrateCodes[$groupName] = [$codes, $version];
         }
 
-        if (!$one) {
-            $squashMigName = 'SquashVersions';
-            $migCode = MigrationSquashBuilder::buildSquashMigrationCode($squashMigName, $squashVersion, $newVersions);
+        $squashMigName = 'SquashVersions';
+        $migCode = MigrationSquashBuilder::buildSquashMigrationCode($squashMigName, $squashVersion, $newVersions);
 
-            $this->writeAndLog(
-                $this->toFileObject($path, $squashVersion, $squashMigName),
-                $migCode,
-            );
-        }
+        $this->writeAndLog(
+            $this->toFileObject($path, $squashVersion, $squashMigName),
+            $migCode,
+        );
 
         /** @var string $version */
         foreach ($migrateCodes as $groupName => [$codes, $version]) {
@@ -145,12 +139,6 @@ class MigrationSquashService
 
             $ups = array_column($codes, 0);
             $downs = array_column($codes, 1);
-
-            if ($one) {
-                $squashCode = MigrationSquashBuilder::buildSquashActionCode($newVersions);
-
-                array_unshift($ups, $squashCode);
-            }
 
             $upCode = implode("\n\n", $ups);
             $downCode = implode("\n", $downs);
