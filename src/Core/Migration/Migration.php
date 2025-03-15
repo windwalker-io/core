@@ -95,7 +95,7 @@ class Migration
      */
     public function getTable(string $name): TableManager
     {
-        return $this->db->getTable($name, true);
+        return $this->db->getTableManager($name, true);
     }
 
     /**

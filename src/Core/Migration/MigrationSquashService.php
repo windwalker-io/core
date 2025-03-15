@@ -70,7 +70,7 @@ class MigrationSquashService
      */
     public function generateMigrationCodes(DatabaseAdapter $db, bool $one, bool $group): array
     {
-        $tables = $db->getSchema()->getTables();
+        $tables = $db->getSchemaManager()->getTables();
 
         $migrateCodes = [];
 
@@ -80,7 +80,7 @@ class MigrationSquashService
                 continue;
             }
 
-            $tableManager = $db->getTable($table->tableName);
+            $tableManager = $db->getTableManager($table->tableName);
             $builder = $this->app->make(
                 MigrationSquashBuilder::class,
                 [

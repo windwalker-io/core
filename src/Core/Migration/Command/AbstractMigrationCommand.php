@@ -124,7 +124,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
             $options
         );
 
-        $schema = $dbPreset->getSchema($dbname);
+        $schema = $dbPreset->getSchemaManager($dbname);
 
         if (!$schema->exists()) {
             $schema->create();

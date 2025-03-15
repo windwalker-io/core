@@ -246,7 +246,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     $db = $this->getORM()->getDb();
                     $clause = (string) $db->select('CHECK_CLAUSE')
                         ->from('information_schema.CHECK_CONSTRAINTS')
-                        ->where('CONSTRAINT_SCHEMA', $db->getDatabase()->getName())
+                        ->where('CONSTRAINT_SCHEMA', $db->getDatabaseManager()->getName())
                         ->where('TABLE_NAME', $tbManager->getName())
                         ->where('CONSTRAINT_NAME', $name)
                         ->result();
@@ -564,7 +564,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected function getTableManager(): TableManager
     {
-        return $this->getORM()->getDb()->getTable($this->metadata->getClassName());
+        return $this->getORM()->getDb()->getTableManager($this->metadata->getClassName());
     }
 
     /**

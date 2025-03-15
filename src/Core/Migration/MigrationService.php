@@ -191,7 +191,7 @@ class MigrationService implements EventAwareInterface
         $this->storeVersion($migration, $direction, $start, $end);
 
         // Reset Tables
-        $this->db->getSchema()->cacheReset();
+        $this->db->getSchemaManager()->cacheReset();
     }
 
     /**
@@ -277,7 +277,7 @@ class MigrationService implements EventAwareInterface
      */
     public function initLogTable(): void
     {
-        $table = $this->db->getTable($this->getLogTable());
+        $table = $this->db->getTableManager($this->getLogTable());
 
         if ($table->exists()) {
             if (!$table->hasColumn('name')) {
@@ -420,7 +420,7 @@ class MigrationService implements EventAwareInterface
         if ($currentVersion !== '0') {
             // Let's clear log tables
             $db = $this->app->retrieve(DatabaseAdapter::class);
-            $db->getTable($this->getLogTable())
+            $db->getTableManager($this->getLogTable())
                 ->truncate();
 
             $this->ignores($ignoreVersions);

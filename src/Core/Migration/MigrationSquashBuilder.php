@@ -29,12 +29,9 @@ class MigrationSquashBuilder
     public function build(TableManager $tableManager): array
     {
         $tableName = $tableManager->getName();
-        $columns = $tableManager->getColumns(true);
-        $indexes = $tableManager->getIndexes();
-        $constraints = $tableManager->getConstraints();
-
-        $this->syncKeyColumns($indexes, $columns);
-        $this->syncKeyColumns($constraints, $columns);
+        $columns = $tableManager->getColumns(true, true);
+        $indexes = $tableManager->getIndexes(true, true);
+        $constraints = $tableManager->getConstraints(true, true);
 
         $schemaLines = collect();
 
@@ -107,7 +104,7 @@ PHP;
 
         $length = $column->getErratas()['custom_length'] ?? $column->getLengthExpression();
 
-        if ($type === 'tinyint' && $length === 1) {
+        if ($type === 'tinyint' && ((int) $length) === 1) {
             $method = 'bool';
         } elseif ($column->getErratas()['is_json'] ?? false) {
             $method = 'json';
@@ -254,25 +251,6 @@ PHP;
     }
 
     /**
-     * @param  array<Constraint|Index>  $keys
-     * @param  array<Column>            $realColumns
-     *
-     * @return  void
-     */
-    protected function syncKeyColumns(array $keys, array $realColumns): void
-    {
-        foreach ($keys as $key) {
-            foreach ($key->columns as $column) {
-                $key->columns[$column->columnName] = $realColumn = $realColumns[$column->columnName];
-
-                if ($key instanceof Constraint && $key->isPrimary()) {
-                    $realColumn->primary(true);
-                }
-            }
-        }
-    }
-
-    /**
      * @param  Index              $index
      * @param  array<Constraint>  $constraints
      *
@@ -382,7 +360,7 @@ PHP;
         }
 
         return <<<PHP
-        /** @var \Windwalker\Core\Migration\MigrationService \$this */
+/** @var \Windwalker\Core\Migration\MigrationService \$this */
         \$this->squashIfNotFresh(
             ignoreVersions: [
                 $versionsCode

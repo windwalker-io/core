@@ -68,7 +68,7 @@ class MySQLExporter extends AbstractExporter
                 ]
             );
 
-            $tableInfos = $this->db->getSchema()->getTables(true);
+            $tableInfos = $this->db->getSchemaManager()->getTables(true);
 
             foreach ($tableInfos as $tableInfo) {
                 $sql = [];
