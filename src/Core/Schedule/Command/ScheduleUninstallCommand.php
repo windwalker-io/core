@@ -44,9 +44,7 @@ class ScheduleUninstallCommand implements CommandInterface
 
         $cronContent = $this->app->runProcess('crontab -l')->getOutput();
 
-        $expr = $this->getScheduleExpression();
-
-        $exists = $this->cronExists($cronContent, $expr);
+        $exists = $this->cronExists($cronContent, $matches);
 
         if (!$exists) {
             $io->writeln('Schedule not exists.');
@@ -54,10 +52,11 @@ class ScheduleUninstallCommand implements CommandInterface
             return 0;
         }
 
-        $cronContent = $this->removeExpression($cronContent, $expr);
+        $cronContent = $this->removeExpression($cronContent);
 
         $this->replaceCrontab($cronContent);
 
+        $io->writeln("[REMOVE] >> {$matches[0]}");
         $io->writeln("Uninstall schedule successfully.");
 
         return 0;

@@ -43,6 +43,20 @@ class ScheduleInstallCommand implements CommandInterface
             'f',
             InputOption::VALUE_NONE,
         );
+
+        $command->addOption(
+            'php-binary',
+            'p',
+            InputOption::VALUE_OPTIONAL,
+            'Find of provide php binary',
+            false
+        );
+
+        $command->addOption(
+            'dry-run',
+            'd',
+            InputOption::VALUE_NONE,
+        );
     }
 
     /**
@@ -59,20 +73,30 @@ class ScheduleInstallCommand implements CommandInterface
         $exists = $this->cronExists($cronContent);
 
         $force = $io->getOption('force');
+        $phpBin = $io->getOption('php-binary');
+        $dryRun = $io->getOption('dry-run');
 
         if ($exists && !$force) {
             throw new \RuntimeException('Schedule already exists.');
         }
 
-        if ($force) {
+        if ($phpBin === null) {
+            $phpBin = true;
+        }
+
+        if ($force && !$dryRun) {
             $cronContent = $this->removeExpression($cronContent);
 
             $this->replaceCrontab($cronContent);
         }
 
-        $expr = $this->getScheduleExpression($io->getOption('tz') ?? '');
-        $this->appendCrontab($expr);
+        $expr = $this->getScheduleExpression($io->getOption('tz') ?? '', $phpBin);
 
+        if (!$dryRun) {
+            $this->appendCrontab($expr);
+        }
+
+        $io->writeln(">> $expr");
         $io->writeln("Install schedule to crontab");
 
         return 0;
