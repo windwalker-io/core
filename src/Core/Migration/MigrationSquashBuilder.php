@@ -98,7 +98,7 @@ PHP;
             if (($type === 'int' || $type === 'integer')) {
                 $method = "primary";
             } elseif ($type === 'bigint') {
-                $method = "bigintPrimary";
+                $method = "primaryBigint";
             }
         }
 
@@ -337,7 +337,7 @@ use Windwalker\Core\Migration\Migration;
  */
 \$mig->up(
     function () {
-        $squashCode
+$squashCode
     }
 );
 
@@ -360,7 +360,7 @@ PHP;
         }
 
         return <<<PHP
-/** @var \Windwalker\Core\Migration\MigrationService \$this */
+        /** @var \Windwalker\Core\Migration\MigrationService \$this */
         \$this->squashIfNotFresh(
             ignoreVersions: [
                 $versionsCode
