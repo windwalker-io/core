@@ -88,11 +88,12 @@ class StarterInstaller
      */
     public static function genEnv(Event $event): void
     {
+        $io = $event->getIO();
         $composer = $_SERVER['COMPOSER_BINARY'] ?? null ?: 'composer';
 
         include getcwd() . '/vendor/autoload.php';
 
-        $io = $event->getIO();
+        $appName = static::getAppName($io);
 
         $dist = getcwd() . '/.env.dist';
         $dest = getcwd() . '/.env';
@@ -142,7 +143,7 @@ class StarterInstaller
 
             $vars['DATABASE_DRIVER'] = $driver;
             $vars['DATABASE_HOST'] = $io->ask('Database host [localhost]: ', 'localhost');
-            $vars['DATABASE_NAME'] = $io->ask('Database name [acme]: ', 'acme');
+            $vars['DATABASE_NAME'] = $io->ask("Database name [$appName]: ", $appName);
             $vars['DATABASE_USER'] = $io->ask('Database user [root]: ', 'root');
             $vars['DATABASE_PASSWORD'] = $io->askAndHideAnswer('Database password: ');
 
@@ -223,5 +224,23 @@ class StarterInstaller
         }
 
         return $value;
+    }
+
+    /**
+     * @param $io
+     *
+     * @return  string
+     */
+    protected static function getAppName($io): string
+    {
+        try {
+            $appConfig = include getcwd() . '/etc/conf/app.php';
+            $appName = $appConfig['name'] ?? null ?: 'windwalker';
+        } catch (\Throwable $e) {
+            $io->write('Unable to get app name because: ' . $e->getMessage());
+            $appName = 'windwalker';
+        }
+
+        return strtolower($appName);
     }
 }
