@@ -632,7 +632,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         // UUID binary(16)
-        if ($type === '?UuidInterface') {
+        if ($type === '?UuidInterface' || $type === 'UuidInterface') {
             $this->addUse(CastNullable::class);
             $this->addUse(UUIDBin::class);
             $prop->setAttribute('fullType', UuidInterface::class);
@@ -643,8 +643,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     new Node\Scalar\String_('uuid_bin'),
                 ),
             );
+
+            $uuidDefault = 'UUID7';
+
+            if ($dbColumn->getColumnDefault() !== null) {
+                $uuidDefault = 'NIL';
+            }
+
             $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute('UUIDBin')
+                $this->attribute('UUIDBin', $factory->classConstFetch('UUIDBin', $uuidDefault))
             );
         }
 
