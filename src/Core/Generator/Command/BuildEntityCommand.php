@@ -17,18 +17,14 @@ use Windwalker\Core\Command\CommandPackageResolveTrait;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
-use Windwalker\Core\Manager\DatabaseManager;
-use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\Data\Collection;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
-use function Windwalker\arr;
 use function Windwalker\collect;
 
 /**
@@ -85,6 +81,13 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
             'm',
             InputOption::VALUE_NONE,
             'Generate methods'
+        );
+
+        $command->addOption(
+            'auto-gen-enums',
+            'e',
+            InputOption::VALUE_NEGATABLE,
+            'Should auto generate enums or not.',
         );
 
         $command->addOption(
@@ -158,6 +161,8 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
     {
         $orm = $this->databaseManager->get($connection)->orm();
 
+        $newEnums = [];
+
         foreach ($classes as $class) {
             if (!class_exists($class)) {
                 continue;
@@ -204,6 +209,42 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
                     $this->io->writeln("    - <info>$method</info>");
                 }
             }
+
+            $newEnums = [...$newEnums, ...$added['enums']];
+        }
+
+        if ($newEnums === []) {
+            return;
+        }
+
+        $this->io->newLine();
+        $this->io->style()->title('NEW ENUMS:');
+
+        foreach ($newEnums as $newEnum) {
+            $this->io->writeln("  - <info>$newEnum</info>");
+        }
+
+        $this->io->newLine();
+        $autoGen = $this->io->getOption('auto-gen-enums')
+            ?? $this->io->askConfirmation('Do you want to auto generate enums? (Y/n): ', true);
+
+        if ($autoGen) {
+            foreach ($newEnums as $newEnum) {
+                // Separate namespace and class name
+                $parts = explode('\\', $newEnum);
+                $shortName = array_pop($parts);
+                $namespace = implode('\\', $parts);
+
+                // Create the new enum class
+                $this->app->runProcess(
+                    sprintf(
+                        'php windwalker g enum %s --ns="%s"',
+                        $shortName,
+                        $namespace
+                    ),
+                    output: $this->io,
+                );
+            }
         }
     }
 
@@ -223,7 +264,7 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
             $classes = iterator_to_array($this->classFinder->findClasses('App\\Entity\\'));
 
             return collect($classes)
-                ->map(fn (string $className) => (string) Collection::explode('\\', $className)->pop())
+                ->map(fn(string $className) => (string) Collection::explode('\\', $className)->pop())
                 ->dump();
         }
 
