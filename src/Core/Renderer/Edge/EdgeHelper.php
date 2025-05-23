@@ -6,6 +6,7 @@ namespace Windwalker\Core\Renderer\Edge;
 
 use Windwalker\Dom\Builder\HtmlBuilder;
 use Windwalker\DOM\DOMElement;
+use Windwalker\DOM\HTMLElement;
 
 /**
  * The EdgeHelper class.
@@ -30,6 +31,6 @@ class EdgeHelper
             $name = [$name => $value];
         }
 
-        return DOMElement::buildAttributes($name);
+        return HTMLElement::buildAttributes($name);
     }
 }

@@ -56,7 +56,7 @@ trait CommandScheduleTrait
         return "* * * * * $php $entry schedule:run {$tz} >> /dev/null 2>&1";
     }
 
-    protected function cronExists(string $cronContent, array &$matches = null): false|int
+    protected function cronExists(string $cronContent, ?array &$matches = null): false|int
     {
         $expr = $this->getScheduleExpression('__TZ__', '__PHP__');
 

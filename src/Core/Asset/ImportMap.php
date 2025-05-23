@@ -6,6 +6,7 @@ namespace Windwalker\Core\Asset;
 
 use JsonException;
 use Windwalker\DOM\DOMElement;
+use Windwalker\DOM\HTMLElement;
 
 /**
  * The ImportMap class.
@@ -194,7 +195,7 @@ class ImportMap
             $attrs['nonce'] = $this->getCspNonce();
         }
 
-        $attrString = DOMElement::buildAttributes($attrs);
+        $attrString = HTMLElement::buildAttributes($attrs);
 
         return <<<SCRIPT
         <script $attrString>

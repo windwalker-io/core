@@ -9,7 +9,6 @@ use Psr\Link\LinkInterface;
 use Stringable;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Link\Link;
-use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
 use function Windwalker\DOM\h;
@@ -62,12 +61,9 @@ class HtmlFrame
      */
     protected string $indents = '    ';
 
-    /**
-     * @var DOMElement
-     */
-    protected DOMElement $body;
+    protected HTMLElement $body;
 
-    protected DOMElement $html;
+    protected HTMLElement $html;
 
     /**
      * HtmlHeaderManager constructor.
@@ -78,8 +74,8 @@ class HtmlFrame
         protected AssetService $asset,
         ?Metadata $metadata = null
     ) {
-        $this->body = HTMLElement::create('body');
-        $this->html = HTMLElement::create('html');
+        $this->body = HTMLElement::new('body');
+        $this->html = HTMLElement::new('html');
         $this->metadata = $metadata ?? new Metadata();
     }
 
@@ -155,7 +151,7 @@ class HtmlFrame
         string|Stringable|LinkInterface $relOrLink,
         string|Stringable $href = '',
         array $attrs = []
-    ): DOMElement {
+    ): HTMLElement {
         if (is_string($relOrLink)) {
             $link = new Link($relOrLink, $href);
         } else {
@@ -177,7 +173,7 @@ class HtmlFrame
         string $hreflang,
         string|Stringable $href,
         array $attrs = [],
-    ): DOMElement {
+    ): HTMLElement {
         $link = new Link('alternate');
         $link = $link->withHref($href)
             ->withAttribute('hreflang', $hreflang);
@@ -188,7 +184,7 @@ class HtmlFrame
     public function addCanonical(
         string|Stringable $href,
         array $attrs = [],
-    ): DOMElement {
+    ): HTMLElement {
         $link = new Link('canonical');
         $link = $link->withHref($href);
 
@@ -235,7 +231,7 @@ class HtmlFrame
         array $attrs = [],
         ?string $type = null,
         ?string $media = null,
-    ): DOMElement {
+    ): HTMLElement {
         $link = (new PreloadLink('preload', $href))
             ->withAs($as);
 
@@ -250,7 +246,7 @@ class HtmlFrame
         return $this->addLink($link, attrs: $attrs);
     }
 
-    public static function linkToElement(LinkInterface $link): DOMElement
+    public static function linkToElement(LinkInterface $link): HTMLElement
     {
         $attribs = array_merge(
             [
@@ -266,22 +262,22 @@ class HtmlFrame
     /**
      * addCustomTag
      *
-     * @param  string|LinkInterface|DOMElement  $tag
+     * @param  string|LinkInterface|HTMLElement  $tag
      * @param  string|Stringable|null           $content
      * @param  array                            $attribs
      *
-     * @return  DOMElement
+     * @return  HTMLElement
      */
     public function addCustomTag(
-        string|LinkInterface|DOMElement $tag,
+        string|LinkInterface|HTMLElement $tag,
         string|Stringable|null $content = null,
         array $attribs = []
-    ): DOMElement {
+    ): HTMLElement {
         if ($tag instanceof LinkInterface) {
             $tag = self::linkToElement($tag);
         }
 
-        if (!$tag instanceof DOMElement) {
+        if (!$tag instanceof HTMLElement) {
             $tag = h($tag, $attribs, $content);
         }
 
@@ -293,7 +289,7 @@ class HtmlFrame
     /**
      * Method to get property CustomTags
      *
-     * @return  array<DOMElement>
+     * @return  array<HTMLElement>
      */
     public function getCustomTags(): array
     {
@@ -303,7 +299,7 @@ class HtmlFrame
     /**
      * Method to set property customTags
      *
-     * @param  array<DOMElement>  $customTags
+     * @param  array<HTMLElement>  $customTags
      *
      * @return  static  Return self to support chaining.
      */
@@ -541,62 +537,62 @@ class HtmlFrame
     /**
      * getBody
      *
-     * @return  DOMElement
+     * @return  HTMLElement
      */
-    public function getBodyElement(): DOMElement
+    public function getBodyElement(): HTMLElement
     {
         return $this->body;
     }
 
     /**
-     * @param  DOMElement  $body
+     * @param  HTMLElement  $body
      *
      * @return  static  Return self to support chaining.
      */
-    public function setBodyElement(DOMElement $body): static
+    public function setBodyElement(HTMLElement $body): static
     {
         $this->body = $body;
 
         return $this;
     }
 
-    public function addBodyClass(string $class): DOMElement
+    public function addBodyClass(string $class): HTMLElement
     {
         return $this->body->addClass($class);
     }
 
     public function bodyAttributes(): string
     {
-        return DOMElement::buildAttributes($this->body);
+        return HTMLElement::buildAttributes($this->body);
     }
 
     /**
-     * @return DOMElement
+     * @return HTMLElement
      */
-    public function getHtmlElement(): DOMElement
+    public function getHtmlElement(): HTMLElement
     {
         return $this->html;
     }
 
     /**
-     * @param  DOMElement  $html
+     * @param  HTMLElement  $html
      *
      * @return  static  Return self to support chaining.
      */
-    public function setHtmlElement(DOMElement $html): static
+    public function setHtmlElement(HTMLElement $html): static
     {
         $this->html = $html;
 
         return $this;
     }
 
-    public function addHtmlClass(string $class): DOMElement
+    public function addHtmlClass(string $class): HTMLElement
     {
         return $this->html->addClass($class);
     }
 
     public function htmlAttributes(): string
     {
-        return DOMElement::buildAttributes($this->html);
+        return HTMLElement::buildAttributes($this->html);
     }
 }

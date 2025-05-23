@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -77,8 +78,6 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     }
 
     /**
-     * boot
-     *
      * @return  void
      *
      * @throws DefinitionException
@@ -185,13 +184,9 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     }
 
     /**
-     * Runs the current command.
-     *
-     * If an event dispatcher has been attached to the application,
-     * events are also dispatched during the life-cycle of the command.
-     *
-     * @return int 0 if everything went fine, or an error code
+     * @inheritDoc
      */
+    #[\Override]
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if ($command instanceof CommandWrapper) {
@@ -277,7 +272,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
      *
      * @return  int
      *
-     * @throws Exception
+     * @throws Exception|ExceptionInterface
      */
     public function runCommand(
         string|Command $command,
