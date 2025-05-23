@@ -21,25 +21,23 @@ class CsrfMiddleware implements MiddlewareInterface
     use OptionAccessTrait;
     use DICreateTrait;
     use AttributeMiddlewareTrait;
+    use RoutingExcludesTrait;
 
     #[Service]
     protected CsrfService $csrfService;
 
-    #[Service]
-    protected AppContext $app;
-
     /**
      * CsrfMiddleware constructor.
      */
-    public function __construct(array $options = [])
+    public function __construct(protected array|Closure|null $excludes = null, array $options = [])
     {
         $this->options = $options;
     }
 
     public function run(ServerRequestInterface $request, Closure $next): mixed
     {
-        if ($this->isExclude()) {
-            return $next($request);
+        if ($result = $this->isExclude()) {
+            return $result === true ? $next($request) : $result;
         }
 
         $methods = $this->getOption('working_methods')
@@ -69,22 +67,8 @@ class CsrfMiddleware implements MiddlewareInterface
         return $next($request);
     }
 
-    protected function isExclude(): bool
+    public function getExcludes(): mixed
     {
-        $excludes = $this->getOption('excludes');
-
-        if (is_callable($excludes)) {
-            if ($this->app->call($excludes)) {
-                return true;
-            }
-        } elseif ($excludes !== null) {
-            $excludes = (array) $excludes;
-
-            $route = $this->app->getMatchedRoute()?->getName();
-
-            return in_array($route, $excludes, true);
-        }
-
-        return false;
+        return $this->excludes ?? $this->getOption('excludes');
     }
 }

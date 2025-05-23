@@ -32,6 +32,8 @@ class MigrationService implements EventAwareInterface
 {
     use MessageOutputTrait;
 
+    protected array $ignoreVersions = [];
+
     /**
      * MigrationService constructor.
      *
@@ -44,7 +46,7 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * @param  string       $path
+     * @param  string  $path
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
@@ -128,6 +130,24 @@ class MigrationService implements EventAwareInterface
         $orm = $db->orm();
         $app = $this->app;
 
+        $start = chronos();
+
+        // Ignore if squashing
+        if (in_array($migration->version, $this->ignoreVersions, true)) {
+            $this->emitMessage(
+                sprintf(
+                    '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
+                    $migration->version,
+                    $migration->name,
+                    'gray',
+                    'IGNORE'
+                ),
+                true
+            );
+            $this->endMigration($migration, $direction, $start);
+            return;
+        }
+
         include $migration->file->getPathname();
 
         $handler = $migration->get($direction);
@@ -135,8 +155,6 @@ class MigrationService implements EventAwareInterface
         if (!$handler) {
             return;
         }
-
-        $start = chronos();
 
         $this->emitMessage(
             sprintf(
@@ -157,18 +175,23 @@ class MigrationService implements EventAwareInterface
 
         $this->emitMessage('<fg=bright-green>Success</>', true);
 
-        $end = chronos();
-
         // $this['log.' . $versionInfo['id']] = [
         //     'id' => $versionInfo['id'],
         //     'direction' => $direction,
         //     'name' => $versionInfo['name'],
         // ];
 
+        $this->endMigration($migration, $direction, $start);
+    }
+
+    public function endMigration(Migration $migration, string $direction, DateTimeImmutable $start): void
+    {
+        $end = chronos();
+
         $this->storeVersion($migration, $direction, $start, $end);
 
         // Reset Tables
-        $db->getSchema()->cacheReset();
+        $this->db->getSchemaManager()->cacheReset();
     }
 
     /**
@@ -254,7 +277,7 @@ class MigrationService implements EventAwareInterface
      */
     public function initLogTable(): void
     {
-        $table = $this->db->getTable($this->getLogTable());
+        $table = $this->db->getTableManager($this->getLogTable());
 
         if ($table->exists()) {
             if (!$table->hasColumn('name')) {
@@ -316,15 +339,9 @@ class MigrationService implements EventAwareInterface
         }
 
         $format = $options['version_format'] ?? 'YmdHi%04d';
-        $i = 1;
         $date = new DateTimeImmutable('now');
         $entity = $options['entity'] ?? 'Table';
-
-        do {
-            $dateFormat = sprintf($format, $i);
-            $version = $date->format($dateFormat);
-            $i++;
-        } while (in_array($version, $versions, true));
+        $version = static::generateVersion($date, $versions, $format);
 
         $year = $date->format('Y');
 
@@ -370,5 +387,43 @@ class MigrationService implements EventAwareInterface
                 $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->getDebugQueryString()}\n\n");
             }
         );
+    }
+
+    public static function generateVersion(
+        DateTimeInterface|string $date,
+        array $versions = [],
+        string $format = 'YmdHi%04d'
+    ): string {
+        $date = chronos($date);
+
+        $i = 1;
+
+        do {
+            $dateFormat = sprintf($format, $i);
+            $version = $date->format($dateFormat);
+            $i++;
+        } while (in_array($version, $versions, true));
+
+        return $version;
+    }
+
+    public function ignores(array $ignoreVersions): void
+    {
+        $this->ignoreVersions = $ignoreVersions;
+    }
+
+    public function squashIfNotFresh(array $ignoreVersions): void
+    {
+        // Check is fresh or not
+        $currentVersion = $this->getCurrentVersion();
+
+        if ($currentVersion !== '0') {
+            // Let's clear log tables
+            $db = $this->app->retrieve(DatabaseAdapter::class);
+            $db->getTableManager($this->getLogTable())
+                ->truncate();
+
+            $this->ignores($ignoreVersions);
+        }
     }
 }

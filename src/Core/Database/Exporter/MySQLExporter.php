@@ -9,6 +9,7 @@ use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
+use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Environment\Environment;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
@@ -39,7 +40,7 @@ class MySQLExporter extends AbstractExporter
 
             $gzMode = $options['gz'] ?? null;
 
-            $dbOptions = $this->db->getDriver()->getOptions();
+            $dbOptions = DatabaseManager::mergeDsnToOptions($this->db->getDriver()->getOptions());
             $cmd = sprintf(
                 '%s --defaults-extra-file="%s" --no-tablespaces %s %s',
                 $md,
@@ -67,7 +68,7 @@ class MySQLExporter extends AbstractExporter
                 ]
             );
 
-            $tableInfos = $this->db->getSchema()->getTables(true);
+            $tableInfos = $this->db->getSchemaManager()->getTables(true);
 
             foreach ($tableInfos as $tableInfo) {
                 $sql = [];

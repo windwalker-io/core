@@ -115,44 +115,44 @@ class ScheduleEvent
 
     public function hourOfDay(int|string ...$v): static
     {
-        return $this->setPart(static::HOUR_POSITION, implode(',', $v));
+        return $this->setPart(static::HOUR_POSITION, implode(',', $v))
+            ->minuteOfHour(0);
     }
 
     public function everyDays(?int $every = null, ?int $from = null, ?int $to = 31): static
     {
         return $this->setPart(static::DAY_POSITION, static::every($every, $from, $to))
-            ->hourOfDay(0)
-            ->minuteOfHour(0);
+            ->hourOfDay(0);
     }
 
     public function dayOfMonth(int|string ...$v): static
     {
-        return $this->setPart(static::DAY_POSITION, implode(',', $v));
+        return $this->setPart(static::DAY_POSITION, implode(',', $v))
+            ->hourOfDay(0);
     }
 
     public function everyMonths(?int $every = null, ?int $from = null, ?int $to = 12): static
     {
         return $this->setPart(static::MONTH_POSITION, static::every($every, $from, $to))
-            ->dayOfMonth(1)
-            ->hourOfDay(0)
-            ->minuteOfHour(0);
+            ->dayOfMonth(1);
     }
 
     public function monthOfYear(int|string ...$v): static
     {
-        return $this->setPart(static::MONTH_POSITION, implode(',', $v));
+        return $this->setPart(static::MONTH_POSITION, implode(',', $v))
+            ->dayOfMonth(1);
     }
 
     public function everyWeeks(?int $every = null, ?int $from = null, ?int $to = 12): static
     {
         return $this->setPart(static::WEEK_POSITION, static::every($every, $from, $to))
-            ->hourOfDay(0)
-            ->minuteOfHour(0);
+            ->hourOfDay(0);
     }
 
     public function dayOfWeek(int|string ...$v): static
     {
-        return $this->setPart(static::WEEK_POSITION, implode(',', $v));
+        return $this->setPart(static::WEEK_POSITION, implode(',', $v))
+            ->hourOfDay(0);
     }
 
     public function minutely(): static

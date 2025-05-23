@@ -111,6 +111,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
                         $e->getCode()
                     )
                 );
+                Logger::error('schedule-error', $e);
             }
         }
 

@@ -2,7 +2,7 @@
 import { babel, ts } from '@windwalker-io/fusion';
 import path from 'path';
 import { loadJson } from './utils.mjs';
-export * from './legacy/4.0/js-aync.mjs';
+export * from './legacy/4.0/js-sync.mjs';
 
 export function syncModuleScripts(source = 'src/Module', dest = 'www/assets/js/view/', options = {}) {
   const jsOptions = options.js || {};
@@ -43,7 +43,10 @@ export function syncModuleTS(source = 'src/Module', dest = 'www/assets/js/view/'
     {
       tsconfig: path.resolve('tsconfig.json'),
       rename: (path) => {
-        path.dirname = path.dirname.replace(/assets$/, '').toLowerCase();
+
+        path.dirname = path.dirname.replace(/\\/g, '/')
+          .replace(/\/assets/, '')
+          .toLowerCase();
       },
       ...options
     }

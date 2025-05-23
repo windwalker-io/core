@@ -67,10 +67,10 @@ class DbDropAllCommand implements CommandInterface
 
         $db = $this->databaseManager->get($io->getOption('connection'));
 
-        $tables = $db->getSchema()->getTables(false);
+        $tables = $db->getSchemaManager()->getTables(false);
 
         foreach ($tables as $table) {
-            $tm = $db->getTable($table->tableName);
+            $tm = $db->getTableManager($table->tableName);
             $tm->drop();
 
             $io->writeln('[DELETED] ' . $table->tableName);

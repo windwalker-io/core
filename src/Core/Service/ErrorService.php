@@ -65,6 +65,7 @@ class ErrorService
         E_COMPILE_WARNING => 'E_COMPILE_WARNING',
         E_USER_ERROR => 'E_USER_ERROR',
         E_USER_WARNING => 'E_USER_WARNING',
+        2048 => 'E_STRICT', // E_STRICT
         E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
         E_DEPRECATED => 'E_DEPRECATED',
         E_USER_DEPRECATED => 'E_USER_DEPRECATED',
@@ -264,7 +265,7 @@ class ErrorService
      * @param  int   $type
      * @param  bool  $shutdown
      */
-    public function register(bool $restore = true, int $type = E_ALL | E_STRICT, bool $shutdown = false): void
+    public function register(bool $restore = true, int $type = E_ALL, bool $shutdown = false): void
     {
         $this->registerErrors($restore, $type);
         $this->registerExceptions($restore);
@@ -274,7 +275,7 @@ class ErrorService
         }
     }
 
-    public function registerErrors(bool $restore = true, int $type = E_ALL | E_STRICT): void
+    public function registerErrors(bool $restore = true, int $type = E_ALL): void
     {
         if ($restore) {
             restore_error_handler();

@@ -6,6 +6,7 @@ namespace Windwalker\Core\Manager;
 
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
+use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\Database\Platform\MySQLPlatform;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
@@ -115,5 +116,14 @@ class DatabaseManager extends AbstractManager
                 $connConfig['options'] ?? [],
             );
         };
+    }
+
+    public static function mergeDsnToOptions(array $options): array
+    {
+        if ($options['dsn'] ?? null) {
+            $options = array_merge($options, DsnHelper::extract($options['dsn']));
+        }
+
+        return $options;
     }
 }

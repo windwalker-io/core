@@ -37,9 +37,15 @@ trait CommandScheduleTrait
         return $path;
     }
 
-    public function getScheduleExpression(string $tz = ''): string
+    public function getScheduleExpression(string $tz = '', bool|null|string $phpBinary = false): string
     {
-        $php = (new PhpExecutableFinder())->find();
+        if ($phpBinary === true) {
+            $php = (new PhpExecutableFinder())->find();
+        } elseif ($phpBinary) {
+            $php = $phpBinary;
+        } else {
+            $php = '';
+        }
 
         $entry = $this->environment->getEntry();
 
@@ -50,18 +56,18 @@ trait CommandScheduleTrait
         return "* * * * * $php $entry schedule:run {$tz} >> /dev/null 2>&1";
     }
 
-    protected function cronExists(string $cronContent): false|int
+    protected function cronExists(string $cronContent, array &$matches = null): false|int
     {
-        $expr = $this->getScheduleExpression('__TZ__');
+        $expr = $this->getScheduleExpression('__TZ__', '__PHP__');
 
         $regex = $this->buildExpressionFindingRegex($expr);
 
-        return preg_match($regex, $cronContent);
+        return preg_match($regex, $cronContent, $matches);
     }
 
     protected function removeExpression(string $cronContent): string
     {
-        $expr = $this->getScheduleExpression('__TZ__');
+        $expr = $this->getScheduleExpression('__TZ__', '__PHP__');
 
         $regex = $this->buildExpressionFindingRegex($expr);
 
@@ -81,6 +87,7 @@ trait CommandScheduleTrait
         $regex = Str::collapseWhitespaces($regex);
 
         $regex = str_replace('__TZ__', '(--tz=[\w\/]+)?', $regex);
+        $regex = str_replace('__PHP__', '(.*)', $regex);
 
         return '/' . str_replace(' ', "\\s*", $regex) . '/';
     }

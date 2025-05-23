@@ -24,7 +24,7 @@ if (cliInput['help'] || cliInput['h']) {
 // exec(`yarn build:prod`, { stdio: 'inherit' });
 
 console.log(`>>> npm version ${args.join(' ')}`);
-const buffer = exec(`npm version ${args.join(' ')}`);
+const buffer = exec(`npm version ${args.join(' ')} --no-workspaces-update`);
 
 const ver = buffer.toString().split("\n")[1];
 

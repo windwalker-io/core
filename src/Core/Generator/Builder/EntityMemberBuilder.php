@@ -33,6 +33,7 @@ use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
+use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Symbol;
 use Windwalker\Utilities\TypeCast;
@@ -49,6 +50,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     protected array $uses = [];
 
     protected array $addedUses = [];
+
+    protected array $newEnums = [];
 
     /**
      * EntityMemberBuilder constructor.
@@ -75,6 +78,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $addedMembers = [
             'properties' => [],
             'methods' => [],
+            'enums' => []
         ];
         $addedMethods = [];
 
@@ -177,11 +181,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             }
         };
 
-        return $this->convertCode(
+        $code = $this->convertCode(
             file_get_contents($ref->getFileName()),
             null,
             $leaveNode
         );
+
+        $addedMembers['enums'] = $this->newEnums;
+
+        return $code;
     }
 
     protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn): array
@@ -209,6 +217,14 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $type = '?UuidInterface';
             $default = null;
             $this->addUse(UuidInterface::class);
+        } elseif ($enumName = $this->getMatchedEnum($dbColumn)) {
+            $type = $enumName;
+            $default = Symbol::none();
+
+            if ($dbColumn->getIsNullable()) {
+                $type = '?' . $type;
+                $default = null;
+            }
         } elseif ($this->isJsonType($dbColumn)) {
             $type = 'array';
             $default = [];
@@ -246,7 +262,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     $db = $this->getORM()->getDb();
                     $clause = (string) $db->select('CHECK_CLAUSE')
                         ->from('information_schema.CHECK_CONSTRAINTS')
-                        ->where('CONSTRAINT_SCHEMA', $db->getDatabase()->getName())
+                        ->where('CONSTRAINT_SCHEMA', $db->getDatabaseManager()->getName())
                         ->where('TABLE_NAME', $tbManager->getName())
                         ->where('CONSTRAINT_NAME', $name)
                         ->result();
@@ -457,6 +473,30 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             || is_a($className, \UnitEnum::class, true);
     }
 
+    protected function getMatchedEnum(DbColumn $dbColumn): ?string
+    {
+        $comment = $dbColumn->getComment();
+
+        // Find `enum:EnumClassName` without ::class
+        if (!preg_match('/enum:(\w+)/', $comment, $matches)) {
+            return null;
+        }
+
+        $enumName = $matches[1];
+
+        $existsEnumClass = $this->findFQCN($enumName);
+
+        if (!$existsEnumClass) {
+            $ns = Str::removeRight($this->metadata->getReflector()->getNamespaceName(), 'Entity');
+            $enumClass = $ns . 'Enum\\' . $enumName;
+            $this->addUse($enumClass);
+        } else {
+            $this->newEnums[] = $existsEnumClass;
+        }
+
+        return $enumName;
+    }
+
     protected function buildUuidInterfaceSetter(string $setter, string $propName, Node $type): Node
     {
         $factory = $this->createNodeFactory();
@@ -564,7 +604,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected function getTableManager(): TableManager
     {
-        return $this->getORM()->getDb()->getTable($this->metadata->getClassName());
+        return $this->getORM()->getDb()->getTableManager($this->metadata->getClassName());
     }
 
     /**
@@ -632,7 +672,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         // UUID binary(16)
-        if ($type === '?UuidInterface') {
+        if ($type === '?UuidInterface' || $type === 'UuidInterface') {
             $this->addUse(CastNullable::class);
             $this->addUse(UUIDBin::class);
             $prop->setAttribute('fullType', UuidInterface::class);
@@ -643,8 +683,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     new Node\Scalar\String_('uuid_bin'),
                 ),
             );
+
+            $uuidDefault = 'UUID7';
+
+            if ($dbColumn->getColumnDefault() !== null) {
+                $uuidDefault = 'NIL';
+            }
+
             $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute('UUIDBin')
+                $this->attribute('UUIDBin', $factory->classConstFetch('UUIDBin', $uuidDefault))
             );
         }
 
@@ -676,6 +723,29 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     new Node\Expr\ClassConstFetch(new Node\Name('BasicState'), 'class')
                 ),
             );
+        }
+
+        if ($enumName = $this->getMatchedEnum($dbColumn)) {
+            $enumName = Str::removeLeft($enumName, '?');
+            $prop->setAttribute('fullType', $this->findFQCN($enumName));
+
+            if ($dbColumn->getIsNullable()) {
+                $this->addUse(CastNullable::class);
+                $prop->attrGroups[] = $this->attributeGroup(
+                    $this->attribute(
+                        'CastNullable',
+                        new Node\Expr\ClassConstFetch(new Node\Name($enumName), 'class')
+                    ),
+                );
+            } else {
+                $this->addUse(Cast::class);
+                $prop->attrGroups[] = $this->attributeGroup(
+                    $this->attribute(
+                        'Cast',
+                        new Node\Expr\ClassConstFetch(new Node\Name($enumName), 'class')
+                    ),
+                );
+            }
         }
 
         if ($this->isJsonType($dbColumn)) {

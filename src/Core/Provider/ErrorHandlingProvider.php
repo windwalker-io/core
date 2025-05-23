@@ -65,27 +65,29 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
 
                     $error->register(
                         (bool) ($this->config->get('restore') ?? true),
-                        (int) ($this->config->get('report_level') ?? E_ALL | E_STRICT),
+                        (int) ($this->config->get('report_level') ?? E_ALL),
                         (bool) ($this->config->get('register_shutdown') ?? true)
                     );
                 }
                 break;
 
             case AppClient::CONSOLE:
-                if (class_exists(Writer::class)) {
-                    $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) {
-                        $error = $event->getError();
+                $this->app->on(ConsoleErrorEvent::class, function (ConsoleErrorEvent $event) use ($error) {
+                    $t = $event->getError();
 
+                    if (class_exists(Writer::class)) {
                         $writer = new Writer(
                             new SolutionRepository(),
                             $event->getOutput()
                         );
-                        $writer->write(new Inspector($error));
-                    });
-                }
+                        $writer->write(new Inspector($t));
+                    }
+
+                    $error->handle($t);
+                });
 
                 // To hide default uncaught errors and backtraces.
-                $error->register(false, E_ALL | E_STRICT, true);
+                $error->register(false, E_ALL, true);
                 break;
         }
     }

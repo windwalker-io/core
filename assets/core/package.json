@@ -1,6 +1,6 @@
 {
     "name": "@windwalker-io/core",
-    "version": "4.1.10",
+    "version": "4.1.12",
     "type": "module",
     "description": "Windwalker Core JS package",
     "scripts": {
@@ -21,6 +21,7 @@
         "@fortawesome/vue-fontawesome": "^3.0.1",
         "@tailwindcss/custom-forms": "^0.2.1",
         "@tailwindcss/ui": "^0.7.2",
+        "@types/gulp-rename": "^2",
         "@vue/reactivity": "^3.3.7",
         "@vue/tsconfig": "^0.4.0",
         "@windwalker-io/fusion": "^1.0",
@@ -52,5 +53,8 @@
         "vendors": [
             "@windwalker-io/core"
         ]
+    },
+    "dependencies": {
+        "gulp-rename": "^2.0.0"
     }
 }

@@ -135,19 +135,20 @@ class Runtime
         $clientIp = $_SERVER['REMOTE_ADDR'] ?? null;
         $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
 
-        if (
-            isset($httpForwardedFor)
-            && !static::isTrusted($httpForwardedFor, $remoteAddr)
-        ) {
-            return true;
+        if (isset($httpForwardedFor)) {
+            if (!static::isTrusted($remoteAddr)) {
+                return true;
+            }
+
+            $clientIp = $httpForwardedFor;
+        } else {
+            if (isset($clientIp) && $clientIp !== $remoteAddr) {
+                return true;
+            }
         }
 
         // Get allow remote ips from config.
-        if (!in_array($remoteAddr, $allowIps, true)) {
-            return true;
-        }
-
-        if (isset($clientIp) && $clientIp !== $remoteAddr) {
+        if (!in_array($clientIp, $allowIps, true)) {
             return true;
         }
 

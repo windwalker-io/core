@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http;
 
-use Jenssegers\Agent\Agent;
+use Asika\Agent\Agent;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

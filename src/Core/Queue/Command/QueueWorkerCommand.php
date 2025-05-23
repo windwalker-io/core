@@ -14,10 +14,11 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\Queue\Driver\DatabaseQueueDriver;
+use Windwalker\Event\AbstractEvent;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
@@ -216,12 +217,20 @@ class QueueWorkerCommand implements CommandInterface
         )
             ->on(
                 AfterJobRunEvent::class,
-                function (AfterJobRunEvent $event) {
+                function (AfterJobRunEvent $event) use ($connection, $io, $worker) {
                     $this->app->addMessage(
                         sprintf(
                             'Job Message: <info>%s</info> END',
                             $event->getMessage()->getId()
                         )
+                    );
+
+                    $this->runEndScripts(
+                        'job_end_scripts',
+                        $worker,
+                        $event,
+                        $io,
+                        $connection
                     );
                 }
             )
@@ -231,12 +240,14 @@ class QueueWorkerCommand implements CommandInterface
                     $message = $event->getMessage();
                     $e = $event->getException();
 
+                    Logger::error('queue-error', $e);
+
                     $this->app->addMessage(
                         sprintf(
-                            'Job %s failed: %s (%s)',
+                            'Job %s failed - ID: <info>%s</info> - %s',
                             get_debug_type($event->getJob()),
+                            $message->getId(),
                             $event->getException()->getMessage(),
-                            $message->getId()
                         ),
                         'error'
                     );
@@ -298,8 +309,9 @@ class QueueWorkerCommand implements CommandInterface
             )
             ->on(
                 LoopEndEvent::class,
-                function (LoopEndEvent $event) {
+                function (LoopEndEvent $event) use ($connection, $io, $worker) {
                     // Stop connections.
+                    $this->runEndScripts('loop_end_scripts', $worker, $event, $io, $connection);
                 }
             );
     }
@@ -327,5 +339,34 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         return $container->get(Worker::class);
+    }
+
+    protected function runEndScripts(
+        string $configName,
+        Worker $worker,
+        AbstractEvent $event,
+        IOInterface $io,
+        string $connection
+    ): void {
+        $scripts = $this->app->config('queue.' . $configName) ?? [];
+
+        if (is_callable($scripts)) {
+            $scripts = [$scripts];
+        }
+
+        foreach ($scripts as $script) {
+            $this->app->call(
+                $script,
+                [
+                    'worker' => $worker,
+                    Worker::class => $worker,
+                    'event' => $event,
+                    LoopEndEvent::class => $event,
+                    'io' => $io,
+                    IOInterface::class => $io,
+                    'connection' => $connection,
+                ]
+            );
+        }
     }
 }

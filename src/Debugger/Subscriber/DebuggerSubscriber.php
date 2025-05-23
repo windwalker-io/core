@@ -38,6 +38,7 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\DI\Container;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
+use Windwalker\Event\Listener\ListenerPriority;
 use Windwalker\Http\Helper\HttpHelper;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Query\Query;
@@ -79,7 +80,7 @@ class DebuggerSubscriber
         //
     }
 
-    #[ListenTo(BeforeRequestEvent::class)]
+    #[ListenTo(BeforeRequestEvent::class, ListenerPriority::MIN)]
     public function beforeRequest(BeforeRequestEvent $event): void
     {
         $rootApp = $this->container->get(RootApplicationInterface::class);
@@ -107,7 +108,7 @@ class DebuggerSubscriber
         $this->collectDatabase($container, $queue, $collector);
     }
 
-    #[ListenTo(AfterRoutingEvent::class)]
+    #[ListenTo(AfterRoutingEvent::class, ListenerPriority::MIN)]
     public function afterRouting(AfterRoutingEvent $event): void
     {
         $matchedRoute = $event->getMatched();
@@ -119,7 +120,7 @@ class DebuggerSubscriber
         $this->profiler->mark('AfterRouting', ['system']);
     }
 
-    #[ListenTo(BeforeAppDispatchEvent::class)]
+    #[ListenTo(BeforeAppDispatchEvent::class, ListenerPriority::MIN)]
     public function beforeAppDispatch(
         BeforeAppDispatchEvent $event
     ): void {
@@ -147,7 +148,7 @@ class DebuggerSubscriber
         $collector['system'] = $info;
     }
 
-    #[ListenTo(BeforeControllerDispatchEvent::class)]
+    #[ListenTo(BeforeControllerDispatchEvent::class, ListenerPriority::MIN)]
     public function beforeControllerDispatch(
         BeforeControllerDispatchEvent $event
     ): void {
@@ -183,7 +184,7 @@ class DebuggerSubscriber
         );
     }
 
-    #[ListenTo(AfterControllerDispatchEvent::class)]
+    #[ListenTo(AfterControllerDispatchEvent::class, ListenerPriority::MIN)]
     public function afterControllerDispatch(
         AfterControllerDispatchEvent $event
     ): void {
@@ -198,7 +199,7 @@ class DebuggerSubscriber
         $this->profiler->mark('AfterControllerDispatch', ['system']);
     }
 
-    #[ListenTo(AfterRequestEvent::class)]
+    #[ListenTo(AfterRequestEvent::class, ListenerPriority::MIN)]
     public function afterRequest(
         AfterRequestEvent $event
     ): void {
@@ -223,7 +224,7 @@ class DebuggerSubscriber
 
                 $http = [];
 
-                $req = $appReq->getRequest();
+                $req = $appReq->getServerRequest();
 
                 $http['request'] = [
                     'headers' => $req->getHeaders(),
@@ -266,7 +267,7 @@ class DebuggerSubscriber
         );
     }
 
-    #[ListenTo(AfterRespondEvent::class)]
+    #[ListenTo(AfterRespondEvent::class, ListenerPriority::MIN)]
     public function afterRespond(AfterRespondEvent $event): void
     {
         $this->profiler->mark('AfterRequest', ['system']);
@@ -312,10 +313,13 @@ class DebuggerSubscriber
         // Events
         $eventCollector = $this->container->get(EventCollector::class);
 
-        $collector->setDeep('events', [
-            'invoked' => $eventCollector->getInvokedListeners(),
-            'uninvoked' => $eventCollector->getUninvokedListeners(),
-        ]);
+        $collector->setDeep(
+            'events',
+            [
+                'invoked' => $eventCollector->getInvokedListeners(),
+                'uninvoked' => $eventCollector->getUninvokedListeners(),
+            ]
+        );
 
         // Database
         $connections = $app->config('database.connections') ?? [];

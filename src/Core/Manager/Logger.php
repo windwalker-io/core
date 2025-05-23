@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use Psr\Log\LoggerInterface;
 use Windwalker\Core\Service\LoggerService;
 
 /**
@@ -36,5 +37,10 @@ class Logger
     public static function __callStatic(string $name, array $args): void
     {
         static::getInstance()?->$name(...$args);
+    }
+
+    public static function getChannel(string $channel): ?LoggerInterface
+    {
+        return static::getInstance()?->getLogger($channel);
     }
 }

@@ -192,7 +192,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
      *
      * @return int 0 if everything went fine, or an error code
      */
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if ($command instanceof CommandWrapper) {
             $handler = $command->getHandler();

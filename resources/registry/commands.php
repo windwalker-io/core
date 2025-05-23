@@ -22,6 +22,7 @@ return [
     'mig:reset' => \Windwalker\Core\Migration\Command\ResetCommand::class,
     'mig:status' => \Windwalker\Core\Migration\Command\StatusCommand::class,
     'mig:create' => \Windwalker\Core\Migration\Command\CreateCommand::class,
+    'mig:squash' => \Windwalker\Core\Migration\Command\MigSquashCommand::class,
     'db:export' => \Windwalker\Core\Database\Command\DbExportCommand::class,
     'db:drop-all' => \Windwalker\Core\Database\Command\DbDropAllCommand::class,
     'seed:import' => \Windwalker\Core\Seed\Command\SeedImportCommand::class,

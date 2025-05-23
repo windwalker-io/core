@@ -81,7 +81,7 @@ class Seeder
     public function truncate(string ...$tables): static
     {
         foreach ($tables as $table) {
-            $this->db->getTable($table)->truncate();
+            $this->db->getTableManager($table)->truncate();
         }
 
         return $this;
