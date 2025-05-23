@@ -333,6 +333,43 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         $methods = [];
 
+        // Set hook
+        // if (!$propRef->hasHook(\PropertyHookType::Set)) {
+        //     $setAccessor = new Node\Expr\ArrowFunction([
+        //         'params' => [
+        //             new \PhpParser\Node\Param(
+        //                 var: new Node\Expr\Variable('value'),
+        //                 type: $type,
+        //             ),
+        //         ],
+        //         'expr' =>
+        //             new Node\Expr\Assign(
+        //                 $factory->propertyFetch(
+        //                     new Node\Expr\Variable('this'),
+        //                     $propName
+        //                 ),
+        //                 new Node\Expr\Variable('value'),
+        //             )
+        //     ]);
+        //
+        //     $prop->hooks[] = new Node\PropertyHook(
+        //         'set',
+        //         [
+        //             new Node\Stmt\Expression(
+        //                 $setAccessor
+        //             )
+        //         ],
+        //         // [
+        //         //     'params' => [
+        //         //         new \PhpParser\Node\Param(
+        //         //             var: new Node\Expr\Variable('value'),
+        //         //             type: $type,
+        //         //         ),
+        //         //     ]
+        //         // ]
+        //     );
+        // }
+
         // Getter
         if (!$ref->hasMethod($getter)) {
             $added[] = $getter;
