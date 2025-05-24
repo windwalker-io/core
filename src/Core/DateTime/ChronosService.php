@@ -136,8 +136,8 @@ class ChronosService
         string|DateTimeZone $from = 'UTC',
         string|DateTimeZone $to = 'UTC'
     ): Chronos {
-        $from = new DateTimeZone($from);
-        $to = new DateTimeZone($to);
+        $from = static::wrapTimeZone($from);
+        $to = static::wrapTimeZone($to);
 
         if ($from->getName() === $to->getName()) {
             return Chronos::wrap($date);
@@ -152,6 +152,15 @@ class ChronosService
         $date = $date->setTimezone($to);
 
         return $date;
+    }
+
+    protected static function wrapTimeZone(string|DateTimeZone $zone): DateTimeZone
+    {
+        if ($zone instanceof DateTimeZone) {
+            return $zone;
+        }
+
+        return new DateTimeZone($zone);
     }
 
     /**

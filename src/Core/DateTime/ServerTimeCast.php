@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use Windwalker\ORM\Attributes\CastAttributeInterface;
+use Windwalker\ORM\Attributes\CastAttributeTrait;
 use Windwalker\ORM\Cast\CastInterface;
+use Windwalker\ORM\Cast\CompositeCastInterface;
+use Windwalker\ORM\Cast\CompositeCastTrait;
 
 use function Windwalker\chronos;
 
@@ -12,10 +16,12 @@ use function Windwalker\chronos;
  * The ChronosCast class.
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-class ServerTimeCast implements CastInterface
+class ServerTimeCast implements CompositeCastInterface
 {
-    public const HYDRATE_TO_LOCAL = 1 << 3;
-    public const EXTRACT_TO_SERVER = 1 << 4;
+    use CompositeCastTrait;
+
+    public const int HYDRATE_TO_LOCAL = 1 << 3;
+    public const int EXTRACT_TO_SERVER = 1 << 4;
 
     public function __construct(
         protected ?ChronosService $chronosService = null,
@@ -51,7 +57,7 @@ class ServerTimeCast implements CastInterface
         if ($value instanceof \DateTimeInterface) {
             if ($this->chronosService) {
                 if ($this->options & static::EXTRACT_TO_SERVER) {
-                    $value = $this->chronosService->toServer($value);
+                    $value = $this->chronosService->toServer($value, $value->getTimezone());
                 }
 
                 $format = $this->chronosService->getSqlFormat();
@@ -63,5 +69,10 @@ class ServerTimeCast implements CastInterface
         }
 
         return (string) $value;
+    }
+
+    public function serialize(mixed $data): mixed
+    {
+        return $data;
     }
 }

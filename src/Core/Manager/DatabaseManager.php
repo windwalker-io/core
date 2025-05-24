@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use Windwalker\Attributes\AttributeType;
+use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\Pdo\DsnHelper;
@@ -23,6 +25,25 @@ class DatabaseManager extends AbstractManager
     public function getConfigPrefix(): string
     {
         return 'database';
+    }
+
+    public function configureORM(ORM $orm): void
+    {
+        $orm->setAttributesResolver($this->container->getAttributesResolver());
+
+        $orm->getCaster()
+            ->setDbTimezone(
+                $this->container->getParam('app.server_timezone') ?: 'UTC'
+            );
+
+        $resolver = $orm->getAttributesResolver();
+        $resolver->registerAttribute(ServerTimeCast::class, AttributeType::PROPERTIES);
+
+        $attributes = (array) $this->config->getDeep('attributes');
+
+        foreach ($attributes as $attribute => $type) {
+            $resolver->registerAttribute($attribute, $type);
+        }
     }
 
     protected function getFactoryPath(string $name): string
@@ -58,12 +79,7 @@ class DatabaseManager extends AbstractManager
 
         $orm = $db->orm();
 
-        $orm->setAttributesResolver($this->container->getAttributesResolver());
-
-        $orm->getCaster()
-            ->setDbTimezone(
-                $this->container->getParam('app.server_timezone') ?: 'UTC'
-            );
+        $this->configureORM($orm);
 
         $platform = $db->getPlatform();
 

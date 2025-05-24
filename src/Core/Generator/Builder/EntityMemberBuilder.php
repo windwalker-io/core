@@ -25,6 +25,7 @@ use Windwalker\ORM\Attributes\AutoIncrement;
 use Windwalker\ORM\Attributes\Cast;
 use Windwalker\ORM\Attributes\CastNullable;
 use Windwalker\ORM\Attributes\Column;
+use Windwalker\ORM\Attributes\JsonObject;
 use Windwalker\ORM\Attributes\PK;
 use Windwalker\ORM\Attributes\UUIDBin;
 use Windwalker\ORM\Cast\JsonCast;
@@ -738,10 +739,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $prop->setAttribute('fullType', Chronos::class);
             $prop->setAttribute('fullType', ServerTimeCast::class);
             $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    'CastNullable',
-                    new Node\Expr\ClassConstFetch(new Node\Name('ServerTimeCast'), 'class')
-                ),
+                $this->attribute('ServerTimeCast'),
             );
         }
 
@@ -787,13 +785,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         if ($this->isJsonType($dbColumn)) {
             $this->addUse(Cast::class);
-            $this->addUse(JsonCast::class);
+            $this->addUse(JsonObject::class);
 
             $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    'Cast',
-                    new Node\Expr\ClassConstFetch(new Node\Name('JsonCast'), 'class')
-                ),
+                $this->attribute('JsonObject')
             );
         }
 
