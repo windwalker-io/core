@@ -17,12 +17,10 @@ class ServerTimeCast implements CompositeCastInterface
 {
     use CompositeCastTrait;
 
-    public const int HYDRATE_TO_LOCAL = 1 << 3;
-    public const int EXTRACT_TO_SERVER = 1 << 4;
-
     public function __construct(
+        public string|\DateTimeZone|bool $toServer = true,
+        public string|\DateTimeZone|bool $toLocal = false,
         protected ?ChronosService $chronosService = null,
-        public int $options = self::EXTRACT_TO_SERVER
     ) {
         //
     }
@@ -35,11 +33,21 @@ class ServerTimeCast implements CompositeCastInterface
 
         $value = chronos($value);
 
-        if (
-            $this->chronosService
-            && ($this->options & static::HYDRATE_TO_LOCAL)
-        ) {
-            $value = $this->chronosService->toLocal($value);
+        $local = $this->toLocal;
+
+        if ($local === true) {
+            if (!$this->chronosService) {
+                throw new \LogicException(
+                    static::class . ' must put in Cast() attribute when toLocal is true, ' .
+                    'otherwise please provide a static timezone.'
+                );
+            }
+
+            $local = $this->chronosService->getTimezone();
+        }
+
+        if ($local) {
+            $value = $value->setTimezone($local);
         }
 
         return $value;
@@ -52,15 +60,25 @@ class ServerTimeCast implements CompositeCastInterface
         }
 
         if ($value instanceof \DateTimeInterface) {
-            if ($this->chronosService) {
-                if ($this->options & static::EXTRACT_TO_SERVER) {
-                    $value = $this->chronosService->toServer($value, $value->getTimezone());
+            $value = chronos($value);
+            $server = $this->toServer;
+
+            if ($server === true) {
+                if (!$this->chronosService) {
+                    throw new \LogicException(
+                        static::class . ' must put in Cast() attribute when toServer is true, ' .
+                        'otherwise please provide a static timezone.'
+                    );
                 }
 
-                $format = $this->chronosService->getSqlFormat();
-            } else {
-                $format = Chronos::FORMAT_YMD_HIS;
+                $server = $this->chronosService->getServerTimezone();
             }
+
+            if ($server) {
+                $value = $value->setTimezone($server);
+            }
+
+            $format = $this->chronosService?->getSqlFormat() ?? Chronos::FORMAT_YMD_HIS;
 
             $value = $value->format($format);
         }
