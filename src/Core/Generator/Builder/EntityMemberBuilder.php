@@ -44,6 +44,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     use CoreEventAwareTrait;
     use InstanceCacheTrait;
     use EntityAccessorConcernTrait;
+    use EntityHooksConcernTrait;
 
     protected array $uses = [];
 
@@ -225,127 +226,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         return array_values($hooks);
-    }
-
-    protected function createHooksIfNotExists(string $propName, Node\Stmt\Property $propNode, ?array &$added = null)
-    {
-        $added = [];
-
-        $tbManager = $this->getTableManager();
-        $factory = $this->createNodeFactory();
-        [$getHook, $setHook] = $this->getHooks($propNode);
-
-        $col = $this->metadata->getColumnByPropertyName($propName);
-
-        $colName = $col?->getName();
-        $column = $colName ? $tbManager->getColumn($colName) : null;
-
-        $type = $propNode->type;
-        $isBool = false;
-        $specialSetHook = null;
-        $typeNode = $type;
-
-        if ($typeNode instanceof Node\NullableType) {
-            $typeNode = $typeNode->type;
-        }
-
-        if ($typeNode instanceof Node\UnionType) {
-            $isBool = in_array('bool', $typeNode->types, true);
-        } elseif ($typeNode instanceof Node\Identifier) {
-            $isBool = $typeNode->name === 'bool';
-        } elseif ($typeNode instanceof Node\Name) {
-            $specialSetHook = 'build' . $typeNode . 'SetHook';
-        }
-
-        if (!$getHook) {
-            // Getter hook is not necessary by default.
-
-        }
-
-        if (!$setHook) {
-            if ($specialSetHook && method_exists($this, $specialSetHook)) {
-                $setHook = $this->{$specialSetHook}($propName, $propNode, $column);
-            } else {
-                $setHook = new Node\PropertyHook(
-                    'set',
-                    [
-                        new Node\Stmt\Expression(
-                            new Node\Expr\Assign(
-                                $factory->propertyFetch(
-                                    new Node\Expr\Variable('this'),
-                                    $propName
-                                ),
-                                new Node\Expr\Variable('value'),
-                            )
-                        )
-                    ],
-                    [
-                        'params' => [
-                            new \PhpParser\Node\Param(
-                                var: new Node\Expr\Variable('value'),
-                                type: $type,
-                            ),
-                        ]
-                    ]
-                );
-            }
-
-            // @event
-
-            if (!$typeNode instanceof Node\UnionType) {
-                $className = $this->findFQCN((string) $typeNode);
-
-                // Enum accept pure value
-                /** @var class-string<\UnitEnum> $className */
-                if ($className && class_exists($className) && $this->isEnum($className)) {
-                    $enumRef = new \ReflectionEnum($className);
-
-                    if ($enumRef->isBacked()) {
-                        $subType = $enumRef->getBackingType()?->getName() ?? 'int';
-                    } else {
-                        $subType = 'int|string';
-                    }
-
-                    $subType .= '|' . $type;
-
-                    $setHook->params[0] = $factory->param($propName)
-                        ->setType($subType)
-                        ->getNode();
-
-                    if (is_a($className, EnumMetaInterface::class, true)) {
-                        $enum = $factory->staticCall(
-                            new Node\Name($type),
-                            'wrap',
-                            [
-                                new Node\Expr\Variable($propName),
-                            ]
-                        );
-                    } else {
-                        $enum = $factory->staticCall(
-                            new Node\Name($type),
-                            'from',
-                            [
-                                new Node\Expr\Variable($propName),
-                            ]
-                        );
-                    }
-
-                    $setHook->body[0] = new Node\Stmt\Expression(
-                        new Node\Expr\Assign(
-                            $factory->propertyFetch(
-                                new Node\Expr\Variable('this'),
-                                $propName
-                            ),
-                            $enum
-                        )
-                    );
-                }
-            }
-        }
-
-        $propNode->hooks = array_filter([$getHook, $setHook]);
-
-        return [];
     }
 
     protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn): array
@@ -546,7 +426,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
 
         $propBuilder = $factory->property($propName)
-            ->makeProtected()
+            ->makePublic()
             ->setType($type);
 
         if (!Symbol::none()->is($default)) {
