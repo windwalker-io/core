@@ -77,6 +77,13 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         );
 
         $command->addOption(
+            'hooks',
+            'k',
+            InputOption::VALUE_NONE,
+            'Generate property hooks'
+        );
+
+        $command->addOption(
             'methods',
             'm',
             InputOption::VALUE_NONE,
@@ -173,15 +180,16 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
 
             $props = $this->io->getOption('props');
             $methods = $this->io->getOption('methods');
+            $hooks = $this->io->getOption('hooks');
 
-            if ($props === false && $methods === false) {
+            if ($props === false && $methods === false && $hooks === false) {
                 $props = true;
             }
 
             $builder = new EntityMemberBuilder($meta = $orm->getEntityMetadata($class));
             $builder->addEventDealer($this->app);
             $newCode = $builder->process(
-                compact('props', 'methods'),
+                compact('props', 'methods', 'hooks'),
                 $added
             );
 

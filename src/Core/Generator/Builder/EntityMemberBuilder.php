@@ -7,15 +7,12 @@ namespace Windwalker\Core\Generator\Builder;
 use MyCLabs\Enum\Enum;
 use PhpParser\Node;
 use Ramsey\Uuid\UuidInterface;
-use ReflectionAttribute;
 use ReflectionProperty;
 use Unicorn\Enum\BasicState;
-use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
-use Windwalker\Core\Generator\Event\BuildEntityMethodEvent;
 use Windwalker\Core\Generator\Event\BuildEntityPropertyEvent;
 use Windwalker\Database\Manager\TableManager;
 use Windwalker\Database\Schema\Ddl\Column as DbColumn;
@@ -28,7 +25,6 @@ use Windwalker\ORM\Attributes\Column;
 use Windwalker\ORM\Attributes\JsonObject;
 use Windwalker\ORM\Attributes\PK;
 use Windwalker\ORM\Attributes\UUIDBin;
-use Windwalker\ORM\Cast\JsonCast;
 use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
@@ -47,6 +43,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     use MessageOutputTrait;
     use CoreEventAwareTrait;
     use InstanceCacheTrait;
+    use EntityAccessorConcernTrait;
 
     protected array $uses = [];
 
@@ -79,7 +76,8 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $addedMembers = [
             'properties' => [],
             'methods' => [],
-            'enums' => []
+            'hooks' => [],
+            'enums' => [],
         ];
         $addedMethods = [];
 
@@ -134,6 +132,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                     if ($options['props'] ?? true) {
                         $prop = $this->createPropertyStatement($createColumn);
 
+                        // Inject property by ordering.
                         array_splice(
                             $node->stmts,
                             $i + $last,
@@ -162,6 +161,22 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         );
                     }
                 }
+
+                // Loop all properties to create hooks
+                foreach ($node->stmts as $stmt) {
+                    if ($stmt instanceof Node\Stmt\Property) {
+                        if ($options['hooks'] ?? true) {
+                            $hooks = $this->createHooksIfNotExists((string) $stmt->props[0]->name, $stmt, $added);
+
+                            array_push(
+                                $addedMembers['hooks'],
+                                ...$added
+                            );
+                        }
+                    }
+                }
+
+                // End class node
             }
 
             if ($node instanceof Node\Stmt\Namespace_) {
@@ -191,6 +206,146 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $addedMembers['enums'] = $this->newEnums;
 
         return $code;
+    }
+
+    /**
+     * @param  Node\Stmt\Property  $propNode
+     *
+     * @return  array{ 0: ?Node\PropertyHook, 1: ?Node\PropertyHook }
+     */
+    protected function getHooks(Node\Stmt\Property $propNode): array
+    {
+        $hooks = [
+            'get' => null,
+            'set' => null,
+        ];
+
+        foreach ($propNode->hooks as $hook) {
+            $hooks[(string) $hook->name] = $hook;
+        }
+
+        return array_values($hooks);
+    }
+
+    protected function createHooksIfNotExists(string $propName, Node\Stmt\Property $propNode, ?array &$added = null)
+    {
+        $added = [];
+
+        $tbManager = $this->getTableManager();
+        $factory = $this->createNodeFactory();
+        [$getHook, $setHook] = $this->getHooks($propNode);
+
+        $col = $this->metadata->getColumnByPropertyName($propName);
+
+        $colName = $col?->getName();
+        $column = $colName ? $tbManager->getColumn($colName) : null;
+
+        $type = $propNode->type;
+        $isBool = false;
+        $specialSetHook = null;
+        $typeNode = $type;
+
+        if ($typeNode instanceof Node\NullableType) {
+            $typeNode = $typeNode->type;
+        }
+
+        if ($typeNode instanceof Node\UnionType) {
+            $isBool = in_array('bool', $typeNode->types, true);
+        } elseif ($typeNode instanceof Node\Identifier) {
+            $isBool = $typeNode->name === 'bool';
+        } elseif ($typeNode instanceof Node\Name) {
+            $specialSetHook = 'build' . $typeNode . 'SetHook';
+        }
+
+        if (!$getHook) {
+            // Getter hook is not necessary by default.
+
+        }
+
+        if (!$setHook) {
+            if ($specialSetHook && method_exists($this, $specialSetHook)) {
+                $setHook = $this->{$specialSetHook}($propName, $propNode, $column);
+            } else {
+                $setHook = new Node\PropertyHook(
+                    'set',
+                    [
+                        new Node\Stmt\Expression(
+                            new Node\Expr\Assign(
+                                $factory->propertyFetch(
+                                    new Node\Expr\Variable('this'),
+                                    $propName
+                                ),
+                                new Node\Expr\Variable('value'),
+                            )
+                        )
+                    ],
+                    [
+                        'params' => [
+                            new \PhpParser\Node\Param(
+                                var: new Node\Expr\Variable('value'),
+                                type: $type,
+                            ),
+                        ]
+                    ]
+                );
+            }
+
+            // @event
+
+            if (!$typeNode instanceof Node\UnionType) {
+                $className = $this->findFQCN((string) $typeNode);
+
+                // Enum accept pure value
+                /** @var class-string<\UnitEnum> $className */
+                if ($className && class_exists($className) && $this->isEnum($className)) {
+                    $enumRef = new \ReflectionEnum($className);
+
+                    if ($enumRef->isBacked()) {
+                        $subType = $enumRef->getBackingType()?->getName() ?? 'int';
+                    } else {
+                        $subType = 'int|string';
+                    }
+
+                    $subType .= '|' . $type;
+
+                    $setHook->params[0] = $factory->param($propName)
+                        ->setType($subType)
+                        ->getNode();
+
+                    if (is_a($className, EnumMetaInterface::class, true)) {
+                        $enum = $factory->staticCall(
+                            new Node\Name($type),
+                            'wrap',
+                            [
+                                new Node\Expr\Variable($propName),
+                            ]
+                        );
+                    } else {
+                        $enum = $factory->staticCall(
+                            new Node\Name($type),
+                            'from',
+                            [
+                                new Node\Expr\Variable($propName),
+                            ]
+                        );
+                    }
+
+                    $setHook->body[0] = new Node\Stmt\Expression(
+                        new Node\Expr\Assign(
+                            $factory->propertyFetch(
+                                new Node\Expr\Variable('this'),
+                                $propName
+                            ),
+                            $enum
+                        )
+                    );
+                }
+            }
+        }
+
+        $propNode->hooks = array_filter([$getHook, $setHook]);
+
+        return [];
     }
 
     protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn): array
@@ -282,221 +437,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         );
     }
 
-    protected function createAccessorsIfNotExists(
-        string $propName,
-        Node\Stmt\Property $prop,
-        ?array &$added = null
-    ): array {
-        $added = [];
-        $factory = $this->createNodeFactory();
-        $type = $prop->type;
-        $tbManager = $this->getTableManager();
-
-        $ref = $this->metadata->getReflector();
-        $propRef = $ref->getProperty($propName);
-        $col = AttributesAccessor::getFirstAttributeInstance(
-            $propRef,
-            Column::class,
-            ReflectionAttribute::IS_INSTANCEOF
-        );
-
-        $colName = $col?->getName();
-        $column = $colName ? $tbManager->getColumn($colName) : null;
-
-        $isBool = false;
-        $specialSetter = null;
-        $typeNode = $type;
-
-        if ($typeNode instanceof Node\NullableType) {
-            $typeNode = $typeNode->type;
-        }
-
-        if ($typeNode instanceof Node\UnionType) {
-            $isBool = in_array('bool', $typeNode->types, true);
-        } elseif ($typeNode instanceof Node\Identifier) {
-            $isBool = $typeNode->name === 'bool';
-        } elseif ($typeNode instanceof Node\Name) {
-            $specialSetter = 'build' . $typeNode . 'Setter';
-        }
-
-        if (str_starts_with($propName, 'is')) {
-            $getter = $propName;
-            $setter = 'set' . ucfirst($propName);
-        } else {
-            $setter = 'set' . ucfirst($propName);
-
-            if ($isBool) {
-                $getter = 'is' . ucfirst($propName);
-            } else {
-                $getter = 'get' . ucfirst($propName);
-            }
-        }
-
-        $methods = [];
-
-        // Set hook
-        // if (!$propRef->hasHook(\PropertyHookType::Set)) {
-        //     $setAccessor = new Node\Expr\ArrowFunction([
-        //         'params' => [
-        //             new \PhpParser\Node\Param(
-        //                 var: new Node\Expr\Variable('value'),
-        //                 type: $type,
-        //             ),
-        //         ],
-        //         'expr' =>
-        //             new Node\Expr\Assign(
-        //                 $factory->propertyFetch(
-        //                     new Node\Expr\Variable('this'),
-        //                     $propName
-        //                 ),
-        //                 new Node\Expr\Variable('value'),
-        //             )
-        //     ]);
-        //
-        //     $prop->hooks[] = new Node\PropertyHook(
-        //         'set',
-        //         [
-        //             new Node\Stmt\Expression(
-        //                 $setAccessor
-        //             )
-        //         ],
-        //         // [
-        //         //     'params' => [
-        //         //         new \PhpParser\Node\Param(
-        //         //             var: new Node\Expr\Variable('value'),
-        //         //             type: $type,
-        //         //         ),
-        //         //     ]
-        //         // ]
-        //     );
-        // }
-
-        // Getter
-        if (!$ref->hasMethod($getter)) {
-            $added[] = $getter;
-            $method = $factory->method($getter)
-                ->makePublic()
-                ->addStmt(
-                    new Node\Stmt\Return_(
-                        $factory->propertyFetch(
-                            new Node\Expr\Variable('this'),
-                            $propName
-                        )
-                    )
-                )
-                ->setReturnType($type)
-                ->getNode();
-
-            $event = $this->emit(
-                BuildEntityMethodEvent::class,
-                [
-                    'accessorType' => 'getter',
-                    'methodName' => $getter,
-                    'method' => $method,
-                    'propName' => $propName,
-                    'column' => $column,
-                    'prop' => $prop,
-                    'type' => $type,
-                    'entityMemberBuilder' => $this,
-                ]
-            );
-
-            $methods[] = $event->getMethod();
-        }
-
-        // Setter
-        if (!$ref->hasMethod($setter)) {
-            $added[] = $setter;
-
-            if ($specialSetter && method_exists($this, $specialSetter)) {
-                $method = $this->$specialSetter($setter, $propName, $type, $column);
-            } else {
-                $method = $factory->method($setter)
-                    ->makePublic()
-                    ->addParam(
-                        $factory->param($propName)
-                            ->setType($type)
-                    )
-                    ->addStmt(
-                        new Node\Expr\Assign(
-                            $factory->propertyFetch(
-                                new Node\Expr\Variable('this'),
-                                $propName
-                            ),
-                            new Node\Expr\Variable($propName),
-                        )
-                    )
-                    ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
-                    ->setReturnType('static')
-                    ->getNode();
-            }
-
-            $event = $this->emit(
-                BuildEntityMethodEvent::class,
-                [
-                    'accessorType' => 'setter',
-                    'methodName' => $getter,
-                    'method' => $method,
-                    'propName' => $propName,
-                    'column' => $column,
-                    'prop' => $prop,
-                    'type' => $type,
-                    'entityMemberBuilder' => $this,
-                ]
-            );
-
-            if (!$typeNode instanceof Node\UnionType) {
-                $className = $this->findFQCN((string) $typeNode);
-
-                // Enum accept pure value
-                if ($className && class_exists($className) && $this->isEnum($className)) {
-                    if ($column) {
-                        $subType = $column->isNumeric() ? 'int' : 'string';
-                    } else {
-                        $subType = 'int|string';
-                    }
-
-                    $subType .= '|' . $type;
-
-                    $method->params[0] = $factory->param($propName)
-                        ->setType($subType)
-                        ->getNode();
-
-                    if (is_a($className, EnumMetaInterface::class, true)) {
-                        $enum = $factory->staticCall(
-                            new Node\Name($type),
-                            'wrap',
-                            [
-                                new Node\Expr\Variable($propName),
-                            ]
-                        );
-                    } else {
-                        $enum = $factory->new(
-                            new Node\Name($type),
-                            [
-                                new Node\Expr\Variable($propName),
-                            ]
-                        );
-                    }
-
-                    $method->stmts[0] = new Node\Stmt\Expression(
-                        new Node\Expr\Assign(
-                            $factory->propertyFetch(
-                                new Node\Expr\Variable('this'),
-                                $propName
-                            ),
-                            $enum
-                        )
-                    );
-                }
-            }
-
-            $methods[] = $event->getMethod();
-        }
-
-        return $methods;
-    }
-
     /**
      * @return EntityMetadata
      */
@@ -533,66 +473,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         return $enumName;
-    }
-
-    protected function buildUuidInterfaceSetter(string $setter, string $propName, Node $type): Node
-    {
-        $factory = $this->createNodeFactory();
-
-        return $factory->method($setter)
-            ->makePublic()
-            ->addParam(
-                $factory->param($propName)
-                    ->setType('UuidInterface|string|null')
-            )
-            ->addStmt(
-                new Node\Expr\Assign(
-                    $factory->propertyFetch(
-                        new Node\Expr\Variable('this'),
-                        $propName
-                    ),
-                    $factory->staticCall(
-                        new Node\Name('UUIDBin'),
-                        'tryWrap',
-                        [
-                            new Node\Expr\Variable($propName),
-                        ]
-                    ),
-                )
-            )
-            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
-            ->setReturnType('static')
-            ->getNode();
-    }
-
-    protected function buildChronosSetter(string $setter, string $propName, Node $type): Node
-    {
-        $factory = $this->createNodeFactory();
-
-        return $factory->method($setter)
-            ->makePublic()
-            ->addParam(
-                $factory->param($propName)
-                    ->setType('\DateTimeInterface|string|null')
-            )
-            ->addStmt(
-                new Node\Expr\Assign(
-                    $factory->propertyFetch(
-                        new Node\Expr\Variable('this'),
-                        $propName
-                    ),
-                    $factory->staticCall(
-                        new Node\Name('Chronos'),
-                        'tryWrap',
-                        [
-                            new Node\Expr\Variable($propName),
-                        ]
-                    ),
-                )
-            )
-            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('this')))
-            ->setReturnType('static')
-            ->getNode();
     }
 
     public function getLastOf(array $stmts, string $class): ?int
@@ -811,7 +691,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             'pks',
             function () {
                 $constraints = $this->getTableManager()->getConstraints();
-                /** @var Constraint $constraint */
+                /** @var ?Constraint $constraint */
                 $constraint = Arr::findFirst(
                     $constraints,
                     fn(Constraint $constraint) => $constraint->constraintType === Constraint::TYPE_PRIMARY_KEY
