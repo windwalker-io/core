@@ -45,8 +45,6 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     public static string $format = 'Y-m-d H:i:s';
 
     /**
-     * wrap
-     *
      * @param  mixed                     $date
      * @param  string|DateTimeZone|null  $tz
      *
@@ -68,6 +66,14 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         return static::create($date, $tz);
     }
 
+    /**
+     * @param  mixed                     $date
+     * @param  string|DateTimeZone|null  $tz
+     *
+     * @return  static|null
+     *
+     * @deprecated  Use tryWrap() instead.
+     */
     public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?static
     {
         return static::tryWrap($date, $tz);
@@ -86,7 +92,8 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * Constructor.
      *
      * @param  string                    $date  String in a format accepted by strtotime(), defaults to "now".
-     * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date. Might be a string or a DateTimeZone object.
+     * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date. Might be a string or
+     *                                          a DateTimeZone object.
      *
      * @throws Exception
      * @since   2.1
