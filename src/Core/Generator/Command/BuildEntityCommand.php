@@ -218,6 +218,18 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
                 }
             }
 
+            if ($added['hooks']) {
+                $this->io->newLine();
+                $this->io->writeln('  Added property hooks:');
+
+                foreach ($added['hooks'] as $propName => $hooks) {
+                    if (count($hooks) > 0) {
+                        $hooksStr = collect($hooks)->map(fn($hook) => "<info>$hook</info>")->implode('|');
+                        $this->io->writeln("    - $propName ($hooksStr)");
+                    }
+                }
+            }
+
             $newEnums = [...$newEnums, ...$added['enums']];
         }
 

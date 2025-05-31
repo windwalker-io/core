@@ -59,13 +59,11 @@ trait EntityHooksConcernTrait
 
             if ($event->hook) {
                 $getHook = $event->hook;
-                $added[] = 'hook(get)';
+                $added[$propName][] = 'hook(get)';
             }
         }
 
         if (!$setHook) {
-            $added[] = 'hook(set)';
-
             if ($specialSetHook && method_exists($this, $specialSetHook)) {
                 $setHook = $this->{$specialSetHook}($propName, $propNode, $column);
             }
@@ -148,7 +146,7 @@ trait EntityHooksConcernTrait
 
             if ($event->hook) {
                 $setHook = $event->hook;
-                $added[] = 'hook(set)';
+                $added[$propName][] = 'set';
             }
         }
 

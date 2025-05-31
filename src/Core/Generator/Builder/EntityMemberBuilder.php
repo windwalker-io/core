@@ -168,9 +168,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         if ($options['hooks'] ?? true) {
                             $hooks = $this->createHooksIfNotExists((string) $stmt->props[0]->name, $stmt, $added);
 
-                            array_push(
+                            $addedMembers['hooks'] = array_merge(
                                 $addedMembers['hooks'],
-                                ...$added
+                                $added
                             );
                         }
                     }

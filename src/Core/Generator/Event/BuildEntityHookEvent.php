@@ -11,6 +11,14 @@ use Windwalker\Event\BaseEvent;
 
 class BuildEntityHookEvent extends BaseEvent
 {
+    public bool $isGet {
+        get => $this->hookType === \PropertyHookType::Get;
+    }
+
+    public bool $isSet {
+        get => $this->hookType === \PropertyHookType::Set;
+    }
+
     public function __construct(
         public \PropertyHookType $hookType,
         public string $propName,
