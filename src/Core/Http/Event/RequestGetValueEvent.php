@@ -5,80 +5,36 @@ declare(strict_types=1);
 namespace Windwalker\Core\Http\Event;
 
 use Windwalker\Core\Http\AppRequest;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The RequestGetValueEvent class.
  */
-class RequestGetValueEvent extends AbstractEvent
+class RequestGetValueEvent extends BaseEvent
 {
-    public const TYPE_BODY = 'body';
-    public const TYPE_QUERY = 'query';
-    public const TYPE_URL_VARS = 'url_vars';
+    use AccessorBCTrait;
 
-    protected AppRequest $appRequest;
+    public const string TYPE_BODY = 'body';
 
-    protected array $values = [];
+    public const string TYPE_QUERY = 'query';
 
-    protected string $type = self::TYPE_BODY;
+    public const string TYPE_URL_VARS = 'url_vars';
 
-    /**
-     * @return AppRequest
-     */
-    public function getAppRequest(): AppRequest
-    {
-        return $this->appRequest;
-    }
-
-    /**
-     * @param  AppRequest  $appRequest
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setAppRequest(AppRequest $appRequest): static
-    {
-        $this->appRequest = $appRequest;
-
-        return $this;
+    public function __construct(
+        public AppRequest $appRequest,
+        public string $type = self::TYPE_BODY,
+        public array $values = [],
+    ) {
     }
 
     /**
      * @return array
+     *
+     * @deprecated  Use property instead.
      */
     public function &getValues(): array
     {
         return $this->values;
-    }
-
-    /**
-     * @param  array  $values
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setValues(array $values): static
-    {
-        $this->values = $values;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param  string  $type
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
     }
 }

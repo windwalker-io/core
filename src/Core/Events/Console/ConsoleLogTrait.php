@@ -15,6 +15,6 @@ trait ConsoleLogTrait
 
     public function consoleLog(string|array $messages, ?string $type = null): ConsoleLogEvent
     {
-        return $this->emit(new ConsoleLogEvent($messages, $type));
+        return $this->emit(new ConsoleLogEvent(messages: $messages, type: $type));
     }
 }

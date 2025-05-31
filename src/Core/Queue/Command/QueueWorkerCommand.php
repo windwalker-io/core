@@ -18,7 +18,7 @@ use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
@@ -157,7 +157,7 @@ class QueueWorkerCommand implements CommandInterface
             $worker->getEventDispatcher()->on(
                 JobFailureEvent::class,
                 function (JobFailureEvent $event) {
-                    $code = $event->getException()->getCode();
+                    $code = $event->exception->getCode();
 
                     exit($code === 0 ? 1 : $code);
                 }
@@ -209,8 +209,8 @@ class QueueWorkerCommand implements CommandInterface
                 $this->app->addMessage(
                     sprintf(
                         'Run Job: <info>%s</info> - Message ID: <info>%s</info>',
-                        get_debug_type($event->getJob()),
-                        $event->getMessage()->getId()
+                        get_debug_type($event->job),
+                        $event->message->getId()
                     )
                 );
             }
@@ -221,7 +221,7 @@ class QueueWorkerCommand implements CommandInterface
                     $this->app->addMessage(
                         sprintf(
                             'Job Message: <info>%s</info> END',
-                            $event->getMessage()->getId()
+                            $event->message->getId()
                         )
                     );
 
@@ -237,17 +237,17 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 JobFailureEvent::class,
                 function (JobFailureEvent $event) use ($io, $connection) {
-                    $message = $event->getMessage();
-                    $e = $event->getException();
+                    $message = $event->message;
+                    $e = $event->exception;
 
                     Logger::error('queue-error', $e);
 
                     $this->app->addMessage(
                         sprintf(
                             'Job %s failed - ID: <info>%s</info> - %s',
-                            get_debug_type($event->getJob()),
+                            get_debug_type($event->job),
                             $message->getId(),
-                            $event->getException()->getMessage(),
+                            $event->exception->getMessage(),
                         ),
                         'error'
                     );
@@ -258,7 +258,7 @@ class QueueWorkerCommand implements CommandInterface
                                 $connection,
                                 $message->getChannel(),
                                 json_encode($message),
-                                (string) $event->getException()
+                                (string) $event->exception
                             );
                     }
 
@@ -272,7 +272,7 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 LoopStartEvent::class,
                 function (LoopStartEvent $event) {
-                    $worker = $event->getWorker();
+                    $worker = $event->worker;
 
                     switch ($worker->getState()) {
                         case $worker::STATE_ACTIVE:
@@ -292,7 +292,7 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 LoopFailureEvent::class,
                 function (LoopFailureEvent $event) use ($io) {
-                    $e = $event->getException();
+                    $e = $event->exception;
 
                     $this->app->addMessage(
                         sprintf(
@@ -344,7 +344,7 @@ class QueueWorkerCommand implements CommandInterface
     protected function runEndScripts(
         string $configName,
         Worker $worker,
-        AbstractEvent $event,
+        EventInterface $event,
         IOInterface $io,
         string $connection
     ): void {
@@ -361,7 +361,7 @@ class QueueWorkerCommand implements CommandInterface
                     'worker' => $worker,
                     Worker::class => $worker,
                     'event' => $event,
-                    LoopEndEvent::class => $event,
+                    $event::class => $event,
                     'io' => $io,
                     IOInterface::class => $io,
                     'connection' => $connection,

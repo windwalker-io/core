@@ -5,23 +5,28 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router\Event;
 
 use Windwalker\Core\Router\Navigator;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The BeforeRouteBuildEvent class.
  */
-class BeforeRouteBuildEvent extends AbstractEvent
+class BeforeRouteBuildEvent extends BaseEvent
 {
-    protected string $route = '';
+    use AccessorBCTrait;
 
-    protected array $query = [];
-
-    protected Navigator $navigator;
-
-    protected int $options = 0;
+    public function __construct(
+        public string $route,
+        public array $query,
+        public Navigator $navigator,
+        public int $options
+    ) {
+    }
 
     /**
      * @return string
+     *
+     * @deprecated  Use property instead.
      */
     public function &getRoute(): string
     {
@@ -29,74 +34,12 @@ class BeforeRouteBuildEvent extends AbstractEvent
     }
 
     /**
-     * @param  string  $route
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRoute(string $route): static
-    {
-        $this->route = $route;
-
-        return $this;
-    }
-
-    /**
      * @return array
+     *
+     * @deprecated  Use property instead.
      */
     public function &getQuery(): array
     {
         return $this->query;
-    }
-
-    /**
-     * @param  array  $query
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setQuery(array $query): static
-    {
-        $this->query = $query;
-
-        return $this;
-    }
-
-    /**
-     * @return Navigator
-     */
-    public function getNavigator(): Navigator
-    {
-        return $this->navigator;
-    }
-
-    /**
-     * @param  Navigator  $navigator
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setNavigator(Navigator $navigator): static
-    {
-        $this->navigator = $navigator;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOptions(): int
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param  int  $options
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setOptions(int $options)
-    {
-        $this->options = $options;
-
-        return $this;
     }
 }

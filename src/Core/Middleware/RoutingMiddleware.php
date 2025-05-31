@@ -87,12 +87,11 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         $route = $this->app->getSystemUri()->route;
 
         $event = $this->emit(
-            BeforeRoutingEvent::class,
-            [
-                'route' => $route,
-                'request' => $request,
-                'systemUri' => $this->app->getSystemUri(),
-            ]
+            new BeforeRoutingEvent(
+                systemUri: $this->app->getSystemUri(),
+                request: $request,
+                route: $route
+            )
         );
 
         $matched = null;
@@ -112,7 +111,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             }
 
             if (!$matched) {
-                $matched = $router->match($request = $event->getRequest(), $route = $event->getRoute());
+                $matched = $router->match($event->request, $event->route);
             }
         } catch (RouteNotFoundException $e) {
             if (!$this->fallback) {
@@ -124,10 +123,10 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
                     $this->fallback,
                     [
                         'request' => $request,
-                        ServerRequestInterface::class => $request,
+                        ServerRequestInterface::class => $event->request,
                         'router' => $router,
                         Router::class => $router,
-                        'route' => $route,
+                        'route' => $event->route,
                     ]
                 );
             } catch (RouteNotFoundException $e2) {
@@ -136,27 +135,25 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
 
             if (!$matched) {
                 $event = $this->emit(
-                    RoutingNotMatchedEvent::class,
-                    [
-                        'route' => $route,
-                        'request' => $request,
-                        'systemUri' => $event->getSystemUri(),
-                        'exception' => $e,
-                    ]
+                    new RoutingNotMatchedEvent(
+                        systemUri: $event->systemUri,
+                        request: $request,
+                        route: $event->route,
+                        exception: $e
+                    )
                 );
 
-                throw $event->getException();
+                throw $event->exception;
             }
         }
 
         $event = $this->emit(
-            AfterRoutingEvent::class,
-            [
-                'route' => $route,
-                'request' => $request,
-                'systemUri' => $event->getSystemUri(),
-                'matched' => $matched,
-            ]
+            new AfterRoutingEvent(
+                systemUri: $event->systemUri,
+                request: $request,
+                route: $event->route,
+                matched: $matched
+            )
         );
 
         $override = (bool) $this->getOption('method_override');
@@ -165,7 +162,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             ? $this->app->getRequestMethod()
             : $this->app->getRequestRawMethod();
 
-        $controller = $this->findController($method, $matched = $event->getMatched());
+        $controller = $this->findController($method, $matched = $event->matched);
 
         $this->app->getContainer()->modify(
             AppContext::class,
@@ -180,13 +177,13 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         }
 
         $middlewares = $matched->getMiddlewares();
-        $runner = $this->app->make(MiddlewareRunner::class);
 
-        return $runner->run(
-            $request,
-            $middlewares,
-            fn(ServerRequestInterface $request) => $handler->handle($request)
-        );
+        return $this->app->make(MiddlewareRunner::class)
+            ->run(
+                $request,
+                $middlewares,
+                fn(ServerRequestInterface $request) => $handler->handle($request)
+            );
     }
 
     /**

@@ -27,7 +27,7 @@ class MailInlinerSubscriber
             );
         }
 
-        $message = $event->getMessage();
+        $message = $event->message;
 
         $body = $message->getHtmlBody();
 

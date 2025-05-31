@@ -5,25 +5,29 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router\Event;
 
 use Windwalker\Core\Router\Navigator;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AfterRouteBuildEvent class.
  */
-class AfterRouteBuildEvent extends AbstractEvent
+class AfterRouteBuildEvent extends BaseEvent
 {
-    protected string $url = '';
+    use AccessorBCTrait;
 
-    protected string $route = '';
-
-    protected array $query = [];
-
-    protected Navigator $navigator;
-
-    protected int $options = 0;
+    public function __construct(
+        public string $url,
+        public string $route,
+        public array $query,
+        public Navigator $navigator,
+        public int $options
+    ) {
+    }
 
     /**
      * @return string
+     *
+     * @deprecated  Use property instead.
      */
     public function &getRoute(): string
     {
@@ -31,19 +35,9 @@ class AfterRouteBuildEvent extends AbstractEvent
     }
 
     /**
-     * @param  string  $route
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRoute(string $route): static
-    {
-        $this->route = $route;
-
-        return $this;
-    }
-
-    /**
      * @return array
+     *
+     * @deprecated  Use property instead.
      */
     public function &getQuery(): array
     {
@@ -51,74 +45,12 @@ class AfterRouteBuildEvent extends AbstractEvent
     }
 
     /**
-     * @param  array  $query
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setQuery(array $query): static
-    {
-        $this->query = $query;
-
-        return $this;
-    }
-
-    /**
-     * @return Navigator
-     */
-    public function getNavigator(): Navigator
-    {
-        return $this->navigator;
-    }
-
-    /**
-     * @param  Navigator  $navigator
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setNavigator(Navigator $navigator): static
-    {
-        $this->navigator = $navigator;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOptions(): int
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param  int  $options
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setOptions(int $options)
-    {
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
      * @return string
+     *
+     * @deprecated  Use property instead.
      */
     public function &getUrl(): string
     {
         return $this->url;
-    }
-
-    /**
-     * @param  string  $url
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setUrl(string $url): static
-    {
-        $this->url = $url;
-
-        return $this;
     }
 }

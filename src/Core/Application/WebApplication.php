@@ -16,7 +16,6 @@ use Stringable;
 use Throwable;
 use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\CliServer\CliServerRuntime;
-use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\DI\RequestReleasableProviderInterface;
 use Windwalker\Core\Events\Web\AfterRequestEvent;
@@ -25,7 +24,6 @@ use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Events\Web\TerminatingEvent;
 use Windwalker\Core\Form\Exception\ValidateFailException;
-use Windwalker\Core\Module\ModuleInterface;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\RequestProvider;
@@ -186,14 +184,14 @@ class WebApplication implements WebRootApplicationInterface
      */
     public function createContextFromServerEvent(RequestEvent $event): AppContext
     {
-        $request = $event->getRequest();
+        $request = $event->request;
 
         $appContext = $this->createContext($request);
 
         $container = $appContext->getContainer();
-        $container->share(OutputInterface::class, $event->getOutput());
+        $container->share(OutputInterface::class, $event->output);
 
-        $event->setAttribute('appContext', $appContext);
+        $event->attributes['appContext'] = $appContext;
 
         return $appContext;
     }
@@ -219,8 +217,7 @@ class WebApplication implements WebRootApplicationInterface
 
         // @event
         $event = $this->emit(
-            BeforeRequestEvent::class,
-            compact('container', 'request')
+            new BeforeRequestEvent(container: $container, request: $request)
         );
 
         if ($handler) {
@@ -229,11 +226,10 @@ class WebApplication implements WebRootApplicationInterface
 
         // @event
         $event = $appContext->emit(
-            BeforeRequestEvent::class,
-            ['container' => $container, 'request' => $event->getRequest()]
+            new BeforeRequestEvent(container: $container, request: $event->request)
         );
 
-        $request = $event->getRequest();
+        $request = $event->request;
 
         $middlewares = MiddlewareRunner::chainMiddlewares(
             $this->middlewares,
@@ -244,25 +240,26 @@ class WebApplication implements WebRootApplicationInterface
 
         // @event
         $event = $appContext->emit(
-            BeforeAppDispatchEvent::class,
-            compact('container', 'middlewares', 'request')
+            new BeforeAppDispatchEvent(
+                request: $request,
+                container: $container,
+                middlewares: $middlewares
+            )
         );
 
-        $response = $this->dispatch($appContext, $event->getRequest(), $event->getMiddlewares());
+        $response = $this->dispatch($appContext, $event->request, $event->middlewares);
 
         // @event
         $event = $this->emit(
-            AfterRequestEvent::class,
-            compact('container', 'response')
+            new AfterRequestEvent(container: $container, response: $response)
         );
 
         // @event
         $event = $appContext->emit(
-            AfterRequestEvent::class,
-            ['container' => $container, 'response' => $event->getResponse()]
+            new AfterRequestEvent(container: $container, response: $event->response)
         );
 
-        return $event->getResponse();
+        return $event->response;
     }
 
     public function runCliServerRequest(RequestEvent $event): RequestEvent
@@ -299,12 +296,12 @@ class WebApplication implements WebRootApplicationInterface
                 }
             }
         } finally {
-            $event->setEndHandler(fn () => $this->stopContext($appContext));
+            $event->setEndHandler(fn() => $this->stopContext($appContext));
 
             $duration = round((microtime(true) - $start) * 1000);
 
             $client->logRequestInfo(
-                $event->getRequest(),
+                $event->request,
                 $statusCode,
                 $duration
             );
@@ -320,7 +317,7 @@ class WebApplication implements WebRootApplicationInterface
     {
         $appContext = $this->createContextFromServerEvent($event);
 
-        $event->setEndHandler(fn () => $this->stopContext($appContext));
+        $event->setEndHandler(fn() => $this->stopContext($appContext));
 
         return $this->runContext($appContext);
     }
@@ -355,8 +352,7 @@ class WebApplication implements WebRootApplicationInterface
         $container = $appContext->getContainer();
 
         $appContext->emit(
-            AfterRespondEvent::class,
-            compact('container')
+            new AfterRespondEvent(container: $container),
         );
 
         $this->releaseProviders($container);
@@ -384,7 +380,7 @@ class WebApplication implements WebRootApplicationInterface
         try {
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
-        } catch (ValidateFailException | InvalidTokenException $e) {
+        } catch (ValidateFailException|InvalidTokenException $e) {
             if ($app->isDebug() || $app->isApiCall()) {
                 throw $e;
             }
@@ -489,11 +485,10 @@ class WebApplication implements WebRootApplicationInterface
         $this->terminating($this->getContainer());
 
         $this->emit(
-            TerminatingEvent::class,
-            [
-                'app' => $this,
-                'container' => $this->getContainer(),
-            ]
+            new TerminatingEvent(
+                app: $this,
+                container: $this->container,
+            )
         );
     }
 

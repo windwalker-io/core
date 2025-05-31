@@ -7,45 +7,29 @@ namespace Windwalker\Core\View\Event;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AbstractViewRenderEvent class.
  */
-class AbstractViewRenderEvent extends AbstractEvent
+abstract class AbstractViewRenderEvent extends BaseEvent
 {
-    protected View $view;
+    use AccessorBCTrait;
 
-    protected string $layout;
-
-    protected ViewModelInterface $viewModel;
-
-    protected array $data = [];
-
-    protected AppState $state;
-
-    /**
-     * @return View
-     */
-    public function getView(): View
-    {
-        return $this->view;
-    }
-
-    /**
-     * @param  View  $view
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setView(View $view): static
-    {
-        $this->view = $view;
-
-        return $this;
+    public function __construct(
+        public View $view,
+        public ViewModelInterface $viewModel,
+        public AppState $state,
+        public string $layout,
+        public array $data,
+    ) {
     }
 
     /**
      * @return array
+     *
+     * @deprecated  Use property instead.
      */
     public function &getData(): array
     {
@@ -53,74 +37,12 @@ class AbstractViewRenderEvent extends AbstractEvent
     }
 
     /**
-     * @param  array  $data
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
-     * @return ViewModelInterface
-     */
-    public function getViewModel(): ViewModelInterface
-    {
-        return $this->viewModel;
-    }
-
-    /**
-     * @param  ViewModelInterface  $viewModel
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setViewModel(ViewModelInterface $viewModel)
-    {
-        $this->viewModel = $viewModel;
-
-        return $this;
-    }
-
-    /**
      * @return string
+     *
+     * @deprecated  Use property instead.
      */
     public function &getLayout(): string
     {
         return $this->layout;
-    }
-
-    /**
-     * @param  string  $layout
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setLayout(string $layout): static
-    {
-        $this->layout = $layout;
-
-        return $this;
-    }
-
-    /**
-     * @return AppState
-     */
-    public function getState(): AppState
-    {
-        return $this->state;
-    }
-
-    /**
-     * @param  AppState  $state
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setState(AppState $state): static
-    {
-        $this->state = $state;
-
-        return $this;
     }
 }

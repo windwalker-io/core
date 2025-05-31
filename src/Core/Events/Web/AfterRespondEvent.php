@@ -5,32 +5,20 @@ declare(strict_types=1);
 namespace Windwalker\Core\Events\Web;
 
 use Windwalker\DI\Container;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AfterRespondEvent class.
  */
-class AfterRespondEvent extends AbstractEvent
+class AfterRespondEvent extends BaseEvent
 {
-    protected Container $container;
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container
-    {
-        return $this->container;
-    }
+    use AccessorBCTrait;
 
     /**
      * @param  Container  $container
-     *
-     * @return  static  Return self to support chaining.
      */
-    public function setContainer(Container $container): static
+    public function __construct(public Container $container)
     {
-        $this->container = $container;
-
-        return $this;
     }
 }

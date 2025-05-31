@@ -141,11 +141,14 @@ class AppRequest implements AppRequestInterface, JsonSerializable
         $type = RequestGetValueEvent::TYPE_QUERY;
 
         $event = $this->emit(
-            RequestGetValueEvent::class,
-            compact('appRequest', 'values', 'type')
+            new RequestGetValueEvent(
+                appRequest: $appRequest,
+                type: $type,
+                values: $values
+            )
         );
 
-        return $event->getValues();
+        return $event->values;
     }
 
     public function getUrlVars(): array
@@ -159,11 +162,14 @@ class AppRequest implements AppRequestInterface, JsonSerializable
         $type = RequestGetValueEvent::TYPE_URL_VARS;
 
         $event = $this->emit(
-            RequestGetValueEvent::class,
-            compact('appRequest', 'values', 'type')
+            new RequestGetValueEvent(
+                appRequest: $appRequest,
+                type: $type,
+                values: $values
+            )
         );
 
-        return $event->getValues();
+        return $event->values;
     }
 
     public function getBodyValues(): array
@@ -174,11 +180,14 @@ class AppRequest implements AppRequestInterface, JsonSerializable
         $type = RequestGetValueEvent::TYPE_BODY;
 
         $event = $this->emit(
-            RequestGetValueEvent::class,
-            compact('appRequest', 'values', 'type')
+            new RequestGetValueEvent(
+                appRequest: $appRequest,
+                type: $type,
+                values: $values
+            )
         );
 
-        return $event->getValues();
+        return $event->values;
     }
 
     public function isAccept(string $type): bool

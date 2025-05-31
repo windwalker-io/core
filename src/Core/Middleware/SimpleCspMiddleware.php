@@ -76,14 +76,11 @@ class SimpleCspMiddleware implements MiddlewareInterface
             $this->asset->on(
                 AssetBeforeRender::class,
                 function (AssetBeforeRender $event) use ($nonce) {
-                    $links = &$event->getLinks();
-
-                    foreach ($links as $i => $link) {
-                        $links[$i] = $link->withAttribute('nonce', $nonce);
+                    foreach ($event->links as $i => $link) {
+                        $event->links[$i] = $link->withAttribute('nonce', $nonce);
                     }
 
-                    $attrs = &$event->getInternalAttrs();
-                    $attrs['nonce'] = $nonce;
+                    $event->internalAttrs['nonce'] = $nonce;
                 }
             );
 

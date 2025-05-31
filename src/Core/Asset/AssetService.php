@@ -318,21 +318,20 @@ class AssetService implements EventAwareInterface
         $html = [];
 
         $event = $this->emit(
-            AssetBeforeRender::class,
-            [
-                'assetService' => $this,
-                'withInternal' => $withInternal,
-                'internalAttrs' => $internalAttrs,
-                'links' => $this->styles,
-                'html' => $html,
-                'type' => AssetBeforeRender::TYPE_CSS,
-            ]
+            new AssetBeforeRender(
+                type: AssetBeforeRender::TYPE_CSS,
+                assetService: $this,
+                withInternal: $withInternal,
+                html: $html,
+                links: $this->styles,
+                internalAttrs: $internalAttrs
+            )
         );
 
         $withInternal = $event->isWithInternal();
-        $html = $event->getHtml();
+        $html = $event->html;
 
-        foreach ($event->getLinks() as $url => $style) {
+        foreach ($event->links as $url => $style) {
             if ($style->isFooter() !== $footer) {
                 continue;
             }
@@ -359,7 +358,7 @@ class AssetService implements EventAwareInterface
         if ($withInternal && $this->internalStyles) {
             $html[] = (string) h(
                 'style',
-                $event->getInternalAttrs(),
+                $event->internalAttrs,
                 "\n" . $this->renderInternalCSS($footer) . "\n" . $this->indents
             );
         }
@@ -380,21 +379,20 @@ class AssetService implements EventAwareInterface
         $html = [];
 
         $event = $this->emit(
-            AssetBeforeRender::class,
-            [
-                'assetService' => $this,
-                'withInternal' => $withInternal,
-                'internalAttrs' => $internalAttrs,
-                'links' => $this->scripts,
-                'html' => $html,
-                'type' => AssetBeforeRender::TYPE_JS,
-            ]
+            new AssetBeforeRender(
+                type: AssetBeforeRender::TYPE_JS,
+                assetService: $this,
+                withInternal: $withInternal,
+                html: $html,
+                links: $this->scripts,
+                internalAttrs: $internalAttrs
+            )
         );
 
         $withInternal = $event->isWithInternal();
-        $html = $event->getHtml();
+        $html = $event->html;
 
-        foreach ($event->getLinks() as $url => $script) {
+        foreach ($event->links as $url => $script) {
             $defaultAttrs = [
                 'src' => $script->getHref(),
             ];
@@ -423,7 +421,7 @@ class AssetService implements EventAwareInterface
         if ($withInternal && $this->internalScripts) {
             $html[] = (string) h(
                 'script',
-                $event->getInternalAttrs(),
+                $event->internalAttrs,
                 "\n" . $this->renderInternalJS() . "\n" . $this->indents
             );
         }
@@ -447,8 +445,6 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * renderInternalStyles
-     *
      * @return  string
      */
     public function renderInternalJS(): string

@@ -68,13 +68,17 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
 
         $mailer = $this;
         $event = $this->emit(
-            BeforeSendEvent::class,
-            compact('mailer', 'message', 'envelope', 'flags')
+            new BeforeSendEvent(
+                message: $message,
+                mailer: $mailer,
+                envelope: $envelope,
+                flags: $flags
+            )
         );
 
-        $flags = $event->getFlags();
-        $envelope = $event->getEnvelope();
-        $message = $event->getMessage();
+        $flags = $event->flags;
+        $envelope = $event->envelope;
+        $message = $event->message;
 
         if ($flags & static::IGNORE_ENVELOPE) {
             $envelope = null;

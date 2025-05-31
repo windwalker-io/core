@@ -4,57 +4,29 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
+
 /**
  * The ConsoleLogEvent class.
  */
 class ConsoleLogEvent
 {
+    use AccessorBCTrait;
+
     /**
      * MessageEvent constructor.
      *
-     * @param  string|array  $messages
-     * @param  string        $type
+     * @param  array   $messages
+     * @param  string  $type
      */
     public function __construct(
-        protected string|array $messages,
-        protected ?string $type = null,
+        public array $messages {
+            get => $this->messages;
+            set ($value) {
+                $this->messages = (array) $value;
+            }
+        },
+        public ?string $type = null,
     ) {
-    }
-
-    public function getMessages(): array
-    {
-        return (array) $this->messages;
-    }
-
-    /**
-     * @param  array|string  $messages
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMessages(array|string $messages)
-    {
-        $this->messages = $messages;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param  string  $type
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setType(?string $type): static
-    {
-        $this->type = $type;
-
-        return $this;
     }
 }

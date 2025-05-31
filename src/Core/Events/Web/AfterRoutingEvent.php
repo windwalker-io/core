@@ -7,98 +7,21 @@ namespace Windwalker\Core\Events\Web;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The BeforeRoutingEvent class.
  */
-class AfterRoutingEvent extends AbstractEvent
+class AfterRoutingEvent extends BaseEvent
 {
-    protected SystemUri $systemUri;
+    use AccessorBCTrait;
 
-    protected ServerRequestInterface $request;
-
-    protected string $route;
-
-    protected Route $matched;
-
-    /**
-     * @return SystemUri
-     */
-    public function getSystemUri(): SystemUri
-    {
-        return $this->systemUri;
-    }
-
-    /**
-     * @param  SystemUri  $systemUri
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setSystemUri(SystemUri $systemUri): static
-    {
-        $this->systemUri = $systemUri;
-
-        return $this;
-    }
-
-    /**
-     * @return ServerRequestInterface
-     */
-    public function getRequest(): ServerRequestInterface
-    {
-        return $this->request;
-    }
-
-    /**
-     * @param  ServerRequestInterface  $request
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRequest(ServerRequestInterface $request): static
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRoute(): string
-    {
-        return $this->route;
-    }
-
-    /**
-     * @param  string  $route
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRoute(string $route): static
-    {
-        $this->route = $route;
-
-        return $this;
-    }
-
-    /**
-     * @return Route
-     */
-    public function getMatched(): Route
-    {
-        return $this->matched;
-    }
-
-    /**
-     * @param  Route  $matched
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMatched(Route $matched): static
-    {
-        $this->matched = $matched;
-
-        return $this;
+    public function __construct(
+        public SystemUri $systemUri,
+        public ServerRequestInterface $request,
+        public string $route,
+        public Route $matched
+    ) {
     }
 }

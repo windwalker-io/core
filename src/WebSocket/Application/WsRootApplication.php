@@ -176,7 +176,7 @@ class WsRootApplication implements WsRootApplicationInterface
             $request = WebSocketRequest::createFromFrame($frame);
         }
 
-        $request = $request->withUri((new Uri())->withPath($task))
+        $request = $request->withUri(new Uri()->withPath($task))
             ->withParsedBody($input);
 
         return $this->createContext($request);
@@ -208,8 +208,7 @@ class WsRootApplication implements WsRootApplicationInterface
 
         // @event
         $event = $this->emit(
-            BeforeRequestEvent::class,
-            compact('container', 'request')
+            new BeforeRequestEvent(container: $container, request: $request)
         );
 
         if ($handler) {
@@ -218,24 +217,21 @@ class WsRootApplication implements WsRootApplicationInterface
 
         // @event
         $event = $appContext->emit(
-            BeforeRequestEvent::class,
-            ['container' => $container, 'request' => $event->getRequest()]
+            new BeforeRequestEvent(container: $container, request: $event->request)
         );
 
-        $request = $event->getRequest();
+        $request = $event->request;
 
         $response = $this->dispatchContext($appContext, $request);
 
         // @event
         $event = $this->emit(
-            AfterRequestEvent::class,
-            compact('container', 'response')
+            new AfterRequestEvent(container: $container, response: $response)
         );
 
         // @event
         $event = $appContext->emit(
-            AfterRequestEvent::class,
-            ['container' => $container, 'response' => $event->getResponse()]
+            new AfterRequestEvent(container: $container, response: $event->response)
         );
 
         $client->logWebSocketMessageEnd(
@@ -243,7 +239,7 @@ class WsRootApplication implements WsRootApplicationInterface
             (int) round((microtime(true) - $start) * 1000)
         );
 
-        return $event->getResponse();
+        return $event->response;
     }
 
     public function runContextByRequest(WebSocketRequestInterface $request): ResponseInterface
@@ -265,11 +261,14 @@ class WsRootApplication implements WsRootApplicationInterface
 
         // @event
         $event = $appContext->emit(
-            BeforeAppDispatchEvent::class,
-            compact('container', 'middlewares', 'request')
+            new BeforeAppDispatchEvent(
+                request: $request,
+                container: $container,
+                middlewares: $middlewares,
+            )
         );
 
-        return $this->dispatch($appContext, $event->getRequest(), $event->getMiddlewares());
+        return $this->dispatch($appContext, $event->request, $event->middlewares);
     }
 
     /**
@@ -310,11 +309,10 @@ class WsRootApplication implements WsRootApplicationInterface
         $this->terminating($this->getContainer());
 
         $this->emit(
-            TerminatingEvent::class,
-            [
-                'app' => $this,
-                'container' => $this->getContainer(),
-            ]
+            new TerminatingEvent(
+                app: $this,
+                container: $this->container,
+            )
         );
     }
 

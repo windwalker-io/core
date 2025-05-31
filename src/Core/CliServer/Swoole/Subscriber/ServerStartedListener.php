@@ -14,8 +14,8 @@ class ServerStartedListener
 {
     public function __invoke(StartEvent $event): void
     {
-        $server = $event->getServer();
-        $serv = $event->getSwooleServer();
+        $server = $event->server;
+        $serv = $event->swooleServer;
         $serverState = CliServerRuntime::getServerState();
 
         $serverState->setMasterPid($serv->getMasterPid());

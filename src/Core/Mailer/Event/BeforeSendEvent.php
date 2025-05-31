@@ -7,98 +7,31 @@ namespace Windwalker\Core\Mailer\Event;
 use Symfony\Component\Mailer\Envelope;
 use Windwalker\Core\Mailer\MailerInterface;
 use Windwalker\Core\Mailer\MailMessage;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The BeforeSendEvent class.
  */
-class BeforeSendEvent extends AbstractEvent
+class BeforeSendEvent extends BaseEvent
 {
-    protected MailMessage $message;
+    use AccessorBCTrait;
 
-    protected MailerInterface $mailer;
-
-    protected ?Envelope $envelope = null;
-
-    protected int $flags = 0;
-
-    /**
-     * @return MailMessage
-     */
-    public function getMessage(): MailMessage
-    {
-        return $this->message;
-    }
-
-    /**
-     * @param  MailMessage  $message
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMessage(MailMessage $message): static
-    {
-        $this->message = $message;
-
-        return $this;
-    }
-
-    /**
-     * @return MailerInterface
-     */
-    public function getMailer(): MailerInterface
-    {
-        return $this->mailer;
-    }
-
-    /**
-     * @param  MailerInterface  $mailer
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMailer(MailerInterface $mailer): static
-    {
-        $this->mailer = $mailer;
-
-        return $this;
-    }
-
-    /**
-     * @return Envelope|null
-     */
-    public function getEnvelope(): ?Envelope
-    {
-        return $this->envelope;
-    }
-
-    /**
-     * @param  Envelope|null  $envelope
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setEnvelope(?Envelope $envelope): static
-    {
-        $this->envelope = $envelope;
-
-        return $this;
+    public function __construct(
+        public MailMessage $message,
+        public MailerInterface $mailer,
+        public ?Envelope $envelope = null,
+        public int $flags = 0
+    ) {
     }
 
     /**
      * @return int
+     *
+     * @deprecated  Use property instead.
      */
     public function &getFlags(): int
     {
         return $this->flags;
-    }
-
-    /**
-     * @param  int  $flags
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setFlags(int $flags): static
-    {
-        $this->flags = $flags;
-
-        return $this;
     }
 }

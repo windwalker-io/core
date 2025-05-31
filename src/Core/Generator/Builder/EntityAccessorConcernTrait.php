@@ -85,20 +85,19 @@ trait EntityAccessorConcernTrait
                 ->getNode();
 
             $event = $this->emit(
-                BuildEntityMethodEvent::class,
-                [
-                    'accessorType' => 'getter',
-                    'methodName' => $getter,
-                    'method' => $method,
-                    'propName' => $propName,
-                    'column' => $column,
-                    'prop' => $propNode,
-                    'type' => $type,
-                    'entityMemberBuilder' => $this,
-                ]
+                new BuildEntityMethodEvent(
+                    accessorType: 'getter',
+                    methodName: $getter,
+                    propName: $propName,
+                    prop: $propNode,
+                    column: $column,
+                    method: $method,
+                    type: $type,
+                    entityMemberBuilder: $this,
+                )
             );
 
-            $methods[] = $event->getMethod();
+            $methods[] = $event->method;
         }
 
         // Setter
@@ -129,17 +128,16 @@ trait EntityAccessorConcernTrait
             }
 
             $event = $this->emit(
-                BuildEntityMethodEvent::class,
-                [
-                    'accessorType' => 'setter',
-                    'methodName' => $getter,
-                    'method' => $method,
-                    'propName' => $propName,
-                    'column' => $column,
-                    'prop' => $propNode,
-                    'type' => $type,
-                    'entityMemberBuilder' => $this,
-                ]
+                new BuildEntityMethodEvent(
+                    accessorType: 'setter',
+                    methodName: $setter,
+                    propName: $propName,
+                    prop: $propNode,
+                    column: $column,
+                    method: $method,
+                    type: $type,
+                    entityMemberBuilder: $this,
+                )
             );
 
             if (!$typeNode instanceof Node\UnionType) {
@@ -188,7 +186,7 @@ trait EntityAccessorConcernTrait
                 }
             }
 
-            $methods[] = $event->getMethod();
+            $methods[] = $event->method;
         }
 
         return $methods;

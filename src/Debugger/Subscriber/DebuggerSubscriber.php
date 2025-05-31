@@ -100,7 +100,7 @@ class DebuggerSubscriber
 
         $this->profiler->mark('RequestStart', ['system']);
 
-        $container = $event->getContainer();
+        $container = $event->container;
 
         $container->share('debugger.collector', $collector = new Collection());
         $container->share('debugger.queue', $queue = new Collection());
@@ -111,7 +111,7 @@ class DebuggerSubscriber
     #[ListenTo(AfterRoutingEvent::class, ListenerPriority::MIN)]
     public function afterRouting(AfterRoutingEvent $event): void
     {
-        $matchedRoute = $event->getMatched();
+        $matchedRoute = $event->matched;
 
         if (str_starts_with((string) $matchedRoute?->getPattern(), '/_debugger')) {
             $this->disableCollection = true;
@@ -128,7 +128,7 @@ class DebuggerSubscriber
             return;
         }
 
-        $container = $event->getContainer();
+        $container = $event->container;
         $app = $container->get(AppContext::class);
 
         if ($app->isDebugProfilerDisabled()) {
@@ -156,7 +156,7 @@ class DebuggerSubscriber
             return;
         }
 
-        $app = $event->getApp();
+        $app = $event->app;
 
         if ($app->isDebugProfilerDisabled()) {
             return;
@@ -177,7 +177,7 @@ class DebuggerSubscriber
 
                 $routing['matched'] = $app->getMatchedRoute();
                 $routing['routes'] = $app->service(Router::class)->getRoutes();
-                $routing['controller'] = $event->getController();
+                $routing['controller'] = $event->controller;
 
                 $collector['routing'] = $routing;
             }
@@ -192,7 +192,7 @@ class DebuggerSubscriber
             return;
         }
 
-        if ($event->getApp()->isDebugProfilerDisabled()) {
+        if ($event->app->isDebugProfilerDisabled()) {
             return;
         }
 
@@ -203,7 +203,7 @@ class DebuggerSubscriber
     public function afterRequest(
         AfterRequestEvent $event
     ): void {
-        $container = $event->getContainer();
+        $container = $event->container;
         $app = $container->get(AppContext::class);
 
         $appReq = $app->getAppRequest();
@@ -245,7 +245,7 @@ class DebuggerSubscriber
                 $http['overrideMethod'] = $appReq->getOverrideMethod();
                 $http['remoteIP'] = HttpHelper::getIp($req->getServerParams());
 
-                $res = $event->getResponse();
+                $res = $event->response;
 
                 $http['response'] = [
                     'status' => $res->getStatusCode(),
@@ -262,7 +262,7 @@ class DebuggerSubscriber
 
                 $collector['http'] = $http;
 
-                $this->finishCollected($event->getResponse());
+                $this->finishCollected($event->response);
             }
         );
     }
@@ -363,13 +363,13 @@ class DebuggerSubscriber
                 $manager->on(
                     InstanceCreatedEvent::class,
                     function (InstanceCreatedEvent $event) use ($app, $queue, $collector) {
-                        $name = $event->getInstanceName();
+                        $name = $event->instanceName;
                         $dbCollector = $collector->proxy('db.queries.' . $name);
                         $startTime = null;
                         $memory = null;
 
                         /** @var DatabaseAdapter $db */
-                        $db = $event->getInstance();
+                        $db = $event->instance;
 
                         $db->on(
                             QueryStartEvent::class,
@@ -406,24 +406,24 @@ class DebuggerSubscriber
                                     return;
                                 }
 
-                                if (str_starts_with(strtoupper($event->getSql()), 'EXPLAIN')) {
+                                if (str_starts_with(strtoupper($event->sql), 'EXPLAIN')) {
                                     return;
                                 }
 
                                 $data['time'] = microtime(true) - $startTime;
                                 $data['memory'] = memory_get_usage(false) - $memory;
-                                $data['count'] = $event->getStatement()->countAffected();
+                                $data['count'] = $event->statement->countAffected();
                                 $backtrace = debug_backtrace();
 
                                 $queue->push(
                                     function () use ($name, $event, $db, $dbCollector, $backtrace, &$data) {
-                                        $data['raw_query'] = (string) $event->getQuery();
-                                        $data['debug_query'] = $event->getDebugQueryString();
-                                        $data['bounded'] = $event->getBounded();
+                                        $data['raw_query'] = (string) $event->query;
+                                        $data['debug_query'] = $event->debugQueryString;
+                                        $data['bounded'] = $event->bounded;
                                         $data['connection'] = $name;
                                         $data['backtrace'] = BacktraceHelper::normalizeBacktraces($backtrace);
 
-                                        $query = $event->getQuery();
+                                        $query = $event->query;
 
                                         if (
                                             $db->getPlatform()->getName() === AbstractPlatform::MYSQL

@@ -24,7 +24,7 @@ class SessionRobotSubscriber
     #[ListenTo(BeforeRequestEvent::class)]
     public function beforeRequest(BeforeRequestEvent $event): void
     {
-        $container = $event->getContainer();
+        $container = $event->container;
 
         $browser = $container->get(Browser::class);
 

@@ -15,7 +15,6 @@ use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Data\Collection;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Event\EventAwareTrait;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
@@ -23,6 +22,9 @@ use Windwalker\Utilities\TypeCast;
 
 /**
  * The Navigator class.
+ *
+ * @event  BeforeRouteBuildEvent
+ * @event  AfterRouteBuildEvent
  */
 class Navigator implements NavConstantInterface, EventAwareInterface
 {
@@ -128,13 +130,17 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                 if (!($options & static::IGNORE_EVENTS)) {
                     $event = $this->emit(
-                        BeforeRouteBuildEvent::class,
-                        compact('navigator', 'query', 'route', 'options')
+                        new BeforeRouteBuildEvent(
+                            route: $route,
+                            query: $query,
+                            navigator: $navigator,
+                            options: $options
+                        )
                     );
 
-                    $route = $event->getRoute();
-                    $options = $event->getOptions();
-                    $query = $event->getQuery();
+                    $route = $event->route;
+                    $options = $event->options;
+                    $query = $event->query;
                 }
 
                 $handler = function (array $query) use ($navigator, $options, $route): array {
@@ -150,12 +156,17 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                     if (!($options & static::IGNORE_EVENTS)) {
                         $event = $this->emit(
-                            AfterRouteBuildEvent::class,
-                            compact('navigator', 'query', 'route', 'options', 'url')
+                            new AfterRouteBuildEvent(
+                                url: $url,
+                                route: $route,
+                                query: $query,
+                                navigator: $navigator,
+                                options: $options
+                            )
                         );
 
-                        $query = $event->getQuery();
-                        $url = $event->getUrl();
+                        $query = $event->query;
+                        $url = $event->url;
                     }
 
                     $systemUri = $this->getSystemUri();
@@ -176,8 +187,8 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      * createRouteUri
      *
      * @param  Closure|Stringable|string  $uri
-     * @param  array|null                  $vars
-     * @param  int                         $options
+     * @param  array|null                 $vars
+     * @param  int                        $options
      *
      * @return  RouteUri
      */

@@ -99,11 +99,13 @@ abstract class AbstractManager implements EventAwareInterface
 
         $instance = $this->container->newInstance($define, $args);
 
-        $this->emit(InstanceCreatedEvent::class, [
-            'instance' => $instance,
-            'instanceName' => $name,
-            'args' => $args,
-        ]);
+        $this->emit(
+            new InstanceCreatedEvent(
+                instance: $instance,
+                instanceName: $name,
+                args: $args
+            )
+        );
 
         return $instance;
     }

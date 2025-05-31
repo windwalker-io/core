@@ -179,19 +179,18 @@ class View implements EventAwareInterface, \ArrayAccess
 
         // @event Before Prepare Data
         $event = $this->emit(
-            PrepareDataEvent::class,
-            [
-                'view' => $this,
-                'viewModel' => $vm,
-                'data' => $data,
-                'layout' => $layout,
-                'state' => $this->getState(),
-            ]
+            new PrepareDataEvent(
+                view: $this,
+                viewModel: $vm,
+                state: $this->getState(),
+                layout: $layout,
+                data: $data
+            )
         );
 
-        $vm = $event->getViewModel();
-        $data = $event->getData();
-        $this->layout = $layout = $event->getLayout();
+        $vm = $event->viewModel;
+        $data = $event->data;
+        $this->layout = $layout = $event->layout;
 
         if ($data !== []) {
             $this->injectData($vm, $data);
@@ -199,25 +198,24 @@ class View implements EventAwareInterface, \ArrayAccess
 
         // @event Before Render
         $event = $this->emit(
-            BeforeRenderEvent::class,
-            [
-                'view' => $this,
-                'viewModel' => $vm,
-                'data' => $data,
-                'layout' => $layout,
-                'state' => $this->getState(),
-                'response' => $vm->prepare($this->app, $this),
-            ]
+            new BeforeRenderEvent(
+                response: $vm->prepare($this->app, $this),
+                view: $this,
+                viewModel: $vm,
+                state: $this->getState(),
+                layout: $layout,
+                data: $data
+            )
         );
 
-        $response = $this->handleVMResponse($event->getResponse());
+        $response = $this->handleVMResponse($event->response);
 
         if ($response instanceof RedirectResponse) {
             return $response;
         }
 
         if (is_array($response)) {
-            $data = array_merge($this->rendererService->getGlobals(), $event->getData(), $response);
+            $data = array_merge($this->rendererService->getGlobals(), $event->data, $response);
 
             $data['vm'] = $vm;
 
@@ -248,18 +246,18 @@ class View implements EventAwareInterface, \ArrayAccess
 
         // @event After Render
         $event = $this->emit(
-            AfterRenderEvent::class,
-            [
-                'view' => $this,
-                'viewModel' => $vm,
-                'data' => $data,
-                'layout' => $layout,
-                'content' => $content,
-                'response' => $response,
-            ]
+            new AfterRenderEvent(
+                content: $content,
+                response: $response,
+                view: $this,
+                viewModel: $vm,
+                state: $this->getState(),
+                layout: $layout,
+                data: $data
+            )
         );
 
-        return $event->getResponse();
+        return $event->response;
     }
 
     protected function handleVMResponse(mixed $data): array|string|ResponseInterface
@@ -367,7 +365,7 @@ class View implements EventAwareInterface, \ArrayAccess
                         [
                             self::class => $this,
                             'view' => $this,
-                            ...$this->data
+                            ...$this->data,
                         ]
                     );
                 }

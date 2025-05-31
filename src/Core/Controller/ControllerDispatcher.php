@@ -14,7 +14,6 @@ use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
-use Windwalker\Core\Http\AppRequest;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\StrNormalize;
 
@@ -40,17 +39,17 @@ class ControllerDispatcher
         $controller = $app->getController();
 
         $event = $app->emit(
-            BeforeControllerDispatchEvent::class,
-            compact('app', 'controller')
+            new BeforeControllerDispatchEvent(
+                controller: $controller,
+                app: $app
+            ),
         );
 
-        $controller = $event->getController();
+        $controller = $event->controller;
 
         if ($controller === null) {
             throw new LogicException(
-                sprintf(
-                    'Controller not found, please set "controller" as a callable to :' . $app::class
-                )
+                'Controller not found, please set "controller" as a callable to :' . $app::class
             );
         }
 
@@ -74,14 +73,16 @@ class ControllerDispatcher
         $response = $controller($app);
 
         $event = $app->emit(
-            AfterControllerDispatchEvent::class,
-            compact('app', 'response')
+            new AfterControllerDispatchEvent(
+                app: $app,
+                response: $response
+            ),
         );
 
-        return $event->getResponse();
+        return $event->response;
     }
 
-    protected function getDefaultTask(AppContext $app): string
+    protected function getDefaultTask(AppContextInterface $app): string
     {
         $task = strtolower($app->getRequestMethod());
 

@@ -41,7 +41,7 @@ class SwooleProcessSubscriber
         if (PHP_OS_FAMILY === 'Linux') {
             $state = CliServerRuntime::getServerState();
 
-            $workerId = $event->getWorkerId();
+            $workerId = $event->workerId;
 
             $isTask = $workerId > $state->getWorkerNumber();
             $name = $isTask ? 'task' : 'worker';
@@ -53,7 +53,7 @@ class SwooleProcessSubscriber
     #[ListenTo(TaskEvent::class)]
     public function task(TaskEvent $event): void
     {
-        $data = $event->getData();
+        $data = $event->data;
 
         if (is_callable($data)) {
             $this->container->call($data);

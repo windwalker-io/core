@@ -6,54 +6,17 @@ namespace Windwalker\Core\Events\Web;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\DI\Container;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The BeforeRequestEvent class.
  */
-class BeforeRequestEvent extends AbstractEvent
+class BeforeRequestEvent extends BaseEvent
 {
-    protected ?ServerRequestInterface $request = null;
+    use AccessorBCTrait;
 
-    protected Container $container;
-
-    /**
-     * @return ServerRequestInterface
-     */
-    public function getRequest(): ServerRequestInterface
+    public function __construct(public Container $container, public ?ServerRequestInterface $request = null)
     {
-        return $this->request;
-    }
-
-    /**
-     * @param  ServerRequestInterface  $request
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setRequest(ServerRequestInterface $request): static
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container
-    {
-        return $this->container;
-    }
-
-    /**
-     * @param  Container  $container
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setContainer(Container $container): static
-    {
-        $this->container = $container;
-
-        return $this;
     }
 }

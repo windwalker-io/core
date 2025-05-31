@@ -6,54 +6,17 @@ namespace Windwalker\Core\Events\Web;
 
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\DI\Container;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AppAfterExecute class.
  */
-class AfterRequestEvent extends AbstractEvent
+class AfterRequestEvent extends BaseEvent
 {
-    protected Container $container;
+    use AccessorBCTrait;
 
-    protected ResponseInterface $response;
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container
+    public function __construct(public Container $container, public ResponseInterface $response)
     {
-        return $this->container;
-    }
-
-    /**
-     * @param  Container  $container
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setContainer(Container $container): static
-    {
-        $this->container = $container;
-
-        return $this;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getResponse(): ResponseInterface
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param  ResponseInterface  $response
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setResponse(ResponseInterface $response): static
-    {
-        $this->response = $response;
-
-        return $this;
     }
 }

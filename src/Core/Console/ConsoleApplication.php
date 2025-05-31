@@ -215,7 +215,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         $this->on(
             ConsoleLogEvent::class,
             function (ConsoleLogEvent $event) use ($output) {
-                $tag = match ($event->getType()) {
+                $tag = match ($event->type) {
                     'success', 'green' => '<info>%s</info>',
                     'warning', 'yellow' => '<comment>%s</comment>',
                     'info', 'blue' => '<option>%s</option>',
@@ -223,7 +223,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
                     default => '%s',
                 };
 
-                foreach ($event->getMessages() as $message) {
+                foreach ($event->messages as $message) {
                     $time = gmdate('Y-m-d H:i:s');
 
                     $output->writeln(sprintf('[%s] ' . $tag, $time, $message));

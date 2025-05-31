@@ -53,7 +53,7 @@ class SessionManager extends AbstractManager
             $app->on(
                 AfterRequestEvent::class,
                 function (AfterRequestEvent $event) use ($cookies) {
-                    $res = $event->getResponse();
+                    $res = $event->response;
 
                     foreach ($cookies->getCookieHeaders() as $header) {
                         $res = $res->withAddedHeader('Set-Cookie', $header);

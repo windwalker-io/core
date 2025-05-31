@@ -4,57 +4,22 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Web;
 
-use Psr\Http\Message\ResponseInterface;
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\Context\AppContextInterface;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AfterControllerDispatchEvent class.
  */
-class AfterControllerDispatchEvent extends AbstractEvent
+class AfterControllerDispatchEvent extends BaseEvent
 {
-    protected mixed $response;
-
-    protected AppContextInterface $app;
+    use AccessorBCTrait;
 
     /**
-     * @return mixed
-     */
-    public function getResponse(): mixed
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param  mixed  $response
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setResponse(mixed $response): static
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
-    /**
-     * @return AppContextInterface
-     */
-    public function getApp(): AppContextInterface
-    {
-        return $this->app;
-    }
-
-    /**
+     * @param  mixed                $response
      * @param  AppContextInterface  $app
-     *
-     * @return  static  Return self to support chaining.
      */
-    public function setApp(AppContextInterface $app): static
+    public function __construct(public AppContextInterface $app, public mixed $response)
     {
-        $this->app = $app;
-
-        return $this;
     }
 }

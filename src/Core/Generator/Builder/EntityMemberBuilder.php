@@ -553,16 +553,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         $event = $this->emit(
-            BuildEntityPropertyEvent::class,
-            [
-                'prop' => $prop,
-                'propName' => $propName,
-                'column' => $dbColumn,
-                'entityMemberBuilder' => $this,
-            ]
+            new BuildEntityPropertyEvent(
+                propName: $propName,
+                prop: $prop,
+                column: $dbColumn,
+                entityMemberBuilder: $this
+            )
         );
 
-        return $event->getProp();
+        return $event->prop;
     }
 
     protected function getPks(): array

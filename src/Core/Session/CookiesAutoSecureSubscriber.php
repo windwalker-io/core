@@ -27,7 +27,7 @@ class CookiesAutoSecureSubscriber
     #[ListenTo(BeforeRequestEvent::class)]
     public function beforeRequest(BeforeRequestEvent $event): void
     {
-        $container = $event->getContainer();
+        $container = $event->container;
 
         if ($this->enabled && $container->has(CookiesInterface::class)) {
             $container->extend(

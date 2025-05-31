@@ -375,7 +375,7 @@ class MigrationService implements EventAwareInterface
         $this->db->on(
             QueryEndEvent::class,
             function (QueryEndEvent $event) use ($logStream) {
-                $logStream->write($event->getDebugQueryString() . ";\n\n");
+                $logStream->write($event->debugQueryString . ";\n\n");
             }
         );
 
@@ -383,8 +383,8 @@ class MigrationService implements EventAwareInterface
         $this->db->on(
             QueryFailedEvent::class,
             function (QueryFailedEvent $event) use ($logStream) {
-                $e = $event->getException();
-                $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->getDebugQueryString()}\n\n");
+                $e = $event->exception;
+                $logStream->write("-- ERROR: {$e->getMessage()}\n{$event->debugQueryString}\n\n");
             }
         );
     }

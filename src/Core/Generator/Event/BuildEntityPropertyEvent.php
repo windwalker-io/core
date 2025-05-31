@@ -7,98 +7,21 @@ namespace Windwalker\Core\Generator\Event;
 use PhpParser\Node\Stmt\Property;
 use Windwalker\Core\Generator\Builder\EntityMemberBuilder;
 use Windwalker\Database\Schema\Ddl\Column;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
- * The GenEntityPropertyEvent class.
+ * The BuildEntityPropertyEvent class.
  */
-class BuildEntityPropertyEvent extends AbstractEvent
+class BuildEntityPropertyEvent extends BaseEvent
 {
-    protected string $propName = '';
+    use AccessorBCTrait;
 
-    protected Property $prop;
-
-    protected Column $column;
-
-    protected EntityMemberBuilder $entityMemberBuilder;
-
-    /**
-     * @return Property
-     */
-    public function getProp(): Property
-    {
-        return $this->prop;
-    }
-
-    /**
-     * @param  Property  $prop
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setProp(Property $prop): static
-    {
-        $this->prop = $prop;
-
-        return $this;
-    }
-
-    /**
-     * @return EntityMemberBuilder
-     */
-    public function getEntityMemberBuilder(): EntityMemberBuilder
-    {
-        return $this->entityMemberBuilder;
-    }
-
-    /**
-     * @param  EntityMemberBuilder  $entityMemberBuilder
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setEntityMemberBuilder(EntityMemberBuilder $entityMemberBuilder): static
-    {
-        $this->entityMemberBuilder = $entityMemberBuilder;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPropName(): string
-    {
-        return $this->propName;
-    }
-
-    /**
-     * @param  string  $propName
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setPropName(string $propName): static
-    {
-        $this->propName = $propName;
-
-        return $this;
-    }
-
-    /**
-     * @return Column
-     */
-    public function getColumn(): Column
-    {
-        return $this->column;
-    }
-
-    /**
-     * @param  Column  $column
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setColumn(Column $column): static
-    {
-        $this->column = $column;
-
-        return $this;
+    public function __construct(
+        public string $propName,
+        public Property $prop,
+        public Column $column,
+        public EntityMemberBuilder $entityMemberBuilder
+    ) {
     }
 }

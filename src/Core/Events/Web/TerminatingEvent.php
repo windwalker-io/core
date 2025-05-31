@@ -4,56 +4,21 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Web;
 
-use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\DI\Container;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The TerminatingEvent class.
  */
-class TerminatingEvent extends AbstractEvent
+class TerminatingEvent extends BaseEvent
 {
-    protected WebApplication $app;
+    use AccessorBCTrait;
 
-    protected Container $container;
-
-    /**
-     * @return WebApplication
-     */
-    public function getApp(): WebApplication
-    {
-        return $this->app;
-    }
-
-    /**
-     * @param  WebApplication  $app
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setApp(WebApplication $app): static
-    {
-        $this->app = $app;
-
-        return $this;
-    }
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container
-    {
-        return $this->container;
-    }
-
-    /**
-     * @param  Container  $container
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setContainer(Container $container): static
-    {
-        $this->container = $container;
-
-        return $this;
+    public function __construct(
+        public RootApplicationInterface $app,
+        public Container $container
+    ) {
     }
 }

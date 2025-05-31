@@ -6,76 +6,25 @@ namespace Windwalker\Core\Events\Web;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\DI\Container;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AppBeforeExecute class.
  */
-class BeforeAppDispatchEvent extends AbstractEvent
+class BeforeAppDispatchEvent extends BaseEvent
 {
-    protected ServerRequestInterface $request;
-
-    protected iterable $middlewares = [];
-
-    protected Container $container;
-
-    /**
-     * @return ServerRequestInterface
-     */
-    public function getRequest(): ServerRequestInterface
-    {
-        return $this->request;
-    }
+    use AccessorBCTrait;
 
     /**
      * @param  ServerRequestInterface  $request
-     *
-     * @return  static  Return self to support chaining.
+     * @param  array|iterable          $middlewares
+     * @param  Container               $container
      */
-    public function setRequest(ServerRequestInterface $request): static
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @return Container
-     */
-    public function getContainer(): Container
-    {
-        return $this->container;
-    }
-
-    /**
-     * @param  Container  $container
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setContainer(Container $container): static
-    {
-        $this->container = $container;
-
-        return $this;
-    }
-
-    /**
-     * @return iterable
-     */
-    public function getMiddlewares(): iterable
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * @param  iterable  $middlewares
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setMiddlewares(iterable $middlewares): static
-    {
-        $this->middlewares = $middlewares;
-
-        return $this;
+    public function __construct(
+        public ServerRequestInterface $request,
+        public Container $container,
+        public iterable $middlewares = [],
+    ) {
     }
 }

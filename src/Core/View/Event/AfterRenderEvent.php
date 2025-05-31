@@ -5,56 +5,41 @@ declare(strict_types=1);
 namespace Windwalker\Core\View\Event;
 
 use Psr\Http\Message\ResponseInterface;
+use Windwalker\Core\State\AppState;
+use Windwalker\Core\View\View;
+use Windwalker\Core\View\ViewModelInterface;
 
 /**
  * The AfterRenderEvent class.
  */
 class AfterRenderEvent extends AbstractViewRenderEvent
 {
-    protected string $content;
-
-    protected ResponseInterface $response;
-
-    /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return $this->content;
+    public function __construct(
+        public string $content,
+        public ResponseInterface $response,
+        View $view,
+        ViewModelInterface $viewModel,
+        AppState $state,
+        string $layout,
+        array $data
+    ) {
+        parent::__construct(
+            view: $view,
+            viewModel: $viewModel,
+            state: $state,
+            layout: $layout,
+            data: $data
+        );
     }
 
     /**
-     * @param  string  $content
+     * @param  string        $name
+     * @param  string|array  $value
      *
-     * @return  static  Return self to support chaining.
-     */
-    public function setContent(string $content): static
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getResponse(): ResponseInterface
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param  ResponseInterface  $response
+     * @return  $this
      *
-     * @return  static  Return self to support chaining.
+     * @deprecated  Use `$event->response = $event->response->withAddedHeader()` instead.
      */
-    public function setResponse(ResponseInterface $response): static
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
     public function addHeader(string $name, string|array $value): static
     {
         // Init response

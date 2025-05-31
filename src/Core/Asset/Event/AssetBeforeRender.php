@@ -6,111 +6,34 @@ namespace Windwalker\Core\Asset\Event;
 
 use Windwalker\Core\Asset\AssetLink;
 use Windwalker\Core\Asset\AssetService;
-use Windwalker\Event\AbstractEvent;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
 /**
  * The AssetBeforeRender class.
  */
-class AssetBeforeRender extends AbstractEvent
+class AssetBeforeRender extends BaseEvent
 {
-    public const TYPE_CSS = 'css';
+    use AccessorBCTrait;
 
-    public const TYPE_JS = 'js';
+    public const string TYPE_CSS = 'css';
 
-    protected AssetService $assetService;
+    public const string TYPE_JS = 'js';
 
-    protected bool $withInternal = false;
-
-    protected array $html = [];
-
-    protected array $links = [];
-
-    protected array $internalAttrs = [];
-
-    protected string $type;
-
-    /**0
-     * @return AssetService
-     */
-    public function getAssetService(): AssetService
-    {
-        return $this->assetService;
-    }
-
-    /**
-     * @param  AssetService  $assetService
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setAssetService(AssetService $assetService)
-    {
-        $this->assetService = $assetService;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isWithInternal(): bool
-    {
-        return $this->withInternal;
-    }
-
-    /**
-     * @param  bool  $withInternal
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setWithInternal(bool $withInternal)
-    {
-        $this->withInternal = $withInternal;
-
-        return $this;
+    public function __construct(
+        public string $type,
+        public AssetService $assetService,
+        public bool $withInternal = false,
+        public array $html = [],
+        public array $links = [],
+        public array $internalAttrs = [],
+    ) {
     }
 
     /**
      * @return array
-     */
-    public function getHtml(): array
-    {
-        return $this->html;
-    }
-
-    /**
-     * @param  array  $html
      *
-     * @return  static  Return self to support chaining.
-     */
-    public function setHtml(array $html)
-    {
-        $this->html = $html;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param  string  $type
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setType(string $type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * @return array
+     * @deprecated  Use property instead.
      */
     public function &getInternalAttrs(): array
     {
@@ -118,34 +41,12 @@ class AssetBeforeRender extends AbstractEvent
     }
 
     /**
-     * @param  array  $internalAttrs
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setInternalAttrs(array $internalAttrs): static
-    {
-        $this->internalAttrs = $internalAttrs;
-
-        return $this;
-    }
-
-    /**
      * @return array<AssetLink>
+     *
+     * @deprecated  Use property instead.
      */
     public function &getLinks(): array
     {
         return $this->links;
-    }
-
-    /**
-     * @param  array  $links
-     *
-     * @return  static  Return self to support chaining.
-     */
-    public function setLinks(array $links): static
-    {
-        $this->links = $links;
-
-        return $this;
     }
 }
