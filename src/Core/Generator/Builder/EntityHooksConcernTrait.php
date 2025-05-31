@@ -7,13 +7,17 @@ namespace Windwalker\Core\Generator\Builder;
 use PhpParser\Node;
 use PhpParser\Node\Param;
 use Ramsey\Uuid\UuidInterface;
+use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
 
 trait EntityHooksConcernTrait
 {
-    protected function createHooksIfNotExists(string $propName, Node\Stmt\Property $propNode, ?array &$added = null)
-    {
+    protected function createHooksIfNotExists(
+        string $propName,
+        Node\Stmt\Property $propNode,
+        ?array &$added = null
+    ): array {
         $added = [];
 
         $tbManager = $this->getTableManager();
@@ -42,9 +46,26 @@ trait EntityHooksConcernTrait
             // Getter hook is not necessary by default.
 
             // @event
+            $event = $this->emit(
+                new BuildEntityHookEvent(
+                    hookType: \PropertyHookType::Get,
+                    propName: $propName,
+                    prop: $propNode,
+                    column: $column,
+                    type: $type,
+                    entityMemberBuilder: $this,
+                )
+            );
+
+            if ($event->hook) {
+                $getHook = $event->hook;
+                $added[] = 'hook(get)';
+            }
         }
 
         if (!$setHook) {
+            $added[] = 'hook(set)';
+
             if ($specialSetHook && method_exists($this, $specialSetHook)) {
                 $setHook = $this->{$specialSetHook}($propName, $propNode, $column);
             }
@@ -56,9 +77,7 @@ trait EntityHooksConcernTrait
             //     );
             // }
 
-            // @event
-
-            if (!$typeNode instanceof Node\UnionType) {
+            if (!$setHook && !$typeNode instanceof Node\UnionType) {
                 $className = $this->findFQCN((string) $typeNode);
 
                 // Enum accept scalar value
@@ -113,11 +132,29 @@ trait EntityHooksConcernTrait
                     );
                 }
             }
+
+            // @event
+            $event = $this->emit(
+                new BuildEntityHookEvent(
+                    hookType: \PropertyHookType::Set,
+                    propName: $propName,
+                    prop: $propNode,
+                    column: $column,
+                    type: $type,
+                    entityMemberBuilder: $this,
+                    hook: $setHook,
+                )
+            );
+
+            if ($event->hook) {
+                $setHook = $event->hook;
+                $added[] = 'hook(set)';
+            }
         }
 
         $propNode->hooks = array_filter([$getHook, $setHook]);
 
-        return [];
+        return $propNode->hooks;
     }
 
     protected function createHookAssignValue(

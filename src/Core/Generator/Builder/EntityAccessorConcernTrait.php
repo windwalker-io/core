@@ -127,19 +127,7 @@ trait EntityAccessorConcernTrait
                     ->getNode();
             }
 
-            $event = $this->emit(
-                new BuildEntityMethodEvent(
-                    accessorType: 'setter',
-                    methodName: $setter,
-                    propName: $propName,
-                    prop: $propNode,
-                    column: $column,
-                    method: $method,
-                    type: $type,
-                    entityMemberBuilder: $this,
-                )
-            );
-
+            // Handle enum types
             if (!$typeNode instanceof Node\UnionType) {
                 $className = $this->findFQCN((string) $typeNode);
 
@@ -185,6 +173,19 @@ trait EntityAccessorConcernTrait
                     );
                 }
             }
+
+            $event = $this->emit(
+                new BuildEntityMethodEvent(
+                    accessorType: 'setter',
+                    methodName: $setter,
+                    propName: $propName,
+                    prop: $propNode,
+                    column: $column,
+                    method: $method,
+                    type: $type,
+                    entityMemberBuilder: $this,
+                )
+            );
 
             $methods[] = $event->method;
         }

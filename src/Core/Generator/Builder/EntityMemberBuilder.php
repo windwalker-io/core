@@ -29,7 +29,6 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-use Windwalker\Utilities\Enum\EnumMetaInterface;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\Symbol;
