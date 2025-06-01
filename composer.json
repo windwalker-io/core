@@ -5,7 +5,7 @@
     "license": "MIT",
     "minimum-stability": "beta",
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4.6",
         "ext-json": "*",
         "fakerphp/faker": "^1.0",
         "fig/link-util": "^1.2",
@@ -61,7 +61,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.2.0"
+            "php": "8.4.6"
         }
     },
     "extra": {
