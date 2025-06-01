@@ -498,7 +498,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $prop->setAttribute('fullType', Chronos::class);
             $prop->setAttribute('fullType', ServerTimeCast::class);
             $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute('ServerTimeCast'),
+                $this->attribute(
+                    'CastNullable',
+                    new Node\Expr\ClassConstFetch(new Node\Name('ServerTimeCast'), 'class')
+                ),
             );
         }
 
