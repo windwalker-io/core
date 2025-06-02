@@ -38,7 +38,7 @@ class ServerTimeCast implements CompositeCastInterface
         if ($local === true) {
             if (!$this->chronosService) {
                 throw new \LogicException(
-                    static::class . ' must put in Cast() attribute when toLocal is true, ' .
+                    static::class . ' must put in Cast() attribute when toLocal is TRUE, ' .
                     'otherwise please provide a static timezone.'
                 );
             }
@@ -66,7 +66,7 @@ class ServerTimeCast implements CompositeCastInterface
             if ($server === true) {
                 if (!$this->chronosService) {
                     throw new \LogicException(
-                        static::class . ' must put in Cast() attribute when toServer is true, ' .
+                        static::class . ' must put in Cast() attribute when toServer is TRUE or not set, ' .
                         'otherwise please provide a static timezone.'
                     );
                 }
