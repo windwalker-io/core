@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Builder;
 
+use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\Node\Param;
 use Ramsey\Uuid\UuidInterface;
+use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
@@ -95,26 +97,34 @@ trait EntityHooksConcernTrait
                         $subType = 'int|string';
                     }
 
-                    $subType .= '|' . $type;
+                    if ($type instanceof Node\NullableType) {
+                        $enumClass = $type->type;
+                        $subType .= '|' . $enumClass . '|null';
+                        $nullable = true;
+                    } else {
+                        $enumClass = $type;
+                        $subType .= '|' . $type;
+                        $nullable = false;
+                    }
 
-                    $setHook->params[0] = $factory->param($propName)
+                    $setHook->params[0] = $factory->param('value')
                         ->setType($subType)
                         ->getNode();
 
                     if (is_a($className, EnumMetaInterface::class, true)) {
                         $enum = $factory->staticCall(
-                            new Node\Name($type),
-                            'wrap',
+                            new Node\Name($enumClass),
+                            $nullable ? 'tryWrap' : 'wrap',
                             [
-                                new Node\Expr\Variable($propName),
+                                new Node\Expr\Variable('value'),
                             ]
                         );
                     } else {
                         $enum = $factory->staticCall(
-                            new Node\Name($type),
+                            new Node\Name($enumClass),
                             'from',
                             [
-                                new Node\Expr\Variable($propName),
+                                new Node\Expr\Variable('value'),
                             ]
                         );
                     }
@@ -128,6 +138,8 @@ trait EntityHooksConcernTrait
                             $enum
                         )
                     );
+
+                    $type = $setHook->params[0]->type;
                 }
             }
 
@@ -146,6 +158,7 @@ trait EntityHooksConcernTrait
 
             if ($event->hook) {
                 $setHook = $event->hook;
+
                 $added[$propName][] = 'set';
             }
         }
@@ -228,7 +241,7 @@ trait EntityHooksConcernTrait
     ): Node\PropertyHook {
         $factory = $this->createNodeFactory();
 
-        $this->addUse(UuidInterface::class);
+        $this->addUse(Chronos::class);
 
         return $this->createHookAssignValue(
             $propName,

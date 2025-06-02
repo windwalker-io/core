@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\Builder;
 
 use MyCLabs\Enum\Enum;
+use PhpParser\Comment;
 use PhpParser\Node;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionProperty;
@@ -163,7 +164,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 }
 
                 // Loop all properties to create hooks
-                foreach ($node->stmts as $stmt) {
+                foreach ($node->stmts as $i => $stmt) {
                     if ($stmt instanceof Node\Stmt\Property) {
                         if ($options['hooks'] ?? true) {
                             $hooks = $this->createHooksIfNotExists((string) $stmt->props[0]->name, $stmt, $added);
@@ -173,9 +174,13 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                                 $added
                             );
                         }
+
+                        // Todo: Remove this when PHPCS supports 8.4
+                        if ($stmt->hooks !== []) {
+                            $this->ignoreSniffers($stmt, $node, $i);
+                        }
                     }
                 }
-
                 // End class node
             }
 
@@ -206,6 +211,44 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $addedMembers['enums'] = $this->newEnums;
 
         return $code;
+    }
+
+    /**
+     * @param  Node\Stmt\Property  $stmt
+     * @param  Node\Stmt\Class_    $node
+     * @param  int|string          $i
+     *
+     * @return  void
+     *
+     * @deprecated  Will be remove if PHPCS supports 8.4
+     */
+    protected function ignoreSniffers(Node\Stmt\Property $stmt, Node\Stmt\Class_ $node, int|string $i): void
+    {
+        // Find comment `phpcs:disable`
+        $hasDisable = array_any(
+            $stmt->getComments(),
+            fn(Comment $comment) => $comment->getText() === '// phpcs:disable'
+        );
+
+        if (!$hasDisable) {
+            $attrs = $stmt->getAttributes();
+            $attrs['comments'][] = new Comment('// phpcs:disable');
+            $stmt->setAttributes($attrs);
+        }
+
+        if (isset($node->stmts[$i + 1])) {
+            $hasEnable = array_any(
+                $node->stmts[$i + 1]->getComments(),
+                fn(Comment $comment) => $comment->getText() === '// phpcs:enable'
+            );
+
+            if (!$hasEnable) {
+                $attrs = $node->stmts[$i + 1]->getAttributes();
+                $attrs['comments'] ??= [];
+                array_unshift($attrs['comments'], new Comment('// phpcs:enable'));
+                $node->stmts[$i + 1]->setAttributes($attrs);
+            }
+        }
     }
 
     /**
@@ -245,6 +288,11 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $type = 'BasicState';
             $default = Symbol::none();
             $this->addUse(BasicState::class);
+
+            if ($dbColumn->getIsNullable()) {
+                $type = '?' . $type;
+                $default = null;
+            }
         } elseif ($dataType === 'tinyint' && $len === '1') {
             $type = 'bool';
             $default = TypeCast::try($default, $type);
