@@ -164,6 +164,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 }
 
                 // Loop all properties to create hooks
+                $hasHooks = false;
                 foreach ($node->stmts as $i => $stmt) {
                     if ($stmt instanceof Node\Stmt\Property) {
                         if ($options['hooks'] ?? true) {
@@ -175,11 +176,14 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                             );
                         }
 
-                        // Todo: Remove this when PHPCS supports 8.4
                         if ($stmt->hooks !== []) {
-                            $this->ignoreSniffers($stmt, $node, $i);
+                            $hasHooks = true;
                         }
                     }
+                }
+
+                if ($hasHooks) {
+                    $this->ignoreSniffer($node);
                 }
                 // End class node
             }
@@ -213,41 +217,19 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         return $code;
     }
 
-    /**
-     * @param  Node\Stmt\Property  $stmt
-     * @param  Node\Stmt\Class_    $node
-     * @param  int|string          $i
-     *
-     * @return  void
-     *
-     * @deprecated  Will be remove if PHPCS supports 8.4
-     */
-    protected function ignoreSniffers(Node\Stmt\Property $stmt, Node\Stmt\Class_ $node, int|string $i): void
+    protected function ignoreSniffer(Node\Stmt\Class_ $node): void
     {
-        // Find comment `phpcs:disable`
-        $hasDisable = array_any(
-            $stmt->getComments(),
-            fn(Comment $comment) => $comment->getText() === '// phpcs:disable'
-        );
+        $comments = $node->getComments();
 
-        if (!$hasDisable) {
-            $attrs = $stmt->getAttributes();
-            $attrs['comments'][] = new Comment('// phpcs:disable');
-            $stmt->setAttributes($attrs);
-        }
-
-        if (isset($node->stmts[$i + 1])) {
-            $hasEnable = array_any(
-                $node->stmts[$i + 1]->getComments(),
-                fn(Comment $comment) => $comment->getText() === '// phpcs:enable'
-            );
-
-            if (!$hasEnable) {
-                $attrs = $node->stmts[$i + 1]->getAttributes();
-                $attrs['comments'] ??= [];
-                array_unshift($attrs['comments'], new Comment('// phpcs:enable'));
-                $node->stmts[$i + 1]->setAttributes($attrs);
-            }
+        if (
+            !array_any(
+                $comments,
+                static fn(Comment $comment) => str_contains($comment->getText(), 'phpcs:disable')
+            )
+        ) {
+            $comments[] = new Comment('// phpcs:disable');
+            $comments[] = new Comment('// todo: remove this when phpcs supports 8.4');
+            $node->setAttribute('comments', $comments);
         }
     }
 
