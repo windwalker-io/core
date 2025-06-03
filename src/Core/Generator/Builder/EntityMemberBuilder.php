@@ -435,22 +435,22 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     }
 
     /**
-     * @param  string  $createColumn
+     * @param  string  $colName
      *
      * @return  Node\Stmt\Property
      */
-    protected function createPropertyStatement(string $createColumn): Node\Stmt\Property
+    protected function createPropertyStatement(string $colName): Node\Stmt\Property
     {
         $factory = $this->createNodeFactory();
 
         $tbManager = $this->getTableManager();
-        $dbColumn = $tbManager->getColumn($createColumn);
+        $dbColumn = $tbManager->getColumn($colName);
 
         if (!$dbColumn) {
-            throw new \RuntimeException("Column: {$createColumn} not found.");
+            throw new \RuntimeException("Column: {$colName} not found.");
         }
 
-        $propName = StrNormalize::toCamelCase($createColumn);
+        $propName = StrNormalize::toCamelCase($colName);
 
         [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
 
@@ -470,7 +470,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $attrs = [
             $this->attribute(
                 'Column',
-                new Node\Scalar\String_($createColumn)
+                new Node\Scalar\String_($colName)
             ),
         ];
 

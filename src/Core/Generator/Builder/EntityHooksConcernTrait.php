@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Builder;
 
-use PhpParser\Comment;
 use PhpParser\Node;
 use PhpParser\Node\Param;
 use Ramsey\Uuid\UuidInterface;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
+use Windwalker\Data\Collection;
+use Windwalker\Data\ValueObject;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
 
@@ -35,17 +36,46 @@ trait EntityHooksConcernTrait
         $isBool = false;
         $specialSetHook = null;
         $typeNode = $type;
+        $isNullable = false;
 
         if ($typeNode instanceof Node\NullableType) {
             $typeNode = $typeNode->type;
+            $isNullable = true;
         }
 
         if ($typeNode instanceof Node\Name) {
             $specialSetHook = 'build' . $typeNode . 'SetHook';
         }
 
+        $className = $this->findFQCN((string) $typeNode);
+
         if (!$getHook) {
-            // Getter hook is not necessary by default.
+            if ($className) {
+                // Getter hook is not necessary by default.
+                // ValueObject or Collection
+                if (
+                    !$isNullable
+                    && (
+                        is_a($className, Collection::class, true)
+                        || is_a($className, ValueObject::class, true)
+                    )
+                ) {
+                    $getHook = new Node\PropertyHook(
+                        'get',
+                        [
+                            new Node\Stmt\Return_(
+                                new Node\Expr\AssignOp\Coalesce(
+                                    $factory->propertyFetch(
+                                        new Node\Expr\Variable('this'),
+                                        $propName,
+                                    ),
+                                    $factory->new($typeNode)
+                                )
+                            )
+                        ]
+                    );
+                }
+            }
 
             // @event
             $event = $this->emit(
@@ -56,12 +86,13 @@ trait EntityHooksConcernTrait
                     column: $column,
                     type: $type,
                     entityMemberBuilder: $this,
+                    hook: $getHook,
                 )
             );
 
             if ($event->hook) {
                 $getHook = $event->hook;
-                $added[$propName][] = 'hook(get)';
+                $added[$propName][] = 'get';
             }
         }
 
@@ -77,12 +108,36 @@ trait EntityHooksConcernTrait
             //     );
             // }
 
-            if (!$setHook && !$typeNode instanceof Node\UnionType) {
-                $className = $this->findFQCN((string) $typeNode);
+            if (!$setHook && !$typeNode instanceof Node\UnionType && $className) {
+                // ValueObject or Collection
+                if (
+                    is_a($className, Collection::class, true)
+                    || is_a($className, ValueObject::class, true)
+                ) {
+                    /** @var class-string<Collection> $className */
+                    $typeClass = (string) $typeNode;
+                    $typeString = $typeNode . '|array';
+
+                    if ($isNullable) {
+                        $typeString .= '|null';
+                    }
+
+                    $setHook = $this->createHookAssignValue(
+                        $propName,
+                        new Node\Identifier($typeString),
+                        $factory->staticCall(
+                            new Node\Name($typeClass),
+                            $isNullable ? 'tryWrap' : 'wrap',
+                            [
+                                new Node\Expr\Variable('value'),
+                            ]
+                        )
+                    );
+                }
 
                 // Enum accept scalar value
-                /** @var class-string<\UnitEnum> $className */
-                if ($className && class_exists($className) && $this->isEnum($className)) {
+                if ($this->isEnum($className)) {
+                    /** @var class-string<\UnitEnum> $className */
                     $setHook = $this->createHookAssignValue(
                         $propName,
                         $type,
@@ -91,37 +146,34 @@ trait EntityHooksConcernTrait
 
                     $enumRef = new \ReflectionEnum($className);
 
+                    $typeClass = (string) $typeNode;
+                    $typeString = (string) $typeNode;
+
                     if ($enumRef->isBacked()) {
-                        $subType = $enumRef->getBackingType()?->getName() ?? 'int';
+                        $typeString .= '|' . ($enumRef->getBackingType()?->getName() ?? 'int');
                     } else {
-                        $subType = 'int|string';
+                        $typeString .= '|int|string';
                     }
 
-                    if ($type instanceof Node\NullableType) {
-                        $enumClass = $type->type;
-                        $subType .= '|' . $enumClass . '|null';
-                        $nullable = true;
-                    } else {
-                        $enumClass = $type;
-                        $subType .= '|' . $type;
-                        $nullable = false;
+                    if ($isNullable) {
+                        $typeString .= '|null';
                     }
 
                     $setHook->params[0] = $factory->param('value')
-                        ->setType($subType)
+                        ->setType($typeString)
                         ->getNode();
 
                     if (is_a($className, EnumMetaInterface::class, true)) {
                         $enum = $factory->staticCall(
-                            new Node\Name($enumClass),
-                            $nullable ? 'tryWrap' : 'wrap',
+                            new Node\Name($typeClass),
+                            $isNullable ? 'tryWrap' : 'wrap',
                             [
                                 new Node\Expr\Variable('value'),
                             ]
                         );
                     } else {
                         $enum = $factory->staticCall(
-                            new Node\Name($enumClass),
+                            new Node\Name($typeClass),
                             'from',
                             [
                                 new Node\Expr\Variable('value'),
@@ -166,6 +218,24 @@ trait EntityHooksConcernTrait
         $propNode->hooks = array_filter([$getHook, $setHook]);
 
         return $propNode->hooks;
+    }
+
+    protected function nonUnionToTypeName(
+        string|Node\ComplexType|Node\Name $type,
+        ?string &$className = null,
+        ?bool &$nullable = null,
+    ): string {
+        if ($type instanceof Node\NullableType) {
+            $className = (string) $type->type;
+            $typeName = $className . '|null';
+            $nullable = true;
+        } else {
+            $className = (string) $type;
+            $typeName = (string) $type;
+            $nullable = false;
+        }
+
+        return $typeName;
     }
 
     protected function createHookAssignValue(
