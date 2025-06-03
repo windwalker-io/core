@@ -24,8 +24,8 @@ class AuthService
     /**
      * AuthService constructor.
      *
-     * @param  AuthenticationInterface  $authentication
-     * @param  AuthorizationInterface   $authorization
+     * @param  AuthenticationInterface|null  $authentication
+     * @param  AuthorizationInterface|null   $authorization
      */
     public function __construct(
         protected ?AuthenticationInterface $authentication = null,
@@ -45,19 +45,19 @@ class AuthService
         return $resultSet->getMatchedResult();
     }
 
-    public function authorize(string $policy, mixed $user = null, ...$args): bool
+    public function authorize(string|\UnitEnum $policy, mixed $user = null, ...$args): bool
     {
         $user ??= $this->getUser($user);
 
         return $this->getAuthorization()->authorize($policy, $user, ...$args);
     }
 
-    public function can(string $policy, mixed $user = null, ...$args): bool
+    public function can(string|\UnitEnum $policy, mixed $user = null, ...$args): bool
     {
         return $this->authorize($policy, $user, ...$args);
     }
 
-    public function cannot(string $policy, mixed $user = null, ...$args): bool
+    public function cannot(string|\UnitEnum $policy, mixed $user = null, ...$args): bool
     {
         return !$this->authorize($policy, $user, ...$args);
     }
