@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Console;
 
+use Asika\ObjectMetadata\ObjectMetadata;
 use Attribute;
 use Closure;
 use LogicException;
@@ -103,6 +104,9 @@ class CommandWrapper extends Command implements
     {
         $io = $this->getIO($input, $output);
 
+        $meta = ObjectMetadata::getInstance('windwalker.console');
+        $meta->set($this->handler, 'io', $io);
+
         try {
             if ($this->handler instanceof CommandInterface) {
                 $result = $this->handler->execute($io);
@@ -168,6 +172,9 @@ class CommandWrapper extends Command implements
      */
     protected function configureHandler(callable|CommandInterface $handler): callable|CommandInterface
     {
+        $meta = ObjectMetadata::getInstance('windwalker.console');
+        $meta->set($handler, 'command', $this);
+
         if ($handler instanceof CommandInterface) {
             $handler->configure($this);
         }

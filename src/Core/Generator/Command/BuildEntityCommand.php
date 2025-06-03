@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Command;
 
+use Asika\ObjectMetadata\ObjectMetadata;
 use DomainException;
 use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Command\CommandPackageResolveTrait;
 use Windwalker\Core\Console\ConsoleApplication;
@@ -26,6 +32,7 @@ use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
 use function Windwalker\collect;
+use function Windwalker\ds;
 
 /**
  * The BuildEntityCommand class.
@@ -281,7 +288,18 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
     public function completeArgumentValues($argumentName, CompletionContext $context)
     {
         if ($argumentName === 'ns') {
-            $classes = iterator_to_array($this->classFinder->findClasses('App\\Entity\\'));
+            // Todo: Rewrite CommandWrapper to support modern features.
+            /** @var CommandWrapper $command */
+            $objectMetadata = ObjectMetadata::getInstance('windwalker.console');
+            $command = $objectMetadata->get($this, 'command');
+
+            $args = $context->getRawWords();
+            array_shift($args);
+            $input = new ArgvInput($args, $command->getDefinition());
+
+            $ns = $this->getPackageNamespace($input, 'Entity') ?? 'App\\Entity\\';
+
+            $classes = iterator_to_array($this->classFinder->findClasses($ns));
 
             return collect($classes)
                 ->map(fn(string $className) => (string) Collection::explode('\\', $className)->pop())

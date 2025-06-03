@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Package\AbstractPackage;
@@ -30,7 +31,7 @@ trait CommandPackageResolveTrait
         );
     }
 
-    public function getPackage(IOInterface $io): ?AbstractPackage
+    public function getPackage(IOInterface|Input $io): ?AbstractPackage
     {
         $pkg = $io->getOption('pkg');
 
@@ -41,7 +42,7 @@ trait CommandPackageResolveTrait
         return $this->packageRegistry->getPackage($pkg);
     }
 
-    public function getPackageNamespace(IOInterface $io, string $suffix = ''): ?string
+    public function getPackageNamespace(IOInterface|Input $io, string $suffix = ''): ?string
     {
         $package = $this->getPackage($io);
 
