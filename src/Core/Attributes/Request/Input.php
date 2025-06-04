@@ -11,8 +11,11 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Input implements ContainerAttributeInterface
 {
-    public function __construct(public string $name, public mixed $default = null, public string $delimiter = '.')
-    {
+    public function __construct(
+        public ?string $name = null,
+        public mixed $default = null,
+        public string $delimiter = '.'
+    ) {
     }
 
     public function __invoke(AttributeHandler $handler): callable

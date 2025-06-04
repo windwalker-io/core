@@ -9,7 +9,7 @@ use Windwalker\Core\Application\Context\AppRequestInterface;
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Header extends Input
 {
-    public function __construct(string $name, mixed $default = null)
+    public function __construct(?string $name = null, mixed $default = null)
     {
         parent::__construct($name, $default);
     }

@@ -34,7 +34,7 @@ class ControllerDispatcher
         //
     }
 
-    public function dispatch(AppContextInterface $app): mixed
+    public function dispatch(AppContextInterface $app, array $args = []): mixed
     {
         $controller = $app->getController();
 
@@ -62,11 +62,14 @@ class ControllerDispatcher
         }
 
         if (is_array($controller)) {
-            $controller = $this->prepareArrayCallable($controller, $app);
+            $controller = $this->prepareArrayCallable($controller, $app, $args);
         } else {
             $controller = fn(AppContextInterface $app): mixed => $this->container->call(
                 $controller,
-                $app->getUrlVars()
+                [
+                    ...$app->getUrlVars(),
+                    ...$args
+                ]
             );
         }
 
@@ -103,7 +106,7 @@ class ControllerDispatcher
         return $task;
     }
 
-    protected function prepareArrayCallable(array $handler, AppContextInterface $app): Closure
+    protected function prepareArrayCallable(array $handler, AppContextInterface $app, array $args = []): Closure
     {
         if (\Windwalker\count($handler) !== 2) {
             throw new LogicException(
@@ -118,12 +121,12 @@ class ControllerDispatcher
         $handler[0] = $this->container->createObject($class);
 
         if ($handler[0] instanceof ControllerInterface) {
-            return function (AppContextInterface $app) use ($handler): mixed {
+            return function (AppContextInterface $app) use ($args, $handler): mixed {
                 [$object, $task] = $handler;
 
                 return $this->container->call(
                     [$object, 'execute'],
-                    [$task, $app->getUrlVars()]
+                    [$task, [...$app->getUrlVars(), ...$args]]
                 );
             };
         }
@@ -132,8 +135,8 @@ class ControllerDispatcher
             throw new ControllerDispatchException('Controller is not callable.');
         }
 
-        return function (AppContextInterface $app) use ($handler) {
-            $this->container->call($handler, $app->getUrlVars());
+        return function (AppContextInterface $app) use ($args, $handler) {
+            $this->container->call($handler, [...$app->getUrlVars(), ...$args]);
         };
     }
 

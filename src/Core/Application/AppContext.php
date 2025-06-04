@@ -56,7 +56,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
 
     public function dispatchWithInput(
         string|array|callable $controller,
-        ServerRequestInterface|array|null $data = null
+        ServerRequestInterface|array|null $data = null,
+        array $args = [],
     ): mixed {
         $controllerOrigin = $this->getController();
 
@@ -78,7 +79,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
             $this->setAppRequest($appReqNew);
         }
 
-        $result = $this->dispatchController($controller);
+        $result = $this->dispatchController($controller, $args);
 
         $this->setController($controllerOrigin);
 
@@ -89,14 +90,14 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         return $result;
     }
 
-    public function dispatchController(mixed $controller = null): mixed
+    public function dispatchController(mixed $controller = null, array $args = []): mixed
     {
         if ($controller) {
             $this->setController($controller);
         }
 
         return $this->retrieve(ControllerDispatcher::class)
-            ->dispatch($this);
+            ->dispatch($this, $args);
     }
 
     public function renderView(string|object $view, array $data = [], array $options = []): ResponseInterface
