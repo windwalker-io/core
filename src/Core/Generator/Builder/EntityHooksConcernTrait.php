@@ -47,7 +47,11 @@ trait EntityHooksConcernTrait
             $specialSetHook = 'build' . $typeNode . 'SetHook';
         }
 
-        $className = $this->findFQCN((string) $typeNode);
+        if ($typeNode instanceof Node\UnionType) {
+            $className = null;
+        } else {
+            $className = $this->findFQCN((string) $typeNode);
+        }
 
         if (!$getHook) {
             if ($className) {
