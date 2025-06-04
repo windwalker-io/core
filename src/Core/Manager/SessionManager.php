@@ -31,6 +31,8 @@ use function Windwalker\chronos;
  *
  * @method Session create(?string $name = null, ...$args)
  * @method Session get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class SessionManager extends AbstractManager
@@ -59,7 +61,7 @@ class SessionManager extends AbstractManager
                         $res = $res->withAddedHeader('Set-Cookie', $header);
                     }
 
-                    $event->setResponse($res);
+                    $event->response = $res;
                 }
             );
 

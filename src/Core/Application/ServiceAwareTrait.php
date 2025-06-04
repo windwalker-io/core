@@ -25,14 +25,15 @@ trait ServiceAwareTrait
      *
      * @param  class-string<T>  $id
      * @param  bool             $forceNew
+     * @param  string|null      $tag
      *
      * @return T
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function retrieve(string $id, bool $forceNew = false): mixed
+    public function retrieve(string $id, bool $forceNew = false, ?string $tag = null): mixed
     {
-        return $this->getContainer()->get($id, $forceNew);
+        return $this->getContainer()->get($id, $forceNew, $tag);
     }
 
     /**
@@ -66,15 +67,15 @@ trait ServiceAwareTrait
      *
      * @throws ContainerExceptionInterface
      */
-    public function service(string $class, array $args = [], int $options = 0): object
+    public function service(string $class, array $args = [], int $options = 0, ?string $tag = null): object
     {
         $container = $this->getContainer();
 
-        if ($container->has($class)) {
-            return $container->get($class);
+        if ($container->has($class, tag: $tag)) {
+            return $container->get($class, tag:  $tag);
         }
 
-        return $container->createSharedObject($class, $args, $options);
+        return $container->createSharedObject($class, $args, $options, tag: $tag);
     }
 
     /**
@@ -106,9 +107,9 @@ trait ServiceAwareTrait
      *
      * @throws Exception\DefinitionException
      */
-    public function bind(string $id, mixed $value, int $options = 0): mixed
+    public function bind(string $id, mixed $value, int $options = 0, ?string $tag = null): mixed
     {
-        $this->getContainer()->bind($id, $value, $options);
+        $this->getContainer()->bind($id, $value, $options, $tag);
 
         return $this;
     }
@@ -126,8 +127,8 @@ trait ServiceAwareTrait
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function resolve(mixed $source, array $args = [], int $options = 0): mixed
+    public function resolve(mixed $source, array $args = [], int $options = 0, ?string $tag = null): mixed
     {
-        return $this->getContainer()->resolve($source, $args, $options);
+        return $this->getContainer()->resolve($source, $args, $options, $tag);
     }
 }

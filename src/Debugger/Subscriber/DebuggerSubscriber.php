@@ -327,7 +327,7 @@ class DebuggerSubscriber
 
         foreach ($connections as $connection => $factory) {
             try {
-                $db = $app->service(DatabaseManager::class)->get($connection);
+                $db = $app->retrieve(DatabaseAdapter::class, tag: $connection);
                 $version = null;
                 $version = $db->getDriver()->getVersion();
             } catch (Throwable $e) {

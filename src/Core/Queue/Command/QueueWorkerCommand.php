@@ -6,6 +6,8 @@ namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
 use Laravel\SerializableClosure\SerializableClosure;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,8 +17,6 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
-use Windwalker\Core\Queue\QueueManager;
-use Windwalker\Core\Service\LoggerService;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Event\AfterJobRunEvent;
@@ -317,28 +317,25 @@ class QueueWorkerCommand implements CommandInterface
     }
 
     /**
-     * getWorker
-     *
      * @param  ?string  $connection
      *
      * @return  Worker
      *
      * @throws DefinitionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \ReflectionException
      */
     protected function getWorker(?string $connection): Worker
     {
-        $container = $this->app->getContainer();
-        $container->share(
-            Queue::class,
-            fn() => $this->app->service(QueueManager::class)->get($connection)
-        );
-
-        $container->share(
-            LoggerInterface::class,
-            fn() => $this->app->service(LoggerService::class)->getLogger('queue')
-        );
-
-        return $container->get(Worker::class);
+        return $this->app->getContainer()
+            ->resolve(
+                Worker::class,
+                [
+                    Queue::class => $this->app->retrieve(Queue::class, tag: $connection),
+                    LoggerInterface::class => $this->app->retrieve(LoggerInterface::class, tag: 'queue'),
+                ]
+            );
     }
 
     protected function runEndScripts(

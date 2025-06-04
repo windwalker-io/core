@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Psr\Log\LoggerInterface;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Manager\LoggerManager;
@@ -29,6 +30,10 @@ class LoggerProvider implements ServiceProviderInterface, RequestBootableProvide
     {
         $container->prepareSharedObject(LoggerManager::class);
         $container->prepareSharedObject(LoggerService::class);
+        $container->bindShared(
+            LoggerInterface::class,
+            fn(LoggerManager $loggerManager, ?string $tag = null) => $loggerManager->get($tag)
+        );
     }
 
     public function bootBeforeRequest(Container $container): void

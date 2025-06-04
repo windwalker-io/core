@@ -12,6 +12,8 @@ use Windwalker\DI\Attributes\Isolation;
  *
  * @method CipherInterface get(?string $name = null, ...$args)
  * @method CipherInterface create(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class CryptoManager extends AbstractManager

@@ -12,6 +12,8 @@ use Windwalker\DI\Attributes\Isolation;
  *
  * @method LoggerInterface create(?string $name = null, ...$args)
  * @method LoggerInterface get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class LoggerManager extends AbstractManager

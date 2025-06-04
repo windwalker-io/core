@@ -17,6 +17,8 @@ use Windwalker\Queue\QueueMessage;
  * The QueueManager class.
  *
  * @method Queue get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class QueueManager extends AbstractManager
@@ -51,21 +53,21 @@ class QueueManager extends AbstractManager
 
     public static function createSyncHandler(): Closure
     {
-        return function (QueueMessage $message) {
+        return static function (QueueMessage $message) {
             $tmp = Filesystem::createTemp(WINDWALKER_TEMP);
             $tmp->write(serialize($message));
 
-            register_shutdown_function(fn() => $tmp->delete());
+            register_shutdown_function(static fn() => $tmp->delete());
 
-            $process = (new Process(
+            $process = new Process(
                 [
-                    (new PhpExecutableFinder())->find(),
+                    new PhpExecutableFinder()->find(),
                     'windwalker',
                     'queue:worker',
                     '--once',
                     '--file=' . $tmp . '',
                 ]
-            ))
+            )
                 ->setWorkingDirectory(WINDWALKER_ROOT)
                 ->mustRun();
 

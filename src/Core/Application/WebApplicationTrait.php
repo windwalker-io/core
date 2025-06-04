@@ -62,19 +62,17 @@ trait WebApplicationTrait
 
     private function getLogger(): LoggerInterface
     {
-        $manager = $this->container->get(LoggerManager::class);
-
         $name = 'web';
 
         if ($this->isCliRuntime()) {
             $name = 'cli-web';
         }
 
-        if (!$manager->has($name)) {
+        if (!$this->container->has(LoggerInterface::class, tag: $name)) {
             return new NullLogger();
         }
 
-        return $manager->get($name);
+        return $this->container->get(LoggerInterface::class, tag: $name);
     }
 
     public function getNav(): Navigator

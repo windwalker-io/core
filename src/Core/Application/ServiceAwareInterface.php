@@ -16,10 +16,11 @@ interface ServiceAwareInterface
      *
      * @param  class-string<T>  $id
      * @param  bool             $forceNew
+     * @param  string|null      $tag
      *
      * @return T
      */
-    public function retrieve(string $id, bool $forceNew = false): mixed;
+    public function retrieve(string $id, bool $forceNew = false, ?string $tag = null): mixed;
 
     /**
      * Create a single use object.
@@ -42,10 +43,11 @@ interface ServiceAwareInterface
      * @param  class-string<T>  $class
      * @param  array            $args
      * @param  int              $options
+     * @param  string|null      $tag
      *
      * @return  T
      */
-    public function service(string $class, array $args = [], int $options = 0): object;
+    public function service(string $class, array $args = [], int $options = 0, ?string $tag = null): object;
 
     /**
      * Call a function or method.
@@ -62,13 +64,14 @@ interface ServiceAwareInterface
     /**
      * Bind a value or object to Container.
      *
-     * @param  string  $id
-     * @param  mixed   $value
-     * @param  int     $options
+     * @param  string       $id
+     * @param  mixed        $value
+     * @param  int          $options
+     * @param  string|null  $tag
      *
      * @return  static
      */
-    public function bind(string $id, mixed $value, int $options = 0): mixed;
+    public function bind(string $id, mixed $value, int $options = 0, ?string $tag = null): mixed;
 
     /**
      * Resolve a definition of DI.
@@ -78,8 +81,9 @@ interface ServiceAwareInterface
      * @param  mixed|class-string<T>  $source
      * @param  array                  $args
      * @param  int                    $options
+     * @param  string|null            $tag
      *
      * @return mixed|T
      */
-    public function resolve(mixed $source, array $args = [], int $options = 0): mixed;
+    public function resolve(mixed $source, array $args = [], int $options = 0, ?string $tag = null): mixed;
 }

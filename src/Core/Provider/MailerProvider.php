@@ -25,7 +25,7 @@ class MailerProvider implements ServiceProviderInterface
 
         $container->bindShared(
             Mailer::class,
-            fn(MailerManager $manager) => $manager->get()
+            fn(MailerManager $manager, ?string $tag = null) => $manager->get($tag)
         )
             ->alias(MailerInterface::class, Mailer::class);
 

@@ -6,6 +6,8 @@ namespace Windwalker\Core\Queue\Command;
 
 use InvalidArgumentException;
 use JsonException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,9 +15,9 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Queue\QueueFailerManager;
 use Windwalker\Core\Queue\QueueManager;
-use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Queue\Failer\QueueFailerInterface;
+use Windwalker\Queue\Queue;
 
 /**
  * The QueueRestartCommand class.
@@ -71,13 +73,13 @@ class QueueRetryCommand implements CommandInterface
      *
      * @return  int Return 0 is success, 1-255 is failure.
      * @throws JsonException
-     * @throws DefinitionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function execute(IOInterface $io): int
     {
         $failerName = $io->getOption('failer');
-        $manager = $this->app->service(QueueManager::class);
-        $failer = $this->app->service(QueueFailerManager::class)->get($failerName);
+        $failer = $this->app->retrieve(QueueFailerInterface::class, tag: $failerName);
 
         $all = $io->getOption('all');
         $delay = $io->getOption('delay');
@@ -107,7 +109,7 @@ class QueueRetryCommand implements CommandInterface
 
             $connection = $failed['connection'] ?? null;
 
-            $queue = $manager->get($connection);
+            $queue = $this->app->retrieve(Queue::class, tag: $connection);
 
             $queue->pushRaw(json_decode($failed['body'], true), (int) $delay, $failed['channel']);
 

@@ -105,7 +105,7 @@ class MailTestCommand implements CommandInterface
             $date->format('Y-m-d H:i:s')
         );
 
-        $mailer = $this->app->make(MailerManager::class)->get($io->getOption('connection'));
+        $mailer = $this->app->retrieve(MailerInterface::class, tag: $io->getOption('connection'));
         $mailer->createMessage($title)
             ->to(...$recipients)
             ->from($from)

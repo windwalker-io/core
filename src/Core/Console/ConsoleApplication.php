@@ -404,10 +404,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
 
     protected function getLogger(): LoggerInterface
     {
-        $manager = $this->container->get(LoggerManager::class);
-
-        if ($manager->has('console')) {
-            return $manager->get('console');
+        if ($this->container->has(LoggerInterface::class, tag: 'console')) {
+            return $this->container->get(LoggerInterface::class, tag: 'console');
         }
 
         return new NullLogger();

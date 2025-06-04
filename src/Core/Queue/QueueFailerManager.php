@@ -12,6 +12,8 @@ use Windwalker\Queue\Failer\QueueFailerInterface;
  * The QueueFailerManager class.
  *
  * @method QueueFailerInterface get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class QueueFailerManager extends AbstractManager

@@ -18,6 +18,8 @@ use Windwalker\ORM\ORM;
  * The DatabaseManager class.
  *
  * @method DatabaseAdapter get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class DatabaseManager extends AbstractManager

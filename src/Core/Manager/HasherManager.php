@@ -12,6 +12,8 @@ use Windwalker\DI\Attributes\Isolation;
  *
  * @method HasherInterface get(?string $name = null, ...$args)
  * @method HasherInterface create(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class HasherManager extends AbstractManager

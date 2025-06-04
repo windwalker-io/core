@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Closure;
+use Psr\Log\LoggerInterface;
 use Windwalker\Cache\CachePool;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
@@ -15,6 +16,8 @@ use Windwalker\DI\Definition\ObjectBuilderDefinition;
  *
  * @method CachePool get(?string $name = null, ...$args)
  * @method CachePool create(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class CacheManager extends AbstractManager
@@ -47,7 +50,7 @@ class CacheManager extends AbstractManager
             return new CachePool(
                 $container->resolve('cache.factories.storages.' . $storage, compact('instanceName')),
                 $container->resolve($serializer),
-                $container->get(LoggerManager::class)->get('error')
+                $container->get(LoggerInterface::class, tag: 'error')
             );
         };
     }

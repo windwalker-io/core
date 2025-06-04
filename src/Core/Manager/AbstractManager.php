@@ -9,12 +9,15 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventAwareTrait;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
  * The AbstractManager class.
+ *
+ * @deprecated  Use container tags instead.
  */
 abstract class AbstractManager implements EventAwareInterface
 {
@@ -64,12 +67,12 @@ abstract class AbstractManager implements EventAwareInterface
     }
 
     /**
-     * create
-     *
      * @param  string|null  $name
      * @param  mixed        ...$args
      *
      * @return  object
+     * @throws \ReflectionException
+     * @throws DefinitionResolveException
      */
     public function create(?string $name = null, ...$args): object
     {

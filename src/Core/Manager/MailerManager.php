@@ -17,6 +17,8 @@ use Windwalker\Utilities\Arr;
  * The MailerManager class.
  *
  * @method Mailer get(?string $name = null, ...$args)
+ *
+ * @deprecated  Use container tags instead.
  */
 #[Isolation]
 class MailerManager extends AbstractManager
