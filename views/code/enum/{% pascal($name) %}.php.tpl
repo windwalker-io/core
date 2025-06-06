@@ -16,6 +16,6 @@ enum {% pascal($name) %} implements EnumTranslatableInterface
 
     public function trans(LanguageInterface $lang, ...$args): string
     {
-        return $lang->trans('app.{% dot($name) %}.' . $this->getKey());
+        return $lang->trans('app.{% dot($name) %}.' . $this->name);
     }
 }
