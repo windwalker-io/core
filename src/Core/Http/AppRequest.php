@@ -135,16 +135,11 @@ class AppRequest implements AppRequestInterface, JsonSerializable
 
     protected function getUriQueryValues(): array
     {
-        $values = $this->getUri()->getQueryValues();
-
-        $appRequest = $this;
-        $type = RequestGetValueEvent::TYPE_QUERY;
-
         $event = $this->emit(
             new RequestGetValueEvent(
-                appRequest: $appRequest,
-                type: $type,
-                values: $values
+                appRequest: $this,
+                type: RequestGetValueEvent::TYPE_QUERY,
+                values: $this->getUri()->getQueryValues()
             )
         );
 
@@ -157,15 +152,11 @@ class AppRequest implements AppRequestInterface, JsonSerializable
             return [];
         }
 
-        $appRequest = $this;
-        $values = $this->matchedRoute->getVars();
-        $type = RequestGetValueEvent::TYPE_URL_VARS;
-
         $event = $this->emit(
             new RequestGetValueEvent(
-                appRequest: $appRequest,
-                type: $type,
-                values: $values
+                appRequest: $this,
+                type: RequestGetValueEvent::TYPE_URL_VARS,
+                values: $this->matchedRoute->getVars()
             )
         );
 
@@ -174,16 +165,11 @@ class AppRequest implements AppRequestInterface, JsonSerializable
 
     public function getBodyValues(): array
     {
-        $values = $this->getServerRequest()->getParsedBody();
-
-        $appRequest = $this;
-        $type = RequestGetValueEvent::TYPE_BODY;
-
         $event = $this->emit(
             new RequestGetValueEvent(
-                appRequest: $appRequest,
-                type: $type,
-                values: $values
+                appRequest: $this,
+                type: RequestGetValueEvent::TYPE_BODY,
+                values: $this->getServerRequest()->getParsedBody()
             )
         );
 

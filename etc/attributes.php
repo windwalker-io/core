@@ -18,6 +18,7 @@ use Windwalker\Core\Attributes\Request\Header;
 use Windwalker\Core\Attributes\Request\Input;
 use Windwalker\Core\Attributes\Request\QueryValue;
 use Windwalker\Core\Attributes\Request\RequestInput;
+use Windwalker\Core\Attributes\Request\RouteParam;
 use Windwalker\Core\Attributes\Request\UrlVar;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Attributes\AttributeType;
@@ -49,5 +50,6 @@ return [
     Header::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     QueryValue::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     UrlVar::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
+    RouteParam::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     File::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
 ];
