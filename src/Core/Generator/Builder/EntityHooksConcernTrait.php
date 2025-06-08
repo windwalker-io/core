@@ -66,17 +66,13 @@ trait EntityHooksConcernTrait
                 ) {
                     $getHook = new Node\PropertyHook(
                         'get',
-                        [
-                            new Node\Stmt\Return_(
-                                new Node\Expr\AssignOp\Coalesce(
-                                    $factory->propertyFetch(
-                                        new Node\Expr\Variable('this'),
-                                        $propName,
-                                    ),
-                                    $factory->new($typeNode)
-                                )
-                            )
-                        ]
+                        new Node\Expr\AssignOp\Coalesce(
+                            $factory->propertyFetch(
+                                new Node\Expr\Variable('this'),
+                                $propName,
+                            ),
+                            $factory->new($typeNode)
+                        )
                     );
                 }
             }
@@ -185,14 +181,12 @@ trait EntityHooksConcernTrait
                         );
                     }
 
-                    $setHook->body[0] = new Node\Stmt\Expression(
-                        new Node\Expr\Assign(
-                            $factory->propertyFetch(
-                                new Node\Expr\Variable('this'),
-                                $propName
-                            ),
-                            $enum
-                        )
+                    $setHook->body = new Node\Expr\Assign(
+                        $factory->propertyFetch(
+                            new Node\Expr\Variable('this'),
+                            $propName
+                        ),
+                        $enum
                     );
 
                     $type = $setHook->params[0]->type;
@@ -251,26 +245,26 @@ trait EntityHooksConcernTrait
 
         return $this->createHookNode(
             $type,
-            [
-                new Node\Expr\Assign(
-                    $factory->propertyFetch(
-                        new Node\Expr\Variable('this'),
-                        $propName
-                    ),
-                    $expr,
+            new Node\Expr\Assign(
+                $factory->propertyFetch(
+                    new Node\Expr\Variable('this'),
+                    $propName
                 ),
-            ]
+                $expr,
+            ),
         );
     }
 
     public function createHookNode(
         Node\Name|Node\Identifier|Node\ComplexType|Node|null $type,
-        array $expressions = []
+        mixed $expressions = []
     ): Node\PropertyHook {
-        $expressions = array_map(
-            fn($expr) => new Node\Stmt\Expression($expr),
-            $expressions
-        );
+        if (is_array($expressions)) {
+            $expressions = array_map(
+                fn($expr) => new Node\Stmt\Expression($expr),
+                $expressions
+            );
+        }
 
         return new Node\PropertyHook(
             'set',
