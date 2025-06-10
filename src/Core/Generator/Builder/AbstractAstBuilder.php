@@ -28,8 +28,23 @@ abstract class AbstractAstBuilder
 
     abstract public function process(array $options = []): string;
 
-    protected static function getLastIndexOf(array $elements, callable $handler): string|int|null
+    protected static function getFirstIndexOf(array $elements, callable|string $handler): ?int
     {
+        if (is_string($handler)) {
+            $handler = static fn($element) => is_a($element, $handler, true);
+        }
+
+        $elements = array_filter($elements, $handler);
+
+        return array_key_first($elements);
+    }
+
+    protected static function getLastIndexOf(array $elements, callable|string $handler): string|int|null
+    {
+        if (is_string($handler)) {
+            $handler = static fn($element) => is_a($element, $handler, true);
+        }
+
         $elements = array_filter($elements, $handler);
 
         return array_key_last($elements);
@@ -40,7 +55,7 @@ abstract class AbstractAstBuilder
         if (!$this->parser) {
             $lexer = $this->getLexer();
 
-            $this->parser = (new ParserFactory())->createForNewestSupportedVersion();
+            $this->parser = new ParserFactory()->createForNewestSupportedVersion();
         }
 
         return $this->parser;
@@ -63,11 +78,25 @@ abstract class AbstractAstBuilder
 
     public function attribute(string $name, ...$args): Node\Attribute
     {
-        $args = array_map(fn($arg) => new Node\Arg($arg), $args);
+        $arguments = [];
+
+        foreach ($args as $i => $arg) {
+            if (is_int($i)) {
+                $arguments[$i] = new Node\Arg($arg);
+            } elseif (is_string($i)) {
+                $arguments[$i] = new Node\Arg(
+                    new Node\Scalar\String_($arg),
+                    false,
+                    false,
+                    [],
+                    new Node\Identifier($i)
+                );
+            }
+        }
 
         return new Node\Attribute(
             new Node\Name($name),
-            $args
+            $arguments
         );
     }
 
@@ -86,7 +115,7 @@ abstract class AbstractAstBuilder
         $traverser->addVisitor($this->createVisitor($enterNode, $leaveNode));
         $newAst = $traverser->traverse($oldAst);
 
-        return (new Standard())->printFormatPreserving($newAst, $oldAst, $oldTokens);
+        return new Standard()->printFormatPreserving($newAst, $oldAst, $oldTokens);
     }
 
     protected function createVisitor(?Closure $enterNode, ?Closure $leaveNode): NodeVisitorAbstract

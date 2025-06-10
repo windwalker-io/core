@@ -50,6 +50,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected array $addedUses = [];
 
+    protected array $functionUses = [];
+
+    protected array $addedFunctionUses = [];
+
     protected array $newEnums = [];
 
     /**
@@ -110,10 +114,10 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             // After class traversed, add properties and methods
             if ($node instanceof Node\Stmt\Class_) {
-                $last = $this->getLastOf($node->stmts, Node\Stmt\Property::class) ?? null;
+                $last = static::getLastIndexOf($node->stmts, Node\Stmt\Property::class);
 
                 if ($last === null) {
-                    $last = $this->getLastOf($node->stmts, Node\Stmt\TraitUse::class) ?? null;
+                    $last = static::getLastIndexOf($node->stmts, Node\Stmt\TraitUse::class);
 
                     if ($last !== null) {
                         $last++;
@@ -136,7 +140,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         // Inject property by ordering.
                         array_splice(
                             $node->stmts,
-                            $i + $last,
+                            $i + 1,
                             0,
                             [$prop]
                         );
@@ -189,7 +193,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             }
 
             if ($node instanceof Node\Stmt\Namespace_) {
-                $last = $this->getLastOf($node->stmts, Node\Stmt\Use_::class) ?? 0;
+                $last = static::getLastIndexOf($node->stmts, Node\Stmt\Use_::class) ?? 0;
 
                 foreach ($this->addedUses as $use) {
                     array_splice(
@@ -199,6 +203,19 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                         [
                             $this->createNodeFactory()
                                 ->use($use)
+                                ->getNode(),
+                        ]
+                    );
+                }
+
+                foreach ($this->addedFunctionUses as $use) {
+                    array_splice(
+                        $node->stmts,
+                        ++$last,
+                        0,
+                        [
+                            $this->createNodeFactory()
+                                ->useFunction($use)
                                 ->getNode(),
                         ]
                     );
@@ -384,22 +401,19 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         return $enumName;
     }
 
-    public function getLastOf(array $stmts, string $class): ?int
-    {
-        foreach ($stmts as $i => $stmt) {
-            if ($stmt instanceof $class) {
-                return $i;
-            }
-        }
-
-        return null;
-    }
-
     public function addUse(string $ns): void
     {
         if (!in_array($ns, $this->uses, true)) {
             $this->uses[] = $ns;
             $this->addedUses[] = $ns;
+        }
+    }
+
+    public function addFunctionUse(string $funcFullName): void
+    {
+        if (!in_array($funcFullName, $this->functionUses, true)) {
+            $this->functionUses[] = $funcFullName;
+            $this->addedFunctionUses[] = $funcFullName;
         }
     }
 
@@ -506,8 +520,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $prop->attrGroups[] = $this->attributeGroup(
                 $this->attribute(
                     'CastNullable',
-                    new Node\Scalar\String_('uuid_bin'),
-                    new Node\Scalar\String_('uuid_bin'),
+                    extract: new Node\Scalar\String_('string'),
                 ),
             );
 
@@ -538,18 +551,18 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         if ($type === 'BasicState') {
             $this->addUse(Cast::class);
             $prop->setAttribute('fullType', BasicState::class);
-            $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    'Cast',
-                    new Node\Scalar\String_('int')
-                ),
-            );
-            $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    'Cast',
-                    new Node\Expr\ClassConstFetch(new Node\Name('BasicState'), 'class')
-                ),
-            );
+            // $prop->attrGroups[] = $this->attributeGroup(
+            //     $this->attribute(
+            //         'Cast',
+            //         extract: new Node\Scalar\String_('int')
+            //     ),
+            // );
+            // $prop->attrGroups[] = $this->attributeGroup(
+            //     $this->attribute(
+            //         'Cast',
+            //         new Node\Expr\ClassConstFetch(new Node\Name('BasicState'), 'class')
+            //     ),
+            // );
         }
 
         if ($enumName = $this->getMatchedEnum($dbColumn)) {
@@ -561,7 +574,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 $prop->attrGroups[] = $this->attributeGroup(
                     $this->attribute(
                         'CastNullable',
-                        new Node\Expr\ClassConstFetch(new Node\Name($enumName), 'class')
+                        extract: new Node\Scalar\String_('string'),
                     ),
                 );
             } else {
@@ -569,7 +582,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 $prop->attrGroups[] = $this->attributeGroup(
                     $this->attribute(
                         'Cast',
-                        new Node\Expr\ClassConstFetch(new Node\Name($enumName), 'class')
+                        extract: new Node\Scalar\String_('string'),
                     ),
                 );
             }

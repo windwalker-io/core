@@ -288,13 +288,13 @@ trait EntityHooksConcernTrait
         $factory = $this->createNodeFactory();
 
         $this->addUse(UuidInterface::class);
+        $this->addFunctionUse('Windwalker\\try_uuid');
 
         return $this->createHookAssignValue(
             $propName,
             new Node\Identifier('UuidInterface|string|null'),
-            $factory->staticCall(
-                new Node\Name('UUIDBin'),
-                'tryWrap',
+            $factory->funcCall(
+                'try_uuid',
                 [
                     new Node\Expr\Variable('value'),
                 ]
