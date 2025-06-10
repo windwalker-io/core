@@ -517,12 +517,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $this->addUse(CastNullable::class);
             $this->addUse(UUIDBin::class);
             $prop->setAttribute('fullType', UuidInterface::class);
-            $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    'CastNullable',
-                    extract: new Node\Scalar\String_('string'),
-                ),
-            );
+            // $prop->attrGroups[] = $this->attributeGroup(
+            //     $this->attribute(
+            //         'CastNullable',
+            //         extract: new Node\Scalar\String_('string'),
+            //     ),
+            // );
 
             $uuidDefault = 'UUID7';
 
@@ -569,23 +569,23 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $enumName = Str::removeLeft($enumName, '?');
             $prop->setAttribute('fullType', $this->findFQCN($enumName));
 
-            if ($dbColumn->getIsNullable()) {
-                $this->addUse(CastNullable::class);
-                $prop->attrGroups[] = $this->attributeGroup(
-                    $this->attribute(
-                        'CastNullable',
-                        extract: new Node\Scalar\String_('string'),
-                    ),
-                );
-            } else {
-                $this->addUse(Cast::class);
-                $prop->attrGroups[] = $this->attributeGroup(
-                    $this->attribute(
-                        'Cast',
-                        extract: new Node\Scalar\String_('string'),
-                    ),
-                );
-            }
+            // if ($dbColumn->getIsNullable()) {
+            //     $this->addUse(CastNullable::class);
+            //     $prop->attrGroups[] = $this->attributeGroup(
+            //         $this->attribute(
+            //             'CastNullable',
+            //             extract: new Node\Scalar\String_('string'),
+            //         ),
+            //     );
+            // } else {
+            //     $this->addUse(Cast::class);
+            //     $prop->attrGroups[] = $this->attributeGroup(
+            //         $this->attribute(
+            //             'Cast',
+            //             extract: new Node\Scalar\String_('string'),
+            //         ),
+            //     );
+            // }
         }
 
         if ($this->isJsonType($dbColumn)) {
