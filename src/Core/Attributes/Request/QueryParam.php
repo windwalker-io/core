@@ -8,7 +8,7 @@ use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Utilities\Arr;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
-class QueryValue extends Input
+class QueryParam extends Input
 {
     protected function getValueFromRequest(AppRequestInterface $appRequest, string $name): mixed
     {

@@ -16,7 +16,7 @@ use Windwalker\Core\Attributes\Request\BodyValue;
 use Windwalker\Core\Attributes\Request\File;
 use Windwalker\Core\Attributes\Request\Header;
 use Windwalker\Core\Attributes\Request\Input;
-use Windwalker\Core\Attributes\Request\QueryValue;
+use Windwalker\Core\Attributes\Request\QueryParam;
 use Windwalker\Core\Attributes\Request\RequestInput;
 use Windwalker\Core\Attributes\Request\RouteParam;
 use Windwalker\Core\Attributes\Request\UrlVar;
@@ -48,7 +48,7 @@ return [
     Input::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     BodyValue::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     Header::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
-    QueryValue::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
+    QueryParam::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     UrlVar::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     RouteParam::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     File::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
