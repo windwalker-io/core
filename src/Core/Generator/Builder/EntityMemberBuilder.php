@@ -91,6 +91,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 $this->uses[] = (string) $node->name;
             }
 
+            if ($node instanceof Node\Stmt\Use_ && $node->type === Node\Stmt\Use_::TYPE_FUNCTION) {
+                foreach ($node->uses as $use) {
+                    $this->functionUses[] = (string) $use->name;
+                }
+            }
+
             // Handle existing properties
             if ($node instanceof Node\Stmt\Property) {
                 if ($options['methods'] ?? true) {
