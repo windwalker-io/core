@@ -123,7 +123,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $buffer = new JsonBuffer($message, $data, false, $apiException->getCode());
         $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());
 
-        return (new JsonResponse($buffer))
+        return new JsonResponse($buffer)
             ->withStatus(
                 ErrorService::normalizeCode($apiException->getStatusCode())
             );

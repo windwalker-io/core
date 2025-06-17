@@ -78,9 +78,13 @@ class ApiException extends \RuntimeException
     {
         $str = (string) $code;
 
-        $status = substr($str, 0, 3);
+        $status = (int) substr($str, 0, 3);
 
-        return (int) $status;
+        if ($status >= 200 && $status < 400) {
+            return $code;
+        }
+
+        return $status;
     }
 
     /**

@@ -391,8 +391,6 @@ class ErrorService
     }
 
     /**
-     * normalizeCode
-     *
      * @param  int  $code
      *
      * @return  int
@@ -401,7 +399,11 @@ class ErrorService
     {
         $stringCode = (string) $code;
 
-        if (strlen($stringCode) > 3) {
+        if (
+            strlen($stringCode) > 3
+            && !str_starts_with($stringCode, '2')
+            && !str_starts_with($stringCode, '3')
+        ) {
             $code = substr($stringCode, 0, 3);
         }
 
