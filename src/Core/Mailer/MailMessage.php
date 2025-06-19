@@ -11,14 +11,14 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Windwalker\Core\Asset\AssetService;
-use Windwalker\Utilities\Classes\FlowControlTrait;
+use Windwalker\Utilities\Classes\ChainingTrait;
 
 /**
  * The MailMessage class.
  */
 class MailMessage extends Email
 {
-    use FlowControlTrait;
+    use ChainingTrait;
 
     protected AssetService|null $asset = null;
 

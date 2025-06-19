@@ -12,7 +12,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\Uri\Uri;
 use Windwalker\Uri\UriNormalizer;
-use Windwalker\Utilities\Classes\FlowControlTrait;
+use Windwalker\Utilities\Classes\ChainingTrait;
 
 /**
  * @method $this getHandler(callable|array|string|null $handler, ?string $task = null)
@@ -26,7 +26,7 @@ use Windwalker\Utilities\Classes\FlowControlTrait;
 class Route implements JsonSerializable
 {
     use RouteConfigurationTrait;
-    use FlowControlTrait;
+    use ChainingTrait;
 
     protected array $groups = [];
 

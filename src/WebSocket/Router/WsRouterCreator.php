@@ -8,7 +8,7 @@ use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\RouteConfigurationTrait;
 use Windwalker\Core\Router\RouteCreatorInterface;
 use Windwalker\Core\Router\RouteCreatorTrait;
-use Windwalker\Utilities\Classes\FlowControlTrait;
+use Windwalker\Utilities\Classes\ChainingTrait;
 
 /**
  * The WsRouterCreator class.
@@ -17,7 +17,7 @@ class WsRouterCreator implements RouteCreatorInterface
 {
     use RouteConfigurationTrait;
     use RouteCreatorTrait;
-    use FlowControlTrait;
+    use ChainingTrait;
 
     public function open(string $pattern, array $options = []): Route
     {

@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Router;
 
-use LogicException;
-use Windwalker\Data\Collection;
-use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\Classes\FlowControlTrait;
-use Windwalker\Utilities\TypeCast;
-
-use function Windwalker\glob_all;
+use Windwalker\Utilities\Classes\ChainingTrait;
 
 class RouteCreator implements RouteCreatorInterface
 {
     use RouteConfigurationTrait;
-    use FlowControlTrait;
+    use ChainingTrait;
     use RouteCreatorTrait;
 
     /**
