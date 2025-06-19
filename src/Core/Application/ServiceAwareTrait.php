@@ -8,8 +8,10 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Windwalker\DI\ContainerAwareTrait;
-use Windwalker\DI\Exception;
+use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DefinitionResolveException;
+use Windwalker\DI\Exception\DependencyResolutionException;
 
 /**
  * Trait ServiceAwareTrait
@@ -23,15 +25,15 @@ trait ServiceAwareTrait
      *
      * @template T
      *
-     * @param  class-string<T>  $id
-     * @param  bool             $forceNew
-     * @param  string|null      $tag
+     * @param  class-string<T>        $id
+     * @param  bool                   $forceNew
+     * @param  \UnitEnum|string|null  $tag
      *
      * @return T
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws DefinitionNotFoundException
+     * @throws DependencyResolutionException
      */
-    public function retrieve(string $id, bool $forceNew = false, ?string $tag = null): mixed
+    public function retrieve(string $id, bool $forceNew = false, \UnitEnum|string|null $tag = null): mixed
     {
         return $this->getContainer()->get($id, $forceNew, $tag);
     }
@@ -59,20 +61,29 @@ trait ServiceAwareTrait
      *
      * @template T
      *
-     * @param  class-string<T>  $class
-     * @param  array            $args
-     * @param  int              $options
+     * @param  class-string<T>        $class
+     * @param  array                  $args
+     * @param  int                    $options
+     * @param  \UnitEnum|string|null  $tag
      *
      * @return  T
      *
      * @throws ContainerExceptionInterface
+     * @throws DefinitionNotFoundException
+     * @throws DependencyResolutionException
+     * @throws DefinitionException
+     * @throws NotFoundExceptionInterface
      */
-    public function service(string $class, array $args = [], int $options = 0, ?string $tag = null): object
-    {
+    public function service(
+        string $class,
+        array $args = [],
+        int $options = 0,
+        \UnitEnum|string|null $tag = null
+    ): object {
         $container = $this->getContainer();
 
         if ($container->has($class, tag: $tag)) {
-            return $container->get($class, tag:  $tag);
+            return $container->get($class, tag: $tag);
         }
 
         return $container->createSharedObject($class, $args, $options, tag: $tag);
@@ -99,15 +110,16 @@ trait ServiceAwareTrait
     /**
      * Bind a value or object to Container.
      *
-     * @param  string  $id
-     * @param  mixed   $value
-     * @param  int     $options
+     * @param  string                 $id
+     * @param  mixed                  $value
+     * @param  int                    $options
+     * @param  \UnitEnum|string|null  $tag
      *
      * @return  static
      *
-     * @throws Exception\DefinitionException
+     * @throws DefinitionException
      */
-    public function bind(string $id, mixed $value, int $options = 0, ?string $tag = null): mixed
+    public function bind(string $id, mixed $value, int $options = 0, \UnitEnum|string|null $tag = null): mixed
     {
         $this->getContainer()->bind($id, $value, $options, $tag);
 
@@ -122,12 +134,15 @@ trait ServiceAwareTrait
      * @param  mixed|class-string<T>  $source
      * @param  array                  $args
      * @param  int                    $options
+     * @param  \UnitEnum|string|null  $tag
      *
      * @return mixed|T
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws DefinitionNotFoundException
+     * @throws DefinitionResolveException
+     * @throws DependencyResolutionException
+     * @throws ReflectionException
      */
-    public function resolve(mixed $source, array $args = [], int $options = 0, ?string $tag = null): mixed
+    public function resolve(mixed $source, array $args = [], int $options = 0, \UnitEnum|string|null $tag = null): mixed
     {
         return $this->getContainer()->resolve($source, $args, $options, $tag);
     }
