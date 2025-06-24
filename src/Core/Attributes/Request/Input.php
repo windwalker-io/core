@@ -32,7 +32,7 @@ class Input implements ContainerAttributeInterface
                 ?? $this->getValueFromRequest($handler->getContainer()->get(AppRequestInterface::class), $field)
                 ?? $default;
 
-            if ($value === null && !($isOptional && $ref->allowsNull())) {
+            if ($value === null && !$isOptional && !$ref->allowsNull()) {
                 throw new \RuntimeException(
                     sprintf(
                         'Field "%s" is missing in request.',
