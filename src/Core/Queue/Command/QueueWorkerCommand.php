@@ -328,14 +328,16 @@ class QueueWorkerCommand implements CommandInterface
      */
     protected function getWorker(?string $connection): Worker
     {
-        return $this->app->getContainer()
-            ->resolve(
+        $worker = $this->app->getContainer()
+            ->newInstance(
                 Worker::class,
                 [
                     Queue::class => $this->app->retrieve(Queue::class, tag: $connection),
                     LoggerInterface::class => $this->app->retrieve(LoggerInterface::class, tag: 'queue'),
                 ]
             );
+
+        return $worker;
     }
 
     protected function runEndScripts(

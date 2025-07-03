@@ -13,20 +13,22 @@ class ConsoleLogEvent
 {
     use AccessorBCTrait;
 
+    public array $messages {
+        set (mixed $value) {
+            $this->messages = (array) $value;
+        }
+    }
+
     /**
      * MessageEvent constructor.
      *
-     * @param  array   $messages
-     * @param  string  $type
+     * @param  array|string  $messages
+     * @param  ?string       $type
      */
     public function __construct(
-        public array $messages {
-            get => $this->messages;
-            set ($value) {
-                $this->messages = (array) $value;
-            }
-        },
+        array|string $messages,
         public ?string $type = null,
     ) {
+        $this->messages = $messages;
     }
 }
