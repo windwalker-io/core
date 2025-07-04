@@ -10,6 +10,7 @@ use Symfony\Component\Process\Process;
 use Windwalker\Core\Manager\AbstractManager;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
 
@@ -73,5 +74,19 @@ class QueueManager extends AbstractManager
 
             return $process->getOutput();
         };
+    }
+
+    public function createContainerHandler(): Closure
+    {
+        return fn(QueueMessage $message) => $message->run(
+            fn(JobController $controller, callable $invokable) => $this->container->call(
+                $invokable,
+                [
+                    JobController::class => $controller,
+                    'jobController' => $controller,
+                    'controller' => $controller,
+                ]
+            )
+        );
     }
 }

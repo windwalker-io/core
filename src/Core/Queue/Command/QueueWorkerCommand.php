@@ -26,6 +26,7 @@ use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
 use Windwalker\Queue\Failer\QueueFailerInterface;
+use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
 use Windwalker\Queue\Worker;
@@ -145,7 +146,7 @@ class QueueWorkerCommand implements CommandInterface
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
         $worker = $this->createWorker($connection);
-        $worker->setJobRunner($this->runJob(...));
+        $worker->setInvoker($this->invoke(...));
 
         $worker->addEventDealer($this->app);
 
@@ -196,9 +197,16 @@ class QueueWorkerCommand implements CommandInterface
         ];
     }
 
-    public function runJob(callable $job): mixed
+    public function invoke(JobController $controller, callable $invokable): mixed
     {
-        return $this->app->call($job);
+        return $this->app->call(
+            $invokable,
+            [
+                'jobController' => $controller,
+                'controller' => $controller,
+                JobController::class => $controller,
+            ]
+        );
     }
 
     protected function listenToWorker(Worker $worker, IOInterface $io, string $connection): void
