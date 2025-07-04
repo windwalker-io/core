@@ -144,8 +144,8 @@ class QueueWorkerCommand implements CommandInterface
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
-        $worker = $this->getWorker($connection);
-        $worker->setJobRunner([$this, 'runJob']);
+        $worker = $this->createWorker($connection);
+        $worker->setJobRunner($this->runJob(...));
 
         $worker->addEventDealer($this->app);
 
@@ -324,20 +324,13 @@ class QueueWorkerCommand implements CommandInterface
      * @throws DefinitionException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
-     * @throws \ReflectionException
      */
-    protected function getWorker(?string $connection): Worker
+    protected function createWorker(?string $connection): Worker
     {
-        $worker = $this->app->getContainer()
-            ->newInstance(
-                Worker::class,
-                [
-                    Queue::class => $this->app->retrieve(Queue::class, tag: $connection),
-                    LoggerInterface::class => $this->app->retrieve(LoggerInterface::class, tag: 'queue'),
-                ]
-            );
-
-        return $worker;
+        return new Worker(
+            queue: $this->app->retrieve(Queue::class, tag: $connection),
+            logger: $this->app->retrieve(LoggerInterface::class, tag: 'queue')
+        );
     }
 
     protected function runEndScripts(
