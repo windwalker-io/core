@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
-use Laravel\SerializableClosure\SerializableClosure;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -357,7 +354,7 @@ class QueueWorkerCommand implements CommandInterface
     }
 
     /**
-     * @param  ?string        $connection
+     * @param  ?string  $connection
      * @param  WorkerOptions  $options
      *
      * @return  Worker
