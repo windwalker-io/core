@@ -18,6 +18,8 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionNotFoundException;
+use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
@@ -30,6 +32,7 @@ use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
 use Windwalker\Queue\Worker;
+use Windwalker\Queue\WorkerOptions;
 
 /**
  * The QueueWorkerCommand class.
@@ -73,10 +76,18 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         $command->addOption(
+            'backoff',
+            'b',
+            InputOption::VALUE_REQUIRED,
+            'Delay time for failed job to wait next run.',
+            '0'
+        );
+
+        $command->addOption(
             'delay',
             'd',
             InputOption::VALUE_REQUIRED,
-            'Delay time for failed job to wait next run.',
+            'Delay time for failed job to wait next run, the alias of backoff.',
             '0'
         );
 
@@ -145,7 +156,7 @@ class QueueWorkerCommand implements CommandInterface
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
-        $worker = $this->createWorker($connection);
+        $worker = $this->createWorker($connection, $options);
         $worker->setInvoker($this->invoke(...));
 
         $worker->addEventDealer($this->app);
@@ -167,34 +178,29 @@ class QueueWorkerCommand implements CommandInterface
             if ($file) {
                 /** @var QueueMessage $message */
                 $message = unserialize(file_get_contents($file));
-                $worker->process($message, $options);
+                $worker->process($message);
             } else {
-                $worker->runNextJob($channels, $options);
+                $worker->runNextJob($channels);
             }
         } else {
-            $worker->loop($channels, $options);
+            $worker->loop($channels);
         }
 
         return 0;
     }
 
-    /**
-     * getWorkOptions
-     *
-     * @return  array
-     */
-    protected function getWorkOptions(IOInterface $io): array
+    protected function getWorkOptions(IOInterface $io): WorkerOptions
     {
-        return [
-            'once' => $io->getOption('once'),
-            'delay' => (int) $io->getOption('delay'),
-            'force' => $io->getOption('force'),
-            'memory' => (int) $io->getOption('memory'),
-            'sleep' => (int) $io->getOption('sleep'),
-            'tries' => (int) $io->getOption('tries'),
-            'timeout' => (int) $io->getOption('timeout'),
-            'restart_signal' => $this->app->path('@temp') . '/queue/restart',
-        ];
+        return new WorkerOptions(
+            once: (bool) $io->getOption('once'),
+            backoff: (int) ($io->getOption('backoff') ?? $io->getOption('delay')),
+            force: (bool) $io->getOption('force'),
+            memoryLimit: (int) $io->getOption('memory'),
+            sleep: (float) $io->getOption('sleep'),
+            tries: (int) $io->getOption('tries'),
+            timeout: (int) $io->getOption('timeout'),
+            restartSignal: $this->app->path('@temp') . '/queue/restart',
+        );
     }
 
     public function invoke(JobController $controller, callable $invokable): mixed
@@ -226,12 +232,24 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 AfterJobRunEvent::class,
                 function (AfterJobRunEvent $event) use ($connection, $io, $worker) {
-                    $this->app->addMessage(
-                        sprintf(
-                            'Job Message: <info>%s</info> END',
-                            $event->message->getId()
-                        )
-                    );
+                    $controller = $event->controller;
+
+                    if ($controller->releaseDelay === null) {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job Message: <info>%s</info> END',
+                                $event->message->getId()
+                            )
+                        );
+                    } else {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job Message: <info>%s</info> released after %d seconds.',
+                                $event->message->getId(),
+                                $controller->releaseDelay
+                            )
+                        );
+                    }
 
                     $this->runEndScripts(
                         'job_end_scripts',
@@ -247,18 +265,32 @@ class QueueWorkerCommand implements CommandInterface
                 function (JobFailureEvent $event) use ($io, $connection) {
                     $message = $event->message;
                     $e = $event->exception;
+                    $retryDelay = $event->retryDelay;
 
                     Logger::error('queue-error', $e);
 
-                    $this->app->addMessage(
-                        sprintf(
-                            'Job %s failed - ID: <info>%s</info> - %s',
-                            get_debug_type($event->job),
-                            $message->getId(),
-                            $event->exception->getMessage(),
-                        ),
-                        'error'
-                    );
+                    if ($retryDelay === false) {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job %s failed - ID: <info>%s</info> - %s. Max attempts reached, will not retry.',
+                                get_debug_type($event->job),
+                                $message->getId(),
+                                $event->exception->getMessage(),
+                            ),
+                            'error'
+                        );
+                    } else {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job %s failed - ID: <info>%s</info> - %s. Will retry after %d seconds.',
+                                get_debug_type($event->job),
+                                $message->getId(),
+                                $event->exception->getMessage(),
+                                $retryDelay
+                            ),
+                            'error'
+                        );
+                    }
 
                     if ($message->isDeleted()) {
                         $this->app->service(QueueFailerInterface::class)
@@ -325,18 +357,19 @@ class QueueWorkerCommand implements CommandInterface
     }
 
     /**
-     * @param  ?string  $connection
+     * @param  ?string        $connection
+     * @param  WorkerOptions  $options
      *
      * @return  Worker
      *
-     * @throws DefinitionException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws DefinitionNotFoundException
+     * @throws DependencyResolutionException
      */
-    protected function createWorker(?string $connection): Worker
+    protected function createWorker(?string $connection, WorkerOptions $options): Worker
     {
         return new Worker(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
+            options: $options,
             logger: $this->app->retrieve(LoggerInterface::class, tag: 'queue')
         );
     }
