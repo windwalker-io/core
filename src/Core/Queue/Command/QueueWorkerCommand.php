@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\Output;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -153,6 +154,9 @@ class QueueWorkerCommand implements CommandInterface
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
+        $this->app->container->share(IOInterface::class, $io);
+        $this->app->container->share(Output::class, $io->getOutput());
+
         $worker = $this->createWorker($connection, $options);
         $worker->setInvoker($this->invoke(...));
 
@@ -262,17 +266,18 @@ class QueueWorkerCommand implements CommandInterface
                 function (JobFailureEvent $event) use ($io, $connection) {
                     $message = $event->message;
                     $e = $event->exception;
-                    $retryDelay = $event->retryDelay;
+                    $backoff = $event->backoff;
 
                     Logger::error('queue-error', $e);
 
-                    if ($retryDelay === false) {
+                    if ($event->maxAttemptsExceeds || $event->abandoned) {
                         $this->app->addMessage(
                             sprintf(
-                                'Job %s failed - ID: <info>%s</info> - %s. Max attempts reached, will not retry.',
+                                'Job %s failed - ID: <info>%s</info> - %s. %s, will not retry.',
                                 get_debug_type($event->job),
                                 $message->getId(),
                                 $event->exception->getMessage(),
+                                $event->abandoned ? 'Job abandoned' : 'Max attempts exceeded'
                             ),
                             'error'
                         );
@@ -283,13 +288,13 @@ class QueueWorkerCommand implements CommandInterface
                                 get_debug_type($event->job),
                                 $message->getId(),
                                 $event->exception->getMessage(),
-                                $retryDelay
+                                $backoff
                             ),
                             'error'
                         );
                     }
 
-                    if ($message->isDeleted()) {
+                    if (!$event->abandoned && $message->isDeleted()) {
                         $this->app->service(QueueFailerInterface::class)
                             ->add(
                                 $connection,
