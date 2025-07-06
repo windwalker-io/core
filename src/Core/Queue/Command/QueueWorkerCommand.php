@@ -78,7 +78,7 @@ class QueueWorkerCommand implements CommandInterface
             'b',
             InputOption::VALUE_REQUIRED,
             'Delay time for failed job to wait next run.',
-            '0'
+            '3'
         );
 
         $command->addOption(
@@ -86,7 +86,7 @@ class QueueWorkerCommand implements CommandInterface
             'd',
             InputOption::VALUE_REQUIRED,
             'Delay time for failed job to wait next run, the alias of backoff.',
-            '0'
+            '3'
         );
 
         $command->addOption(
@@ -245,9 +245,9 @@ class QueueWorkerCommand implements CommandInterface
                     } else {
                         $this->app->addMessage(
                             sprintf(
-                                'Job Message: <info>%s</info> released after %d seconds.',
+                                'Job Message: <info>%s</info> %s',
                                 $event->message->getId(),
-                                $controller->defer
+                                $controller->defer->getReasonText()
                             )
                         );
                     }
@@ -264,20 +264,23 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 JobFailureEvent::class,
                 function (JobFailureEvent $event) use ($io, $connection) {
-                    $message = $event->message;
+                    $controller = $event->controller;
+                    $message = $controller->message;
                     $e = $event->exception;
                     $backoff = $event->backoff;
 
                     Logger::error('queue-error', $e);
 
-                    if ($event->maxAttemptsExceeds || $event->abandoned) {
+                    if ($controller->shouldDelete) {
                         $this->app->addMessage(
                             sprintf(
                                 'Job %s failed - ID: <info>%s</info> - %s. %s, will not retry.',
                                 get_debug_type($event->job),
                                 $message->getId(),
                                 $event->exception->getMessage(),
-                                $event->abandoned ? 'Job abandoned' : 'Max attempts exceeded'
+                                $controller->maxAttemptsExceeds
+                                    ? 'Max attempts exceeded'
+                                    : $controller->abandoned->toReasonText()
                             ),
                             'error'
                         );
@@ -294,7 +297,7 @@ class QueueWorkerCommand implements CommandInterface
                         );
                     }
 
-                    if (!$event->abandoned && $message->isDeleted()) {
+                    if (!$controller->abandoned && $message->isDeleted()) {
                         $this->app->service(QueueFailerInterface::class)
                             ->add(
                                 $connection,
