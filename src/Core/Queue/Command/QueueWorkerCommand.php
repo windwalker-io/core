@@ -235,7 +235,7 @@ class QueueWorkerCommand implements CommandInterface
                 function (AfterJobRunEvent $event) use ($connection, $io, $worker) {
                     $controller = $event->controller;
 
-                    if ($controller->releaseDelay === null) {
+                    if ($controller->defer === null) {
                         $this->app->addMessage(
                             sprintf(
                                 'Job Message: <info>%s</info> END',
@@ -247,7 +247,7 @@ class QueueWorkerCommand implements CommandInterface
                             sprintf(
                                 'Job Message: <info>%s</info> released after %d seconds.',
                                 $event->message->getId(),
-                                $controller->releaseDelay
+                                $controller->defer
                             )
                         );
                     }
