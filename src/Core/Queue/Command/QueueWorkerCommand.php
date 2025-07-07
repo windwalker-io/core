@@ -6,12 +6,17 @@ namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
@@ -21,6 +26,7 @@ use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
+use Windwalker\Queue\Event\DebugOutputEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
@@ -154,11 +160,10 @@ class QueueWorkerCommand implements CommandInterface
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
-        $this->app->container->share(IOInterface::class, $io);
-        $this->app->container->share(Output::class, $io->getOutput());
-
         $worker = $this->createWorker($connection, $options);
         $worker->setInvoker($this->invoke(...));
+
+        $this->prepareDebugServices($io, $worker);
 
         $worker->addEventDealer($this->app);
 
@@ -406,5 +411,61 @@ class QueueWorkerCommand implements CommandInterface
                 ]
             );
         }
+    }
+
+    /**
+     * @param  IOInterface  $io
+     * @param  Worker       $worker
+     *
+     * @return  void
+     *
+     * @throws DefinitionException
+     */
+    public function prepareDebugServices(IOInterface $io, Worker $worker): void
+    {
+        if ($io->isVerbose()) {
+            $this->app->container->share(IOInterface::class, $io);
+            $this->app->container->share(Output::class, $io->getOutput());
+        } else {
+            $this->app->container->share(
+                IOInterface::class,
+                new IO(
+                    new ArrayInput([]),
+                    new NullOutput(),
+                    new Command()
+                )
+            );
+            $this->app->container->share(Output::class, NullOutput::class);
+        }
+
+        $worker->on(
+            DebugOutputEvent::class,
+            function (DebugOutputEvent $event) use ($io) {
+                $levels = [];
+
+                if ($io->getVerbosity() === OutputInterface::VERBOSITY_NORMAL) {
+                    $levels[] = LogLevel::EMERGENCY;
+                    $levels[] = LogLevel::ALERT;
+                    $levels[] = LogLevel::CRITICAL;
+                    $levels[] = LogLevel::ERROR;
+                } elseif ($io->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $levels[] = LogLevel::WARNING;
+                    $levels[] = LogLevel::NOTICE;
+                    $levels[] = LogLevel::INFO;
+                    $levels[] = LogLevel::DEBUG;
+                }
+
+                if (in_array($event->level, $levels, true)) {
+                    $io->getOutput()->writeln(
+                        sprintf(
+                            '[%s] %s %s',
+                            $event->level,
+                            $event->message,
+                            $event->context ? json_encode($event->context) : ''
+                        )
+                    );
+                }
+            }
+        );
     }
 }
