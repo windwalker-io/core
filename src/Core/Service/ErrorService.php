@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Part of starter project.
- *
- * @copyright  Copyright (C) 2020 .
- * @license    MIT
- */
-
 declare(strict_types=1);
 
 namespace Windwalker\Core\Service;
@@ -15,6 +8,7 @@ use ErrorException;
 use InvalidArgumentException;
 use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Error\DeprecatedException;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Utilities\Utf8String;
@@ -41,6 +35,11 @@ class ErrorService
      * @var  callable[]
      */
     protected array $handlers = [];
+
+    /**
+     * @var array<callable>
+     */
+    protected array $deprecationHandlers = [];
 
     /**
      * Property engine.
@@ -109,14 +108,13 @@ class ErrorService
      * @param  string   $message  The error message, as a string.
      * @param  string   $file  The filename that the error was raised in, as a string.
      * @param  integer  $line  The line number the error was raised at, as an integer.
-     * @param  mixed    $context  An array that contains variables in the scope which this error occurred.
      *
      * @return  void
      *
      * @throws  ErrorException
      * @see  http://php.net/manual/en/function.set-error-handler.php
      */
-    public function error(int $code, string $message, string $file, int $line, $context = null): void
+    public function error(int $code, string $message, string $file, int $line): void
     {
         if (!(error_reporting() & $code)) {
             return;
@@ -124,7 +122,15 @@ class ErrorService
 
         $content = sprintf('%s. File: %s (line: %s)', $message, $file, $line);
 
-        throw new ErrorException($content, 500, $code, $file, $line);
+        $e = new ErrorException($content, 500, $code, $file, $line);
+
+        if ($code === E_USER_DEPRECATED || $code === E_DEPRECATED) {
+            $this->handleDeprecation($e);
+
+            return;
+        }
+
+        throw $e;
     }
 
     /**
@@ -151,6 +157,21 @@ class ErrorService
         }
 
         exit();
+    }
+
+    protected function handleDeprecation(ErrorException $exception): void
+    {
+        foreach ($this->deprecationHandlers as $handler) {
+            $this->app->call(
+                $handler,
+                [
+                    $exception,
+                    'exception' => $exception,
+                    'error' => $exception,
+                    ErrorException::class => $exception
+                ]
+            );
+        }
     }
 
     public function handle(Throwable $exception): void
@@ -312,8 +333,8 @@ class ErrorService
     /**
      * Method to set property handler
      *
-     * @param  callable  $handler
-     * @param  string    $name
+     * @param  callable     $handler
+     * @param  string|null  $name
      *
      * @return static Return self to support chaining.
      */
@@ -366,6 +387,55 @@ class ErrorService
         return $this;
     }
 
+    public function addDeprecationHandler(callable $handler, ?string $name = null): static
+    {
+        if ($name) {
+            $this->deprecationHandlers[$name] = $handler;
+        } else {
+            $this->deprecationHandlers[] = $handler;
+        }
+
+        return $this;
+    }
+
+    /**
+     * removeHandler
+     *
+     * @param  string  $name
+     *
+     * @return  static
+     */
+    public function removeDeprecationHandler(string $name): static
+    {
+        unset($this->deprecationHandlers[$name]);
+
+        return $this;
+    }
+
+    /**
+     * Method to get property Handlers
+     *
+     * @return  callable[]
+     */
+    public function getDeprecationHandlers(): array
+    {
+        return $this->deprecationHandlers;
+    }
+
+    /**
+     * Method to set property handlers
+     *
+     * @param  callable[]  $handlers
+     *
+     * @return  static  Return self to support chaining.
+     */
+    public function setDeprecationHandlers(array $handlers): static
+    {
+        $this->deprecationHandlers = $handlers;
+
+        return $this;
+    }
+
     /**
      * Method to get property Engine
      *
@@ -383,7 +453,7 @@ class ErrorService
      *
      * @return  static  Return self to support chaining.
      */
-    public function setEngine(string $engine)
+    public function setEngine(string $engine): static
     {
         $this->engine = $engine;
 

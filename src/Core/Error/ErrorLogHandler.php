@@ -53,13 +53,12 @@ class ErrorLogHandler implements ErrorHandlerInterface
                 'enabled' => false,
                 'channel' => $this->config->getDeep('error.log_channel') ?: 'error',
                 'ignore_40x' => false,
+                'print' => false,
             ]
         );
     }
 
     /**
-     * __invoke
-     *
      * @param  Throwable  $e
      *
      * @return  void
@@ -67,6 +66,10 @@ class ErrorLogHandler implements ErrorHandlerInterface
      */
     public function __invoke(Throwable $e): void
     {
+        if (!$this->options['enabled']) {
+            return;
+        }
+
         // Do not log 4xx errors
         $code = $e->getCode();
 
@@ -75,11 +78,17 @@ class ErrorLogHandler implements ErrorHandlerInterface
         if (
             $code < 400 || $code >= 500 || !$ignore40x
         ) {
-            $this->logger->error(
-                $this->options['channel'],
-                $e->getMessage(),
-                ['exception' => $e]
-            );
+            if ($this->options['channel']) {
+                $this->logger->error(
+                    $this->options['channel'],
+                    $e->getMessage(),
+                    ['exception' => $e]
+                );
+            }
+
+            if ($this->options['print']) {
+                echo $e->getMessage();
+            }
         }
     }
 

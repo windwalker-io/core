@@ -6,8 +6,6 @@ namespace Windwalker\Core\Provider;
 
 use NunoMaduro\Collision\Writer;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Symfony\Component\Console\Exception\ExceptionInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Whoops\Exception\Inspector;
 use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
@@ -35,7 +33,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     /**
      * ErrorHandlingProvider constructor.
      *
-     * @param  Config                $config
+     * @param  Config  $config
      * @param  ApplicationInterface  $app
      */
     public function __construct(Config $config, protected ApplicationInterface $app)
@@ -97,14 +95,34 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
      */
     public function register(Container $container): void
     {
-        $container->prepareSharedObject(ErrorService::class, function (ErrorService $error, Container $container) {
-            foreach ($this->config->getDeep('handlers.' . $this->app->getType()->name) ?? [] as $key => $handler) {
-                $handler = $container->resolve($handler);
+        $container->prepareSharedObject(
+            ErrorService::class,
+            function (ErrorService $error, Container $container) {
+                // Error Handlers
+                $appType = $this->app->getType()->name;
 
-                $error->addHandler($handler, is_numeric($key) ? null : $key);
-            }
+                foreach ($this->config->getDeep('handlers.' . $appType) ?? [] as $key => $handler) {
+                    $error->addHandler($container->resolve($handler), is_numeric($key) ? null : $key);
+                }
 
-            return $error;
-        }, Container::ISOLATION);
+                // Error Handlers all
+                foreach ($this->config->getDeep('handlers.all') ?? [] as $key => $handler) {
+                    $error->addHandler($container->resolve($handler), is_numeric($key) ? null : $key);
+                }
+
+                // Deprecation handlers.
+                foreach ($this->config->getDeep('deprecation_handlers.' . $appType) ?? [] as $key => $handler) {
+                    $error->addDeprecationHandler($container->resolve($handler), is_numeric($key) ? null : $key);
+                }
+
+                // Deprecation handlers all.
+                foreach ($this->config->getDeep('deprecation_handlers.all') ?? [] as $key => $handler) {
+                    $error->addDeprecationHandler($container->resolve($handler), is_numeric($key) ? null : $key);
+                }
+
+                return $error;
+            },
+            Container::ISOLATION
+        );
     }
 }
