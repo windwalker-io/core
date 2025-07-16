@@ -241,19 +241,27 @@ class QueueWorkerCommand implements CommandInterface
                 function (AfterJobRunEvent $event) use ($connection, $io, $worker) {
                     $controller = $event->controller;
 
-                    if ($controller->defer === null) {
-                        $this->app->addMessage(
-                            sprintf(
-                                'Job Message: <info>%s</info> END',
-                                $event->message->getId()
-                            )
-                        );
-                    } else {
+                    if ($controller->defer) {
                         $this->app->addMessage(
                             sprintf(
                                 'Job Message: <info>%s</info> %s',
                                 $event->message->getId(),
                                 $controller->defer->getReasonText()
+                            )
+                        );
+                    } elseif ($controller->abandoned) {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job Message: <info>%s</info> END - %s',
+                                $event->message->getId(),
+                                $controller->abandoned->toReasonText()
+                            )
+                        );
+                    } else {
+                        $this->app->addMessage(
+                            sprintf(
+                                'Job Message: <info>%s</info> END',
+                                $event->message->getId()
                             )
                         );
                     }
