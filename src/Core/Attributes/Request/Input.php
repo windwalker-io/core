@@ -14,7 +14,7 @@ class Input implements ContainerAttributeInterface
     public function __construct(
         public ?string $name = null,
         public mixed $default = null,
-        public string $delimiter = '.'
+        public string $delimiter = '.',
     ) {
     }
 

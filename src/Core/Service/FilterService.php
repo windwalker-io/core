@@ -89,6 +89,27 @@ class FilterService
         return $this->filterFactory->createChainFromSyntax($syntax);
     }
 
+    public function addFilterFactory(string $type, callable|string $factory): static
+    {
+        $this->filterFactory->addFactory($type, $factory);
+
+        return $this;
+    }
+
+    public function addFilterCallback(string $type, \Closure $callback): static
+    {
+        $this->filterFactory->addFilterCallback($type, $callback);
+
+        return $this;
+    }
+
+    public function removeFilter(string $type): static
+    {
+        $this->filterFactory->removeFactory($type);
+
+        return $this;
+    }
+
     public static function getInstance(): static
     {
         return Runtime::getContainer()->get(static::class);
