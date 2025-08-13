@@ -11,6 +11,7 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
 use Windwalker\Data\Collection;
 use Windwalker\Data\ValueObject;
+use Windwalker\Data\ValueObjectInterface;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
 
@@ -36,12 +37,16 @@ trait EntityHooksConcernTrait
         $isBool = false;
         $specialSetHook = null;
         $typeNode = $type;
-        $isNullable = false;
+        $setterNullable = false;
+        $typeNullable = false;
 
         if ($typeNode instanceof Node\NullableType) {
             $typeNode = $typeNode->type;
-            $isNullable = true;
+            $setterNullable = true;
+            $typeNullable = true;
         }
+
+        $setterNullable = $setterNullable || $column?->getIsNullable();
 
         if ($typeNode instanceof Node\Name) {
             $specialSetHook = 'build' . $typeNode . 'SetHook';
@@ -58,10 +63,11 @@ trait EntityHooksConcernTrait
                 // Getter hook is not necessary by default.
                 // ValueObject or Collection
                 if (
-                    !$isNullable
+                    !$setterNullable
                     && (
                         is_a($className, Collection::class, true)
-                        || is_a($className, ValueObject::class, true)
+                        // || is_a($className, ValueObject::class, true)
+                        || is_a($className, ValueObjectInterface::class, true)
                     )
                 ) {
                     $getHook = new Node\PropertyHook(
@@ -112,13 +118,13 @@ trait EntityHooksConcernTrait
                 // ValueObject or Collection
                 if (
                     is_a($className, Collection::class, true)
-                    || is_a($className, ValueObject::class, true)
+                    || is_a($className, ValueObjectInterface::class, true)
                 ) {
                     /** @var class-string<Collection> $className */
                     $typeClass = (string) $typeNode;
                     $typeString = $typeNode . '|array';
 
-                    if ($isNullable) {
+                    if ($setterNullable) {
                         $typeString .= '|null';
                     }
 
@@ -127,7 +133,7 @@ trait EntityHooksConcernTrait
                         new Node\Identifier($typeString),
                         $factory->staticCall(
                             new Node\Name($typeClass),
-                            $isNullable ? 'tryWrap' : 'wrap',
+                            $typeNullable ? 'tryWrap' : 'wrap',
                             [
                                 new Node\Expr\Variable('value'),
                             ]
@@ -155,7 +161,7 @@ trait EntityHooksConcernTrait
                         $typeString .= '|int|string';
                     }
 
-                    if ($isNullable) {
+                    if ($setterNullable) {
                         $typeString .= '|null';
                     }
 
@@ -166,7 +172,7 @@ trait EntityHooksConcernTrait
                     if (is_a($className, EnumMetaInterface::class, true)) {
                         $enum = $factory->staticCall(
                             new Node\Name($typeClass),
-                            $isNullable ? 'tryWrap' : 'wrap',
+                            $typeNullable ? 'tryWrap' : 'wrap',
                             [
                                 new Node\Expr\Variable('value'),
                             ]

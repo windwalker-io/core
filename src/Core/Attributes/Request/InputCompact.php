@@ -9,7 +9,7 @@ use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
-class RequestInput implements ContainerAttributeInterface
+class InputCompact implements ContainerAttributeInterface
 {
     public array $fields;
 

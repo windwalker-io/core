@@ -17,9 +17,10 @@ use Windwalker\Core\Attributes\Request\File;
 use Windwalker\Core\Attributes\Request\Header;
 use Windwalker\Core\Attributes\Request\Input;
 use Windwalker\Core\Attributes\Request\QueryParam;
-use Windwalker\Core\Attributes\Request\RequestInput;
+use Windwalker\Core\Attributes\Request\InputCompact;
 use Windwalker\Core\Attributes\Request\RouteParam;
 use Windwalker\Core\Attributes\Request\UrlVar;
+use Windwalker\Core\Attributes\Transaction;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Attributes\AttributeType;
 use Windwalker\DI\Container;
@@ -42,9 +43,10 @@ return [
     Json::class => AttributeType::CALLABLE,
     JsonApi::class => AttributeType::CALLABLE,
     Method::class => AttributeType::CALLABLE,
+    Transaction::class => AttributeType::CALLABLE,
 
     // Request
-    RequestInput::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
+    InputCompact::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     Input::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     BodyValue::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
     Header::class => AttributeType::PROPERTIES | AttributeType::PARAMETERS,
