@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
+use Symfony\Component\Console\Output\OutputInterface;
+use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 
 /**
@@ -12,6 +14,17 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 trait MessageOutputTrait
 {
     use CoreEventAwareTrait;
+
+    public function setMessageOutput(OutputInterface|ApplicationInterface $output): static
+    {
+        $this->onMessages(
+            function (MessageOutputEvent $event) use ($output) {
+                $event->writeWith($output);
+            }
+        );
+
+        return $this;
+    }
 
     public function onMessages(callable $handler): static
     {

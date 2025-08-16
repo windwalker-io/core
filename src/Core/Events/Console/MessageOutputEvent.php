@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Events\Console;
 
 use Symfony\Component\Console\Output\OutputInterface;
+use Windwalker\Core\Application\ApplicationInterface;
 
 /**
  * The ConsoleOutputEvent class.
@@ -25,13 +26,23 @@ class MessageOutputEvent
     /**
      * Instant write to std output.
      *
-     * @param  OutputInterface  $output
+     * @param  OutputInterface|ApplicationInterface  $output
      *
      * @return  static
      */
-    public function writeWith(OutputInterface $output): static
+    public function writeWith(OutputInterface|ApplicationInterface $output): static
     {
-        $output->write($this->messages, $this->newLine, $this->options);
+        if ($output instanceof ApplicationInterface) {
+            $messages = $this->messages;
+
+            if (!$this->newLine) {
+                $messages = implode(' ', (array) $messages);
+            }
+
+            $output->addMessage($messages);
+        } else {
+            $output->write($this->messages, $this->newLine, $this->options);
+        }
 
         return $this;
     }
