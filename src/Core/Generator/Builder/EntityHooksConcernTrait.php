@@ -10,8 +10,7 @@ use Ramsey\Uuid\UuidInterface;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
 use Windwalker\Data\Collection;
-use Windwalker\Data\ValueObject;
-use Windwalker\Data\ValueObjectInterface;
+use Windwalker\Data\RecordInterface;
 use Windwalker\Database\Schema\Ddl\Column;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
 
@@ -61,13 +60,13 @@ trait EntityHooksConcernTrait
         if (!$getHook) {
             if ($className) {
                 // Getter hook is not necessary by default.
-                // ValueObject or Collection
+                // Record or Collection
                 if (
                     !$setterNullable
                     && (
                         is_a($className, Collection::class, true)
                         // || is_a($className, ValueObject::class, true)
-                        || is_a($className, ValueObjectInterface::class, true)
+                        || is_a($className, RecordInterface::class, true)
                     )
                 ) {
                     $getHook = new Node\PropertyHook(
@@ -115,10 +114,10 @@ trait EntityHooksConcernTrait
             // }
 
             if (!$setHook && !$typeNode instanceof Node\UnionType && $className) {
-                // ValueObject or Collection
+                // Record or Collection
                 if (
                     is_a($className, Collection::class, true)
-                    || is_a($className, ValueObjectInterface::class, true)
+                    || is_a($className, RecordInterface::class, true)
                 ) {
                     /** @var class-string<Collection> $className */
                     $typeClass = (string) $typeNode;
