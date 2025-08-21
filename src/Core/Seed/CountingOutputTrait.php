@@ -17,19 +17,19 @@ trait CountingOutputTrait
 {
     use MessageOutputTrait;
 
-    /**
-     * Property count.
-     *
-     * @var  int
-     */
     public int $count = 0;
 
     /**
-     * outCounting
+     * @return  $this
      *
-     * @return  static
+     * @deprecated  Use printCounting() instead.
      */
     public function outCounting(): static
+    {
+        return $this->printCounting();
+    }
+
+    public function printCounting(): static
     {
         if ($this instanceof Migration && $this->count === 0) {
             $this->emitMessage('');
@@ -51,13 +51,6 @@ trait CountingOutputTrait
         return $this;
     }
 
-    /**
-     * resetCount
-     *
-     * @return  $this
-     *
-     * @since  3.4.6
-     */
     public function resetCount(): static
     {
         $this->count = 0;

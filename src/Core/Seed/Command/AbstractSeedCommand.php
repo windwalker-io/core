@@ -30,6 +30,13 @@ abstract class AbstractSeedCommand extends AbstractMigrationCommand
 
     public function getSeederDefaultFile(): string
     {
+        $path = $this->app->path('@seeders/main.seeder.php');
+
+        if (is_file($path)) {
+            return $path;
+        }
+
+        // B/C
         return $this->app->path('@seeders/main.php');
     }
 
@@ -39,7 +46,12 @@ abstract class AbstractSeedCommand extends AbstractMigrationCommand
 
         if (!$file) {
             if ($dir = $io->getOption('dir')) {
-                $file = $dir . '/main.php';
+                $file = $dir . '/main.seeder.php';
+
+                if (!is_file($file)) {
+                    // B/C
+                    $file = $dir . '/main.php';
+                }
             } else {
                 $file = $this->getSeederDefaultFile();
             }

@@ -13,41 +13,16 @@ use Windwalker\Utilities\StrNormalize;
 
 /**
  * The Seeder class.
+ *
+ * @deprecated  Use class SeedTask instead.
  */
-class Seeder
+class Seeder extends SeederTask
 {
     use InstanceMarcoableTrait;
-    use CountingOutputTrait;
 
-    public string $name;
+    public ?\Closure $import = null;
 
-    public string $prettyName;
-
-    /**
-     * @var callable
-     */
-    public $import = null;
-
-    /**
-     * @var callable
-     */
-    public $clear = null;
-
-    /**
-     * Migration constructor.
-     *
-     * @param  SplFileInfo     $file
-     * @param  DatabaseAdapter  $db
-     * @param  FakerService     $faker
-     */
-    public function __construct(
-        public SplFileInfo $file,
-        public DatabaseAdapter $db,
-        protected FakerService $faker
-    ) {
-        $this->name = $this->file->getBasename('.php');
-        $this->prettyName = ucwords(StrNormalize::toSpaceSeparated($this->name));
-    }
+    public ?\Closure $clear = null;
 
     /**
      * @param  callable  $import
@@ -56,7 +31,7 @@ class Seeder
      */
     public function import(callable $import): static
     {
-        $this->import = $import;
+        $this->import = $import(...);
 
         return $this;
     }
@@ -68,22 +43,18 @@ class Seeder
      */
     public function clear(callable $clear): static
     {
-        $this->clear = $clear;
+        $this->clear = $clear(...);
 
         return $this;
     }
 
-    public function faker(string $locale = FakerFactory::DEFAULT_LOCALE): Generator
+    public function getImportClosure(): ?\Closure
     {
-        return $this->faker->create($locale);
+        return $this->import;
     }
 
-    public function truncate(string ...$tables): static
+    public function getClearClosure(): ?\Closure
     {
-        foreach ($tables as $table) {
-            $this->db->getTableManager($table)->truncate();
-        }
-
-        return $this;
+        return $this->clear;
     }
 }

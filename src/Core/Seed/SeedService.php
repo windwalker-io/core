@@ -14,8 +14,11 @@ use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
+use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\TypeCast;
+
+use function Windwalker\fs;
 
 /**
  * The SeedService class.
@@ -43,14 +46,15 @@ class SeedService implements EventAwareInterface
     {
         $entry = FileObject::wrap($file);
 
-        $seeder = new Seeder($entry, $this->db, $this->fakerService);
-        $db = $seeder->db;
+        $seeder = new Seeder();
+        $db = $this->db;
         $orm = $db->orm();
         $app = $this->app;
 
-        $seeders = include $entry->getPathname();
+        $seeder = static::afterInclude($seeders = include $entry->getPathname(), $seeder)
+            ->init($entry, $this->db, $this->fakerService);
 
-        if (!is_array($seeders) && is_callable($seeder->import)) {
+        if (!is_array($seeders) && $seeder->getImportClosure()) {
             $this->runImport($seeder);
 
             return 1;
@@ -59,18 +63,15 @@ class SeedService implements EventAwareInterface
         $count = 0;
 
         foreach ($seeders as $seederFile) {
-            $seeder = new Seeder(
-                FileObject::wrap($seederFile),
-                $this->db,
-                $this->fakerService
-            );
-            $db = $seeder->db;
+            $seeder = new Seeder();
+            $db = $this->db;
             $orm = $db->orm();
             $app = $this->app;
 
-            include $seederFile;
+            $seeder = static::afterInclude(include $seederFile, $seeder)
+                ->init(fs($seederFile), $this->db, $this->fakerService);
 
-            if (is_callable($seeder->import)) {
+            if ($seeder->getImportClosure()) {
                 $this->runImport($seeder);
                 $count++;
             }
@@ -83,14 +84,15 @@ class SeedService implements EventAwareInterface
     {
         $entry = FileObject::wrap($file);
 
-        $seeder = new Seeder($entry, $this->db, $this->fakerService);
-        $db = $seeder->db;
+        $seeder = new Seeder();
+        $db = $this->db;
         $orm = $db->orm();
         $app = $this->app;
 
-        $seeders = include $entry;
+        $seeder = static::afterInclude($seeders = include $entry, $seeder)
+            ->init($entry, $this->db, $this->fakerService);
 
-        if (!is_array($seeders) && is_callable($seeder->clear)) {
+        if (!is_array($seeders) && $seeder->getClearClosure()) {
             $this->runClear($seeder);
 
             return 1;
@@ -102,18 +104,15 @@ class SeedService implements EventAwareInterface
         $count = 0;
 
         foreach ($seeders as $seederFile) {
-            $seeder = new Seeder(
-                FileObject::wrap($seederFile),
-                $this->db,
-                $this->fakerService
-            );
-            $db = $seeder->db;
+            $seeder = new Seeder();
+            $db = $this->db;
             $orm = $db->orm();
             $app = $this->app;
 
-            include $seederFile;
+            $seeder = static::afterInclude(include $seederFile, $seeder)
+                ->init(fs($seederFile), $this->db, $this->fakerService);
 
-            if (is_callable($seeder->clear)) {
+            if ($seeder->getClearClosure()) {
                 $this->runClear($seeder);
 
                 $count++;
@@ -126,6 +125,15 @@ class SeedService implements EventAwareInterface
     protected function getSeedPrettyName(string $name): string
     {
         return ucwords(StrNormalize::toSpaceSeparated($name));
+    }
+
+    protected static function afterInclude(mixed $included, Seeder $seeder): SeederTask
+    {
+        if (!$included instanceof SeederTask) {
+            return $seeder;
+        }
+
+        return $included;
     }
 
     // /**
@@ -175,14 +183,7 @@ class SeedService implements EventAwareInterface
             );
     }
 
-    /**
-     * runSeeder
-     *
-     * @param  Seeder  $seeder
-     *
-     * @return  void
-     */
-    protected function runImport(Seeder $seeder): void
+    protected function runImport(SeederTask $seeder): void
     {
         $seeder->addEventDealer($this);
 
@@ -190,7 +191,7 @@ class SeedService implements EventAwareInterface
             "Import seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
         );
 
-        $this->app->call($seeder->import);
+        $this->app->call($seeder->getImportClosure());
 
         if ($seeder->count > 0) {
             $this->emitMessage('');
@@ -201,18 +202,11 @@ class SeedService implements EventAwareInterface
         return;
     }
 
-    /**
-     * runClear
-     *
-     * @param  Seeder  $seeder
-     *
-     * @return  void
-     */
-    protected function runClear(Seeder $seeder): void
+    protected function runClear(SeederTask $seeder): void
     {
         $seeder->addEventDealer($this);
 
-        $this->app->call($seeder->clear);
+        $this->app->call($seeder->getClearClosure());
 
         $this->emitMessage(
             "Clear seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
