@@ -5,24 +5,24 @@ declare(strict_types=1);
 namespace Windwalker\Core\Seed;
 
 use Faker\Factory as FakerFactory;
-use Faker\Generator;
+use Faker\Generator as FakerGenerator;
 use SplFileInfo;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\StrNormalize;
 
-class SeederTask
+abstract class AbstractSeeder
 {
     use CountingOutputTrait;
 
-    public string $name;
+    public protected(set) string $name;
 
-    public string $prettyName;
+    public protected(set) string $prettyName;
 
-    public SplFileInfo $file;
+    public protected(set) SplFileInfo $file;
 
-    public DatabaseAdapter $db;
+    public protected(set) DatabaseAdapter $db;
 
     public ORM $orm {
         get => $this->db->orm();
@@ -44,7 +44,7 @@ class SeederTask
         return $this;
     }
 
-    public function faker(string $locale = FakerFactory::DEFAULT_LOCALE): Generator
+    public function faker(string $locale = FakerFactory::DEFAULT_LOCALE): FakerGenerator
     {
         return $this->faker->create($locale);
     }
@@ -58,7 +58,7 @@ class SeederTask
         return $this;
     }
 
-    public function getImportClosure(): ?\Closure
+    public function getImportHandler(): ?\Closure
     {
         if (!$found = $this->getReflectionMethod(SeedImport::class)) {
             return null;
@@ -67,7 +67,7 @@ class SeederTask
         return $found[0]->getClosure($this);
     }
 
-    public function getClearClosure(): ?\Closure
+    public function getClearHandler(): ?\Closure
     {
         if (!$found = $this->getReflectionMethod(SeedClear::class)) {
             return null;
@@ -87,18 +87,5 @@ class SeederTask
             \ReflectionAttribute::IS_INSTANCEOF,
             \ReflectionMethod::class
         );
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === 'import') {
-            return $this->getImportClosure();
-        }
-
-        if ($name === 'clear') {
-            return $this->getClearClosure();
-        }
-
-        return $this->{$name};
     }
 }

@@ -74,9 +74,9 @@ class MigrationService implements EventAwareInterface
         }
 
         $count = 0;
-        $direction = ($targetVersion >= $currentVersion) ? Migration::UP : Migration::DOWN;
+        $direction = ($targetVersion >= $currentVersion) ? MigrationDirection::UP : MigrationDirection::DOWN;
 
-        if ($direction === Migration::DOWN) {
+        if ($direction === MigrationDirection::DOWN) {
             krsort($migrations);
 
             foreach ($migrations as $migration) {
@@ -85,7 +85,7 @@ class MigrationService implements EventAwareInterface
                 }
 
                 if (in_array((string) $migration->version, $versions, true)) {
-                    $this->executeMigration($migration, Migration::DOWN);
+                    $this->executeMigration($migration, MigrationDirection::DOWN);
                 }
 
                 $count++;
@@ -99,7 +99,7 @@ class MigrationService implements EventAwareInterface
                 }
 
                 if (!in_array((string) $migration->version, $versions, true)) {
-                    $this->executeMigration($migration, Migration::UP);
+                    $this->executeMigration($migration, MigrationDirection::UP);
                 }
 
                 $count++;
@@ -113,23 +113,10 @@ class MigrationService implements EventAwareInterface
         return $count;
     }
 
-    /**
-     * executeMigration
-     *
-     * @param  Migration  $migration
-     * @param  string     $direction
-     *
-     * @return  void
-     *
-     * @throws Exception
-     */
-    public function executeMigration(Migration $migration, string $direction = Migration::UP): void
-    {
-        $mig = $migration;
-        $db = $this->db;
-        $orm = $db->orm();
-        $app = $this->app;
-
+    public function executeMigration(
+        AbstractMigration $migration,
+        MigrationDirection $direction = MigrationDirection::UP
+    ): void {
         $start = chronos();
 
         // Ignore if squashing
@@ -145,10 +132,9 @@ class MigrationService implements EventAwareInterface
                 true
             );
             $this->endMigration($migration, $direction, $start);
+
             return;
         }
-
-        include $migration->file->getPathname();
 
         $handler = $migration->get($direction);
 
@@ -161,10 +147,10 @@ class MigrationService implements EventAwareInterface
                 '<fg=gray>%s</> <info>%s</info> <fg=%s>%s</>... ',
                 $migration->version,
                 $migration->name,
-                $direction === Migration::UP
+                $direction === MigrationDirection::UP
                     ? 'bright-cyan'
                     : 'magenta',
-                strtoupper($direction)
+                strtoupper($direction->name)
             ),
             false
         );
@@ -184,8 +170,11 @@ class MigrationService implements EventAwareInterface
         $this->endMigration($migration, $direction, $start);
     }
 
-    public function endMigration(Migration $migration, string $direction, DateTimeImmutable $start): void
-    {
+    public function endMigration(
+        AbstractMigration $migration,
+        MigrationDirection $direction,
+        DateTimeImmutable $start
+    ): void {
         $end = chronos();
 
         $this->storeVersion($migration, $direction, $start, $end);
@@ -195,8 +184,6 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * getMigrations
-     *
      * @param  string  $path
      *
      * @return  array<string, Migration>
@@ -214,12 +201,27 @@ class MigrationService implements EventAwareInterface
                 continue;
             }
 
-            $mig = new Migration($file, $this->db);
+            $mig = new Migration();
+            $db = $this->db;
+            $orm = $db->orm();
+            $app = $this->app;
+
+            $mig = static::processIncluded(include $file->getPathname(), $mig)
+                ->init($file, $this->db);
 
             $migrations[$mig->version] = $mig;
         }
 
         return $migrations;
+    }
+
+    protected static function processIncluded(mixed $included, Migration $default): AbstractMigration
+    {
+        if ($included instanceof AbstractMigration) {
+            return $included;
+        }
+
+        return $default;
     }
 
     /**
@@ -251,12 +253,12 @@ class MigrationService implements EventAwareInterface
     }
 
     public function storeVersion(
-        Migration $migration,
-        string $direction,
+        AbstractMigration $migration,
+        MigrationDirection $direction,
         DateTimeInterface $start,
         DateTimeInterface $end
     ): void {
-        if ($direction === Migration::UP) {
+        if ($direction === MigrationDirection::UP) {
             $data['version'] = $migration->version;
             $data['name'] = $migration->name;
             $data['start_time'] = $start->format($this->db->getDateFormat());
@@ -310,15 +312,6 @@ class MigrationService implements EventAwareInterface
         return $this->app->config('db.migration.table_name') ?: 'migration_log';
     }
 
-    /**
-     * copyMigrationFile
-     *
-     * @param  string  $dir
-     * @param  string  $name
-     * @param  string  $source
-     *
-     * @return  FileCollection
-     */
     public function copyMigrationFile(string $dir, string $name, string $source, array $options = []): FileCollection
     {
         $codeGenerator = $this->app->make(CodeGenerator::class);

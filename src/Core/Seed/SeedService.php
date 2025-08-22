@@ -51,10 +51,10 @@ class SeedService implements EventAwareInterface
         $orm = $db->orm();
         $app = $this->app;
 
-        $seeder = static::afterInclude($seeders = include $entry->getPathname(), $seeder)
+        $seeder = static::processIncluded($seeders = include $entry->getPathname(), $seeder)
             ->init($entry, $this->db, $this->fakerService);
 
-        if (!is_array($seeders) && $seeder->getImportClosure()) {
+        if (!is_array($seeders) && $seeder->getImportHandler()) {
             $this->runImport($seeder);
 
             return 1;
@@ -68,10 +68,10 @@ class SeedService implements EventAwareInterface
             $orm = $db->orm();
             $app = $this->app;
 
-            $seeder = static::afterInclude(include $seederFile, $seeder)
+            $seeder = static::processIncluded(include $seederFile, $seeder)
                 ->init(fs($seederFile), $this->db, $this->fakerService);
 
-            if ($seeder->getImportClosure()) {
+            if ($seeder->getImportHandler()) {
                 $this->runImport($seeder);
                 $count++;
             }
@@ -89,10 +89,10 @@ class SeedService implements EventAwareInterface
         $orm = $db->orm();
         $app = $this->app;
 
-        $seeder = static::afterInclude($seeders = include $entry, $seeder)
+        $seeder = static::processIncluded($seeders = include $entry, $seeder)
             ->init($entry, $this->db, $this->fakerService);
 
-        if (!is_array($seeders) && $seeder->getClearClosure()) {
+        if (!is_array($seeders) && $seeder->getClearHandler()) {
             $this->runClear($seeder);
 
             return 1;
@@ -109,10 +109,10 @@ class SeedService implements EventAwareInterface
             $orm = $db->orm();
             $app = $this->app;
 
-            $seeder = static::afterInclude(include $seederFile, $seeder)
+            $seeder = static::processIncluded(include $seederFile, $seeder)
                 ->init(fs($seederFile), $this->db, $this->fakerService);
 
-            if ($seeder->getClearClosure()) {
+            if ($seeder->getClearHandler()) {
                 $this->runClear($seeder);
 
                 $count++;
@@ -127,41 +127,16 @@ class SeedService implements EventAwareInterface
         return ucwords(StrNormalize::toSpaceSeparated($name));
     }
 
-    protected static function afterInclude(mixed $included, Seeder $seeder): SeederTask
+    protected static function processIncluded(mixed $included, Seeder $seeder): AbstractSeeder
     {
-        if (!$included instanceof SeederTask) {
+        if (!$included instanceof AbstractSeeder) {
             return $seeder;
         }
 
         return $included;
     }
 
-    // /**
-    //  * includeList
-    //  *
-    //  * @param  FileObject  $entry
-    //  *
-    //  * @return  ?iterable
-    //  */
-    // protected function includeSeeders(FileObject $entry): ?iterable
-    // {
-    //     $seeder = include $entry;
-    //
-    //     if (!is_iterable($seeder)) {
-    //         throw new \LogicException(
-    //             sprintf(
-    //                 'Seed entry file: %s should return array ,iterable or void',
-    //                 $entry->getPathname()
-    //             )
-    //         );
-    //     }
-    //
-    //     return $seeder;
-    // }
-
     /**
-     * copyMigrationFile
-     *
      * @param  string  $dir
      * @param  string  $name
      * @param  string  $source
@@ -183,7 +158,7 @@ class SeedService implements EventAwareInterface
             );
     }
 
-    protected function runImport(SeederTask $seeder): void
+    protected function runImport(AbstractSeeder $seeder): void
     {
         $seeder->addEventDealer($this);
 
@@ -191,7 +166,7 @@ class SeedService implements EventAwareInterface
             "Import seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
         );
 
-        $this->app->call($seeder->getImportClosure());
+        $this->app->call($seeder->getImportHandler());
 
         if ($seeder->count > 0) {
             $this->emitMessage('');
@@ -202,11 +177,11 @@ class SeedService implements EventAwareInterface
         return;
     }
 
-    protected function runClear(SeederTask $seeder): void
+    protected function runClear(AbstractSeeder $seeder): void
     {
         $seeder->addEventDealer($this);
 
-        $this->app->call($seeder->getClearClosure());
+        $this->app->call($seeder->getClearHandler());
 
         $this->emitMessage(
             "Clear seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"

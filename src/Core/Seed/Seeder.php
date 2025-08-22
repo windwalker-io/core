@@ -16,13 +16,13 @@ use Windwalker\Utilities\StrNormalize;
  *
  * @deprecated  Use class SeedTask instead.
  */
-class Seeder extends SeederTask
+class Seeder extends AbstractSeeder
 {
     use InstanceMarcoableTrait;
 
-    public ?\Closure $import = null;
+    public protected(set) ?\Closure $importHandler = null;
 
-    public ?\Closure $clear = null;
+    public protected(set) ?\Closure $clearHandler = null;
 
     /**
      * @param  callable  $import
@@ -31,7 +31,7 @@ class Seeder extends SeederTask
      */
     public function import(callable $import): static
     {
-        $this->import = $import(...);
+        $this->importHandler = $import(...);
 
         return $this;
     }
@@ -43,18 +43,18 @@ class Seeder extends SeederTask
      */
     public function clear(callable $clear): static
     {
-        $this->clear = $clear(...);
+        $this->clearHandler = $clear(...);
 
         return $this;
     }
 
-    public function getImportClosure(): ?\Closure
+    public function getImportHandler(): ?\Closure
     {
-        return $this->import;
+        return $this->importHandler;
     }
 
-    public function getClearClosure(): ?\Closure
+    public function getClearHandler(): ?\Closure
     {
-        return $this->clear;
+        return $this->clearHandler;
     }
 }

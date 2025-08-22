@@ -12,55 +12,14 @@ use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
 
 /**
  * The Migration class.
+ *
+ * @deprecated  Use class extends AbstractMigration instead.
  */
-class Migration
+final class Migration extends AbstractMigration
 {
-    use InstanceMarcoableTrait;
-    use CountingOutputTrait;
+    protected ?\Closure $upHandler = null;
 
-    public const UP = 'up';
-
-    public const DOWN = 'down';
-
-    public string $version;
-
-    public string $name;
-
-    public string $fullName;
-
-    /**
-     * @var callable
-     */
-    protected $up = null;
-
-    /**
-     * @var callable
-     */
-    protected $down = null;
-
-    /**
-     * Migration constructor.
-     *
-     * @param  SplFileInfo     $file
-     * @param  DatabaseAdapter  $db
-     */
-    public function __construct(
-        public SplFileInfo $file,
-        public DatabaseAdapter $db
-    ) {
-        $name = $this->file->getBasename('.php');
-
-        [$id, $name] = explode('_', $name, 2);
-
-        $this->version = $id;
-        $this->name = $name;
-        $this->fullName = $id . '_' . $name;
-    }
-
-    public function get(string $direction): ?callable
-    {
-        return $direction === static::UP ? $this->up : $this->down;
-    }
+    protected ?\Closure $downHandler = null;
 
     /**
      * @param  callable  $up
@@ -69,7 +28,7 @@ class Migration
      */
     public function up(callable $up): static
     {
-        $this->up = $up;
+        $this->upHandler = $up(...);
 
         return $this;
     }
@@ -81,90 +40,18 @@ class Migration
      */
     public function down(callable $down): static
     {
-        $this->down = $down;
+        $this->downHandler = $down(...);
 
         return $this;
     }
 
-    /**
-     * Get DB table object.
-     *
-     * @param  string  $name
-     *
-     * @return  TableManager
-     */
-    public function getTable(string $name): TableManager
+    protected function getUpHandler(): ?\Closure
     {
-        return $this->db->getTableManager($name, true);
+        return $this->upHandler;
     }
 
-    /**
-     * createTable
-     *
-     * @param  string    $name
-     * @param  callable  $callback
-     * @param  array     $options
-     *
-     * @return TableManager
-     */
-    public function createTable(string $name, callable $callback, array $options = []): TableManager
+    protected function getDownHandler(): ?\Closure
     {
-        return $this->getTable($name)->create($callback, true, $options);
-    }
-
-    /**
-     * updateTable
-     *
-     * @param  string    $name
-     * @param  callable  $callback
-     *
-     * @return  TableManager
-     */
-    public function updateTable(string $name, callable $callback): TableManager
-    {
-        return $this->getTable($name)->update($callback);
-    }
-
-    /**
-     * saveTable
-     *
-     * @param  string    $name
-     * @param  callable  $callback
-     * @param  array     $options
-     *
-     * @return TableManager
-     */
-    public function saveTable(string $name, callable $callback, $options = []): TableManager
-    {
-        return $this->getTable($name)->save($callback, true, $options);
-    }
-
-    /**
-     * Drop a table.
-     *
-     * @param  string|array  $names
-     *
-     * @return  static
-     */
-    public function dropTables(string ...$names): static
-    {
-        foreach ($names as $name) {
-            $this->getTable($name)->drop();
-        }
-
-        return $this;
-    }
-
-    public function dropTableColumns(string $table, ...$columns): static
-    {
-        if ($columns !== []) {
-            $tm = $this->getTable($table);
-
-            foreach ($columns as $column) {
-                $tm->dropColumn($column);
-            }
-        }
-
-        return $this;
+        return $this->downHandler;
     }
 }
