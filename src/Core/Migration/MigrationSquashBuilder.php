@@ -67,7 +67,7 @@ class MigrationSquashBuilder
             ->trim();
 
         $upCode = <<<PHP
-        \$mig->createTable(
+        \$this->createTable(
             '$tableName',
             function (Schema \$schema) {
                 $schemaCode
@@ -76,7 +76,7 @@ class MigrationSquashBuilder
 PHP;
 
         $downCode = <<<PHP
-        \$mig->dropTables('$tableName');
+        \$this->dropTables('$tableName');
 PHP;
 
         return [$upCode, $downCode];
@@ -287,31 +287,24 @@ declare(strict_types=1);
 
 namespace App\Migration;
 
-use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Migration\Migration;
+use Windwalker\Core\Migration\AbstractMigration;
+use Windwalker\Core\Migration\MigrateDown;
+use Windwalker\Core\Migration\MigrateUp;
 use Windwalker\Database\Schema\Schema;
 
-/**
- * Migration UP: {$version}_{$name}.
- *
- * @var Migration \$mig
- * @var ConsoleApplication \$app
- */
-\$mig->up(
-    function () use (\$mig) {
+return new /** {$version}_{$name} */ class extends AbstractMigration {
+    #[MigrateUp]
+    public function up(): void
+    {
 $createTableCode
     }
-);
 
-/**
- * Migration DOWN.
- */
-\$mig->down(
-    static function () use (\$mig) {
+    #[MigrateDown]
+    public function down(): void
+    {
 $dropTableCode
     }
-);
-
+};
 PHP;
     }
 
@@ -326,20 +319,17 @@ declare(strict_types=1);
 
 namespace App\Migration;
 
-use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Migration\Migration;
+use Windwalker\Core\Migration\AbstractMigration;
+use Windwalker\Core\Migration\MigrationService;
+use Windwalker\Core\Migration\MigrateUp;
 
-/**
- * Migration UP: {$version}_{$name}.
- *
- * @var Migration \$mig
- * @var ConsoleApplication \$app
- */
-\$mig->up(
-    function () {
+return new /** {$version}_{$name} */ class extends AbstractMigration {
+    #[MigrateUp]
+    public function up(MigrationService \$mig): void
+    {
 $squashCode
     }
-);
+};
 
 PHP;
     }
@@ -360,8 +350,7 @@ PHP;
         }
 
         return <<<PHP
-        /** @var \Windwalker\Core\Migration\MigrationService \$this */
-        \$this->squashIfNotFresh(
+        \$mig->squashIfNotFresh(
             ignoreVersions: [
                 $versionsCode
             ]

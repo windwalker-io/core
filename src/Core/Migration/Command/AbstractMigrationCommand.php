@@ -63,7 +63,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
             'force',
             'f',
             InputOption::VALUE_NONE,
-            'Force run.'
+            'Force run and no confirm.'
         );
     }
 
