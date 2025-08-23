@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { resolve } from 'node:path';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { buildAll } from './runner/build';
+import { buildAll, watchAll } from './runner/build';
 import { loadConfigFile, mustGetAvailableConfigFile } from './runner/config';
 import { displayAvailableTasks } from './runner/describe';
 import { resolveAllTasksAsOptions, selectRunningTasks } from './runner/tasks';
@@ -51,7 +51,7 @@ async function main() {
     await run(argv);
 
     // Success exit
-    process.exit(0);
+    // process.exit(0);
   } catch (e) {
     if (e instanceof Error) {
       if (argv.verbose && argv.verbose > 0) {
@@ -94,5 +94,9 @@ async function run(params: RunnerCliParams) {
 
   const options = (await resolveAllTasksAsOptions(selectedTasks));
 
-  await buildAll(defineConfig(options));
+  if (params.watch) {
+    await watchAll(defineConfig(options));
+  } else {
+    await buildAll(defineConfig(options));
+  }
 }

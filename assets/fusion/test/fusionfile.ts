@@ -49,14 +49,14 @@ export async function hello(): Promise<any> {
 export async function world(): Promise<RollupOptions[]> {
   return [
     {
-      input: './src/css/workd1.css',
+      input: './src/css/world.css',
       output: {
         dir: './dest/css/moved/',
         format: 'es',
       },
     },
     {
-      input: './src/css/workd2.scss',
+      input: './src/css/world.scss',
       output: {
         dir: './dest/css/moved/',
         format: 'es',

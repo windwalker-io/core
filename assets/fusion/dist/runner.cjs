@@ -20,9 +20,57 @@ async function buildAll(optionsList) {
     }
     console.log("✅ Task completed.");
 }
+async function watchAll(optionsList) {
+    const watcher = rollup.watch(optionsList.map((options) => ({
+        ...options,
+        watch: {
+        // clearScreen: true,
+        // buildDelay: 50
+        }
+    })));
+    watcher.on("event", (e) => {
+        switch (e.code) {
+            case "START":
+                console.log("→ Start Watching...");
+                break;
+            case "BUNDLE_START":
+                console.log("→ Start Bundling...");
+                break;
+            case "BUNDLE_END":
+                console.log(`✔ Bundled, uses ${e.duration}ms`);
+                // Must manually close it.
+                e.result?.close();
+                break;
+            case "END":
+                console.log("Watching...");
+                break;
+            case "ERROR":
+                console.error("✖ ERROR: ", e.error);
+                break;
+        }
+    });
+    process.on("SIGINT", async () => {
+        await watcher.close();
+        console.log("\n🛑 STOP Watching...");
+        process.exit(0);
+    });
+}
 
 async function loadConfigFile(configFile) {
-    const modules = await import(configFile.path);
+    let path = configFile.path;
+    // If is Windows, Add "file://" prefix to path
+    if (process.platform === 'win32') {
+        // Replace backslash to slash
+        const winPath = path.replace(/\\/g, '/');
+        // Add file:// prefix if not exists
+        if (!winPath.startsWith('file://')) {
+            // Add extra slash to make it absolute path
+            // e.g. C:/path/to/file
+            // becomes file:///C:/path/to/file
+            path = `file:///${winPath}`;
+        }
+    }
+    const modules = await import(path);
     return { ...modules };
 }
 async function resolveTaskOptions(task, flat = false) {
@@ -283,7 +331,7 @@ async function main() {
     try {
         await run(argv);
         // Success exit
-        process.exit(0);
+        // process.exit(0);
     }
     catch (e) {
         if (e instanceof Error) {
@@ -322,6 +370,11 @@ async function run(params) {
     // Select running tasks
     const selectedTasks = selectRunningTasks([...params._], tasks);
     const options = (await resolveAllTasksAsOptions(selectedTasks));
-    await buildAll(rollup.defineConfig(options));
+    if (params.watch) {
+        await watchAll(rollup.defineConfig(options));
+    }
+    else {
+        await buildAll(rollup.defineConfig(options));
+    }
 }
 //# sourceMappingURL=runner.cjs.map

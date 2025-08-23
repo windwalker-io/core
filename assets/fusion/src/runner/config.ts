@@ -4,7 +4,22 @@ import { MaybeArray, RollupOptions } from 'rollup';
 import { ConfigResult, LoadedConfigTask, RunnerCliParams } from './types';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
-  const modules = await import(configFile.path);
+  let path = configFile.path;
+
+  // If is Windows, Add "file://" prefix to path
+  if (process.platform === 'win32') {
+    // Replace backslash to slash
+    const winPath = path.replace(/\\/g, '/');
+    // Add file:// prefix if not exists
+    if (!winPath.startsWith('file://')) {
+      // Add extra slash to make it absolute path
+      // e.g. C:/path/to/file
+      // becomes file:///C:/path/to/file
+      path = `file:///${winPath}`;
+    }
+  }
+
+  const modules = await import(path);
 
   return { ...modules };
 }
