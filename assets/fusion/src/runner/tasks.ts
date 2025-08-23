@@ -1,0 +1,76 @@
+import chalk from 'chalk';
+import { uniq } from 'lodash-es';
+import { MaybeArray, RollupOptions } from 'rollup';
+import { resolveTaskOptions } from './config';
+import { LoadedConfigTask } from './types';
+
+export function selectRunningTasks(
+  input: string[],
+  tasks: Record<string, LoadedConfigTask>
+): Record<string, LoadedConfigTask> {
+  input = uniq(input);
+
+  if (input.length === 0) {
+    input.push('default');
+  }
+
+  const selected: Record<string, LoadedConfigTask> = {};
+
+  for (const name of input) {
+    if (tasks[name]) {
+      selected[name] = tasks[name];
+    } else {
+      throw new Error(`Task "${chalk.cyan(name)}" not found in fusion config.`);
+    }
+  }
+
+  return selected;
+}
+
+export async function resolveAllTasksAsOptions(tasks: Record<string, LoadedConfigTask>) {
+  const cache: Record<string, MaybeArray<LoadedConfigTask>> = {};
+  const optionSet = [];
+
+  for (const name in tasks) {
+    const task = tasks[name];
+    optionSet.push(...await resolveTaskAsFlat(name, task, cache));
+  }
+
+  return optionSet;
+}
+
+export async function resolveTaskAsFlat(
+  name: string,
+  task: LoadedConfigTask,
+  cache: Record<string, MaybeArray<LoadedConfigTask>>
+): Promise<RollupOptions[]> {
+  const results: RollupOptions[] = [];
+
+  if (Array.isArray(task)) {
+    for (const n in task) {
+      const t = task[n];
+      results.push(...await resolveTaskAsFlat(n, t, cache));
+    }
+  } else if (typeof task === 'function') {
+    name = task.name || name;
+
+    if (cache[name]) {
+      return [];
+    }
+
+    cache[name] = task;
+
+    const resolved = await resolveTaskOptions(task, true);
+
+    if (Array.isArray(resolved)) {
+      for (const n in resolved) {
+        const t = resolved[n];
+        results.push(...await resolveTaskAsFlat(n, t, cache));
+      }
+    }
+  } else {
+    results.push(task);
+  }
+
+  return results;
+}

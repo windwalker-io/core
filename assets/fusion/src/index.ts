@@ -1,5 +1,5 @@
 
-export * from './dep.ts';
-import * as fusion from './dep.ts';
+export * from './dep';
+import * as fusion from './dep';
 
 export default fusion;

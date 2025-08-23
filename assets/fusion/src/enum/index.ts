@@ -1,2 +1,2 @@
-export * from './MinifyOptions.ts';
+export * from './MinifyOptions';
 
