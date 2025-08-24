@@ -21,4 +21,4 @@ export interface ConfigResult {
   ts: boolean;
 }
 
-export type LoadedConfigTask = MaybeArray<RollupOptions | (() => MaybePromise<MaybeArray<RollupOptions>>)>;
+export type LoadedConfigTask = MaybeArray<MaybePromise<RollupOptions> | (() => MaybePromise<MaybeArray<MaybePromise<RollupOptions>>>)>;

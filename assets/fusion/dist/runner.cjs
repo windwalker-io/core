@@ -79,9 +79,15 @@ async function resolveTaskOptions(task, flat = false) {
         return results.flat();
     }
     if (typeof task === 'function') {
-        return await task();
+        return resolvePromises(await task());
     }
-    return (await task);
+    return resolvePromises((await task));
+}
+async function resolvePromises(tasks) {
+    if (!Array.isArray(tasks)) {
+        return await tasks;
+    }
+    return await Promise.all(tasks);
 }
 function mustGetAvailableConfigFile(root, params) {
     const found = getAvailableConfigFile(root, params);

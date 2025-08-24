@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
-import { MaybeArray, RollupOptions } from 'rollup';
+import { MaybeArray, MaybePromise, RollupOptions } from 'rollup';
 import { ConfigResult, LoadedConfigTask, RunnerCliParams } from './types';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
@@ -31,10 +31,18 @@ export async function resolveTaskOptions(task: LoadedConfigTask, flat = false): 
   }
 
   if (typeof task === 'function') {
-    return await task();
+    return resolvePromises(await task());
   }
 
-  return (await task) as MaybeArray<RollupOptions>;
+  return resolvePromises((await task) as MaybeArray<RollupOptions>);
+}
+
+async function resolvePromises(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
+  if (!Array.isArray(tasks)) {
+    return await tasks;
+  }
+
+  return await Promise.all(tasks);
 }
 
 export function mustGetAvailableConfigFile(root: string, params: RunnerCliParams): ConfigResult {

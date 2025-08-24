@@ -1,4 +1,5 @@
 import { RollupOptions } from 'rollup';
+import { css } from '../src';
 import postcss from 'rollup-plugin-postcss';
 
 enum Foo {
@@ -7,36 +8,41 @@ enum Foo {
   C = 'c',
 }
 
-export async function cssTest(): Promise<RollupOptions[]> {
+export async function cssTest() {
   return [
-    {
-      input: './src/css/foo.css',
-      output: {
-        file: './dest/foo.css',
-        format: 'es',
-      },
-      plugins: [
-        postcss({
-          extract: true,
-          sourceMap: true
-        }),
-      ]
-    },
-    {
-      input: './src/scss/foo.scss',
-      output: {
-        file: './dest/foosass.css',
-        format: 'es',
-      },
-      plugins: [
-        postcss({
-          extract: true,
-          sourceMap: true,
-          use: ['sass']
-        }),
-      ]
-    }
+    css('./src/css/foo.css', './dest/foo.css'),
+    css('./src/scss/foo.scss', './dest/foosass.css')
   ];
+
+  // return [
+  //   {
+  //     input: './src/css/foo.css',
+  //     output: {
+  //       file: './dest/foo.css',
+  //       format: 'es',
+  //     },
+  //     plugins: [
+  //       postcss({
+  //         extract: true,
+  //         sourceMap: true
+  //       }),
+  //     ]
+  //   },
+  //   {
+  //     input: './src/scss/foo.scss',
+  //     output: {
+  //       file: './dest/foosass.css',
+  //       format: 'es',
+  //     },
+  //     plugins: [
+  //       postcss({
+  //         extract: true,
+  //         sourceMap: true,
+  //         use: ['sass']
+  //       }),
+  //     ]
+  //   }
+  // ];
 }
 
 export async function hello(): Promise<any> {
