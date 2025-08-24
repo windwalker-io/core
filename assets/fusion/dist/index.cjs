@@ -2,62 +2,34 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var postcss = require('rollup-plugin-postcss');
+var fusion = require('@/dep');
 
-class MinifyOptions {
-    NONE = 'none';
-    SAME_FILE = 'same_file';
-    SEPARATE_FILE = 'separate_file';
+function _interopNamespaceDefault(e) {
+	var n = Object.create(null);
+	if (e) {
+		Object.keys(e).forEach(function (k) {
+			if (k !== 'default') {
+				var d = Object.getOwnPropertyDescriptor(e, k);
+				Object.defineProperty(n, k, d.get ? d : {
+					enumerable: true,
+					get: function () { return e[k]; }
+				});
+			}
+		});
+	}
+	n.default = e;
+	return Object.freeze(n);
 }
 
-async function css(input, output, options) {
-    if (typeof output === 'string') {
-        if (output.endsWith('/')) {
-            output = {
-                dir: output,
-                format: 'es',
-            };
-        }
-        else {
-            output = {
-                file: output,
-                format: 'es',
-            };
-        }
-    }
-    try {
-        const { vue } = await import('rollup-plugin-vue');
-    }
-    catch (e) {
-        console.log(e);
-    }
-    let opt = {
-        input,
-        output,
-        plugins: [
-            postcss({
-                extract: true,
-                sourceMap: true,
-                use: ['sass']
-            }),
-        ],
-    };
-    if (typeof options === 'function') {
-        opt = options(opt) ?? opt;
-    }
-    else {
-        opt = { ...opt, ...options };
-    }
-    return opt;
-}
+var fusion__namespace = /*#__PURE__*/_interopNamespaceDefault(fusion);
 
-var fusion = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    MinifyOptions: MinifyOptions,
-    css: css
+
+
+exports.default = fusion__namespace;
+Object.keys(fusion).forEach(function (k) {
+	if (k !== 'default' && !Object.prototype.hasOwnProperty.call(exports, k)) Object.defineProperty(exports, k, {
+		enumerable: true,
+		get: function () { return fusion[k]; }
+	});
 });
-
-exports.MinifyOptions = MinifyOptions;
-exports.css = css;
-exports.default = fusion;
 //# sourceMappingURL=index.cjs.map

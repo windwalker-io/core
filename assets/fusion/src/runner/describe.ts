@@ -44,10 +44,10 @@ async function describeTasks(name: string, tasks: MaybeArray<RollupOptions>): Pr
   if (!Array.isArray(tasks)) {
     tasks = [tasks]
   }
-
+  
   for (const task of tasks) {
     if (typeof task === 'function') {
-      const taskOptions = await resolveTaskOptions(task, true);
+      let taskOptions = await resolveTaskOptions(task, true);
 
       nodes.push(
         await describeTasks((task as Function).name, taskOptions)

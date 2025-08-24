@@ -24,25 +24,36 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
   return { ...modules };
 }
 
-export async function resolveTaskOptions(task: LoadedConfigTask, flat = false): Promise<MaybeArray<RollupOptions>> {
+export async function resolveTaskOptions(task: LoadedConfigTask, flat = false): Promise<RollupOptions[]> {
   if (!flat && Array.isArray(task)) {
     const results = await Promise.all(task.map((task) => resolveTaskOptions(task, true)));
     return results.flat();
   }
 
   if (typeof task === 'function') {
-    return resolvePromises(await task());
+    return resolvePromisesToArray(await task());
   }
 
-  return resolvePromises((await task) as MaybeArray<RollupOptions>);
+  return resolvePromisesToArray((await task) as MaybeArray<RollupOptions>);
 }
 
-async function resolvePromises(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
+async function resolvePromisesToArray(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
   if (!Array.isArray(tasks)) {
-    return await tasks;
+    return [await tasks];
   }
 
-  return await Promise.all(tasks);
+  const resolvedTasks = await Promise.all(tasks);
+  const returnTasks = [];
+
+  for (const resolvedTask of resolvedTasks) {
+    if (Array.isArray(resolvedTask)) {
+      returnTasks.push(...resolvedTask);
+    } else {
+      returnTasks.push(resolvedTask);
+    }
+  }
+
+  return returnTasks;
 }
 
 export function mustGetAvailableConfigFile(root: string, params: RunnerCliParams): ConfigResult {

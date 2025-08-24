@@ -8,6 +8,7 @@ var node_fs = require('node:fs');
 var chalk = require('chalk');
 var archy = require('archy');
 var lodashEs = require('lodash-es');
+var config = require('@/runner/config');
 
 async function buildAll(optionsList) {
     for (const options of optionsList) {
@@ -79,15 +80,25 @@ async function resolveTaskOptions(task, flat = false) {
         return results.flat();
     }
     if (typeof task === 'function') {
-        return resolvePromises(await task());
+        return resolvePromisesToArray(await task());
     }
-    return resolvePromises((await task));
+    return resolvePromisesToArray((await task));
 }
-async function resolvePromises(tasks) {
+async function resolvePromisesToArray(tasks) {
     if (!Array.isArray(tasks)) {
-        return await tasks;
+        return [await tasks];
     }
-    return await Promise.all(tasks);
+    const resolvedTasks = await Promise.all(tasks);
+    const returnTasks = [];
+    for (const resolvedTask of resolvedTasks) {
+        if (Array.isArray(resolvedTask)) {
+            returnTasks.push(...resolvedTask);
+        }
+        else {
+            returnTasks.push(resolvedTask);
+        }
+    }
+    return returnTasks;
 }
 function mustGetAvailableConfigFile(root, params) {
     const found = getAvailableConfigFile(root, params);
@@ -208,7 +219,7 @@ async function describeTasks(name, tasks) {
     }
     for (const task of tasks) {
         if (typeof task === 'function') {
-            const taskOptions = await resolveTaskOptions(task, true);
+            let taskOptions = await resolveTaskOptions(task, true);
             nodes.push(await describeTasks(task.name, taskOptions));
         }
         else {
@@ -292,7 +303,7 @@ async function resolveTaskAsFlat(name, task, cache) {
             return [];
         }
         cache[name] = task;
-        const resolved = await resolveTaskOptions(task, true);
+        const resolved = await config.resolveTaskOptions(task, true);
         if (Array.isArray(resolved)) {
             for (const n in resolved) {
                 const t = resolved[n];
@@ -301,7 +312,7 @@ async function resolveTaskAsFlat(name, task, cache) {
         }
     }
     else {
-        results.push(task);
+        results.push(await task);
     }
     return results;
 }

@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
 import { MaybeArray, RollupOptions } from 'rollup';
-import { resolveTaskOptions } from './config';
-import { LoadedConfigTask } from './types';
+import { resolveTaskOptions } from '@/runner/config';
+import { LoadedConfigTask } from '@/runner/types';
 
 export function selectRunningTasks(
   input: string[],
@@ -69,7 +69,7 @@ export async function resolveTaskAsFlat(
       }
     }
   } else {
-    results.push(task);
+    results.push(await task);
   }
 
   return results;

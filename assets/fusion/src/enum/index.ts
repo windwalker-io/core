@@ -1,2 +1,2 @@
-export * from './MinifyOptions';
+export * from '@/enum/MinifyOptions';
 

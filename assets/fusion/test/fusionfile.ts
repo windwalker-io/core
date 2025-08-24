@@ -1,5 +1,5 @@
 import { RollupOptions } from 'rollup';
-import { css } from '../src';
+import { css, js, MinifyOptions } from '../src';
 import postcss from 'rollup-plugin-postcss';
 
 enum Foo {
@@ -10,8 +10,19 @@ enum Foo {
 
 export async function cssTest() {
   return [
-    css('./src/css/foo.css', './dest/foo.css'),
-    css('./src/scss/foo.scss', './dest/foosass.css')
+    css('./src/css/foo.css', './dest/foo.css', {
+      browserslist: [
+        // Simulate old browsers
+        'since 2013',
+      ],
+    }),
+    css(
+      './src/scss/foo.scss',
+      './dest/foosass.css',
+      {
+        minify: MinifyOptions.SEPARATE_FILE,
+      }
+    )
   ];
 
   // return [
@@ -45,10 +56,22 @@ export async function cssTest() {
   // ];
 }
 
-export async function hello(): Promise<any> {
+export async function jsTest(): Promise<any> {
   return [
-    cssTest,
-    world
+    js('./src/js/foo.js', './dest/js/simple/'),
+    js('./src/js/foo.js', {
+      dir: './dest/js/simple/',
+      entryFileNames: 'foo.bundle.js',
+    }, { minify: MinifyOptions.SAME_FILE }),
+    js(
+      ['./src/js/single.js'],
+      './dest/js/simple/single.umd.js',
+      {
+        format: 'umd',
+        umdName: 'MySingle',
+        minify: MinifyOptions.SEPARATE_FILE,
+      }
+    )
   ];
 }
 
@@ -73,4 +96,4 @@ export async function world(): Promise<RollupOptions[]> {
 
 
 
-export default [cssTest, hello];
+export default [cssTest];

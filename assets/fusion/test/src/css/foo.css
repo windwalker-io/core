@@ -9,4 +9,10 @@ body {
   background-color: black;
   color: red;
   filter: grayscale(100);
+  flex-direction: column;
+  line-clamp: 3;
+}
+
+::placeholder {
+  color: gray;
 }

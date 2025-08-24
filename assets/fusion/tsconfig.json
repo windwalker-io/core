@@ -12,7 +12,10 @@
     "resolveJsonModule": true,
     "declaration": false,
     "emitDeclarationOnly": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "@/*": ["./src/*"],
+    }
   },
-  "include": ["src", "rollup.config.ts"]
+  "include": ["src", "rollup.config.ts"],
 }
