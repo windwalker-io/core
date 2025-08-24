@@ -1,4 +1,6 @@
 import { MinifyOptions } from '@/enum';
+import { isVerbose } from '@/index';
+import clean from '@/plugins/clean';
 import { CssOptions, TaskInput, TaskOutput } from '@/types';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
@@ -9,8 +11,10 @@ import postcss, { type PostCSSPluginConf } from 'rollup-plugin-postcss';
 export async function css(
   input: TaskInput,
   output: TaskOutput,
-  options?: CssOptions
+  options: CssOptions = {}
 ): Promise<MaybeArray<RollupOptions>> {
+  options.verbose ??= isVerbose;
+
   let outputs = normalizeOutputs(output, { format: 'es' });
 
   const allOutputs = [];
@@ -51,13 +55,14 @@ export async function css(
 function createOptions(
   input: TaskInput,
   output: MaybeArray<OutputOptions>,
-  options?: CssOptions,
+  options: CssOptions,
   postcssOptions?: Partial<PostCSSPluginConf>
 ): Partial<RollupOptions> {
   return {
     input,
     output,
     plugins: [
+      clean(options.clean || false, options.verbose),
       postcss(
         mergeOptions(
           {
@@ -65,12 +70,12 @@ function createOptions(
             use: ['sass'],
             plugins: [
               autoprefixer({
-                overrideBrowserslist: options?.browserslist
+                overrideBrowserslist: options.browserslist
               })
             ],
           },
           postcssOptions,
-          options?.postcss,
+          options.postcss,
         )
       ),
     ],

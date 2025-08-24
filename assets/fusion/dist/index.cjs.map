@@ -1,1 +1,1 @@
-{"version":3,"file":"index.cjs","sources":[],"sourcesContent":[],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;"}
+{"version":3,"file":"index.cjs","sources":["../src/index.ts"],"sourcesContent":[null],"names":["params","fusion"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;AAKA,MAAM,SAAS,GAAGA,aAAM,CAAC,OAAO,GAAGA,aAAM,CAAC,OAAO,GAAG,CAAC,GAAG;AAIxD,YAAe;AACb,IAAA,GAAGC,iBAAM;YACTD,aAAM;CACP;;;;;;;;;;;;;;;"}

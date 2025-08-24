@@ -1,5 +1,13 @@
 
 export * from '@/dep';
 import * as fusion from '@/dep';
+import { params } from '@/runner';
 
-export default fusion;
+const isVerbose = params.verbose ? params.verbose > 0 : false;
+
+export { params, isVerbose };
+
+export default {
+  ...fusion,
+  params,
+};

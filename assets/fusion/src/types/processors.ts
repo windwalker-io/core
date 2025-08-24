@@ -5,6 +5,7 @@ export type TaskOutput = OutputOptions | OutputOptions[] | string;
 
 export interface ProcessorOptions {
   rollup?: ExtraRollupOptions;
+  verbose?: boolean;
 }
 export type OverrideOptions <T> = Partial<T> | ((options: Partial<T>) => Partial<T> | undefined);
 export type ExtraRollupOptions = OverrideOptions<RollupOptions>;

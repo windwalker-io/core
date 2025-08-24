@@ -1,46 +1,67 @@
 import { MinifyOptions } from '@/enum';
+import { isVerbose } from '@/index';
+import clean from '@/plugins/clean';
 import { JsOptions, TaskInput, TaskOutput } from '@/types';
-import { handleMaybeArray } from '@/utilities/arr';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
 import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
+import esbuild, { Options as EsbuildOptions } from 'rollup-plugin-esbuild';
 
-export async function js(input: TaskInput, output: TaskOutput, options?: JsOptions): Promise<RollupOptions[]> {
-  output = handleMaybeArray(
-    normalizeOutputs(output, { format: options?.format || 'es' }),
-    (output) => {
-      if (output.format === 'umd') {
-        output.name = options?.umdName;
-      }
+export async function js(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<RollupOptions[]> {
+  options.verbose ??= isVerbose;
 
-      return output;
+  const outputs = normalizeOutputs(output, { format: options?.format || 'es' });
+
+  for (const output of outputs) {
+    if (output.format === 'umd') {
+      output.name = options?.umdName;
     }
-  );
-
-  const opts = [];
-
-  let opt: Partial<RollupOptions> = createOptions(input, output);
-  opts.push(mergeOptions(opt, options?.rollup));
-
-  if (options?.minify === MinifyOptions.SEPARATE_FILE) {
-    let opt = createOptions(
-      input,
-      appendMinFileName(output),
-      options,
-    );
-
-    opts.push(mergeOptions(opt, options?.rollup));
   }
 
-  return opts
+  const all: RollupOptions[] = [];
+
+  const opt = createOptions(input, outputs, options, {
+    minify: options?.minify === MinifyOptions.SAME_FILE,
+    sourceMap: options?.minify === MinifyOptions.SAME_FILE,
+  });
+  all.push(mergeOptions(opt, options.rollup));
+
+  if (options?.minify === MinifyOptions.SEPARATE_FILE) {
+    const minOutputs = outputs.map((output) => {
+      return appendMinFileName(output);
+    });
+
+    const minOptions = createOptions(input, minOutputs, options,{
+      minify: true,
+      sourceMap: true,
+    });
+
+    all.push(mergeOptions(minOptions, options?.rollup));
+  }
+
+  return all;
 }
 
-function createOptions(input: TaskInput, output: MaybeArray<OutputOptions>, options?: JsOptions): Partial<RollupOptions> {
+function createOptions(
+  input: TaskInput,
+  output: MaybeArray<OutputOptions>,
+  options: JsOptions,
+  esbuildOptions?: EsbuildOptions
+): Partial<RollupOptions> {
   return {
     input,
     output,
     plugins: [
-      //
+      clean(options.clean || false, options.verbose),
+      esbuild(
+        mergeOptions<EsbuildOptions>(
+          {
+            target: options?.target || 'esnext',
+            tsconfig: options?.tsconfig ?? './tsconfig.json',
+          },
+          esbuildOptions
+        )
+      )
     ],
   };
 }

@@ -1,6 +1,5 @@
 import { RollupOptions } from 'rollup';
-import { css, js, MinifyOptions } from '../src';
-import postcss from 'rollup-plugin-postcss';
+import { css, js, MinifyOptions, params } from '../src';
 
 enum Foo {
   A = 'a',
@@ -10,7 +9,7 @@ enum Foo {
 
 export async function cssTest() {
   return [
-    css('./src/css/foo.css', './dest/foo.css', {
+    css('./src/css/foo.css', './dest/css/foo.css', {
       browserslist: [
         // Simulate old browsers
         'since 2013',
@@ -18,7 +17,7 @@ export async function cssTest() {
     }),
     css(
       './src/scss/foo.scss',
-      './dest/foosass.css',
+      './dest/css/foosass.css',
       {
         minify: MinifyOptions.SEPARATE_FILE,
       }
@@ -58,18 +57,66 @@ export async function cssTest() {
 
 export async function jsTest(): Promise<any> {
   return [
-    js('./src/js/foo.js', './dest/js/simple/'),
-    js('./src/js/foo.js', {
-      dir: './dest/js/simple/',
-      entryFileNames: 'foo.bundle.js',
-    }, { minify: MinifyOptions.SAME_FILE }),
+    js(
+      './src/js/foo.js',
+      './dest/js/simple/',
+      {
+        tsconfig: '../tsconfig.json',
+        clean: true,
+      }
+    ),
+    js(
+      './src/js/foo.js',
+      {
+        dir: './dest/js/minify/',
+        entryFileNames: 'foo.bundle.js',
+      },
+      {
+        minify: MinifyOptions.SAME_FILE,
+        tsconfig: '../tsconfig.json',
+        clean: true,
+      }),
     js(
       ['./src/js/single.js'],
-      './dest/js/simple/single.umd.js',
+      './dest/js/single/index.umd.js',
       {
         format: 'umd',
         umdName: 'MySingle',
         minify: MinifyOptions.SEPARATE_FILE,
+        tsconfig: '../tsconfig.json',
+        clean: true,
+      }
+    )
+  ];
+}
+
+export async function tsTest(): Promise<any> {
+  return [
+    js(
+      './src/ts/foo.ts',
+      './dest/ts/simple/',
+      {
+        tsconfig: '../tsconfig.json',
+      }
+    ),
+    js(
+      './src/ts/foo.ts',
+      {
+        dir: './dest/ts/minify/',
+        entryFileNames: 'foo.bundle.js',
+      },
+      {
+        minify: MinifyOptions.SAME_FILE,
+        tsconfig: '../tsconfig.json',
+      }),
+    js(
+      ['./src/ts/single.ts'],
+      './dest/ts/single/index.umd.js',
+      {
+        format: 'umd',
+        umdName: 'MySingle',
+        minify: MinifyOptions.SEPARATE_FILE,
+        tsconfig: '../tsconfig.json',
       }
     )
   ];
@@ -93,7 +140,5 @@ export async function world(): Promise<RollupOptions[]> {
     }
   ];
 }
-
-
 
 export default [cssTest];
