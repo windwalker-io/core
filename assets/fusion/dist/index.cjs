@@ -3,8 +3,10 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var fusion = require('@/dep');
-var runner = require('@/runner');
+var run = require('@/runner/run');
+var node_url = require('node:url');
 
+var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 function _interopNamespaceDefault(e) {
     var n = Object.create(null);
     if (e) {
@@ -24,16 +26,18 @@ function _interopNamespaceDefault(e) {
 
 var fusion__namespace = /*#__PURE__*/_interopNamespaceDefault(fusion);
 
-const isVerbose = runner.params.verbose ? runner.params.verbose > 0 : false;
+let params = undefined;
+const isCliRunning = process.argv[1] && node_url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('index.cjs', document.baseURI).href))) === process.argv[1];
 var index = {
     ...fusion__namespace,
-    params: runner.params,
+    params,
 };
+if (isCliRunning) {
+    params = run.parseArgv();
+    run.run(params);
+}
+const isVerbose = params?.verbose ? params?.verbose > 0 : false;
 
-Object.defineProperty(exports, "params", {
-    enumerable: true,
-    get: function () { return runner.params; }
-});
 exports.default = index;
 exports.isVerbose = isVerbose;
 Object.keys(fusion).forEach(function (k) {

@@ -1,13 +1,25 @@
 
 export * from '@/dep';
 import * as fusion from '@/dep';
-import { params } from '@/runner';
+import { parseArgv, run } from '@/runner/run';
+import { RunnerCliParams } from '@/runner/types';
+import { fileURLToPath } from 'node:url';
 
-const isVerbose = params.verbose ? params.verbose > 0 : false;
+let params: RunnerCliParams | undefined = undefined;
 
-export { params, isVerbose };
+const isCliRunning = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
 
 export default {
   ...fusion,
   params,
 };
+
+if (isCliRunning) {
+  params = parseArgv();
+
+  run(params);
+}
+
+const isVerbose = params?.verbose ? params?.verbose > 0 : false;
+
+export { isVerbose };

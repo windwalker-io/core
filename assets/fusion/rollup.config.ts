@@ -31,25 +31,6 @@ export default defineConfig([
     ],
     treeshake: { moduleSideEffects: false }
   },
-  // --- 1) JS bundles ---
-  {
-    input: "./src/runner.ts",
-    output: [
-      { file: "dist/runner.js", format: "esm", sourcemap: true, inlineDynamicImports: true, },
-      { file: "dist/runner.cjs", format: "cjs", sourcemap: true, exports: "named", inlineDynamicImports: true, }
-    ],
-    external,
-    plugins: [
-      nodeResolve({ extensions: [".mjs", ".js", ".json", ".ts"] }),
-      commonjs(),
-      typescript({
-        tsconfig: "./tsconfig.json"
-        // If you are using Node ESM project, consider to add below if necessary:
-        // declaration: false, emitDeclarationOnly: false
-      })
-    ],
-    treeshake: { moduleSideEffects: false }
-  },
 
   // --- 2) DTS ---
   {

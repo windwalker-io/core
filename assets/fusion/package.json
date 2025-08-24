@@ -12,7 +12,7 @@
     "clean": "rimraf dist",
     "build": "yarn clean && rollup -c --configPlugin typescript",
     "dev": "rollup -c --configPlugin typescript -w",
-    "test": "tsx src/runner.ts --cwd ./test/"
+    "test": "tsx src/index.ts --cwd ./test/"
   },
   "dependencies": {
     "@types/archy": "^0.0.36",
