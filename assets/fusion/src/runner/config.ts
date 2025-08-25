@@ -24,20 +24,20 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
   return { ...modules };
 }
 
-export async function resolveTaskOptions(task: LoadedConfigTask, flat = false): Promise<RollupOptions[]> {
-  if (!flat && Array.isArray(task)) {
+export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunctions = false): Promise<RollupOptions[]> {
+  if (!resolveSubFunctions && Array.isArray(task)) {
     const results = await Promise.all(task.map((task) => resolveTaskOptions(task, true)));
     return results.flat();
   }
 
   if (typeof task === 'function') {
-    return resolvePromisesToArray(await task());
+    return resolvePromisesToFlatArray(await task());
   }
 
-  return resolvePromisesToArray((await task) as MaybeArray<RollupOptions>);
+  return resolvePromisesToFlatArray((await task) as MaybeArray<RollupOptions>);
 }
 
-async function resolvePromisesToArray(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
+async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
   if (!Array.isArray(tasks)) {
     return [await tasks];
   }

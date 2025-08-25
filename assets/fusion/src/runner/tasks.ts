@@ -29,14 +29,14 @@ export function selectRunningTasks(
 
 export async function resolveAllTasksAsOptions(tasks: Record<string, LoadedConfigTask>) {
   const cache: Record<string, MaybeArray<LoadedConfigTask>> = {};
-  const optionSet = [];
+  const allOptions = [];
 
   for (const name in tasks) {
     const task = tasks[name];
-    optionSet.push(...await resolveTaskAsFlat(name, task, cache));
+    allOptions.push(...await resolveTaskAsFlat(name, task, cache));
   }
 
-  return optionSet;
+  return allOptions;
 }
 
 export async function resolveTaskAsFlat(

@@ -4,13 +4,20 @@ import clean from '@/plugins/clean';
 import { JsOptions, TaskInput, TaskOutput } from '@/types';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
+import vuePlugin, { Options as VueOptions } from '@vitejs/plugin-vue';
 import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
 import esbuild, { Options as EsbuildOptions } from 'rollup-plugin-esbuild';
 
-export async function js(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<RollupOptions[]> {
-  function plugins(esbuildOptions: EsbuildOptions) {
+export async function vue(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<RollupOptions[]> {
+  function plugins(esbuildOptions: EsbuildOptions, vueOptions: VueOptions) {
     return [
       clean(options.clean || false, options.verbose),
+      vuePlugin(
+        mergeOptions(
+          {},
+          vueOptions
+        )
+      ),
       esbuild(
         mergeOptions<EsbuildOptions>(
           {

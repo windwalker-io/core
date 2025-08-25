@@ -42,6 +42,7 @@
     "@types/lodash-es": "^4",
     "@types/minimist": "^1",
     "@types/node": "^24.3.0",
+    "@vitejs/plugin-vue": "^6.0.1",
     "rimraf": "^6.0.1",
     "rollup": "^4.48.0",
     "rollup-plugin-dts": "^6.2.3",
