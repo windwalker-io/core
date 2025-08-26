@@ -1,21 +1,22 @@
-import { type RollupOptions, rollup, watch } from 'rollup';
+import { RunningTasks } from '@/types';
+import chalk from 'chalk';
+import { type rollup, watch } from 'rollup';
+import { build, defineConfig, type UserConfig, type UserConfigExport } from 'vite';
 
-export async function buildAll(optionsList: RollupOptions[]) {
-  for (const options of optionsList) {
-    const bundle = await rollup(options);
+export async function buildAll(runningTasks: RunningTasks) {
+  for (const name in runningTasks) {
+    const configList = runningTasks[name];
 
-    const outputs = Array.isArray(options.output) ? options.output : [options.output];
+    console.log(`▶️ - ${chalk.cyan(name)} Start...`);
 
-    for (const out of outputs) {
-      await bundle.write(out!);
+    for (const config of configList) {
+      const output = await build(defineConfig(config));
     }
 
-    await bundle.close();
+    console.log(`✅ - ${chalk.cyan(name)} completed.`);
   }
-
-  console.log("✅ Task completed.");
 }
-export async function watchAll(optionsList: RollupOptions[]) {
+export async function watchAll(optionsList: UserConfig[]) {
   const watcher = watch(
     optionsList.map((options) => ({
       ...options,

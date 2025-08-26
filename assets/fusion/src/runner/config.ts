@@ -1,7 +1,8 @@
 import { existsSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
-import { MaybeArray, MaybePromise, RollupOptions } from 'rollup';
-import { ConfigResult, LoadedConfigTask, RunnerCliParams } from './types';
+import { MaybeArray, MaybePromise } from 'rollup';
+import { UserConfig } from 'vite';
+import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types/runner';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
   let path = configFile.path;
@@ -24,20 +25,20 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
   return { ...modules };
 }
 
-export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunctions = false): Promise<RollupOptions[]> {
+export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunctions = false): Promise<UserConfig[]> {
   if (!resolveSubFunctions && Array.isArray(task)) {
     const results = await Promise.all(task.map((task) => resolveTaskOptions(task, true)));
     return results.flat();
   }
 
   if (typeof task === 'function') {
-    return resolvePromisesToFlatArray(await task());
+    return resolvePromisesToFlatArray(await task(), task?.name);
   }
 
-  return resolvePromisesToFlatArray((await task) as MaybeArray<RollupOptions>);
+  return resolvePromisesToFlatArray((await task) as MaybeArray<UserConfig>, task?.name);
 }
 
-async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<RollupOptions>>) {
+async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<UserConfig>>, name?: string) {
   if (!Array.isArray(tasks)) {
     return [await tasks];
   }

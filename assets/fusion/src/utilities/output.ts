@@ -1,6 +1,7 @@
 import { TaskOutput } from '@/types';
 import { forceArray, handleMaybeArray } from '@/utilities/arr';
 import { MaybeArray, OutputOptions } from 'rollup';
+import { dirname, normalize } from 'node:path';
 
 export function normalizeOutputs(
   output: TaskOutput,
@@ -15,7 +16,9 @@ export function normalizeOutputs(
         };
       } else {
         output = {
-          file: output,
+          dir: dirname(output),
+          // Get file name with node library, consider Windows
+          entryFileNames: normalize(output).replace(/\\/g, '/').split('/').pop(),
           ...defaultOptions
         };
       }

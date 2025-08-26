@@ -4,10 +4,10 @@ import clean from '@/plugins/clean';
 import { JsOptions, TaskInput, TaskOutput } from '@/types';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
-import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
 import esbuild, { Options as EsbuildOptions } from 'rollup-plugin-esbuild';
+import { UserConfig } from 'vite';
 
-export async function js(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<RollupOptions[]> {
+export async function js(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<UserConfig[]> {
   function plugins(esbuildOptions: EsbuildOptions) {
     return [
       clean(options.clean || false, options.verbose),
@@ -23,11 +23,10 @@ export async function js(input: TaskInput, output: TaskOutput, options: JsOption
     ];
   }
 
-  return useJsProcessor({
-    input,
+  return useJsProcessor(
     output,
     options,
-    createOptions: (output, isMinify) => {
+    (output, isMinify) => {
       if (isMinify) {
         return {
           input,
@@ -48,19 +47,14 @@ export async function js(input: TaskInput, output: TaskOutput, options: JsOption
         })
       };
     }
-  });
+  );
 }
 
-export function useJsProcessor(
-  params: {
-    input: TaskInput;
-    output: TaskOutput;
-    options: JsOptions;
-    createOptions: (outputs: RollupOptions[], isMinify: boolean) => RollupOptions
-  }
+function useJsProcessor(
+  output: TaskOutput,
+  options: JsOptions,
+  createOptions: (outputs: UserConfig[], isMinify: boolean) => UserConfig
 ) {
-  const { output, options, createOptions } = params;
-
   options.verbose ??= isVerbose;
 
   const outputs = normalizeOutputs(output, { format: options?.format || 'es' });
@@ -71,10 +65,10 @@ export function useJsProcessor(
     }
   }
 
-  const all: RollupOptions[] = [];
+  const all: UserConfig[] = [];
 
   const opt = createOptions(outputs, false);
-  all.push(mergeOptions(opt, options.rollup));
+  all.push(mergeOptions(opt, options.vite));
 
   if (options?.minify === MinifyOptions.SEPARATE_FILE) {
     const minOutputs = outputs.map((output) => {
@@ -83,22 +77,8 @@ export function useJsProcessor(
 
     const minOptions = createOptions(minOutputs, true);
 
-    all.push(mergeOptions(minOptions, options?.rollup));
+    all.push(mergeOptions(minOptions, options?.vite));
   }
 
   return all;
 }
-
-// function createOptions(params: {
-//   input: TaskInput;
-//   output: MaybeArray<OutputOptions>;
-//   plugins?: RollupOptions['plugins'];
-// }): Partial<RollupOptions> {
-//   const { input, output, plugins } = params;
-//
-//   return {
-//     input,
-//     output,
-//     plugins
-//   };
-// }

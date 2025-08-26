@@ -2,7 +2,7 @@
 export * from '@/dep';
 import * as fusion from '@/dep';
 import { parseArgv, run } from '@/runner/run';
-import { RunnerCliParams } from '@/runner/types';
+import { RunnerCliParams } from '@/types/runner';
 import { fileURLToPath } from 'node:url';
 
 let params: RunnerCliParams | undefined = undefined;

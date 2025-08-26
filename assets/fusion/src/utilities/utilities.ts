@@ -1,12 +1,15 @@
 import { handleMaybeArray } from '@/utilities/arr';
 import { cloneDeep } from 'lodash-es';
-import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
+import { MaybeArray, OutputOptions } from 'rollup';
 import { OverrideOptions } from '@/types';
+import { UserConfig } from 'vite';
 
-export function mergeOptions<T = RollupOptions>(
-  base: Partial<T>,
+export function mergeOptions<T = UserConfig>(
+  base: Partial<T> | undefined,
   ...overrides: (OverrideOptions<T> | undefined)[]
 ): Partial<T> {
+  base ??= {};
+
   if (!overrides.length) {
     return base;
   }

@@ -1,9 +1,10 @@
 import chalk from 'chalk';
 import archy, { type Data } from 'archy';
 import { shuffle } from 'lodash-es';
-import { MaybeArray, RollupOptions } from 'rollup';
+import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
+import { LibraryOptions, UserConfig } from 'vite';
 import { resolveTaskOptions } from './config';
-import { LoadedConfigTask } from './types';
+import { LoadedConfigTask } from '../types/runner';
 
 export async function displayAvailableTasks(tasks: Record<string, LoadedConfigTask>) {
   const keys = Object.keys(tasks);
@@ -38,7 +39,7 @@ export async function displayAvailableTasks(tasks: Record<string, LoadedConfigTa
   console.log(text);
 }
 
-async function describeTasks(name: string, tasks: MaybeArray<RollupOptions>): Promise<Data> {
+async function describeTasks(name: string, tasks: MaybeArray<UserConfig>): Promise<Data> {
   const nodes = [];
   // console.log(name, tasks)
   if (!Array.isArray(tasks)) {
@@ -63,25 +64,31 @@ async function describeTasks(name: string, tasks: MaybeArray<RollupOptions>): Pr
   };
 }
 
-function describeTaskDetail(task: RollupOptions, indent: number = 4): string {
+function describeTaskDetail(task: UserConfig, indent: number = 4): string {
   const str = [];
 
+  const lib = task.build?.lib;
+
   // Input
-  if (task.input) {
+  if (lib && lib.entry) {
+    const entry = lib.entry;
+
     let inputStr = '';
-    if (typeof task.input === 'string') {
-      inputStr = chalk.yellow(task.input);
-    } else if (Array.isArray(task.input)) {
-      inputStr = chalk.yellow(task.input.join(', '));
-    } else if (typeof task.input === 'object') {
-      inputStr = chalk.yellow(Object.values(task.input).join(', '));
+    if (typeof entry === 'string') {
+      inputStr = chalk.yellow(entry);
+    } else if (Array.isArray(entry)) {
+      inputStr = chalk.yellow(entry.join(', '));
+    } else if (typeof entry === 'object') {
+      inputStr = chalk.yellow(Object.values(entry).join(', '));
     }
     str.push(`Input: ${inputStr}`);
   }
 
+  const output = task.build?.rollupOptions?.output;
+
   // Output
-  if (task.output) {
-    const outputs = Array.isArray(task.output) ? task.output : [task.output];
+  if (output) {
+    const outputs = Array.isArray(output) ? output : [output];
     outputs.forEach((output, index) => {
       let outStr = '';
       if (output.file) {
@@ -96,7 +103,7 @@ function describeTaskDetail(task: RollupOptions, indent: number = 4): string {
   return str.join(" - ");
 }
 
-function countTask(task: MaybeArray<RollupOptions>) {
+function countTask(task: MaybeArray<UserConfig>) {
   if (Array.isArray(task)) {
     return task.length;
   }

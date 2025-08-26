@@ -14,9 +14,10 @@ export async function cssTest() {
         // Simulate old browsers
         'since 2013',
       ],
+      minify: MinifyOptions.SAME_FILE,
     }),
     css(
-      './src/scss/foo.scss',
+      './src/scss/foosass.scss',
       './dest/css/foosass.css',
       {
         minify: MinifyOptions.SEPARATE_FILE,

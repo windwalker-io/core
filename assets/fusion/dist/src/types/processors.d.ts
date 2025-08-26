@@ -1,12 +1,10 @@
 import { InputOption, OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
-
 export type TaskInput = InputOption;
 export type TaskOutput = OutputOptions | OutputOptions[] | string;
-
 export interface ProcessorOptions {
-  vite?: ExtraViteOptions;
-  verbose?: boolean;
+    vite?: ExtraViteOptions;
+    verbose?: boolean;
 }
-export type OverrideOptions <T> = Partial<T> | ((options: Partial<T>) => Partial<T> | undefined);
+export type OverrideOptions<T> = Partial<T> | ((options: Partial<T>) => Partial<T> | undefined);
 export type ExtraViteOptions = OverrideOptions<UserConfig>;

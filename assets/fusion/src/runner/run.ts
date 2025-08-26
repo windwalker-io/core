@@ -2,9 +2,10 @@ import { buildAll, watchAll } from '@/runner/build';
 import { loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe';
 import { resolveAllTasksAsOptions, selectRunningTasks } from '@/runner/tasks';
-import { RunnerCliParams } from '@/runner/types';
+import { RunnerCliParams } from '@/types/runner';
+import { defineAllConfigs } from '@/utilities/vite';
 import { resolve } from 'node:path';
-import { defineConfig } from 'rollup';
+import { inspect } from 'node:util';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
@@ -89,11 +90,14 @@ export async function processApp(params: RunnerCliParams) {
   // Select running tasks
   const selectedTasks = selectRunningTasks([...params._] as string[], tasks);
 
-  const options = (await resolveAllTasksAsOptions(selectedTasks));
+  const runningTasks = (await resolveAllTasksAsOptions(selectedTasks));
 
-  if (params.watch) {
-    await watchAll(defineConfig(options));
-  } else {
-    await buildAll(defineConfig(options));
-  }
+  // console.log(inspect(runningTasks, { depth: null, colors: true }));
+
+  //
+  // if (params.watch) {
+  //   await watchAll(defineAllConfigs(options));
+  // } else {
+    await buildAll(runningTasks);
+  // }
 }

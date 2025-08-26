@@ -1,36 +1,40 @@
 import { MinifyOptions } from '@/enum';
 import { isVerbose } from '@/index';
-import clean from '@/plugins/clean';
-import { CssOptions, TaskInput, TaskOutput } from '@/types';
+import { CssOptions, OverrideOptions, TaskInput, TaskOutput } from '@/types';
+import { forceArray } from '@/utilities/arr';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
-import autoprefixer from 'autoprefixer';
-import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
+import { createViteLibOptions, createViteOptions } from '@/utilities/vite';
+import { cloneDeep } from 'lodash-es';
+import { MaybeArray, OutputOptions } from 'rollup';
 import postcss, { type PostCSSPluginConf } from 'rollup-plugin-postcss';
+import { BuildEnvironmentOptions, BuilderOptions, UserConfig } from 'vite';
 
 export async function css(
   input: TaskInput,
   output: TaskOutput,
   options: CssOptions = {}
-): Promise<MaybeArray<RollupOptions>> {
+): Promise<MaybeArray<UserConfig>> {
   options.verbose ??= isVerbose;
 
   let outputs = normalizeOutputs(output, { format: 'es' });
 
-  const allOutputs = [];
+  const all = [];
 
   for (const output of outputs) {
     const opt = createOptions(
       input,
       outputs,
       options,
-      {
-        sourceMap: options?.minify === MinifyOptions.SAME_FILE,
-        minimize: options?.minify === MinifyOptions.SAME_FILE,
-      }
+      (config) => {
+        config.build!.minify = options.minify === MinifyOptions.SAME_FILE ? 'esbuild' : false;
+        config.build!.cssMinify = options.minify === MinifyOptions.SAME_FILE ? 'esbuild' : false;
+
+        return config;
+      },
     );
 
-    allOutputs.push(mergeOptions(opt, options?.rollup));
+    all.push(mergeOptions(opt, options?.vite));
 
     if (options?.minify === MinifyOptions.SEPARATE_FILE) {
       const minOutput = appendMinFileName(output);
@@ -39,45 +43,73 @@ export async function css(
         input,
         minOutput,
         options,
-        {
-          sourceMap: true,
-          minimize: true,
-        }
+        (config) => {
+          config.build!.minify = 'esbuild';
+          config.build!.cssMinify = 'esbuild';
+
+          return config;
+        },
       );
 
-      allOutputs.push(mergeOptions(opt, options?.rollup));
+      all.push(mergeOptions(opt, options?.vite));
     }
   }
 
-  return allOutputs;
+  return all;
 }
 
 function createOptions(
   input: TaskInput,
   output: MaybeArray<OutputOptions>,
   options: CssOptions,
-  postcssOptions?: Partial<PostCSSPluginConf>
-): Partial<RollupOptions> {
-  return {
-    input,
+  override?: OverrideOptions<UserConfig>
+): Partial<UserConfig> {
+  output = cloneDeep(output);
+
+  const config = createViteOptions(
+    undefined,
     output,
-    plugins: [
-      clean(options.clean || false, options.verbose),
-      postcss(
-        mergeOptions(
-          {
-            extract: true,
-            use: ['sass'],
-            plugins: [
-              autoprefixer({
-                overrideBrowserslist: options.browserslist
-              })
-            ],
+    (config) => {
+      config.build!.rollupOptions!.input = input;
+
+      for (const o of forceArray(config.build!.rollupOptions!.output) as OutputOptions[]) {
+        o.assetFileNames = String(o.entryFileNames);
+
+        delete o.entryFileNames;
+      }
+
+      config.build!.cssCodeSplit = true;
+      config.css = {
+        modules: {
+          scopeBehaviour: 'global', // 或是 'global'
+        },
+        transformer: 'postcss',
+      };
+
+      // Remove __placeholder__ file since Vite must use it to extract CSS.
+      config.plugins = [
+        {
+          name: 'drop-vite-facade-css',
+          generateBundle(_, bundle) {
+            for (const [fileName, asset] of Object.entries(bundle)) {
+              if (
+                asset.type === 'asset'
+                && fileName === '__plaecholder__.min.css'
+              ) {
+                delete bundle[fileName];
+              }
+            }
           },
-          postcssOptions,
-          options.postcss,
-        )
-      ),
-    ],
-  };
+        }
+      ]
+
+      return config;
+    }
+  );
+
+  return mergeOptions(
+    config,
+    override,
+    options.vite
+  )
 }

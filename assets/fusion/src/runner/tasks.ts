@@ -1,8 +1,9 @@
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
-import { MaybeArray, RollupOptions } from 'rollup';
+import { MaybeArray } from 'rollup';
 import { resolveTaskOptions } from '@/runner/config';
-import { LoadedConfigTask } from '@/runner/types';
+import { LoadedConfigTask, RunningTasks } from '@/types/runner';
+import { UserConfig } from 'vite';
 
 export function selectRunningTasks(
   input: string[],
@@ -27,24 +28,25 @@ export function selectRunningTasks(
   return selected;
 }
 
-export async function resolveAllTasksAsOptions(tasks: Record<string, LoadedConfigTask>) {
+export async function resolveAllTasksAsOptions(tasks: Record<string, LoadedConfigTask>): Promise<RunningTasks> {
   const cache: Record<string, MaybeArray<LoadedConfigTask>> = {};
-  const allOptions = [];
+  const allTasks: RunningTasks = {};
 
   for (const name in tasks) {
     const task = tasks[name];
-    allOptions.push(...await resolveTaskAsFlat(name, task, cache));
+
+    allTasks[name] = (await resolveTaskAsFlat(name, task, cache));
   }
 
-  return allOptions;
+  return allTasks;
 }
 
 export async function resolveTaskAsFlat(
   name: string,
   task: LoadedConfigTask,
   cache: Record<string, MaybeArray<LoadedConfigTask>>
-): Promise<RollupOptions[]> {
-  const results: RollupOptions[] = [];
+): Promise<UserConfig[]> {
+  const results: UserConfig[] = [];
 
   if (Array.isArray(task)) {
     for (const n in task) {
