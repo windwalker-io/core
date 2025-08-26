@@ -1,4 +1,3 @@
-import { RunningTasks } from '../types';
-import { UserConfig } from 'vite';
-export declare function buildAll(runningTasks: RunningTasks): Promise<void>;
-export declare function watchAll(optionsList: UserConfig[]): Promise<void>;
+import { RunnerCliParams, RunningTasks } from '../types';
+export declare function buildAll(runningTasks: RunningTasks, params: RunnerCliParams): Promise<void>;
+export declare function watchAll(runningTasks: RunningTasks, params: RunnerCliParams): Promise<void>;

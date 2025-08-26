@@ -4,11 +4,12 @@ import { CssOptions, OverrideOptions, TaskInput, TaskOutput } from '@/types';
 import { forceArray } from '@/utilities/arr';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
-import { createViteLibOptions, createViteOptions } from '@/utilities/vite';
+import { createViteOptions } from '@/utilities/vite';
+import autoprefixer from 'autoprefixer';
 import { cloneDeep } from 'lodash-es';
+import type { AcceptedPlugin, ProcessOptions } from 'postcss';
 import { MaybeArray, OutputOptions } from 'rollup';
-import postcss, { type PostCSSPluginConf } from 'rollup-plugin-postcss';
-import { BuildEnvironmentOptions, BuilderOptions, UserConfig } from 'vite';
+import { UserConfig } from 'vite';
 
 export async function css(
   input: TaskInput,
@@ -71,6 +72,7 @@ function createOptions(
     output,
     (config) => {
       config.build!.rollupOptions!.input = input;
+      config.build!.emptyOutDir = options.clean ?? false;
 
       for (const o of forceArray(config.build!.rollupOptions!.output) as OutputOptions[]) {
         o.assetFileNames = String(o.entryFileNames);
@@ -80,28 +82,19 @@ function createOptions(
 
       config.build!.cssCodeSplit = true;
       config.css = {
-        modules: {
-          scopeBehaviour: 'global', // 或是 'global'
-        },
+        // modules: {
+        //   scopeBehaviour: 'global', // 或是 'global'
+        // },
         transformer: 'postcss',
-      };
-
-      // Remove __placeholder__ file since Vite must use it to extract CSS.
-      config.plugins = [
-        {
-          name: 'drop-vite-facade-css',
-          generateBundle(_, bundle) {
-            for (const [fileName, asset] of Object.entries(bundle)) {
-              if (
-                asset.type === 'asset'
-                && fileName === '__plaecholder__.min.css'
-              ) {
-                delete bundle[fileName];
-              }
-            }
+        postcss: mergeOptions<ProcessOptions & AcceptedPlugin>(
+          {
+            plugins: [
+              autoprefixer({ overrideBrowserslist: options.browserslist })
+            ]
           },
-        }
-      ]
+          options.postcss
+        ),
+      };
 
       return config;
     }
@@ -111,5 +104,5 @@ function createOptions(
     config,
     override,
     options.vite
-  )
+  );
 }

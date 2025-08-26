@@ -1,7 +1,7 @@
 
 export * from '@/dep';
 import * as fusion from '@/dep';
-import { parseArgv, run } from '@/runner/run';
+import { parseArgv, runApp } from '@/runner/app';
 import { RunnerCliParams } from '@/types/runner';
 import { fileURLToPath } from 'node:url';
 
@@ -17,7 +17,7 @@ export default {
 if (isCliRunning) {
   params = parseArgv();
 
-  run(params);
+  runApp(params);
 }
 
 const isVerbose = params?.verbose ? params?.verbose > 0 : false;

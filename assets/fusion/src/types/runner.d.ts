@@ -12,6 +12,8 @@ export type RunnerCliOptions = {
   config?: string;
   v?: number;
   verbose?: number;
+  series?: boolean;
+  s?: boolean;
 }
 export type RunnerCliParams = Arguments<RunnerCliOptions>;
 

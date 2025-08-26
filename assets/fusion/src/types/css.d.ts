@@ -1,13 +1,12 @@
-import { CleanHandler } from '@/plugins/clean';
-import { PostCSSPluginConf } from 'rollup-plugin-postcss';
 import { MinifyOptions } from '@/enum';
 import { OverrideOptions, ProcessorOptions } from './processors';
+import { type AcceptedPlugin, type ProcessOptions } from 'postcss';
 
 export type CssOptions = ProcessorOptions & {
   minify?: MinifyOptions | boolean;
   browserslist?: string | string[];
-  postcss?: OverrideOptions<PostCSSPluginConf>;
-  clean?: CleanHandler;
+  postcss?: OverrideOptions<ProcessOptions & AcceptedPlugin>;
+  clean?: boolean;
 
   // Todo: implement this
   rebase?: boolean;

@@ -1,51 +1,57 @@
 import { MinifyOptions } from '@/enum';
 import { isVerbose } from '@/index';
-import clean from '@/plugins/clean';
 import { JsOptions, TaskInput, TaskOutput } from '@/types';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
-import esbuild, { Options as EsbuildOptions } from 'rollup-plugin-esbuild';
-import { UserConfig } from 'vite';
+import { createViteLibOptions, createViteOptions } from '@/utilities/vite';
+import { OutputOptions } from 'rollup';
+import { ESBuildOptions, UserConfig } from 'vite';
 
 export async function js(input: TaskInput, output: TaskOutput, options: JsOptions = {}): Promise<UserConfig[]> {
-  function plugins(esbuildOptions: EsbuildOptions) {
-    return [
-      clean(options.clean || false, options.verbose),
-      esbuild(
-        mergeOptions<EsbuildOptions>(
-          {
-            target: options?.target || 'esnext',
-            tsconfig: options?.tsconfig ?? './tsconfig.json',
-          },
-          esbuildOptions
-        )
-      )
-    ];
-  }
+  const esbuild = mergeOptions<ESBuildOptions>(
+    {
+      target: options?.target || 'esnext',
+    },
+    options?.esbuild
+  );
+
+  // if (typeof options.tsconfig === 'string') {
+  //   esbuild.tsconfig = options.tsconfig;
+  // } else if (typeof options.tsconfig === 'object') {
+  //   esbuild.tsconfigRaw = options.tsconfig;
+  // }
 
   return useJsProcessor(
     output,
     options,
     (output, isMinify) => {
       if (isMinify) {
-        return {
-          input,
+        return createViteOptions(
+          createViteLibOptions(input),
           output,
-          plugins: plugins({
-            minify: true,
-            sourceMap: true,
-          })
-        };
+          (config) => {
+            config.build!.minify = 'esbuild';
+            config.build!.emptyOutDir = options.clean || false;
+            config.build!.target = options.target || 'esnext';
+            config.esbuild = esbuild;
+
+            return config;
+          }
+        );
       }
 
-      return {
-        input,
+      return createViteOptions(
+        createViteLibOptions(input),
         output,
-        plugins: plugins({
-          minify: options?.minify === MinifyOptions.SAME_FILE,
-          sourceMap: options?.minify === MinifyOptions.SAME_FILE,
-        })
-      };
+        (config) => {
+          config.build!.minify = options?.minify === MinifyOptions.SAME_FILE ? 'esbuild' : false;
+          config.build!.emptyOutDir = options.clean || false;
+          config.build!.target = options.target || 'esnext';
+          config.esbuild = esbuild;
+
+          return config;
+        }
+      );
     }
   );
 }
@@ -53,7 +59,7 @@ export async function js(input: TaskInput, output: TaskOutput, options: JsOption
 function useJsProcessor(
   output: TaskOutput,
   options: JsOptions,
-  createOptions: (outputs: UserConfig[], isMinify: boolean) => UserConfig
+  createOptions: (outputs: OutputOptions[], isMinify: boolean) => UserConfig
 ) {
   options.verbose ??= isVerbose;
 

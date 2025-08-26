@@ -19,7 +19,7 @@ export function createViteLibOptions(input: TaskInput, extraOptions?: OverrideOp
 export function createViteOptions(
   lib?: LibraryOptions,
   output?: MaybeArray<OutputOptions>,
-  extraOptions?: OverrideOptions<UserConfig>
+  override?: OverrideOptions<UserConfig>
 ): Partial<UserConfig> {
   return mergeOptions(
     {
@@ -29,9 +29,10 @@ export function createViteOptions(
           output,
         },
         emptyOutDir: false,
+        target: 'esnext',
       },
     },
-    extraOptions
+    override
   );
 }
 

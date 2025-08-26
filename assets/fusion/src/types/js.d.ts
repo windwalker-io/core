@@ -1,7 +1,9 @@
 import { MinifyOptions } from '@/enum';
 import { CleanHandler } from '@/plugins/clean';
 import { OverrideOptions, ProcessorOptions } from '@/types/processors';
+import { TsconfigRaw } from 'esbuild';
 import { ModuleFormat } from 'rollup';
+import { ESBuildOptions } from 'vite';
 
 export type JsOptions = ProcessorOptions & {
   /**
@@ -25,10 +27,14 @@ export type JsOptions = ProcessorOptions & {
    */
   clean?: CleanHandler;
   /**
-   * Path to tsconfig.json. Set false to disable it.
-   * @default './tsconfig.json'
+   * esbuild() config override.
    */
-  tsconfig?: string | false;
+  esbuild?: OverrideOptions<ESBuildOptions>;
+  // /**
+  //  * Path to tsconfig.json. Set false to disable it.
+  //  * @default './tsconfig.json'
+  //  */
+  // tsconfig?: TsconfigRaw | string;
   /**
    * Target JS env for esbuild.
    * @see https://esbuild.github.io/api/#target
