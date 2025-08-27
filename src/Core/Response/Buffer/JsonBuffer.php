@@ -11,6 +11,7 @@ use JsonException;
  *
  * @since  3.0
  */
+#[\AllowDynamicProperties]
 class JsonBuffer extends AbstractBuffer
 {
     /**

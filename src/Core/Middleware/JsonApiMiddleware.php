@@ -92,16 +92,32 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $e = $apiException->getPrevious() ?? $apiException;
 
         $data = [];
+        $backtraces = null;
 
         if ($this->app->isDebug()) {
             $data['exception'] = $e::class;
-            $data['backtraces'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
+            $backtraces = BacktraceHelper::normalizeBacktraces($e->getTrace(), $this->app->path('@root'));
 
-            foreach ($data['backtraces'] as &$datum) {
-                unset($datum['pathname']);
-            }
+            // Add last caller
+            array_unshift(
+                $backtraces,
+                [
+                    'file' => BacktraceHelper::replaceRoot($e->getFile(), $this->app->path('@root'))
+                        . ':' . $e->getLine(),
+                    'function' => $e->getMessage(),
+                ]
+            );
 
-            unset($datum);
+            $data['backtraces'] = $backtraces = Arr::mapWithKeys(
+                $backtraces,
+                static fn($v, $k) => yield "#{$k} {$v['file']}" => $v['function']
+            );
+
+            // foreach ($data['backtraces'] as &$datum) {
+            //     unset($datum['pathname']);
+            // }
+
+            // unset($datum);
 
             // if (class_exists(DebuggerHelper::class)) {
             //     try {

@@ -9,9 +9,11 @@ namespace Windwalker\Core\Response\Buffer;
  *
  * @since  3.0
  */
+#[\AllowDynamicProperties]
 abstract class AbstractBuffer implements ResponseBufferInterface
 {
     public int $status = 200;
+
     public function __construct(
         public string $message = '',
         public mixed $data = null,
