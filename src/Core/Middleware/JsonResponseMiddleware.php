@@ -21,9 +21,10 @@ use function Windwalker\response;
 /**
  * The JsonResponseMiddleware class.
  */
-class JsonResponseMiddleware implements MiddlewareInterface
+class JsonResponseMiddleware implements AttributeMiddlewareInterface
 {
     use DICreateTrait;
+    use AttributeMiddlewareTrait;
 
     /**
      * JsonResponseMiddleware constructor.
@@ -32,15 +33,10 @@ class JsonResponseMiddleware implements MiddlewareInterface
     {
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        return $this->run(fn() => $handler->handle($request));
-    }
-
-    public function run(Closure $callback): ResponseInterface
+    public function run(ServerRequestInterface $request, Closure $next): mixed
     {
         try {
-            $response = $callback();
+            $response = $next($request);
 
             if ($response instanceof ResponseInterface) {
                 // Allow redirect

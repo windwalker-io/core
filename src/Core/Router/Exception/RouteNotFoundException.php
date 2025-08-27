@@ -21,7 +21,7 @@ class RouteNotFoundException extends RuntimeException
      * @param  int         $code
      * @param  ?Throwable  $previous
      */
-    public function __construct($message = 'Page not found', $code = 404, ?Throwable $previous = null)
+    public function __construct($message = 'Not found', $code = 404, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

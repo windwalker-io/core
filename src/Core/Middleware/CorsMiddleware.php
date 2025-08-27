@@ -23,8 +23,17 @@ class CorsMiddleware implements MiddlewareInterface
 {
     use OptionsResolverTrait;
 
-    public function __construct(protected Container $container, array $options = [])
-    {
+    public function __construct(
+        protected Container $container,
+        protected bool $enabled = true,
+        protected string|array|null $allowOrigins = null,
+        protected bool $sendInstantly = false,
+        protected ?\Closure $configure = null,
+        /**
+         * @deprecated  Use constructor arguments instead.
+         */
+        array $options = [],
+    ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
     }
 
@@ -32,19 +41,19 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $resolver->define('enabled')
             ->allowedTypes('bool', 'callable')
-            ->default(true);
+            ->default($this->enabled);
 
         $resolver->define('allow_origins')
             ->allowedTypes('string', 'array', 'null')
-            ->default(env('CORS_ALLOW_ORIGINS') ?: null);
+            ->default($this->allowOrigins ?? env('CORS_ALLOW_ORIGINS') ?: null);
 
         $resolver->define('configure')
             ->allowedTypes('callable', 'null')
-            ->default(null);
+            ->default($this->configure);
 
         $resolver->define('send_instantly')
             ->allowedTypes('bool')
-            ->default(false);
+            ->default($this->sendInstantly);
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface

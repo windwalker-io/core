@@ -7,6 +7,7 @@ namespace Windwalker\Core\Middleware;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Windwalker\Core\Http\Exception\ApiException;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
@@ -26,11 +27,11 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 {
     use DICreateTrait;
 
-    public function run(Closure $callback): ResponseInterface
+    public function run(ServerRequestInterface $request, Closure $next): mixed
     {
         try {
             /** @var ResponseInterface|mixed $response */
-            $response = $callback();
+            $response = $next($request);
 
             if ($response instanceof ResponseInterface) {
                 // Allow redirect

@@ -22,21 +22,21 @@ class SimpleCspMiddleware implements MiddlewareInterface
 {
     protected string $nonce = '';
 
-    public const FRAME_SRC = 1 << 0;
+    public const int FRAME_SRC = 1 << 0;
 
-    public const IMG_SRC = 1 << 1;
+    public const int IMG_SRC = 1 << 1;
 
-    public const MEDIA_SRC = 1 << 2;
+    public const int MEDIA_SRC = 1 << 2;
 
-    public const OBJECT_SRC = 1 << 3;
+    public const int OBJECT_SRC = 1 << 3;
 
-    public const SCRIPT_SRC = 1 << 4;
+    public const int SCRIPT_SRC = 1 << 4;
 
-    public const STYLE_SRC = 1 << 5;
+    public const int STYLE_SRC = 1 << 5;
 
-    public const FONT_SRC = 1 << 6;
+    public const int FONT_SRC = 1 << 6;
 
-    public const DEFAULT_PRESET = self::SCRIPT_SRC | self::STYLE_SRC | self::IMG_SRC | self::FONT_SRC;
+    public const int DEFAULT_PRESET = self::SCRIPT_SRC | self::STYLE_SRC | self::IMG_SRC | self::FONT_SRC;
 
     /**
      * Use the CSP Builder, please see: https://github.com/paragonie/csp-builder
