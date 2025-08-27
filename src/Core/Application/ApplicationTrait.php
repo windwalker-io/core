@@ -22,6 +22,7 @@ use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Crypt\SecretToolkit;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\Parameters;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
@@ -40,6 +41,10 @@ trait ApplicationTrait
     }
     use CoreEventAwareTrait;
     use ProcessRunnerTrait;
+
+    public Parameters $config {
+        get => $this->container->getParameters();
+    }
 
     public LoggerInterface $logger;
 
@@ -272,19 +277,6 @@ trait ApplicationTrait
                 return $object;
             });
         }
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === 'config') {
-            return $this->getContainer()->getParameters();
-        }
-
-        if ($name === 'container') {
-            return $this->getContainer();
-        }
-
-        throw new OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
     }
 
     /**

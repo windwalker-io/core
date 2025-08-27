@@ -7,18 +7,18 @@ namespace Windwalker\Core\Application;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
-use Windwalker\DI\ContainerAwareTrait;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\DI\Exception\DependencyResolutionException;
+use Windwalker\DI\PublicVisibleContainerAwareTrait;
 
 /**
  * Trait ServiceAwareTrait
  */
 trait ServiceAwareTrait
 {
-    use ContainerAwareTrait;
+    use PublicVisibleContainerAwareTrait;
 
     /**
      * Get object from Container.

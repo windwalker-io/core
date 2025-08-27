@@ -38,11 +38,12 @@ class AppRequest implements AppRequestInterface, JsonSerializable
      */
     public function __construct(
         protected ServerRequestInterface $request,
-        protected SystemUri $systemUri,
-        protected ProxyResolver $proxyResolver,
+        SystemUri $systemUri,
+        ProxyResolver $proxyResolver,
         protected RequestInspector $requestInspector
     ) {
-        //
+        $this->systemUri = $systemUri;
+        $this->proxyResolver = $proxyResolver;
     }
 
     public function getMethod(): string

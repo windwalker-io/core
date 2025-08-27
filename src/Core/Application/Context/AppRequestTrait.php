@@ -24,9 +24,13 @@ trait AppRequestTrait
 {
     protected mixed $input = null;
 
-    protected ?Route $matchedRoute = null;
-
     protected ?string $clientIp = null;
+
+    public protected(set) SystemUri $systemUri;
+
+    public protected(set) ?Route $matchedRoute = null;
+
+    protected ProxyResolver $proxyResolver;
 
     public function withClientIp(?string $clientIp): static
     {

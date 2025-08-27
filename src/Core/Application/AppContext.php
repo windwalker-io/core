@@ -33,8 +33,6 @@ use Windwalker\Session\Session;
  * The Context class.
  *
  * @method WebRootApplicationInterface getRootApp()
- *
- * @property-read AppState $state
  */
 #[Immutable(Immutable::PROTECTED_WRITE_SCOPE)]
 class AppContext implements WebApplicationInterface, AppContextInterface
@@ -45,6 +43,13 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     protected AppRequest $appRequest {
         get => $this->getAppRequest();
     }
+
+    /**
+     * @var Parameters|null
+     *
+     * @deprecated  Use config() instead.
+     */
+    public protected(set) ?Parameters $params = null;
 
     /**
      * Context constructor.
@@ -144,6 +149,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
 
     /**
      * @return Parameters|null
+     *
+     * @deprecated  No-longer used.
      */
     public function getParams(): ?Parameters
     {
@@ -154,6 +161,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @param  Parameters|null  $params
      *
      * @return  static  Return self to support chaining.
+     *
+     * @deprecated  No-longer used.
      */
     public function setParams(?Parameters $params): static
     {
@@ -317,17 +326,5 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         mixed $return = ''
     ): void {
         $this->getRootApp()->close($return);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function __get(string $name)
-    {
-        if ($name === 'state') {
-            return $this->$name;
-        }
-
-        return $this->magicGet($name);
     }
 }

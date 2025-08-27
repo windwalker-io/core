@@ -31,10 +31,11 @@ class WsAppRequest implements AppRequestInterface, \JsonSerializable, WebSocketF
      */
     public function __construct(
         protected WebSocketRequestInterface $request,
-        protected SystemUri $systemUri,
-        protected ProxyResolver $proxyResolver
+        SystemUri $systemUri,
+        ProxyResolver $proxyResolver
     ) {
-        //
+        $this->systemUri = $systemUri;
+        $this->proxyResolver = $proxyResolver;
     }
 
     public function getFd(): int
