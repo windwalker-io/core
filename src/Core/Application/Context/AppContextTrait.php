@@ -117,9 +117,9 @@ trait AppContextTrait
      */
     public function setMatchedRoute(?Route $matchedRoute): static
     {
-        $this->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequestInterface $request) => $request->withMatchedRoute($matchedRoute)
+        );
     }
 
     public function getQueryValues(): array
@@ -147,9 +147,9 @@ trait AppContextTrait
      */
     public function setUrlVars(array $vars): static
     {
-        $this->appRequest = $this->appRequest->withUrlVars($vars);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequestInterface $request) => $request->withUrlVars($vars)
+        );
     }
 
     public function getHeader(string $name): string

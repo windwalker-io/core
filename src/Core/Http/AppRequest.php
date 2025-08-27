@@ -73,8 +73,6 @@ class AppRequest implements AppRequestInterface, JsonSerializable
     }
 
     /**
-     * inputWithMethod
-     *
      * @param  string  $method
      * @param  mixed   ...$fields
      *

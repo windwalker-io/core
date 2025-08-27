@@ -26,8 +26,22 @@ trait AppRequestTrait
 
     protected ?Route $matchedRoute = null;
 
+    protected ?string $clientIp = null;
+
+    public function withClientIp(?string $clientIp): static
+    {
+        $new = clone $this;
+        $new->clientIp = $clientIp;
+
+        return $new;
+    }
+
     public function getClientIP(): string
     {
+        if ($this->clientIp !== null) {
+            return $this->clientIp;
+        }
+
         if ($this->proxyResolver->isProxy()) {
             if ($this->proxyResolver->isTrustedProxy()) {
                 return $this->request->getServerParams()['REMOTE_ADDR'] ?? '';

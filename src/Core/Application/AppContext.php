@@ -15,7 +15,6 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppContextTrait;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
-use Windwalker\Core\Http\RequestInspector;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
@@ -23,11 +22,12 @@ use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
+use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionNotFoundException;
+use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\DI\Parameters;
 use Windwalker\Filter\Traits\FilterAwareTrait;
 use Windwalker\Session\Session;
-
-use function Swoole\Coroutine\Http\get;
 
 /**
  * The Context class.
@@ -42,7 +42,9 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     use FilterAwareTrait;
     use AppContextTrait;
 
-    protected ?AppRequest $appRequest = null;
+    protected AppRequest $appRequest {
+        get => $this->getAppRequest();
+    }
 
     /**
      * Context constructor.
@@ -175,9 +177,9 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      */
     public function sethUri(UriInterface $uri): static
     {
-        $this->appRequest = $this->appRequest->withUri($uri);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequest $request) => $request->withUri($uri)
+        );
     }
 
     /**
@@ -195,29 +197,44 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      */
     public function setSystemUri(SystemUri $uri): static
     {
-        $this->appRequest = $this->appRequest->withSystemUri($uri);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequest $request) => $request->withSystemUri($uri)
+        );
     }
 
     /**
      * @return AppRequest
+     * @throws DefinitionNotFoundException
+     * @throws DependencyResolutionException
      */
     public function getAppRequest(): AppRequest
     {
-        return $this->appRequest;
+        return $this->container->get(AppRequestInterface::class);
     }
 
     /**
      * @param  AppRequest  $request
      *
      * @return  static  Return self to support chaining.
+     * @throws DefinitionException
+     *
+     * @deprecated  Use modifyAppRequest() instead.
      */
     public function setAppRequest(AppRequest $request): static
     {
-        $this->appRequest = $request;
+        $this->container->share(AppRequestInterface::class, $request);
 
         $request->addEventDealer($this);
+
+        return $this;
+    }
+
+    public function modifyAppRequest(\Closure $handler): static
+    {
+        $this->container->modify(
+            AppRequestInterface::class,
+            $handler
+        );
 
         return $this;
     }
