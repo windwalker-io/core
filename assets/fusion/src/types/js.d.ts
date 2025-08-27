@@ -5,7 +5,7 @@ import { TsconfigRaw } from 'esbuild';
 import { ModuleFormat } from 'rollup';
 import { ESBuildOptions } from 'vite';
 
-export type JsOptions = ProcessorOptions & {
+export interface JsOptions extends ProcessorOptions {
   /**
    * Minify options or boolean to enable with default options.
    */
@@ -40,4 +40,12 @@ export type JsOptions = ProcessorOptions & {
    * @see https://esbuild.github.io/api/#target
    */
   target?: string | string[];
-};
+  /**
+   * Externals with instead variables for rollup, use webpack external syntax.
+   */
+  externals?: Record<string, string>;
+  /**
+   * Path alias for module resolution, if send a string, it will be resolved as `@/*`.
+   */
+  path?: string | Record<string, string>;
+}

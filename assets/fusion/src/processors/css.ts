@@ -70,6 +70,7 @@ function createOptions(
   const config = createViteOptions(
     undefined,
     output,
+    [],
     (config) => {
       config.build!.rollupOptions!.input = input;
       config.build!.emptyOutDir = options.clean ?? false;

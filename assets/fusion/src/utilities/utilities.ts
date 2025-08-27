@@ -1,7 +1,6 @@
-import { handleMaybeArray } from '@/utilities/arr';
-import { cloneDeep } from 'lodash-es';
-import { MaybeArray, OutputOptions } from 'rollup';
 import { OverrideOptions } from '@/types';
+import { cloneDeep, merge } from 'lodash-es';
+import { OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
 
 export function mergeOptions<T = UserConfig>(
@@ -22,7 +21,7 @@ export function mergeOptions<T = UserConfig>(
     if (typeof override === 'function') {
       base = override(base) ?? base;
     } else {
-      base = { ...base, ...override };
+      base = merge(base, override);
     }
   }
 

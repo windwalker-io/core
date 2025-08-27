@@ -1,5 +1,5 @@
 import { RollupOptions } from 'rollup';
-import { css, js, MinifyOptions, params } from '../src';
+import { css, js, vue, MinifyOptions, params } from '../src';
 
 enum Foo {
   A = 'a',
@@ -139,6 +139,31 @@ export async function world(): Promise<RollupOptions[]> {
         format: 'es',
       },
     }
+  ];
+}
+
+export function vueTest() {
+  return [
+    vue(
+      './src/vue/main.ts',
+      './dest/vue/vue-dest.js',
+      {
+        path: './src/vue',
+        externals: {
+          vue: 'Vue'
+        }
+      }
+    ),
+    vue(
+      ['./src/vue/entries/entry-1.ts', './src/vue/entries/entry-2.ts'],
+      './dest/vue/pages/',
+      {
+        path: './src/vue',
+        externals: {
+          vue: 'Vue'
+        }
+      }
+    )
   ];
 }
 

@@ -21,5 +21,7 @@ if (isCliRunning) {
 }
 
 const isVerbose = params?.verbose ? params?.verbose > 0 : false;
+const isProd = process.env.NODE_ENV === 'production';
+const isDev = !isProd;
 
-export { isVerbose };
+export { isVerbose, isDev, isProd };

@@ -1,7 +1,7 @@
 import { OverrideOptions, TaskInput } from '@/types';
 import { mergeOptions } from '@/utilities/utilities';
 import { MaybeArray, OutputOptions } from 'rollup';
-import { defineConfig, LibraryOptions, UserConfig } from 'vite';
+import { defineConfig, LibraryOptions, PluginOption, UserConfig } from 'vite';
 
 export function defineAllConfigs(configs: UserConfig[]) {
   return configs.map(defineConfig);
@@ -19,10 +19,12 @@ export function createViteLibOptions(input: TaskInput, extraOptions?: OverrideOp
 export function createViteOptions(
   lib?: LibraryOptions,
   output?: MaybeArray<OutputOptions>,
+  plugins: PluginOption[] = [],
   override?: OverrideOptions<UserConfig>
 ): Partial<UserConfig> {
   return mergeOptions(
     {
+      resolve: {},
       build: {
         lib,
         rollupOptions: {
@@ -31,6 +33,7 @@ export function createViteOptions(
         emptyOutDir: false,
         target: 'esnext',
       },
+      plugins
     },
     override
   );
