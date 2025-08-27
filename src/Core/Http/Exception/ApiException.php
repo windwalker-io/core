@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http\Exception;
 
-use Windwalker\Attributes\AttributesAccessor;
+use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\Attributes\Enum\Title;
 
 /**
@@ -14,12 +14,20 @@ class ApiException extends \RuntimeException
 {
     protected int $statusCode;
 
+    protected string $errCode = '';
+
     public function __construct(
         string $message = '',
-        int $code = 0,
+        int|string $code = 0,
         int $statusCode = 0,
         ?\Throwable $previous = null
     ) {
+        $this->errCode = (string) $code;
+
+        if (is_string($code)) {
+            $code = 500;
+        }
+
         parent::__construct($message, $code, $previous);
 
         $statusCode = $statusCode ?: static::getStatusCodeFromErrorCode($code);
@@ -162,5 +170,10 @@ class ApiException extends \RuntimeException
                 throw new \LogicException('The BackedEnum used as error code must be int type.');
             }
         }
+    }
+
+    public function getErrCode(): string|int
+    {
+        return $this->errCode ?: $this->code;
     }
 }
