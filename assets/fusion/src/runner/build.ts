@@ -1,7 +1,7 @@
 import { RunnerCliParams, RunningTasks } from '@/types';
 import chalk from 'chalk';
 import { type rollup, RollupWatcher, watch } from 'rollup';
-import { build, defineConfig, mergeConfig, type UserConfig, type UserConfigExport } from 'vite';
+import { build, createServer, defineConfig, mergeConfig, type UserConfig, type UserConfigExport } from 'vite';
 
 export async function buildAll(runningTasks: RunningTasks, params: RunnerCliParams) {
   const all = [];
@@ -94,3 +94,22 @@ export async function watchAll(runningTasks: RunningTasks, params: RunnerCliPara
   });
 }
 
+// function startServerAll(runningTasks: RunningTasks, params: RunnerCliParams) {
+//
+// }
+//
+// async function startServer(config: UserConfig, params: RunnerCliParams) {
+//   const server = await createServer(
+//     mergeConfig(
+//       {
+//         root,
+//         cacheDir,
+//         server: { port, strictPort: true }
+//       },
+//       {} // 可再合併各自的 config
+//     )
+//   );
+//   await server.listen();
+//   console.log(`[dev] ${root} running at: http://localhost:${port}`);
+//   return server;
+// }
