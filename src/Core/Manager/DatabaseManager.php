@@ -77,7 +77,7 @@ class DatabaseManager extends AbstractManager
         /** @var DatabaseAdapter $db */
         $db = parent::create($name, ...$args);
 
-        $db->getDriver()->setOption('debug', WINDWALKER_DEBUG);
+        $db->getDriver()->options->debug = WINDWALKER_DEBUG;
 
         $orm = $db->orm();
 
@@ -89,10 +89,10 @@ class DatabaseManager extends AbstractManager
             $options = $db->getOptions();
 
             try {
-                if ($options['strict'] ?? true) {
-                    $platform->enableStrictMode($options['modes'] ?? null ?: null);
-                } elseif ($options['modes'] ?? null) {
-                    $platform->setModes($options['modes'] ?? []);
+                if ($options->strict ?? true) {
+                    $platform->enableStrictMode($options->modes);
+                } elseif ($options->modes) {
+                    $platform->setModes($options->modes);
                 }
             } catch (\RuntimeException $e) {
                 // No actions
