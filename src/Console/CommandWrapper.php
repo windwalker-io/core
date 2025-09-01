@@ -21,6 +21,7 @@ use Windwalker\Console\Input\InputOption;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\DIOptions;
 use Windwalker\Utilities\Assert\Assert;
 
 /**
@@ -146,7 +147,7 @@ class CommandWrapper extends Command implements
     {
         $container = $handler->getContainer();
 
-        return function (array $args, int $options) use ($handler, $container) {
+        return function (array $args, DIOptions $options) use ($handler, $container) {
             if (isset($args['name'])) {
                 $this->setName($args['name']);
 
