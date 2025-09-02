@@ -10,6 +10,7 @@ use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Database\Driver\DriverOptions;
 use Windwalker\Environment\Environment;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
@@ -45,7 +46,7 @@ class MySQLExporter extends AbstractExporter
                 '%s --defaults-extra-file="%s" --no-tablespaces %s %s',
                 $md,
                 $this->createPasswordCnfFile($dbOptions),
-                $dbOptions['dbname'],
+                $dbOptions->dbname,
                 env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
             );
 
@@ -91,14 +92,14 @@ class MySQLExporter extends AbstractExporter
         $stream->close();
     }
 
-    protected function createPasswordCnfFile(array $options): string
+    protected function createPasswordCnfFile(DriverOptions $options): string
     {
         $tmpFile = Path::normalize($this->app->path('@temp/.md.cnf'), '/');
 
-        $user = addslashes($options['user'] ?? 'root');
-        $password = addslashes($options['password'] ?? '');
-        $host = addslashes($options['host'] ?? 'localhost');
-        $port = addslashes($options['port'] ?? '3306');
+        $user = addslashes($options->user ?? 'root');
+        $password = addslashes($options->password ?? '');
+        $host = addslashes($options->host ?? 'localhost');
+        $port = addslashes($options->port ?? '3306');
 
         $content = <<<CNF
 [mysqldump]

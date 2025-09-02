@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Windwalker\Core\Runtime;
 
 use Windwalker\Core\Attributes\ConfigModule;
-use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\Attributes\AttributesAccessor;
+use Windwalker\Utilities\Iterator\PriorityQueue;
 
 class ConfigLoader
 {
     public static function includeArrays(string $path, array $contextData = []): array
     {
-        $resultBag = [];
+        $loaded = [];
+        $queue = new PriorityQueue();
 
         extract($contextData, EXTR_OVERWRITE);
         unset($contextData);
@@ -22,48 +22,50 @@ class ConfigLoader
 
             $included = include $file;
 
-            if ($included instanceof \Closure) {
-                $ref = new \ReflectionFunction($included);
-                $module = $ref->getAttributes(ConfigModule::class)[0] ?? null;
+            if ($included instanceof \Closure || !array_is_list($included)) {
+                $included = [$included];
+            }
 
-                $module = $module ? $module->newInstance() : new ConfigModule();
+            foreach ($included as $item) {
+                if ($item instanceof \Closure) {
+                    $ref = new \ReflectionFunction($item);
+                    $module = $ref->getAttributes(ConfigModule::class)[0] ?? null;
 
-                $module->config = $included();
+                    $module = $module ? $module->newInstance() : new ConfigModule();
 
-                $resultBag[$filename] = $module;
-            } else {
-                foreach ($included as $name => $subConfig) {
-                    $module = new ConfigModule();
-                    $module->config = $subConfig;
+                    if (!$module->isAvailable()) {
+                        continue;
+                    }
 
-                    $resultBag[$name] = $module;
+                    $module->callback = $item;
+
+                    $queue->insert($module, $module->priority);
+                } else {
+                    foreach ($item as $name => $subConfig) {
+                        $module = new ConfigModule();
+                        $module->name = $name;
+                        $module->config = $subConfig;
+
+                        $queue->insert($module, $module->priority);
+                    }
                 }
+
+                $module->file = $file;
             }
         }
-
-        uasort($resultBag, function (ConfigModule $a, ConfigModule $b) {
-            return $a->ordering <=> $b->ordering;
-        });
 
         $resultConfigs = [];
 
         /** @var ConfigModule $module */
-        foreach ($resultBag as $name => $module) {
-            if ($module->path !== null) {
-                Arr::set($resultBag, $module->path, $module->config);
+        foreach ($queue as $module) {
+            if ($module->name !== null) {
+                $resultConfigs[$module->name] = $module->config;
             } else {
-                $resultConfigs[$name] = $module->config;
+                $resultConfigs += $module->config;
             }
         }
 
-        return Arr::mapGenerator(
-            function () use ($resultBag) {
-
-                foreach ($resultBag as $name => $result) {
-                    $path
-                }
-            }
-        );
+        return $resultConfigs;
     }
 
     public static function getFileName(string $filePath): string

@@ -8,7 +8,14 @@ use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Runtime\Runtime;
 
 Runtime::boot(WINDWALKER_ROOT, __DIR__);
-Runtime::loadConfig(Runtime::getRootDir() . '/etc/runtime.php');
+
+$file = Runtime::getRootDir() . '/etc/runtime.config.php';
+
+if (!is_file($file)) {
+    $file = Runtime::getRootDir() . '/etc/runtime.config.php';
+}
+
+Runtime::loadConfig($file);
 
 $container = Runtime::getContainer();
 

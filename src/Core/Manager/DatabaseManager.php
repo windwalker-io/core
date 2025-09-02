@@ -8,6 +8,7 @@ use Windwalker\Attributes\AttributeType;
 use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
+use Windwalker\Database\Driver\DriverOptions;
 use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\Database\Platform\MySQLPlatform;
 use Windwalker\DI\Attributes\Isolation;
@@ -136,10 +137,12 @@ class DatabaseManager extends AbstractManager
         };
     }
 
-    public static function mergeDsnToOptions(array $options): array
+    public static function mergeDsnToOptions(array|DriverOptions $options): DriverOptions
     {
-        if ($options['dsn'] ?? null) {
-            $options = array_merge($options, DsnHelper::extract($options['dsn']));
+        $options = clone DriverOptions::wrap($options);
+
+        if ($options->dsn) {
+            $options = $options->withMerge(DsnHelper::extract($options->dsn));
         }
 
         return $options;
