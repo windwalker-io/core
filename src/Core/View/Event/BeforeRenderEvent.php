@@ -18,7 +18,7 @@ class BeforeRenderEvent extends AbstractViewRenderEvent
     public function __construct(
         public mixed $response,
         View $view,
-        ViewModelInterface $viewModel,
+        object $viewModel,
         AppState $state,
         string $layout,
         array $data

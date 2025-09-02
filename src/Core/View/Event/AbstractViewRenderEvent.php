@@ -19,7 +19,7 @@ abstract class AbstractViewRenderEvent extends BaseEvent
 
     public function __construct(
         public View $view,
-        public ViewModelInterface $viewModel,
+        public object $viewModel,
         public AppState $state,
         public string $layout,
         public array $data,

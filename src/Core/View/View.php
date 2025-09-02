@@ -10,11 +10,11 @@ use Psr\Http\Message\UriInterface;
 use ReflectionClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
-use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Attributes\ViewMetadata;
 use Windwalker\Core\Attributes\ViewModel;
+use Windwalker\Core\Attributes\ViewPrepare;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Html\HtmlFrame;
 use Windwalker\Core\Language\LangService;
@@ -31,6 +31,7 @@ use Windwalker\Filesystem\Path;
 use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Language\Language;
+use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\Attributes\Prop;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
@@ -108,6 +109,27 @@ class View implements EventAwareInterface, \ArrayAccess
         return $this;
     }
 
+    protected function findPrepareMethod(object $vm): \Closure
+    {
+        if ($vm instanceof ViewModelInterface || method_exists($vm, 'prepare')) {
+            $prepare = $vm->prepare(...);
+        } else {
+            $prepare = AttributesAccessor::getFirstMemberWithAttribute(
+                $vm,
+                ViewPrepare::class,
+                \ReflectionAttribute::IS_INSTANCEOF
+            );
+        }
+
+        return $prepare ?? throw new LogicException(
+            sprintf(
+                '%s must implement %s or has prepare() method.',
+                $vm::class,
+                ViewModelInterface::class
+            )
+        );
+    }
+
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define('layout_var_name')
@@ -161,15 +183,7 @@ class View implements EventAwareInterface, \ArrayAccess
 
         $vm = $this->getViewModel();
 
-        if (!$vm instanceof ViewModelInterface && method_exists($vm, 'prepare')) {
-            throw new LogicException(
-                sprintf(
-                    '%s must implement %s or has prepare() method.',
-                    $vm::class,
-                    ViewModelInterface::class
-                )
-            );
-        }
+        // $prepare = $this->findPrepareMethod($vm);
 
         if (EventSubscriber::isSubscriber($vm)) {
             $this->subscribe($vm);
@@ -199,7 +213,15 @@ class View implements EventAwareInterface, \ArrayAccess
         // @event Before Render
         $event = $this->emit(
             new BeforeRenderEvent(
-                response: $vm->prepare($this->app, $this),
+                response: $this->app->call(
+                    $this->findPrepareMethod($vm),
+                    [
+                        $this->app,
+                        $this,
+                        'app' => $this->app,
+                        'view' => $this,
+                    ]
+                ),
                 view: $this,
                 viewModel: $vm,
                 state: $this->getState(),
@@ -347,7 +369,7 @@ class View implements EventAwareInterface, \ArrayAccess
         }
     }
 
-    protected function prepareHtmlFrame(ViewModelInterface $vm): void
+    protected function prepareHtmlFrame(object $vm): void
     {
         $asset = $this->asset;
         $name = strtolower(ltrim($this->guessName($vm), '\\/'));
@@ -356,7 +378,7 @@ class View implements EventAwareInterface, \ArrayAccess
         if (!$this->isChild()) {
             $this->addBodyClass($vm::class);
 
-            $methods = (new ReflectionClass($vm))->getMethods();
+            $methods = new ReflectionClass($vm)->getMethods();
 
             foreach ($methods as $method) {
                 if (has_attributes($method, ViewMetadata::class)) {
@@ -498,7 +520,7 @@ class View implements EventAwareInterface, \ArrayAccess
         return $this;
     }
 
-    protected function preparePaths(ViewModelInterface $vm, string $ns = 'main'): void
+    protected function preparePaths(object $vm, string $ns = 'main'): void
     {
         // Prepare App view override
         // ROOT/views/{stage}/{view}
@@ -563,7 +585,7 @@ class View implements EventAwareInterface, \ArrayAccess
         return $this->options['vmAttr'];
     }
 
-    public function guessName(ViewModelInterface $vm): string
+    public function guessName(object $vm): string
     {
         $root = $this->app->config('asset.namespace_base');
 
@@ -631,7 +653,7 @@ class View implements EventAwareInterface, \ArrayAccess
         return $this;
     }
 
-    protected function getAppTemplatePath(ViewModelInterface $vm): string
+    protected function getAppTemplatePath(object $vm): string
     {
         $name = $this->guessName($vm);
 

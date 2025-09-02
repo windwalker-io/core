@@ -21,10 +21,10 @@ class Input implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         return function () use ($handler) {
-            /** @var \ReflectionParameter $ref */
-            $ref = $handler->getReflector();
+            /** @var \ReflectionParameter|\ReflectionProperty $ref */
+            $ref = $handler->reflector;
             $field = $this->name ?? $ref->getName();
-            $isOptional = $ref->isOptional();
+            $isOptional = $ref instanceof \ReflectionParameter ? $ref->isOptional() : false;
 
             $default = $this->default ?? ($isOptional ? $ref->getDefaultValue() : null);
 
