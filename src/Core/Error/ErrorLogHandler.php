@@ -38,8 +38,11 @@ class ErrorLogHandler implements ErrorHandlerInterface
      * @param  Config         $config
      * @param  array          $options
      */
-    public function __construct(LoggerService $logger, Config $config, array $options = [])
-    {
+    public function __construct(
+        LoggerService $logger,
+        Config $config,
+        array $options = []
+    ) {
         $this->logger = $logger;
         $this->config = $config;
 
@@ -54,6 +57,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
                 'channel' => $this->config->getDeep('error.log_channel') ?: 'error',
                 'ignore_40x' => false,
                 'print' => false,
+                'backtraces' => true,
             ]
         );
     }
@@ -79,10 +83,16 @@ class ErrorLogHandler implements ErrorHandlerInterface
             $code < 400 || $code >= 500 || !$ignore40x
         ) {
             if ($this->options['channel']) {
+                $context = [];
+
+                if ($this->options['backtraces']) {
+                    $context['exception'] = $e;
+                }
+
                 $this->logger->error(
                     $this->options['channel'],
                     $e->getMessage(),
-                    ['exception' => $e]
+                    $context
                 );
             }
 
