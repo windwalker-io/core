@@ -312,7 +312,7 @@ class MigrationService implements EventAwareInterface
         return $this->app->config('db.migration.table_name') ?: 'migration_log';
     }
 
-    public function copyMigrationFile(string $dir, string $name, string $source, array $options = []): FileCollection
+    public function copyMigrationFile(string $dir, string $name, string $source, array $data = []): FileCollection
     {
         $codeGenerator = $this->app->make(CodeGenerator::class);
         $migrations = $this->getMigrations($dir);
@@ -331,9 +331,9 @@ class MigrationService implements EventAwareInterface
             $versions[] = $migration->version;
         }
 
-        $format = $options['version_format'] ?? 'YmdHi%04d';
+        $format = $data['version_format'] ?? 'YmdHi%04d';
         $date = new DateTimeImmutable('now');
-        $entity = $options['entity'] ?? 'Table';
+        $entity = $data['entity'] ?? 'Table';
         $version = static::generateVersion($date, $versions, $format);
 
         $year = $date->format('Y');
