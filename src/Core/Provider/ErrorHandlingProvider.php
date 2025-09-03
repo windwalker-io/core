@@ -14,6 +14,7 @@ use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\DIOptions;
 use Windwalker\DI\ServiceProviderInterface;
 
 /**
@@ -122,7 +123,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
 
                 return $error;
             },
-            Container::ISOLATION
+            new DIOptions(isolation: true)
         );
     }
 }

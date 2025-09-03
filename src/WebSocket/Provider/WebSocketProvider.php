@@ -18,6 +18,7 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\BootableProviderInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Request\ServerRequest;
@@ -169,11 +170,11 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
                     SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
                 );
             },
-            Container::ISOLATION
+            new DIOptions(isolation: true)
         );
 
         // Proxy
-        $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);
+        $container->prepareSharedObject(ProxyResolver::class, null, new DIOptions(isolation: true));
 
         // App Request
         $container->set(

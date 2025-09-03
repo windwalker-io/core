@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Symfony\Component\Mailer\Transport;
+use Windwalker\Core\Factory\MailerFactory;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
 use Windwalker\Core\Manager\MailerManager;
@@ -22,10 +23,11 @@ class MailerProvider implements ServiceProviderInterface
     public function register(Container $container): void
     {
         $container->prepareSharedObject(MailerManager::class);
+        $container->prepareSharedObject(MailerFactory::class);
 
         $container->bindShared(
             Mailer::class,
-            fn(MailerManager $manager, ?string $tag = null) => $manager->get($tag)
+            fn(MailerFactory $factory, ?string $tag = null) => $factory->get($tag)
         )
             ->alias(MailerInterface::class, Mailer::class);
 

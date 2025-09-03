@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Core\Factory\CryptoFactory;
+use Windwalker\Core\Factory\HasherFactory;
 use Windwalker\Core\Manager\CryptoManager;
 use Windwalker\Core\Manager\HasherManager;
 use Windwalker\Crypt\Hasher\HasherInterface;
@@ -19,25 +21,27 @@ class SecurityProvider implements ServiceProviderInterface
     {
         $container->prepareSharedObject(CryptoManager::class);
         $container->prepareSharedObject(HasherManager::class);
+        $container->prepareSharedObject(CryptoFactory::class);
+        $container->prepareSharedObject(HasherFactory::class);
 
         $container->bindShared(
             CipherInterface::class,
             function (Container $container, ?string $tag = null) {
-                return $container->get(CryptoManager::class)->get($tag);
+                return $container->get(CryptoFactory::class)->get($tag);
             }
         );
 
         $container->bindShared(
             HasherInterface::class,
             function (Container $container, ?string $tag = null) {
-                return $container->get(HasherManager::class)->get($tag);
+                return $container->get(HasherFactory::class)->get($tag);
             }
         );
 
         $container->bindShared(
             PasswordHasher::class,
             function (Container $container) {
-                return $container->get(HasherManager::class)->get('password');
+                return $container->get(HasherInterface::class, tag: 'password');
             }
         )
             ->alias(PasswordHasherInterface::class, PasswordHasher::class);

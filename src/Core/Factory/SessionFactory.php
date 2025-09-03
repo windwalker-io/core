@@ -2,40 +2,88 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Core\Manager;
+namespace Windwalker\Core\Factory;
 
+use Closure;
+use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
+use Windwalker\Core\Application\Context\AppContextInterface;
+use Windwalker\Core\Attributes\Ref;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\DI\ServiceFactoryInterface;
+use Windwalker\Core\DI\ServiceFactoryTrait;
+use Windwalker\Core\Events\Web\AfterRequestEvent;
 use Windwalker\Core\Events\Web\AfterRespondEvent;
-use Windwalker\Core\Factory\SessionFactory;
 use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\Session\Bridge\BridgeInterface;
 use Windwalker\Session\Bridge\PhpBridge;
+use Windwalker\Session\Cookie\ArrayCookies;
+use Windwalker\Session\Cookie\Cookies;
 use Windwalker\Session\Session;
 use Windwalker\Session\SessionInterface;
 
 use function Windwalker\chronos;
 
-/**
- * The SessionManager class.
- *
- * @method Session create(?string $name = null, ...$args)
- * @method Session get(?string $name = null, ...$args)
- *
- * @deprecated  Use container tags instead.
- */
 #[Isolation]
-class SessionManager extends SessionFactory
+class SessionFactory implements ServiceFactoryInterface
 {
+    use ServiceFactoryTrait;
+
+    public function getConfigPrefix(): string
+    {
+        return 'session';
+    }
+
+    public static function psrCookies(): callable
+    {
+        return #[Factory] static function (
+            ServerRequestInterface $request,
+            AppContextInterface $app,
+            #[Ref('session.cookie_params')] $params
+        ) {
+            $cookies = new ArrayCookies($request->getCookieParams());
+            $cookies->setOptions($params);
+
+            $app->on(
+                AfterRequestEvent::class,
+                function (AfterRequestEvent $event) use ($cookies) {
+                    $res = $event->response;
+
+                    foreach ($cookies->getCookieHeaders() as $header) {
+                        $res = $res->withAddedHeader('Set-Cookie', $header);
+                    }
+
+                    $event->response = $res;
+                }
+            );
+
+            return $cookies;
+        };
+    }
+
+    public static function nativeCookies(): callable
+    {
+        return #[Factory] static function (
+            ServerRequestInterface $request,
+            AppContextInterface $app,
+            #[Ref('session.cookie_params')] $params
+        ) {
+            $cookies = new Cookies();
+            $cookies->setOptions($params);
+
+            return $cookies;
+        };
+    }
+
     public static function createSession(
         string $bridge,
         string $handler,
         string $cookies,
         array $options = []
-    ): \Closure {
+    ): Closure {
         return #[Factory] static function (Container $container) use ($cookies, $handler, $bridge, $options) {
             $bridge = $container->resolve(
                 'session.factories.bridges.' . $bridge,

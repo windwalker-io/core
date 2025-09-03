@@ -11,6 +11,7 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\CliServer\CliServerClient;
 use Windwalker\Core\CliServer\CliServerStateManager;
+use Windwalker\Core\DI\TaggingFactory;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -18,6 +19,7 @@ use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
+use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\EventEmitter;
@@ -51,6 +53,7 @@ class AppProvider implements ServiceProviderInterface
     {
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
+        $container->prepareObject(TaggingFactory::class);
         $container->share($this->app::class, $this->app)
             ->alias(RootApplicationInterface::class, $this->app::class)
             ->alias(ApplicationInterface::class, $this->app::class)
@@ -66,7 +69,7 @@ class AppProvider implements ServiceProviderInterface
         if ($this->profilerFactory) {
             $container->share(ProfilerFactory::class, $this->profilerFactory);
         } else {
-            $container->prepareSharedObject(ProfilerFactory::class, null, Container::ISOLATION);
+            $container->prepareSharedObject(ProfilerFactory::class, null, new DIOptions(isolation: true));
         }
 
         if ($this->app->getType() === AppType::CLI_WEB) {
@@ -103,9 +106,9 @@ class AppProvider implements ServiceProviderInterface
 
     protected function prepareUtilities(Container $container): void
     {
-        $container->prepareSharedObject(FilterFactory::class, options: Container::ISOLATION);
-        $container->prepareSharedObject(FilterService::class, options: Container::ISOLATION);
-        $container->prepareSharedObject(ScheduleService::class, options: Container::ISOLATION);
+        $container->prepareSharedObject(FilterFactory::class, options: new DIOptions(isolation: true));
+        $container->prepareSharedObject(FilterService::class, options: new DIOptions(isolation: true));
+        $container->prepareSharedObject(ScheduleService::class, options: new DIOptions(isolation: true));
     }
 
     protected function prepareCliWeb(Container $container): void

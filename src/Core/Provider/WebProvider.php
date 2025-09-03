@@ -24,6 +24,7 @@ use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\Container;
+use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Http\Factory\ServerRequestFactory;
@@ -156,7 +157,7 @@ class WebProvider implements ServiceProviderInterface
 
                 return ServerRequestFactory::createFromGlobals();
             },
-            Container::ISOLATION
+            new DIOptions(isolation: true)
         )
             ->alias(ServerRequestInterface::class, ServerRequest::class);
 
@@ -168,14 +169,14 @@ class WebProvider implements ServiceProviderInterface
                     SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
                 );
             },
-            Container::ISOLATION
+            new DIOptions(isolation: true)
         );
 
         // AjaxInspector
         $container->prepareSharedObject(RequestInspector::class);
 
         // Proxy
-        $container->prepareSharedObject(ProxyResolver::class, null, Container::ISOLATION);
+        $container->prepareSharedObject(ProxyResolver::class, null, new DIOptions(isolation: true));
 
         // App Request
         $container->set(
@@ -197,7 +198,7 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(
             CspNonceService::class,
             null,
-            Container::ISOLATION
+            new DIOptions(isolation: true)
         );
     }
 }
