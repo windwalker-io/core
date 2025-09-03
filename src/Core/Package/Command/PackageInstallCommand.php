@@ -115,7 +115,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         // Discover and prepare-install
         $installer = $registry->prepareInstall();
 
-        if (!$packages && !$tags) {
+        if (!$tags) {
             $targets = $this->askForTargets($registry);
         } else {
             $targets = [];
