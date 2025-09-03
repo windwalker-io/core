@@ -259,23 +259,35 @@ trait ApplicationTrait
                 // EventAwareObject name => Array<EventName, [object, __invoke]>
                 $listener[0] = $container->resolve($listener[0]);
                 $this->handleListener($container, $dispatcher, $name, $listener);
-            } elseif ($container->has($name)) {
-                // EventAwareObject name => Array<EventName or int, Listeners>
-                $container->extend($name, function (EventAwareInterface $object) use ($name, $listener, $container) {
+            } else {
+                $extends = function (EventAwareInterface $object) use ($name, $listener, $container) {
                     foreach ($listener as $eventName => $eventListener) {
                         $this->handleListener($container, $object->getEventDispatcher(), $eventName, $eventListener);
                     }
 
                     return $object;
-                });
+                };
+
+                // EventAwareObject name => Array<EventName or int, Listeners>
+                if ($container->has($name)) {
+                    $container->extend($name, $extends);
+                } else {
+                    $container->extendForCreate($name, $extends);
+                }
             }
-        } elseif ($container->has($name)) {
-            // EventAwareObject Array<int, Subscriber>
-            $container->extend($name, function (EventAwareInterface $object) use ($listener, $container) {
+        } else {
+            $extends = function (EventAwareInterface $object) use ($listener, $container) {
                 $object->subscribe($container->resolve($listener));
 
                 return $object;
-            });
+            };
+
+            // EventAwareObject Array<int, Subscriber>
+            if ($container->has($name)) {
+                $container->extend($name, $extends);
+            } else {
+                $container->extendForCreate($name, $extends);
+            }
         }
     }
 
