@@ -15,16 +15,8 @@ use Windwalker\Utilities\Str;
 /**
  * The FileData class.
  */
-class FileData
+class FileGenData extends FileCloneResult
 {
-    protected FileObject $src;
-
-    protected ?FileObject $dest = null;
-
-    protected ?StreamInterface $destStream = null;
-
-    protected string $destFilePath = '';
-
     /**
      * FileData constructor.
      *
@@ -32,7 +24,7 @@ class FileData
      */
     public function __construct(FileObject $src, protected Edge $edge)
     {
-        $this->src = $src;
+        parent::__construct($src);
     }
 
     public function compileContent(array $data = []): static

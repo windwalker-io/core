@@ -74,7 +74,7 @@ class AssetSyncCommand implements CommandInterface
             throw new \RuntimeException('package.json not exists to sync.');
         }
 
-        $io->style()->title('Sync package.json Versions');
+        $io->writeln('Sync package.json Versions');
 
         $packageJson = $packageJsonFile->readAndParse('json');
 
