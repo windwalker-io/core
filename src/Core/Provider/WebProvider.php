@@ -15,6 +15,7 @@ use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Http\BrowserNext;
 use Windwalker\Core\Http\RequestInspector;
 use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Core\Http\AppRequest;
@@ -190,6 +191,10 @@ class WebProvider implements ServiceProviderInterface
         $container->share(
             Browser::class,
             fn(Container $container) => Browser::fromRequest($container->get(ServerRequest::class))
+        );
+        $container->share(
+            BrowserNext::class,
+            fn(Container $container) => BrowserNext::fromRequest($container->get(ServerRequest::class))
         );
     }
 

@@ -9,6 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * The Browser class.
+ *
+ * @deprecated Use {@see BrowserNext} directly.
  */
 class Browser extends Agent
 {
@@ -20,6 +22,6 @@ class Browser extends Agent
             $headers[$header] = implode(', ', (array) $values);
         }
 
-        return new Browser($headers, $request->getHeaderLine('user-agent'));
+        return new static($headers, $request->getHeaderLine('user-agent'));
     }
 }

@@ -12,8 +12,8 @@ use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\Browser;
+use Windwalker\Core\Http\BrowserNext;
 use Windwalker\Core\Http\ProxyResolver;
-use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
 use Windwalker\DI\BootableProviderInterface;
@@ -187,6 +187,10 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
         $container->share(
             Browser::class,
             fn(Container $container) => Browser::fromRequest($container->get(ServerRequest::class))
+        );
+        $container->share(
+            BrowserNext::class,
+            fn(Container $container) => BrowserNext::fromRequest($container->get(ServerRequest::class))
         );
     }
 
