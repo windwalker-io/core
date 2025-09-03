@@ -8,6 +8,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
+use Windwalker\Utilities\Arr;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The GenEnumSubCommand class.
@@ -34,11 +36,27 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
     {
         parent::configure($command);
 
+        // $command->addOption(
+        //     'options',
+        //     'o',
+        //     InputOption::VALUE_OPTIONAL
+        // );
+
         $command->addOption(
-            'options',
-            'o',
-            InputOption::VALUE_OPTIONAL
+            'case',
+            'c',
+            InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+            'Enum cases (can use multiple options or separate by comma). E.g. -c PENDING -c ACTIVE,BLOCKED'
         );
+    }
+
+    public function interact(IOInterface $io): void
+    {
+        if (!$io->getArgument('name')) {
+            $name = $io->ask('Enum name (e.g. Status, UserType, etc): ');
+
+            $io->setArgument('name', $name);
+        }
     }
 
     /**
@@ -59,12 +77,31 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
+        $cases = $io->getOption('case');
+        $cases = Arr::mapWithKeys(
+            $cases,
+            static function ($case) {
+                foreach (explode(',', $case) as $c) {
+                    $c = StrNormalize::toSnakeCase($c);
+                    yield strtoupper($c) => strtolower($c);
+                }
+            }
+        );
+
+        $type = '';
+
+        if ($cases) {
+            $type = ': string';
+        }
+
         $this->codeGenerator->from($this->getViewPath('enum/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
                     'name' => $name,
                     'ns' => $this->getNamespace($io),
+                    'cases' => $cases,
+                    'type' => $type
                 ],
                 $force
             );

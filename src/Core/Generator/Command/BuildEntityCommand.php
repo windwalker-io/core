@@ -247,8 +247,10 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         $this->io->newLine();
         $this->io->style()->title('NEW ENUMS:');
 
-        foreach ($newEnums as $newEnum) {
-            $this->io->writeln("  - <info>$newEnum</info>");
+        foreach ($newEnums as [$newEnum, $cases]) {
+            $this->io->writeln(
+                "  - <info>$newEnum</info>" . ($cases ? " ($cases)" : '')
+            );
         }
 
         $this->io->newLine();
@@ -256,17 +258,20 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
             ?? $this->io->askConfirmation('Do you want to auto generate enums? (Y/n): ', true);
 
         if ($autoGen) {
-            foreach ($newEnums as $newEnum) {
+            foreach ($newEnums as [$newEnum, $cases]) {
                 // Separate namespace and class name
                 $parts = explode('\\', $newEnum);
                 $shortName = array_pop($parts);
                 $namespace = implode('\\', $parts);
 
+                $casesOptions = $cases ? '--case="' . $cases . '"' : '';
+
                 // Create the new enum class
                 $this->app->runProcess(
                     sprintf(
-                        'php windwalker g enum %s --ns="%s"',
+                        'php windwalker g enum %s %s --ns="%s"',
                         $shortName,
+                        $casesOptions,
                         $namespace
                     ),
                     output: $this->io,
