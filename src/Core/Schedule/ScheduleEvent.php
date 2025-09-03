@@ -17,15 +17,15 @@ use function Windwalker\nope;
  */
 class ScheduleEvent
 {
-    public const MINUTE_POSITION = 0;
+    public const int MINUTE_POSITION = 0;
 
-    public const HOUR_POSITION = 1;
+    public const int HOUR_POSITION = 1;
 
-    public const DAY_POSITION = 2;
+    public const int DAY_POSITION = 2;
 
-    public const MONTH_POSITION = 3;
+    public const int MONTH_POSITION = 3;
 
-    public const WEEK_POSITION = 4;
+    public const int WEEK_POSITION = 4;
 
     /**
      * Property handler.
@@ -47,6 +47,8 @@ class ScheduleEvent
      * @var  array
      */
     protected array $tags = [];
+
+    protected \Closure $catch;
 
     /**
      * ScheduleEvent constructor.
@@ -371,5 +373,17 @@ class ScheduleEvent
     public function __toString(): string
     {
         return (string) $this->getExpression();
+    }
+
+    public function getCatch(): ?\Closure
+    {
+        return $this->catch ?? null;
+    }
+
+    public function catch(\Closure $catch): static
+    {
+        $this->catch = $catch;
+
+        return $this;
     }
 }
