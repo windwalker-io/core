@@ -36,7 +36,6 @@
         "composer/semver": "^3.4"
     },
     "require-dev": {
-        "nunomaduro/collision": "^7.8"
     },
     "suggest": {
         "dragonmantank/cron-expression": "Install ^3.1 to support schedule runner.",
