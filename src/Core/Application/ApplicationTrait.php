@@ -186,7 +186,7 @@ trait ApplicationTrait
 
     protected function registerAllConfigs(Container $container): void
     {
-        $container->registerByConfig($this->config('di') ?? [], $providers);
+        $providers = [];
 
         foreach (iterator_to_array($this->config) as $service => $config) {
             if (!is_array($config) || !($config['enabled'] ?? true)) {
@@ -195,6 +195,8 @@ trait ApplicationTrait
 
             $container->registerByConfig($config ?: [], $providers);
         }
+
+        $container->registerByConfig($this->config('di') ?? [], $providers);
 
         foreach ($providers as $provider) {
             if ($provider instanceof BootableDeferredProviderInterface) {
