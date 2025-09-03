@@ -93,16 +93,16 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
     {
         $schedule = $this->scheduleService->getSchedule();
 
-        Logger::info('schedule', 'Run schedule');
+        Logger::info('system/schedule', 'Run schedule');
 
         foreach ($this->getAvailableEvents($schedule, $io) as $event) {
-            Logger::info('schedule', '  [Event] ' . $event->getName());
+            Logger::info('system/schedule', '  [Event] ' . $event->getName());
 
             try {
                 $this->runEvent($event);
             } catch (\Throwable $e) {
                 Logger::error(
-                    'schedule',
+                    'system/schedule',
                     sprintf(
                         "  [Error %s] %s - %s:%s",
                         $e->getCode(),
@@ -111,7 +111,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
                         $e->getCode()
                     )
                 );
-                Logger::error('schedule-error', $e);
+                Logger::error('system/schedule-error', $e);
 
                 if ($catch = $event->getCatch()) {
                     $this->app->call($catch, ['exception' => $e, 'e' => $e, \Throwable::class => $e]);

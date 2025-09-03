@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -113,6 +114,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         $this->on(ConsoleTerminateEvent::class, fn($event) => $this->terminating($container));
 
         $this->booting($container->createChild());
+
+        $this->logger ??= $this->getLogger();
 
         // $container->clearCache();
 
@@ -263,6 +266,36 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         return $this;
     }
 
+    public function doRun(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            $exitCode = parent::doRun($input, $output);
+
+            if ($input instanceof ArgvInput) {
+                $this->log(
+                    'windwalker ' . implode(' ', $input->getRawTokens()),
+                    compact('exitCode'),
+                    level: LogLevel::INFO
+                );
+            }
+
+            return $exitCode;
+        } catch (\Throwable $e) {
+            if ($input instanceof ArgvInput) {
+                $this->log(
+                    'windwalker ' . implode(' ', $input->getRawTokens()),
+                    [
+                        'error' => $e->getMessage(),
+                        'code' => $e->getCode()
+                    ],
+                    level: LogLevel::ERROR
+                );
+            }
+
+            throw $e;
+        }
+    }
+
     /**
      * runCommand
      *
@@ -404,8 +437,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
 
     protected function getLogger(): LoggerInterface
     {
-        if ($this->container->has(LoggerInterface::class, tag: 'console')) {
-            return $this->container->get(LoggerInterface::class, tag: 'console');
+        if ($this->container->has(LoggerInterface::class, tag: 'system/console')) {
+            return $this->container->get(LoggerInterface::class, tag: 'system/console');
         }
 
         return new NullLogger();

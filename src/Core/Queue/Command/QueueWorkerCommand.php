@@ -389,7 +389,7 @@ class QueueWorkerCommand implements CommandInterface
         return new Worker(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
-            logger: $this->app->retrieve(LoggerInterface::class, tag: 'queue')
+            logger: $this->app->retrieve(LoggerInterface::class, tag: 'system/queue')
         );
     }
 
