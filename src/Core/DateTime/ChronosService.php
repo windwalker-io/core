@@ -21,13 +21,13 @@ class ChronosService
 {
     use TranslatorTrait;
 
-    public const UNIT_MINUTE = 'minute';
+    public const string UNIT_MINUTE = 'minute';
 
-    public const UNIT_HOUR = 'hour';
+    public const string UNIT_HOUR = 'hour';
 
-    public const UNIT_DAY = 'day';
+    public const string UNIT_DAY = 'day';
 
-    public const UNIT_WEEK = 'week';
+    public const string UNIT_WEEK = 'week';
 
     /**
      * ChronosService constructor.
@@ -222,6 +222,11 @@ class ChronosService
         $chronos = static::create($date, $tz);
 
         return $this->toLocal($chronos, $to);
+    }
+
+    public function createFromLocal(string $date = 'now', string|DateTimeZone|null $to = null): Chronos
+    {
+        return $this->createLocal($date, to: $to ?? $this->getServerTimezone());
     }
 
     public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
