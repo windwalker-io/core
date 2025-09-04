@@ -12,7 +12,7 @@ Runtime::boot(WINDWALKER_ROOT, __DIR__);
 $file = Runtime::getRootDir() . '/etc/runtime.config.php';
 
 if (!is_file($file)) {
-    $file = Runtime::getRootDir() . '/etc/runtime.config.php';
+    $file = Runtime::getRootDir() . '/etc/runtime.php';
 }
 
 Runtime::loadConfig($file);
