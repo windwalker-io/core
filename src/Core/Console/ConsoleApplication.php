@@ -15,7 +15,9 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -30,12 +32,12 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Command\RunCommand;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
 use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Events\Console\MessageOutputEvent;
-use Windwalker\Core\Manager\LoggerManager;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\ConsoleProvider;
 use Windwalker\Core\Provider\WebProvider;
@@ -60,6 +62,8 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     protected bool $booted = false;
 
     protected ?OutputInterface $output = null;
+
+    protected ?InputInterface $initialInput = null;
 
     public ?WebAppSimulator $webSimulator = null;
 
@@ -236,6 +240,19 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
 
         $this->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output));
         $this->on(ErrorMessageOutputEvent::class, fn(ErrorMessageOutputEvent $event) => $event->writeWith($output));
+
+        $this->on(
+            ConsoleSignalEvent::class,
+            function (ConsoleSignalEvent $event) {
+                $input = $this->initialInput ?? $event->getInput();
+                $signal = $event->getHandlingSignal();
+                $this->logUserCommand(
+                    $input,
+                    false,
+                    compact('signal')
+                );
+            }
+        );
     }
 
     /**
@@ -268,31 +285,70 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
 
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        try {
-            $exitCode = parent::doRun($input, $output);
+        $this->initialInput = $input;
 
-            if ($input instanceof ArgvInput) {
-                $this->log(
-                    'windwalker ' . implode(' ', $input->getRawTokens()),
-                    compact('exitCode'),
-                    level: LogLevel::INFO
-                );
+        try {
+            try {
+                $exitCode = parent::doRun($input, $output);
+            } catch (CommandNotFoundException $e) {
+                if (!$input = $this->fallbackRunInput($input, $output)) {
+                    throw $e;
+                }
+
+                $exitCode = parent::doRun($input, $output);
             }
+
+            $this->logUserCommand($this->initialInput, false, compact('exitCode'));
 
             return $exitCode;
         } catch (\Throwable $e) {
-            if ($input instanceof ArgvInput) {
-                $this->log(
-                    'windwalker ' . implode(' ', $input->getRawTokens()),
-                    [
-                        'error' => $e->getMessage(),
-                        'code' => $e->getCode()
-                    ],
-                    level: LogLevel::ERROR
-                );
-            }
+            $this->logUserCommand($this->initialInput, true, $e);
 
             throw $e;
+        } finally {
+            $this->initialInput = null;
+        }
+    }
+
+    protected function fallbackRunInput(InputInterface $input, OutputInterface $output): ?ArgvInput
+    {
+        if (!$input instanceof ArgvInput) {
+            return null;
+        }
+
+        /** @var CommandWrapper $runCommandWrapper */
+        $runCommandWrapper = $this->get('run');
+        /** @var RunCommand $runCommand */
+        $runCommand = $runCommandWrapper->getHandler();
+        $scripts = array_keys($runCommand->getAvailableScripts());
+
+        $task = $input->getFirstArgument();
+
+        if (!in_array($task, $scripts, true)) {
+            return null;
+        }
+
+        $tokens = $input->getRawTokens();
+        array_unshift($tokens, $this->getAppName(), 'run');
+
+        return new ArgvInput($tokens);
+    }
+
+    protected function logUserCommand(InputInterface|null $input, bool $error, array|\Throwable $context = []): void
+    {
+        if ($input instanceof ArgvInput && $input->getFirstArgument() !== '_completion') {
+            $level = $error ? LogLevel::ERROR : LogLevel::INFO;
+
+            if ($context instanceof \Throwable) {
+                $context = [
+                    'error' => $context->getMessage(),
+                    'code' => $context->getCode(),
+                    'file' => $context->getFile(),
+                    'line' => $context->getLine(),
+                ];
+            }
+
+            $this->log('windwalker ' . $input, $context, level: $level);
         }
     }
 
