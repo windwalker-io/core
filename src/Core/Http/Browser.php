@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * The Browser class.
  *
- * @deprecated Use {@see BrowserNext} directly.
+ * @deprecated The Agent package was deprecated, use {@see BrowserNext} instead.
  */
 class Browser extends Agent
 {

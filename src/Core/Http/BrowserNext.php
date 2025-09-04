@@ -7,8 +7,14 @@ namespace Windwalker\Core\Http;
 use Psr\Http\Message\ServerRequestInterface;
 use WhichBrowser\Parser;
 
+use function Windwalker\tap;
+
 class BrowserNext extends Parser
 {
+    public ?string $userAgent {
+        get => $this->headers['user-agent'] ?? null;
+    }
+
     public static function fromRequest(ServerRequestInterface $request): static
     {
         $headers = [];
@@ -17,24 +23,42 @@ class BrowserNext extends Parser
             $headers[$header] = $request->getHeaderLine($header);
         }
 
-        return new static($request->getHeaderLine('User-Agent'), $headers);
+        return new static($headers, $request->getHeaderLine('User-Agent'));
     }
 
-    public function withParse(string|ServerRequestInterface $userAgent, ?array $headers = null): static
-    {
-        if ($userAgent instanceof ServerRequestInterface) {
-            return static::fromRequest($userAgent);
+    public function with(
+        array|ServerRequestInterface|null $headers = null,
+        ?string $userAgent = null,
+        array $options = []
+    ): static {
+        if ($headers instanceof ServerRequestInterface) {
+            return static::fromRequest($headers);
         }
 
-        return new static($userAgent, $headers ?? $this->headers);
+        $new = clone $this;
+        $headers ??= $this->headers;
+
+        if ($userAgent !== null) {
+            $this->headers['user-agent'] = trim($userAgent);
+        }
+
+        $this->headers = array_change_key_case($headers, CASE_LOWER);
+
+        $new->analyse($this->headers, $options);
+
+        return $new;
     }
 
     public function __construct(
-        public protected(set) string $userAgent,
         public protected(set) array $headers = [],
+        ?string $userAgent = null,
         $options = []
     ) {
-        $this->headers['user-agent'] = $this->userAgent;
+        if ($userAgent !== null) {
+            $this->headers['user-agent'] = trim($userAgent);
+        }
+
+        $this->headers = array_change_key_case($this->headers, CASE_LOWER);
 
         parent::__construct($this->headers, $options);
     }
@@ -46,22 +70,34 @@ class BrowserNext extends Parser
 
     public function osString(): string
     {
+        $hidden = $this->os->hidden;
         $this->os->hidden = false;
 
-        return $this->os->toString();
+        return tap(
+            $this->os->toString(),
+            fn () => $this->os->hidden = $hidden
+        );
     }
 
     public function deviceString(): string
     {
+        $hidden = $this->device->hidden;
         $this->device->hidden = false;
 
-        return $this->device->toString();
+        return tap(
+            $this->device->toString(),
+            fn () => $this->device->hidden = $hidden
+        );
     }
 
     public function browserString(): string
     {
+        $hidden = $this->browser->hidden;
         $this->browser->hidden = false;
 
-        return $this->browser->toString();
+        return tap(
+            $this->browser->toString(),
+            fn () => $this->browser->hidden = $hidden
+        );
     }
 }
