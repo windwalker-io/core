@@ -17,6 +17,7 @@ use Windwalker\Filesystem\Filesystem;
 use Windwalker\Queue\Driver\DatabaseQueueDriver;
 use Windwalker\Queue\Driver\SqsQueueDriver;
 use Windwalker\Queue\Driver\SyncQueueDriver;
+use Windwalker\Queue\Enum\DatabaseIdType;
 use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
@@ -45,6 +46,7 @@ class QueueFactory implements ServiceFactoryInterface
 
     public function create(?string $name = null, ...$args): object
     {
+        /** @var Queue $instance */
         $instance = $this->parentCreate($name, ...$args);
 
         $instance->getObjectBuilder()->setBuilder(
@@ -73,14 +75,15 @@ class QueueFactory implements ServiceFactoryInterface
         DatabaseAdapter $db,
         string $channel,
         string $table,
-        int $timeout = 60
+        int $timeout = 60,
+        DatabaseIdType $idType = DatabaseIdType::INT
     ): \Closure {
         return #[Factory]
-        function (Container $container) use ($db, $channel, $table, $timeout) {
+        function (Container $container) use ($db, $channel, $table, $timeout, $idType) {
             return new Queue(
                 $container->newInstance(
                     DatabaseQueueDriver::class,
-                    compact('db', 'channel', 'table', 'timeout')
+                    compact('db', 'channel', 'table', 'timeout', 'idType')
                 )
             );
         };
