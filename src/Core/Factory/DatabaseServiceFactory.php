@@ -20,6 +20,7 @@ use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\ORM\ORM;
 
 use function Windwalker\DI\create;
+use function Windwalker\value;
 
 #[Isolation]
 class DatabaseServiceFactory implements ServiceFactoryInterface
@@ -125,22 +126,24 @@ class DatabaseServiceFactory implements ServiceFactoryInterface
     {
         return #[Factory] static function (Container $container) use ($instanceName) {
             $factory = $container->newInstance(DatabaseFactory::class);
-            $connConfig = $container->getParam('database.connections.' . $instanceName);
+            $connConfig = $container->parameters->proxy('database.connections.' . $instanceName);
 
             $driverKey = 'database.connection.driver.' . $instanceName;
+
+            $options = value($connConfig->getDeep('options') ?? []);
 
             if ($container->has($driverKey)) {
                 $driver = $container->get($driverKey);
 
                 return $factory->create(
                     $driver,
-                    $connConfig['options'] ?? [],
+                    $options,
                 );
             }
 
             return $factory->create(
-                $connConfig['driver'],
-                $connConfig['options'] ?? [],
+                $connConfig->getDeep('driver'),
+                $options,
             );
         };
     }
