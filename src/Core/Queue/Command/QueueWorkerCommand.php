@@ -6,18 +6,11 @@ namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
@@ -27,17 +20,17 @@ use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
-use Windwalker\Queue\Event\DebugOutputEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
+use Windwalker\Queue\Event\StopEvent;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
-use Windwalker\Queue\Worker;
 use Windwalker\Queue\RunnerOptions;
+use Windwalker\Queue\Worker;
 
 /**
  * The QueueWorkerCommand class.
@@ -47,6 +40,10 @@ use Windwalker\Queue\RunnerOptions;
 )]
 class QueueWorkerCommand implements CommandInterface
 {
+    use QueueCommandTrait;
+
+    protected IOInterface $io;
+
     public function __construct(protected ConsoleApplication $app)
     {
     }
@@ -136,6 +133,29 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         $command->addOption(
+            'max-runs',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max times to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'lifetime',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max seconds to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'stop-when-empty',
+            'e',
+            InputOption::VALUE_NONE,
+            'Stop the worker when no job is remaining.',
+        );
+
+        $command->addOption(
             'file',
             null,
             InputOption::VALUE_REQUIRED,
@@ -156,6 +176,8 @@ class QueueWorkerCommand implements CommandInterface
         if (!class_exists(Worker::class)) {
             throw new DomainException('Please install windwalker/queue first.');
         }
+
+        $this->io = $io;
 
         $channels = $io->getArgument('channels') ?: 'default';
         $options = $this->getWorkOptions($io);
@@ -190,6 +212,14 @@ class QueueWorkerCommand implements CommandInterface
                 $worker->next($channels);
             }
         } else {
+            $io->writeln(
+                sprintf(
+                    "Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
+                    getmypid()
+                )
+            );
+            $this->displayInfo($connection, $channels, $options);
+
             $worker->loop($channels);
         }
 
@@ -206,6 +236,9 @@ class QueueWorkerCommand implements CommandInterface
             sleep: (float) $io->getOption('sleep'),
             tries: (int) $io->getOption('tries'),
             timeout: (int) $io->getOption('timeout'),
+            maxRuns: (int) $io->getOption('max-runs'),
+            lifetime: (int) $io->getOption('lifetime'),
+            stopWhenEmpty: (bool) $io->getOption('stop-when-empty'),
             restartSignal: $this->app->path('@temp') . '/queue/restart',
         );
     }
@@ -372,11 +405,15 @@ class QueueWorkerCommand implements CommandInterface
                     // Stop connections.
                     $this->runEndScripts('loop_end_scripts', $worker, $event, $io, $connection);
                 }
+            )
+            ->on(
+                StopEvent::class,
+                fn(StopEvent $event) => $io->writeln($event->reason)
             );
     }
 
     /**
-     * @param  ?string        $connection
+     * @param  ?string  $connection
      * @param  RunnerOptions  $options
      *
      * @return  Worker
@@ -389,7 +426,7 @@ class QueueWorkerCommand implements CommandInterface
         return new Worker(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
-            logger: $this->app->retrieve(LoggerInterface::class, tag: 'system/queue')
+            logger: $this->logger
         );
     }
 
@@ -422,59 +459,8 @@ class QueueWorkerCommand implements CommandInterface
         }
     }
 
-    /**
-     * @param  IOInterface  $io
-     * @param  Worker       $worker
-     *
-     * @return  void
-     *
-     * @throws DefinitionException
-     */
-    public function prepareDebugServices(IOInterface $io, Worker $worker): void
+    protected function createLogger(): LoggerInterface
     {
-        if ($io->isVerbose()) {
-            $this->app->container->share(IOInterface::class, $io);
-            $this->app->container->share(Output::class, $io->getOutput());
-        } else {
-            $this->app->container->share(
-                IOInterface::class,
-                new IO(
-                    new ArrayInput([]),
-                    new NullOutput(),
-                    new Command()
-                )
-            );
-            $this->app->container->share(Output::class, NullOutput::class);
-        }
-
-        $worker->on(
-            DebugOutputEvent::class,
-            function (DebugOutputEvent $event) use ($io) {
-                $levels = [];
-
-                if ($io->getVerbosity() === OutputInterface::VERBOSITY_NORMAL) {
-                    $levels[] = LogLevel::EMERGENCY;
-                    $levels[] = LogLevel::ALERT;
-                    $levels[] = LogLevel::CRITICAL;
-                    $levels[] = LogLevel::ERROR;
-                } elseif ($io->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $levels[] = LogLevel::WARNING;
-                    $levels[] = LogLevel::NOTICE;
-                    $levels[] = LogLevel::INFO;
-                    $levels[] = LogLevel::DEBUG;
-                }
-
-                if (in_array($event->level, $levels, true)) {
-                    $io->getOutput()->writeln(
-                        sprintf(
-                            '[%s] %s %s',
-                            $event->level,
-                            $event->message,
-                            $event->context ? json_encode($event->context) : ''
-                        )
-                    );
-                }
-            }
-        );
+        return $this->app->service(LoggerInterface::class, tag: 'system/queue');
     }
 }

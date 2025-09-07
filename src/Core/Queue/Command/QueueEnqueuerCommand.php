@@ -8,15 +8,10 @@ use DomainException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
@@ -27,11 +22,11 @@ use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Enqueuer;
 use Windwalker\Queue\Event\AfterEnqueueEvent;
 use Windwalker\Queue\Event\BeforeEnqueueEvent;
-use Windwalker\Queue\Event\DebugOutputEvent;
 use Windwalker\Queue\Event\EnqueueFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
+use Windwalker\Queue\Event\StopEvent;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\RunnerOptions;
 use Windwalker\Queue\Worker;
@@ -44,6 +39,8 @@ use Windwalker\Queue\Worker;
 )]
 class QueueEnqueuerCommand implements CommandInterface
 {
+    use QueueCommandTrait;
+
     protected IOInterface $io;
 
     public function __construct(protected ConsoleApplication $app)
@@ -79,22 +76,6 @@ class QueueEnqueuerCommand implements CommandInterface
             'Only run next job.'
         );
 
-        // $command->addOption(
-        //     'backoff',
-        //     'b',
-        //     InputOption::VALUE_REQUIRED,
-        //     'Delay time for failed job to wait next run.',
-        //     '3'
-        // );
-
-        // $command->addOption(
-        //     'delay',
-        //     'd',
-        //     InputOption::VALUE_REQUIRED,
-        //     'Delay time for failed job to wait next run, the alias of backoff.',
-        //     '3'
-        // );
-
         $command->addOption(
             'force',
             'f',
@@ -118,14 +99,6 @@ class QueueEnqueuerCommand implements CommandInterface
             '1'
         );
 
-        // $command->addOption(
-        //     'tries',
-        //     't',
-        //     InputOption::VALUE_REQUIRED,
-        //     'Number of times to attempt a job if it failed.',
-        //     '5'
-        // );
-
         $command->addOption(
             'timeout',
             null,
@@ -134,12 +107,28 @@ class QueueEnqueuerCommand implements CommandInterface
             '60'
         );
 
-        // $command->addOption(
-        //     'file',
-        //     null,
-        //     InputOption::VALUE_REQUIRED,
-        //     'The job file to run once.',
-        // );
+        $command->addOption(
+            'max-runs',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max times to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'lifetime',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max seconds to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'stop-when-empty',
+            'e',
+            InputOption::VALUE_NONE,
+            'Stop the worker when no job is remaining.',
+        );
     }
 
     /**
@@ -172,15 +161,13 @@ class QueueEnqueuerCommand implements CommandInterface
         $this->listenToRunner($enqueuer, $io, $connection);
 
         // Show enqueuer start information
-        $io->style()->title(sprintf('Enqueuer started.'));
-        $io->writeln('- Connection: ' . $connection);
-        $io->writeln('- Channels: ' . (is_array($channels) ? implode(', ', $channels) : $channels));
-        $io->writeln('- PID: ' . getmypid());
-        $io->writeln('- Memory limit: ' . ($options->memoryLimit ?: 'no limit') . 'MB');
-        $io->writeln('- Sleep: ' . ($options->sleep ?: 'no sleep') . 's');
-        $io->writeln('- Timeout: ' . ($options->timeout ?: 'no timeout') . 's');
-        $io->writeln('- Once: ' . ($options->once ? 'yes' : 'no'));
-        $io->writeln('');
+        $io->writeln(
+            sprintf(
+                "Enqueuer started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
+                getmypid()
+            )
+        );
+        $this->displayInfo($connection, $channels, $options);
 
         if ($io->getOption('once')) {
             $enqueuer->getEventDispatcher()->on(
@@ -210,6 +197,9 @@ class QueueEnqueuerCommand implements CommandInterface
             sleep: (float) $io->getOption('sleep'),
             // tries: (int) $io->getOption('tries'),
             timeout: (int) $io->getOption('timeout'),
+            maxRuns: (int) $io->getOption('max-runs'),
+            lifetime: (int) $io->getOption('lifetime'),
+            stopWhenEmpty: (bool) $io->getOption('stop-when-empty'),
             restartSignal: $this->app->path('@temp') . '/queue/enqueuer-restart',
         );
     }
@@ -324,6 +314,10 @@ class QueueEnqueuerCommand implements CommandInterface
                     // Stop connections.
                     $this->runEndScripts('loop_end_scripts', $enqueuer, $event, $io, $connection);
                 }
+            )
+            ->on(
+                StopEvent::class,
+                fn(StopEvent $event) => $io->writeln($event->reason)
             );
     }
 
@@ -341,7 +335,7 @@ class QueueEnqueuerCommand implements CommandInterface
         return new Enqueuer(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
-            logger: $this->app->retrieve(LoggerInterface::class, tag: 'system/enqueuer')
+            logger: $this->logger
         );
     }
 
@@ -391,76 +385,8 @@ class QueueEnqueuerCommand implements CommandInterface
         }
     }
 
-    /**
-     * @param  IOInterface  $io
-     * @param  Enqueuer     $enqueuer
-     *
-     * @return  void
-     *
-     * @throws DefinitionException
-     */
-    public function prepareDebugServices(IOInterface $io, Enqueuer $enqueuer): void
+    protected function createLogger(): LoggerInterface
     {
-        if ($io->isVerbose()) {
-            $this->app->container->share(IOInterface::class, $io);
-            $this->app->container->share(Output::class, $io->getOutput());
-        } else {
-            $this->app->container->share(
-                IOInterface::class,
-                new IO(
-                    new ArrayInput([]),
-                    new NullOutput(),
-                    new Command()
-                )
-            );
-            $this->app->container->share(Output::class, NullOutput::class);
-        }
-
-        $enqueuer->on(
-            DebugOutputEvent::class,
-            function (DebugOutputEvent $event) use ($io) {
-                if ($this->canShowLog($event->level)) {
-                    $io->getOutput()->writeln(
-                        sprintf(
-                            '[%s] %s %s',
-                            $event->level,
-                            $event->message,
-                            $event->context ? json_encode($event->context) : ''
-                        )
-                    );
-                }
-            }
-        );
-    }
-
-    protected function getAvailableLogLevels(int $verbosity): array
-    {
-        $levels = [];
-
-        if ($verbosity >= OutputInterface::VERBOSITY_NORMAL) {
-            $levels[] = LogLevel::EMERGENCY;
-            $levels[] = LogLevel::ALERT;
-            $levels[] = LogLevel::CRITICAL;
-            $levels[] = LogLevel::ERROR;
-        }
-
-        if ($verbosity >= OutputInterface::VERBOSITY_VERBOSE) {
-            $levels[] = LogLevel::WARNING;
-            $levels[] = LogLevel::NOTICE;
-            $levels[] = LogLevel::INFO;
-        }
-
-        if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            $levels[] = LogLevel::DEBUG;
-        }
-
-        return $levels;
-    }
-
-    protected function canShowLog(string $level, ?int $verbosity = null): bool
-    {
-        $verbosity ??= $this->io->getVerbosity();
-
-        return in_array($level, $this->getAvailableLogLevels($verbosity), true);
+        return $this->app->retrieve(LoggerInterface::class, tag: 'system/enqueuer');
     }
 }

@@ -180,7 +180,7 @@ CNF;
 
         $sql = explode("\n", $sql);
 
-        $tableStriped = DatabaseExportService::stripPrefix($result[0], $db->getDriver()->getOption('prefix'));
+        $tableStriped = DatabaseExportService::stripPrefix($result[0], $db->getDriver()->options->prefix);
 
         $sql[0] = str_replace($result[0], $tableStriped, $sql[0]);
 
