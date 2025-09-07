@@ -54,10 +54,10 @@ class AppProvider implements ServiceProviderInterface
         $container->share(Config::class, $container->getParameters());
         $container->share(Container::class, $container);
         $container->prepareObject(TaggingFactory::class);
-        $container->share($this->app::class, $this->app)
+        $container->share($this->app::class, $this->app, options: new DIOptions(providedIn: AppLayer::APP))
             ->alias(RootApplicationInterface::class, $this->app::class)
-            ->alias(ApplicationInterface::class, $this->app::class)
-            ->providedIn(AppLayer::APP);
+            ->alias(ApplicationInterface::class, $this->app::class);
+        $container->share(AppType::class, $this->app->getType());
 
         if ($parentClass = get_parent_class($this->app)) {
             $container->alias($parentClass, $this->app::class);
@@ -99,9 +99,9 @@ class AppProvider implements ServiceProviderInterface
     {
         $container->share(
             EventDispatcherRegistry::class,
-            fn () => new EventDispatcherRegistry($this->app)
-        )
-            ->providedIn(AppLayer::REQUEST);
+            fn () => new EventDispatcherRegistry($this->app),
+            options: new DIOptions(providedIn: AppLayer::REQUEST)
+        );
     }
 
     protected function prepareUtilities(Container $container): void

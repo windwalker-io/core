@@ -9,7 +9,7 @@ namespace Windwalker\Core\Application;
  */
 class AppLayer
 {
-    public const RUNTIME = 1;
-    public const APP = 2;
-    public const REQUEST = 3;
+    public const int RUNTIME = 1;
+    public const int APP = 2;
+    public const int REQUEST = 3;
 }
