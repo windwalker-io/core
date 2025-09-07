@@ -37,7 +37,7 @@ use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
 use Windwalker\Queue\Worker;
-use Windwalker\Queue\WorkerOptions;
+use Windwalker\Queue\RunnerOptions;
 
 /**
  * The QueueWorkerCommand class.
@@ -187,7 +187,7 @@ class QueueWorkerCommand implements CommandInterface
                 $message = unserialize(file_get_contents($file));
                 $worker->process($message);
             } else {
-                $worker->runNextJob($channels);
+                $worker->next($channels);
             }
         } else {
             $worker->loop($channels);
@@ -196,9 +196,9 @@ class QueueWorkerCommand implements CommandInterface
         return 0;
     }
 
-    protected function getWorkOptions(IOInterface $io): WorkerOptions
+    protected function getWorkOptions(IOInterface $io): RunnerOptions
     {
-        return new WorkerOptions(
+        return new RunnerOptions(
             once: (bool) $io->getOption('once'),
             backoff: (int) ($io->getOption('backoff') ?? $io->getOption('delay')),
             force: (bool) $io->getOption('force'),
@@ -331,7 +331,7 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 LoopStartEvent::class,
                 function (LoopStartEvent $event) {
-                    $worker = $event->worker;
+                    $worker = $event->runner;
 
                     switch ($worker->getState()) {
                         case $worker::STATE_ACTIVE:
@@ -376,15 +376,15 @@ class QueueWorkerCommand implements CommandInterface
     }
 
     /**
-     * @param  ?string  $connection
-     * @param  WorkerOptions  $options
+     * @param  ?string        $connection
+     * @param  RunnerOptions  $options
      *
      * @return  Worker
      *
      * @throws DefinitionNotFoundException
      * @throws DependencyResolutionException
      */
-    protected function createWorker(?string $connection, WorkerOptions $options): Worker
+    protected function createWorker(?string $connection, RunnerOptions $options): Worker
     {
         return new Worker(
             queue: $this->app->retrieve(Queue::class, tag: $connection),

@@ -48,6 +48,7 @@ return [
     'crypt:secret' => \Windwalker\Core\Crypt\Command\CryptSecretCommand::class,
 
     'queue:worker' => \Windwalker\Core\Queue\Command\QueueWorkerCommand::class,
+    'queue:enqueuer' => \Windwalker\Core\Queue\Command\QueueEnqueuerCommand::class,
     'queue:restart' => \Windwalker\Core\Queue\Command\QueueRestartCommand::class,
     'queue:retry' => \Windwalker\Core\Queue\Command\QueueRetryCommand::class,
     'queue:table' => \Windwalker\Core\Queue\Command\QueueTableCommand::class,
