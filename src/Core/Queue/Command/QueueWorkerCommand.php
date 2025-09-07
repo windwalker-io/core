@@ -18,6 +18,7 @@ use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
+use Windwalker\Queue\Enqueuer;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
@@ -150,9 +151,16 @@ class QueueWorkerCommand implements CommandInterface
 
         $command->addOption(
             'stop-when-empty',
-            'e',
+            'E',
             InputOption::VALUE_NONE,
             'Stop the worker when no job is remaining.',
+        );
+
+        $command->addOption(
+            'enqueuer',
+            'e',
+            InputOption::VALUE_NONE,
+            'Also run the enqueuer service in the worker.',
         );
 
         $command->addOption(
@@ -212,6 +220,15 @@ class QueueWorkerCommand implements CommandInterface
                 $worker->next($channels);
             }
         } else {
+            if ($io->getOption('enqueuer')) {
+                $enqueuer = $this->createEnqueuer($connection, $options);
+                $enqueuer->addEventDealer($this->app);
+
+                $this->prepareDebugServices($io, $enqueuer);
+
+                $worker->enqueuer = $enqueuer;
+            }
+
             $io->writeln(
                 sprintf(
                     "Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
@@ -424,6 +441,15 @@ class QueueWorkerCommand implements CommandInterface
     protected function createWorker(?string $connection, RunnerOptions $options): Worker
     {
         return new Worker(
+            queue: $this->app->retrieve(Queue::class, tag: $connection),
+            options: $options,
+            logger: $this->logger
+        );
+    }
+
+    protected function createEnqueuer(?string $connection, RunnerOptions $options): Enqueuer
+    {
+        return new Enqueuer(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
             logger: $this->logger
