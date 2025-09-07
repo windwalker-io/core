@@ -19,9 +19,12 @@ use Windwalker\Database\Event\QueryFailedEvent;
 use Windwalker\Database\Schema\Schema;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Filesystem\Path;
 use Windwalker\Stream\Stream;
 
 use function Windwalker\chronos;
+
+use function Windwalker\depth;
 
 use const Windwalker\Stream\WRITE_ONLY_FROM_END;
 
@@ -33,6 +36,8 @@ class MigrationService implements EventAwareInterface
     use MessageOutputTrait;
 
     protected array $ignoreVersions = [];
+
+    public bool $ignoreErrors = false;
 
     /**
      * MigrationService constructor.
@@ -157,9 +162,19 @@ class MigrationService implements EventAwareInterface
 
         $migration->addEventDealer($this);
 
-        $this->app->call($handler);
+        try {
+            $this->app->call($handler);
 
-        $this->emitMessage('<fg=bright-green>Success</>', true);
+            $this->emitMessage('<fg=bright-green>Success</>', true);
+        } catch (\Throwable $e) {
+            $this->emitMessage('<fg=bright-red>Failed</>', true);
+
+            if (!$this->ignoreErrors) {
+                throw $e;
+            }
+
+            $this->displayIgnoreErrorMessages($e, $migration);
+        }
 
         // $this['log.' . $versionInfo['id']] = [
         //     'id' => $versionInfo['id'],
@@ -417,6 +432,31 @@ class MigrationService implements EventAwareInterface
                 ->truncate();
 
             $this->ignores($ignoreVersions);
+        }
+    }
+
+    protected function displayIgnoreErrorMessages(\Throwable $e, AbstractMigration $migration): void
+    {
+        $this->emitMessage(
+            sprintf(
+                '[IGNORED]: <comment>%s</comment>: %s (%s:%s)',
+                get_class($e),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ),
+            true
+        );
+
+        $traces = $e->getTrace();
+
+        foreach ($traces as $trace) {
+            if (Path::normalize($trace['file']) === Path::normalize($migration->file->getPathname())) {
+                $this->emitMessage(
+                    "  May caused at <comment>{$trace['file']}:{$trace['line']}</comment>",
+                );
+                break;
+            }
         }
     }
 }

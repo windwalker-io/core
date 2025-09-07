@@ -67,6 +67,16 @@ abstract class AbstractMigrationCommand implements CommandInterface
         );
     }
 
+    public function configureRunningOptions(Command $command): void
+    {
+        $command->addOption(
+            'ignore-errors',
+            'e',
+            InputOption::VALUE_NONE,
+            'Ignore errors and continue the process.',
+        );
+    }
+
     protected function preprocess(IOInterface $io, int $options = 0): void
     {
         if (!class_exists(DatabaseAdapter::class)) {

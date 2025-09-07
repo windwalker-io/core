@@ -66,6 +66,7 @@ class ResetCommand extends AbstractMigrationCommand
             'Do not auto create database or schema.',
             false
         );
+        $this->configureRunningOptions($command);
     }
 
     /**
@@ -93,6 +94,7 @@ class ResetCommand extends AbstractMigrationCommand
 
         $migrationService = $this->app->make(MigrationService::class);
         $migrationService->addEventDealer($this->app);
+        $migrationService->ignoreErrors = (bool) $io->getOption('ignore-errors');
 
         $style = $io->style();
         $style->title('Rollback to 0 version...');
