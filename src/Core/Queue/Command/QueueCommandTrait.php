@@ -13,9 +13,22 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
+use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\DI\Exception\DefinitionNotFoundException;
+use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Queue\AbstractRunner;
+use Windwalker\Queue\Enqueuer;
+use Windwalker\Queue\Enqueuer\EnqueuerController;
+use Windwalker\Queue\Event\AfterEnqueueEvent;
+use Windwalker\Queue\Event\BeforeEnqueueEvent;
 use Windwalker\Queue\Event\DebugOutputEvent;
+use Windwalker\Queue\Event\EnqueueFailureEvent;
+use Windwalker\Queue\Event\LoopEndEvent;
+use Windwalker\Queue\Event\LoopFailureEvent;
+use Windwalker\Queue\Event\LoopStartEvent;
+use Windwalker\Queue\Event\StopEvent;
+use Windwalker\Queue\Queue;
 use Windwalker\Queue\RunnerOptions;
 
 trait QueueCommandTrait
@@ -32,17 +45,22 @@ trait QueueCommandTrait
 
         $info1[] = "Connection: <info>{$connection}</info>";
         $info1[] = 'Channels: <info>' . (is_array($channels) ? implode(', ', $channels) : $channels) . '</info>';
-        $info1[] = 'Memory limit: <info>' . ($options->memoryLimit ?: 'no limit') . 'MB</info>';
-        $info1[] = 'Sleep: <info>' . ($options->sleep ?: 'no sleep') . 's</info>';
+        $info1[] = 'Memory limit: <info>' . static::unit($options->memoryLimit, 'MB', 'no limit') . '</info>';
+        $info1[] = 'Sleep: <info>' . static::unit($options->sleep, 's', 'no sleep') . '</info>';
 
-        $info2[] = 'Timeout: <info>' . ($options->timeout ?: 'no timeout') . 's</info>';
-        $info2[] = 'Max runs: <info>' . ($options->maxRuns ?: 'unlimited') . '</info>';
-        $info2[] = 'Max lifetime: <info>' . ($options->lifetime ?: 'unlimited') . 's</info>';
+        $info2[] = 'Timeout: <info>' . static::unit($options->timeout, 's', 'no timeout') . '</info>';
+        $info2[] = 'Max runs: <info>' . static::unit($options->maxRuns, '', 'unlimited') . '</info>';
+        $info2[] = 'Max lifetime: <info>' . static::unit($options->lifetime, 's', 'unlimited') . '</info>';
         $info2[] = 'Stop when empty: ' . ($options->stopWhenEmpty ? '<info>yes</info>' : '<comment>no</comment>');
 
         $style->createTable()
             ->setRows(compact('info1', 'info2'))
             ->render();
+    }
+
+    protected static function unit(int|float $size, string $unit, string $fallback): string
+    {
+        return $size ? $size . $unit : $fallback;
     }
 
     /**

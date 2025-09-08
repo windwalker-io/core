@@ -42,6 +42,7 @@ use Windwalker\Queue\Worker;
 class QueueWorkerCommand implements CommandInterface
 {
     use QueueCommandTrait;
+    use EnqueuerCommandTrait;
 
     protected IOInterface $io;
 
@@ -192,7 +193,7 @@ class QueueWorkerCommand implements CommandInterface
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
         $worker = $this->createWorker($connection, $options);
-        $worker->setInvoker($this->invoke(...));
+        $worker->setInvoker($this->createInvoker());
 
         $this->prepareDebugServices($io, $worker);
 
@@ -221,8 +222,17 @@ class QueueWorkerCommand implements CommandInterface
             }
         } else {
             if ($io->getOption('enqueuer')) {
+                $io->style()->warning(
+                    [
+                        'Running Enqueuer with queue worker.',
+                        'We recommend you to run enqueuer in another process for better performance.',
+                    ]
+                );
+
                 $enqueuer = $this->createEnqueuer($connection, $options);
+                $this->prepareEnqueuer($enqueuer);
                 $enqueuer->addEventDealer($this->app);
+                $this->listenToEnqueuer($enqueuer, $io, $connection);
 
                 $this->prepareDebugServices($io, $enqueuer);
 
@@ -260,9 +270,9 @@ class QueueWorkerCommand implements CommandInterface
         );
     }
 
-    public function invoke(JobController $controller, callable $invokable): mixed
+    public function createInvoker(): \Closure
     {
-        return $this->app->call(
+        return fn (JobController $controller, callable $invokable) => $this->app->call(
             $invokable,
             [
                 'jobController' => $controller,
@@ -441,15 +451,6 @@ class QueueWorkerCommand implements CommandInterface
     protected function createWorker(?string $connection, RunnerOptions $options): Worker
     {
         return new Worker(
-            queue: $this->app->retrieve(Queue::class, tag: $connection),
-            options: $options,
-            logger: $this->logger
-        );
-    }
-
-    protected function createEnqueuer(?string $connection, RunnerOptions $options): Enqueuer
-    {
-        return new Enqueuer(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
             logger: $this->logger
