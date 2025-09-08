@@ -76,6 +76,14 @@ class DbExportCommand implements CommandInterface
             InputOption::VALUE_NONE,
             'Output as gz format.'
         );
+
+        $command->addOption(
+            'keep',
+            'k',
+            InputOption::VALUE_REQUIRED,
+            'Keep x files in the dir.',
+            '7'
+        );
     }
 
     /**
@@ -115,8 +123,11 @@ class DbExportCommand implements CommandInterface
         $databaseExportService = $this->app->make(DatabaseExportService::class);
 
         $compress = (bool) $io->getOption('compress');
+        $keep = $io->getOption('keep');
+
         $options = [
-            'compress' => $compress
+            'compress' => $compress,
+            'keep' => $keep ? (int) $keep : null,
         ];
 
         $dest = $databaseExportService->exportTo($file, $io, $options);

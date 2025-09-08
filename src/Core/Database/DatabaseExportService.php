@@ -80,7 +80,7 @@ class DatabaseExportService
 
         $dest->getParent()->mkdir();
 
-        $this->rotate($dest->getPath());
+        $this->rotate($dest->getPath(), $options['keep'] ?? null);
 
         $exporter = $this->exporterFactory->createExporter($this->db, $this->app);
 
@@ -108,19 +108,18 @@ class DatabaseExportService
     }
 
     /**
-     * rotate
-     *
-     * @param  string  $dir
+     * @param  string    $dir
+     * @param  int|null  $max
      *
      * @since  3.4.2
      */
-    protected function rotate(string $dir): void
+    protected function rotate(string $dir, ?int $max = null): void
     {
         $files = Filesystem::files($dir)->toArray();
 
         rsort($files);
 
-        array_splice($files, 0, ($this->app->config('database.backup.max') ?? 10) - 1);
+        array_splice($files, 0, ($max ?? ($this->app->config('database.backup.max') ?? 10)) - 1);
 
         foreach ($files as $file) {
             Filesystem::delete($file);
