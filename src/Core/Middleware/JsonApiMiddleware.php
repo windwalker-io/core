@@ -127,7 +127,11 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             //         // None
             //     }
             // }
+
+            $data = array_merge($data, $apiException->debugData);
         }
+
+        $data = array_merge($data, $apiException->data);
 
         $message = !$this->app->isDebug() ? $e->getMessage() : sprintf(
             '#%d %s - File: %s (%d)',

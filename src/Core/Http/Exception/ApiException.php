@@ -16,6 +16,10 @@ class ApiException extends \RuntimeException
 
     protected string $errCode = '';
 
+    public array $data = [];
+
+    public array $debugData = [];
+
     public function __construct(
         string $message = '',
         int|string $code = 0,
@@ -175,5 +179,33 @@ class ApiException extends \RuntimeException
     public function getErrCode(): string|int
     {
         return $this->errCode ?: $this->code;
+    }
+
+    public function setData(array $data): static
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function details(...$args): static
+    {
+        $this->data = [...$this->data, ...$args];
+
+        return $this;
+    }
+
+    public function setDebugData(array $debugData): static
+    {
+        $this->debugData = $debugData;
+
+        return $this;
+    }
+
+    public function debugDetails(...$args): static
+    {
+        $this->debugData = [...$this->debugData, ...$args];
+
+        return $this;
     }
 }
