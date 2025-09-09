@@ -305,9 +305,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $type = 'bool';
             $default = TypeCast::try($default, $type);
         } elseif ($dataType === 'binary' && $len === '16') {
-            $type = '?UuidInterface';
-            $default = null;
+            $type = 'UuidInterface';
             $this->addUse(UuidInterface::class);
+
+            $default = Symbol::none();
+
+            if ($dbColumn->getIsNullable()) {
+                $type = '?' . $type;
+                $default = null;
+            }
         } elseif ($enumName = $this->getMatchedEnum($dbColumn)) {
             $type = $enumName;
             $default = Symbol::none();
@@ -538,7 +544,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             $uuidDefault = 'UUID7';
 
-            if ($dbColumn->getColumnDefault() !== null) {
+            if (!$dbColumn->getIsNullable()) {
                 $uuidDefault = 'NIL';
             }
 
