@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Factory;
 
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Transport;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Core\Mailer\Mailer;
@@ -12,6 +14,8 @@ use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\Arr;
+
+use function Symfony\Component\String\s;
 
 #[Isolation]
 class MailerFactory implements ServiceFactoryInterface
@@ -68,7 +72,7 @@ class MailerFactory implements ServiceFactoryInterface
             return new Mailer(
                 $transport,
                 $container,
-                $this->createEnvelope($options['envelope']),
+                static::createEnvelope($options['envelope']),
             );
         };
     }
@@ -78,7 +82,7 @@ class MailerFactory implements ServiceFactoryInterface
         return $this->container->call(static::createMailer($options));
     }
 
-    public function createEnvelope(array $options): ?Envelope
+    public static function createEnvelope(array $options): ?Envelope
     {
         if (!$options['sender']) {
             return null;

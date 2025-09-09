@@ -27,6 +27,8 @@ interface MailerInterface
         ?AbstractPart $body = null
     ): MailMessage;
 
+    public function buildBody(\Closure $handler, ?string $layout = null): string;
+
     /**
      * @param  MailMessage    $message
      * @param  Envelope|null  $envelope
