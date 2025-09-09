@@ -87,6 +87,16 @@ class CoreResponse extends Response
         return new RedirectResponse($uri, $status, $headers);
     }
 
+    public function redirectOutside(
+        string|null|Stringable $uri,
+        int $status = 303,
+        array $headers = []
+    ): RedirectResponse {
+        [, $status, $headers] = $this->prepare($uri, $status, $headers);
+
+        return new OutsideRedirectResponse($uri, $status, $headers);
+    }
+
     public function attachment(mixed $body = null, ?int $status = null, array $headers = []): AttachmentResponse
     {
         [$body, $status, $headers] = $this->prepare($body, $status, $headers);

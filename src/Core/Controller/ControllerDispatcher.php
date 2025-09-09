@@ -8,13 +8,15 @@ use Closure;
 use LogicException;
 use ReflectionAttribute;
 use Windwalker\Attributes\AttributesAccessor;
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\Context\AppContextInterface;
 use Windwalker\Core\Attributes\TaskMapping;
 use Windwalker\Core\Controller\Exception\ControllerDispatchException;
 use Windwalker\Core\Events\Web\AfterControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
+use Windwalker\Core\Http\OutsideRedirectResponse;
+use Windwalker\Core\Router\Navigator;
 use Windwalker\DI\Container;
+use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Utilities\StrNormalize;
 
 /**
@@ -68,12 +70,12 @@ class ControllerDispatcher
                 $controller,
                 [
                     ...$app->getUrlVars(),
-                    ...$args
+                    ...$args,
                 ]
             );
         }
 
-        $response = $controller($app);
+        $response = $this->handleResponse($controller($app), $app);
 
         $event = $app->emit(
             new AfterControllerDispatchEvent(
@@ -149,5 +151,24 @@ class ControllerDispatcher
         );
 
         return $mapping?->processTask($app->getRequestMethod(), $task) ?? $task;
+    }
+
+    /**
+     * @param  mixed  $response
+     * @param  AppContextInterface  $app
+     *
+     * @return  mixed
+     */
+    public function handleResponse(mixed $response, AppContextInterface $app): mixed
+    {
+        if ($response instanceof RedirectResponse && !$response instanceof OutsideRedirectResponse) {
+            $nav = $app->retrieve(Navigator::class);
+
+            $url = $nav->validateRedirectUrl($response->getHeaderLine('Location'));
+
+            $response = $response->withHeader('Location', $url);
+        }
+
+        return $response;
     }
 }
