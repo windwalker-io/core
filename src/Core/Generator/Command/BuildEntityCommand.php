@@ -147,7 +147,6 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         $props = $this->io->getOption('props');
         $methods = $this->io->getOption('methods');
         $hooks = $this->io->getOption('hooks');
-        $options = compact('props', 'methods', 'hooks');
 
         $runDefer = false;
 
@@ -158,6 +157,8 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         } elseif ($props === false && $methods === false && $hooks === false) {
             $props = true;
         }
+
+        $options = compact('props', 'methods', 'hooks');
 
         if ($ns === '*') {
             $ns = 'App\\Entity\\*';
