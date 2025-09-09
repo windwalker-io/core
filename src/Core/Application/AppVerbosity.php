@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
+
 enum AppVerbosity: int
 {
     /**
@@ -31,7 +33,11 @@ enum AppVerbosity: int
     public function message(\Throwable|string $e, string $fallback = 'Something went wrong'): string
     {
         if ($e instanceof \Throwable) {
-            $e = $e->getMessage();
+            if ($e instanceof VerbosityExceptionInterface) {
+                $e = $e->getMessageByVerbosity($this->value);
+            } else {
+                $e = $e->getMessage();
+            }
         }
 
         if ($this === self::HIDDEN) {
