@@ -11,6 +11,7 @@ use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -141,7 +142,7 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         $this->io = $io;
 
         $ns = $io->getArgument('ns');
-        $connection = $io->getOption('connection');
+        $connection = $io->getOption('connection') ?: null;
 
         if (str_contains($ns, '*')) {
             $ns = Str::removeRight($ns, '\\*');
@@ -166,12 +167,47 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
 
         $classes = [$ns];
 
-        $this->handleClasses($classes, $connection);
+        $props = $this->io->getOption('props');
+        $methods = $this->io->getOption('methods');
+        $hooks = $this->io->getOption('hooks');
+
+        $runDefer = false;
+
+        if ($props === true && ($methods === true || $hooks === true)) {
+            $runDefer = true;
+            $methods = false;
+            $hooks = false;
+        } elseif ($props === false && $methods === false && $hooks === false) {
+            $props = true;
+        }
+
+        $this->handleClasses($classes, $connection, compact('props', 'methods', 'hooks'));
+
+        if ($runDefer) {
+
+            $command = [
+                'build:entity',
+                $io->getArgument('ns') ?: '',
+                ($pkg = $io->getOption('pkg')) ? "--pkg=$pkg" : '',
+                $connection ? "--connection=$connection" : '',
+                ($methods = $io->getOption('methods')) ? "--methods" : '',
+                ($hooks = $io->getOption('hooks')) ? "--hooks" : '',
+                $io->getOption('dry-run') ? '--dry-run' : '',
+            ];
+
+            $process = $this->app->runProcess(
+                '@php windwalker ' . implode(' ', $command),
+                null,
+                $io->getOutput()
+            );
+
+            return $process->getExitCode();
+        }
 
         return 0;
     }
 
-    protected function handleClasses(iterable $classes, ?string $connection): void
+    protected function handleClasses(iterable $classes, ?string $connection, array $options = []): void
     {
         $orm = $this->databaseManager->get($connection)->orm();
 
@@ -185,18 +221,10 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
             $this->io->newLine();
             $this->io->writeln("Handling: <info>$class</info>");
 
-            $props = $this->io->getOption('props');
-            $methods = $this->io->getOption('methods');
-            $hooks = $this->io->getOption('hooks');
-
-            if ($props === false && $methods === false && $hooks === false) {
-                $props = true;
-            }
-
             $builder = new EntityMemberBuilder($meta = $orm->getEntityMetadata($class));
             $builder->addEventDealer($this->app);
             $newCode = $builder->process(
-                compact('props', 'methods', 'hooks'),
+                $options,
                 $added
             );
 

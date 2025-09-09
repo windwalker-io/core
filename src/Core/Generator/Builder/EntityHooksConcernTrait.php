@@ -292,14 +292,22 @@ trait EntityHooksConcernTrait
     ): Node\PropertyHook {
         $factory = $this->createNodeFactory();
 
+        $type = 'UuidInterface|string';
+        $funcName = 'to_uuid';
+
+        if ($column->getIsNullable()) {
+            $type .= '|null';
+            $funcName = 'try_uuid';
+        }
+
         $this->addUse(UuidInterface::class);
-        $this->addFunctionUse('Windwalker\\try_uuid');
+        $this->addFunctionUse('Windwalker\\' . $funcName);
 
         return $this->createHookAssignValue(
             $propName,
-            new Node\Identifier('UuidInterface|string|null'),
+            new Node\Identifier($type),
             $factory->funcCall(
-                'try_uuid',
+                $funcName,
                 [
                     new Node\Expr\Variable('value'),
                 ]
