@@ -107,7 +107,7 @@ namespace Windwalker {
          *
          * @return Chronos
          */
-        function chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): Chronos
+        function chronos(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
         {
             return Chronos::wrap($date, $tz);
         }

@@ -8,6 +8,8 @@ use Cron\CronExpression;
 use DateTimeInterface;
 use DateTimeZone;
 
+use Windwalker\Core\DateTime\Clock;
+
 use function Windwalker\nope;
 
 /**
@@ -67,7 +69,7 @@ class ScheduleEvent extends ScheduleExpression
     /**
      * isDue
      *
-     * @param  DateTimeInterface|string  $currentTime
+     * @param  mixed|null                $clock
      * @param  DateTimeZone|string|null  $timeZone
      *
      * @return  bool
@@ -75,14 +77,16 @@ class ScheduleEvent extends ScheduleExpression
      * @since  3.5.3
      */
     public function isDue(
-        DateTimeInterface|string $currentTime = 'now',
+        mixed $clock = null,
         DateTimeZone|string|null $timeZone = null
     ): bool {
+        $clock = Clock::from($clock);
+
         if ($timeZone instanceof DateTimeZone) {
             $timeZone = $timeZone->getName();
         }
 
-        return $this->expression->isDue($currentTime, $timeZone);
+        return $this->expression->isDue($clock->now(), $timeZone);
     }
 
     /**

@@ -10,6 +10,7 @@ use DateTimeZone;
 use DomainException;
 use Exception;
 use InvalidArgumentException;
+use Psr\Clock\ClockInterface;
 use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
@@ -215,7 +216,7 @@ class ChronosService
     }
 
     public function createLocal(
-        string $date = 'now',
+        mixed $date = null,
         string|DateTimeZone|null $tz = null,
         string|DateTimeZone|null $to = null
     ): Chronos {
@@ -224,14 +225,14 @@ class ChronosService
         return $this->toLocal($chronos, $to);
     }
 
-    public function createFromLocal(string $date = 'now', string|DateTimeZone|null $to = null): Chronos
+    public function createFromLocal(mixed $date = null, string|DateTimeZone|null $to = null): Chronos
     {
         return $this->createLocal($date, to: $to ?? $this->getServerTimezone());
     }
 
     public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
-        return $this->createLocal('now', $tz)->format($format);
+        return $this->createLocal(null, $tz)->format($format);
     }
 
     /**
@@ -261,7 +262,7 @@ class ChronosService
      */
     public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
-        return static::create('now', $tz)->format($format);
+        return static::create(null, $tz)->format($format);
     }
 
     /**
@@ -275,7 +276,7 @@ class ChronosService
      * @throws Exception
      * @since   2.1
      */
-    public static function create(string $date = 'now', string|DateTimeZone|null $tz = null): Chronos
+    public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
     {
         return Chronos::create($date, $tz);
     }
@@ -298,7 +299,7 @@ class ChronosService
         return Chronos::createFromFormat($format, $time, $timezone);
     }
 
-    public function relative(mixed $date, ?string $unit = null, mixed $current = 'now', ?string $format = null): string
+    public function relative(mixed $date, ?string $unit = null, mixed $current = null, ?string $format = null): string
     {
         $date = Chronos::wrap($date);
         $current = Chronos::wrap($current);
@@ -339,5 +340,10 @@ class ChronosService
         }
 
         return $date->format($format ?? Chronos::FORMAT_YMD_HIS);
+    }
+
+    public static function setClock(ClockInterface|\DateTimeInterface|string|int|float|null $clock): void
+    {
+        Clock::set($clock);
     }
 }

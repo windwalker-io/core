@@ -64,7 +64,14 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
             'time',
             null,
             InputOption::VALUE_REQUIRED,
-            'Simulate a date time.'
+            'Deprecated, use clock instead.'
+        );
+
+        $command->addOption(
+            'clock',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Current clock.'
         );
 
         $command->addOption(
@@ -142,7 +149,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
             $events = $schedule->getEvents($tags);
         } else {
             $tz = $io->getOption('tz');
-            $time = $io->getOption('time') ?: 'now';
+            $time = $io->getOption('time') ? $io->getOption('clock') : 'now';
 
             $events = $schedule->getDueEvents($tags, $time, $tz);
         }

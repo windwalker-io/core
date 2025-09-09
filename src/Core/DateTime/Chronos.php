@@ -11,6 +11,7 @@ use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 use JsonSerializable;
+use Psr\Clock\ClockInterface;
 
 /**
  * The Chronos class.
@@ -30,11 +31,11 @@ use JsonSerializable;
  */
 class Chronos extends DateTimeImmutable implements JsonSerializable
 {
-    public const FORMAT_YMD = 'Y-m-d';
+    public const string FORMAT_YMD = 'Y-m-d';
 
-    public const FORMAT_YMD_HI = 'Y-m-d H:i';
+    public const string FORMAT_YMD_HI = 'Y-m-d H:i';
 
-    public const FORMAT_YMD_HIS = 'Y-m-d H:i:s';
+    public const string FORMAT_YMD_HIS = 'Y-m-d H:i:s';
 
     /**
      * The format string to be applied when using the __toString() magic method.
@@ -53,7 +54,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @throws Exception
      * @since  3.5.19
      */
-    public static function wrap(mixed $date = 'now', string|DateTimeZone|null $tz = null): static
+    public static function wrap(mixed $date = null, string|DateTimeZone|null $tz = null): static
     {
         if ($date instanceof static) {
             return $date;
@@ -74,7 +75,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @deprecated  Use tryWrap() instead.
      */
-    public static function wrapOrNull(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?static
+    public static function wrapOrNull(mixed $date = null, string|DateTimeZone|null $tz = null): ?static
     {
         return static::tryWrap($date, $tz);
     }
@@ -98,14 +99,23 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @throws Exception
      * @since   2.1
      */
-    public function __construct(mixed $date = 'now', string|DateTimeZone|null $tz = null)
+    public function __construct(mixed $date = null, string|DateTimeZone|null $tz = null)
     {
+        if ($date instanceof ClockInterface) {
+            $date = $date->now();
+        }
+
+        if ($date === null) {
+            $date = Clock::now();
+        }
+
         $tz = static::wrapTimezoneObject($tz);
 
         // If the date is numeric assume a unix timestamp and convert it.
         $date = is_numeric($date) ? date('c', (int) $date) : $date;
 
         if ($date instanceof DateTimeInterface) {
+            $tz ??= $date->getTimezone();
             $date = $date->format('Y-m-d H:i:s.u');
         }
 
@@ -150,10 +160,18 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  string
      * @throws Exception
+     *
+     * @deprecated  Use Clock::now()->format() instead.
      */
+    #[\Deprecated(message: 'Use Clock::now()->format() instead.', since: '4.2')]
     public static function now(string $format = self::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
-        return (new static('now', $tz))->format($format, $tz);
+        return Clock::now()->format($format, $tz);
+    }
+
+    public static function clockNow(): Chronos
+    {
+        return Clock::now();
     }
 
     /**
@@ -167,7 +185,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @throws Exception
      * @since   2.1
      */
-    public static function create(mixed $date = 'now', string|DateTimeZone|null $tz = null): static
+    public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): static
     {
         return new static($date, $tz);
     }
@@ -544,6 +562,16 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         }
 
         return (float) $this->format('U.u');
+    }
+
+    public static function setClock(ClockInterface|\DateTimeInterface|string|int|float|null $clock): void
+    {
+        Clock::set($clock);
+    }
+
+    public static function fromClock(ClockInterface $clock, DateTimeZone|string|null $tz = null): static
+    {
+        return new static($clock, $tz);
     }
 
     public function jsonSerialize(): string

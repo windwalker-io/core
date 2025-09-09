@@ -11,6 +11,7 @@ use DateTimeZone;
 use DomainException;
 use Generator;
 use ReflectionException;
+use Windwalker\Core\DateTime\Clock;
 use Windwalker\DI\Exception\DependencyResolutionException;
 
 /**
@@ -71,20 +72,22 @@ class Schedule
      * getDueEvents
      *
      * @param  array                     $tags
-     * @param  string|DateTimeInterface  $currentTime
+     * @param  mixed                     $clock
      * @param  DateTimeZone|string|null  $timezone
      *
-     * @return  ScheduleEvent[]|Generator
+     * @return  Generator<ScheduleEvent>
      *
      * @since  3.5.3
      */
     public function getDueEvents(
         array $tags = [],
-        DateTimeInterface|string $currentTime = 'now',
+        mixed $clock = null,
         DateTimeZone|string|null $timezone = null
     ): Generator {
+        $clock = Clock::from($clock);
+
         foreach ($this->getEvents($tags) as $name => $event) {
-            if ($event->isDue($currentTime, $timezone)) {
+            if ($event->isDue($clock, $timezone)) {
                 yield $name => $event;
             }
         }
