@@ -144,32 +144,10 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         $ns = $io->getArgument('ns');
         $connection = $io->getOption('connection') ?: null;
 
-        if (str_contains($ns, '*')) {
-            $ns = Str::removeRight($ns, '\\*');
-            $ns = StrNormalize::toClassNamespace($ns);
-            $classes = $this->classFinder->findClasses($ns);
-            $this->handleClasses($classes, $connection);
-
-            return 0;
-        }
-
-        if (!class_exists($ns)) {
-            $baseNs = $this->getPackageNamespace($io, 'Entity') ?? 'App\\Entity\\';
-            $ns = $baseNs . $ns;
-        }
-
-        if (!class_exists($ns)) {
-            $classes = $this->classFinder->findClasses($ns);
-            $this->handleClasses($classes, $connection);
-
-            return 0;
-        }
-
-        $classes = [$ns];
-
         $props = $this->io->getOption('props');
         $methods = $this->io->getOption('methods');
         $hooks = $this->io->getOption('hooks');
+        $options = compact('props', 'methods', 'hooks');
 
         $runDefer = false;
 
@@ -181,17 +159,43 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
             $props = true;
         }
 
-        $this->handleClasses($classes, $connection, compact('props', 'methods', 'hooks'));
+        if ($ns === '*') {
+            $ns = 'App\\Entity\\*';
+        }
+
+        if (str_contains($ns, '*')) {
+            $ns = Str::removeRight($ns, '\\*');
+            $ns = StrNormalize::toClassNamespace($ns);
+            $classes = $this->classFinder->findClasses($ns);
+            $this->handleClasses($classes, $connection, $options);
+
+            return 0;
+        }
+
+        if (!class_exists($ns)) {
+            $baseNs = $this->getPackageNamespace($io, 'Entity') ?? 'App\\Entity\\';
+            $ns = $baseNs . $ns;
+        }
+
+        if (!class_exists($ns)) {
+            $classes = $this->classFinder->findClasses($ns);
+            $this->handleClasses($classes, $connection, $options);
+
+            return 0;
+        }
+
+        $classes = [$ns];
+
+        $this->handleClasses($classes, $connection, $options);
 
         if ($runDefer) {
-
             $command = [
                 'build:entity',
                 $io->getArgument('ns') ?: '',
                 ($pkg = $io->getOption('pkg')) ? "--pkg=$pkg" : '',
                 $connection ? "--connection=$connection" : '',
-                ($methods = $io->getOption('methods')) ? "--methods" : '',
-                ($hooks = $io->getOption('hooks')) ? "--hooks" : '',
+                $io->getOption('methods') ? "--methods" : '',
+                $io->getOption('hooks') ? "--hooks" : '',
                 $io->getOption('dry-run') ? '--dry-run' : '',
             ];
 
