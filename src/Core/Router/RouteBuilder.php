@@ -38,6 +38,17 @@ class RouteBuilder
         return $this->compileUri($variant, $vars);
     }
 
+    public function buildUri(string $pattern, array $vars): string
+    {
+        [$uri, $vars] = $this->build($pattern, $vars);
+
+        if ($vars !== []) {
+            $uri .= '?' . http_build_query($vars);
+        }
+
+        return $uri;
+    }
+
     /**
      * findVariant
      *
@@ -69,7 +80,7 @@ class RouteBuilder
      * @param  array  $variant
      * @param  array  $vars
      *
-     * @return  array
+     * @return  array{ string, array }
      */
     protected function compileUri(array $variant, array $vars): array
     {
@@ -91,10 +102,6 @@ class RouteBuilder
         }
 
         $pattern = implode('', $segments);
-
-        if ($vars !== []) {
-            $pattern .= '?' . http_build_query($vars);
-        }
 
         // Remove start slash to make this uri relative.
         return [ltrim($pattern, '/'), $vars];
