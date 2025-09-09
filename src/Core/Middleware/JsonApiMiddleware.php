@@ -133,13 +133,17 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 
         $data = array_merge($data, $apiException->data);
 
-        $message = !$this->app->isDebug() ? $e->getMessage() : sprintf(
-            '#%d %s - File: %s (%d)',
-            $apiException->getErrCode() ?: $e->getCode(),
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
+        $verbosity = $this->app->getVerbosity();
+
+        $message = !$verbosity->isVerbose()
+            ? $verbosity->message($e)
+            : sprintf(
+                '#%d %s - File: %s (%d)',
+                $apiException->getErrCode() ?: $e->getCode(),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
 
         $buffer = new JsonBuffer($message, $data, false, $apiException->getErrCode());
         $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());

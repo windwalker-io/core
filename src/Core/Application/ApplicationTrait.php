@@ -133,6 +133,22 @@ trait ApplicationTrait
         return (string) $this->config('app.mode');
     }
 
+    public function getVerbosity(): AppVerbosity
+    {
+        $verbosity = $this->config('app.verbosity');
+
+        if ($verbosity === null || $verbosity === '') {
+            return $this->isDebug() ? AppVerbosity::VERBOSE : AppVerbosity::NORMAL;
+        }
+
+        return AppVerbosity::tryFrom((int) $verbosity) ?? AppVerbosity::NORMAL;
+    }
+
+    public function isVerbose(): bool
+    {
+        return $this->getVerbosity() >= 1;
+    }
+
     public function getSecret(): string
     {
         return (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
