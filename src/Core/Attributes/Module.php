@@ -11,6 +11,8 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
 
 /**
  * The Module class.
+ *
+ * @deprecated  No replacement.
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 class Module implements ContainerAttributeInterface
@@ -25,7 +27,7 @@ class Module implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         return function (...$args) use ($handler) {
-            $container = $handler->getContainer();
+            $container = $handler->container;
 
             if ($this->config) {
                 $container->registerByConfig($this->config);

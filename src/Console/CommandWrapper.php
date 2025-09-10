@@ -145,7 +145,7 @@ class CommandWrapper extends Command implements
      */
     public function __invoke(AttributeHandler $handler): callable
     {
-        $container = $handler->getContainer();
+        $container = $handler->container;
 
         return function (array $args, DIOptions $options) use ($handler, $container) {
             if (isset($args['name'])) {

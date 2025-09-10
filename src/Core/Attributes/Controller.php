@@ -38,7 +38,7 @@ class Controller implements ContainerAttributeInterface
      */
     public function __invoke(AttributeHandler $handler): callable
     {
-        $container = $handler->getContainer();
+        $container = $handler->container;
 
         if ($this->config) {
             $config = $this->config;

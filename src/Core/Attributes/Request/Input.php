@@ -29,7 +29,7 @@ class Input implements ContainerAttributeInterface
             $default = $this->default ?? ($isOptional ? $ref->getDefaultValue() : null);
 
             $value = $handler()
-                ?? $this->getValueFromRequest($handler->getContainer()->get(AppRequestInterface::class), $field)
+                ?? $this->getValueFromRequest($handler->container->get(AppRequestInterface::class), $field)
                 ?? $default;
 
             if ($value === null && !$isOptional && !$ref->allowsNull()) {

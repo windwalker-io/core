@@ -29,7 +29,7 @@ class Method implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         return function (...$args) use ($handler) {
-            $container = $handler->getContainer();
+            $container = $handler->container;
             $request = $container->get(AppRequest::class);
 
             $method = strtoupper($request->getMethod());

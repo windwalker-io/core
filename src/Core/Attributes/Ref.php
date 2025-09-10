@@ -29,7 +29,7 @@ class Ref implements ContainerAttributeInterface
 
     public function __invoke(AttributeHandler $handler): callable
     {
-        $container = $handler->getContainer();
+        $container = $handler->container;
         $ref = $handler->reflector;
         $v = ref($this->path, $this->delimiter);
 

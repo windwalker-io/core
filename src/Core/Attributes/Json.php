@@ -18,7 +18,7 @@ class Json implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         return static function (...$args) use ($handler) {
-            $container = $handler->getContainer();
+            $container = $handler->container;
 
             return $container->newInstance(JsonResponseMiddleware::class)->run(fn() => $handler(...$args));
         };
