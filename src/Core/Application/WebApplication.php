@@ -386,7 +386,7 @@ class WebApplication implements WebRootApplicationInterface
                 throw $e;
             }
 
-            $app->addMessage($this->getVerbosity()->message($e), 'warning');
+            $app->addMessage($this->getVerbosity()->displayMessage($e), 'warning');
             $nav = $app->service(Navigator::class);
 
             return $this->redirect($nav->back());
@@ -402,7 +402,7 @@ class WebApplication implements WebRootApplicationInterface
 
             $this->logError($e);
 
-            $app->addMessage($this->getVerbosity()->message($e), 'warning');
+            $app->addMessage($this->getVerbosity()->displayMessage($e), 'warning');
             $nav = $app->service(Navigator::class);
 
             return $this->redirect($nav->back());

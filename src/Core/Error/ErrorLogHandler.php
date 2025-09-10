@@ -7,6 +7,7 @@ namespace Windwalker\Core\Error;
 use Exception;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Throwable;
+use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
@@ -22,30 +23,19 @@ class ErrorLogHandler implements ErrorHandlerInterface
     use OptionsResolverTrait;
 
     /**
-     * @var LoggerService
-     */
-    protected LoggerService $logger;
-
-    /**
-     * @var Config
-     */
-    protected Config $config;
-
-    /**
      * ErrorLogHandler constructor.
      *
      * @param  LoggerService  $logger
      * @param  Config         $config
+     * @param  AppVerbosity   $verbosity
      * @param  array          $options
      */
     public function __construct(
-        LoggerService $logger,
-        Config $config,
+        protected LoggerService $logger,
+        protected Config $config,
+        protected AppVerbosity $verbosity,
         array $options = []
     ) {
-        $this->logger = $logger;
-        $this->config = $config;
-
         $this->resolveOptions($options, [$this, 'configureOptions']);
     }
 
@@ -82,6 +72,8 @@ class ErrorLogHandler implements ErrorHandlerInterface
         if (
             $code < 400 || $code >= 500 || !$ignore40x
         ) {
+            $message = $this->verbosity->debugMessage($e);
+
             if ($this->options['channel']) {
                 $context = [];
 
@@ -91,13 +83,13 @@ class ErrorLogHandler implements ErrorHandlerInterface
 
                 $this->logger->error(
                     $this->options['channel'],
-                    $e->getMessage(),
+                    $message,
                     $context
                 );
             }
 
             if ($this->options['print']) {
-                echo $e->getMessage();
+                echo $message;
             }
         }
     }

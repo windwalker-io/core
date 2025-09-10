@@ -7,6 +7,8 @@ namespace Windwalker\Core\Provider;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\DI\TaggingFactory;
+use Windwalker\Core\Error\ErrorHandlerInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\BootableProviderInterface;
@@ -112,6 +114,13 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
 
                 return $error;
             },
+            new DIOptions(isolation: true)
+        );
+        $container->bind(
+            ErrorHandlerInterface::class,
+            fn (TaggingFactory $factory, ?string $tag) => $factory->useConfig('error')
+                ->id('handlers')
+                ->get($tag),
             new DIOptions(isolation: true)
         );
     }

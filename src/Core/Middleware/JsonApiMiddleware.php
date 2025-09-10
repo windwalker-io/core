@@ -92,6 +92,8 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $apiException = ApiException::wrap($e);
         $e = $apiException->getPrevious() ?? $apiException;
 
+        $this->logError($e);
+
         $data = [];
         $backtraces = null;
 
@@ -136,7 +138,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $verbosity = $this->app->getVerbosity();
 
         $message = !$verbosity->isVerbose()
-            ? $verbosity->message($e)
+            ? $verbosity->displayMessage($e)
             : sprintf(
                 '#%d %s - File: %s (%d)',
                 $apiException->getErrCode() ?: $e->getCode(),

@@ -136,7 +136,13 @@ trait ApplicationTrait
             return $this->isDebug() ? AppVerbosity::VERBOSE : AppVerbosity::NORMAL;
         }
 
-        return AppVerbosity::tryFrom((int) $verbosity) ?? AppVerbosity::NORMAL;
+        $verbosity = AppVerbosity::tryFrom((int) $verbosity) ?? AppVerbosity::NORMAL;
+
+        if ($verbosity->value < AppVerbosity::VERBOSE->value && $this->isDebug()) {
+            $verbosity = AppVerbosity::VERBOSE;
+        }
+
+        return $verbosity;
     }
 
     public function isVerbose(): bool

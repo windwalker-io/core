@@ -31,7 +31,7 @@ enum AppVerbosity: int
         return $this->value >= self::VERBOSE->value;
     }
 
-    public function message(\Throwable|string $e, string $fallback = 'Something went wrong'): string
+    public function displayMessage(\Throwable|string $e, string $fallback = 'Something went wrong'): string
     {
         if ($e instanceof \Throwable) {
             if ($e instanceof VerbosityExceptionInterface) {
@@ -50,6 +50,15 @@ enum AppVerbosity: int
         }
 
         return $fallback;
+    }
+
+    public function debugMessage(\Throwable|string $e): string
+    {
+        if ($e instanceof VerbosityExceptionInterface) {
+            return $e->getMessageByVerbosity($this->value);
+        }
+
+        return $e->getMessage();
     }
 
     public function toLogLevel(): string

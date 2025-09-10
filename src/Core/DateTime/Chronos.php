@@ -107,7 +107,6 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
 
         if ($date === null) {
             $date = Clock::now($tz);
-            show($date);
         }
 
         $tz = static::wrapTimezoneObject($tz);
