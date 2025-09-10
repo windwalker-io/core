@@ -25,6 +25,8 @@ abstract class AbstractMigration
 
     public protected(set) string $name;
 
+    public ?string $hash = null;
+
     public string $fullName {
         get => $this->version . '_' . $this->name;
     }

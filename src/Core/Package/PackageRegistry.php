@@ -19,7 +19,9 @@ class PackageRegistry
 
     public bool $discovered = false;
 
-    protected ?PackageInstaller $installer = null;
+    protected PackageInstaller $installer;
+
+    protected PackageMigrator $migrator;
 
     /**
      * PackageRegistry constructor.
@@ -33,6 +35,11 @@ class PackageRegistry
     public function getInstaller(): PackageInstaller
     {
         return $this->installer ??= new PackageInstaller(null, $this->app);
+    }
+
+    public function getMigrator(): PackageMigrator
+    {
+        return $this->migrator ??= new PackageMigrator(null, $this->app);
     }
 
     public function discover(): void
@@ -90,6 +97,19 @@ class PackageRegistry
         }
 
         return $installer;
+    }
+
+    public function prepareMigrate(): PackageMigrator
+    {
+        $this->discover();
+
+        $migrator = $this->getMigrator();
+
+        foreach ($this->packages as $package) {
+            $package->migrate($migrator->getChild($package::getName()));
+        }
+
+        return $migrator;
     }
 
     public function addPackage(AbstractPackage $package): static

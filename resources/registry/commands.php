@@ -38,6 +38,8 @@ return [
     'asset:version' => \Windwalker\Core\Asset\Command\AssetVersionCommand::class,
 
     'pkg:install' => \Windwalker\Core\Package\Command\PackageInstallCommand::class,
+    'pkg:migrate' => \Windwalker\Core\Package\Command\PackageMigrateCommand::class,
+    'pkg:postinstall' => \Windwalker\Core\Package\Command\PackagePostInstallCommand::class,
 
     'run' => \Windwalker\Core\Command\RunCommand::class,
 

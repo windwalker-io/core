@@ -87,8 +87,12 @@ class PackageInstaller
         );
     }
 
-    public function installFiles(string $path, string $dest, string|array $tags = [], ?callable $callback = null): static
-    {
+    public function installFiles(
+        string $path,
+        string $dest,
+        string|array $tags = [],
+        ?callable $callback = null
+    ): static {
         return $this->installResource(
             'files',
             Filesystem::globAll($path),

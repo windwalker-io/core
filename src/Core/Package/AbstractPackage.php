@@ -23,6 +23,11 @@ abstract class AbstractPackage
 
     abstract public function install(PackageInstaller $installer): void;
 
+    public function migrate(PackageMigrator $migrator): void
+    {
+        //
+    }
+
     public static function getName(): string
     {
         $name = static::$name ?? static::composerJson()['name'] ?? null;
