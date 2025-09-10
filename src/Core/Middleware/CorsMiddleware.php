@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Http\CorsHandler;
 use Windwalker\Core\Manager\Logger;
@@ -29,6 +30,7 @@ class CorsMiddleware implements MiddlewareInterface
         protected string|array|null $allowOrigins = null,
         protected bool $sendInstantly = false,
         protected ?\Closure $configure = null,
+        protected \Closure|LoggerInterface|string|null $logger = null,
         /**
          * @deprecated  Use constructor arguments instead.
          */
@@ -88,8 +90,15 @@ class CorsMiddleware implements MiddlewareInterface
                         $res = $handler->handle($request);
                     }
 
-                    return $cors->handle($res);
+                    $res = $cors->handle($res);
+
+                    $logger = $this->getLogCallback();
+                    $logger('Handling CORS for request', static::getHeaders($res));
+
+                    return $res;
                 } catch (\Throwable $e) {
+                    $logger = $this->getLogCallback();
+                    $logger('Something Error, send CORS instantly: ' . $e->getMessage());
                     $this->sendInstantly($cors);
 
                     throw $e;
@@ -159,10 +168,44 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $response = $cors->getResponse();
 
+        $logger = $this->getLogCallback();
+
         foreach ($response->getHeaders() as $header => $headers) {
             foreach ($headers as $value) {
                 header("$header: $value");
             }
         }
+
+        $logger('Send CORS headers instantly', static::getHeaders($response));
+    }
+
+    protected static function getHeaders(ResponseInterface $response): array
+    {
+        return Arr::mapWithKeys(
+            $response->getHeaders(),
+            static fn ($v, $k) => yield $k => $response->getHeaderLine($k)
+        );
+    }
+
+    public function getLogCallback(): \Closure
+    {
+        if ($this->logger instanceof \Closure) {
+            return $this->logger;
+        }
+
+        if (is_string($this->logger)) {
+            return function ($message, $context = []) {
+                $this->container->get(LoggerInterface::class, tag: $this->logger)
+                    ->debug($message, $context);
+            };
+        }
+
+        if ($this->logger instanceof LoggerInterface) {
+            return function ($message, $context = []) {
+                $this->logger->debug($message, $context);
+            };
+        }
+
+        return fn () => null;
     }
 }
