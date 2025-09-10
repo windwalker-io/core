@@ -34,7 +34,7 @@ class Assert implements ContainerAttributeInterface
                 return $value;
             } catch (ValidateException $e) {
                 $debug = $handler->getContainer()->get(ApplicationInterface::class)->isDebug();
-                $name = $handler->getReflector()->getName();
+                $name = $handler->reflector->getName();
 
                 $message = sprintf("Invalid type of field \"%s\"", $name);
 
