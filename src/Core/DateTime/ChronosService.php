@@ -225,17 +225,12 @@ class ChronosService
         throw new InvalidArgumentException('Invalid operator: ' . $operator);
     }
 
-    /**
-     * This will create server DateTime and convert to local timezone, not local time.
-     *
-     * @deprecated  Use another create*() methods instead.
-     */
     public function createLocal(
         mixed $date = null,
         string|DateTimeZone|null $tz = null,
         string|DateTimeZone|null $to = null
     ): Chronos {
-        return $this->createAs($date, $tz, $to);
+        return $this->createAs($date, $tz ?? $this->getTimezone(), $to);
     }
 
     public function createAsLocal(
