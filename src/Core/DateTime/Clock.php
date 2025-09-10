@@ -10,11 +10,17 @@ class Clock
 {
     protected static ?ClockInterface $clock = null;
 
-    public static function now(): Chronos
+    public static function now(string|\DateTimeZone|null $tz = null): Chronos
     {
         self::$clock ??= new SystemClock();
 
-        return new Chronos(self::$clock->now());
+        $date = new Chronos(self::$clock->now());
+
+        if ($tz !== null) {
+            $date = $date->setTimezone($tz);
+        }
+
+        return $date;
     }
 
     public static function get(): ?ClockInterface
