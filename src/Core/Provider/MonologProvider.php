@@ -30,6 +30,14 @@ class MonologProvider implements ServiceProviderInterface
         //
     }
 
+    /**
+     * @param  string  $channel
+     * @param          ...$args
+     *
+     * @return  ObjectBuilderDefinition
+     *
+     * @deprecated  Use LoggerFactory::rotatingFileHandler() instead
+     */
     public static function rotatingFileHandler(string $channel, ...$args): ObjectBuilderDefinition
     {
         return create(
@@ -39,6 +47,16 @@ class MonologProvider implements ServiceProviderInterface
         );
     }
 
+    /**
+     * @param  string|null  $name
+     * @param  array        $handlers
+     * @param  array        $processors
+     * @param  string       $formatter
+     *
+     * @return  \Closure
+     *
+     * @deprecated  Use LoggerFactory::monolog() instead
+     */
     public static function logger(
         ?string $name = null,
         array $handlers = [],

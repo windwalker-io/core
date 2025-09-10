@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application;
 
+use Psr\Log\LogLevel;
 use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 
 enum AppVerbosity: int
@@ -49,5 +50,15 @@ enum AppVerbosity: int
         }
 
         return $fallback;
+    }
+
+    public function toLogLevel(): string
+    {
+        // Todo: After 5.0, should log info at VERBOSE
+        return match ($this) {
+            self::HIDDEN => LogLevel::ERROR,
+            self::NORMAL => LogLevel::INFO,
+            self::VERBOSE, self::VERY_VERBOSE => LogLevel::DEBUG,
+        };
     }
 }
