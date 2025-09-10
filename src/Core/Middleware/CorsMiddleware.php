@@ -92,13 +92,20 @@ class CorsMiddleware implements MiddlewareInterface
 
                     $res = $cors->handle($res);
 
-                    $logger = $this->getLogCallback();
-                    $logger('Handling CORS for request', static::getHeaders($res));
+                    $log = $this->getLogCallback();
+
+                    if ($log) {
+                        $log('Response CORS: ' . json_encode(static::getHeaders($res), JSON_PRETTY_PRINT));
+                    }
 
                     return $res;
                 } catch (\Throwable $e) {
-                    $logger = $this->getLogCallback();
-                    $logger('Something Error, send CORS instantly: ' . $e->getMessage());
+                    $log = $this->getLogCallback();
+
+                    if ($log) {
+                        $log('Something Error, send CORS instantly: ' . $e->getMessage());
+                    }
+
                     $this->sendInstantly($cors);
 
                     throw $e;
@@ -168,7 +175,7 @@ class CorsMiddleware implements MiddlewareInterface
     {
         $response = $cors->getResponse();
 
-        $logger = $this->getLogCallback();
+        $log = $this->getLogCallback();
 
         foreach ($response->getHeaders() as $header => $headers) {
             foreach ($headers as $value) {
@@ -176,7 +183,7 @@ class CorsMiddleware implements MiddlewareInterface
             }
         }
 
-        $logger('Send CORS headers instantly', static::getHeaders($response));
+        $log && $log('Send CORS headers instantly: ' . json_encode(static::getHeaders($response), JSON_PRETTY_PRINT));
     }
 
     protected static function getHeaders(ResponseInterface $response): array
@@ -187,7 +194,7 @@ class CorsMiddleware implements MiddlewareInterface
         );
     }
 
-    public function getLogCallback(): \Closure
+    protected function getLogCallback(): ?\Closure
     {
         if ($this->logger instanceof \Closure) {
             return $this->logger;
@@ -206,6 +213,6 @@ class CorsMiddleware implements MiddlewareInterface
             };
         }
 
-        return fn () => null;
+        return null;
     }
 }
