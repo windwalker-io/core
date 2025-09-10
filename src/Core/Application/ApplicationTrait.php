@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use Closure;
-use OutOfRangeException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
-use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
-use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Crypt\SecretToolkit;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
@@ -259,8 +254,12 @@ trait ApplicationTrait
             if ($dispatcher instanceof EventListenableInterface) {
                 if ($listener instanceof Closure) {
                     // Closure with ListenTo() attribute
-                    $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
-                    $event->listen(
+                    /** @var ListenTo $event */
+                    $event = new \ReflectionFunction($listener)
+                        ->getAttributes(ListenTo::class, \ReflectionAttribute::IS_INSTANCEOF)[0]
+                        ?->newInstance();
+
+                    $event?->listen(
                         $dispatcher,
                         fn (...$args) => $container->call($listener, $args)
                     );
@@ -294,7 +293,7 @@ trait ApplicationTrait
                 }
             }
         } else {
-            $extends = function (EventAwareInterface $object) use ($listener, $container) {
+            $extends = static function (EventAwareInterface $object) use ($listener, $container) {
                 $object->subscribe($container->resolve($listener));
 
                 return $object;
@@ -310,7 +309,7 @@ trait ApplicationTrait
     }
 
     /**
-     * handleListeners
+     * Handle root listeners.
      *
      * @param  mixed      $listeners
      * @param  Container  $container
@@ -319,8 +318,10 @@ trait ApplicationTrait
      */
     public function handleListeners(mixed $listeners, Container $container): void
     {
+        $dispatcher = $this->getEventDispatcher();
+
         foreach ($listeners as $name => $listener) {
-            $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
+            $this->handleListener($container, $dispatcher, $name, $listener);
         }
     }
 }
