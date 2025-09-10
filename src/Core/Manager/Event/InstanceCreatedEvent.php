@@ -14,6 +14,10 @@ class InstanceCreatedEvent extends BaseEvent
 {
     use AccessorBCTrait;
 
+    public string $tag {
+        get => $this->instanceName;
+    }
+
     public function __construct(
         public object $instance,
         public string $instanceName = '',

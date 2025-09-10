@@ -50,7 +50,7 @@ class Profiler implements \JsonSerializable
             $this->start();
         }
 
-        $event = $this->stopwatch->lap($this->name);
+        $this->currentEvent = $event = $this->stopwatch->lap($this->name);
 
         $periods = $event->getPeriods();
 
@@ -111,9 +111,24 @@ class Profiler implements \JsonSerializable
         return $this->currentEvent?->getEndTime();
     }
 
-    public function getMemory(): ?int
+    public function getMemory(bool $real = false): ?int
     {
-        return $this->currentEvent?->getMemory();
+        $max = 0;
+
+        foreach ($this->items as $item) {
+            $mem = $real ? $item->memory : $item->memoryCurrent;
+
+            if ($mem > $max) {
+                $max = $mem;
+            }
+        }
+
+        return $max;
+    }
+
+    public function getMemoryPeak(bool $real = false): int
+    {
+        return memory_get_peak_usage($real);
     }
 
     public function jsonSerialize(): array

@@ -21,7 +21,7 @@ use Windwalker\Core\Events\Web\AfterRoutingEvent;
 use Windwalker\Core\Events\Web\BeforeAppDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeControllerDispatchEvent;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
-use Windwalker\Core\Manager\DatabaseManager;
+use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Core\Manager\Event\InstanceCreatedEvent;
 use Windwalker\Core\Profiler\Profiler;
 use Windwalker\Core\Profiler\ProfilerFactory;
@@ -29,6 +29,7 @@ use Windwalker\Core\Router\Router;
 use Windwalker\Data\Collection;
 use Windwalker\Data\Format\FormatRegistry;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\Event\FullFetchedEvent;
 use Windwalker\Database\Event\QueryEndEvent;
 use Windwalker\Database\Event\QueryStartEvent;
 use Windwalker\Database\Platform\AbstractPlatform;
@@ -358,22 +359,21 @@ class DebuggerSubscriber
         $app = $container->get(AppContext::class);
 
         $container->extend(
-            DatabaseManager::class,
-            function (DatabaseManager $manager) use ($app, $queue, $collector) {
-                $manager->on(
+            DatabaseServiceFactory::class,
+            function (DatabaseServiceFactory $factory) use ($app, $queue, $collector) {
+                $factory->on(
                     InstanceCreatedEvent::class,
                     function (InstanceCreatedEvent $event) use ($app, $queue, $collector) {
-                        $name = $event->instanceName;
+                        $name = $event->tag;
                         $dbCollector = $collector->proxy('db.queries.' . $name);
-                        $startTime = null;
-                        $memory = null;
+                        $dataSet = new \WeakMap();
 
                         /** @var DatabaseAdapter $db */
                         $db = $event->instance;
 
                         $db->on(
                             QueryStartEvent::class,
-                            function (QueryStartEvent $event) use ($app, &$startTime, &$memory) {
+                            function (QueryStartEvent $event) use ($dataSet, $app) {
                                 if ($this->disableCollection) {
                                     return;
                                 }
@@ -382,21 +382,22 @@ class DebuggerSubscriber
                                     return;
                                 }
 
-                                $startTime = microtime(true);
-                                $memory = memory_get_usage(false);
+                                $dataSet[$event->statement] = [
+                                    'startTime' => microtime(true),
+                                    'startMemory' => memory_get_usage(false),
+                                ];
                             }
                         );
 
                         $db->on(
                             QueryEndEvent::class,
                             function (QueryEndEvent $event) use (
+                                $dataSet,
                                 $app,
                                 $queue,
-                                &$startTime,
                                 $name,
                                 $dbCollector,
-                                &$memory,
-                                $db
+                                $db,
                             ) {
                                 if ($this->disableCollection) {
                                     return;
@@ -410,9 +411,16 @@ class DebuggerSubscriber
                                     return;
                                 }
 
-                                $data['time'] = microtime(true) - $startTime;
-                                $data['memory'] = memory_get_usage(false) - $memory;
+                                if (!isset($dataSet[$event->statement])) {
+                                    return;
+                                }
+
+                                $data = &$dataSet[$event->statement];
+
+                                $data['time'] = microtime(true) - $data['startTime'];
+                                $data['memory'] = memory_get_usage(false) - $data['startMemory'];
                                 $data['count'] = $event->statement->countAffected();
+
                                 $backtrace = debug_backtrace();
 
                                 $queue->push(
@@ -438,14 +446,42 @@ class DebuggerSubscriber
                                         $dbCollector->push($data);
                                     }
                                 );
+                            }
+                        );
 
-                                $startTime = null;
+                        $db->on(
+                            FullFetchedEvent::class,
+                            function (FullFetchedEvent $event) use (
+                                $dataSet,
+                                $app,
+                            ) {
+                                if ($this->disableCollection) {
+                                    return;
+                                }
+
+                                if ($app->isDebugProfilerDisabled()) {
+                                    return;
+                                }
+
+                                if (str_starts_with(strtoupper($event->sql), 'EXPLAIN')) {
+                                    return;
+                                }
+
+                                if (!isset($dataSet[$event->statement])) {
+                                    return;
+                                }
+
+                                $data = &$dataSet[$event->statement];
+
+                                $data['time'] = microtime(true) - $data['startTime'];
+                                $data['memory'] = memory_get_usage(false) - $data['startMemory'];
+                                $data['test'] = 123;
                             }
                         );
                     }
                 );
 
-                return $manager;
+                return $factory;
             }
         );
     }
