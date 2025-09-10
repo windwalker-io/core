@@ -28,35 +28,37 @@ class MailBuilder implements \Stringable
         return $this;
     }
 
-    public function line(string|array|\Stringable|\Closure $elements = '', array $attrs = []): static
+    public function line(string|array|\Stringable|\Closure $elements = '', array|\Closure $attrs = []): static
     {
         $this->blocks[] = $this->addLine($elements, $attrs);
 
         return $this;
     }
 
-    public function lineAlignCenter(string|array|\Stringable|\Closure $elements = '', array $attrs = []): static
-    {
-        $this->blocks[] = $this->addLine($elements, $attrs)->addClass('text-center');
+    public function lineAlignCenter(
+        string|array|\Stringable|\Closure $elements = '',
+        array|\Closure $attrs = []
+    ): static {
+        $this->blocks[] = $this->addLine($elements, $attrs)->addClass('text-center align-center');
 
         return $this;
     }
 
-    public function lineAlignEnd(string|array|\Stringable|\Closure $elements = '', array $attrs = []): static
+    public function lineAlignEnd(string|array|\Stringable|\Closure $elements = '', array|\Closure $attrs = []): static
     {
-        $this->blocks[] = $this->addLine($elements, $attrs)->addClass('text-right');
+        $this->blocks[] = $this->addLine($elements, $attrs)->addClass('text-right align-right');
 
         return $this;
     }
 
-    public function addLine(\Stringable|array|\Closure|string $elements, array $attrs): HTMLElement
+    public function addLine(\Stringable|array|\Closure|string $elements, array|\Closure $attrs): HTMLElement
     {
         if ($this->inline) {
             throw new \LogicException('You cannot add more line in a line.');
         }
 
         if ($elements instanceof \Closure) {
-            $sub = new static(true, $this->markdown);
+            $sub = new static($this->markdown, true);
             $sub = $elements($sub) ?? $sub;
 
             $elements = $sub->blocks;
@@ -107,36 +109,42 @@ class MailBuilder implements \Stringable
         return $this;
     }
 
-    public function button(string|\Stringable $text, string|\Stringable $url, array $attrs = []): static
+    public function button(string|\Stringable $text, string|\Stringable $url, array|\Closure $attrs = []): static
     {
         $this->addButton($text, $url, $attrs);
 
         return $this;
     }
 
-    public function primaryButton(string|\Stringable $text, string|\Stringable $url, array $attrs = []): static
+    public function primaryButton(string|\Stringable $text, string|\Stringable $url, array|\Closure $attrs = []): static
     {
         $this->addButton($text, $url, $attrs)->addClass('btn-primary');
 
         return $this;
     }
 
-    public function secondaryButton(string|\Stringable $text, string|\Stringable $url, array $attrs = []): static
-    {
+    public function secondaryButton(
+        string|\Stringable $text,
+        string|\Stringable $url,
+        array|\Closure $attrs = []
+    ): static {
         $this->addButton($text, $url, $attrs)->addClass('btn-secondary');
 
         return $this;
     }
 
-    public function dangerButton(string|\Stringable $text, string|\Stringable $url, array $attrs = []): static
+    public function dangerButton(string|\Stringable $text, string|\Stringable $url, array|\Closure $attrs = []): static
     {
         $this->addButton($text, $url, $attrs)->addClass('btn-danger');
 
         return $this;
     }
 
-    public function addButton(string|\Stringable $text, string|\Stringable $url, array $attrs = []): HTMLElement
-    {
+    public function addButton(
+        string|\Stringable $text,
+        string|\Stringable $url,
+        array|\Closure $attrs = []
+    ): HTMLElement {
         if (!$this->inline) {
             $button = null;
             $this->line(

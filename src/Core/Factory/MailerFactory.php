@@ -6,16 +6,16 @@ namespace Windwalker\Core\Factory;
 
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Core\Mailer\Mailer;
 use Windwalker\Core\Mailer\MailerInterface;
+use Windwalker\Core\Mailer\MailerOptions;
 use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\Utilities\Arr;
-
-use function Symfony\Component\String\s;
 
 #[Isolation]
 class MailerFactory implements ServiceFactoryInterface
@@ -27,44 +27,23 @@ class MailerFactory implements ServiceFactoryInterface
         return 'mail';
     }
 
-    public static function mailer(array $options = []): \Closure
+    public static function mailer(array|MailerOptions|\Closure $options = []): \Closure
     {
         return #[Factory] function (Container $container) use ($options) {
             if (!class_exists(Transport::class)) {
                 throw new \DomainException('Please install symfony/mailer first.');
             }
 
-            $options = Arr::mergeRecursive(
-                [
-                    'envelope' => [
-                        'sender' => null,
-                        'recipients' => [],
-                    ],
-                    'dsn' => [
-                        'scheme' => '',
-                        'host' => '',
-                        'user' => '',
-                        'password' => '',
-                        'port' => '',
-                        'options' => [],
-                    ],
+            if ($options instanceof \Closure) {
+                $options = $options();
+            }
 
-                    // Auto CC to emails, use (,) separate addresses.
-                    'cc' => '',
+            $options = MailerOptions::wrapWith($options);
+            $dsn = $options->getDsn();
 
-                    // Auto BCC to emails, use (,) separate addresses.
-                    'bcc' => '',
-                ],
-                $options
-            );
-
-            $options['dsn'] = $options['dsn'] ?: 'null://null';
-
-            if (!is_array($options['dsn'])) {
-                $transport = Transport::fromDsn($options['dsn']);
+            if (is_string($dsn)) {
+                $transport = Transport::fromDsn($dsn);
             } else {
-                $dsn = new Dsn(...$options['dsn']);
-
                 $factory = $container->get(Transport::class);
                 $transport = $factory->fromDsnObject($dsn);
             }
@@ -72,7 +51,8 @@ class MailerFactory implements ServiceFactoryInterface
             return new Mailer(
                 $transport,
                 $container,
-                static::createEnvelope($options['envelope']),
+                $options->getEnvelope(),
+                $options,
             );
         };
     }

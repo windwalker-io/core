@@ -11,7 +11,6 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
-use Symfony\Component\Mime\Part\TextPart;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Utilities\Classes\ChainingTrait;
 use Windwalker\Utilities\Str;
@@ -85,8 +84,12 @@ class MailMessage extends Email
         return $this;
     }
 
-    public function buildBody(\Closure $handler, ?string $layout = null): static
+    public function buildBody(\Closure $handler, string|false|null $layout = null): static
     {
+        if (!$this->mailer instanceof BuilderMailerInterface) {
+            return $this;
+        }
+
         $body = $this->mailer->buildBody($handler, $layout);
 
         return $this->html($body);

@@ -27,10 +27,9 @@ use function Windwalker\str;
 /**
  * The Mailer class.
  */
-class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareInterface
+class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMailerInterface, EventAwareInterface
 {
     use CoreEventAwareTrait;
-    use OptionsResolverTrait;
 
     /**
      * Mailer constructor.
@@ -38,35 +37,15 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
      * @param  TransportInterface  $transport
      * @param  Container           $container
      * @param  Envelope|null       $envelop
-     * @param  array               $options
+     * @param  MailerOptions       $options
      */
     public function __construct(
         protected TransportInterface $transport,
         protected Container $container,
         protected ?Envelope $envelop = null,
-        array $options = []
+        public MailerOptions $options = new MailerOptions()
     ) {
-        $this->resolveOptions($options, [$this, 'configureOptions']);
-    }
-
-    public function htmlToTextMessage(string $html): string
-    {
-        return (string) str($html)
-            ->apply(OutputFilter::stripStyle(...))
-            ->apply(OutputFilter::cleanText(...))
-            ->stripHtmlTags('<a>')
-            ->collapseWhitespaces()
-            ->replace('&nbsp;', '');
-    }
-
-    protected function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults(
-            [
-                'cc' => '',
-                'bcc' => '',
-            ]
-        );
+        //
     }
 
     /**
@@ -76,7 +55,7 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
     {
         $envelope ??= $this->envelop;
 
-        // $this->prepareMessage($message, $flags);
+        $this->prepareMessage($message, $flags);
 
         $mailer = $this;
         $event = $this->emit(
@@ -124,8 +103,8 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         }
 
         if ($flags & static::IGNORE_AUTO_CC) {
-            $this->handleAutoCC($message, 'cc');
-            $this->handleAutoCC($message, 'bcc');
+            $this->handleAutoCC($message);
+            $this->handleAutoBcc($message);
         }
 
         if ($message->getTextBody() === null) {
@@ -133,16 +112,21 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         }
     }
 
-    protected function handleAutoCC(MailMessage $message, string $type = 'cc'): void
+    protected function handleAutoCC(MailMessage $message): void
     {
-        $cc = $this->getOption($type);
-
-        if (is_string($cc)) {
-            $cc = Arr::explodeAndClear(',', $cc);
-        }
+        $cc = $this->options->getCcList();
 
         if ($cc !== []) {
             $message->addCc(...$cc);
+        }
+    }
+
+    protected function handleAutoBcc(MailMessage $message): void
+    {
+        $bcc = $this->options->getBccList();
+
+        if ($bcc !== []) {
+            $message->addBcc(...$bcc);
         }
     }
 
@@ -216,6 +200,27 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         return $this->container->newInstance(AssetService::class);
     }
 
+    public function buildBody(\Closure $handler, string|false|null $layout = null): string
+    {
+        $builder = $this->container->newInstance(MailBuilder::class);
+
+        $layout ??= $this->container->getParam('mail.builder.layout') ?? 'mail.mail-layout';
+
+        $body = $this->container->call($handler, ['mailer' => $this, 'builder' => $builder]) ?? $builder;
+
+        if ($layout === false) {
+            return (string) $body;
+        }
+
+        return $this->renderBody(
+            $layout,
+            [
+                'content' => (string) $body,
+                'builder' => $body,
+            ]
+        );
+    }
+
     /**
      * @return TransportInterface
      */
@@ -236,20 +241,13 @@ class Mailer implements MailerInterface, RenderableMailerInterface, EventAwareIn
         return $this;
     }
 
-    public function buildBody(\Closure $handler, ?string $layout = null): string
+    public function htmlToTextMessage(string $html): string
     {
-        $builder = $this->container->newInstance(MailBuilder::class);
-
-        $layout ??= $this->container->getParam('mail.builder.layout') ?? 'mail.mail-layout';
-
-        $body = $this->container->call($handler, ['mailer' => $this, 'builder' => $builder]) ?? $builder;
-
-        return $this->renderBody(
-            $layout,
-            [
-                'content' => (string) $body,
-                'builder' => $body,
-            ]
-        );
+        return (string) str($html)
+            ->apply(OutputFilter::stripStyle(...))
+            ->apply(OutputFilter::cleanText(...))
+            ->stripHtmlTags('<a>')
+            ->collapseWhitespaces()
+            ->replace('&nbsp;', '');
     }
 }
