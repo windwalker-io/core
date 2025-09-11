@@ -50,7 +50,7 @@ class StarterInstaller
             return;
         }
 
-        $file = getcwd() . '/etc/conf/app.php';
+        $file = self::getAppConfigFile();
 
         $content = file_get_contents($file);
         $name = addslashes($name);
@@ -234,7 +234,7 @@ class StarterInstaller
     protected static function getAppName($io): string
     {
         try {
-            $appConfig = include getcwd() . '/etc/conf/app.php';
+            $appConfig = include self::getAppConfigFile();
             $appName = $appConfig['name'] ?? null ?: 'windwalker';
         } catch (\Throwable $e) {
             $io->write('Unable to get app name because: ' . $e->getMessage());
@@ -242,5 +242,19 @@ class StarterInstaller
         }
 
         return strtolower($appName);
+    }
+
+    /**
+     * @return  string
+     */
+    protected static function getAppConfigFile(): string
+    {
+        $file = getcwd() . '/etc/conf/app.config.php';
+
+        if (!is_file($file)) {
+            $file = getcwd() . '/etc/conf/app.php';
+        }
+
+        return $file;
     }
 }

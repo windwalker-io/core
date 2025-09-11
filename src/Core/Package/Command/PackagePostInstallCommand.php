@@ -28,13 +28,19 @@ class PackagePostInstallCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         $this->app->runProcess(
-            '@php windwalker pkg:install --tag config --no-details',
+            'php windwalker pkg:migrate',
             null,
             $io
         );
 
         $this->app->runProcess(
-            '@php windwalker asset:sync',
+            'php windwalker pkg:install --tag config --no-details',
+            null,
+            $io
+        );
+
+        $this->app->runProcess(
+            'php windwalker asset:sync',
             null,
             $io
         );

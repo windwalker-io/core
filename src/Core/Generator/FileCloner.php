@@ -180,10 +180,11 @@ class FileCloner
     {
         $this->output->writeln(
             sprintf(
-                'Files: Created: <info>%d</info>, Exists: <comment>%d</comment>, Overridden: <fg=cyan>%d</>',
+                'Files: Created: <info>%d</info>, Exists: <comment>%d</comment>, Overridden: <fg=cyan>%d</> %s',
                 count($creates),
                 count($ignores),
-                count($overrides)
+                count($overrides),
+                $this->dryRun ? '<comment>(Dry Run)</comment>' : ''
             )
         );
     }
