@@ -122,8 +122,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
             if (!$packages) {
                 foreach ($registry->getPackages() as $package) {
-                    $name = $package::getName();
-                    $tagNames = array_keys($installer->getChild($name)->tags);
+                    $tagNames = array_keys($installer->getChild($package)->tags);
 
                     if (array_intersect($tagNames, $tags)) {
                         $packages[] = $package::getName();
@@ -150,7 +149,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
         // Install
         foreach ($targets as $package => $tags) {
-            $pkgInstaller = $installer->getChild($package);
+            $pkgInstaller = $installer->getChild($registry->getPackage($package));
 
             $callbacks = $pkgInstaller->getAllCallbacks($tags);
 
@@ -245,7 +244,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             $options[] = $name . ' ALL';
             $items[$name . ' ALL'] = [$name, null];
 
-            foreach ($installer->getChild($name)->tags as $tag => $res) {
+            foreach ($installer->getChild($package)->tags as $tag => $res) {
                 $options[] = $optName = "<fg=gray>{$name}</>: {$tag}";
                 $items[$optName] = [$name, $tag];
             }
@@ -281,6 +280,15 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         return $targets;
     }
 
+    /**
+     * @param  PackageRegistry  $registry
+     * @param  string[]          $packages
+     * @param  string[]          $tags
+     *
+     * @return  void
+     *
+     * @throws \JsonException
+     */
     protected function validateTargets(PackageRegistry $registry, array $packages, array $tags): void
     {
         $foundPackages = $registry->getPackages();
@@ -294,7 +302,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         }
 
         foreach ($packages as $package) {
-            $installer = $registry->getInstaller()->getChild($package);
+            $installer = $registry->getInstaller()->getChild($registry->getPackage($package));
 
             foreach ($tags as $tag) {
                 if (!isset($installer->tags[$tag])) {
@@ -317,7 +325,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             $tags = [];
 
             foreach ($registry->getPackages() as $package) {
-                $tags[] = array_keys($installer->getChild($package::getName())->tags);
+                $tags[] = array_keys($installer->getChild($package)->tags);
             }
 
             return array_unique(array_merge(...$tags));

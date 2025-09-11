@@ -109,7 +109,7 @@ class PackageRegistry
         $installer = $this->getInstaller();
 
         foreach ($this->packages as $package) {
-            $package->install($installer->getChild($package::getName()));
+            $package->install($installer->getChild($package));
         }
 
         return $installer;

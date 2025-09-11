@@ -7,6 +7,7 @@ namespace Windwalker\Core\Package;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Utilities\StrNormalize;
 
 /**
  * The PackageInstaller class.
@@ -27,20 +28,24 @@ class PackageInstaller
      */
     public array $children = [];
 
+    public ?string $name {
+        get => $this->package ? $this->package::getName() : null;
+    }
+
     /**
      * PackageInstaller constructor.
      *
-     * @param  string|null  $name
+     * @param  AbstractPackage|null  $package
      * @param  ApplicationInterface  $app
      */
-    public function __construct(public ?string $name, protected ApplicationInterface $app)
+    public function __construct(public protected(set) ?AbstractPackage $package, protected ApplicationInterface $app)
     {
         $this->installResources = new InstallResource();
     }
 
-    public function getChild(string $name): static
+    public function getChild(AbstractPackage $package): static
     {
-        return $this->children[$name] ??= new static($name, $this->app);
+        return $this->children[$package::getName()] ??= new static($package, $this->app);
     }
 
     public function installConfig(string|array $path, string|array $tags = [], ?callable $callback = null): static
@@ -136,6 +141,59 @@ class PackageInstaller
                         $callback($src, $dest);
                     }
                 }
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Example: $installer->installMVCModules('Banner', ['Front', 'Admin'], true);
+     *
+     * @param  string  $name
+     * @param  array   $modules
+     * @param  bool    $model
+     *
+     * @return  $this
+     *
+     * @throws \ReflectionException
+     */
+    public function installMVCModules(
+        string $name,
+        array $modules = [
+            'Front',
+            'Admin',
+        ],
+        bool $model = true,
+    ): static {
+        $snake = StrNormalize::toSnakeCase($name);
+
+        $ref = new \ReflectionClass($this->package);
+        $ns = $ref->getNamespaceName();
+
+        foreach ($modules as $module) {
+            $snakeModule = StrNormalize::toSnakeCase($module);
+
+            $this->installModules(
+                [
+                    $this->package::path("src/Module/$module/$name/**/*") => "@source/Module/Admin/$name",
+                ],
+                [$ns . "\\Module\\$module" => "App\\Module\\$module"],
+                ['modules', $snake . '_' . $snakeModule],
+            );
+        }
+
+        if ($model) {
+            $this->installModules(
+                [
+                    $this->package::path("src/Entity/$name.php") => '@source/Entity',
+                    $this->package::path("src/Repository/{$name}Repository.php") => '@source/Repository',
+                ],
+                [
+                    $ns . '\\Entity' => 'App\\Entity',
+                    $ns . '\\Repository' => 'App\\Repository',
+                ],
+                ['modules', $snake . '_model']
             );
         }
 
