@@ -138,6 +138,11 @@ class IO implements IOInterface
         );
     }
 
+    public function askChoice(string|Question $question, array $options, mixed $default = null): mixed
+    {
+        return $this->style()->choice($question, $options, $default);
+    }
+
     protected function getQuestionHelper(): QuestionHelper
     {
         return $this->command->getHelper('question');

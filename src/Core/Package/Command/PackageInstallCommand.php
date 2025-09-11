@@ -16,6 +16,8 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Generator\FileCloner;
+use Windwalker\Core\Generator\FileCloneResult;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\InstallResource;
 use Windwalker\Core\Package\PackageRegistry;
@@ -32,6 +34,8 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
      * @var IOInterface
      */
     private ?IOInterface $io = null;
+
+    protected FileCloner $fileCloner;
 
     /**
      * PackageInstallCommand constructor.
@@ -82,6 +86,13 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             'Force override files.',
             false
         );
+        $command->addOption(
+            'details',
+            null,
+            InputOption::VALUE_NEGATABLE,
+            'Show details of each file operation.',
+            true
+        );
     }
 
     /**
@@ -97,21 +108,21 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
         $packages = (array) $io->getArgument('packages');
         $tags = (array) $io->getOption('tag');
+        $details = $this->io->getOption('details');
 
         $registry = $this->app->make(PackageRegistry::class);
 
         // Discover and prepare-install
         $installer = $registry->prepareInstall();
 
-        if (!$packages && !$tags) {
+        if (!$tags) {
             $targets = $this->askForTargets($registry);
         } else {
             $targets = [];
 
             if (!$packages) {
                 foreach ($registry->getPackages() as $package) {
-                    $name = $package::getName();
-                    $tagNames = array_keys($installer->getChild($name)->tags);
+                    $tagNames = array_keys($installer->getChild($package)->tags);
 
                     if (array_intersect($tagNames, $tags)) {
                         $packages[] = $package::getName();
@@ -130,87 +141,83 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
         $this->validateTargets($registry, $packages, $tags);
 
+        $resultSet = [];
+
+        if (!$details) {
+            $io->writeln("Installing selected resources...");
+        }
+
         // Install
         foreach ($targets as $package => $tags) {
-            $pkgInstaller = $installer->getChild($package);
+            $pkgInstaller = $installer->getChild($registry->getPackage($package));
 
             $callbacks = $pkgInstaller->getAllCallbacks($tags);
 
-            $io->writeln("Installing: <comment>$package</comment>");
+            if ($details) {
+                $io->writeln("Installing: <comment>$package</comment>");
+            }
 
             if ($tags === []) {
-                $this->install($pkgInstaller->installResources, $callbacks);
+                $resultSet[] = $this->install($pkgInstaller->installResources, $callbacks);
             } else {
                 foreach ($tags as $tag) {
-                    $this->install($pkgInstaller->tags[$tag], $callbacks);
+                    $resultSet [] = $this->install($pkgInstaller->tags[$tag], $callbacks);
                 }
             }
         }
+
+        $results = array_merge(...$resultSet);
+
+        $this->getFilCloner()->printListResults($results);
 
         return 0;
     }
 
-    protected function install(InstallResource $installResource, array $callbacks): void
+    /**
+     * @param  InstallResource  $installResource
+     * @param  array            $callbacks
+     *
+     * @return  array<FileCloneResult>
+     */
+    protected function install(InstallResource $installResource, array $callbacks): array
     {
-        $root = $this->app->path('@root');
-        $dry = $this->io->getOption('dry-run') !== false;
+        // $root = $this->app->path('@root');
+        // $dry = $this->io->getOption('dry-run') !== false;
         $force = $this->io->getOption('force') !== false;
+
+        $filCloner = $this->getFilCloner();
+        $results = [];
 
         foreach ($installResource->dump() as $files) {
             if ($files !== []) {
                 foreach ($files as $src => $dest) {
-                    $prefix = '[<info>Copied</info>]';
+                    $results[] = $result = $filCloner->copyFile($src, $dest, $force);
 
-                    if (!$dry) {
-                        $exists = is_file($dest);
-
-                        if (!$force && $exists) {
-                            $prefix = '[<comment>File exists</comment>]';
-                        } else {
-                            if ($exists) {
-                                $prefix = '[<comment>Override</comment>]';
-                            }
-
-                            if ($this->io->getOption('link') !== false) {
-                                if (is_file($dest) && $force) {
-                                    Filesystem::delete($dest);
-                                }
-
-                                Filesystem::mkdir(dirname($dest));
-
-                                Filesystem::symlink($src, $dest);
-                            } else {
-                                Filesystem::copy($src, $dest, $force);
-                            }
-
-                            foreach ($callbacks as $callback) {
-                                $this->app->call(
-                                    $callback,
-                                    [
-                                        'src' => $src,
-                                        'dest' => $dest,
-                                        'force' => $force,
-                                        'io' => $this->io,
-                                        IOInterface::class => $this->io,
-                                        'command' => $this,
-                                        Command::class => $this,
-                                    ]
-                                );
-                            }
+                    if (!$result->dryRun && $result->action !== $filCloner::IGNORE) {
+                        foreach ($callbacks as $callback) {
+                            $this->app->call(
+                                $callback,
+                                [
+                                    'src' => $src,
+                                    'dest' => $dest,
+                                    'force' => $force,
+                                    'io' => $this->io,
+                                    IOInterface::class => $this->io,
+                                    'command' => $this,
+                                    Command::class => $this,
+                                ]
+                            );
                         }
                     }
 
-                    $this->io->writeln(
-                        sprintf(
-                            '%s %s => <info>%s</info>',
-                            $prefix,
-                            Path::relative($root, $src),
-                            Path::relative($root, $dest),
-                        )
-                    );
+                    if ($filCloner->getOutputLevel() === 3) {
+                        $filCloner->printSingleResult($result);
+                    }
                 }
             }
         }
+
+        return $results;
     }
 
     protected function askForTargets(PackageRegistry $registry): array
@@ -237,7 +244,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             $options[] = $name . ' ALL';
             $items[$name . ' ALL'] = [$name, null];
 
-            foreach ($installer->getChild($name)->tags as $tag => $res) {
+            foreach ($installer->getChild($package)->tags as $tag => $res) {
                 $options[] = $optName = "<fg=gray>{$name}</>: {$tag}";
                 $items[$optName] = [$name, $tag];
             }
@@ -273,6 +280,15 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         return $targets;
     }
 
+    /**
+     * @param  PackageRegistry  $registry
+     * @param  string[]          $packages
+     * @param  string[]          $tags
+     *
+     * @return  void
+     *
+     * @throws \JsonException
+     */
     protected function validateTargets(PackageRegistry $registry, array $packages, array $tags): void
     {
         $foundPackages = $registry->getPackages();
@@ -286,7 +302,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         }
 
         foreach ($packages as $package) {
-            $installer = $registry->getInstaller()->getChild($package);
+            $installer = $registry->getInstaller()->getChild($registry->getPackage($package));
 
             foreach ($tags as $tag) {
                 if (!isset($installer->tags[$tag])) {
@@ -309,7 +325,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             $tags = [];
 
             foreach ($registry->getPackages() as $package) {
-                $tags[] = array_keys($installer->getChild($package::getName())->tags);
+                $tags[] = array_keys($installer->getChild($package)->tags);
             }
 
             return array_unique(array_merge(...$tags));
@@ -326,5 +342,19 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
             return array_map(static fn (AbstractPackage $pkg) => $pkg::getName(), $registry->getPackages());
         }
+    }
+
+    public function getFilCloner(): FileCloner
+    {
+        $dry = $this->io->getOption('dry-run') !== false;
+        $details = $this->io->getOption('details');
+
+        return $this->fileCloner ??= new FileCloner(
+            output: $this->io,
+            link: $this->io->getOption('link') !== false,
+            dryRun: $dry,
+            printSourcePath: true,
+            verbosity: $details ? 3 : 1,
+        );
     }
 }

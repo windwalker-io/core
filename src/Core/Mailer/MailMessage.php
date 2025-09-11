@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Mailer;
 
 use LogicException;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Email;
@@ -12,6 +13,7 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Utilities\Classes\ChainingTrait;
+use Windwalker\Utilities\Str;
 
 /**
  * The MailMessage class.
@@ -52,6 +54,19 @@ class MailMessage extends Email
         return $this->mailer->send($this, $envelope, $flags);
     }
 
+    public function toString(bool $debug = false): string
+    {
+        if (!$debug || !$this->mailer instanceof RenderableMailerInterface) {
+            return parent::toString();
+        }
+
+        $message = clone $this;
+
+        $this->mailer->prepareMessage($message);
+
+        return $message->toString();
+    }
+
     public function renderBody(string $path, array $data = []): static
     {
         if ($this->mailer instanceof RenderableMailerInterface) {
@@ -67,6 +82,17 @@ class MailMessage extends Email
         }
 
         return $this;
+    }
+
+    public function buildBody(\Closure $handler, string|false|null $layout = null): static
+    {
+        if (!$this->mailer instanceof BuilderMailerInterface) {
+            return $this;
+        }
+
+        $body = $this->mailer->buildBody($handler, $layout);
+
+        return $this->html($body);
     }
 
     public function debugPrintBody(bool $die = false): static
@@ -86,5 +112,36 @@ class MailMessage extends Email
     public function getAsset(): ?AssetService
     {
         return $this->asset;
+    }
+
+    public function attachPsr7(StreamInterface $body, ?string $name = null, ?string $contentType = null): static
+    {
+        return $this->attach($body->getContents(), $name, $contentType);
+    }
+
+    public function unsubscribe(
+        string|\Stringable|null $http,
+        string|\Stringable|null $mailto = null,
+        bool $oneClick = false
+    ): static {
+        if ($oneClick) {
+            $this->getHeaders()->addTextHeader('List-Unsubscribe-Post', 'List-Unsubscribe=One-Click');
+        }
+
+        $links = [];
+
+        if ($http) {
+            $links[] = '<' . $http . '>';
+        }
+
+        if ($mailto) {
+            $links[] = '<' . Str::ensureLeft($mailto, 'mailto:') . '>';
+        }
+
+        if ($links !== []) {
+            $this->getHeaders()->addTextHeader('List-Unsubscribe', implode(', ', $links));
+        }
+
+        return $this;
     }
 }

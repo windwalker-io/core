@@ -19,15 +19,15 @@ use const Windwalker\Stream\READ_WRITE_FROM_BEGIN;
  */
 class SefMiddleware implements MiddlewareInterface
 {
-    public const REPLACE_LINK_HREF = 1 << 0;
-    public const REPLACE_LINK_HASH = 1 << 1;
-    public const REPLACE_SRC = 1 << 2;
-    public const REPLACE_SRCSET = 1 << 3;
-    public const REPLACE_POSTER = 1 << 4;
-    public const REPLACE_WINDOW_OPEN = 1 << 5;
-    public const REPLACE_STYLES = 1 << 6;
-    public const REPLACE_OBJECTS = 1 << 7;
-    public const REPLACE_ALL = self::REPLACE_LINK_HREF | self::REPLACE_LINK_HASH | self::REPLACE_SRC
+    public const int REPLACE_LINK_HREF = 1 << 0;
+    public const int REPLACE_LINK_HASH = 1 << 1;
+    public const int REPLACE_SRC = 1 << 2;
+    public const int REPLACE_SRCSET = 1 << 3;
+    public const int REPLACE_POSTER = 1 << 4;
+    public const int REPLACE_WINDOW_OPEN = 1 << 5;
+    public const int REPLACE_STYLES = 1 << 6;
+    public const int REPLACE_OBJECTS = 1 << 7;
+    public const int REPLACE_ALL = self::REPLACE_LINK_HREF | self::REPLACE_LINK_HASH | self::REPLACE_SRC
         | self::REPLACE_SRCSET | self::REPLACE_POSTER | self::REPLACE_WINDOW_OPEN | self::REPLACE_STYLES
         | self::REPLACE_OBJECTS;
 

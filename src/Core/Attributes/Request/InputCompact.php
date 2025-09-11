@@ -22,7 +22,7 @@ class InputCompact implements ContainerAttributeInterface
     {
         return function () use ($handler) {
             return $handler()
-                ?? $handler->getContainer()
+                ?? $handler->container
                     ->get(AppRequestInterface::class)->input(...$this->fields);
         };
     }

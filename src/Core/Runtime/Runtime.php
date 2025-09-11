@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Runtime;
 
+use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Provider\IniSetterTrait;
 use Windwalker\Core\Provider\RuntimeProvider;
@@ -21,6 +22,10 @@ class Runtime
 {
     use IniSetterTrait;
 
+    protected static string $env;
+
+    public static AppVerbosity $verbosity = AppVerbosity::NORMAL;
+
     protected static string $rootDir = '';
 
     protected static string $workDir = '';
@@ -36,7 +41,7 @@ class Runtime
     {
     }
 
-    public static function boot(string $rootDir, string $workDir): void
+    public static function boot(string $rootDir, string $workDir, ?bool $debug = null): void
     {
         if (!static::isBooted()) {
             static::$rootDir = $rootDir;
@@ -49,6 +54,14 @@ class Runtime
             $ini = $container->getParam('ini') ?? [];
 
             self::setINIValues($ini, $container);
+
+            if ($debug === null) {
+                $debug = static::getEnv() === 'dev';
+            }
+
+            if ($debug) {
+                static::$verbosity = AppVerbosity::VERBOSE;
+            }
         }
 
         static::$booted = true;
@@ -81,7 +94,7 @@ class Runtime
 
     public static function getContainer(int $options = 0): Container
     {
-        return static::$container ??= (new Container(null, $options))->setParameters(new Config());
+        return static::$container ??= new Container(null, $options)->setParameters(new Config());
     }
 
     /**
@@ -118,7 +131,7 @@ class Runtime
             return false;
         }
 
-        if (!in_array((string) env('APP_ENV'), (array) $forEnv, true)) {
+        if (!in_array(static::getEnv(), (array) $forEnv, true)) {
             return false;
         }
 
@@ -189,5 +202,20 @@ class Runtime
     public static function isCli(): bool
     {
         return static::sapi() === 'cli';
+    }
+
+    public static function isVerbose(): bool
+    {
+        return static::$verbosity->isVerbose();
+    }
+
+    public static function getEnv(): string
+    {
+        return self::$env ??= env('APP_ENV', 'prod');
+    }
+
+    public static function setEnv(string $env): void
+    {
+        static::$env = $env;
     }
 }

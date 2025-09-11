@@ -64,7 +64,14 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
             'time',
             null,
             InputOption::VALUE_REQUIRED,
-            'Simulate a date time.'
+            'Deprecated, use clock instead.'
+        );
+
+        $command->addOption(
+            'clock',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Current clock.'
         );
 
         $command->addOption(
@@ -93,16 +100,16 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
     {
         $schedule = $this->scheduleService->getSchedule();
 
-        Logger::info('schedule', 'Run schedule');
+        Logger::info('system/schedule', 'Run schedule');
 
         foreach ($this->getAvailableEvents($schedule, $io) as $event) {
-            Logger::info('schedule', '  [Event] ' . $event->getName());
+            Logger::info('system/schedule', '  [Event] ' . $event->getName());
 
             try {
                 $this->runEvent($event);
             } catch (\Throwable $e) {
                 Logger::error(
-                    'schedule',
+                    'system/schedule',
                     sprintf(
                         "  [Error %s] %s - %s:%s",
                         $e->getCode(),
@@ -111,7 +118,11 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
                         $e->getCode()
                     )
                 );
-                Logger::error('schedule-error', $e);
+                Logger::error('system/schedule-error', $e);
+
+                if ($catch = $event->getCatch()) {
+                    $this->app->call($catch, ['exception' => $e, 'e' => $e, \Throwable::class => $e]);
+                }
             }
         }
 
@@ -138,7 +149,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
             $events = $schedule->getEvents($tags);
         } else {
             $tz = $io->getOption('tz');
-            $time = $io->getOption('time') ?: 'now';
+            $time = $io->getOption('time') ? $io->getOption('clock') : 'now';
 
             $events = $schedule->getDueEvents($tags, $time, $tz);
         }

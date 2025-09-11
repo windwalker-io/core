@@ -6,6 +6,7 @@ namespace Windwalker\Core\Provider;
 
 use Composer\Autoload\ClassLoader;
 use Windwalker\Core\Application\AppLayer;
+use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
@@ -29,6 +30,7 @@ class RuntimeProvider implements ServiceProviderInterface
 
         $container->share(Config::class, $config);
         $container->share(Container::class, $container);
+        $container->share(AppVerbosity::class, Runtime::$verbosity);
         $container->prepareSharedObject(Environment::class);
 
         $autoloadFile = Runtime::getRootDir() . '/vendor/autoload.php';

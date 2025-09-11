@@ -16,7 +16,7 @@ use Windwalker\Utilities\Options\OptionAccessTrait;
 /**
  * The CsrfMiddleware class.
  */
-class CsrfMiddleware implements MiddlewareInterface
+class CsrfMiddleware implements AttributeMiddlewareInterface
 {
     use OptionAccessTrait;
     use DICreateTrait;
@@ -29,8 +29,16 @@ class CsrfMiddleware implements MiddlewareInterface
     /**
      * CsrfMiddleware constructor.
      */
-    public function __construct(protected array|Closure|null $excludes = null, array $options = [])
-    {
+    public function __construct(
+        protected array|Closure|null $excludes = null,
+        protected ?array $workingMethods = null,
+        protected ?string $inputMethod = null,
+        protected ?string $invalidMessage = null,
+        /**
+         * @deprecated  Use constructor arguments instead.
+         */
+        array $options = []
+    ) {
         $this->options = $options;
     }
 
@@ -41,6 +49,7 @@ class CsrfMiddleware implements MiddlewareInterface
         }
 
         $methods = $this->getOption('working_methods')
+            ?? $this->workingMethods
             ?? [
                 'post',
                 'put',
@@ -55,12 +64,12 @@ class CsrfMiddleware implements MiddlewareInterface
             // Otherwise you can set input_method as false to only allow header.
             $inputMethod = $this->app->isApiCall()
                 ? 'GET'
-                : $this->getOption('input_method');
+                : $this->getOption('input_method', $this->inputMethod);
 
             $this->csrfService->validate(
                 $this->app->getAppRequest(),
                 $inputMethod,
-                $this->getOption('invalid_message'),
+                $this->getOption('invalid_message', $this->invalidMessage),
             );
         }
 

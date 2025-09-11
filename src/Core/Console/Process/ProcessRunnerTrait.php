@@ -125,6 +125,6 @@ trait ProcessRunnerTrait
 
     private function getPhpBinary(): string|false
     {
-        return (new PhpExecutableFinder())->find();
+        return new PhpExecutableFinder()->find();
     }
 }

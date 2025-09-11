@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
-use Closure;
 use Psr\Log\LoggerInterface;
 use Windwalker\Cache\CachePool;
+use Windwalker\Core\Factory\CacheFactory;
+use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
 use Windwalker\DI\Definition\ObjectBuilderDefinition;
@@ -20,38 +21,7 @@ use Windwalker\DI\Definition\ObjectBuilderDefinition;
  * @deprecated  Use container tags instead.
  */
 #[Isolation]
-class CacheManager extends AbstractManager
+class CacheManager extends CacheFactory
 {
-    public function getConfigPrefix(): string
-    {
-        return 'cache';
-    }
-
-    /**
-     * getDefaultFactory
-     *
-     * @param  string  $name
-     * @param  mixed   ...$args
-     *
-     * @return  mixed
-     *
-     * @since  4.0
-     */
-    protected function getDefaultFactory(string $name, ...$args): mixed
-    {
-        return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
-    }
-
-    public static function cachePoolFactory(
-        string $storage,
-        string|ObjectBuilderDefinition $serializer,
-    ): Closure {
-        return static function (Container $container, string $instanceName) use ($storage, $serializer): CachePool {
-            return new CachePool(
-                $container->resolve('cache.factories.storages.' . $storage, compact('instanceName')),
-                $container->resolve($serializer),
-                $container->get(LoggerInterface::class, tag: 'error')
-            );
-        };
-    }
+    //
 }

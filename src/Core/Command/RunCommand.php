@@ -79,7 +79,7 @@ class RunCommand implements CommandInterface, CompletionAwareInterface
     {
         set_time_limit(0);
 
-        $scripts = (array) $this->app->config('scripts');
+        $scripts = $this->getAvailableScripts();
         $names = $io->getArgument('names');
 
         if ($names === [] || $io->getOption('list') !== false) {
@@ -184,6 +184,11 @@ class RunCommand implements CommandInterface, CompletionAwareInterface
         }
 
         return $cmd;
+    }
+
+    public function getAvailableScripts(): array
+    {
+        return (array) $this->app->config('scripts');
     }
 
     /**

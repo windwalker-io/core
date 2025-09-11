@@ -10,6 +10,7 @@ use DateTimeZone;
 use DomainException;
 use Exception;
 use InvalidArgumentException;
+use Psr\Clock\ClockInterface;
 use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
@@ -21,13 +22,13 @@ class ChronosService
 {
     use TranslatorTrait;
 
-    public const UNIT_MINUTE = 'minute';
+    public const string UNIT_MINUTE = 'minute';
 
-    public const UNIT_HOUR = 'hour';
+    public const string UNIT_HOUR = 'hour';
 
-    public const UNIT_DAY = 'day';
+    public const string UNIT_DAY = 'day';
 
-    public const UNIT_WEEK = 'week';
+    public const string UNIT_WEEK = 'week';
 
     /**
      * ChronosService constructor.
@@ -96,6 +97,11 @@ class ChronosService
         return static::convert($date, $from, $this->getServerTimezone());
     }
 
+    public function mustToServer(mixed $date, string|DateTimeZone|null $from = null): Chronos
+    {
+        return $this->toServer($date, $from);
+    }
+
     public function toServerFormat(
         mixed $date,
         string $format = Chronos::FORMAT_YMD_HIS,
@@ -105,7 +111,7 @@ class ChronosService
             return '';
         }
 
-        return $this->toServer($date, $from)->format($format);
+        return $this->mustToServer($date, $from)->format($format);
     }
 
     public function toLocal(mixed $date, string|DateTimeZone|null $to = null): ?Chronos
@@ -119,6 +125,11 @@ class ChronosService
         return static::convert($date, $this->getServerTimezone(), $to);
     }
 
+    public function mustToLocal(mixed $date, string|DateTimeZone|null $to = null): Chronos
+    {
+        return $this->toLocal($date, $to);
+    }
+
     public function toLocalFormat(
         mixed $date,
         string $format = Chronos::FORMAT_YMD_HIS,
@@ -128,7 +139,7 @@ class ChronosService
             return '';
         }
 
-        return $this->toLocal($date, $to)->format($format);
+        return $this->mustToLocal($date, $to)->format($format);
     }
 
     public static function convert(
@@ -215,18 +226,66 @@ class ChronosService
     }
 
     public function createLocal(
-        string $date = 'now',
+        mixed $date = null,
         string|DateTimeZone|null $tz = null,
         string|DateTimeZone|null $to = null
     ): Chronos {
-        $chronos = static::create($date, $tz);
-
-        return $this->toLocal($chronos, $to);
+        return $this->createAs($date, $tz ?? $this->getTimezone(), $to);
     }
 
+    public function createAsLocal(
+        mixed $date = null,
+        string|DateTimeZone|null $fromTz = null,
+    ): Chronos {
+        $chronos = static::create($date, $fromTz);
+
+        return static::convert($chronos, $chronos->getTimezone(), $this->getTimezone());
+    }
+
+    public function createAs(
+        mixed $date = null,
+        string|DateTimeZone|null $fromTz = null,
+        string|DateTimeZone|null $toTz = null
+    ): Chronos {
+        $chronos = static::create($date, $fromTz);
+
+        return $this->toLocal($chronos, $toTz);
+    }
+
+    public function createServerAsLocal(mixed $date = null): Chronos
+    {
+        $chronos = static::create($date, $this->getServerTimezone());
+
+        return $this->toLocal($chronos, $this->getTimezone());
+    }
+
+    public function createServerAs(
+        mixed $date = null,
+        string|DateTimeZone|null $toTz = null
+    ): Chronos {
+        $chronos = static::create($date, $this->getServerTimezone());
+
+        return $this->toLocal($chronos, $toTz);
+    }
+
+    public function createLocalAsServer(mixed $date = null): Chronos
+    {
+        return $this->createLocalAs($date, $this->getServerTimezone());
+    }
+
+    public function createLocalAs(mixed $date = null, string|DateTimeZone|null $toTz = null): Chronos
+    {
+        $chronos = static::create($date, $this->getTimezone());
+
+        return $chronos->setTimezone($toTz ?: $this->getServerTimezone());
+    }
+
+    /**
+     * @deprecated  No instead, manually format it.
+     */
     public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
-        return $this->createLocal('now', $tz)->format($format);
+        return $this->createLocal(null, $tz)->format($format);
     }
 
     /**
@@ -256,7 +315,7 @@ class ChronosService
      */
     public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
-        return static::create('now', $tz)->format($format);
+        return static::create(null, $tz)->format($format);
     }
 
     /**
@@ -270,7 +329,7 @@ class ChronosService
      * @throws Exception
      * @since   2.1
      */
-    public static function create(string $date = 'now', string|DateTimeZone|null $tz = null): Chronos
+    public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
     {
         return Chronos::create($date, $tz);
     }
@@ -293,7 +352,7 @@ class ChronosService
         return Chronos::createFromFormat($format, $time, $timezone);
     }
 
-    public function relative(mixed $date, ?string $unit = null, mixed $current = 'now', ?string $format = null): string
+    public function relative(mixed $date, ?string $unit = null, mixed $current = null, ?string $format = null): string
     {
         $date = Chronos::wrap($date);
         $current = Chronos::wrap($current);
@@ -334,5 +393,10 @@ class ChronosService
         }
 
         return $date->format($format ?? Chronos::FORMAT_YMD_HIS);
+    }
+
+    public static function setClock(ClockInterface|\DateTimeInterface|string|int|float|null $clock): void
+    {
+        Clock::set($clock);
     }
 }

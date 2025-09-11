@@ -7,6 +7,7 @@ namespace Windwalker\Core\Error;
 use Exception;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Throwable;
+use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Service\LoggerService;
 use Windwalker\Utilities\Options\OptionsResolverTrait;
@@ -22,27 +23,19 @@ class ErrorLogHandler implements ErrorHandlerInterface
     use OptionsResolverTrait;
 
     /**
-     * @var LoggerService
-     */
-    protected LoggerService $logger;
-
-    /**
-     * @var Config
-     */
-    protected Config $config;
-
-    /**
      * ErrorLogHandler constructor.
      *
      * @param  LoggerService  $logger
      * @param  Config         $config
+     * @param  AppVerbosity   $verbosity
      * @param  array          $options
      */
-    public function __construct(LoggerService $logger, Config $config, array $options = [])
-    {
-        $this->logger = $logger;
-        $this->config = $config;
-
+    public function __construct(
+        protected LoggerService $logger,
+        protected Config $config,
+        protected AppVerbosity $verbosity,
+        array $options = []
+    ) {
         $this->resolveOptions($options, [$this, 'configureOptions']);
     }
 
@@ -54,6 +47,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
                 'channel' => $this->config->getDeep('error.log_channel') ?: 'error',
                 'ignore_40x' => false,
                 'print' => false,
+                'backtraces' => true,
             ]
         );
     }
@@ -78,16 +72,24 @@ class ErrorLogHandler implements ErrorHandlerInterface
         if (
             $code < 400 || $code >= 500 || !$ignore40x
         ) {
+            $message = $this->verbosity->debugMessage($e);
+
             if ($this->options['channel']) {
+                $context = [];
+
+                if ($this->options['backtraces']) {
+                    $context['exception'] = $e;
+                }
+
                 $this->logger->error(
                     $this->options['channel'],
-                    $e->getMessage(),
-                    ['exception' => $e]
+                    $message,
+                    $context
                 );
             }
 
             if ($this->options['print']) {
-                echo $e->getMessage();
+                echo $message;
             }
         }
     }

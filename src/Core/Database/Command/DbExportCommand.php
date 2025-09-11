@@ -15,6 +15,7 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
+use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Filesystem\FileObject;
@@ -43,7 +44,7 @@ class DbExportCommand implements CommandInterface
     public function configure(Command $command): void
     {
         try {
-            $databaseManager = $this->app->service(DatabaseManager::class);
+            $databaseManager = $this->app->service(DatabaseServiceFactory::class);
             $default = $databaseManager->getDefaultName();
         } catch (Throwable $e) {
             $default = 'local';
@@ -75,6 +76,14 @@ class DbExportCommand implements CommandInterface
             InputOption::VALUE_NONE,
             'Output as gz format.'
         );
+
+        $command->addOption(
+            'keep',
+            'k',
+            InputOption::VALUE_REQUIRED,
+            'Keep x files in the dir.',
+            '7'
+        );
     }
 
     /**
@@ -86,7 +95,7 @@ class DbExportCommand implements CommandInterface
             throw new DomainException('Please install windwalker/database first.');
         }
 
-        $databaseManager = $this->app->service(DatabaseManager::class);
+        $databaseManager = $this->app->service(DatabaseServiceFactory::class);
 
         $now = new DateTimeImmutable('now');
         $conn = $io->getOption('connection');
@@ -114,8 +123,11 @@ class DbExportCommand implements CommandInterface
         $databaseExportService = $this->app->make(DatabaseExportService::class);
 
         $compress = (bool) $io->getOption('compress');
+        $keep = $io->getOption('keep');
+
         $options = [
-            'compress' => $compress
+            'compress' => $compress,
+            'keep' => $keep ? (int) $keep : null,
         ];
 
         $dest = $databaseExportService->exportTo($file, $io, $options);

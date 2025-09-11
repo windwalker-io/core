@@ -70,6 +70,8 @@ class MigrateGoCommand extends AbstractMigrationCommand
             'Do not auto create database or schema.',
             false
         );
+
+        $this->configureRunningOptions($command);
     }
 
     /**
@@ -97,6 +99,7 @@ class MigrateGoCommand extends AbstractMigrationCommand
 
         $migrationService = $this->app->make(MigrationService::class);
         $migrationService->addEventDealer($this->app);
+        $migrationService->ignoreErrors = (bool) $io->getOption('ignore-errors');
 
         $count = $migrationService->migrate(
             $this->getMigrationFolder($io),

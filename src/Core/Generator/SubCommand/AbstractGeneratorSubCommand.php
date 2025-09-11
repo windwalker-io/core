@@ -100,7 +100,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     public function interact(IOInterface $io): void
     {
         if (!$io->getArgument('name')) {
-            $io->setArgument('name', $io->ask('Controller name (camel case): '));
+            $io->setArgument('name', $io->ask('Name (camel case): '));
         }
 
         // if (!$io->getArgument('dest') && $this->requireDest) {

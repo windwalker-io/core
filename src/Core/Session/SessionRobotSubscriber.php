@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Session;
 
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
-use Windwalker\Core\Http\Browser;
+use Windwalker\Core\Http\BrowserNext;
 use Windwalker\Event\Attributes\EventSubscriber;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Session\Session;
@@ -26,7 +26,7 @@ class SessionRobotSubscriber
     {
         $container = $event->container;
 
-        $browser = $container->get(Browser::class);
+        $browser = $container->get(BrowserNext::class);
 
         if ($browser->isRobot() && $container->has(Session::class)) {
             $container->getParameters()->setDeep('session.default', $this->profileName);

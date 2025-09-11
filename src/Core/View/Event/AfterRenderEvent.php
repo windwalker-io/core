@@ -18,7 +18,7 @@ class AfterRenderEvent extends AbstractViewRenderEvent
         public string $content,
         public ResponseInterface $response,
         View $view,
-        ViewModelInterface $viewModel,
+        object $viewModel,
         AppState $state,
         string $layout,
         array $data

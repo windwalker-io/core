@@ -27,6 +27,10 @@ trait WebApplicationTrait
 {
     use ApplicationTrait;
 
+    public Navigator $nav {
+        get => $this->getNav();
+    }
+
     /**
      * Method to check to see if headers have already been sent.
      * We wrap headers_sent() function with this method for testing reason.

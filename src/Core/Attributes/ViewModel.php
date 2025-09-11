@@ -46,7 +46,7 @@ class ViewModel implements ContainerAttributeInterface
 
     public function __invoke(AttributeHandler $handler): callable
     {
-        $container = $handler->getContainer();
+        $container = $handler->container;
         $container->share(static::class, $this);
         $container->share('vm.self', $this);
 

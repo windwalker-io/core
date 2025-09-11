@@ -15,11 +15,11 @@ use Symfony\Component\Mime\Part\AbstractPart;
  */
 interface MailerInterface
 {
-    public const FORCE_SEND = 1;
+    public const int FORCE_SEND = 1;
 
-    public const IGNORE_AUTO_CC = 1 << 1;
+    public const int IGNORE_AUTO_CC = 1 << 1;
 
-    public const IGNORE_ENVELOPE = 1 << 2;
+    public const int IGNORE_ENVELOPE = 1 << 2;
 
     public function createMessage(
         ?string $subject = null,

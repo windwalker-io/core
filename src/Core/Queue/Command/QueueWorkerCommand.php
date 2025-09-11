@@ -6,18 +6,11 @@ namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\Output;
-use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Manager\Logger;
@@ -25,19 +18,20 @@ use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
+use Windwalker\Queue\Enqueuer;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
-use Windwalker\Queue\Event\DebugOutputEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
+use Windwalker\Queue\Event\StopEvent;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\QueueMessage;
+use Windwalker\Queue\RunnerOptions;
 use Windwalker\Queue\Worker;
-use Windwalker\Queue\WorkerOptions;
 
 /**
  * The QueueWorkerCommand class.
@@ -47,6 +41,11 @@ use Windwalker\Queue\WorkerOptions;
 )]
 class QueueWorkerCommand implements CommandInterface
 {
+    use QueueCommandTrait;
+    use EnqueuerCommandTrait;
+
+    protected IOInterface $io;
+
     public function __construct(protected ConsoleApplication $app)
     {
     }
@@ -136,6 +135,36 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         $command->addOption(
+            'max-runs',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max times to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'lifetime',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The max seconds to run the worker before exit. 0 for unlimited.',
+            '0'
+        );
+
+        $command->addOption(
+            'stop-when-empty',
+            'E',
+            InputOption::VALUE_NONE,
+            'Stop the worker when no job is remaining.',
+        );
+
+        $command->addOption(
+            'enqueuer',
+            'e',
+            InputOption::VALUE_NONE,
+            'Also run the enqueuer service in the worker.',
+        );
+
+        $command->addOption(
             'file',
             null,
             InputOption::VALUE_REQUIRED,
@@ -157,12 +186,14 @@ class QueueWorkerCommand implements CommandInterface
             throw new DomainException('Please install windwalker/queue first.');
         }
 
+        $this->io = $io;
+
         $channels = $io->getArgument('channels') ?: 'default';
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
 
         $worker = $this->createWorker($connection, $options);
-        $worker->setInvoker($this->invoke(...));
+        $worker->setInvoker($this->createInvoker());
 
         $this->prepareDebugServices($io, $worker);
 
@@ -187,18 +218,44 @@ class QueueWorkerCommand implements CommandInterface
                 $message = unserialize(file_get_contents($file));
                 $worker->process($message);
             } else {
-                $worker->runNextJob($channels);
+                $worker->next($channels);
             }
         } else {
+            if ($io->getOption('enqueuer')) {
+                $io->style()->warning(
+                    [
+                        'Running Enqueuer with queue worker.',
+                        'We recommend you to run enqueuer in another process for better performance.',
+                    ]
+                );
+
+                $enqueuer = $this->createEnqueuer($connection, $options);
+                $this->prepareEnqueuer($enqueuer);
+                $enqueuer->addEventDealer($this->app);
+                $this->listenToEnqueuer($enqueuer, $io, $connection);
+
+                $this->prepareDebugServices($io, $enqueuer);
+
+                $worker->enqueuer = $enqueuer;
+            }
+
+            $io->writeln(
+                sprintf(
+                    "Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
+                    getmypid()
+                )
+            );
+            $this->displayInfo($connection, $channels, $options);
+
             $worker->loop($channels);
         }
 
         return 0;
     }
 
-    protected function getWorkOptions(IOInterface $io): WorkerOptions
+    protected function getWorkOptions(IOInterface $io): RunnerOptions
     {
-        return new WorkerOptions(
+        return new RunnerOptions(
             once: (bool) $io->getOption('once'),
             backoff: (int) ($io->getOption('backoff') ?? $io->getOption('delay')),
             force: (bool) $io->getOption('force'),
@@ -206,13 +263,16 @@ class QueueWorkerCommand implements CommandInterface
             sleep: (float) $io->getOption('sleep'),
             tries: (int) $io->getOption('tries'),
             timeout: (int) $io->getOption('timeout'),
+            maxRuns: (int) $io->getOption('max-runs'),
+            lifetime: (int) $io->getOption('lifetime'),
+            stopWhenEmpty: (bool) $io->getOption('stop-when-empty'),
             restartSignal: $this->app->path('@temp') . '/queue/restart',
         );
     }
 
-    public function invoke(JobController $controller, callable $invokable): mixed
+    public function createInvoker(): \Closure
     {
-        return $this->app->call(
+        return fn (JobController $controller, callable $invokable) => $this->app->call(
             $invokable,
             [
                 'jobController' => $controller,
@@ -331,7 +391,7 @@ class QueueWorkerCommand implements CommandInterface
             ->on(
                 LoopStartEvent::class,
                 function (LoopStartEvent $event) {
-                    $worker = $event->worker;
+                    $worker = $event->runner;
 
                     switch ($worker->getState()) {
                         case $worker::STATE_ACTIVE:
@@ -372,24 +432,28 @@ class QueueWorkerCommand implements CommandInterface
                     // Stop connections.
                     $this->runEndScripts('loop_end_scripts', $worker, $event, $io, $connection);
                 }
+            )
+            ->on(
+                StopEvent::class,
+                fn(StopEvent $event) => $io->writeln($event->reason)
             );
     }
 
     /**
      * @param  ?string  $connection
-     * @param  WorkerOptions  $options
+     * @param  RunnerOptions  $options
      *
      * @return  Worker
      *
      * @throws DefinitionNotFoundException
      * @throws DependencyResolutionException
      */
-    protected function createWorker(?string $connection, WorkerOptions $options): Worker
+    protected function createWorker(?string $connection, RunnerOptions $options): Worker
     {
         return new Worker(
             queue: $this->app->retrieve(Queue::class, tag: $connection),
             options: $options,
-            logger: $this->app->retrieve(LoggerInterface::class, tag: 'queue')
+            logger: $this->logger
         );
     }
 
@@ -422,59 +486,8 @@ class QueueWorkerCommand implements CommandInterface
         }
     }
 
-    /**
-     * @param  IOInterface  $io
-     * @param  Worker       $worker
-     *
-     * @return  void
-     *
-     * @throws DefinitionException
-     */
-    public function prepareDebugServices(IOInterface $io, Worker $worker): void
+    protected function createLogger(): LoggerInterface
     {
-        if ($io->isVerbose()) {
-            $this->app->container->share(IOInterface::class, $io);
-            $this->app->container->share(Output::class, $io->getOutput());
-        } else {
-            $this->app->container->share(
-                IOInterface::class,
-                new IO(
-                    new ArrayInput([]),
-                    new NullOutput(),
-                    new Command()
-                )
-            );
-            $this->app->container->share(Output::class, NullOutput::class);
-        }
-
-        $worker->on(
-            DebugOutputEvent::class,
-            function (DebugOutputEvent $event) use ($io) {
-                $levels = [];
-
-                if ($io->getVerbosity() === OutputInterface::VERBOSITY_NORMAL) {
-                    $levels[] = LogLevel::EMERGENCY;
-                    $levels[] = LogLevel::ALERT;
-                    $levels[] = LogLevel::CRITICAL;
-                    $levels[] = LogLevel::ERROR;
-                } elseif ($io->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $levels[] = LogLevel::WARNING;
-                    $levels[] = LogLevel::NOTICE;
-                    $levels[] = LogLevel::INFO;
-                    $levels[] = LogLevel::DEBUG;
-                }
-
-                if (in_array($event->level, $levels, true)) {
-                    $io->getOutput()->writeln(
-                        sprintf(
-                            '[%s] %s %s',
-                            $event->level,
-                            $event->message,
-                            $event->context ? json_encode($event->context) : ''
-                        )
-                    );
-                }
-            }
-        );
+        return $this->app->service(LoggerInterface::class, tag: 'system/queue');
     }
 }

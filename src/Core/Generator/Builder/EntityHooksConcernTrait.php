@@ -28,6 +28,7 @@ trait EntityHooksConcernTrait
         [$getHook, $setHook] = $this->getHooks($propNode);
 
         $col = $this->metadata->getColumnByPropertyName($propName);
+        $propRef = $this->metadata->getProperty($propName);
 
         $colName = $col?->getName();
         $column = $colName ? $tbManager->getColumn($colName) : null;
@@ -48,7 +49,11 @@ trait EntityHooksConcernTrait
         $setterNullable = $setterNullable || $column?->getIsNullable();
 
         if ($typeNode instanceof Node\Name) {
-            $specialSetHook = 'build' . $typeNode . 'SetHook';
+            $specialSetHook = match ((string) $typeNode) {
+                'UuidInterface' => $this->buildUuidInterfaceSetHook(...),
+                'Chronos', 'DateTimeInterface' => $this->buildChronosSetHook(...),
+                default => null,
+            };
         }
 
         if ($typeNode instanceof Node\UnionType) {
@@ -102,8 +107,8 @@ trait EntityHooksConcernTrait
         }
 
         if (!$setHook) {
-            if ($specialSetHook && method_exists($this, $specialSetHook)) {
-                $setHook = $this->{$specialSetHook}($propName, $propNode, $column);
+            if ($specialSetHook) {
+                $setHook = $specialSetHook($propRef, $propNode, $column);
             }
             // else {
             //     $setHook = $this->createHookAssignValue(
@@ -242,7 +247,7 @@ trait EntityHooksConcernTrait
     }
 
     protected function createHookAssignValue(
-        string $propName,
+        \ReflectionProperty $prop,
         Node\Name|Node\Identifier|Node\ComplexType|Node|null $type,
         Node\Expr $expr,
     ): Node\PropertyHook {
@@ -253,7 +258,7 @@ trait EntityHooksConcernTrait
             new Node\Expr\Assign(
                 $factory->propertyFetch(
                     new Node\Expr\Variable('this'),
-                    $propName
+                    $prop->getName()
                 ),
                 $expr,
             ),
@@ -286,29 +291,39 @@ trait EntityHooksConcernTrait
     }
 
     protected function buildUuidInterfaceSetHook(
-        string $propName,
+        \ReflectionProperty $prop,
         Node\Stmt\Property $propNode,
         Column $column
     ): Node\PropertyHook {
         $factory = $this->createNodeFactory();
 
+        $type = 'UuidInterface|string|null';
+        $funcName = 'to_uuid';
+        $value = new Node\Expr\Variable('value');
+
+        if ($prop->getType()?->allowsNull()) {
+            $funcName = 'try_uuid';
+        } else {
+            $value = new Node\Expr\BinaryOp\Coalesce($value, $factory->classConstFetch('UUIDBin', 'NIL'));
+        }
+
         $this->addUse(UuidInterface::class);
-        $this->addFunctionUse('Windwalker\\try_uuid');
+        $this->addFunctionUse('Windwalker\\' . $funcName);
 
         return $this->createHookAssignValue(
-            $propName,
-            new Node\Identifier('UuidInterface|string|null'),
+            $prop,
+            new Node\Identifier($type),
             $factory->funcCall(
-                'try_uuid',
+                $funcName,
                 [
-                    new Node\Expr\Variable('value'),
+                    $value,
                 ]
             )
         );
     }
 
     protected function buildChronosSetHook(
-        string $propName,
+        \ReflectionProperty $prop,
         Node\Stmt\Property $propNode,
         Column $column
     ): Node\PropertyHook {
@@ -317,7 +332,7 @@ trait EntityHooksConcernTrait
         $this->addUse(Chronos::class);
 
         return $this->createHookAssignValue(
-            $propName,
+            $prop,
             new Node\Identifier('\DateTimeInterface|string|null'),
             $factory->staticCall(
                 new Node\Name('Chronos'),

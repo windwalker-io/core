@@ -14,8 +14,17 @@ class ProfilerItem implements \JsonSerializable
 {
     protected array $tags = [];
 
+    public protected(set) int $memory = 0;
+    public protected(set) int $memoryCurrent = 0;
+    public protected(set) int $memoryPeak = 0;
+    public protected(set) int $memoryPeakCurrent = 0;
+
     public function __construct(protected string $label, protected StopwatchPeriod $period)
     {
+        $this->memory = memory_get_usage(true);
+        $this->memoryCurrent = memory_get_usage(false);
+        $this->memoryPeak = memory_get_peak_usage(true);
+        $this->memoryPeakCurrent = memory_get_peak_usage(false);
     }
 
     public function getStartTime(): float|int
@@ -35,7 +44,7 @@ class ProfilerItem implements \JsonSerializable
 
     public function getMemory(): int
     {
-        return $this->period->getMemory();
+        return $this->memoryCurrent;
     }
 
     /**

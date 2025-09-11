@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Router\Event;
 
 use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\NavOptions;
 use Windwalker\Event\BaseEvent;
 use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
@@ -20,7 +21,7 @@ class AfterRouteBuildEvent extends BaseEvent
         public string $route,
         public array $query,
         public Navigator $navigator,
-        public int $options
+        public NavOptions $options
     ) {
     }
 

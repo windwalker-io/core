@@ -6,14 +6,20 @@ namespace Windwalker\Core\Service;
 
 use ErrorException;
 use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Error\DeprecatedException;
+use Windwalker\Core\Error\ErrorHandlerInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\ResponseHelper;
+use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 use Windwalker\Utilities\Utf8String;
 
 use function is_string;
+use function Windwalker\str;
 
 /**
  * The ErrorService class.
@@ -84,6 +90,44 @@ class ErrorService
     public function __construct(Config $config, protected ApplicationInterface $app)
     {
         $this->config = $config->proxy('error');
+    }
+
+    public function shouldLogError(): bool
+    {
+        return (bool) ($this->config->get('log') ?? true);
+    }
+
+    public function errorLogChannel(): string
+    {
+        return (string) ($this->config->get('log_channel') ?? 'error');
+    }
+
+    public function logError(string $message, array $context = [], string|int $level = LogLevel::ERROR): static
+    {
+        $this->app->retrieve(LoggerInterface::class, tag: $this->errorLogChannel())
+            ->log($level, $message, $context);
+
+        return $this;
+    }
+
+    public function logException(\Throwable $e, string|int $level = LogLevel::ERROR): static
+    {
+        if ($handler = $this->resolveErrorHandler('log')) {
+            $handler($e);
+
+            return $this;
+        }
+
+        return $this->logError($this->app->getVerbosity()->debugMessage($e), ['exception' => $e], $level);
+    }
+
+    public function resolveErrorHandler(string $tag): ?ErrorHandlerInterface
+    {
+        try {
+            return $this->app->retrieve(ErrorHandlerInterface::class, tag: $tag);
+        } catch (ContainerExceptionInterface) {
+            return null;
+        }
     }
 
     /**

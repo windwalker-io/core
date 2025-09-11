@@ -9,8 +9,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Error\ErrorHandlerInterface;
+use Windwalker\Core\Error\ErrorLogHandler;
+use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\Http\Response\JsonResponse;
@@ -21,9 +25,10 @@ use function Windwalker\response;
 /**
  * The JsonResponseMiddleware class.
  */
-class JsonResponseMiddleware implements MiddlewareInterface
+class JsonResponseMiddleware implements AttributeMiddlewareInterface
 {
     use DICreateTrait;
+    use AttributeMiddlewareTrait;
 
     /**
      * JsonResponseMiddleware constructor.
@@ -32,15 +37,10 @@ class JsonResponseMiddleware implements MiddlewareInterface
     {
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        return $this->run(fn() => $handler->handle($request));
-    }
-
-    public function run(Closure $callback): ResponseInterface
+    public function run(ServerRequestInterface $request, Closure $next): mixed
     {
         try {
-            $response = $callback();
+            $response = $next($request);
 
             if ($response instanceof ResponseInterface) {
                 // Allow redirect
@@ -64,6 +64,8 @@ class JsonResponseMiddleware implements MiddlewareInterface
                 200
             );
         } catch (Throwable $e) {
+            $this->logError($e);
+
             return response()->json(
                 [
                     'error' => !$this->app->isDebug() ? $e->getMessage() : sprintf(
@@ -83,5 +85,10 @@ class JsonResponseMiddleware implements MiddlewareInterface
     protected static function toJsonResponse(ResponseInterface $response): JsonResponse
     {
         return JsonResponse::from($response);
+    }
+
+    protected function logError(\Throwable $e): void
+    {
+        $this->app->retrieve(ErrorService::class)->logException($e);
     }
 }

@@ -16,20 +16,6 @@ use Windwalker\Queue\Failer\QueueFailerInterface;
  * @deprecated  Use container tags instead.
  */
 #[Isolation]
-class QueueFailerManager extends AbstractManager
+class QueueFailerManager extends QueueFailerFactory
 {
-    public function getConfigPrefix(): string
-    {
-        return 'queue';
-    }
-
-    public function getDefaultName(): ?string
-    {
-        return $this->config->getDeep('failer_default');
-    }
-
-    protected function getFactoryPath(string $name): string
-    {
-        return 'factories.failers.' . $name;
-    }
 }

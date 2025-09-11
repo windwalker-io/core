@@ -33,7 +33,7 @@ class FileCollection implements EventAwareInterface
         $edge = $this->createEdge();
 
         foreach ($this->files as $file) {
-            $fileData = new FileData($file, $edge);
+            $fileData = new FileGenData($file, $edge);
             $callback($fileData);
         }
 
@@ -45,7 +45,7 @@ class FileCollection implements EventAwareInterface
         $this->results = [];
 
         return $this->each(
-            function (FileData $file) use ($force, $destDir, $data) {
+            function (FileGenData $file) use ($force, $destDir, $data) {
                 if (is_callable($data)) {
                     $data($file);
                 } else {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Manager;
 
+use Windwalker\Core\Factory\HasherFactory;
 use Windwalker\Crypt\Hasher\HasherInterface;
 use Windwalker\DI\Attributes\Isolation;
 
@@ -16,10 +17,7 @@ use Windwalker\DI\Attributes\Isolation;
  * @deprecated  Use container tags instead.
  */
 #[Isolation]
-class HasherManager extends AbstractManager
+class HasherManager extends HasherFactory
 {
-    public function getConfigPrefix(): string
-    {
-        return 'security.hasher';
-    }
+    //
 }

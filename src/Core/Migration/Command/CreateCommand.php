@@ -6,20 +6,25 @@ namespace Windwalker\Core\Migration\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\InteractInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
+use Windwalker\Core\Utilities\ClassFinder;
+use Windwalker\DI\Attributes\Autowire;
+use Windwalker\Utilities\Str;
 
 /**
  * The CreateCommand class.
  */
 #[CommandWrapper(description: 'Create a migration version.')]
-class CreateCommand extends AbstractMigrationCommand
+class CreateCommand extends AbstractMigrationCommand implements InteractInterface
 {
     /**
      * CreateCommand constructor.
      */
-    public function __construct()
+    public function __construct(#[Autowire] protected ClassFinder $classFinder)
     {
     }
 
@@ -45,6 +50,68 @@ class CreateCommand extends AbstractMigrationCommand
             InputArgument::OPTIONAL,
             'Entity name',
         );
+
+        $command->addOption(
+            'update',
+            'u',
+            InputOption::VALUE_NONE,
+            'Is an update or create new entity',
+        );
+    }
+
+    public function interact(IOInterface $io): void
+    {
+        if (!$io->getArgument('entity')) {
+            $classes = iterator_to_array($this->classFinder->findClasses('App\\Entity'));
+            $ignore = '** IGNORE **';
+            array_unshift($classes, $ignore);
+
+            $value = $io->askChoice(
+                '<question>Entity name?</question>',
+                $classes,
+                '0'
+            );
+
+            if ($value !== $ignore) {
+                $io->setArgument('entity', $value);
+            }
+        }
+        // $io->getArgument('entity') ?: $io->ask(
+        //     new Question(
+        //         '<question>Entity name?</question> [default: Table]',
+        //         ''
+        //     )->setAutocompleterCallback(
+        //         function (string $input) {
+        //             $classes = $this->classFinder->findClasses('App\\Entity');
+        //             $classes = iterator_to_array($classes);
+        //
+        //             return array_map(
+        //                 fn ($class) => Str::removeLeft($class, 'App\\Entity\\'),
+        //                 $classes
+        //             );
+        //
+        //             // return array_filter(
+        //             //     $classes,
+        //             //     static fn($class) => str_contains(
+        //             //         Str::removeLeft(strtolower($class), 'App\\Entity\\'),
+        //             //         strtolower($input)
+        //             //     )
+        //             // );
+        //         }
+        //     )
+        // );
+        if (!$io->getOption('update')) {
+            $update = $io->askChoice(
+                '<question>Is an update or create new entity?</question>',
+                [
+                    'create',
+                    'update',
+                ],
+                0
+            );
+
+            $io->setOption('update', $update === 'update');
+        }
     }
 
     /**
@@ -58,13 +125,24 @@ class CreateCommand extends AbstractMigrationCommand
     {
         $name = $io->getArgument('name');
         $entity = $io->getArgument('entity');
+        $update = $io->getOption('update');
+
+        if ($entity && !str_contains($entity, '\\')) {
+            $entity = Str::ensureLeft($entity, '\\App\\Entity\\');
+        }
+
+        if ($entity) {
+            $entity = Str::ensureLeft($entity, '\\');
+        }
+
+        $dir = $update ? 'update' : 'create';
 
         $migrationService = $this->app->make(MigrationService::class);
 
         $migrationService->copyMigrationFile(
             $this->getMigrationFolder($io),
             $name,
-            __DIR__ . '/../../../../resources/templates/migration/*',
+            __DIR__ . "/../../../../resources/templates/migration/$dir/*",
             compact('entity')
         );
 

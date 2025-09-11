@@ -19,7 +19,7 @@ class Transaction implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         return function (...$args) use ($handler) {
-            $container = $handler->getContainer();
+            $container = $handler->container;
 
             return $container->get(DatabaseAdapter::class, tag: $this->connection)
                 ->transaction(fn () => $handler(...$args), true, $this->enabled);

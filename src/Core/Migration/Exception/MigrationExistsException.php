@@ -6,6 +6,7 @@ namespace Windwalker\Core\Migration\Exception;
 
 use RuntimeException;
 use Throwable;
+use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Core\Migration\Migration;
 
 /**
@@ -21,8 +22,12 @@ class MigrationExistsException extends RuntimeException
      * @param  int             $code      [optional] The Exception code.
      * @param  Throwable|null  $previous  [optional] The previous throwable used for the exception chaining.
      */
-    public function __construct(protected Migration $migration, $message = "", $code = 0, ?Throwable $previous = null)
-    {
+    public function __construct(
+        protected AbstractMigration $migration,
+        $message = "",
+        $code = 0,
+        ?Throwable $previous = null
+    ) {
         parent::__construct($message, $code, $previous);
     }
 

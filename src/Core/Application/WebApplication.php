@@ -45,6 +45,7 @@ use Windwalker\Http\Response\HtmlResponse;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Server\HttpServerInterface;
 use Windwalker\Http\Server\ServerInterface;
+use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 
 /**
  * The WebApplication class.
@@ -380,20 +381,16 @@ class WebApplication implements WebRootApplicationInterface
         try {
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
-        } catch (ValidateFailException|InvalidTokenException $e) {
+        } catch (ValidateFailException | InvalidTokenException $e) {
             if ($app->isDebug() || $app->isApiCall()) {
                 throw $e;
             }
 
-            $app->addMessage($e->getMessage(), 'warning');
+            $app->addMessage($this->getVerbosity()->displayMessage($e), 'warning');
             $nav = $app->service(Navigator::class);
 
             return $this->redirect($nav->back());
         } catch (Throwable $e) {
-            if ($app->isCliRuntime()) {
-                $this->logError($e);
-            }
-
             if (
                 $app->isDebug()
                 || strtoupper($app->getRequestMethod()) === 'GET'
@@ -403,7 +400,9 @@ class WebApplication implements WebRootApplicationInterface
                 throw $e;
             }
 
-            $app->addMessage($e->getMessage(), 'warning');
+            $this->logError($e);
+
+            $app->addMessage($this->getVerbosity()->displayMessage($e), 'warning');
             $nav = $app->service(Navigator::class);
 
             return $this->redirect($nav->back());
@@ -427,10 +426,16 @@ class WebApplication implements WebRootApplicationInterface
 
         // $message = ErrorLogHandler::handleExceptionLogText($e, $this->app->path('@root'));
 
+        $message = $e->getMessage();
+
+        if ($e instanceof VerbosityExceptionInterface) {
+            $message = $e->getMessageByVerbosity(AppVerbosity::VERBOSE->value);
+        }
+
         $this->retrieve(LoggerService::class)
             ->error(
-                $this->app->config('error.log_channel') ?? 'error',
-                $e->getMessage(),
+                $this->config('error.log_channel') ?? 'error',
+                $message,
                 ['exception' => $e]
             );
     }

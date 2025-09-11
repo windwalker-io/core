@@ -29,8 +29,8 @@ class Ref implements ContainerAttributeInterface
 
     public function __invoke(AttributeHandler $handler): callable
     {
-        $container = $handler->getContainer();
-        $ref = $handler->getReflector();
+        $container = $handler->container;
+        $ref = $handler->reflector;
         $v = ref($this->path, $this->delimiter);
 
         return fn() => $container->getDependencyResolver()

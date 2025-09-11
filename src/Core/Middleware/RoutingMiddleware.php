@@ -51,11 +51,15 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         protected Router $router,
         protected ?\Closure $preMatch = null,
         protected ?\Closure $fallback = null,
+        protected bool $methodOverride = true,
+        /**
+         * @deprecated  Use constructor arguments instead.
+         */
         array $options = []
     ) {
         $this->prepareOptions(
             [
-                'method_override' => true,
+                'method_override' => $this->methodOverride,
             ],
             $options
         );

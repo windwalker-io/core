@@ -20,7 +20,7 @@ class Filter implements ContainerAttributeInterface
         return function () use ($handler) {
             $value = $handler();
 
-            return $handler->getContainer()
+            return $handler->container
                 ->get(FilterService::class)
                 ->filter($value, $this->command);
         };

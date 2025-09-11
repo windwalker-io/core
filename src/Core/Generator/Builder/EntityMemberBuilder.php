@@ -54,6 +54,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
     protected array $addedFunctionUses = [];
 
+    /**
+     * @var array<array{ string, string }>
+     */
     protected array $newEnums = [];
 
     /**
@@ -302,9 +305,15 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $type = 'bool';
             $default = TypeCast::try($default, $type);
         } elseif ($dataType === 'binary' && $len === '16') {
-            $type = '?UuidInterface';
-            $default = null;
+            $type = 'UuidInterface';
             $this->addUse(UuidInterface::class);
+
+            $default = Symbol::none();
+
+            if ($dbColumn->getIsNullable()) {
+                $type = '?' . $type;
+                $default = null;
+            }
         } elseif ($enumName = $this->getMatchedEnum($dbColumn)) {
             $type = $enumName;
             $default = Symbol::none();
@@ -388,11 +397,12 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $comment = $dbColumn->getComment();
 
         // Find `enum:EnumClassName` without ::class
-        if (!preg_match('/enum:(\w+)/', $comment, $matches)) {
+        if (!preg_match('/enum:(?P<enum>\w+)(\((?P<cases>[a-zA-Z0-9_,]+)\))?/', $comment, $matches)) {
             return null;
         }
 
-        $enumName = $matches[1];
+        $enumName = $matches['enum'] ?? null;
+        $cases = $matches['cases'] ?? null;
 
         $existsEnumClass = $this->findFQCN($enumName);
 
@@ -401,7 +411,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $enumClass = $ns . 'Enum\\' . $enumName;
             $this->addUse($enumClass);
         } else {
-            $this->newEnums[] = $existsEnumClass;
+            if (!enum_exists($existsEnumClass)) {
+                $this->newEnums[$existsEnumClass] = [$existsEnumClass, $cases];
+            }
         }
 
         return $enumName;
@@ -532,7 +544,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             $uuidDefault = 'UUID7';
 
-            if ($dbColumn->getColumnDefault() !== null) {
+            if (!$dbColumn->getIsNullable()) {
                 $uuidDefault = 'NIL';
             }
 

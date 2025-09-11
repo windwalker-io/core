@@ -17,6 +17,8 @@ use Windwalker\Event\EventAwareInterface;
  */
 interface AppRequestInterface extends EventAwareInterface
 {
+    public function withClientIp(?string $clientIp): static;
+
     public function getClientIP(): string;
 
     /**

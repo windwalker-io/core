@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\CliServer;
 
-use NunoMaduro\Collision\Handler;
-use NunoMaduro\Collision\Writer;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
@@ -121,27 +119,32 @@ class CliServerRuntime
     public static function createErrorHandler(): \Closure
     {
         if (!isset(static::$errorHandler)) {
-            if (
-                class_exists(Run::class)
-                && class_exists(Handler::class)
-                && static::isDev()
-            ) {
-                $run = new Run();
-                $run->allowQuit(false);
-                $run->pushHandler(
-                    new Handler(
-                        new Writer(output: static::getOutput())
-                    )
-                );
+            // Todo: Check we can safely remove this block
+            // if (
+            //     class_exists(Run::class)
+            //     && class_exists(Handler::class)
+            //     && static::isDev()
+            // ) {
+            //     $run = new Run();
+            //     $run->allowQuit(false);
+            //     $run->pushHandler(
+            //         new Handler(
+            //             new Writer(output: static::getOutput())
+            //         )
+            //     );
+            //
+            //     static::$errorHandler = static function (\Throwable $e) use ($run) {
+            //         $run->handleException($e);
+            //     };
+            // } else {
+            //     static::$errorHandler = static function (\Throwable $e) {
+            //         static::renderThrowable($e, static::getOutput());
+            //     };
+            // }
 
-                static::$errorHandler = static function (\Throwable $e) use ($run) {
-                    $run->handleException($e);
-                };
-            } else {
-                static::$errorHandler = static function (\Throwable $e) {
-                    static::renderThrowable($e, static::getOutput());
-                };
-            }
+            static::$errorHandler = static function (\Throwable $e) {
+                static::renderThrowable($e, static::getOutput());
+            };
         }
 
         return static::$errorHandler;

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Windwalker\Core\Command;
 
 use RuntimeException;
+use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
+use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandInterface;
@@ -17,6 +19,7 @@ use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Folder;
 use Windwalker\Filesystem\Path;
 
+use function Windwalker\ds;
 use function Windwalker\fs;
 
 /**
@@ -25,8 +28,10 @@ use function Windwalker\fs;
 #[CommandWrapper(
     description: 'Merge language files.'
 )]
-class LangMergeCommand implements CommandInterface
+class LangMergeCommand implements CommandInterface, CompletionAwareInterface
 {
+    use CommandPackageResolveTrait;
+
     public function __construct(protected ConsoleApplication $app)
     {
     }
@@ -47,18 +52,18 @@ class LangMergeCommand implements CommandInterface
         );
 
         $command->addArgument(
-            'target_locale',
-            InputArgument::OPTIONAL,
-            'The target file locale.',
-            $this->app->config('language.locale') ?? 'en-US'
+            'locales',
+            InputArgument::IS_ARRAY,
+            'The locales and direction, can be "{to} {from}", "{from} \'>\' {to}" or "{to} \'<\' {from}".',
+            // $this->app->config('language.locale') ?? 'en-US'
         );
 
-        $command->addArgument(
-            'from_locale',
-            InputArgument::OPTIONAL,
-            'The locale to copy from.',
-            $this->app->config('language.fallback') ?? 'en-US'
-        );
+        // $command->addArgument(
+        //     'locale2',
+        //     InputArgument::OPTIONAL,
+        //     'The locale to copy from.',
+        //     $this->app->config('language.fallback') ?? 'en-US'
+        // );
 
         $command->addOption(
             'dir',
@@ -80,6 +85,15 @@ class LangMergeCommand implements CommandInterface
             InputOption::VALUE_NONE,
             'Sort language keys.'
         );
+
+        $command->addOption(
+            'clear',
+            'c',
+            InputOption::VALUE_NEGATABLE,
+            'Clear unexists lang keys or not.'
+        );
+
+        $this->configurePackageOptions($command);
     }
 
     /**
@@ -92,10 +106,14 @@ class LangMergeCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         $filename = $io->getArgument('filename');
-        $to = $io->getArgument('target_locale');
-        $from = $io->getArgument('from_locale');
+        $locales = $io->getArgument('locales');
+        $clear = $io->getOption('clear');
 
-        $dir = $io->getOption('dir') ?? $this->app->path('@languages');
+        [$to, $from] = $this->getToAndFrom($locales);
+
+        $dir = $io->getOption('dir')
+            ?: $this->getPackageDir($io, '../resources/languages')
+            ?? $this->app->path('@languages');
         $sort = $io->getOption('sort');
         $replace = $io->getOption('replace');
 
@@ -119,8 +137,11 @@ class LangMergeCommand implements CommandInterface
 
             if ($toFile->exists()) {
                 $targetData = $toFile->readAndParse()
-                    ->collapse()
-                    ->only($data->keys()->dump());
+                    ->collapse();
+
+                if ($clear) {
+                    $targetData = $targetData->only($data->keys()->dump());
+                }
 
                 $data = $data->load($targetData);
             }
@@ -142,5 +163,55 @@ class LangMergeCommand implements CommandInterface
         }
 
         return 0;
+    }
+
+    protected function getToAndFrom(array $locales): array
+    {
+        $current = $this->app->config('language.locale') ?? 'en-US';
+        $fallback = $this->app->config('language.fallback') ?? 'en-US';
+
+        if (count($locales) === 0) {
+            return [$current, $fallback];
+        }
+
+        if (count($locales) === 1) {
+            $locales[] = $fallback;
+
+            return $locales;
+        }
+
+        if (count($locales) === 2) {
+            return $locales;
+        }
+
+        if (count($locales) === 3) {
+            $dir = match ($locales[1]) {
+                '>' => 2,
+                '<' => 0,
+                default => throw new RuntimeException('Direction must be \'>\' or \'<\''),
+            };
+
+            $to = $locales[$dir];
+            $from = $locales[$dir ? 0 : 2];
+
+            return [$to, $from];
+        }
+
+        throw new RuntimeException('Too many locales given.');
+    }
+
+    public function completeOptionValues($optionName, CompletionContext $context)
+    {
+    }
+
+    public function completeArgumentValues($argumentName, CompletionContext $context)
+    {
+        // if ($argumentName === 'filename') {
+        //
+        //
+        //     $files = Filesystem::files(WINDWALKER_RESOURCES . '/languages');
+        //
+        //     return array_map(fn(FileObject $file) => $file->getBasename(), iterator_to_array($files));
+        // }
     }
 }

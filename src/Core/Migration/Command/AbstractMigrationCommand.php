@@ -27,13 +27,13 @@ abstract class AbstractMigrationCommand implements CommandInterface
 {
     use CommandDatabaseTrait;
 
-    public const AUTO_BACKUP = 1;
+    public const int AUTO_BACKUP = 1;
 
-    public const NO_TIME_LIMIT = 1 << 1;
+    public const int NO_TIME_LIMIT = 1 << 1;
 
-    public const CREATE_DATABASE = 1 << 2;
+    public const int CREATE_DATABASE = 1 << 2;
 
-    public const TOGGLE_CONNECTION = 1 << 3;
+    public const int TOGGLE_CONNECTION = 1 << 3;
 
     #[Inject]
     protected ?ApplicationInterface $app = null;
@@ -64,6 +64,16 @@ abstract class AbstractMigrationCommand implements CommandInterface
             'f',
             InputOption::VALUE_NONE,
             'Force run and no confirm.'
+        );
+    }
+
+    public function configureRunningOptions(Command $command): void
+    {
+        $command->addOption(
+            'ignore-errors',
+            'e',
+            InputOption::VALUE_NONE,
+            'Ignore errors and continue the process.',
         );
     }
 
@@ -115,12 +125,12 @@ abstract class AbstractMigrationCommand implements CommandInterface
 
         $options = DatabaseManager::mergeDsnToOptions($db->getOptions());
 
-        $dbname = $options['dbname'];
+        $dbname = $options->dbname;
 
-        $options['dbname'] = null;
+        $options->dbname = null;
 
         $dbPreset = $factory->create(
-            $options['driver'],
+            $options->driver,
             $options
         );
 

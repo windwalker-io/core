@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace {% $ns %};
 
-use Windwalker\Utilities\Enum\EnumTranslatableInterface;
-use Windwalker\Utilities\Enum\EnumTranslatableTrait;
-use Windwalker\Utilities\Contract\LanguageInterface;
+use Windwalker\Utilities\Enum\EnumRichInterface;
+use Windwalker\Utilities\Enum\EnumRichTrait;
 
-enum {% pascal($name) %} implements EnumTranslatableInterface
+enum {% pascal($name) %}{% $type %} implements EnumRichInterface
 {
-    use EnumTranslatableTrait;
+    use EnumRichTrait;
 
+<?php if ($cases): ?>
+<?php foreach ($cases as $name => $value): ?>
+    case <?= $name ?> = '<?= $value ?>';
+<?php endforeach; ?>
+<?php else: ?>
     // case CASE = '';
+<?php endif; ?>
 
-    public function trans(LanguageInterface $lang, ...$args): string
+    protected function translateKey(string $name): string
     {
-        return $lang->trans('app.{% dot($name) %}.' . $this->name);
+        return "app.enum.{% dot($name) %}.$name";
     }
 }

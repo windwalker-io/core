@@ -17,22 +17,18 @@ use Windwalker\DI\Parameters;
  */
 trait AppContextTrait
 {
-    use WebApplicationTrait {
-        __get as magicGet;
-    }
+    use WebApplicationTrait;
 
     /**
      * @var callable|array
      */
     protected mixed $controller = null;
 
-    protected AppState $state;
+    public protected(set) AppState $state;
 
-    protected bool $isDebug = false;
+    public protected(set) bool $isDebug = false;
 
-    protected string $mode = '';
-
-    protected ?Parameters $params = null;
+    public protected(set) string $mode = '';
 
     public function getRootApp(): RootApplicationInterface
     {
@@ -117,9 +113,9 @@ trait AppContextTrait
      */
     public function setMatchedRoute(?Route $matchedRoute): static
     {
-        $this->appRequest = $this->appRequest->withMatchedRoute($matchedRoute);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequestInterface $request) => $request->withMatchedRoute($matchedRoute)
+        );
     }
 
     public function getQueryValues(): array
@@ -147,9 +143,9 @@ trait AppContextTrait
      */
     public function setUrlVars(array $vars): static
     {
-        $this->appRequest = $this->appRequest->withUrlVars($vars);
-
-        return $this;
+        return $this->modifyAppRequest(
+            fn (AppRequestInterface $request) => $request->withUrlVars($vars)
+        );
     }
 
     public function getHeader(string $name): string
@@ -167,17 +163,5 @@ trait AppContextTrait
     public function input(...$fields): mixed
     {
         return $this->appRequest->input(...$fields);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function __get(string $name)
-    {
-        if ($name === 'state') {
-            return $this->$name;
-        }
-
-        return $this->magicGet($name);
     }
 }

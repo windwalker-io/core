@@ -27,14 +27,14 @@ class Assert implements ContainerAttributeInterface
             }
 
             try {
-                $handler->getContainer()
+                $handler->container
                     ->get(FilterService::class)
                     ->validate($value, $this->command, $this->strict);
 
                 return $value;
             } catch (ValidateException $e) {
-                $debug = $handler->getContainer()->get(ApplicationInterface::class)->isDebug();
-                $name = $handler->getReflector()->getName();
+                $debug = $handler->container->get(ApplicationInterface::class)->isDebug();
+                $name = $handler->reflector->getName();
 
                 $message = sprintf("Invalid type of field \"%s\"", $name);
 

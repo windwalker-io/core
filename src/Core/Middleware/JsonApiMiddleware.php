@@ -7,6 +7,7 @@ namespace Windwalker\Core\Middleware;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Windwalker\Core\Http\Exception\ApiException;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
@@ -26,11 +27,11 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 {
     use DICreateTrait;
 
-    public function run(Closure $callback): ResponseInterface
+    public function run(ServerRequestInterface $request, Closure $next): mixed
     {
         try {
             /** @var ResponseInterface|mixed $response */
-            $response = $callback();
+            $response = $next($request);
 
             if ($response instanceof ResponseInterface) {
                 // Allow redirect
@@ -91,17 +92,35 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $apiException = ApiException::wrap($e);
         $e = $apiException->getPrevious() ?? $apiException;
 
+        $this->logError($e);
+
         $data = [];
+        $backtraces = null;
 
         if ($this->app->isDebug()) {
             $data['exception'] = $e::class;
-            $data['backtraces'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
+            $backtraces = BacktraceHelper::normalizeBacktraces($e->getTrace(), $this->app->path('@root'));
 
-            foreach ($data['backtraces'] as &$datum) {
-                unset($datum['pathname']);
-            }
+            // Add last caller
+            array_unshift(
+                $backtraces,
+                [
+                    'file' => BacktraceHelper::replaceRoot($e->getFile(), $this->app->path('@root'))
+                        . ':' . $e->getLine(),
+                    'function' => $e->getMessage(),
+                ]
+            );
 
-            unset($datum);
+            $data['backtraces'] = $backtraces = Arr::mapWithKeys(
+                $backtraces,
+                static fn($v, $k) => yield "#{$k} {$v['file']}" => $v['function']
+            );
+
+            // foreach ($data['backtraces'] as &$datum) {
+            //     unset($datum['pathname']);
+            // }
+
+            // unset($datum);
 
             // if (class_exists(DebuggerHelper::class)) {
             //     try {
@@ -110,17 +129,25 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             //         // None
             //     }
             // }
+
+            $data = array_merge($data, $apiException->debugData);
         }
 
-        $message = !$this->app->isDebug() ? $e->getMessage() : sprintf(
-            '#%d %s - File: %s (%d)',
-            $e->getCode(),
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
+        $data = array_merge($data, $apiException->data);
 
-        $buffer = new JsonBuffer($message, $data, false, $apiException->getCode());
+        $verbosity = $this->app->getVerbosity();
+
+        $message = !$verbosity->isVerbose()
+            ? $verbosity->displayMessage($e)
+            : sprintf(
+                '#%d %s - File: %s (%d)',
+                $apiException->getErrCode() ?: $e->getCode(),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
+
+        $buffer = new JsonBuffer($message, $data, false, $apiException->getErrCode());
         $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());
 
         return new JsonResponse($buffer)

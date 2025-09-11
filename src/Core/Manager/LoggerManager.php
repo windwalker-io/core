@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Manager;
 
 use Psr\Log\LoggerInterface;
+use Windwalker\Core\Factory\LoggerFactory;
 use Windwalker\DI\Attributes\Isolation;
 
 /**
@@ -16,18 +17,7 @@ use Windwalker\DI\Attributes\Isolation;
  * @deprecated  Use container tags instead.
  */
 #[Isolation]
-class LoggerManager extends AbstractManager
+class LoggerManager extends LoggerFactory
 {
-    public function getConfigPrefix(): string
-    {
-        return 'logs';
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getDefaultFactory(string $name, ...$args): mixed
-    {
-        return $this->config->getDeep($this->getFactoryPath($this->getDefaultName()));
-    }
+   //
 }

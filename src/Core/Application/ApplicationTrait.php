@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use Closure;
-use OutOfRangeException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
-use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Console\Process\ProcessRunnerTrait;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
-use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Crypt\SecretToolkit;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
+use Windwalker\DI\Parameters;
 use Windwalker\DI\ServiceProviderInterface;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Event\EventAwareInterface;
@@ -40,6 +36,10 @@ trait ApplicationTrait
     }
     use CoreEventAwareTrait;
     use ProcessRunnerTrait;
+
+    public Parameters $config {
+        get => $this->container->getParameters();
+    }
 
     public LoggerInterface $logger;
 
@@ -128,6 +128,28 @@ trait ApplicationTrait
         return (string) $this->config('app.mode');
     }
 
+    public function getVerbosity(): AppVerbosity
+    {
+        $verbosity = $this->config('app.verbosity');
+
+        if ($verbosity === null || $verbosity === '') {
+            return $this->isDebug() ? AppVerbosity::VERBOSE : AppVerbosity::NORMAL;
+        }
+
+        $verbosity = AppVerbosity::tryFrom((int) $verbosity) ?? AppVerbosity::NORMAL;
+
+        if ($verbosity->value < AppVerbosity::VERBOSE->value && $this->isDebug()) {
+            $verbosity = AppVerbosity::VERBOSE;
+        }
+
+        return $verbosity;
+    }
+
+    public function isVerbose(): bool
+    {
+        return $this->getVerbosity() >= 1;
+    }
+
     public function getSecret(): string
     {
         return (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
@@ -181,7 +203,7 @@ trait ApplicationTrait
 
     protected function registerAllConfigs(Container $container): void
     {
-        $container->registerByConfig($this->config('di') ?? [], $providers);
+        $providers = [];
 
         foreach (iterator_to_array($this->config) as $service => $config) {
             if (!is_array($config) || !($config['enabled'] ?? true)) {
@@ -190,6 +212,8 @@ trait ApplicationTrait
 
             $container->registerByConfig($config ?: [], $providers);
         }
+
+        $container->registerByConfig($this->config('di') ?? [], $providers);
 
         foreach ($providers as $provider) {
             if ($provider instanceof BootableDeferredProviderInterface) {
@@ -236,8 +260,12 @@ trait ApplicationTrait
             if ($dispatcher instanceof EventListenableInterface) {
                 if ($listener instanceof Closure) {
                     // Closure with ListenTo() attribute
-                    $event = AttributesAccessor::getFirstAttributeInstance($listener, ListenTo::class);
-                    $event->listen(
+                    /** @var ListenTo $event */
+                    $event = new \ReflectionFunction($listener)
+                        ->getAttributes(ListenTo::class, \ReflectionAttribute::IS_INSTANCEOF)[0]
+                        ?->newInstance();
+
+                    $event?->listen(
                         $dispatcher,
                         fn (...$args) => $container->call($listener, $args)
                     );
@@ -254,41 +282,40 @@ trait ApplicationTrait
                 // EventAwareObject name => Array<EventName, [object, __invoke]>
                 $listener[0] = $container->resolve($listener[0]);
                 $this->handleListener($container, $dispatcher, $name, $listener);
-            } elseif ($container->has($name)) {
-                // EventAwareObject name => Array<EventName or int, Listeners>
-                $container->extend($name, function (EventAwareInterface $object) use ($name, $listener, $container) {
+            } else {
+                $extends = function (EventAwareInterface $object) use ($name, $listener, $container) {
                     foreach ($listener as $eventName => $eventListener) {
                         $this->handleListener($container, $object->getEventDispatcher(), $eventName, $eventListener);
                     }
 
                     return $object;
-                });
+                };
+
+                // EventAwareObject name => Array<EventName or int, Listeners>
+                if ($container->has($name)) {
+                    $container->extend($name, $extends);
+                } else {
+                    $container->extendForCreate($name, $extends);
+                }
             }
-        } elseif ($container->has($name)) {
-            // EventAwareObject Array<int, Subscriber>
-            $container->extend($name, function (EventAwareInterface $object) use ($listener, $container) {
+        } else {
+            $extends = static function (EventAwareInterface $object) use ($listener, $container) {
                 $object->subscribe($container->resolve($listener));
 
                 return $object;
-            });
-        }
-    }
+            };
 
-    public function __get(string $name)
-    {
-        if ($name === 'config') {
-            return $this->getContainer()->getParameters();
+            // EventAwareObject Array<int, Subscriber>
+            if ($container->has($name)) {
+                $container->extend($name, $extends);
+            } else {
+                $container->extendForCreate($name, $extends);
+            }
         }
-
-        if ($name === 'container') {
-            return $this->getContainer();
-        }
-
-        throw new OutOfRangeException('No such property: ' . $name . ' in ' . static::class);
     }
 
     /**
-     * handleListeners
+     * Handle root listeners.
      *
      * @param  mixed      $listeners
      * @param  Container  $container
@@ -297,8 +324,10 @@ trait ApplicationTrait
      */
     public function handleListeners(mixed $listeners, Container $container): void
     {
+        $dispatcher = $this->getEventDispatcher();
+
         foreach ($listeners as $name => $listener) {
-            $this->handleListener($container, $this->getEventDispatcher(), $name, $listener);
+            $this->handleListener($container, $dispatcher, $name, $listener);
         }
     }
 }

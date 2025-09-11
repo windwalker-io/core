@@ -17,9 +17,20 @@ class PackageRegistry
      */
     protected array $packages = [];
 
+    /**
+     * @var AbstractPackage[][]
+     */
+    protected array $composerPackagesMap = [];
+
     public bool $discovered = false;
 
-    protected ?PackageInstaller $installer = null;
+    protected PackageInstaller $installer;
+
+    protected PackageMigrator $migrator;
+
+    public protected(set) array $rootComposerJson = [];
+
+    public protected(set) array $installedJson = [];
 
     /**
      * PackageRegistry constructor.
@@ -35,13 +46,18 @@ class PackageRegistry
         return $this->installer ??= new PackageInstaller(null, $this->app);
     }
 
+    public function getMigrator(): PackageMigrator
+    {
+        return $this->migrator ??= new PackageMigrator(null, $this->app);
+    }
+
     public function discover(): void
     {
         if ($this->discovered) {
             return;
         }
 
-        $mainComposer = json_decode(
+        $this->rootComposerJson = $mainComposer = json_decode(
             file_get_contents($this->app->path('@root/composer.json')),
             true,
             512,
@@ -50,7 +66,7 @@ class PackageRegistry
 
         // todo: Add ignore config
 
-        $installed = json_decode(
+        $this->installedJson = $installed = json_decode(
             file_get_contents($this->app->path('@root/vendor/composer/installed.json')),
             true,
             512,
@@ -67,12 +83,19 @@ class PackageRegistry
                 continue;
             }
 
+            $name = $manifest['name'] ?? null;
+
             foreach ($options['packages'] ?? [] as $packageClass) {
                 if (!is_subclass_of($packageClass, AbstractPackage::class)) {
                     continue;
                 }
 
-                $this->packages[$packageClass] = $this->app->make($packageClass);
+                $this->packages[$packageClass] = $package = $this->app->make($packageClass);
+
+                if ($name) {
+                    $this->composerPackagesMap[$name] ??= [];
+                    $this->composerPackagesMap[$name][] = $package;
+                }
             }
         }
 
@@ -86,10 +109,23 @@ class PackageRegistry
         $installer = $this->getInstaller();
 
         foreach ($this->packages as $package) {
-            $package->install($installer->getChild($package::getName()));
+            $package->install($installer->getChild($package));
         }
 
         return $installer;
+    }
+
+    public function prepareMigrate(): PackageMigrator
+    {
+        $this->discover();
+
+        $migrator = $this->getMigrator();
+
+        foreach ($this->packages as $package) {
+            $package->migrate($migrator->getChild($package::getName()));
+        }
+
+        return $migrator;
     }
 
     public function addPackage(AbstractPackage $package): static
@@ -115,7 +151,7 @@ class PackageRegistry
      *
      * @return  static  Return self to support chaining.
      */
-    public function setPackages(array $packages)
+    public function setPackages(array $packages): static
     {
         $this->packages = $packages;
 
@@ -124,12 +160,18 @@ class PackageRegistry
 
     public function getPackage(string $name): ?AbstractPackage
     {
-        foreach ($this->getPackages() as $package) {
-            if ($package::getName() === $name) {
-                return $package;
-            }
-        }
+        return array_find($this->getPackages(), fn($package) => $package::getName() === $name);
+    }
 
-        return null;
+    /**
+     * @return  AbstractPackage[][]
+     *
+     * @throws JsonException
+     */
+    public function getComposerPackagesMap(): array
+    {
+        $this->discover();
+
+        return $this->composerPackagesMap;
     }
 }

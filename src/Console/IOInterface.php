@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Interface IOInterface
@@ -19,9 +20,9 @@ interface IOInterface extends InputInterface, OutputInterface
     /**
      * Get style output.
      *
-     * @return  StyleInterface
+     * @return  SymfonyStyle
      */
-    public function style(): StyleInterface;
+    public function style(): SymfonyStyle;
 
     /**
      * Get error style.
@@ -115,4 +116,6 @@ interface IOInterface extends InputInterface, OutputInterface
      * @return  string
      */
     public function askAndHideAnswer(string|Question $question): mixed;
+
+    public function askChoice(string|Question $question, array $options, mixed $default = null): mixed;
 }

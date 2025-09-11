@@ -58,6 +58,7 @@ namespace Windwalker {
     use Windwalker\Core\DateTime\ChronosService;
     use Windwalker\Core\Http\CoreResponse;
     use Windwalker\Core\Manager\Logger;
+    use Windwalker\Core\Runtime\ConfigLoader;
     use Windwalker\Core\Runtime\Runtime;
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
@@ -86,16 +87,7 @@ namespace Windwalker {
     if (!function_exists('\Windwalker\include_arrays')) {
         function include_arrays(string $path, array $contextData = []): array
         {
-            $resultBag = [];
-
-            extract($contextData, EXTR_OVERWRITE);
-            unset($contextData);
-
-            foreach (glob($path) as $file) {
-                $resultBag += include $file;
-            }
-
-            return $resultBag;
+            return ConfigLoader::includeArrays($path, $contextData);
         }
     }
 
@@ -115,7 +107,7 @@ namespace Windwalker {
          *
          * @return Chronos
          */
-        function chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): Chronos
+        function chronos(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
         {
             return Chronos::wrap($date, $tz);
         }

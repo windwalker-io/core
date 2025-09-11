@@ -19,9 +19,9 @@ interface ApplicationInterface extends
     ServiceAwareInterface,
     ProcessRunnerInterface
 {
-    public const CLIENT_WEB = AppClient::WEB;
+    public const AppClient CLIENT_WEB = AppClient::WEB;
 
-    public const CLIENT_CONSOLE = AppClient::CONSOLE;
+    public const AppClient CLIENT_CONSOLE = AppClient::CONSOLE;
 
     public function getAppName(): string;
 
@@ -52,6 +52,10 @@ interface ApplicationInterface extends
      * @return  bool
      */
     public function isDebug(): bool;
+
+    public function getVerbosity(): AppVerbosity;
+
+    public function isVerbose(): bool;
 
     /**
      * getMode

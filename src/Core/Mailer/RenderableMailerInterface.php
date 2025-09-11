@@ -14,7 +14,7 @@ interface RenderableMailerInterface
     /**
      * renderBody
      *
-     * @param  string  $path
+     * @param  string  $layout
      * @param  array   $data
      * @param  array   $options
      *

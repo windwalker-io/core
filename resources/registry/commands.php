@@ -38,6 +38,8 @@ return [
     'asset:version' => \Windwalker\Core\Asset\Command\AssetVersionCommand::class,
 
     'pkg:install' => \Windwalker\Core\Package\Command\PackageInstallCommand::class,
+    'pkg:migrate' => \Windwalker\Core\Package\Command\PackageMigrateCommand::class,
+    'pkg:postinstall' => \Windwalker\Core\Package\Command\PackagePostInstallCommand::class,
 
     'run' => \Windwalker\Core\Command\RunCommand::class,
 
@@ -48,6 +50,7 @@ return [
     'crypt:secret' => \Windwalker\Core\Crypt\Command\CryptSecretCommand::class,
 
     'queue:worker' => \Windwalker\Core\Queue\Command\QueueWorkerCommand::class,
+    'queue:enqueuer' => \Windwalker\Core\Queue\Command\QueueEnqueuerCommand::class,
     'queue:restart' => \Windwalker\Core\Queue\Command\QueueRestartCommand::class,
     'queue:retry' => \Windwalker\Core\Queue\Command\QueueRetryCommand::class,
     'queue:table' => \Windwalker\Core\Queue\Command\QueueTableCommand::class,

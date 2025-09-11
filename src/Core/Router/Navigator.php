@@ -36,21 +36,25 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      */
     protected RouteBuilder $routeBuilder;
 
-    protected int $options = 0;
+    public protected(set) NavOptions $options;
 
     public function __construct(
         protected Router $router,
         EventEmitter $dispatcher,
         protected ?AppContext $app = null,
-        ?RouteBuilder $routeBuilder = null
+        ?RouteBuilder $routeBuilder = null,
     ) {
         $this->routeBuilder = $routeBuilder ?? new RouteBuilder(new Std());
         $this->dispatcher = $dispatcher;
+        $this->options = new NavOptions(
+            mode: NavMode::PATH,
+        );
     }
 
-    public function back(int $options = self::TYPE_PATH): RouteUri
+    public function back(NavOptions|int $options = new NavOptions()): RouteUri
     {
-        $options |= $this->options;
+        $options = $this->mergeDefaultOptions($options);
+        $options->allowQuery ??= false;
 
         $to = $this->localReferrer() ?? $this->getSystemUri()->root();
 
@@ -73,15 +77,17 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->isLocalUrl((string) $referrer) ? $referrer : null;
     }
 
-    public function self(int $options = self::TYPE_PATH): RouteUri
+    public function self(NavOptions|int $options = new NavOptions()): RouteUri
     {
+        $options = $this->mergeDefaultOptions($options);
+        $options->allowQuery ??= false;
+
         $route = $this->getMatchedRoute();
         $to = $route?->getName() ?? $this->getSystemUri()->current();
 
         $vars = [];
-        $withoutVars = (bool) ($options & static::WITHOUT_VARS);
 
-        if ($route && !$withoutVars) {
+        if ($route && !$options->withoutVars) {
             $keys = [];
 
             $variants = $this->routeBuilder->parse($route->getPattern());
@@ -96,7 +102,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $vars = Arr::only($route?->getVars(), $keys);
         }
 
-        $query = ($options & static::WITHOUT_QUERY) ? [] : $this->app->getServerRequest()->getQueryParams();
+        $query = $options->withoutQuery ? [] : $this->app->getServerRequest()->getQueryParams();
 
         return $this->to(
             $to,
@@ -108,16 +114,19 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         );
     }
 
-    public function selfNoQuery(int $options = self::TYPE_PATH): RouteUri
+    public function selfNoQuery(NavOptions|int $options = new NavOptions()): RouteUri
     {
-        return $this->self($options | static::WITHOUT_QUERY);
+        $options = $this->mergeDefaultOptions($options);
+        $options->withoutQuery = true;
+
+        return $this->self($options);
     }
 
-    public function to(string $route, array $query = [], int $options = self::TYPE_PATH): RouteUri
+    public function to(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
     {
-        $options |= $this->options;
+        $options = $this->mergeDefaultOptions($options);
 
-        $id = $route . ':' . $options;
+        $id = $route . ':' . json_encode($options);
 
         if ($query !== []) {
             $id .= ':' . json_encode($query);
@@ -128,7 +137,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             function () use ($options, $query, $route) {
                 $navigator = $this;
 
-                if (!($options & static::IGNORE_EVENTS)) {
+                if (!$options->ignoreEvents) {
                     $event = $this->emit(
                         new BeforeRouteBuildEvent(
                             route: $route,
@@ -154,7 +163,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                     $navigator = $this;
 
-                    if (!($options & static::IGNORE_EVENTS)) {
+                    if (!$options->ignoreEvents) {
                         $event = $this->emit(
                             new AfterRouteBuildEvent(
                                 url: $url,
@@ -188,45 +197,60 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      *
      * @param  Closure|Stringable|string  $uri
      * @param  array|null                 $vars
-     * @param  int                        $options
+     * @param  NavOptions|int             $options
      *
      * @return  RouteUri
      */
-    public function createRouteUri(mixed $uri, ?array $vars = [], int $options = 0): RouteUri
+    public function createRouteUri(mixed $uri, ?array $vars = [], NavOptions|int $options = new NavOptions()): RouteUri
     {
+        $options = $this->mergeDefaultOptions($options);
+
         return new RouteUri($uri, $vars, $this, $options);
     }
 
-    public function redirectInstant(Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
-    {
-        return $this->redirect($uri, $code, $options | static::REDIRECT_INSTANT);
+    public function redirectInstant(
+        Stringable|string $uri,
+        int $code = 303,
+        NavOptions|int $options = new NavOptions()
+    ): ResponseInterface {
+        $options = $this->mergeDefaultOptions($options);
+        $options->instant = true;
+
+        return $this->redirect($uri, $code, $options);
     }
 
-    public function redirect(Stringable|string $uri, int $code = 303, int $options = 0): ResponseInterface
-    {
-        if (!($options & static::REDIRECT_ALLOW_OUTSIDE)) {
+    public function redirect(
+        Stringable|string $uri,
+        int $code = 303,
+        NavOptions|int $options = new NavOptions()
+    ): ResponseInterface {
+        $options = $this->mergeDefaultOptions($options);
+
+        if (!$options->allowOutside) {
             $uri = $this->validateRedirectUrl($uri);
         }
 
-        return $this->app->redirect($uri, $code, (bool) ($options & static::REDIRECT_INSTANT));
+        return $this->app->redirect($uri, $code, (bool) $options->instant);
     }
 
     public function redirectTo(
         string $route,
         array $query = [],
         int $code = 303,
-        int $options = self::TYPE_PATH,
+        NavOptions|int $options = new NavOptions(),
     ): ResponseInterface {
+        $options = $this->mergeDefaultOptions($options);
+
         return $this->app->redirect(
             $this->to($route, $query),
             $code,
-            (bool) ($options & static::REDIRECT_INSTANT)
+            (bool) $options->instant
         );
     }
 
-    public function redirectSelf(int $code = 303, int $options = 0): ResponseInterface
+    public function redirectSelf(int $code = 303, NavOptions|int $options = new NavOptions()): ResponseInterface
     {
-        return $this->redirect($this->self(), $code, $options);
+        return $this->redirect($this->self($options), $code, $options);
     }
 
     public function isLocalUrl(Stringable|string $uri): bool
@@ -249,8 +273,10 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->isLocalUrl($uri) ? $uri : $root;
     }
 
-    public function absolute(string $url, int $options = RouteUri::TYPE_PATH): string
+    public function absolute(string $url, NavOptions|int $options = new NavOptions()): string
     {
+        $options = $this->mergeDefaultOptions($options);
+
         $systemUri = $this->getSystemUri();
 
         // if (!$systemUri) {
@@ -259,14 +285,14 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
         return $systemUri->absolute(
             $url,
-            (bool) ($options & static::TYPE_FULL)
+            $options->mode === NavMode::FULL
         );
     }
 
     /**
-     * @return int
+     * @return NavOptions
      */
-    public function getOptions(): int
+    public function getOptions(): NavOptions
     {
         return $this->options;
     }
@@ -274,14 +300,14 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     /**
      * type
      *
-     * @param  int  $options
+     * @param  NavOptions  $options
      *
      * @return  $this
      */
-    public function withOptions(int $options): static
+    public function withOptions(NavOptions|int $options): static
     {
         $new = clone $this;
-        $new->options = $options;
+        $new->options = $this->mergeDefaultOptions($options);
 
         return $new;
     }
@@ -320,13 +346,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function isActive(string|array $path, Closure|array|null $query = null, string $menu = 'mainmenu'): bool
     {
         if (is_array($path)) {
-            foreach ($path as $item) {
-                if ($this->isActive($item)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($path, fn($item) => $this->isActive($item));
         }
 
         $matched = $this->getMatchedRoute();
@@ -464,5 +484,20 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function getSystemUri(): SystemUri
     {
         return $this->app->getSystemUri();
+    }
+
+    /**
+     * @param  NavOptions|int  $options
+     *
+     * @return  NavOptions
+     */
+    protected function mergeDefaultOptions(NavOptions|int $options): NavOptions
+    {
+        return NavOptions::wrapWith($options)->defaults($this->options);
+    }
+
+    public function __clone(): void
+    {
+        $this->options = clone $this->options;
     }
 }
