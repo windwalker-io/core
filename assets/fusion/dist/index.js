@@ -1,39 +1,59 @@
-import c from "chalk";
-import { build as E, mergeConfig as _, defineConfig as T } from "vite";
-import { existsSync as y } from "node:fs";
-import { normalize as R, dirname as L, isAbsolute as x, resolve as d } from "node:path";
-import $ from "archy";
-import { cloneDeep as O, uniq as C } from "lodash-es";
-import W from "yargs";
-import { hideBin as D } from "yargs/helpers";
-import { fileURLToPath as I } from "node:url";
-import k from "autoprefixer";
-var p = /* @__PURE__ */ ((e) => (e.NONE = "none", e.SAME_FILE = "same_file", e.SEPARATE_FILE = "separate_file", e))(p || {});
-function S(e) {
+import { normalize as M, dirname as L } from "node:path";
+import { merge as P, cloneDeep as O } from "lodash-es";
+import D from "autoprefixer";
+import { resolve as b } from "path";
+import { mergeConfig as E } from "vite";
+import I from "@vitejs/plugin-vue";
+const B = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  get MinifyOptions() {
+    return f;
+  },
+  get css() {
+    return j;
+  },
+  get isDev() {
+    return S;
+  },
+  get isProd() {
+    return N;
+  },
+  get isVerbose() {
+    return p;
+  },
+  get js() {
+    return V;
+  },
+  get vue() {
+    return T;
+  }
+}, Symbol.toStringTag, { value: "Module" }));
+var f = /* @__PURE__ */ ((e) => (e.NONE = "none", e.SAME_FILE = "same_file", e.SEPARATE_FILE = "separate_file", e))(f || {});
+function A(e) {
   return Array.isArray(e) ? e : [e];
 }
-function M(e, t) {
+function F(e, t) {
   return Array.isArray(e) ? e.map(t) : t(e);
 }
-function F(e, t = {}) {
-  return e = M(e, (r) => (typeof r == "string" && (r.endsWith("/") ? r = {
+function h(e, t = {}) {
+  return e = F(e, (r) => (typeof r == "string" && (r.endsWith("/") ? r = {
     dir: r,
     ...t
   } : r = {
     dir: L(r),
     // Get file name with node library, consider Windows
-    entryFileNames: R(r).replace(/\\/g, "/").split("/").pop(),
+    entryFileNames: M(r).replace(/\\/g, "/").split("/").pop(),
     ...t
-  }), r)), S(e);
+  }), r)), A(e);
 }
-function f(e, ...t) {
+function u(e, ...t) {
   if (e ??= {}, !t.length)
     return e;
   for (const r of t)
-    r && (typeof r == "function" ? e = r(e) ?? e : e = { ...e, ...r });
+    r && (typeof r == "function" ? e = r(e) ?? e : e = P(e, r));
   return e;
 }
-function j(e) {
+function _(e) {
   if (e = O(e), e.file) {
     const t = e.file.split("."), r = t.pop();
     e.file = `${t.join(".")}.min.${r}`;
@@ -43,17 +63,18 @@ function j(e) {
   }
   return e;
 }
-function g(e, t) {
-  return f(
+function c(e, t) {
+  return u(
     {
       entry: e
     },
     t
   );
 }
-function b(e, t, r) {
-  return f(
+function o(e, t, r = [], n) {
+  return u(
     {
+      resolve: {},
       build: {
         lib: e,
         rollupOptions: {
@@ -61,379 +82,161 @@ function b(e, t, r) {
         },
         emptyOutDir: !1,
         target: "esnext"
-      }
+      },
+      plugins: r
     },
-    r
+    n
   );
 }
-async function B(e, t, r = {}) {
-  r.verbose ??= N;
-  let s = F(t, { format: "es" });
-  const n = [];
-  for (const o of s) {
-    const i = A(
+async function j(e, t, r = {}) {
+  r.verbose ??= p;
+  let n = h(t, { format: "es" });
+  const i = [];
+  for (const s of n) {
+    const l = v(
       e,
-      s,
+      n,
       r,
-      (l) => (l.build.minify = r.minify === p.SAME_FILE ? "esbuild" : !1, l.build.cssMinify = r.minify === p.SAME_FILE ? "esbuild" : !1, l)
+      (a) => (a.build.minify = r.minify === f.SAME_FILE ? "esbuild" : !1, a.build.cssMinify = r.minify === f.SAME_FILE ? "esbuild" : !1, a)
     );
-    if (n.push(f(i, r?.vite)), r?.minify === p.SEPARATE_FILE) {
-      const l = j(o), a = A(
+    if (i.push(u(l, r?.vite)), r?.minify === f.SEPARATE_FILE) {
+      const a = _(s), m = v(
         e,
-        l,
+        a,
         r,
-        (u) => (u.build.minify = "esbuild", u.build.cssMinify = "esbuild", u)
+        (d) => (d.build.minify = "esbuild", d.build.cssMinify = "esbuild", d)
       );
-      n.push(f(a, r?.vite));
+      i.push(u(m, r?.vite));
     }
   }
-  return n;
+  return i;
 }
-function A(e, t, r, s) {
+function v(e, t, r, n) {
   t = O(t);
-  const n = b(
+  const i = o(
     void 0,
     t,
-    (o) => {
-      o.build.rollupOptions.input = e, o.build.emptyOutDir = r.clean ?? !1;
-      for (const i of S(o.build.rollupOptions.output))
-        i.assetFileNames = String(i.entryFileNames), delete i.entryFileNames;
-      return o.build.cssCodeSplit = !0, o.css = {
+    [],
+    (s) => {
+      s.build.rollupOptions.input = e, s.build.emptyOutDir = r.clean ?? !1;
+      for (const l of A(s.build.rollupOptions.output))
+        l.assetFileNames = String(l.entryFileNames), delete l.entryFileNames;
+      return s.build.cssCodeSplit = !0, s.css = {
         // modules: {
         //   scopeBehaviour: 'global', // 或是 'global'
         // },
         transformer: "postcss",
-        postcss: f(
+        postcss: u(
           {
             plugins: [
-              k({ overrideBrowserslist: r.browserslist })
+              D({ overrideBrowserslist: r.browserslist })
             ]
           },
           r.postcss
         )
-      }, o;
+      }, s;
     }
   );
-  return f(
+  return u(
+    i,
     n,
-    s,
     r.vite
   );
 }
-async function U(e, t, r = {}) {
-  const s = f(
-    {
-      target: r?.target || "esnext"
-    },
-    r?.esbuild
-  );
-  return z(
+async function V(e, t, r = {}) {
+  return x(
     t,
     r,
-    (n, o) => o ? b(
-      g(e),
+    (n, i) => i ? o(
+      c(e),
       n,
-      (i) => (i.build.minify = "esbuild", i.build.emptyOutDir = r.clean || !1, i.build.target = r.target || "esnext", i.esbuild = s, i)
-    ) : b(
-      g(e),
+      [],
+      (s) => y(s, r)
+    ) : o(
+      c(e),
       n,
-      (i) => (i.build.minify = r?.minify === p.SAME_FILE ? "esbuild" : !1, i.build.emptyOutDir = r.clean || !1, i.build.target = r.target || "esnext", i.esbuild = s, i)
+      [],
+      (s) => y(s, r)
     )
   );
 }
-function z(e, t, r) {
-  t.verbose ??= N;
-  const s = F(e, { format: t?.format || "es" });
-  for (const i of s)
-    i.format === "umd" && (i.name = t?.umdName);
-  const n = [], o = r(s, !1);
-  if (n.push(f(o, t.vite)), t?.minify === p.SEPARATE_FILE) {
-    const i = s.map((a) => j(a)), l = r(i, !0);
-    n.push(f(l, t?.vite));
+function x(e, t, r) {
+  t.verbose ??= p;
+  const n = h(e, { format: t?.format || "es" });
+  for (const l of n)
+    l.format === "umd" && (l.name = t?.umdName);
+  const i = [], s = r(n, !1);
+  if (i.push(u(s, t.vite)), t?.minify === f.SEPARATE_FILE) {
+    const l = n.map((m) => _(m)), a = r(l, !0);
+    i.push(u(a, t?.vite));
   }
-  return n;
+  return i;
 }
-const V = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  MinifyOptions: p,
-  css: B,
-  js: U
-}, Symbol.toStringTag, { value: "Module" }));
-async function G(e, t) {
-  const r = [];
-  for (const s in e) {
-    const n = [], o = e[s];
-    console.log(`▶️ - ${c.cyan(s)} Start...`);
-    for (const l of o) {
-      const a = E(T(l));
-      t.series && await a, n.push(a);
+function y(e, t) {
+  const r = u(
+    {
+      target: t?.target || "esnext"
+    },
+    t?.esbuild
+  );
+  if (e.build.minify = t?.minify === f.SAME_FILE ? "esbuild" : !1, e.build.emptyOutDir = t.clean || !1, e.build.target = t.target || "esnext", e.esbuild = r, e = w(e, t.externals), t.path)
+    if (e = E(e, { resolve: { alias: {} } }), typeof t.path == "string")
+      e.resolve.alias = {
+        "@": b(t.path)
+      };
+    else {
+      const n = {};
+      for (const i in t.path)
+        n[i] = b(t.path[i]);
+      e.resolve.alias = n;
     }
-    const i = Promise.all(n).then(() => {
-      console.log(`✅ - ${c.cyan(s)} completed.`);
-    });
-    t.series && await i, r.push(i);
-  }
-  await Promise.all(r);
+  return e;
 }
-async function q(e, t) {
-  const r = [];
-  for (const n in e) {
-    const o = e[n];
-    console.log(`▶️ - ${c.cyan(n)} Start...`);
-    for (const i of o) {
-      const l = E(
-        _(
-          T(i),
-          {
-            build: { watch: {} }
-          }
-        )
-      );
-      l.then((a) => {
-        a.on("event", (u) => {
-          switch (u.code) {
-            case "START":
-              console.log("→ Start Watching...");
-              break;
-            case "BUNDLE_START":
-              console.log("→ Start Bundling...");
-              break;
-            case "BUNDLE_END":
-              console.log(`✔ Bundled, uses ${u.duration}ms`), u.result?.close();
-              break;
-            case "END":
-              console.log("Watching...");
-              break;
-            case "ERROR":
-              console.error("✖ ERROR: ", u.error);
-              break;
-          }
-        });
-      }), r.push(l);
-    }
-  }
-  const s = await Promise.all(r);
-  process.on("SIGINT", async () => {
-    for (const n of s)
-      await n.close();
-    console.log(`
-🛑 STOP Watching...`), process.exit(0);
-  });
+function w(e, t) {
+  if (!t)
+    return e;
+  if (e = E(e, { build: { rollupOptions: { external: [] } } }), !Array.isArray(e.build.rollupOptions.external))
+    throw new Error("Only array externals are supported now.");
+  for (const r in t)
+    e.build.rollupOptions.external.includes(r) || e.build.rollupOptions.external.push(r);
+  return e.build.rollupOptions.output = F(e.build.rollupOptions.output, (r) => (r.globals = {
+    ...r.globals,
+    ...t
+  }, r)), e;
 }
-async function J(e) {
-  let t = e.path;
-  if (process.platform === "win32") {
-    const s = t.replace(/\\/g, "/");
-    s.startsWith("file://") || (t = `file:///${s}`);
-  }
-  return { ...await import(t) };
+async function T(e, t, r = {}) {
+  return x(
+    t,
+    r,
+    (n, i) => o(
+      c(e),
+      n,
+      [
+        I()
+      ],
+      (s) => (s = y(s, r), s.build.sourcemap = S ? "inline" : !1, s)
+    )
+  );
 }
-async function h(e, t = !1) {
-  return !t && Array.isArray(e) ? (await Promise.all(e.map((s) => h(s, !0)))).flat() : v(typeof e == "function" ? await e() : await e, e?.name);
-}
-async function v(e, t) {
-  if (!Array.isArray(e))
-    return [await e];
-  const r = await Promise.all(e), s = [];
-  for (const n of r)
-    Array.isArray(n) ? s.push(...n) : s.push(n);
-  return s;
-}
-function H(e, t) {
-  const r = K(e, t);
-  if (!r)
-    throw new Error("No config file found. Please create a fusionfile.js or fusionfile.ts in the root directory.");
-  return r;
-}
-function K(e, t) {
-  let r = t?.config;
-  return r ? (x(r) || (r = d(e, r)), y(r) ? {
-    path: r,
-    // get filename from file path
-    filename: r.split("/").pop() || "",
-    type: X(r),
-    ts: Y(r)
-  } : null) : Q(e);
-}
-function Q(e) {
-  let t = d(e, "fusionfile.js");
-  return y(t) ? {
-    path: t,
-    // get filename from file path
-    filename: t.split("/").pop() || "",
-    type: "commonjs",
-    ts: !1
-  } : (t = d(e, "fusionfile.mjs"), y(t) ? {
-    path: t,
-    // get filename from file path
-    filename: t.split("/").pop() || "",
-    type: "module",
-    ts: !1
-  } : (t = d(e, "fusionfile.ts"), y(t) ? {
-    path: t,
-    // get filename from file path
-    filename: t.split("/").pop() || "",
-    type: "module",
-    ts: !0
-  } : (t = d(e, "fusionfile.mts"), y(t) ? {
-    path: t,
-    // get filename from file path
-    filename: t.split("/").pop() || "",
-    type: "module",
-    ts: !0
-  } : null)));
-}
-function X(e) {
-  let t = "unknown";
-  return e.endsWith(".cjs") ? t = "commonjs" : (e.endsWith(".mjs") || e.endsWith(".ts") || e.endsWith(".mts")) && (t = "module"), t;
-}
-function Y(e) {
-  return e.endsWith(".ts") || e.endsWith(".mts");
-}
-async function Z(e) {
-  const t = Object.keys(e);
-  t.sort((n, o) => n === "default" ? -1 : o === "default" ? 1 : n.localeCompare(o));
-  const r = [];
-  for (const n of t) {
-    const o = e[n], i = await h(o, !0);
-    r.push(await P(n, i));
-  }
-  const s = $({
-    label: c.magenta("Available Tasks"),
-    nodes: r
-  });
-  console.log(s);
-}
-async function P(e, t) {
-  const r = [];
-  Array.isArray(t) || (t = [t]);
-  for (const s of t)
-    if (typeof s == "function") {
-      let n = await h(s, !0);
-      r.push(
-        await P(s.name, n)
-      );
-    } else
-      r.push(ee(s));
+let p = !1;
+const N = process.env.NODE_ENV === "production", S = !N;
+function W(e = {}) {
   return {
-    label: c.cyan(e),
-    nodes: r
+    name: "fusion",
+    config(t, r) {
+      console.log(r);
+    }
   };
 }
-function ee(e, t = 4) {
-  const r = [], s = e.build?.lib;
-  if (s && s.entry) {
-    const o = s.entry;
-    let i = "";
-    typeof o == "string" ? i = c.yellow(o) : Array.isArray(o) ? i = c.yellow(o.join(", ")) : typeof o == "object" && (i = c.yellow(Object.values(o).join(", "))), r.push(`Input: ${i}`);
-  }
-  const n = e.build?.rollupOptions?.output;
-  return n && (Array.isArray(n) ? n : [n]).forEach((i, l) => {
-    let a = "";
-    i.file ? a = c.green(i.file) : i.dir && (a = c.green(i.dir)), r.push(`Output[${l}]: ${a}`);
-  }), r.join(" - ");
-}
-function te(e, t) {
-  e = C(e), e.length === 0 && e.push("default");
-  const r = {};
-  for (const s of e)
-    if (t[s])
-      r[s] = t[s];
-    else
-      throw new Error(`Task "${c.cyan(s)}" not found in fusion config.`);
-  return r;
-}
-async function re(e) {
-  const t = {}, r = {};
-  for (const s in e) {
-    const n = e[s];
-    r[s] = await w(s, n, t);
-  }
-  return r;
-}
-async function w(e, t, r) {
-  const s = [];
-  if (Array.isArray(t))
-    for (const n in t) {
-      const o = t[n];
-      s.push(...await w(n, o, r));
-    }
-  else if (typeof t == "function") {
-    if (e = t.name || e, r[e])
-      return [];
-    r[e] = t;
-    const n = await h(t, !0);
-    if (Array.isArray(n))
-      for (const o in n) {
-        const i = n[o];
-        s.push(...await w(o, i, r));
-      }
-  } else
-    s.push(await t);
-  return s;
-}
-function se() {
-  const e = W();
-  return e.option("watch", {
-    alias: "w",
-    type: "boolean",
-    description: "Watch files for changes and re-run the tasks"
-  }), e.option("cwd", {
-    type: "string",
-    description: "Current working directory"
-  }), e.option("list", {
-    alias: "l",
-    type: "boolean",
-    description: "List all available tasks"
-  }), e.option("config", {
-    alias: "c",
-    type: "string",
-    description: "Path to config file"
-  }), e.option("series", {
-    alias: "s",
-    type: "boolean",
-    description: "Run tasks in series instead of parallel"
-  }), e.option("verbose", {
-    alias: "v",
-    type: "count",
-    description: "Increase verbosity of output. Use multiple times for more verbosity."
-  }), e.parseSync(D(process.argv));
-}
-async function ne(e) {
-  try {
-    await ie(e);
-  } catch (t) {
-    if (t instanceof Error) {
-      if (e.verbose && e.verbose > 0)
-        throw t;
-      console.error(t), process.exit(1);
-    } else
-      throw t;
-  }
-}
-async function ie(e) {
-  let t = e?.cwd, r;
-  t ? (r = t = d(t), process.chdir(t)) : r = process.cwd();
-  const s = H(r, e), n = await J(s);
-  if (e.list) {
-    await Z(n);
-    return;
-  }
-  const o = te([...e._], n), i = await re(o);
-  e.watch ? await q(i) : await G(i, e);
-}
-let m;
-const oe = process.argv[1] && I(import.meta.url) === process.argv[1], be = {
-  ...V,
-  params: m
-};
-oe && (m = se(), ne(m));
-const N = m?.verbose ? m?.verbose > 0 : !1;
 export {
-  p as MinifyOptions,
-  B as css,
-  be as default,
-  N as isVerbose,
-  U as js
+  f as MinifyOptions,
+  j as css,
+  B as default,
+  S as isDev,
+  N as isProd,
+  p as isVerbose,
+  V as js,
+  W as useFusion,
+  T as vue
 };
 //# sourceMappingURL=index.js.map

@@ -44,7 +44,7 @@ export default defineConfig({
   plugins: [
     dts({
       // entryRoot: 'src',
-      // outDir: 'dist',
+      outDir: 'dist',
       tsconfigPath: './tsconfig.json',
       insertTypesEntry: true,
       // merge to 1 file
