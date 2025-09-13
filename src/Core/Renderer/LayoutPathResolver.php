@@ -9,6 +9,7 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
 use Windwalker\Renderer\CompositeRenderer;
+use Windwalker\Utilities\Cache\InstanceCacheTrait;
 use Windwalker\Utilities\Iterator\PriorityQueue;
 
 /**
@@ -16,6 +17,8 @@ use Windwalker\Utilities\Iterator\PriorityQueue;
  */
 class LayoutPathResolver
 {
+    use InstanceCacheTrait;
+
     protected array $aliases = [];
 
     /**
@@ -44,8 +47,14 @@ class LayoutPathResolver
         }
     }
 
-    public function resolveLayout(string $layout, array $extensions = []): string
+    public function resolveLayout(string $layout, array $extensions = [], bool $refresh = false): string
     {
+        $key = $layout . ':' . implode(',', $extensions);
+
+        if (!$refresh && array_key_exists($key, $this->cacheStorage)) {
+            return $this->cacheStorage[$key];
+        }
+
         $layout = $this->resolveAlias($layout);
 
         [$ns, $layout] = static::extractNamespace($layout);
@@ -60,7 +69,7 @@ class LayoutPathResolver
             );
 
             if ($info) {
-                return $info->getPathname();
+                return $this->cacheStorage[$key] = $info->getPathname();
             }
         }
 

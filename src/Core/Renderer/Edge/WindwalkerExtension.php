@@ -15,6 +15,7 @@ use Windwalker\Core\Router\SystemUri;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
 use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
+use Windwalker\Edge\Extension\ParsersExtensionInterface;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
@@ -25,7 +26,8 @@ use Windwalker\Utilities\Cache\InstanceCacheTrait;
 class WindwalkerExtension implements
     EdgeExtensionInterface,
     DirectivesExtensionInterface,
-    GlobalVariablesExtensionInterface
+    GlobalVariablesExtensionInterface,
+    ParsersExtensionInterface
 {
     use InstanceCacheTrait;
 
@@ -56,37 +58,37 @@ class WindwalkerExtension implements
     public function getDirectives(): array
     {
         return [
-            'lang' => [$this, 'lang'],
-            'translate' => [$this, 'lang'],
-            'choice' => [$this, 'choice'],
-            'messages' => [$this, 'messages'],
-            // 'widget' => [$this, 'widget'],
-            // 'route' => [$this, 'route'],
-            'formToken' => [$this, 'formToken'],
-            'csrf' => [$this, 'formToken'],
-            'nonce' => [$this, 'cspNonce'],
+            'lang' => $this->lang(...),
+            'translate' => $this->lang(...),
+            'choice' => $this->choice(...),
+            'messages' => $this->messages(...),
+            // 'widget' => $this->widget(...),
+            // 'route' => $this->route(...),
+            'formToken' => $this->formToken(...),
+            'csrf' => $this->formToken(...),
+            'nonce' => $this->cspNonce(...),
 
             // Authorisation
-            'can' => [$this, 'can'],
-            'cannot' => [$this, 'cannot'],
-            'endcan' => [$this, 'endcan'],
-            'endcannot' => [$this, 'endcan'],
+            'can' => $this->can(...),
+            'cannot' => $this->cannot(...),
+            'endcan' => $this->endcan(...),
+            'endcannot' => $this->endcan(...),
 
             // Asset
-            // 'css' => [$this, 'css'],
-            // 'js' => [$this, 'js'],
-            'teleport' => [$this, 'teleport'],
-            'endTeleport' => [$this, 'endTeleport'],
-            'attr' => [$this, 'attr'],
+            // 'css' => $this->css(...),
+            // 'js' => $this->js(...),
+            'teleport' => $this->teleport(...),
+            'endTeleport' => $this->endTeleport(...),
+            'attr' => $this->attr(...),
 
             // Debug
-            'dump' => [$this, 'dump'],
-            'shown' => [$this, 'shown'],
-            'dd' => [$this, 'dd'],
-            'ds' => [$this, 'ds'],
-            'die' => [$this, 'dead'],
-            'debug' => [$this, 'debug'],
-            'enddebug' => [$this, 'enddebug'],
+            'dump' => $this->dump(...),
+            'shown' => $this->shown(...),
+            'dd' => $this->dd(...),
+            'ds' => $this->ds(...),
+            'die' => $this->dead(...),
+            'debug' => $this->debug(...),
+            'enddebug' => $this->enddebug(...),
         ];
     }
 
@@ -343,6 +345,36 @@ class WindwalkerExtension implements
                     $this->app->service(RendererService::class)->getGlobals()
                 );
             }
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParsers(): array
+    {
+        return [
+            $this->stripInPageScripts(...)
+        ];
+    }
+
+    protected function stripInPageScripts(string $content): string
+    {
+        $regexes = [
+            // Remove <style type="text/scss">...</style>
+            '/<style\b[^>]*\btype\s*=\s*(?:("|\')text\/scss("|\'))[^>]*>.*?<\/style>/is',
+
+            // Remove <script lang="scss">...</style>
+            '/<script\b[^>]*\blang\s*=\s*(?:("|\')scss("|\'))[^>]*>.*?<\/script>/is',
+
+            // Remove <script lang="ts">...</script>
+            '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*>.*?<\/script>/is',
+        ];
+
+        return preg_replace(
+            $regexes,
+            '',
+            $content
         );
     }
 }

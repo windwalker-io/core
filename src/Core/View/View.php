@@ -130,6 +130,21 @@ class View implements EventAwareInterface, \ArrayAccess
         );
     }
 
+    /**
+     * @param  string  $fullLayout
+     *
+     * @return  string
+     */
+    public function getStyleScope(string $fullLayout): string
+    {
+        $fullLayout = Path::relative(WINDWALKER_ROOT, $fullLayout);
+
+        $segments = explode('.', basename($fullLayout));
+        $layoutName = array_shift($segments);
+
+        return $layoutName . '-' . substr(sha1($fullLayout), 0, 8);
+    }
+
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->define('layout_var_name')
@@ -452,6 +467,7 @@ class View implements EventAwareInterface, \ArrayAccess
         $names = explode('\\', $fullName);
         $shortName = array_pop($names);
         $viewName = Str::removeRight($shortName, 'View');
+        $fullLayout = $this->rendererService->resolveLayout($this->layout);
 
         $stage = null;
 
@@ -467,6 +483,7 @@ class View implements EventAwareInterface, \ArrayAccess
         $classNames[] = 'module-' . $module;
         $classNames[] = 'view-' . $viewName;
         $classNames[] = 'layout-' . str_replace('.', '-', $this->layout);
+        $classNames[] = 'scope-' . $this->getStyleScope($fullLayout);
 
         $c = StrNormalize::toKebabCase(implode('##', $classNames));
 
