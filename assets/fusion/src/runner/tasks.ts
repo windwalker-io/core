@@ -1,3 +1,4 @@
+import { ProcessorInterface } from '@/processors/ProcessorInterface.ts';
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
 import { MaybeArray } from 'rollup';
@@ -28,7 +29,7 @@ export function selectRunningTasks(
   return selected;
 }
 
-export async function resolveAllTasksAsOptions(tasks: Record<string, LoadedConfigTask>): Promise<RunningTasks> {
+export async function resolveAllTasksAsProcessors(tasks: Record<string, LoadedConfigTask>): Promise<RunningTasks> {
   const cache: Record<string, MaybeArray<LoadedConfigTask>> = {};
   const allTasks: RunningTasks = {};
 
@@ -45,8 +46,8 @@ export async function resolveTaskAsFlat(
   name: string,
   task: LoadedConfigTask,
   cache: Record<string, MaybeArray<LoadedConfigTask>>
-): Promise<UserConfig[]> {
-  const results: UserConfig[] = [];
+): Promise<ProcessorInterface[]> {
+  const results: ProcessorInterface[] = [];
 
   if (Array.isArray(task)) {
     for (const n in task) {

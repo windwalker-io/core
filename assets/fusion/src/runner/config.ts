@@ -1,5 +1,9 @@
-import { existsSync } from 'node:fs';
-import { isAbsolute, resolve } from 'node:path';
+import { ProcessorInterface } from '@/processors/ProcessorInterface.ts';
+import { forceArray } from '@/utilities/arr.ts';
+import { build } from 'esbuild';
+import Module from 'module';
+import { existsSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, resolve } from 'node:path';
 import { MaybeArray, MaybePromise } from 'rollup';
 import { UserConfig } from 'vite';
 import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types/runner';
@@ -9,6 +13,7 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
 
   // If is Windows, Add "file://" prefix to path
   if (process.platform === 'win32') {
+    // todo: try use pathToFileURL(): import { pathToFileURL } from 'url';
     // Replace backslash to slash
     const winPath = path.replace(/\\/g, '/');
     // Add file:// prefix if not exists
@@ -20,12 +25,49 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
     }
   }
 
-  const modules = await import(path);
+  if (configFile.ts) {
+    const buildResult = await build({
+      entryPoints: [configFile.path],
+      bundle: true,
+      write: false,
+      outdir: 'dist',
+      platform: 'node',
+      format: 'cjs',
+      target: 'esnext',
+      external: ['../dist', '../dist/*'],
+      packages: 'external',
+      sourcemap: 'inline',
+    });
+    
+    const output = buildResult.outputFiles[0];
 
-  return { ...modules };
+    const code = Buffer.from(output.contents).toString('utf8');
+    writeFileSync(output.path, code);
+    const m = new Module(output.path, undefined);
+    m.filename = output.path;
+    m.paths = Module._nodeModulePaths(dirname(output.path));
+    m._compile(code, output.path);
+
+    const modules = { ...m.exports };
+    delete modules.__esModule;
+
+    return { ...modules };
+  } else {
+    const modules = await import(path);
+
+    return { ...modules };
+  }
 }
 
-export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunctions = false): Promise<UserConfig[]> {
+export async function resolveTaskResults(task: LoadedConfigTask) {
+  task = await task;
+
+  return Promise.all(forceArray(task));
+}
+
+export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunctions = false): Promise<ProcessorInterface[]> {
+  task = await task;
+
   if (!resolveSubFunctions && Array.isArray(task)) {
     const results = await Promise.all(task.map((task) => resolveTaskOptions(task, true)));
     return results.flat();
@@ -35,10 +77,10 @@ export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunct
     return resolvePromisesToFlatArray(await task(), task?.name);
   }
 
-  return resolvePromisesToFlatArray((await task) as MaybeArray<UserConfig>, task?.name);
+  return resolvePromisesToFlatArray((await task) as MaybeArray<ProcessorInterface>, task?.name);
 }
 
-async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<UserConfig>>, name?: string) {
+async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<ProcessorInterface>>, name?: string) {
   if (!Array.isArray(tasks)) {
     return [await tasks];
   }

@@ -1,7 +1,7 @@
 import { buildAll, watchAll } from '@/runner/build';
 import { loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe';
-import { resolveAllTasksAsOptions, selectRunningTasks } from '@/runner/tasks';
+import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks';
 import { RunnerCliParams } from '@/types/runner';
 import { defineAllConfigs } from '@/utilities/vite';
 import { resolve } from 'node:path';
@@ -9,14 +9,20 @@ import { inspect } from 'node:util';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
-export function parseArgv(): RunnerCliParams {
+export function getArgsAfterDoubleDashes(argv?: string[]): string[] {
+  argv ??= process.argv;
+
+  return argv.slice(2).join(' ').split('--').slice(1).join('--').trim().split(' ');
+}
+
+export function parseArgv(argv: string[]): RunnerCliParams {
   const app = yargs();
 
-  app.option('watch', {
-    alias: 'w',
-    type: 'boolean',
-    description: 'Watch files for changes and re-run the tasks',
-  });
+  // app.option('watch', {
+  //   alias: 'w',
+  //   type: 'boolean',
+  //   description: 'Watch files for changes and re-run the tasks',
+  // });
 
   app.option('cwd', {
     type: 'string',
@@ -35,11 +41,11 @@ export function parseArgv(): RunnerCliParams {
     description: 'Path to config file',
   });
 
-  app.option('series', {
-    alias: 's',
-    type: 'boolean',
-    description: 'Run tasks in series instead of parallel',
-  });
+  // app.option('series', {
+  //   alias: 's',
+  //   type: 'boolean',
+  //   description: 'Run tasks in series instead of parallel',
+  // });
 
   app.option('verbose', {
     alias: 'v',
@@ -47,7 +53,7 @@ export function parseArgv(): RunnerCliParams {
     description: 'Increase verbosity of output. Use multiple times for more verbosity.',
   });
 
-  return app.parseSync(hideBin(process.argv));
+  return app.parseSync(argv);
 }
 
 export async function runApp(argv: RunnerCliParams) {
@@ -96,7 +102,7 @@ export async function processApp(params: RunnerCliParams) {
   // Select running tasks
   const selectedTasks = selectRunningTasks([...params._] as string[], tasks);
 
-  const runningTasks = (await resolveAllTasksAsOptions(selectedTasks));
+  const runningTasks = (await resolveAllTasksAsProcessors(selectedTasks));
 
   if (params.watch) {
     await watchAll(runningTasks, params);

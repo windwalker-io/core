@@ -11,7 +11,7 @@
   "scripts": {
     "clean": "rimraf test/dest",
     "build": "vite build",
-    "dev": "vite build --watch",
+    "dev": "vite build --watch --mode development",
     "test": "yarn clean && yarn vite build ./test"
   },
   "dependencies": {
@@ -26,7 +26,6 @@
     "gulp": "^5.0.1",
     "gulp-error-handle": "^1.0.1",
     "gulp-livereload": "^4.0.2",
-    "lodash-es": "^4.17.21",
     "minimist": "^1.2.8",
     "rollup-plugin-esbuild": "^6.2.1",
     "rollup-plugin-postcss": "^4.0.2",
@@ -41,16 +40,18 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/events": "^3",
-    "@types/lodash-es": "^4",
+    "@types/lodash-es": "^4.17.12",
     "@types/minimist": "^1",
     "@types/node": "^24.3.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "cross-env": "^10.0.0",
+    "lodash-es": "^4.17.21",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "tsx": "^4.20.4",
     "vue": "^3.5.20"
   },
-  "bin": "dist/runner.js"
+  "bin": "dist/runner.js",
+  "packageManager": "yarn@4.9.4+sha512.7b1cb0b62abba6a537b3a2ce00811a843bea02bcf53138581a6ae5b1bf563f734872bd47de49ce32a9ca9dcaff995aa789577ffb16811da7c603dcf69e73750b"
 }

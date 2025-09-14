@@ -1,7 +1,6 @@
-import { InputOption, OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
-export type TaskInput = InputOption;
-export type TaskOutput = OutputOptions | OutputOptions[] | string;
+export type TaskInput = string | string[];
+export type TaskOutput = string;
 export interface ProcessorOptions {
     vite?: ExtraViteOptions;
     verbose?: boolean;

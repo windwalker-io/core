@@ -1,10 +1,11 @@
-import chalk from 'chalk';
+import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
+import { LoadedConfigTask } from '@/types';
+import { forceArray } from '@/utilities/arr.ts';
 import archy, { type Data } from 'archy';
-import { shuffle } from 'lodash-es';
-import { MaybeArray, OutputOptions, RollupOptions } from 'rollup';
-import { LibraryOptions, UserConfig } from 'vite';
+import chalk from 'chalk';
+import { MaybeArray } from 'rollup';
+import { UserConfig } from 'vite';
 import { resolveTaskOptions } from './config';
-import { LoadedConfigTask } from '../types/runner';
 
 export async function displayAvailableTasks(tasks: Record<string, LoadedConfigTask>) {
   const keys = Object.keys(tasks);
@@ -26,9 +27,9 @@ export async function displayAvailableTasks(tasks: Record<string, LoadedConfigTa
 
   for (const key of keys) {
     const task = tasks[key];
-    const taskOptions = await resolveTaskOptions(task, true);
+    // const taskOptions = await resolveTaskOptions(task, true);
 
-    nodes.push(await describeTasks(key, taskOptions));
+    nodes.push(await describeTasks(key, task));
   }
 
   const text = archy({
@@ -39,22 +40,21 @@ export async function displayAvailableTasks(tasks: Record<string, LoadedConfigTa
   console.log(text);
 }
 
-async function describeTasks(name: string, tasks: MaybeArray<UserConfig>): Promise<Data> {
+async function describeTasks(name: string, tasks: LoadedConfigTask): Promise<Data> {
   const nodes = [];
-  // console.log(name, tasks)
-  if (!Array.isArray(tasks)) {
-    tasks = [tasks]
-  }
-  
-  for (const task of tasks) {
-    if (typeof task === 'function') {
-      let taskOptions = await resolveTaskOptions(task, true);
+  tasks = forceArray(await tasks);
 
-      nodes.push(
-        await describeTasks((task as Function).name, taskOptions)
-      );
-    } else {
-      nodes.push(describeTaskDetail(task));
+  for (let task of tasks) {
+    const processors = await resolveTaskOptions(task, true);
+
+    for (const processor of processors) {
+      if (typeof processor === 'function') {
+        nodes.push(
+          await describeTasks((processor as Function).name, processor)
+        );
+      } else {
+        nodes.push(...await describeProcessor(processor));
+      }
     }
   }
 
@@ -64,41 +64,44 @@ async function describeTasks(name: string, tasks: MaybeArray<UserConfig>): Promi
   };
 }
 
-function describeTaskDetail(task: UserConfig, indent: number = 4): string {
+async function describeProcessor(processor: ProcessorInterface): Promise<string[]> {
+  const results = await processor.preview();
+
+  return Promise.all(results.map((result) => describeProcessorPreview(result)));
+}
+
+async function describeProcessorPreview(preview: ProcessorPreview): Promise<string> {
   const str = [];
 
-  const lib = task.build?.lib;
+  const { input: entry, output, extra } = preview;
 
   // Input
-  if (lib && lib.entry) {
-    const entry = lib.entry;
-
-    let inputStr = '';
-    if (typeof entry === 'string') {
-      inputStr = chalk.yellow(entry);
-    } else if (Array.isArray(entry)) {
-      inputStr = chalk.yellow(entry.join(', '));
-    } else if (typeof entry === 'object') {
-      inputStr = chalk.yellow(Object.values(entry).join(', '));
-    }
-    str.push(`Input: ${inputStr}`);
-  }
-
-  const output = task.build?.rollupOptions?.output;
+  const inputStr = chalk.yellow(entry);
+  // if (typeof entry === 'string') {
+  //   inputStr = chalk.yellow(entry);
+  // } else if (Array.isArray(entry)) {
+  //   inputStr = chalk.yellow(entry.join(', '));
+  // } else if (typeof entry === 'object') {
+  //   inputStr = chalk.yellow(Object.values(entry).join(', '));
+  // }
+  str.push(`Input: ${inputStr}`);
 
   // Output
-  if (output) {
-    const outputs = Array.isArray(output) ? output : [output];
-    outputs.forEach((output, index) => {
-      let outStr = '';
-      if (output.file) {
-        outStr = chalk.green(output.file);
-      } else if (output.dir) {
-        outStr = chalk.green(output.dir);
-      }
-      str.push(`Output[${index}]: ${outStr}`);
-    });
-  }
+  // if (output) {
+  //   const outputs = Array.isArray(output) ? output : [output];
+  //   outputs.forEach((output, index) => {
+  //     let outStr = '';
+  //     if (output.file) {
+  //       outStr = chalk.green(output.file);
+  //     } else if (output.dir) {
+  //       outStr = chalk.green(output.dir);
+  //     }
+  //     str.push(`Output[${index}]: ${outStr}`);
+  //   });
+  // }
+
+  const outStr = chalk.green(output);
+  str.push(`Output: ${outStr}`);
 
   return str.join(" - ");
 }

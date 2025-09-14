@@ -1,22 +1,54 @@
+import ConfigBuilder from '@/ConfigBuilder.ts';
 import { MinifyOptions } from '@/enum';
 import { isVerbose } from '@/index';
+import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface';
 import { CssOptions, OverrideOptions, TaskInput, TaskOutput } from '@/types';
-import { forceArray } from '@/utilities/arr';
+import { forceArray, handleMaybeArray } from '@/utilities/arr';
 import { normalizeOutputs } from '@/utilities/output';
 import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
 import { createViteOptions } from '@/utilities/vite';
 import autoprefixer from 'autoprefixer';
 import { cloneDeep } from 'lodash-es';
 import type { AcceptedPlugin, ProcessOptions } from 'postcss';
-import { MaybeArray, OutputOptions } from 'rollup';
+import { MaybeArray, MaybePromise, OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
 
-export async function css(
+export function css(
+  input: TaskInput,
+  output: TaskOutput,
+  options: CssOptions = {}
+): CssProcessor {
+  return new CssProcessor(input, output, options);
+}
+
+export class CssProcessor implements ProcessorInterface {
+  constructor(protected input: TaskInput, protected output: TaskOutput, protected options: CssOptions = {}) {
+  }
+
+  async config(taskName: string, builder: ConfigBuilder) {
+    handleMaybeArray(this.input, (input) => {
+      builder.addInput(input, taskName);
+    });
+  }
+
+  preview(): MaybePromise<ProcessorPreview[]> {
+    return forceArray(this.input).map((input) => {
+      return {
+        input,
+        output: this.output,
+        extra: {}
+      };
+    });
+  }
+}
+
+export async function cssBak(
   input: TaskInput,
   output: TaskOutput,
   options: CssOptions = {}
 ): Promise<MaybeArray<UserConfig>> {
   options.verbose ??= isVerbose;
+
 
   let outputs = normalizeOutputs(output, { format: 'es' });
 
