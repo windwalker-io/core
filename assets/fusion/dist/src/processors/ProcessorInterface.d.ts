@@ -1,4 +1,4 @@
-import { default as ConfigBuilder } from '../ConfigBuilder.ts';
+import { default as ConfigBuilder } from '../builder/ConfigBuilder.ts';
 import { MaybePromise } from 'rollup';
 export type ProcessorPreview = {
     input: string;

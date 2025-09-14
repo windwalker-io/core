@@ -1,17 +1,19 @@
-import ConfigBuilder from '@/ConfigBuilder.ts';
+import BuildTask from '@/builder/BuildTask.ts';
+import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { MinifyOptions } from '@/enum';
 import { isVerbose } from '@/index';
 import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface';
 import { CssOptions, OverrideOptions, TaskInput, TaskOutput } from '@/types';
 import { forceArray, handleMaybeArray } from '@/utilities/arr';
 import { normalizeOutputs } from '@/utilities/output';
-import { appendMinFileName, mergeOptions } from '@/utilities/utilities';
+import { appendMinFileName, mergeOptions, show } from '@/utilities/utilities';
 import { createViteOptions } from '@/utilities/vite';
 import autoprefixer from 'autoprefixer';
 import { cloneDeep } from 'lodash-es';
 import type { AcceptedPlugin, ProcessOptions } from 'postcss';
 import { MaybeArray, MaybePromise, OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
+import { basename, isAbsolute, resolve } from 'node:path';
 
 export function css(
   input: TaskInput,
@@ -27,8 +29,27 @@ export class CssProcessor implements ProcessorInterface {
 
   async config(taskName: string, builder: ConfigBuilder) {
     handleMaybeArray(this.input, (input) => {
-      builder.addInput(input, taskName);
+      const task = builder.addTask(input, taskName);
+
+      builder.assetFileNamesCallbacks.push((assetInfo) => {
+        const name = assetInfo.names[0];
+        if (!name) {
+          return undefined;
+        }
+
+        if (basename(name, '.css') === task.id) {
+          const name = task.normalizeOutput(this.output);
+
+          if (!isAbsolute(name)) {
+            return name;
+          } else {
+            builder.moveFilesMap[task.id + '.css'] = name;
+          }
+        }
+      });
     });
+
+    // show(builder)
   }
 
   preview(): MaybePromise<ProcessorPreview[]> {

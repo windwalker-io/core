@@ -1,5 +1,6 @@
 import { OverrideOptions } from '@/types';
 import { cloneDeep, merge } from 'lodash-es';
+import { inspect } from 'node:util';
 import { OutputOptions } from 'rollup';
 import { UserConfig } from 'vite';
 
@@ -42,4 +43,8 @@ export function appendMinFileName(output: OutputOptions): OutputOptions {
   }
 
   return output;
+}
+
+export function show(data: any, depth = 10) {
+  console.log(inspect(data, { depth: null, colors: true }));
 }

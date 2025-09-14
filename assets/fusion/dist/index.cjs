@@ -4,6 +4,7 @@ Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toString
 
 const node_path = require('node:path');
 const lodashEs = require('lodash-es');
+const node_util = require('node:util');
 const path = require('path');
 const vite = require('vite');
 const vuePlugin = require('@vitejs/plugin-vue');
@@ -14,6 +15,7 @@ const Module = require('module');
 const node_fs = require('node:fs');
 const archy = require('archy');
 const chalk = require('chalk');
+const fsExtra = require('fs-extra');
 
 var MinifyOptions = /* @__PURE__ */ ((MinifyOptions2) => {
   MinifyOptions2["NONE"] = "none";
@@ -89,6 +91,9 @@ function appendMinFileName(output) {
   }
   return output;
 }
+function show(data, depth = 10) {
+  console.log(node_util.inspect(data, { depth: null, colors: true }));
+}
 
 function createViteLibOptions(input, extraOptions) {
   return mergeOptions(
@@ -127,7 +132,21 @@ class CssProcessor {
   }
   async config(taskName, builder) {
     handleMaybeArray(this.input, (input) => {
-      builder.addInput(input, taskName);
+      const task = builder.addTask(input, taskName);
+      builder.assetFileNamesCallbacks.push((assetInfo) => {
+        const name = assetInfo.names[0];
+        if (!name) {
+          return void 0;
+        }
+        if (node_path.basename(name, ".css") === task.id) {
+          const name2 = task.normalizeOutput(this.output);
+          if (!node_path.isAbsolute(name2)) {
+            return name2;
+          } else {
+            builder.moveFilesMap[task.id + ".css"] = name2;
+          }
+        }
+      });
     });
   }
   preview() {
@@ -289,10 +308,49 @@ function shortHash(bufferOrString, short = 8) {
   return hash;
 }
 
+class BuildTask {
+  constructor(input, group) {
+    this.input = input;
+    this.group = group;
+    this.id = BuildTask.toFileId(input, group);
+    this.input = node_path.normalize(input);
+  }
+  id;
+  output;
+  postCallbacks = [];
+  dest(output) {
+    if (typeof output === "string") {
+      output = this.normalizeOutput(output);
+    }
+    this.output = output;
+    return this;
+  }
+  addPostCallback(callback) {
+    this.postCallbacks.push(callback);
+    return this;
+  }
+  normalizeOutput(output) {
+    if (output.endsWith("/") || output.endsWith("\\")) {
+      output += node_path.basename(this.input);
+    }
+    if (output.startsWith(".")) {
+      output = node_path.resolve(output);
+    }
+    return output;
+  }
+  static toFileId(input, group) {
+    input = node_path.normalize(input);
+    group ||= lodashEs.uniqueId();
+    return group + "-" + shortHash(input);
+  }
+}
+
 class ConfigBuilder {
-  constructor(config, env) {
+  constructor(config, env, params) {
     this.config = config;
     this.env = env;
+    this.params = params;
+    this.config = vite.mergeConfig(ConfigBuilder.defaultConfig, this.config);
     this.config = vite.mergeConfig(this.config, {
       build: {
         rollupOptions: {
@@ -303,32 +361,51 @@ class ConfigBuilder {
       plugins: []
     });
   }
+  static defaultConfig = {};
   entryFileNamesCallbacks = [];
   chunkFileNamesCallbacks = [];
   assetFileNamesCallbacks = [];
+  moveFilesMap = {};
+  copyFilesMap = {};
+  deleteFilesMap = {};
+  postBuildCallbacks = [];
+  // fileNameMap: Record<string, string> = {};
+  tasks = /* @__PURE__ */ new Map();
   merge(override) {
-    this.config = mergeOptions(this.config, override);
+    if (typeof override === "function") {
+      this.config = override(this.config) ?? this.config;
+      return this;
+    }
+    this.config = vite.mergeConfig(this.config, override);
     return this;
   }
   getDefaultOutput() {
     return {
       entryFileNames: (chunkInfo) => {
+        const name = this.getChunkNameFromTask(chunkInfo);
+        if (name) {
+          return name;
+        }
         for (const entryFileNamesCallback of this.entryFileNamesCallbacks) {
-          const name = entryFileNamesCallback(chunkInfo);
-          if (name) {
-            return name;
+          const name2 = entryFileNamesCallback(chunkInfo);
+          if (name2) {
+            return name2;
           }
         }
         return "[name].js";
       },
       chunkFileNames: (chunkInfo) => {
+        const name = this.getChunkNameFromTask(chunkInfo);
+        if (name) {
+          return name;
+        }
         for (const chunkFileNamesCallback of this.chunkFileNamesCallbacks) {
-          const name = chunkFileNamesCallback(chunkInfo);
-          if (name) {
-            return name;
+          const name2 = chunkFileNamesCallback(chunkInfo);
+          if (name2) {
+            return name2;
           }
         }
-        return "[name].js";
+        return "[name].[ext]";
       },
       assetFileNames: (assetInfo) => {
         for (const assetFileNamesCallback of this.assetFileNamesCallbacks) {
@@ -340,6 +417,18 @@ class ConfigBuilder {
         return "[name].[ext]";
       }
     };
+  }
+  getChunkNameFromTask(chunkInfo) {
+    if (this.tasks.has(chunkInfo.name)) {
+      const output = this.tasks.get(chunkInfo.name)?.output;
+      if (output) {
+        const name = typeof output === "function" ? output(chunkInfo) : output;
+        if (!node_path.isAbsolute(name)) {
+          return name;
+        }
+      }
+    }
+    return void 0;
   }
   ensurePath(path, def = {}) {
     if (lodashEs.get(this.config, path) == null) {
@@ -354,12 +443,12 @@ class ConfigBuilder {
     lodashEs.set(this.config, path, value);
     return this;
   }
-  addInput(input, group) {
-    input = node_path.normalize(input);
-    group ||= lodashEs.uniqueId();
-    const id = group + "-" + shortHash(input);
-    this.config.build.rollupOptions.input[id] = input;
-    return this;
+  addTask(input, group) {
+    const task = new BuildTask(input, group);
+    this.tasks.set(task.id, task);
+    const inputOptions = this.config.build.rollupOptions.input;
+    inputOptions[task.id] = task.input;
+    return task;
   }
   addPlugin(plugin) {
     this.config.plugins?.push(plugin);
@@ -376,6 +465,12 @@ class ConfigBuilder {
       }
       return true;
     });
+  }
+  relativePath(to) {
+    return node_path.relative(process.cwd(), to);
+  }
+  debug() {
+    show(this.config);
   }
 }
 
@@ -659,22 +754,50 @@ function parseArgv(argv) {
   return app.parseSync(argv);
 }
 
+function moveFilesAndLog(files, outDir) {
+  const promises = [];
+  for (let src in files) {
+    let dest = files[src];
+    src = normalizeFilePath(src, outDir);
+    dest = normalizeFilePath(dest, outDir);
+    console.log(`Moving file from ${node_path.relative(outDir, src)} to ${node_path.relative(outDir, dest)}`);
+    promises.push(fsExtra.move(src, dest));
+  }
+  return Promise.all(promises);
+}
+function normalizeFilePath(path, outDir) {
+  if (path.startsWith(".")) {
+    path = node_path.resolve(path);
+  } else if (!node_path.isAbsolute(path)) {
+    path = outDir + "/" + path;
+  }
+  return path;
+}
+
 const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 function useFusion(options = {}) {
+  let builder;
   return {
     name: "fusion",
     async config(config, env) {
-      const builder = new ConfigBuilder(config, env);
-      params?.cwd;
       let root;
       if (config.root) {
         root = node_path.resolve(config.root);
       } else {
         root = params.cwd || process.cwd();
       }
-      const configFile = mustGetAvailableConfigFile(root, params);
-      const tasks = await loadConfigFile(configFile);
+      delete config.root;
+      process.chdir(root);
+      builder = new ConfigBuilder(config, env, params);
+      let tasks;
+      if (typeof options.fusionfile !== "object") {
+        params.config ??= options.fusionfile;
+        const configFile = mustGetAvailableConfigFile(root, params);
+        tasks = await loadConfigFile(configFile);
+      } else {
+        tasks = { ...options.fusionfile };
+      }
       if (params.list) {
         await displayAvailableTasks(tasks);
         return;
@@ -687,9 +810,23 @@ function useFusion(options = {}) {
           await processor.config(taskName, builder);
         }
       }
-      console.log(builder.config);
+      console.log("plugin bottom", builder.config);
+      return builder.config;
+    },
+    async writeBundle(options2, bundle) {
+      await moveFilesAndLog(builder.moveFilesMap, options2.dir ?? process.cwd());
     }
   };
+}
+function mergeViteConfig(config) {
+  ConfigBuilder.defaultConfig = vite.mergeConfig(ConfigBuilder.defaultConfig, config);
+}
+function outDir(outDir2) {
+  ConfigBuilder.defaultConfig = vite.mergeConfig(ConfigBuilder.defaultConfig, {
+    build: {
+      outDir: outDir2
+    }
+  });
 }
 
 exports.MinifyOptions = MinifyOptions;
@@ -698,6 +835,8 @@ exports.default = fusion;
 exports.isDev = isDev;
 exports.isProd = isProd;
 exports.js = js;
+exports.mergeViteConfig = mergeViteConfig;
+exports.outDir = outDir;
 exports.useFusion = useFusion;
 exports.vue = vue;
 //# sourceMappingURL=index.cjs.map

@@ -1,4 +1,4 @@
-import ConfigBuilder from '@/ConfigBuilder.ts';
+import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { MaybePromise } from 'rollup';
 import { UserConfig } from 'vite';
 

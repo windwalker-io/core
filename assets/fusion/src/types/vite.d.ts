@@ -1,4 +1,6 @@
+import { LoadedConfigTask } from '@/types/runner';
+import Module from 'module';
 
 export interface FusionVitePluginOptions {
-  configFile?: string;
+  fusionfile?: string | Record<string, LoadedConfigTask>;
 }

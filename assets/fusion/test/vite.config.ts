@@ -8,11 +8,11 @@ export default defineConfig({
   //   }
   // },
   build: {
-    outDir: './dest'
+    // outDir:
   },
   plugins: [
     useFusion({
-      // configFile: './fusionfile.ts'
+      fusionfile: await import('./fusionfile')
     })
   ]
 });

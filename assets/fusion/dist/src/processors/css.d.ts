@@ -1,4 +1,4 @@
-import { default as ConfigBuilder } from '../ConfigBuilder.ts';
+import { default as ConfigBuilder } from '../builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from './ProcessorInterface';
 import { CssOptions, TaskInput, TaskOutput } from '../types';
 import { MaybeArray, MaybePromise } from 'rollup';

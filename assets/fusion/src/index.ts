@@ -1,16 +1,17 @@
 export * from '@/dep';
-import ConfigBuilder from '@/ConfigBuilder';
+import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import * as fusion from '@/dep';
 import { getArgsAfterDoubleDashes, parseArgv, runApp } from '@/runner/app';
 import { findDefaultConfig, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
-import { FusionVitePluginOptions } from '@/types';
+import { FusionVitePluginOptions, LoadedConfigTask } from '@/types';
+import { moveFilesAndLog } from '@/utilities/fs.ts';
 import minimist from 'minimist';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prepareParams, params as p } from '@/params';
-import { PluginOption } from 'vite';
+import { mergeConfig, PluginOption, UserConfig } from 'vite';
 
 export default fusion;
 //
@@ -26,12 +27,11 @@ const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 
 export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
+  let builder: ConfigBuilder;
+
   return {
     name: 'fusion',
     async config(config, env) {
-      const builder = new ConfigBuilder(config, env);
-
-      let cwd = params?.cwd;
       let root: string;
 
       if (config.root) {
@@ -40,11 +40,25 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
         root = params.cwd || process.cwd();
       }
 
-      // Retrieve config file
-      const configFile = mustGetAvailableConfigFile(root, params);
+      delete config.root;
+      // delete builder.config.root;
 
-      // Load config
-      const tasks = await loadConfigFile(configFile);
+      process.chdir(root);
+
+      builder = new ConfigBuilder(config, env, params);
+
+      // Retrieve config file
+      let tasks: Record<string, LoadedConfigTask>;
+
+      if (typeof options.fusionfile !== 'object') {
+        params.config ??= options.fusionfile;
+        const configFile = mustGetAvailableConfigFile(root, params);
+
+        // Load config
+        tasks = await loadConfigFile(configFile);
+      } else {
+        tasks = { ...options.fusionfile };
+      }
 
       // Describe tasks
       if (params.list) {
@@ -65,9 +79,25 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
         }
       }
 
-      console.log(builder.config);
+      console.log('plugin bottom', builder.config);
+
+      return builder.config;
+    },
+
+    async writeBundle(options, bundle) {
+      await moveFilesAndLog(builder.moveFilesMap, options.dir ?? process.cwd());
     }
   };
 }
 
+export function mergeViteConfig(config: UserConfig) {
+  ConfigBuilder.defaultConfig = mergeConfig(ConfigBuilder.defaultConfig, config);
+}
 
+export function outDir(outDir: string) {
+  ConfigBuilder.defaultConfig = mergeConfig<UserConfig, UserConfig>(ConfigBuilder.defaultConfig, {
+    build: {
+      outDir
+    }
+  });
+}
