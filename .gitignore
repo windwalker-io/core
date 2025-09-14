@@ -19,6 +19,9 @@ composer.lock
 
 # JS #
 /node_modules
+yarn.lock
+package-lock.json
+.yarn
 
 # Test #
 phpunit.xml
