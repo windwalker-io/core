@@ -85,8 +85,18 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
     },
 
     async writeBundle(options, bundle) {
+      // Todo: override logger to replace vite's files logs
+      // @see https://github.com/windwalker-io/core/issues/1355
       await moveFilesAndLog(builder.moveFilesMap, options.dir ?? process.cwd());
-    }
+
+      for (const callback of builder.postBuildCallbacks) {
+        await callback();
+      }
+    },
+    
+    closeBundle(error) {
+      //
+    },
   };
 }
 

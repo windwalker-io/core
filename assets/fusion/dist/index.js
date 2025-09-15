@@ -1,8 +1,8 @@
 import { normalize, dirname, basename, isAbsolute, resolve as resolve$1, relative } from 'node:path';
-import { merge, cloneDeep, uniqueId, get, set, uniq } from 'lodash-es';
+import { cloneDeep, uniqueId, get, set, uniq } from 'lodash-es';
 import { inspect } from 'node:util';
-import { resolve } from 'path';
 import { mergeConfig } from 'vite';
+import { resolve } from 'path';
 import vuePlugin from '@vitejs/plugin-vue';
 import Crypto from 'crypto';
 import yargs from 'yargs';
@@ -58,7 +58,6 @@ function normalizeOutputs(output, defaultOptions = {}) {
 }
 
 function mergeOptions(base, ...overrides) {
-  base ??= {};
   if (!overrides.length) {
     return base;
   }
@@ -69,7 +68,7 @@ function mergeOptions(base, ...overrides) {
     if (typeof override === "function") {
       base = override(base) ?? base;
     } else {
-      base = merge(base, override);
+      base = mergeConfig(base, override);
     }
   }
   return base;
@@ -366,6 +365,7 @@ class ConfigBuilder {
   deleteFilesMap = {};
   postBuildCallbacks = [];
   // fileNameMap: Record<string, string> = {};
+  // externals:
   tasks = /* @__PURE__ */ new Map();
   merge(override) {
     if (typeof override === "function") {
@@ -445,6 +445,8 @@ class ConfigBuilder {
     const inputOptions = this.config.build.rollupOptions.input;
     inputOptions[task.id] = task.input;
     return task;
+  }
+  addExternals() {
   }
   addPlugin(plugin) {
     this.config.plugins?.push(plugin);
@@ -811,6 +813,11 @@ function useFusion(options = {}) {
     },
     async writeBundle(options2, bundle) {
       await moveFilesAndLog(builder.moveFilesMap, options2.dir ?? process.cwd());
+      for (const callback of builder.postBuildCallbacks) {
+        await callback();
+      }
+    },
+    closeBundle(error) {
     }
   };
 }

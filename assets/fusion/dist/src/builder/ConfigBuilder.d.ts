@@ -1,6 +1,6 @@
 import { default as BuildTask } from './BuildTask.ts';
 import { RunnerCliParams } from '../types';
-import { PreRenderedAsset, PreRenderedChunk } from 'rollup';
+import { MaybePromise, PreRenderedAsset, PreRenderedChunk } from 'rollup';
 import { ConfigEnv, PluginOption, UserConfig } from 'vite';
 export default class ConfigBuilder {
     config: UserConfig;
@@ -13,7 +13,7 @@ export default class ConfigBuilder {
     moveFilesMap: Record<string, string>;
     copyFilesMap: Record<string, string>;
     deleteFilesMap: Record<string, string>;
-    postBuildCallbacks: (() => void)[];
+    postBuildCallbacks: (() => MaybePromise<void>)[];
     tasks: Map<string, BuildTask>;
     constructor(config: UserConfig, env: ConfigEnv, params: RunnerCliParams);
     merge(override: UserConfig | ((config: UserConfig) => UserConfig)): this;
@@ -23,6 +23,7 @@ export default class ConfigBuilder {
     get(path: string): any;
     set(path: string, value: any): this;
     addTask(input: string, group?: string): BuildTask;
+    addExternals(): void;
     addPlugin(plugin: PluginOption): void;
     removePlugin(plugin: string | PluginOption): void;
     relativePath(to: string): string;

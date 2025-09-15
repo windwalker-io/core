@@ -112,6 +112,11 @@ export function overrideViteJsOptions(config: UserConfig, options: JsOptions) {
   return config;
 }
 
+/**
+ * @deprecated
+ * @param config
+ * @param externals
+ */
 export function addExternals(config: UserConfig, externals?: Record<string, string>) {
   if (!externals) {
     return config;

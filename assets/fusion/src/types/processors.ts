@@ -1,4 +1,4 @@
-import { InputOption, OutputOptions } from 'rollup';
+import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { UserConfig } from 'vite';
 
 export type TaskInput = string | string[];
@@ -8,5 +8,5 @@ export interface ProcessorOptions {
   vite?: ExtraViteOptions;
   verbose?: boolean;
 }
-export type OverrideOptions <T> = Partial<T> | ((options: Partial<T>) => Partial<T> | undefined);
-export type ExtraViteOptions = OverrideOptions<UserConfig>;
+export type OverrideOptions <T> = Partial<T> | ((options: Partial<T>) => T | undefined);
+export type ExtraViteOptions = OverrideOptions<ConfigBuilder>;

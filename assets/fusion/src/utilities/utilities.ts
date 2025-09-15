@@ -2,14 +2,12 @@ import { OverrideOptions } from '@/types';
 import { cloneDeep, merge } from 'lodash-es';
 import { inspect } from 'node:util';
 import { OutputOptions } from 'rollup';
-import { UserConfig } from 'vite';
+import { mergeConfig, UserConfig } from 'vite';
 
-export function mergeOptions<T = UserConfig>(
-  base: Partial<T> | undefined,
+export function mergeOptions<T extends Record<string, any> = Record<string, any>>(
+  base: T,
   ...overrides: (OverrideOptions<T> | undefined)[]
-): Partial<T> {
-  base ??= {};
-
+): T {
   if (!overrides.length) {
     return base;
   }
@@ -22,7 +20,7 @@ export function mergeOptions<T = UserConfig>(
     if (typeof override === 'function') {
       base = override(base) ?? base;
     } else {
-      base = merge(base, override);
+      base = mergeConfig(base, override);
     }
   }
 

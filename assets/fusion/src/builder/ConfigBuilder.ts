@@ -4,7 +4,7 @@ import { shortHash } from '@/utilities/crypto.ts';
 import { mergeOptions, show } from '@/utilities/utilities.ts';
 import { get, set, uniqueId } from 'lodash-es';
 import { isAbsolute, normalize, relative } from 'node:path';
-import { PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
+import { MaybePromise, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
 import { ConfigEnv, mergeConfig, PluginOption, UserConfig } from 'vite';
 
 export default class ConfigBuilder {
@@ -17,8 +17,10 @@ export default class ConfigBuilder {
   moveFilesMap: Record<string, string> = {};
   copyFilesMap: Record<string, string> = {};
   deleteFilesMap: Record<string, string> = {};
-  postBuildCallbacks: (() => void)[] = [];
+  postBuildCallbacks: (() => MaybePromise<void>)[] = [];
   // fileNameMap: Record<string, string> = {};
+
+  // externals:
 
   tasks: Map<string, BuildTask> = new Map();
 
@@ -154,6 +156,10 @@ export default class ConfigBuilder {
     inputOptions[task.id] = task.input;
 
     return task;
+  }
+
+  addExternals() {
+
   }
 
   addPlugin(plugin: PluginOption) {
