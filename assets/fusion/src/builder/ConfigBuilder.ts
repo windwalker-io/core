@@ -8,7 +8,7 @@ import { MaybePromise, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 
 import { ConfigEnv, mergeConfig, PluginOption, UserConfig } from 'vite';
 
 export default class ConfigBuilder {
-  static defaultConfig: UserConfig = {};
+  static overrideConfig: UserConfig = {};
 
   entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[] = [];
   chunkFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[] = [];
@@ -32,13 +32,13 @@ export default class ConfigBuilder {
     // });
     // this.ensurePath('plugins', []);
 
-    this.config = mergeConfig(ConfigBuilder.defaultConfig, this.config);
     this.config = mergeConfig<UserConfig, UserConfig>(this.config, {
       build: {
         rollupOptions: {
           input: {},
           output: this.getDefaultOutput(),
         },
+        emptyOutDir: false,
       },
       plugins: [
       ],

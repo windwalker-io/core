@@ -6,12 +6,14 @@ import { findDefaultConfig, loadConfigFile, mustGetAvailableConfigFile } from '@
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
 import { FusionVitePluginOptions, LoadedConfigTask } from '@/types';
+import { forceArray } from '@/utilities/arr.ts';
 import { moveFilesAndLog } from '@/utilities/fs.ts';
+import { show } from '@/utilities/utilities.ts';
 import minimist from 'minimist';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prepareParams, params as p } from '@/params';
-import { mergeConfig, PluginOption, UserConfig } from 'vite';
+import { Logger, mergeConfig, PluginOption, UserConfig } from 'vite';
 
 export default fusion;
 //
@@ -28,9 +30,21 @@ prepareParams(params);
 
 export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
   let builder: ConfigBuilder;
+  let logger: Logger;
+
+  if (options.tasks !== undefined) {
+    params._ = forceArray(options.tasks);
+  }
+
+  if (options.cwd !== undefined) {
+    params.cwd = options.cwd;
+  }
 
   return {
     name: 'fusion',
+    configResolved(config) {
+      logger = config.logger;
+    },
     async config(config, env) {
       let root: string;
 
@@ -79,7 +93,11 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
         }
       }
 
-      console.log('plugin bottom', builder.config);
+      builder.merge(ConfigBuilder.overrideConfig);
+
+      // console.log('plugin bottom', builder.config);
+      //
+      show(builder.config, 15)
 
       return builder.config;
     },
@@ -87,7 +105,7 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
     async writeBundle(options, bundle) {
       // Todo: override logger to replace vite's files logs
       // @see https://github.com/windwalker-io/core/issues/1355
-      await moveFilesAndLog(builder.moveFilesMap, options.dir ?? process.cwd());
+      await moveFilesAndLog(builder.moveFilesMap, options.dir ?? process.cwd(), logger);
 
       for (const callback of builder.postBuildCallbacks) {
         await callback();
@@ -101,11 +119,11 @@ export function useFusion(options: FusionVitePluginOptions = {}): PluginOption {
 }
 
 export function mergeViteConfig(config: UserConfig) {
-  ConfigBuilder.defaultConfig = mergeConfig(ConfigBuilder.defaultConfig, config);
+  ConfigBuilder.overrideConfig = mergeConfig(ConfigBuilder.overrideConfig, config);
 }
 
 export function outDir(outDir: string) {
-  ConfigBuilder.defaultConfig = mergeConfig<UserConfig, UserConfig>(ConfigBuilder.defaultConfig, {
+  ConfigBuilder.overrideConfig = mergeConfig<UserConfig, UserConfig>(ConfigBuilder.overrideConfig, {
     build: {
       outDir
     }

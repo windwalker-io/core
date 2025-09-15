@@ -1,7 +1,8 @@
 import { move } from 'fs-extra';
 import { isAbsolute, relative, resolve } from 'node:path';
+import { createLogger, Logger } from 'vite';
 
-export function moveFilesAndLog(files: Record<string, string>, outDir: string) {
+export function moveFilesAndLog(files: Record<string, string>, outDir: string, logger: Logger) {
   const promises = [];
 
   for (let src in files) {
@@ -10,9 +11,9 @@ export function moveFilesAndLog(files: Record<string, string>, outDir: string) {
     src = normalizeFilePath(src, outDir);
     dest = normalizeFilePath(dest, outDir);
 
-    console.log(`Moving file from ${relative(outDir, src)} to ${relative(outDir, dest)}`);
+    logger.info(`Moving file from ${relative(outDir, src)} to ${relative(outDir, dest)}`);
 
-    promises.push(move(src, dest));
+    promises.push(move(src, dest, { overwrite: true }));
   }
 
   return Promise.all(promises);

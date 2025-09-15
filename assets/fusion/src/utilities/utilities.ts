@@ -20,6 +20,7 @@ export function mergeOptions<T extends Record<string, any> = Record<string, any>
     if (typeof override === 'function') {
       base = override(base) ?? base;
     } else {
+      // @ts-ignore
       base = mergeConfig(base, override);
     }
   }
@@ -44,5 +45,5 @@ export function appendMinFileName(output: OutputOptions): OutputOptions {
 }
 
 export function show(data: any, depth = 10) {
-  console.log(inspect(data, { depth: null, colors: true }));
+  console.log(inspect(data, { depth, colors: true }));
 }

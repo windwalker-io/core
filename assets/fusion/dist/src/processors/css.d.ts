@@ -1,8 +1,7 @@
 import { default as ConfigBuilder } from '../builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from './ProcessorInterface';
 import { CssOptions, TaskInput, TaskOutput } from '../types';
-import { MaybeArray, MaybePromise } from 'rollup';
-import { UserConfig } from 'vite';
+import { MaybePromise } from 'rollup';
 export declare function css(input: TaskInput, output: TaskOutput, options?: CssOptions): CssProcessor;
 export declare class CssProcessor implements ProcessorInterface {
     protected input: TaskInput;
@@ -12,4 +11,3 @@ export declare class CssProcessor implements ProcessorInterface {
     config(taskName: string, builder: ConfigBuilder): Promise<void>;
     preview(): MaybePromise<ProcessorPreview[]>;
 }
-export declare function cssBak(input: TaskInput, output: TaskOutput, options?: CssOptions): Promise<MaybeArray<UserConfig>>;

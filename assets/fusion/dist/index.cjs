@@ -39,6 +39,45 @@ function handleMaybeArray(items, callback) {
   }
 }
 
+function css(input, output, options = {}) {
+  return new CssProcessor(input, output, options);
+}
+class CssProcessor {
+  constructor(input, output, options = {}) {
+    this.input = input;
+    this.output = output;
+    this.options = options;
+  }
+  async config(taskName, builder) {
+    handleMaybeArray(this.input, (input) => {
+      const task = builder.addTask(input, taskName);
+      builder.assetFileNamesCallbacks.push((assetInfo) => {
+        const name = assetInfo.names[0];
+        if (!name) {
+          return void 0;
+        }
+        if (node_path.basename(name, ".css") === task.id) {
+          const name2 = task.normalizeOutput(this.output);
+          if (!node_path.isAbsolute(name2)) {
+            return name2;
+          } else {
+            builder.moveFilesMap[task.id + ".css"] = name2;
+          }
+        }
+      });
+    });
+  }
+  preview() {
+    return forceArray(this.input).map((input) => {
+      return {
+        input,
+        output: this.output,
+        extra: {}
+      };
+    });
+  }
+}
+
 function normalizeOutputs(output, defaultOptions = {}) {
   output = handleMaybeArray(output, (output2) => {
     if (typeof output2 === "string") {
@@ -91,7 +130,7 @@ function appendMinFileName(output) {
   return output;
 }
 function show(data, depth = 10) {
-  console.log(node_util.inspect(data, { depth: null, colors: true }));
+  console.log(node_util.inspect(data, { depth, colors: true }));
 }
 
 function createViteLibOptions(input, extraOptions) {
@@ -118,45 +157,6 @@ function createViteOptions(lib, output, plugins = [], override) {
     },
     override
   );
-}
-
-function css(input, output, options = {}) {
-  return new CssProcessor(input, output, options);
-}
-class CssProcessor {
-  constructor(input, output, options = {}) {
-    this.input = input;
-    this.output = output;
-    this.options = options;
-  }
-  async config(taskName, builder) {
-    handleMaybeArray(this.input, (input) => {
-      const task = builder.addTask(input, taskName);
-      builder.assetFileNamesCallbacks.push((assetInfo) => {
-        const name = assetInfo.names[0];
-        if (!name) {
-          return void 0;
-        }
-        if (node_path.basename(name, ".css") === task.id) {
-          const name2 = task.normalizeOutput(this.output);
-          if (!node_path.isAbsolute(name2)) {
-            return name2;
-          } else {
-            builder.moveFilesMap[task.id + ".css"] = name2;
-          }
-        }
-      });
-    });
-  }
-  preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.output,
-        extra: {}
-      };
-    });
-  }
 }
 
 async function js(input, output, options = {}) {
@@ -349,18 +349,18 @@ class ConfigBuilder {
     this.config = config;
     this.env = env;
     this.params = params;
-    this.config = vite.mergeConfig(ConfigBuilder.defaultConfig, this.config);
     this.config = vite.mergeConfig(this.config, {
       build: {
         rollupOptions: {
           input: {},
           output: this.getDefaultOutput()
-        }
+        },
+        emptyOutDir: false
       },
       plugins: []
     });
   }
-  static defaultConfig = {};
+  static overrideConfig = {};
   entryFileNamesCallbacks = [];
   chunkFileNamesCallbacks = [];
   assetFileNamesCallbacks = [];
@@ -730,7 +730,7 @@ async function resolveTaskAsFlat(name, task, cache) {
 
 function getArgsAfterDoubleDashes(argv) {
   argv ??= process.argv;
-  return argv.slice(2).join(" ").split("--").slice(1).join("--").trim().split(" ");
+  return argv.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
 }
 function parseArgv(argv) {
   const app = yargs();
@@ -756,14 +756,14 @@ function parseArgv(argv) {
   return app.parseSync(argv);
 }
 
-function moveFilesAndLog(files, outDir) {
+function moveFilesAndLog(files, outDir, logger) {
   const promises = [];
   for (let src in files) {
     let dest = files[src];
     src = normalizeFilePath(src, outDir);
     dest = normalizeFilePath(dest, outDir);
-    console.log(`Moving file from ${node_path.relative(outDir, src)} to ${node_path.relative(outDir, dest)}`);
-    promises.push(fsExtra.move(src, dest));
+    logger.info(`Moving file from ${node_path.relative(outDir, src)} to ${node_path.relative(outDir, dest)}`);
+    promises.push(fsExtra.move(src, dest, { overwrite: true }));
   }
   return Promise.all(promises);
 }
@@ -780,8 +780,18 @@ const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 function useFusion(options = {}) {
   let builder;
+  let logger;
+  if (options.tasks !== void 0) {
+    params._ = forceArray(options.tasks);
+  }
+  if (options.cwd !== void 0) {
+    params.cwd = options.cwd;
+  }
   return {
     name: "fusion",
+    configResolved(config) {
+      logger = config.logger;
+    },
     async config(config, env) {
       let root;
       if (config.root) {
@@ -812,11 +822,12 @@ function useFusion(options = {}) {
           await processor.config(taskName, builder);
         }
       }
-      console.log("plugin bottom", builder.config);
+      builder.merge(ConfigBuilder.overrideConfig);
+      show(builder.config, 15);
       return builder.config;
     },
     async writeBundle(options2, bundle) {
-      await moveFilesAndLog(builder.moveFilesMap, options2.dir ?? process.cwd());
+      await moveFilesAndLog(builder.moveFilesMap, options2.dir ?? process.cwd(), logger);
       for (const callback of builder.postBuildCallbacks) {
         await callback();
       }
@@ -826,10 +837,10 @@ function useFusion(options = {}) {
   };
 }
 function mergeViteConfig(config) {
-  ConfigBuilder.defaultConfig = vite.mergeConfig(ConfigBuilder.defaultConfig, config);
+  ConfigBuilder.overrideConfig = vite.mergeConfig(ConfigBuilder.overrideConfig, config);
 }
 function outDir(outDir2) {
-  ConfigBuilder.defaultConfig = vite.mergeConfig(ConfigBuilder.defaultConfig, {
+  ConfigBuilder.overrideConfig = vite.mergeConfig(ConfigBuilder.overrideConfig, {
     build: {
       outDir: outDir2
     }

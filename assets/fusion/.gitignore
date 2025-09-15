@@ -7,4 +7,4 @@ package-lock.json
 
 # Test
 #/fusionfile.js
-/test/dest/*
+/tests/dest/*

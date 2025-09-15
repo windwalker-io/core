@@ -12,7 +12,13 @@ import { hideBin } from 'yargs/helpers';
 export function getArgsAfterDoubleDashes(argv?: string[]): string[] {
   argv ??= process.argv;
 
-  return argv.slice(2).join(' ').split('--').slice(1).join('--').trim().split(' ');
+  return argv.slice(2).join(' ')
+    // Split by -- and remove the first part
+    .split(' -- ').slice(1)
+    // Join back and split by space
+    .join(' -- ').trim()
+    // Split back to array and remove empty values
+    .split(' ').filter(v => v !== '');
 }
 
 export function parseArgv(argv: string[]): RunnerCliParams {
