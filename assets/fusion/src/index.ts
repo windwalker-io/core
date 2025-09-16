@@ -8,7 +8,7 @@ import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
 import { FusionVitePluginUnresolved, FusionVitePluginOptions, LoadedConfigTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
-import { moveFilesAndLog } from '@/utilities/fs.ts';
+import { copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
 import { show } from '@/utilities/utilities.ts';
 import minimist from 'minimist';
 import { resolve } from 'node:path';
@@ -108,6 +108,11 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         builder.merge(ConfigBuilder.globalOverrideConfig);
         builder.merge(builder.overrideConfig);
 
+        // If no input, delete it.
+        if (Object.keys(builder.config.build!.rollupOptions!.input!)?.length === 0) {
+          delete builder.config.build!.rollupOptions!.input;
+        }
+
         // console.log('plugin bottom', builder.config);
         //
         // show(builder.overrideConfig, 15)
@@ -125,7 +130,9 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
       async writeBundle(options, bundle) {
         // Todo: override logger to replace vite's files logs
         // @see https://github.com/windwalker-io/core/issues/1355
-        await moveFilesAndLog(builder.moveFilesMap, options.dir ?? process.cwd(), logger);
+        await moveFilesAndLog(builder.moveTasks, options.dir ?? process.cwd(), logger);
+        await copyFilesAndLog(builder.copyTasks, options.dir ?? process.cwd(), logger);
+        await linkFilesAndLog(builder.linkTasks, options.dir ?? process.cwd(), logger);
 
         for (const callback of builder.postBuildCallbacks) {
           await callback();

@@ -1,5 +1,5 @@
 import { default as BuildTask } from './BuildTask.ts';
-import { RunnerCliParams } from '../types';
+import { FileTasks, RunnerCliParams } from '../types';
 import { MaybePromise, PreRenderedAsset, PreRenderedChunk } from 'rollup';
 import { ConfigEnv, PluginOption, UserConfig } from 'vite';
 export default class ConfigBuilder {
@@ -11,9 +11,9 @@ export default class ConfigBuilder {
     entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
     chunkFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
     assetFileNamesCallbacks: ((chunkInfo: PreRenderedAsset) => string | undefined | void)[];
-    moveFilesMap: Record<string, string>;
-    copyFilesMap: Record<string, string>;
-    deleteFilesMap: Record<string, string>;
+    moveTasks: FileTasks;
+    copyTasks: FileTasks;
+    linkTasks: FileTasks<'link'>;
     postBuildCallbacks: (() => MaybePromise<void>)[];
     cleans: string[];
     tasks: Map<string, BuildTask>;

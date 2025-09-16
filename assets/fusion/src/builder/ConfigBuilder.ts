@@ -1,5 +1,5 @@
 import BuildTask from '@/builder/BuildTask.ts';
-import { RunnerCliParams } from '@/types';
+import { FileTasks, LinkOptions, RunnerCliParams } from '@/types';
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
@@ -14,9 +14,9 @@ export default class ConfigBuilder {
   chunkFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[] = [];
   assetFileNamesCallbacks: ((chunkInfo: PreRenderedAsset) => string | undefined | void)[] = [];
 
-  moveFilesMap: Record<string, string> = {};
-  copyFilesMap: Record<string, string> = {};
-  deleteFilesMap: Record<string, string> = {};
+  moveTasks: FileTasks = [];
+  copyTasks: FileTasks = [];
+  linkTasks: FileTasks<'link'> = [];
   postBuildCallbacks: (() => MaybePromise<void>)[] = [];
   // fileNameMap: Record<string, string> = {};
 

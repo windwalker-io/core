@@ -9,7 +9,8 @@ import Module from 'module';
 import { writeFileSync, existsSync } from 'node:fs';
 import archy from 'archy';
 import chalk from 'chalk';
-import { move } from 'fs-extra';
+import fg from 'fast-glob';
+import fs from 'fs-extra';
 
 function forceArray(item) {
   if (Array.isArray(item)) {
@@ -99,6 +100,79 @@ class JsProcessor {
   }
 }
 
+function move(input, dest) {
+  return new MoveProcessor(input, dest);
+}
+class MoveProcessor {
+  constructor(input, dest) {
+    this.input = input;
+    this.dest = dest;
+  }
+  config(taskName, builder) {
+    handleMaybeArray(this.input, (input) => {
+      builder.moveTasks.push({ src: input, dest: this.dest, options: {} });
+    });
+  }
+  preview() {
+    return forceArray(this.input).map((input) => {
+      return {
+        input,
+        output: this.dest,
+        extra: {}
+      };
+    });
+  }
+}
+
+function copy(input, dest) {
+  return new CopyProcessor(input, dest);
+}
+class CopyProcessor {
+  constructor(input, dest) {
+    this.input = input;
+    this.dest = dest;
+  }
+  config(taskName, builder) {
+    handleMaybeArray(this.input, (input) => {
+      builder.copyTasks.push({ src: input, dest: this.dest, options: {} });
+    });
+  }
+  preview() {
+    return forceArray(this.input).map((input) => {
+      return {
+        input,
+        output: this.dest,
+        extra: {}
+      };
+    });
+  }
+}
+
+function link(input, dest, options = {}) {
+  return new LinkProcessor(input, dest, options);
+}
+class LinkProcessor {
+  constructor(input, dest, options = {}) {
+    this.input = input;
+    this.dest = dest;
+    this.options = options;
+  }
+  config(taskName, builder) {
+    handleMaybeArray(this.input, (input) => {
+      builder.linkTasks.push({ src: input, dest: this.dest, options: this.options });
+    });
+  }
+  preview() {
+    return forceArray(this.input).map((input) => {
+      return {
+        input,
+        output: this.dest,
+        extra: {}
+      };
+    });
+  }
+}
+
 let params$1 = void 0;
 function prepareParams(p) {
   params$1 = p;
@@ -111,11 +185,14 @@ const isDev = !isProd;
 
 const fusion = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
+  copy,
   css,
   isDev,
   isProd,
   get isVerbose () { return isVerbose; },
   js,
+  link,
+  move,
   get params () { return params$1; }
 }, Symbol.toStringTag, { value: 'Module' }));
 
@@ -204,9 +281,9 @@ class ConfigBuilder {
   entryFileNamesCallbacks = [];
   chunkFileNamesCallbacks = [];
   assetFileNamesCallbacks = [];
-  moveFilesMap = {};
-  copyFilesMap = {};
-  deleteFilesMap = {};
+  moveTasks = [];
+  copyTasks = [];
+  linkTasks = [];
   postBuildCallbacks = [];
   // fileNameMap: Record<string, string> = {};
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
@@ -611,16 +688,110 @@ function parseArgv(argv) {
   return app.parseSync(argv);
 }
 
-function moveFilesAndLog(files, outDir, logger) {
+function isWindows() {
+  return process.platform === "win32";
+}
+
+function handleFilesOperation(src, dest, options) {
   const promises = [];
-  for (let src in files) {
-    let dest = files[src];
-    src = normalizeFilePath(src, outDir);
-    dest = normalizeFilePath(dest, outDir);
-    logger.info(`Moving file from ${relative(outDir, src)} to ${relative(outDir, dest)}`);
-    promises.push(move(src, dest, { overwrite: true }));
+  src = normalizeFilePath(src, options.outDir);
+  dest = normalizeFilePath(dest, options.outDir);
+  const base = getBaseFromPattern(src);
+  const sources = isGlob(src) ? fg.globSync(fg.convertPathToPattern(src), options.globOptions) : [src];
+  for (let source of sources) {
+    let dir;
+    let resolvedDest = dest;
+    if (endsWithSlash(dest)) {
+      dir = resolvedDest;
+      resolvedDest = resolvedDest + relative(base, source);
+    } else {
+      dir = dirname(resolvedDest);
+    }
+    fs.ensureDirSync(dir);
+    promises.push(options.handler(source, resolvedDest));
+  }
+  return promises;
+}
+function moveFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Moving file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
+          return fs.move(src2, dest2, { overwrite: true });
+        },
+        globOptions: { onlyFiles: true }
+      }
+    );
+    promises.push(...ps);
   }
   return Promise.all(promises);
+}
+function copyFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Copy file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
+          return fs.copy(src2, dest2, { overwrite: true });
+        },
+        globOptions: { onlyFiles: true }
+      }
+    );
+    promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+function linkFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Link file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
+          return symlink(src2, dest2, options?.force ?? false);
+        },
+        globOptions: { onlyFiles: false }
+      }
+    );
+    promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+async function symlink(target, link, force = false) {
+  if (isWindows() && fs.lstatSync(target).isDirectory()) {
+    return fs.ensureSymlink(target, link, "junction");
+  }
+  if (isWindows() && fs.lstatSync(target).isFile() && force) {
+    return fs.ensureLink(target, link);
+  }
+  return fs.ensureSymlink(target, link);
+}
+function endsWithSlash(path) {
+  return path.endsWith("/") || path.endsWith("\\");
+}
+function getBaseFromPattern(pattern) {
+  const specialChars = ["*", "?", "[", "]"];
+  const idx = [...pattern].findIndex((c) => specialChars.includes(c));
+  if (idx === -1) {
+    return dirname(pattern);
+  }
+  return dirname(pattern.slice(0, idx + 1));
+}
+function isGlob(pattern) {
+  const specialChars = ["*", "?", "[", "]"];
+  return specialChars.some((c) => pattern.includes(c));
 }
 function normalizeFilePath(path, outDir) {
   if (path.startsWith(".")) {
@@ -686,6 +857,9 @@ function useFusion(fusionOptions = {}, tasks) {
         }
         builder.merge(ConfigBuilder.globalOverrideConfig);
         builder.merge(builder.overrideConfig);
+        if (Object.keys(builder.config.build.rollupOptions.input)?.length === 0) {
+          delete builder.config.build.rollupOptions.input;
+        }
         show(builder.config, 15);
         return builder.config;
       },
@@ -695,7 +869,9 @@ function useFusion(fusionOptions = {}, tasks) {
     {
       name: "fusion:file-handles",
       async writeBundle(options2, bundle) {
-        await moveFilesAndLog(builder.moveFilesMap, options2.dir ?? process.cwd(), logger);
+        await moveFilesAndLog(builder.moveTasks, options2.dir ?? process.cwd(), logger);
+        await copyFilesAndLog(builder.copyTasks, options2.dir ?? process.cwd(), logger);
+        await linkFilesAndLog(builder.linkTasks, options2.dir ?? process.cwd(), logger);
         for (const callback of builder.postBuildCallbacks) {
           await callback();
         }
@@ -756,5 +932,5 @@ function external(match, varName) {
   });
 }
 
-export { alias, builder, css, fusion as default, external, isDev, isProd, isVerbose, js, mergeViteConfig, outDir, params$1 as params, useFusion };
+export { alias, builder, copy, css, fusion as default, external, isDev, isProd, isVerbose, js, link, mergeViteConfig, move, outDir, params$1 as params, useFusion };
 //# sourceMappingURL=index.js.map
