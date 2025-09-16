@@ -12,7 +12,7 @@
     "clean": "rimraf test/dest",
     "build": "vite build",
     "dev": "vite build --watch --mode development",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "try": "yarn clean && yarn vite build ./tests",
     "vite": "vite"
   },

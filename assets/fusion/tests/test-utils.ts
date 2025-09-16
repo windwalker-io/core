@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { rimrafSync } from 'rimraf';
 import { defineConfig, mergeConfig, UserConfig, build, createBuilder, InlineConfig } from 'vite';
 import { useFusion } from '../dist';
-import { FusionVitePluginOptions } from '../src/types';
+import { FusionVitePluginUnresolved, FusionVitePluginOptions } from '../src/types';
 import { show } from '../src/utilities/utilities';
 
 export function clearDest() {
@@ -19,18 +19,16 @@ export function urlToDirname(url: string) {
 }
 
 export function importFusionfile() {
-  return import('./fusionfile');
+  return () => import('./fusionfile');
 }
 
-export async function viteBuild(options: FusionVitePluginOptions, viteConfig: InlineConfig = {}) {
-  options.tasks ??= [];
-
-  const config = createViteConfig(options, viteConfig);
+export async function viteBuild(options: FusionVitePluginUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
+  const config = createViteConfig(options, tasks, viteConfig);
 
   return build(config);
 }
 
-export function createViteConfig(options: FusionVitePluginOptions, viteConfig: InlineConfig = {}) {
+export function createViteConfig(options: FusionVitePluginUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
   return defineConfig(mergeConfig<InlineConfig, InlineConfig>(
     {
       configFile: false,
@@ -40,7 +38,7 @@ export function createViteConfig(options: FusionVitePluginOptions, viteConfig: I
         outDir: './dest',
       },
       plugins: [
-        useFusion(options)
+        useFusion(options, tasks)
       ],
       logLevel: 'warn'
     },

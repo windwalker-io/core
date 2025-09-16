@@ -48,15 +48,22 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
     m.paths = Module._nodeModulePaths(dirname(output.path));
     m._compile(code, output.path);
 
-    const modules = { ...m.exports };
-    delete modules.__esModule;
-
-    return { ...modules };
+    return expandModules(m.exports);
   } else {
     const modules = await import(path);
 
-    return { ...modules };
+    return expandModules(modules);
   }
+}
+
+export function expandModules(modules: Record<string, any>) {
+  modules = { ...modules };
+
+  if (modules.__esModule) {
+    delete modules.__esModule;
+  }
+
+  return modules;
 }
 
 export async function resolveTaskResults(task: LoadedConfigTask) {

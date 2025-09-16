@@ -6,7 +6,8 @@ export default class ConfigBuilder {
     config: UserConfig;
     env: ConfigEnv;
     params: RunnerCliParams;
-    static overrideConfig: UserConfig;
+    static globalOverrideConfig: UserConfig;
+    overrideConfig: UserConfig;
     entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
     chunkFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
     assetFileNamesCallbacks: ((chunkInfo: PreRenderedAsset) => string | undefined | void)[];
@@ -14,6 +15,7 @@ export default class ConfigBuilder {
     copyFilesMap: Record<string, string>;
     deleteFilesMap: Record<string, string>;
     postBuildCallbacks: (() => MaybePromise<void>)[];
+    cleans: string[];
     tasks: Map<string, BuildTask>;
     constructor(config: UserConfig, env: ConfigEnv, params: RunnerCliParams);
     merge(override: UserConfig | ((config: UserConfig) => UserConfig)): this;
@@ -23,7 +25,6 @@ export default class ConfigBuilder {
     get(path: string): any;
     set(path: string, value: any): this;
     addTask(input: string, group?: string): BuildTask;
-    addExternals(): void;
     addPlugin(plugin: PluginOption): void;
     removePlugin(plugin: string | PluginOption): void;
     relativePath(to: string): string;

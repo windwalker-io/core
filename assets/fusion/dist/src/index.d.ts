@@ -1,8 +1,12 @@
-import { FusionVitePluginOptions } from './types';
+import { default as ConfigBuilder } from './builder/ConfigBuilder.ts';
+import { FusionVitePluginUnresolved } from './types';
 import { PluginOption, UserConfig } from 'vite';
 export * from './dep';
 import * as fusion from '@/dep';
 export default fusion;
-export declare function useFusion(options?: FusionVitePluginOptions): PluginOption;
-export declare function mergeViteConfig(config: UserConfig): void;
+export declare let builder: ConfigBuilder;
+export declare function useFusion(fusionOptions?: FusionVitePluginUnresolved, tasks?: string | string[]): PluginOption;
+export declare function mergeViteConfig(config: UserConfig | null): void;
 export declare function outDir(outDir: string): void;
+export declare function alias(src: string, dest: string): void;
+export declare function external(match: string, varName?: string): void;

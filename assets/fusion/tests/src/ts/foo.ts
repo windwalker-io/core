@@ -1,15 +1,6 @@
-/**
- * Part of fusion project.
- *
- * @copyright  Copyright (C) 2021 .
- * @license    __LICENSE__
- */
 
 // @ts-ignore
-import Bar, { decorator } from './bar';
-
-// @ts-ignore
-@decorator
+@decorator('Hello')
 // @ts-ignore
 export class Foo {
   flower: string = 'Sakura';
@@ -21,5 +12,11 @@ export class Foo {
 }
 
 function decorator(value: Foo): Function {
+  console.log(value);
   return () => value;
 }
+
+// Test toplevel await
+const bar = await import('./bar');
+
+export const foo = new Foo();

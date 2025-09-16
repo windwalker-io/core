@@ -1,14 +1,14 @@
 import BuildTask from '@/builder/BuildTask.ts';
 import { RunnerCliParams } from '@/types';
-import { shortHash } from '@/utilities/crypto.ts';
-import { mergeOptions, show } from '@/utilities/utilities.ts';
-import { get, set, uniqueId } from 'lodash-es';
-import { isAbsolute, normalize, relative } from 'node:path';
+import { show } from '@/utilities/utilities.ts';
+import { get, set } from 'lodash-es';
+import { isAbsolute, relative } from 'node:path';
 import { MaybePromise, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
 import { ConfigEnv, mergeConfig, PluginOption, UserConfig } from 'vite';
 
 export default class ConfigBuilder {
-  static overrideConfig: UserConfig = {};
+  static globalOverrideConfig: UserConfig = {};
+  overrideConfig: UserConfig = {};
 
   entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[] = [];
   chunkFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[] = [];
@@ -20,7 +20,8 @@ export default class ConfigBuilder {
   postBuildCallbacks: (() => MaybePromise<void>)[] = [];
   // fileNameMap: Record<string, string> = {};
 
-  // externals:
+  // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
+  cleans: string[] = [];
 
   tasks: Map<string, BuildTask> = new Map();
 
@@ -35,13 +36,30 @@ export default class ConfigBuilder {
     this.config = mergeConfig<UserConfig, UserConfig>(this.config, {
       build: {
         rollupOptions: {
+          preserveEntrySignatures: 'strict',
           input: {},
           output: this.getDefaultOutput(),
+          // external: (source: string, importer: string | undefined, isResolved: boolean) => {
+          //   for (const external of this.externals) {
+          //     const result = external(source, importer, isResolved);
+          //
+          //     if (result) {
+          //       return true;
+          //     }
+          //   }
+          // },
         },
         emptyOutDir: false,
+        sourcemap: env.mode !== 'production' ? 'inline' : false,
       },
-      plugins: [
-      ],
+      plugins: [],
+      css: {
+        devSourcemap: true,
+      },
+      esbuild: {
+        // Todo: Remove if esbuild supports decorators by default
+        target: 'es2022',
+      }
     });
   }
 
@@ -93,7 +111,7 @@ export default class ConfigBuilder {
           }
         }
 
-        return '[name].[ext]';
+        return 'chunks/[name]-[hash].js';
       },
       assetFileNames: (assetInfo) => {
         // if (this.fileNameMap[assetInfo.name]) {
@@ -158,9 +176,17 @@ export default class ConfigBuilder {
     return task;
   }
 
-  addExternals() {
-
-  }
+  // addExternals(externals: Externalize) {
+  //   if (Array.isArray(externals)) {
+  //     this.externals.push((rollupOptions) => {
+  //       rollupOptions.external
+  //     })
+  //   } else if (typeof externals === 'object') {
+  //
+  //   } else {
+  //
+  //   }
+  // }
 
   addPlugin(plugin: PluginOption) {
     this.config.plugins?.push(plugin);
@@ -185,7 +211,6 @@ export default class ConfigBuilder {
   relativePath(to: string) {
     return relative(process.cwd(), to);
   }
-
 
   debug() {
     show(this.config);

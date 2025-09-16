@@ -8,6 +8,6 @@ export default class BuildTask {
     constructor(input: string, group?: string | undefined);
     dest(output?: string | ((chunkInfo: PreRenderedChunk) => any)): this;
     addPostCallback(callback: () => void): this;
-    normalizeOutput(output: string): string;
+    normalizeOutput(output: string, ext?: string): string;
     static toFileId(input: string, group?: string): string;
 }

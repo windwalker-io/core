@@ -1,6 +1,6 @@
 import { shortHash } from '@/utilities/crypto.ts';
 import { uniqueId } from 'lodash-es';
-import { normalize, basename, resolve, isAbsolute } from 'node:path';
+import { normalize, basename, resolve, isAbsolute, parse } from 'node:path';
 import { PreRenderedChunk } from 'rollup';
 
 export default class BuildTask {
@@ -29,14 +29,14 @@ export default class BuildTask {
     return this;
   }
 
-  normalizeOutput(output: string) {
+  normalizeOutput(output: string, ext = '.js') {
     if (output.endsWith('/') || output.endsWith('\\')) {
-      output += basename(this.input);
+      output += parse(this.input).name + ext;
     }
 
-    if (output.startsWith('.')) {
-      output = resolve(output);
-    }
+    // if (output.startsWith('.')) {
+    //   output = resolve(output);
+    // }
 
     return output;
   }

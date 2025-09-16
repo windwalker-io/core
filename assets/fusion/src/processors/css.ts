@@ -2,19 +2,19 @@ import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface';
 import { CssOptions, TaskInput, TaskOutput } from '@/types';
 import { forceArray, handleMaybeArray } from '@/utilities/arr';
-import { basename, isAbsolute } from 'node:path';
+import { basename, parse } from 'node:path';
 import { MaybePromise } from 'rollup';
 
 export function css(
   input: TaskInput,
-  output: TaskOutput,
+  output?: TaskOutput,
   options: CssOptions = {}
 ): CssProcessor {
   return new CssProcessor(input, output, options);
 }
 
 export class CssProcessor implements ProcessorInterface {
-  constructor(protected input: TaskInput, protected output: TaskOutput, protected options: CssOptions = {}) {
+  constructor(protected input: TaskInput, protected output?: TaskOutput, protected options: CssOptions = {}) {
   }
 
   async config(taskName: string, builder: ConfigBuilder) {
@@ -30,13 +30,17 @@ export class CssProcessor implements ProcessorInterface {
 
         // Rename only if the asset name matches the task id with .css extension
         if (basename(name, '.css') === task.id) {
-          const name = task.normalizeOutput(this.output);
-
-          if (!isAbsolute(name)) {
-            return name;
-          } else {
-            builder.moveFilesMap[task.id + '.css'] = name;
+          if (!this.output) {
+            return parse(input).name + '.css';
           }
+
+          return task.normalizeOutput(this.output, '.css');
+
+          // if (!isAbsolute(name)) {
+          //   return name;
+          // } else {
+          //   builder.moveFilesMap[task.id + '.css'] = name;
+          // }
         }
       });
     });
@@ -48,7 +52,7 @@ export class CssProcessor implements ProcessorInterface {
     return forceArray(this.input).map((input) => {
       return {
         input,
-        output: this.output,
+        output: this.output || basename(input),
         extra: {}
       };
     });

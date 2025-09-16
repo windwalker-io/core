@@ -1,12 +1,12 @@
-import { JsOptions, TaskInput, TaskOutput } from '../types';
-import { OutputOptions } from 'rollup';
-import { UserConfig } from 'vite';
-export declare function js(input: TaskInput, output: TaskOutput, options?: JsOptions): Promise<UserConfig[]>;
-export declare function useJsProcessor(output: TaskOutput, options: JsOptions, createOptions: (outputs: OutputOptions[], isMinify: boolean) => UserConfig): UserConfig[];
-export declare function overrideViteJsOptions(config: UserConfig, options: JsOptions): UserConfig;
-/**
- * @deprecated
- * @param config
- * @param externals
- */
-export declare function addExternals(config: UserConfig, externals?: Record<string, string>): UserConfig;
+import { default as ConfigBuilder } from '../builder/ConfigBuilder.ts';
+import { ProcessorInterface, ProcessorPreview } from './ProcessorInterface.ts';
+import { TaskInput, TaskOutput } from '../types';
+import { MaybePromise } from 'rollup';
+export declare function js(input: TaskInput, output?: TaskOutput): ProcessorInterface;
+export declare class JsProcessor implements ProcessorInterface {
+    input: TaskInput;
+    output?: TaskOutput | undefined;
+    constructor(input: TaskInput, output?: TaskOutput | undefined);
+    config(taskName: string, builder: ConfigBuilder): MaybePromise<void>;
+    preview(): MaybePromise<ProcessorPreview[]>;
+}

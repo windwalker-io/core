@@ -1,6 +1,6 @@
 import { RollupOptions } from 'rollup';
 import * as fusion from '../dist/index.js';
-import { css, js, vue, MinifyOptions, params, outDir } from '../dist/index.js';
+import { css, js, params, outDir } from '../dist/index.js';
 
 fusion.outDir('./dest');
 
@@ -12,19 +12,15 @@ enum Foo {
 
 export async function cssTest() {
   return [
-    css('./src/css/foo.css', './dest/css/foo123.css', {
+    css('./src/css/foo.css', 'css/foo123.css', {
       browserslist: [
         // Simulate old browsers
         'since 2013',
       ],
-      // minify: MinifyOptions.SAME_FILE,
     }),
     css(
       './src/scss/foo.scss',
       'css/foosass.css',
-      {
-        minify: MinifyOptions.SEPARATE_FILE,
-      }
     )
   ];
 

@@ -14,7 +14,7 @@ describe('Test CSS from fusionfile', () => {
 
   it('should work with fusionfile', async () => {
     // execSync('yarn vite build ./tests --mode development -- cssTest');
-    await viteBuild({ fusionfile: await importFusionfile(), tasks: 'cssTest' });
+    await viteBuild(importFusionfile(), 'cssTest', { mode: 'development' });
 
     // CSS
     const file1 = resolve(__dirname, './dest/css/foo123.css');
@@ -35,18 +35,16 @@ describe('Test CSS from fusionfile', () => {
   });
 
   it('should work with fusionfile with move must override', async () => {
-    await viteBuild({ fusionfile: await importFusionfile(), tasks: 'cssTest' });
-    await viteBuild({ fusionfile: await importFusionfile(), tasks: 'cssTest' });
+    await viteBuild(importFusionfile(), 'cssTest');
+    await viteBuild(importFusionfile(), 'cssTest');
   });
 
   it('should copy to dir and keep name', async () => {
-    await viteBuild({
-      fusionfile: {
-        default() {
-          return css('src/css/foo.css', 'css/')
-        }
-      },
-    });
+    await viteBuild(() => ({
+      default() {
+        return css('src/css/foo.css', 'css/')
+      }
+    }));
 
     const file1 = resolve(__dirname, './dest/css/foo.css');
     const file1Content = readFileSync(file1, 'utf8');
