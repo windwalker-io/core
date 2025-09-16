@@ -2,8 +2,6 @@ import { default as ConfigBuilder } from './builder/ConfigBuilder.ts';
 import { FusionVitePluginUnresolved } from './types';
 import { PluginOption, UserConfig } from 'vite';
 export * from './dep';
-import * as fusion from '@/dep';
-export default fusion;
 export declare let builder: ConfigBuilder;
 export declare function useFusion(fusionOptions?: FusionVitePluginUnresolved, tasks?: string | string[]): PluginOption;
 export declare function mergeViteConfig(config: UserConfig | null): void;

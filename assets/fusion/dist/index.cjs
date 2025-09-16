@@ -1,10 +1,10 @@
 'use strict';
 
-Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
-const node_path = require('node:path');
 const Crypto = require('crypto');
 const lodashEs = require('lodash-es');
+const node_path = require('node:path');
 const node_util = require('node:util');
 const vite = require('vite');
 const yargs = require('yargs');
@@ -187,18 +187,9 @@ exports.isVerbose = false;
 const isProd = process.env.NODE_ENV === "production";
 const isDev = !isProd;
 
-const fusion = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
-  __proto__: null,
-  copy,
-  css,
-  isDev,
-  isProd,
-  get isVerbose () { return exports.isVerbose; },
-  js,
-  link,
-  move,
-  get params () { return exports.params; }
-}, Symbol.toStringTag, { value: 'Module' }));
+function isWindows() {
+  return process.platform === "win32";
+}
 
 function shortHash(bufferOrString, short = 8) {
   let hash = Crypto.createHash("sha1").update(bufferOrString).digest("hex");
@@ -206,6 +197,116 @@ function shortHash(bufferOrString, short = 8) {
     hash = hash.substring(0, short);
   }
   return hash;
+}
+
+function handleFilesOperation(src, dest, options) {
+  const promises = [];
+  src = normalizeFilePath(src, options.outDir);
+  dest = normalizeFilePath(dest, options.outDir);
+  const base = getBaseFromPattern(src);
+  const sources = isGlob(src) ? fg.globSync(fg.convertPathToPattern(src), options.globOptions) : [src];
+  for (let source of sources) {
+    let dir;
+    let resolvedDest = dest;
+    if (endsWithSlash(dest)) {
+      dir = resolvedDest;
+      resolvedDest = resolvedDest + node_path.relative(base, source);
+    } else {
+      dir = node_path.dirname(resolvedDest);
+    }
+    fs.ensureDirSync(dir);
+    promises.push(options.handler(source, resolvedDest));
+  }
+  return promises;
+}
+function moveFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Moving file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
+          return fs.move(src2, dest2, { overwrite: true });
+        },
+        globOptions: { onlyFiles: true }
+      }
+    );
+    promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+function copyFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Copy file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
+          return fs.copy(src2, dest2, { overwrite: true });
+        },
+        globOptions: { onlyFiles: true }
+      }
+    );
+    promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+function linkFilesAndLog(tasks, outDir, logger) {
+  const promises = [];
+  for (const { src, dest, options } of tasks) {
+    const ps = handleFilesOperation(
+      src,
+      dest,
+      {
+        outDir,
+        handler: async (src2, dest2) => {
+          logger.info(`Link file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
+          return symlink(src2, dest2, options?.force ?? false);
+        },
+        globOptions: { onlyFiles: false }
+      }
+    );
+    promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+async function symlink(target, link, force = false) {
+  if (isWindows() && fs.lstatSync(target).isDirectory()) {
+    return fs.ensureSymlink(target, link, "junction");
+  }
+  if (isWindows() && fs.lstatSync(target).isFile() && force) {
+    return fs.ensureLink(target, link);
+  }
+  return fs.ensureSymlink(target, link);
+}
+function endsWithSlash(path) {
+  return path.endsWith("/") || path.endsWith("\\");
+}
+function getBaseFromPattern(pattern) {
+  const specialChars = ["*", "?", "[", "]"];
+  const idx = [...pattern].findIndex((c) => specialChars.includes(c));
+  if (idx === -1) {
+    return node_path.dirname(pattern);
+  }
+  return node_path.dirname(pattern.slice(0, idx + 1));
+}
+function isGlob(pattern) {
+  const specialChars = ["*", "?", "[", "]"];
+  return specialChars.some((c) => pattern.includes(c));
+}
+function normalizeFilePath(path, outDir) {
+  if (path.startsWith(".")) {
+    path = node_path.resolve(path);
+  } else if (!node_path.isAbsolute(path)) {
+    path = outDir + "/" + path;
+  }
+  return path;
 }
 
 class BuildTask {
@@ -405,6 +506,34 @@ class ConfigBuilder {
   debug() {
     show(this.config);
   }
+}
+
+function getArgsAfterDoubleDashes(argv) {
+  argv ??= process.argv;
+  return argv.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
+}
+function parseArgv(argv) {
+  const app = yargs();
+  app.option("cwd", {
+    type: "string",
+    description: "Current working directory"
+  });
+  app.option("list", {
+    alias: "l",
+    type: "boolean",
+    description: "List all available tasks"
+  });
+  app.option("config", {
+    alias: "c",
+    type: "string",
+    description: "Path to config file"
+  });
+  app.option("verbose", {
+    alias: "v",
+    type: "count",
+    description: "Increase verbosity of output. Use multiple times for more verbosity."
+  });
+  return app.parseSync(argv);
 }
 
 async function loadConfigFile(configFile) {
@@ -664,148 +793,6 @@ async function resolveTaskAsFlat(name, task, cache) {
   return results;
 }
 
-function getArgsAfterDoubleDashes(argv) {
-  argv ??= process.argv;
-  return argv.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
-}
-function parseArgv(argv) {
-  const app = yargs();
-  app.option("cwd", {
-    type: "string",
-    description: "Current working directory"
-  });
-  app.option("list", {
-    alias: "l",
-    type: "boolean",
-    description: "List all available tasks"
-  });
-  app.option("config", {
-    alias: "c",
-    type: "string",
-    description: "Path to config file"
-  });
-  app.option("verbose", {
-    alias: "v",
-    type: "count",
-    description: "Increase verbosity of output. Use multiple times for more verbosity."
-  });
-  return app.parseSync(argv);
-}
-
-function isWindows() {
-  return process.platform === "win32";
-}
-
-function handleFilesOperation(src, dest, options) {
-  const promises = [];
-  src = normalizeFilePath(src, options.outDir);
-  dest = normalizeFilePath(dest, options.outDir);
-  const base = getBaseFromPattern(src);
-  const sources = isGlob(src) ? fg.globSync(fg.convertPathToPattern(src), options.globOptions) : [src];
-  for (let source of sources) {
-    let dir;
-    let resolvedDest = dest;
-    if (endsWithSlash(dest)) {
-      dir = resolvedDest;
-      resolvedDest = resolvedDest + node_path.relative(base, source);
-    } else {
-      dir = node_path.dirname(resolvedDest);
-    }
-    fs.ensureDirSync(dir);
-    promises.push(options.handler(source, resolvedDest));
-  }
-  return promises;
-}
-function moveFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
-      {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Moving file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
-          return fs.move(src2, dest2, { overwrite: true });
-        },
-        globOptions: { onlyFiles: true }
-      }
-    );
-    promises.push(...ps);
-  }
-  return Promise.all(promises);
-}
-function copyFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
-      {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Copy file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
-          return fs.copy(src2, dest2, { overwrite: true });
-        },
-        globOptions: { onlyFiles: true }
-      }
-    );
-    promises.push(...ps);
-  }
-  return Promise.all(promises);
-}
-function linkFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
-      {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Link file from ${node_path.relative(outDir, src2)} to ${node_path.relative(outDir, dest2)}`);
-          return symlink(src2, dest2, options?.force ?? false);
-        },
-        globOptions: { onlyFiles: false }
-      }
-    );
-    promises.push(...ps);
-  }
-  return Promise.all(promises);
-}
-async function symlink(target, link, force = false) {
-  if (isWindows() && fs.lstatSync(target).isDirectory()) {
-    return fs.ensureSymlink(target, link, "junction");
-  }
-  if (isWindows() && fs.lstatSync(target).isFile() && force) {
-    return fs.ensureLink(target, link);
-  }
-  return fs.ensureSymlink(target, link);
-}
-function endsWithSlash(path) {
-  return path.endsWith("/") || path.endsWith("\\");
-}
-function getBaseFromPattern(pattern) {
-  const specialChars = ["*", "?", "[", "]"];
-  const idx = [...pattern].findIndex((c) => specialChars.includes(c));
-  if (idx === -1) {
-    return node_path.dirname(pattern);
-  }
-  return node_path.dirname(pattern.slice(0, idx + 1));
-}
-function isGlob(pattern) {
-  const specialChars = ["*", "?", "[", "]"];
-  return specialChars.some((c) => pattern.includes(c));
-}
-function normalizeFilePath(path, outDir) {
-  if (path.startsWith(".")) {
-    path = node_path.resolve(path);
-  } else if (!node_path.isAbsolute(path)) {
-    path = outDir + "/" + path;
-  }
-  return path;
-}
-
 const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 exports.builder = void 0;
@@ -864,14 +851,11 @@ function useFusion(fusionOptions = {}, tasks) {
         if (Object.keys(exports.builder.config.build.rollupOptions.input)?.length === 0) {
           delete exports.builder.config.build.rollupOptions.input;
         }
-        show(exports.builder.config, 15);
         return exports.builder.config;
-      },
-      closeBundle(error) {
       }
     },
     {
-      name: "fusion:file-handles",
+      name: "fusion:post-handles",
       async writeBundle(options2, bundle) {
         await moveFilesAndLog(exports.builder.moveTasks, options2.dir ?? process.cwd(), logger);
         await copyFilesAndLog(exports.builder.copyTasks, options2.dir ?? process.cwd(), logger);
@@ -939,14 +923,16 @@ function external(match, varName) {
 exports.alias = alias;
 exports.copy = copy;
 exports.css = css;
-exports.default = fusion;
 exports.external = external;
 exports.isDev = isDev;
 exports.isProd = isProd;
+exports.isWindows = isWindows;
 exports.js = js;
 exports.link = link;
 exports.mergeViteConfig = mergeViteConfig;
 exports.move = move;
 exports.outDir = outDir;
+exports.shortHash = shortHash;
+exports.symlink = symlink;
 exports.useFusion = useFusion;
 //# sourceMappingURL=index.cjs.map

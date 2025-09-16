@@ -1,31 +1,15 @@
 export * from '@/dep';
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
-import * as fusion from '@/dep';
-import clean from '@/plugins/clean.ts';
-import { getArgsAfterDoubleDashes, parseArgv, runApp } from '@/runner/app';
-import { expandModules, findDefaultConfig, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
+import { prepareParams } from '@/params';
+import { getArgsAfterDoubleDashes, parseArgv } from '@/runner/app';
+import { expandModules, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
-import { FusionVitePluginUnresolved, FusionVitePluginOptions, LoadedConfigTask } from '@/types';
+import { FusionVitePluginOptions, FusionVitePluginUnresolved, LoadedConfigTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
 import { copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
-import { show } from '@/utilities/utilities.ts';
-import minimist from 'minimist';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { prepareParams, params as p } from '@/params';
 import { Logger, mergeConfig, PluginOption, UserConfig } from 'vite';
-import swc from '@vitejs/plugin-react-swc';
-
-export default fusion;
-//
-// const isCliRunning = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
-//
-// if (isCliRunning) {
-//   const params = prepareParams(parseArgv());
-//
-//   runApp(params!);
-// }
 
 const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
@@ -116,17 +100,13 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         // console.log('plugin bottom', builder.config);
         //
         // show(builder.overrideConfig, 15)
-        show(builder.config, 15)
+        // show(builder.config, 15)
 
         return builder.config;
       },
-
-      closeBundle(error) {
-        //
-      },
     },
     {
-      name: 'fusion:file-handles',
+      name: 'fusion:post-handles',
       async writeBundle(options, bundle) {
         // Todo: override logger to replace vite's files logs
         // @see https://github.com/windwalker-io/core/issues/1355

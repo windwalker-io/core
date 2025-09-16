@@ -1,5 +1,5 @@
 import { ProcessorInterface } from '../processors/ProcessorInterface.ts';
-import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types/runner';
+import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types';
 export declare function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>>;
 export declare function expandModules(modules: Record<string, any>): Record<string, any>;
 export declare function resolveTaskResults(task: LoadedConfigTask): Promise<(ProcessorInterface | (() => LoadedConfigTask))[]>;

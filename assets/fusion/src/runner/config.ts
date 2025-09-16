@@ -5,8 +5,7 @@ import Module from 'module';
 import { existsSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import { MaybeArray, MaybePromise } from 'rollup';
-import { UserConfig } from 'vite';
-import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types/runner';
+import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '@/types';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
   let path = configFile.path;

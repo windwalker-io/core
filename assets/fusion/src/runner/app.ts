@@ -1,13 +1,5 @@
-import { buildAll, watchAll } from '@/runner/build';
-import { loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
-import { displayAvailableTasks } from '@/runner/describe';
-import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks';
 import { RunnerCliParams } from '@/types/runner';
-import { defineAllConfigs } from '@/utilities/vite';
-import { resolve } from 'node:path';
-import { inspect } from 'node:util';
 import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 
 export function getArgsAfterDoubleDashes(argv?: string[]): string[] {
   argv ??= process.argv;
@@ -60,59 +52,4 @@ export function parseArgv(argv: string[]): RunnerCliParams {
   });
 
   return app.parseSync(argv);
-}
-
-export async function runApp(argv: RunnerCliParams) {
-  try {
-    await processApp(argv);
-
-    // Success exit
-    // process.exit(0);
-  } catch (e) {
-    if (e instanceof Error) {
-      if (argv.verbose && argv.verbose > 0) {
-        throw e;
-      } else {
-        console.error(e);
-        process.exit(1);
-      }
-    } else {
-      throw e;
-    }
-  }
-}
-
-export async function processApp(params: RunnerCliParams) {
-  let cwd = params?.cwd;
-  let root: string;
-
-  if (cwd) {
-    root = cwd = resolve(cwd);
-    process.chdir(cwd);
-  } else {
-    root = process.cwd();
-  }
-
-  // Retrieve config file
-  const configFile = mustGetAvailableConfigFile(root, params);
-
-  // Load config
-  const tasks = await loadConfigFile(configFile);
-
-  // Describe tasks
-  if (params.list) {
-    await displayAvailableTasks(tasks);
-    return;
-  }
-
-  // Select running tasks
-  const selectedTasks = selectRunningTasks([...params._] as string[], tasks);
-
-  const runningTasks = (await resolveAllTasksAsProcessors(selectedTasks));
-
-  if (params.watch) {
-    await watchAll(runningTasks, params);
-  } else {
-    await buildAll(runningTasks, params);
-  }
 }
