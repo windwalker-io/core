@@ -5,9 +5,11 @@ import { getArgsAfterDoubleDashes, parseArgv } from '@/runner/app';
 import { expandModules, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
-import { FusionVitePluginOptions, FusionVitePluginUnresolved, LoadedConfigTask } from '@/types';
+import { FusionPlugin, FusionVitePluginOptions, FusionVitePluginUnresolved, LoadedConfigTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
 import { copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
+import { show } from '@/utilities/utilities.ts';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Logger, mergeConfig, PluginOption, UserConfig } from 'vite';
 
@@ -17,6 +19,7 @@ prepareParams(params);
 export let builder: ConfigBuilder;
 
 const originalTasks = params._;
+const extraVitePlugins: FusionPlugin[] = [];
 
 export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?: string | string[]): PluginOption {
   let logger: Logger;
@@ -38,6 +41,14 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
       name: 'fusion',
       configResolved(config) {
         logger = config.logger;
+
+        config.plugins.push(...extraVitePlugins);
+
+        for (const plugin of (config.plugins as FusionPlugin[])) {
+          if ('buildConfig' in plugin) {
+            plugin.buildConfig?.(builder);
+          }
+        }
       },
       async config(config, env) {
         let root: string;
@@ -92,10 +103,11 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         builder.merge(ConfigBuilder.globalOverrideConfig);
         builder.merge(builder.overrideConfig);
 
-        // If no input, delete it.
-        if (Object.keys(builder.config.build!.rollupOptions!.input!)?.length === 0) {
-          delete builder.config.build!.rollupOptions!.input;
-        }
+        // for (const plugin of plugins) {
+        //   if (plugin.buildConfig) {
+        //     await plugin.buildConfig(builder, env);
+        //   }
+        // }
 
         // console.log('plugin bottom', builder.config);
         //
@@ -104,9 +116,56 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
         return builder.config;
       },
+      outputOptions(options) {
+        const dir = options.dir!;
+        const uploadDir = resolve(dir, 'upload');
+
+        if (existsSync(uploadDir)) {
+          throw new Error(
+            `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
+          );
+        }
+      },
+    },
+    {
+      name: 'fusion:pre-handles',
+      enforce: 'pre',
+      async resolveId(source, importer, options) {
+        for (const resolveId of builder.resolveIdCallbacks) {
+          const result = await resolveId(source, importer, options);
+
+          if (result) {
+            return result;
+          }
+        }
+
+        if (source.startsWith('hidden:')) {
+          return source;
+        }
+      },
+      async load(source, options) {
+        for (const load of builder.loadCallbacks) {
+          const result = await load(source, options);
+
+          if (result) {
+            return result;
+          }
+        }
+
+        if (source.startsWith('hidden:')) {
+          return '';
+        }
+      },
     },
     {
       name: 'fusion:post-handles',
+      generateBundle(options, bundle) {
+        for (const [fileName, chunk] of Object.entries(bundle)) {
+          if (chunk.type === 'chunk' && chunk.facadeModuleId?.startsWith('hidden:')) {
+            delete bundle[fileName];
+          }
+        }
+      },
       async writeBundle(options, bundle) {
         // Todo: override logger to replace vite's files logs
         // @see https://github.com/windwalker-io/core/issues/1355
@@ -116,6 +175,12 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
         for (const callback of builder.postBuildCallbacks) {
           await callback();
+        }
+
+        for (const [name, task] of builder.tasks) {
+          for (const callback of task.postCallbacks) {
+            await callback();
+          }
         }
       },
     },
@@ -136,6 +201,10 @@ function prepareFusionOptions(options: FusionVitePluginUnresolved): FusionVitePl
   }
 
   return options;
+}
+
+export function configureBuilder(handler: (builder: ConfigBuilder) => void) {
+  handler(builder);
 }
 
 export function mergeViteConfig(config: UserConfig | null) {
@@ -193,5 +262,9 @@ export function external(match: string, varName?: string) {
       }
     }
   });
+}
+
+export function plugin(...plugins: FusionPlugin[]) {
+  extraVitePlugins.push(...plugins);
 }
 

@@ -1,7 +1,8 @@
+import BuildTask from '@/builder/BuildTask.ts';
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
 import { TaskInput, TaskOutput } from '@/types';
-import { forceArray, handleMaybeArray } from '@/utilities/arr';
+import { forceArray, handleForceArray, handleMaybeArray } from '@/utilities/arr';
 import { basename, parse } from 'node:path';
 import { MaybePromise } from 'rollup';
 
@@ -14,8 +15,8 @@ export class JsProcessor implements ProcessorInterface {
   constructor(public input: TaskInput, public output?: TaskOutput) {
   }
 
-  config(taskName: string, builder: ConfigBuilder): MaybePromise<void> {
-    handleMaybeArray(this.input, (input) => {
+  config(taskName: string, builder: ConfigBuilder): BuildTask[] {
+    return handleForceArray(this.input, (input) => {
       const task = builder.addTask(input, taskName);
 
       builder.entryFileNamesCallbacks.push((chunkInfo) => {
@@ -40,6 +41,8 @@ export class JsProcessor implements ProcessorInterface {
           // }
         }
       });
+
+      return task;
     });
   }
 

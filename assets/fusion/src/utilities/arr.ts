@@ -8,7 +8,6 @@ export function forceArray<T>(item: T | T[]): T[] {
   }
 }
 
-
 export function handleMaybeArray<T, R>(
   items: T | T[],
   callback: (item: T) => R
@@ -18,6 +17,15 @@ export function handleMaybeArray<T, R>(
   } else {
     return callback(items as T) as any;
   }
+}
+
+export function handleForceArray<T, R>(
+  items: T | T[],
+  callback: (item: T) => R
+): R[] {
+  items = forceArray(items);
+
+  return items.map(callback) as any;
 }
 
 export function appendToMaybeArray<T>(items: MaybeArray<T>, value: T): T[] {

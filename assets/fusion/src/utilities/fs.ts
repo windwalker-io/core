@@ -1,8 +1,10 @@
 import { FileTasks } from '@/types';
 import { isWindows } from '@/utilities/env.ts';
+import { shortHash } from '@/utilities/crypto.ts';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { randomBytes } from 'node:crypto';
+import { dirname, isAbsolute, normalize, relative, resolve } from 'node:path';
 import { Logger } from 'vite';
 
 function handleFilesOperation(
@@ -109,8 +111,36 @@ export function linkFilesAndLog(tasks: FileTasks<'link'>, outDir: string, logger
   return Promise.all(promises);
 }
 
+export async function copyGlob(src: string, dest: string): Promise<void> {
+  const promises = handleFilesOperation(
+    src,
+    dest,
+    {
+      outDir: process.cwd(),
+      handler: async (src, dest) => fs.copy(src, dest, { overwrite: true }),
+      globOptions: { onlyFiles: true }
+    }
+  );
+
+  await Promise.all(promises);
+}
+
+export async function moveGlob(src: string, dest: string): Promise<void> {
+  const promises = handleFilesOperation(
+    src,
+    dest,
+    {
+      outDir: process.cwd(),
+      handler: async (src, dest) => fs.move(src, dest, { overwrite: true }),
+      globOptions: { onlyFiles: true }
+    }
+  );
+
+  await Promise.all(promises);
+}
+
 export async function symlink(target: string, link: string, force = false) {
-  if (isWindows() && fs.lstatSync(target).isDirectory()) {
+  if (isWindows() && !fs.lstatSync(target).isFile()) {
     return fs.ensureSymlink(target, link, 'junction');
   }
 
@@ -149,4 +179,12 @@ function normalizeFilePath(path: string, outDir: string) {
   }
 
   return path;
+}
+
+export function fileToId(input: string, group?: string) {
+  input = normalize(input);
+
+  group ||= randomBytes(4).toString('hex');
+
+  return group + '-' + shortHash(input);
 }

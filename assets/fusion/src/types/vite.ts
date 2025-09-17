@@ -1,9 +1,9 @@
-import { LoadedConfigTask } from '@/types/runner';
-import Module from 'module';
+import { FusionPlugin } from '@/types/plugin.ts';
 import { MaybePromise } from 'rollup';
 
 export interface FusionVitePluginOptions {
   fusionfile?: string | Fusionfile;
+  plugins?: FusionPlugin[];
   cwd?: string;
 }
 

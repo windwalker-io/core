@@ -1,0 +1,93 @@
+import { type ConfigBuilder, css, ProcessorInterface } from '@windwalker-io/fusion-next';
+import { globSync } from 'fast-glob';
+import { readFileSync } from 'fs-extra';
+import { parse } from 'node-html-parser';
+import { normalize } from 'node:path';
+import { resolve } from 'path';
+
+export function cssModulize(entry: string, dest: string) {
+  return new CssModulizeProcessor(css(entry, dest));
+}
+
+class CssModulizeProcessor implements ProcessorInterface {
+
+  constructor(
+    protected processor: ReturnType<typeof css>,
+    protected bladePatterns: string[] = [],
+    protected cssPatterns: string[] = []
+  ) {
+
+  }
+
+  parseBlades(...bladePatterns: (string[] | string)[]) {
+    this.bladePatterns = bladePatterns.flat();
+
+    return this;
+  }
+
+  mergeCss(...css: (string[] | string)[]) {
+    this.cssPatterns = css.flat();
+
+    return this;
+  }
+
+  config(taskName: string, builder) {
+    const tasks = this.processor.config(taskName, builder);
+
+    for (const task of tasks) {
+      builder.loadCallbacks.push((src, options) => {
+        if (normalize(src) === resolve(task.input)) {
+          const patterns = globSync(
+            this.cssPatterns.map((v) => resolve(v))
+              .map(v => v.replace(/\\/g, '/'))
+          );
+
+          const imports = patterns
+            .map((pattern) => `@import "${pattern}";`)
+            .concat(parseStylesFromBlades(this.bladePatterns))
+            .join('\n');
+
+          let main = readFileSync(src, 'utf-8');
+
+          main += `\n\n${imports}\n`;
+
+          return main;
+        }
+      });
+    }
+
+    return undefined;
+  }
+
+  preview(): MaybePromise<ProcessorPreview[]> {
+    return undefined;
+  }
+}
+
+function parseStylesFromBlades(patterns: string | string[]) {
+  let files = globSync(patterns);
+
+  return files.map((file) => {
+    const bladeText = readFileSync(file, 'utf8');
+
+    const html = parse(bladeText);
+
+    return html.querySelectorAll('style[type],script[type]')
+      .filter(
+        (el) => ['text/scss', 'text/css'].includes(el.getAttribute('type'))
+      )
+      .map((el) => {
+        const scope = el.getAttribute('data-scope');
+
+        if (scope) {
+          return `${scope} {
+          ${el.innerHTML}
+        }`;
+        } else {
+          return el.innerHTML;
+        }
+      });
+  })
+    .filter((c) => c.length > 0)
+    .flat();
+}

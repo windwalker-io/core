@@ -4,7 +4,7 @@ import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
 import { MaybePromise, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
-import { ConfigEnv, mergeConfig, PluginOption, UserConfig } from 'vite';
+import { ConfigEnv, mergeConfig, PluginOption, UserConfig, Plugin } from 'vite';
 
 export default class ConfigBuilder {
   static globalOverrideConfig: UserConfig = {};
@@ -18,6 +18,8 @@ export default class ConfigBuilder {
   copyTasks: FileTasks = [];
   linkTasks: FileTasks<'link'> = [];
   postBuildCallbacks: (() => MaybePromise<void>)[] = [];
+  resolveIdCallbacks: Exclude<Plugin['resolveId'], undefined>[] = [];
+  loadCallbacks: Exclude<Plugin['load'], undefined>[] = [];
   // fileNameMap: Record<string, string> = {};
 
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
@@ -49,7 +51,6 @@ export default class ConfigBuilder {
           //   }
           // },
         },
-        emptyOutDir: false,
         sourcemap: env.mode !== 'production' ? 'inline' : false,
       },
       plugins: [],
@@ -61,6 +62,8 @@ export default class ConfigBuilder {
         target: 'es2022',
       }
     });
+
+    this.addTask('hidden:placeholder');
   }
 
   merge(override: UserConfig | ((config: UserConfig) => UserConfig)) {

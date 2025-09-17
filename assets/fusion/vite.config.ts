@@ -1,3 +1,4 @@
+import { tree } from 'gulp';
 import path from "node:path";
 import { resolve } from 'path';
 import { defineConfig } from "vite";
@@ -46,6 +47,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       dts({
         // entryRoot: 'src',
+        // pathsToAliases: true,
         outDir: 'dist',
         tsconfigPath: './tsconfig.json',
         insertTypesEntry: true,

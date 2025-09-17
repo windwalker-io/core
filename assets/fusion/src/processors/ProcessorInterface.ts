@@ -1,6 +1,5 @@
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { MaybePromise } from 'rollup';
-import { UserConfig } from 'vite';
 
 export type ProcessorPreview = {
   input: string;
@@ -9,7 +8,7 @@ export type ProcessorPreview = {
 };
 
 export interface ProcessorInterface {
-  config(taskName: string, builder: ConfigBuilder): MaybePromise<void>;
+  config(taskName: string, builder: ConfigBuilder): MaybePromise<any>;
 
   preview(): MaybePromise<ProcessorPreview[]>;
 }

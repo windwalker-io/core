@@ -1,12 +1,12 @@
-import { shortHash } from '@/utilities/crypto.ts';
-import { uniqueId } from 'lodash-es';
-import { normalize, basename, resolve, isAbsolute, parse } from 'node:path';
+import { MaybePromise } from '@/types';
+import { fileToId } from '@/utilities/fs.ts';
+import { normalize, parse } from 'node:path';
 import { PreRenderedChunk } from 'rollup';
 
 export default class BuildTask {
   id: string;
   output?: string | ((chunkInfo: PreRenderedChunk) => any);
-  postCallbacks: (() => void)[] = [];
+  postCallbacks: (() => MaybePromise<any>)[] = [];
 
   constructor(public input: string, public group?: string) {
     this.id = BuildTask.toFileId(input, group);
@@ -42,11 +42,7 @@ export default class BuildTask {
   }
 
   static toFileId(input: string, group?: string) {
-    input = normalize(input);
-
-    group ||= uniqueId();
-
-    return group + '-' + shortHash(input);
+    return fileToId(input, group);
   }
 }
 
