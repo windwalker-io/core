@@ -17,6 +17,7 @@ class AssetProvider implements ServiceProviderInterface
      */
     public function register(Container $container): void
     {
+        $container->prepareSharedObject(ViteResolver::class);
         $container->prepareSharedObject(
             AssetService::class,
             function (AssetService $asset, Container $container) {

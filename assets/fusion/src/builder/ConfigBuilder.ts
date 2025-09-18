@@ -1,5 +1,5 @@
 import BuildTask from '@/builder/BuildTask.ts';
-import { FileTasks, LinkOptions, RunnerCliParams } from '@/types';
+import { FileTasks, FusionVitePluginOptions, LinkOptions, RunnerCliParams } from '@/types';
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
@@ -27,7 +27,7 @@ export default class ConfigBuilder {
 
   tasks: Map<string, BuildTask> = new Map();
 
-  constructor(public config: UserConfig, public env: ConfigEnv, public params: RunnerCliParams) {
+  constructor(public config: UserConfig, public env: ConfigEnv, public fusionOptions: FusionVitePluginOptions) {
     // this.ensurePath('build', {});
     // this.ensurePath('build.rollupOptions', {
     //   input: {},
@@ -37,6 +37,7 @@ export default class ConfigBuilder {
 
     this.config = mergeConfig<UserConfig, UserConfig>(this.config, {
       build: {
+        manifest: 'manifest.json',
         rollupOptions: {
           preserveEntrySignatures: 'strict',
           input: {},
@@ -51,6 +52,7 @@ export default class ConfigBuilder {
           //   }
           // },
         },
+        emptyOutDir: false,
         sourcemap: env.mode !== 'production' ? 'inline' : false,
       },
       plugins: [],
@@ -114,7 +116,9 @@ export default class ConfigBuilder {
           }
         }
 
-        return 'chunks/[name]-[hash].js';
+        const chunkDir = this.getChunkDir();
+
+        return `${chunkDir}/[name]-[hash].js`;
       },
       assetFileNames: (assetInfo) => {
         // if (this.fileNameMap[assetInfo.name]) {
@@ -133,6 +137,22 @@ export default class ConfigBuilder {
         return '[name].[ext]';
       }
     };
+  }
+
+  private getChunkDir(): string {
+    let chunkDir = this.fusionOptions.chunkDir ?? 'chunks';
+    chunkDir.replace(/\\/g, '/');
+
+    // Ensure trailing slash
+    if (chunkDir && !chunkDir.endsWith('/')) {
+      chunkDir += '/';
+    }
+
+    if (chunkDir === './' || chunkDir === '/') {
+      chunkDir = '';
+    }
+
+    return chunkDir;
   }
 
   private getChunkNameFromTask(chunkInfo: PreRenderedChunk) {
@@ -179,6 +199,12 @@ export default class ConfigBuilder {
     return task;
   }
 
+  addCleans(...paths: string[]) {
+    this.cleans.push(...paths);
+
+    return this;
+  }
+
   // addExternals(externals: Externalize) {
   //   if (Array.isArray(externals)) {
   //     this.externals.push((rollupOptions) => {
@@ -191,25 +217,25 @@ export default class ConfigBuilder {
   //   }
   // }
 
-  addPlugin(plugin: PluginOption) {
-    this.config.plugins?.push(plugin);
-  }
-
-  removePlugin(plugin: string | PluginOption) {
-    this.config.plugins = this.config.plugins?.filter((p) => {
-      if (!p) {
-        return true;
-      }
-
-      if (typeof plugin === 'string' && typeof p === 'object' && 'name' in p) {
-        return p.name !== plugin;
-      } else if (typeof plugin === 'object' && typeof p === 'object') {
-        return p !== plugin;
-      }
-
-      return true;
-    });
-  }
+  // addPlugin(plugin: PluginOption) {
+  //   this.config.plugins?.push(plugin);
+  // }
+  //
+  // removePlugin(plugin: string | PluginOption) {
+  //   this.config.plugins = this.config.plugins?.filter((p) => {
+  //     if (!p) {
+  //       return true;
+  //     }
+  //
+  //     if (typeof plugin === 'string' && typeof p === 'object' && 'name' in p) {
+  //       return p.name !== plugin;
+  //     } else if (typeof plugin === 'object' && typeof p === 'object') {
+  //       return p !== plugin;
+  //     }
+  //
+  //     return true;
+  //   });
+  // }
 
   relativePath(to: string) {
     return relative(process.cwd(), to);

@@ -1,10 +1,12 @@
 import { FusionPlugin } from '@/types/plugin.ts';
+import { RunnerCliParams } from '@/types/runner';
 import { MaybePromise } from 'rollup';
 
 export interface FusionVitePluginOptions {
   fusionfile?: string | Fusionfile;
+  chunkDir?: string;
   plugins?: FusionPlugin[];
-  cwd?: string;
+  cliParams?: RunnerCliParams;
 }
 
 export type FusionVitePluginUnresolved = FusionVitePluginOptions | string | (() => MaybePromise<Record<string, any>>);

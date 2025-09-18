@@ -36,7 +36,9 @@ class CssModulizeProcessor implements ProcessorInterface {
 
     for (const task of tasks) {
       builder.loadCallbacks.push((src, options) => {
-        if (normalize(src) === resolve(task.input)) {
+        const file = stripUrlQuery(src);
+
+        if (normalize(file) === resolve(task.input)) {
           const patterns = globSync(
             this.cssPatterns.map((v) => resolve(v))
               .map(v => v.replace(/\\/g, '/'))
@@ -47,10 +49,10 @@ class CssModulizeProcessor implements ProcessorInterface {
             .concat(parseStylesFromBlades(this.bladePatterns))
             .join('\n');
 
-          let main = readFileSync(src, 'utf-8');
+          let main = readFileSync(file, 'utf-8');
 
           main += `\n\n${imports}\n`;
-
+          
           return main;
         }
       });
@@ -90,4 +92,14 @@ function parseStylesFromBlades(patterns: string | string[]) {
   })
     .filter((c) => c.length > 0)
     .flat();
+}
+
+function stripUrlQuery(src: string) {
+  const qPos = src.indexOf('?');
+
+  if (qPos !== -1) {
+    return src.substring(0, qPos);
+  }
+
+  return src;
 }

@@ -22,7 +22,7 @@ function handleFilesOperation(
 
   const base = getBaseFromPattern(src);
   const sources = isGlob(src)
-    ? fg.globSync(fg.convertPathToPattern(src), options.globOptions)
+    ? fg.globSync(src.replace(/\\/g, '/'), options.globOptions)
     : [src];
 
   for (let source of sources) {
@@ -106,6 +106,34 @@ export function linkFilesAndLog(tasks: FileTasks<'link'>, outDir: string, logger
     );
 
     promises.push(...ps);
+  }
+
+  return Promise.all(promises);
+}
+
+export function cleanFiles(patterns: string[], outDir: string) {
+  const promises = [];
+
+  outDir = outDir.replace(/\\/g, '/');
+
+  for (let src of patterns) {
+    src = normalizeFilePath(src, outDir);
+    src = resolve(src);
+    
+    const sources = isGlob(src)
+      ? fg.globSync(src.replace(/\\/g, '/'), { onlyFiles: false })
+      : [src];
+
+    // To protect `upload/*` folder.
+    const protectDir = resolve(outDir + '/upload').replace(/\\/g, '/');
+
+    for (let source of sources) {
+      if (source.replace(/\\/g, '/').startsWith(protectDir)) {
+        throw new Error('Refuse to delete `upload/*` folder.');
+      }
+
+      promises.push(fs.remove(source));
+    }
   }
 
   return Promise.all(promises);

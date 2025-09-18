@@ -1,11 +1,11 @@
 import { default as BuildTask } from './BuildTask.ts';
-import { FileTasks, RunnerCliParams } from '../types';
+import { FileTasks, FusionVitePluginOptions } from '../types';
 import { MaybePromise, PreRenderedAsset, PreRenderedChunk } from 'rollup';
-import { ConfigEnv, PluginOption, UserConfig, Plugin } from 'vite';
+import { ConfigEnv, UserConfig, Plugin } from 'vite';
 export default class ConfigBuilder {
     config: UserConfig;
     env: ConfigEnv;
-    params: RunnerCliParams;
+    fusionOptions: FusionVitePluginOptions;
     static globalOverrideConfig: UserConfig;
     overrideConfig: UserConfig;
     entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
@@ -19,16 +19,16 @@ export default class ConfigBuilder {
     loadCallbacks: Exclude<Plugin['load'], undefined>[];
     cleans: string[];
     tasks: Map<string, BuildTask>;
-    constructor(config: UserConfig, env: ConfigEnv, params: RunnerCliParams);
+    constructor(config: UserConfig, env: ConfigEnv, fusionOptions: FusionVitePluginOptions);
     merge(override: UserConfig | ((config: UserConfig) => UserConfig)): this;
     private getDefaultOutput;
+    private getChunkDir;
     private getChunkNameFromTask;
     ensurePath(path: string, def?: any): this;
     get(path: string): any;
     set(path: string, value: any): this;
     addTask(input: string, group?: string): BuildTask;
-    addPlugin(plugin: PluginOption): void;
-    removePlugin(plugin: string | PluginOption): void;
+    addCleans(...paths: string[]): this;
     relativePath(to: string): string;
     debug(): void;
 }

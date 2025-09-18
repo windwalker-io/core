@@ -7,13 +7,15 @@ import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
 import { FusionPlugin, FusionVitePluginOptions, FusionVitePluginUnresolved, LoadedConfigTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
-import { copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
-import { show } from '@/utilities/utilities.ts';
-import { existsSync } from 'node:fs';
+import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
+import { mergeOptions, show } from '@/utilities/utilities.ts';
+import fs from 'fs';
+import { uniq } from 'lodash-es';
+import { existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { Logger, mergeConfig, PluginOption, UserConfig } from 'vite';
+import { Logger, mergeConfig, PluginOption, ResolvedConfig, UserConfig } from 'vite';
 
-const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
+let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 
 export let builder: ConfigBuilder;
@@ -23,8 +25,10 @@ const extraVitePlugins: FusionPlugin[] = [];
 
 export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?: string | string[]): PluginOption {
   let logger: Logger;
+  let resolvedConfig: ResolvedConfig;
+  let exitHandlersBound = false;
 
-  const options = prepareFusionOptions(fusionOptions);
+  const resolvedOptions = prepareFusionOptions(fusionOptions);
 
   if (tasks !== undefined || (Array.isArray(tasks) && tasks.length > 0)) {
     params._ = forceArray(tasks);
@@ -32,14 +36,14 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
     params._ = originalTasks;
   }
 
-  if (options.cwd !== undefined) {
-    params.cwd = options.cwd;
-  }
+  params = mergeOptions(params, resolvedOptions.cliParams);
 
   return [
     {
       name: 'fusion',
       configResolved(config) {
+        resolvedConfig = config;
+
         logger = config.logger;
 
         config.plugins.push(...extraVitePlugins);
@@ -64,21 +68,21 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
         process.chdir(root);
 
-        builder = new ConfigBuilder(config, env, params);
+        builder = new ConfigBuilder(config, env, resolvedOptions);
 
         // Retrieve config file
         let tasks: Record<string, LoadedConfigTask>;
 
-        if (typeof options.fusionfile === 'string' || !options.fusionfile) {
-          params.config ??= options.fusionfile;
+        if (typeof resolvedOptions.fusionfile === 'string' || !resolvedOptions.fusionfile) {
+          params.config ??= resolvedOptions.fusionfile;
           const configFile = mustGetAvailableConfigFile(root, params);
 
           // Load config
           tasks = await loadConfigFile(configFile);
-        } else if (typeof options.fusionfile === 'function') {
-          tasks = expandModules(await options.fusionfile());
+        } else if (typeof resolvedOptions.fusionfile === 'function') {
+          tasks = expandModules(await resolvedOptions.fusionfile());
         } else {
-          tasks = expandModules(options.fusionfile);
+          tasks = expandModules(resolvedOptions.fusionfile);
         }
 
         // Describe tasks
@@ -117,15 +121,53 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         return builder.config;
       },
       outputOptions(options) {
-        const dir = options.dir!;
-        const uploadDir = resolve(dir, 'upload');
+        // Protect upload folder
+        if (resolvedConfig.build.emptyOutDir) {
+          const dir = resolvedConfig.build.outDir;
+          const uploadDir = resolve(dir, 'upload');
 
-        if (existsSync(uploadDir)) {
-          throw new Error(
-            `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
-          );
+          if (existsSync(uploadDir)) {
+            throw new Error(
+              `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
+            );
+          }
         }
       },
+      async buildStart(options) {
+        if (builder.cleans.length > 0) {
+          await cleanFiles(builder.cleans, resolvedConfig.build.outDir || process.cwd());
+        }
+      },
+
+      // Server
+      configureServer(server) {
+        server.httpServer?.once('listening', () => {
+          const scheme = server.config.server.https ? 'https' : 'http';
+          const address = server.httpServer?.address();
+          const host = address && typeof address !== 'string' ? address.address : 'localhost';
+          const port = address && typeof address !== 'string' ? address.port : 80;
+
+          const url = `${scheme}://${host}:${port}/`;
+          const serverFile = resolve(
+            server.config.root,
+            resolvedOptions.cliParams?.serverFile ?? 'tmp/vite-server'
+          );
+
+          writeFileSync(resolve(server.config.root, serverFile), url);
+
+          if (!exitHandlersBound) {
+            process.on("exit", () => {
+              if (fs.existsSync(serverFile)) {
+                fs.rmSync(serverFile);
+              }
+            });
+            process.on("SIGINT", () => process.exit());
+            process.on("SIGTERM", () => process.exit());
+            process.on("SIGHUP", () => process.exit());
+            exitHandlersBound = true;
+          }
+        });
+      }
     },
     {
       name: 'fusion:pre-handles',
@@ -167,11 +209,13 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         }
       },
       async writeBundle(options, bundle) {
+        const outDir = resolvedConfig.build.outDir || process.cwd();
+
         // Todo: override logger to replace vite's files logs
         // @see https://github.com/windwalker-io/core/issues/1355
-        await moveFilesAndLog(builder.moveTasks, options.dir ?? process.cwd(), logger);
-        await copyFilesAndLog(builder.copyTasks, options.dir ?? process.cwd(), logger);
-        await linkFilesAndLog(builder.linkTasks, options.dir ?? process.cwd(), logger);
+        await moveFilesAndLog(builder.moveTasks, outDir, logger);
+        await copyFilesAndLog(builder.copyTasks, outDir, logger);
+        await linkFilesAndLog(builder.linkTasks, outDir, logger);
 
         for (const callback of builder.postBuildCallbacks) {
           await callback();
@@ -219,7 +263,7 @@ export function mergeViteConfig(config: UserConfig | null) {
     return;
   }
 
-  builder.overrideConfig = mergeConfig(ConfigBuilder.globalOverrideConfig, config);
+  builder.overrideConfig = mergeConfig(builder.overrideConfig, config);
 }
 
 export function outDir(outDir: string) {
@@ -233,6 +277,10 @@ export function outDir(outDir: string) {
       outDir
     }
   });
+}
+
+export function chunkDir(dir: string) {
+  builder.fusionOptions.chunkDir = dir;
 }
 
 export function alias(src: string, dest: string) {
@@ -268,3 +316,8 @@ export function plugin(...plugins: FusionPlugin[]) {
   extraVitePlugins.push(...plugins);
 }
 
+export function clean(...paths: string[]) {
+  builder.addCleans(...paths);
+
+  builder.cleans = uniq(builder.cleans);
+}

@@ -16,6 +16,7 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\Event\AssetBeforeRender;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Core\Runtime\Config;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Path;
@@ -118,11 +119,15 @@ class AssetService implements EventAwareInterface
 
     public function __construct(
         protected ApplicationInterface $app,
+        protected Config $config,
         protected SystemUri $systemUri,
         protected PathResolver $pathResolver,
+        public protected(set) ViteResolver $vite,
         EventEmitter $dispatcher
     ) {
-        $folder = $this->app->config('asset.folder') ?? 'assets';
+        $this->config = $this->config->proxy('asset');
+
+        $folder = $this->config->get('folder') ?? 'assets';
 
         $this->path = $options['uri'] ?? $this->systemUri->path($folder);
         $this->root = $options['uri'] ?? $this->systemUri->root($folder);
@@ -392,6 +397,13 @@ class AssetService implements EventAwareInterface
         $withInternal = $event->isWithInternal();
         $html = $event->html;
 
+        if ($this->vite->serverIsRunning()) {
+            $html[] = (string) h(
+                'script',
+                ['src' => $this->vite->prependHost('@vite/client'), 'type' => 'module'],
+            );
+        }
+
         foreach ($event->links as $url => $script) {
             $defaultAttrs = [
                 'src' => $script->getHref(),
@@ -438,7 +450,7 @@ class AssetService implements EventAwareInterface
     {
         $styles = array_filter(
             $this->internalStyles,
-            static fn (AssetItem $item) => $item->isFooter() === $footer
+            static fn(AssetItem $item) => $item->isFooter() === $footer
         );
 
         return implode("\n\n", $styles);
@@ -846,6 +858,10 @@ class AssetService implements EventAwareInterface
     public function handleUri(string $uri, string $path = 'path'): string
     {
         $uri = $this->resolveAlias($uri);
+
+        if ($this->vite->shouldResolve($uri)) {
+            $uri = $this->vite->resolve($uri);
+        }
 
         // Check has .min
         // $uri = Uri::addUriBase($uri, 'path');

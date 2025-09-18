@@ -7,6 +7,8 @@ export declare function useFusion(fusionOptions?: FusionVitePluginUnresolved, ta
 export declare function configureBuilder(handler: (builder: ConfigBuilder) => void): void;
 export declare function mergeViteConfig(config: UserConfig | null): void;
 export declare function outDir(outDir: string): void;
+export declare function chunkDir(dir: string): void;
 export declare function alias(src: string, dest: string): void;
 export declare function external(match: string, varName?: string): void;
 export declare function plugin(...plugins: FusionPlugin[]): void;
+export declare function clean(...paths: string[]): void;

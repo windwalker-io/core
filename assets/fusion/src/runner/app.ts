@@ -39,6 +39,12 @@ export function parseArgv(argv: string[]): RunnerCliParams {
     description: 'Path to config file',
   });
 
+  app.option('server-file', {
+    alias: 's',
+    type: 'string',
+    description: 'Path to server file',
+  });
+
   // app.option('series', {
   //   alias: 's',
   //   type: 'boolean',

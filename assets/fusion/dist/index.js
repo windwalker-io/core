@@ -2,16 +2,17 @@ import Crypto from 'crypto';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
 import { randomBytes } from 'node:crypto';
-import { basename, parse, normalize, relative, dirname, resolve, isAbsolute } from 'node:path';
+import { basename, parse, normalize, resolve, relative, dirname, isAbsolute } from 'node:path';
 import { inspect } from 'node:util';
-import { get, set, uniq } from 'lodash-es';
 import { mergeConfig } from 'vite';
+import { get, set, uniq } from 'lodash-es';
 import yargs from 'yargs';
 import { build } from 'esbuild';
 import Module from 'module';
 import { writeFileSync, existsSync } from 'node:fs';
 import archy from 'archy';
 import chalk from 'chalk';
+import fs$1 from 'fs';
 
 function forceArray(item) {
   if (Array.isArray(item)) {
@@ -231,7 +232,7 @@ function handleFilesOperation(src, dest, options) {
   src = normalizeFilePath(src, options.outDir);
   dest = normalizeFilePath(dest, options.outDir);
   const base = getBaseFromPattern(src);
-  const sources = isGlob(src) ? fg.globSync(fg.convertPathToPattern(src), options.globOptions) : [src];
+  const sources = isGlob(src) ? fg.globSync(src.replace(/\\/g, "/"), options.globOptions) : [src];
   for (let source of sources) {
     let dir;
     let resolvedDest = dest;
@@ -300,6 +301,23 @@ function linkFilesAndLog(tasks, outDir, logger) {
       }
     );
     promises.push(...ps);
+  }
+  return Promise.all(promises);
+}
+function cleanFiles(patterns, outDir) {
+  const promises = [];
+  outDir = outDir.replace(/\\/g, "/");
+  for (let src of patterns) {
+    src = normalizeFilePath(src, outDir);
+    src = resolve(src);
+    const sources = isGlob(src) ? fg.globSync(src.replace(/\\/g, "/"), { onlyFiles: false }) : [src];
+    const protectDir = resolve(outDir + "/upload").replace(/\\/g, "/");
+    for (let source of sources) {
+      if (source.replace(/\\/g, "/").startsWith(protectDir)) {
+        throw new Error("Refuse to delete `upload/*` folder.");
+      }
+      promises.push(fs.remove(source));
+    }
   }
   return Promise.all(promises);
 }
@@ -397,17 +415,34 @@ class BuildTask {
   }
 }
 
+function mergeOptions(base, ...overrides) {
+  if (!overrides.length) {
+    return base;
+  }
+  for (const override of overrides) {
+    if (!override) {
+      continue;
+    }
+    if (typeof override === "function") {
+      base = override(base) ?? base;
+    } else {
+      base = mergeConfig(base, override);
+    }
+  }
+  return base;
+}
 function show(data, depth = 10) {
   console.log(inspect(data, { depth, colors: true }));
 }
 
 class ConfigBuilder {
-  constructor(config, env, params) {
+  constructor(config, env, fusionOptions) {
     this.config = config;
     this.env = env;
-    this.params = params;
+    this.fusionOptions = fusionOptions;
     this.config = mergeConfig(this.config, {
       build: {
+        manifest: "manifest.json",
         rollupOptions: {
           preserveEntrySignatures: "strict",
           input: {},
@@ -422,6 +457,7 @@ class ConfigBuilder {
           //   }
           // },
         },
+        emptyOutDir: false,
         sourcemap: env.mode !== "production" ? "inline" : false
       },
       plugins: [],
@@ -484,7 +520,8 @@ class ConfigBuilder {
             return name2;
           }
         }
-        return "chunks/[name]-[hash].js";
+        const chunkDir = this.getChunkDir();
+        return `${chunkDir}/[name]-[hash].js`;
       },
       assetFileNames: (assetInfo) => {
         for (const assetFileNamesCallback of this.assetFileNamesCallbacks) {
@@ -496,6 +533,17 @@ class ConfigBuilder {
         return "[name].[ext]";
       }
     };
+  }
+  getChunkDir() {
+    let chunkDir = this.fusionOptions.chunkDir ?? "chunks";
+    chunkDir.replace(/\\/g, "/");
+    if (chunkDir && !chunkDir.endsWith("/")) {
+      chunkDir += "/";
+    }
+    if (chunkDir === "./" || chunkDir === "/") {
+      chunkDir = "";
+    }
+    return chunkDir;
   }
   getChunkNameFromTask(chunkInfo) {
     if (this.tasks.has(chunkInfo.name)) {
@@ -529,6 +577,10 @@ class ConfigBuilder {
     inputOptions[task.id] = task.input;
     return task;
   }
+  addCleans(...paths) {
+    this.cleans.push(...paths);
+    return this;
+  }
   // addExternals(externals: Externalize) {
   //   if (Array.isArray(externals)) {
   //     this.externals.push((rollupOptions) => {
@@ -540,22 +592,25 @@ class ConfigBuilder {
   //
   //   }
   // }
-  addPlugin(plugin) {
-    this.config.plugins?.push(plugin);
-  }
-  removePlugin(plugin) {
-    this.config.plugins = this.config.plugins?.filter((p) => {
-      if (!p) {
-        return true;
-      }
-      if (typeof plugin === "string" && typeof p === "object" && "name" in p) {
-        return p.name !== plugin;
-      } else if (typeof plugin === "object" && typeof p === "object") {
-        return p !== plugin;
-      }
-      return true;
-    });
-  }
+  // addPlugin(plugin: PluginOption) {
+  //   this.config.plugins?.push(plugin);
+  // }
+  //
+  // removePlugin(plugin: string | PluginOption) {
+  //   this.config.plugins = this.config.plugins?.filter((p) => {
+  //     if (!p) {
+  //       return true;
+  //     }
+  //
+  //     if (typeof plugin === 'string' && typeof p === 'object' && 'name' in p) {
+  //       return p.name !== plugin;
+  //     } else if (typeof plugin === 'object' && typeof p === 'object') {
+  //       return p !== plugin;
+  //     }
+  //
+  //     return true;
+  //   });
+  // }
   relativePath(to) {
     return relative(process.cwd(), to);
   }
@@ -583,6 +638,11 @@ function parseArgv(argv) {
     alias: "c",
     type: "string",
     description: "Path to config file"
+  });
+  app.option("server-file", {
+    alias: "s",
+    type: "string",
+    description: "Path to server file"
   });
   app.option("verbose", {
     alias: "v",
@@ -849,26 +909,27 @@ async function resolveTaskAsFlat(name, task, cache) {
   return results;
 }
 
-const params = parseArgv(getArgsAfterDoubleDashes(process.argv));
+let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
 let builder;
 const originalTasks = params._;
 const extraVitePlugins = [];
 function useFusion(fusionOptions = {}, tasks) {
   let logger;
-  const options = prepareFusionOptions(fusionOptions);
+  let resolvedConfig;
+  let exitHandlersBound = false;
+  const resolvedOptions = prepareFusionOptions(fusionOptions);
   if (tasks !== void 0 || Array.isArray(tasks) && tasks.length > 0) {
     params._ = forceArray(tasks);
   } else {
     params._ = originalTasks;
   }
-  if (options.cwd !== void 0) {
-    params.cwd = options.cwd;
-  }
+  params = mergeOptions(params, resolvedOptions.cliParams);
   return [
     {
       name: "fusion",
       configResolved(config) {
+        resolvedConfig = config;
         logger = config.logger;
         config.plugins.push(...extraVitePlugins);
         for (const plugin2 of config.plugins) {
@@ -886,16 +947,16 @@ function useFusion(fusionOptions = {}, tasks) {
         }
         delete config.root;
         process.chdir(root);
-        builder = new ConfigBuilder(config, env, params);
+        builder = new ConfigBuilder(config, env, resolvedOptions);
         let tasks2;
-        if (typeof options.fusionfile === "string" || !options.fusionfile) {
-          params.config ??= options.fusionfile;
+        if (typeof resolvedOptions.fusionfile === "string" || !resolvedOptions.fusionfile) {
+          params.config ??= resolvedOptions.fusionfile;
           const configFile = mustGetAvailableConfigFile(root, params);
           tasks2 = await loadConfigFile(configFile);
-        } else if (typeof options.fusionfile === "function") {
-          tasks2 = expandModules(await options.fusionfile());
+        } else if (typeof resolvedOptions.fusionfile === "function") {
+          tasks2 = expandModules(await resolvedOptions.fusionfile());
         } else {
-          tasks2 = expandModules(options.fusionfile);
+          tasks2 = expandModules(resolvedOptions.fusionfile);
         }
         if (params.list) {
           await displayAvailableTasks(tasks2);
@@ -913,22 +974,55 @@ function useFusion(fusionOptions = {}, tasks) {
         builder.merge(builder.overrideConfig);
         return builder.config;
       },
-      outputOptions(options2) {
-        const dir = options2.dir;
-        const uploadDir = resolve(dir, "upload");
-        if (existsSync(uploadDir)) {
-          throw new Error(
-            `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
-          );
+      outputOptions(options) {
+        if (resolvedConfig.build.emptyOutDir) {
+          const dir = resolvedConfig.build.outDir;
+          const uploadDir = resolve(dir, "upload");
+          if (existsSync(uploadDir)) {
+            throw new Error(
+              `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
+            );
+          }
         }
+      },
+      async buildStart(options) {
+        if (builder.cleans.length > 0) {
+          await cleanFiles(builder.cleans, resolvedConfig.build.outDir || process.cwd());
+        }
+      },
+      // Server
+      configureServer(server) {
+        server.httpServer?.once("listening", () => {
+          const scheme = server.config.server.https ? "https" : "http";
+          const address = server.httpServer?.address();
+          const host = address && typeof address !== "string" ? address.address : "localhost";
+          const port = address && typeof address !== "string" ? address.port : 80;
+          const url = `${scheme}://${host}:${port}/`;
+          const serverFile = resolve(
+            server.config.root,
+            resolvedOptions.cliParams?.serverFile ?? "tmp/vite-server"
+          );
+          writeFileSync(resolve(server.config.root, serverFile), url);
+          if (!exitHandlersBound) {
+            process.on("exit", () => {
+              if (fs$1.existsSync(serverFile)) {
+                fs$1.rmSync(serverFile);
+              }
+            });
+            process.on("SIGINT", () => process.exit());
+            process.on("SIGTERM", () => process.exit());
+            process.on("SIGHUP", () => process.exit());
+            exitHandlersBound = true;
+          }
+        });
       }
     },
     {
       name: "fusion:pre-handles",
       enforce: "pre",
-      async resolveId(source, importer, options2) {
+      async resolveId(source, importer, options) {
         for (const resolveId of builder.resolveIdCallbacks) {
-          const result = await resolveId(source, importer, options2);
+          const result = await resolveId(source, importer, options);
           if (result) {
             return result;
           }
@@ -937,9 +1031,9 @@ function useFusion(fusionOptions = {}, tasks) {
           return source;
         }
       },
-      async load(source, options2) {
+      async load(source, options) {
         for (const load of builder.loadCallbacks) {
-          const result = await load(source, options2);
+          const result = await load(source, options);
           if (result) {
             return result;
           }
@@ -951,17 +1045,18 @@ function useFusion(fusionOptions = {}, tasks) {
     },
     {
       name: "fusion:post-handles",
-      generateBundle(options2, bundle) {
+      generateBundle(options, bundle) {
         for (const [fileName, chunk] of Object.entries(bundle)) {
           if (chunk.type === "chunk" && chunk.facadeModuleId?.startsWith("hidden:")) {
             delete bundle[fileName];
           }
         }
       },
-      async writeBundle(options2, bundle) {
-        await moveFilesAndLog(builder.moveTasks, options2.dir ?? process.cwd(), logger);
-        await copyFilesAndLog(builder.copyTasks, options2.dir ?? process.cwd(), logger);
-        await linkFilesAndLog(builder.linkTasks, options2.dir ?? process.cwd(), logger);
+      async writeBundle(options, bundle) {
+        const outDir2 = resolvedConfig.build.outDir || process.cwd();
+        await moveFilesAndLog(builder.moveTasks, outDir2, logger);
+        await copyFilesAndLog(builder.copyTasks, outDir2, logger);
+        await linkFilesAndLog(builder.linkTasks, outDir2, logger);
         for (const callback of builder.postBuildCallbacks) {
           await callback();
         }
@@ -995,7 +1090,7 @@ function mergeViteConfig(config) {
     builder.overrideConfig = {};
     return;
   }
-  builder.overrideConfig = mergeConfig(ConfigBuilder.globalOverrideConfig, config);
+  builder.overrideConfig = mergeConfig(builder.overrideConfig, config);
 }
 function outDir(outDir2) {
   builder.overrideConfig = mergeConfig(builder.overrideConfig, {
@@ -1003,6 +1098,9 @@ function outDir(outDir2) {
       outDir: outDir2
     }
   });
+}
+function chunkDir(dir) {
+  builder.fusionOptions.chunkDir = dir;
 }
 function alias(src, dest) {
   builder.overrideConfig = mergeConfig(builder.overrideConfig, {
@@ -1032,6 +1130,10 @@ function external(match, varName) {
 function plugin(...plugins) {
   extraVitePlugins.push(...plugins);
 }
+function clean(...paths) {
+  builder.addCleans(...paths);
+  builder.cleans = uniq(builder.cleans);
+}
 
-export { alias, builder, callback, callbackAfterBuild, configureBuilder, copy, copyGlob, css, external, fileToId, isDev, isProd, isVerbose, isWindows, js, link, mergeViteConfig, move, moveGlob, outDir, params$1 as params, plugin, shortHash, symlink, useFusion };
+export { alias, builder, callback, callbackAfterBuild, chunkDir, clean, configureBuilder, copy, copyGlob, css, external, fileToId, isDev, isProd, isVerbose, isWindows, js, link, mergeViteConfig, move, moveGlob, outDir, params$1 as params, plugin, shortHash, symlink, useFusion };
 //# sourceMappingURL=index.js.map
