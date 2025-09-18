@@ -1,9 +1,8 @@
-import { type ConfigBuilder, css, ProcessorInterface } from '@windwalker-io/fusion-next';
-import { globSync } from 'fast-glob';
-import { readFileSync } from 'fs-extra';
+import { type ConfigBuilder, css, type ProcessorInterface, type ProcessorPreview } from '@windwalker-io/fusion-next';
+import fg from 'fast-glob';
+import fs from 'fs-extra';
 import { parse } from 'node-html-parser';
-import { normalize } from 'node:path';
-import { resolve } from 'path';
+import { normalize, resolve } from 'node:path';
 
 export function cssModulize(entry: string, dest: string) {
   return new CssModulizeProcessor(css(entry, dest));
@@ -31,7 +30,7 @@ class CssModulizeProcessor implements ProcessorInterface {
     return this;
   }
 
-  config(taskName: string, builder) {
+  config(taskName: string, builder: ConfigBuilder) {
     const tasks = this.processor.config(taskName, builder);
 
     for (const task of tasks) {
@@ -39,7 +38,7 @@ class CssModulizeProcessor implements ProcessorInterface {
         const file = stripUrlQuery(src);
 
         if (normalize(file) === resolve(task.input)) {
-          const patterns = globSync(
+          const patterns = fg.globSync(
             this.cssPatterns.map((v) => resolve(v))
               .map(v => v.replace(/\\/g, '/'))
           );
@@ -49,10 +48,10 @@ class CssModulizeProcessor implements ProcessorInterface {
             .concat(parseStylesFromBlades(this.bladePatterns))
             .join('\n');
 
-          let main = readFileSync(file, 'utf-8');
+          let main = fs.readFileSync(file, 'utf-8');
 
           main += `\n\n${imports}\n`;
-          
+
           return main;
         }
       });
@@ -61,16 +60,16 @@ class CssModulizeProcessor implements ProcessorInterface {
     return undefined;
   }
 
-  preview(): MaybePromise<ProcessorPreview[]> {
-    return undefined;
+  preview(): ProcessorPreview[] {
+    return [];
   }
 }
 
 function parseStylesFromBlades(patterns: string | string[]) {
-  let files = globSync(patterns);
+  let files = fg.globSync(patterns);
 
   return files.map((file) => {
-    const bladeText = readFileSync(file, 'utf8');
+    const bladeText = fs.readFileSync(file, 'utf8');
 
     const html = parse(bladeText);
 

@@ -1,8 +1,8 @@
-import { callback, ConfigBuilder } from '@windwalker-io/fusion-next';
+import { callback, type ConfigBuilder } from '@windwalker-io/fusion-next';
 import isGlob from 'is-glob';
 import micromatch from 'micromatch';
 import { normalize } from 'node:path';
-import { relative } from 'path';
+import { relative } from 'node:path';
 import { containsMiddleGlob, removeLastGlob, uniqId } from '../../utilities';
 
 export function cloneAssets(patterns: Record<string, string>) {

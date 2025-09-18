@@ -1,7 +1,7 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import isGlob from 'is-glob';
 
-export function loadJson(file) {
+export function loadJson(file: string) {
   if (!fs.existsSync(file)) {
     return null;
   }

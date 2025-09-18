@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { loadJson } from './fs';
 
 export function findModules(suffix = ''): string[] {

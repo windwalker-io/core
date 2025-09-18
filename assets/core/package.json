@@ -4,16 +4,30 @@
   "type": "module",
   "description": "Windwalker Core JS package",
   "scripts": {
-    "build": "cross-env node_modules/.bin/gulp",
-    "build:dev": "cross-env NODE_ENV=development node_modules/.bin/gulp",
-    "build:prod": "cross-env NODE_ENV=production node_modules/.bin/gulp",
-    "watch": "cross-env NODE_ENV=development node_modules/.bin/gulp --watching=1",
-    "watch:reload": "cross-env NODE_ENV=development node_modules/.bin/gulp --watching=1 --livereload=1"
+    "build": "vite build",
+    "dev": "vite"
   },
-  "main": "src/index.mjs",
+  "main": "dist/next.js",
+  "types": "dist/next.d.ts",
+  "exports": {
+    ".": "dist/next.js",
+    "./next": {
+      "require": "./dist/next.js",
+      "import": "./dist/next.js",
+      "types": "./dist/next.d.ts"
+    }
+  },
   "repository": "https://github.com/ventoviro/windwalker-core",
   "author": "Simon Asika",
   "license": "MIT",
+  "dependencies": {
+    "@windwalker-io/fusion-next": "*",
+    "fast-glob": "^3.3.3",
+    "is-glob": "^4.0.3",
+    "micromatch": "^4.0.8",
+    "node-html-parser": "^7.0.1",
+    "rollup": "^4.50.2"
+  },
   "devDependencies": {
     "@asika32764/vue-animate": "^3.0.2",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
@@ -23,43 +37,26 @@
     "@tailwindcss/ui": "^0.7.2",
     "@types/gulp-rename": "^2",
     "@types/is-glob": "^4",
+    "@types/micromatch": "^4.0.9",
     "@vue/reactivity": "^3.3.7",
     "@vue/tsconfig": "^0.4.0",
-    "@windwalker-io/fusion-next": "*",
-    "autoprefixer": "^10.2.6",
     "axios": "^1.0",
     "bootstrap": "^5.0",
     "dayjs": "^1.11.5",
     "file-loader": "^6.2.0",
-    "gulp": "^4.0.2",
-    "gulp-postcss": "~9.0.0",
-    "postcss-import": "^14.0.2",
-    "postcss-loader": "^4.0.0",
-    "postcss-nested": "^5.0.5",
-    "regenerator-runtime": "^0.13.7",
+    "gulp-rename": "^2.0.0",
     "sql-formatter": "^10.6.0",
     "tailwindcss": "^2.1.4",
-    "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
+    "vite": "^7.1.6",
+    "vite-plugin-dts": "^4.5.4",
     "vue": "^3.0.11",
-    "vue-loader": "^16.0",
     "vue-router": "^4.2.4",
-    "vue-style-loader": "^4.1.3",
-    "vue-tsc": "^1.8.8",
-    "vuedraggable": "^3.0||^4.0.3",
-    "webpack": "^5.0",
-    "webpack-bundle-analyzer": "^4.6.1"
+    "vuedraggable": "^3.0||^4.0.3"
   },
   "windwalker": {
     "vendors": [
       "@windwalker-io/core"
     ]
-  },
-  "dependencies": {
-    "@types/micromatch": "^4.0.9",
-    "fast-glob": "^3.3.3",
-    "gulp-rename": "^2.0.0",
-    "is-glob": "^4.0.3",
-    "node-html-parser": "^7.0.1"
   }
 }

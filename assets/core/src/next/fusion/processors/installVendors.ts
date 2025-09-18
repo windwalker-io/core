@@ -1,6 +1,6 @@
 import { callbackAfterBuild, copyGlob, symlink } from '@windwalker-io/fusion-next';
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'node:path';
 import { loadJson } from '../../utilities';
 
 export function installVendors(
