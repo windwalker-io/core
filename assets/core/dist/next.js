@@ -4,8 +4,9 @@ import micromatch from "micromatch";
 import path, { normalize, relative, resolve } from "node:path";
 import fs from "node:fs";
 import { randomBytes } from "node:crypto";
-import fg from "fast-glob";
+import { createRequire } from "node:module";
 import fs$1 from "fs-extra";
+import fg from "fast-glob";
 import { parse } from "node-html-parser";
 function loadJson(file) {
   if (!fs.existsSync(file)) {
@@ -42,6 +43,10 @@ function uniqId(prefix = "", size = 16) {
     id = prefix + id;
   }
   return id;
+}
+function resolveModuleRealpath(url, module) {
+  const require2 = createRequire(url);
+  return require2.resolve(module);
 }
 function cloneAssets(patterns) {
   return callback((taskName, builder) => {
@@ -107,6 +112,48 @@ function windwalkerAssets(options) {
     }
   };
 }
+function injectSystemJS(systemPath, filter) {
+  systemPath ??= resolve("node_modules/systemjs/dist/system.min.js");
+  return {
+    name: "inject-systemjs",
+    async generateBundle(options, bundle) {
+      if (options.format !== "system") {
+        return;
+      }
+      const systemjsCode = fs$1.readFileSync(
+        resolve(systemPath),
+        "utf-8"
+      );
+      for (const file of Object.values(bundle)) {
+        if (filter && !filter(file)) {
+          continue;
+        }
+        if (file.type === "chunk" && file.isEntry && file.fileName.endsWith(".js")) {
+          file.code = systemjsCode + "\n" + file.code;
+        }
+      }
+    }
+  };
+}
+function systemCSSFix() {
+  return {
+    name: "systemjs.css.fix",
+    async generateBundle(options, bundle) {
+      if (options.format !== "system") {
+        return;
+      }
+      for (const [fileName, chunk] of Object.entries(bundle)) {
+        if (fileName.endsWith(".css") && "code" in chunk) {
+          const regex = /__vite_style__\.textContent\s*=\s*"([\s\S]*?)";/;
+          const match2 = chunk.code.match(regex);
+          if (match2 && match2[1]) {
+            chunk.code = match2[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").replace(/\\t/g, "	").replace(/\\\\/g, "\\").replace(/\/\*\$vite\$:\d+\*\/$/, "");
+          }
+        }
+      }
+    }
+  };
+}
 function cssModulize(entry, dest) {
   return new CssModulizeProcessor(css(entry, dest));
 }
@@ -155,7 +202,7 @@ function parseStylesFromBlades(patterns) {
     const bladeText = fs$1.readFileSync(file, "utf8");
     const html = parse(bladeText);
     return html.querySelectorAll("style[type],script[type]").filter(
-      (el) => ["text/scss", "text/css"].includes(el.getAttribute("type"))
+      (el) => ["text/scss", "text/css"].includes(el.getAttribute("type") || "")
     ).map((el) => {
       const scope = el.getAttribute("data-scope");
       if (scope) {
@@ -175,13 +222,14 @@ function stripUrlQuery(src) {
   }
   return src;
 }
+var define_process_env_default = {};
 function installVendors(npmVendors = [], to = "www/assets/vendor") {
   return callbackAfterBuild(() => findAndInstall(npmVendors, to));
 }
 async function findAndInstall(npmVendors = [], to = "www/assets/vendor") {
   const root = to;
   let vendors = npmVendors;
-  const action = process.env.INSTALL_VENDOR === "hard" ? "Copy" : "Link";
+  const action = define_process_env_default.INSTALL_VENDOR === "hard" ? "Copy" : "Link";
   console.log("");
   if (!fs$1.existsSync(root)) {
     fs$1.mkdirSync(root);
@@ -233,7 +281,7 @@ async function findAndInstall(npmVendors = [], to = "www/assets/vendor") {
   }
 }
 async function doInstall(source, dest) {
-  if (process.env.INSTALL_VENDOR === "hard") {
+  if (define_process_env_default.INSTALL_VENDOR === "hard") {
     await copyGlob(source + "/**/*", dest);
   } else {
     await symlink(source, dest);
@@ -281,9 +329,12 @@ export {
   cssModulize,
   ensureDirPath,
   findModules,
+  injectSystemJS,
   installVendors,
   loadJson,
   removeLastGlob,
+  resolveModuleRealpath,
+  systemCSSFix,
   uniqId,
   windwalkerAssets
 };

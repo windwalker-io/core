@@ -30,7 +30,10 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
   const resolvedOptions = prepareFusionOptions(fusionOptions);
 
-  if (tasks !== undefined || (Array.isArray(tasks) && tasks.length > 0)) {
+  if (
+    typeof tasks === 'string'
+    || (Array.isArray(tasks) && tasks.length > 0)
+  ) {
     params._ = forceArray(tasks);
   } else {
     params._ = originalTasks;
@@ -46,6 +49,7 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
         logger = config.logger;
 
+        // @ts-ignore
         config.plugins.push(...extraVitePlugins);
 
         for (const plugin of (config.plugins as FusionPlugin[])) {
@@ -174,7 +178,11 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
       enforce: 'pre',
       async resolveId(source, importer, options) {
         for (const resolveId of builder.resolveIdCallbacks) {
-          const result = await resolveId(source, importer, options);
+          if (typeof resolveId !== 'function') {
+            continue;
+          }
+
+          const result = await resolveId.call(this, source, importer, options);
 
           if (result) {
             return result;
@@ -187,7 +195,11 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
       },
       async load(source, options) {
         for (const load of builder.loadCallbacks) {
-          const result = await load(source, options);
+          if (typeof load !== 'function') {
+            continue;
+          }
+
+          const result = await load.call(this, source, options);
 
           if (result) {
             return result;

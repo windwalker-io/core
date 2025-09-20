@@ -20,8 +20,8 @@ if (cliInput['help'] || cliInput['h']) {
   process.exit(0);
 }
 
-// console.log(`>>> yarn build:prod`);
-// exec(`yarn build:prod`, { stdio: 'inherit' });
+console.log(`>>> yarn build`);
+exec(`yarn build`, { stdio: 'inherit' });
 
 console.log(`>>> npm version ${args.join(' ')}`);
 const buffer = exec(`npm version ${args.join(' ')} --no-workspaces-update`);

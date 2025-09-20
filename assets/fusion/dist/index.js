@@ -1,446 +1,315 @@
-import Crypto from 'crypto';
-import fg from 'fast-glob';
-import fs from 'fs-extra';
-import { randomBytes } from 'node:crypto';
-import { basename, parse, normalize, resolve, relative, dirname, isAbsolute } from 'node:path';
-import { inspect } from 'node:util';
-import { mergeConfig } from 'vite';
-import { get, set, uniq } from 'lodash-es';
-import yargs from 'yargs';
-import { build } from 'esbuild';
-import Module from 'module';
-import { writeFileSync, existsSync } from 'node:fs';
-import archy from 'archy';
-import chalk from 'chalk';
-import fs$1 from 'fs';
-
-function forceArray(item) {
-  if (Array.isArray(item)) {
-    return item;
-  } else {
-    return [item];
+import Y from "crypto";
+import L from "fast-glob";
+import d from "fs-extra";
+import { randomBytes as Z } from "node:crypto";
+import { basename as A, parse as S, normalize as z, resolve as f, relative as g, dirname as F, isAbsolute as N } from "node:path";
+import { inspect as tt } from "node:util";
+import { mergeConfig as w } from "vite";
+import { get as $, set as B, uniq as R } from "lodash-es";
+import et from "yargs";
+import { build as st } from "esbuild";
+import M from "module";
+import { writeFileSync as H, existsSync as k } from "node:fs";
+import nt from "archy";
+import b from "chalk";
+import I from "fs";
+function y(e) {
+  return Array.isArray(e) ? e : [e];
+}
+function D(e, t) {
+  return Array.isArray(e) ? e.map(t) : t(e);
+}
+function V(e, t) {
+  return e = y(e), e.map(t);
+}
+function Zt(e, t, s = {}) {
+  return new it(e, t, s);
+}
+class it {
+  constructor(t, s, n = {}) {
+    this.input = t, this.output = s, this.options = n;
   }
-}
-function handleMaybeArray(items, callback) {
-  if (Array.isArray(items)) {
-    return items.map(callback);
-  } else {
-    return callback(items);
-  }
-}
-function handleForceArray(items, callback) {
-  items = forceArray(items);
-  return items.map(callback);
-}
-
-function css(input, output, options = {}) {
-  return new CssProcessor(input, output, options);
-}
-class CssProcessor {
-  constructor(input, output, options = {}) {
-    this.input = input;
-    this.output = output;
-    this.options = options;
-  }
-  config(taskName, builder) {
-    return handleForceArray(this.input, (input) => {
-      const task = builder.addTask(input, taskName);
-      builder.assetFileNamesCallbacks.push((assetInfo) => {
-        const name = assetInfo.names[0];
-        if (!name) {
-          return void 0;
-        }
-        if (basename(name, ".css") === task.id) {
-          if (!this.output) {
-            return parse(input).name + ".css";
-          }
-          return task.normalizeOutput(this.output, ".css");
-        }
-      });
-      return task;
+  config(t, s) {
+    return V(this.input, (n) => {
+      const i = s.addTask(n, t);
+      return s.assetFileNamesCallbacks.push((o) => {
+        const r = o.names[0];
+        if (r && A(r, ".css") === i.id)
+          return this.output ? i.normalizeOutput(this.output, ".css") : S(n).name + ".css";
+      }), i;
     });
   }
   preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.output || basename(input),
-        extra: {}
-      };
-    });
+    return y(this.input).map((t) => ({
+      input: t,
+      output: this.output || A(t),
+      extra: {}
+    }));
   }
 }
-
-function js(input, output) {
-  return new JsProcessor(input, output);
+function te(e, t) {
+  return new ot(e, t);
 }
-class JsProcessor {
-  constructor(input, output) {
-    this.input = input;
-    this.output = output;
+class ot {
+  constructor(t, s) {
+    this.input = t, this.output = s;
   }
-  config(taskName, builder) {
-    return handleForceArray(this.input, (input) => {
-      const task = builder.addTask(input, taskName);
-      builder.entryFileNamesCallbacks.push((chunkInfo) => {
-        const name = chunkInfo.name;
-        if (!name) {
-          return;
-        }
-        if (name === task.id) {
-          if (!this.output) {
-            return parse(input).name + ".js";
-          }
-          return task.normalizeOutput(this.output);
-        }
-      });
-      return task;
+  config(t, s) {
+    return V(this.input, (n) => {
+      const i = s.addTask(n, t);
+      return s.entryFileNamesCallbacks.push((o) => {
+        const r = o.name;
+        if (r && r === i.id)
+          return this.output ? i.normalizeOutput(this.output) : S(n).name + ".js";
+      }), i;
     });
   }
   preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.output || basename(input),
-        extra: {}
-      };
-    });
+    return y(this.input).map((t) => ({
+      input: t,
+      output: this.output || A(t),
+      extra: {}
+    }));
   }
 }
-
-function move(input, dest) {
-  return new MoveProcessor(input, dest);
+function ee(e, t) {
+  return new rt(e, t);
 }
-class MoveProcessor {
-  constructor(input, dest) {
-    this.input = input;
-    this.dest = dest;
+class rt {
+  constructor(t, s) {
+    this.input = t, this.dest = s;
   }
-  config(taskName, builder) {
-    handleMaybeArray(this.input, (input) => {
-      builder.moveTasks.push({ src: input, dest: this.dest, options: {} });
+  config(t, s) {
+    D(this.input, (n) => {
+      s.moveTasks.push({ src: n, dest: this.dest, options: {} });
     });
   }
   preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.dest,
-        extra: {}
-      };
-    });
+    return y(this.input).map((t) => ({
+      input: t,
+      output: this.dest,
+      extra: {}
+    }));
   }
 }
-
-function copy(input, dest) {
-  return new CopyProcessor(input, dest);
+function se(e, t) {
+  return new at(e, t);
 }
-class CopyProcessor {
-  constructor(input, dest) {
-    this.input = input;
-    this.dest = dest;
+class at {
+  constructor(t, s) {
+    this.input = t, this.dest = s;
   }
-  config(taskName, builder) {
-    handleMaybeArray(this.input, (input) => {
-      builder.copyTasks.push({ src: input, dest: this.dest, options: {} });
+  config(t, s) {
+    D(this.input, (n) => {
+      s.copyTasks.push({ src: n, dest: this.dest, options: {} });
     });
   }
   preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.dest,
-        extra: {}
-      };
-    });
+    return y(this.input).map((t) => ({
+      input: t,
+      output: this.dest,
+      extra: {}
+    }));
   }
 }
-
-function link(input, dest, options = {}) {
-  return new LinkProcessor(input, dest, options);
+function ne(e, t, s = {}) {
+  return new lt(e, t, s);
 }
-class LinkProcessor {
-  constructor(input, dest, options = {}) {
-    this.input = input;
-    this.dest = dest;
-    this.options = options;
+class lt {
+  constructor(t, s, n = {}) {
+    this.input = t, this.dest = s, this.options = n;
   }
-  config(taskName, builder) {
-    handleMaybeArray(this.input, (input) => {
-      builder.linkTasks.push({ src: input, dest: this.dest, options: this.options });
+  config(t, s) {
+    D(this.input, (n) => {
+      s.linkTasks.push({ src: n, dest: this.dest, options: this.options });
     });
   }
   preview() {
-    return forceArray(this.input).map((input) => {
-      return {
-        input,
-        output: this.dest,
-        extra: {}
-      };
-    });
+    return y(this.input).map((t) => ({
+      input: t,
+      output: this.dest,
+      extra: {}
+    }));
   }
 }
-
-function callback(handler) {
-  return new CallbackProcessor(handler);
+function ie(e) {
+  return new U(e);
 }
-function callbackAfterBuild(handler) {
-  return new CallbackProcessor(handler, true);
+function oe(e) {
+  return new U(e, !0);
 }
-class CallbackProcessor {
-  constructor(handler, afterBuild = false) {
-    this.handler = handler;
-    this.afterBuild = afterBuild;
+class U {
+  constructor(t, s = !1) {
+    this.handler = t, this.afterBuild = s;
   }
-  config(taskName, builder) {
-    if (this.afterBuild) {
-      builder.postBuildCallbacks.push(() => this.handler(taskName, builder));
-    } else {
-      this.handler(taskName, builder);
-    }
-    return void 0;
+  config(t, s) {
+    this.afterBuild ? s.postBuildCallbacks.push(() => this.handler(t, s)) : this.handler(t, s);
   }
   preview() {
     return [];
   }
 }
-
-let params$1 = void 0;
-function prepareParams(p) {
-  params$1 = p;
-  isVerbose = params$1?.verbose ? params$1?.verbose > 0 : false;
-  return p;
+let P;
+function ut(e) {
+  return P = e, ct = P?.verbose ? P?.verbose > 0 : !1, e;
 }
-let isVerbose = false;
-const isProd = process.env.NODE_ENV === "production";
-const isDev = !isProd;
-
-function isWindows() {
+let ct = !1;
+const ft = process.env.NODE_ENV === "production", re = !ft;
+function _() {
   return process.platform === "win32";
 }
-
-function shortHash(bufferOrString, short = 8) {
-  let hash = Crypto.createHash("sha1").update(bufferOrString).digest("hex");
-  if (short && short > 0) {
-    hash = hash.substring(0, short);
-  }
-  return hash;
+function pt(e, t = 8) {
+  let s = Y.createHash("sha1").update(e).digest("hex");
+  return t && t > 0 && (s = s.substring(0, t)), s;
 }
-
-function handleFilesOperation(src, dest, options) {
-  const promises = [];
-  src = normalizeFilePath(src, options.outDir);
-  dest = normalizeFilePath(dest, options.outDir);
-  const base = getBaseFromPattern(src);
-  const sources = isGlob(src) ? fg.globSync(src.replace(/\\/g, "/"), options.globOptions) : [src];
-  for (let source of sources) {
-    let dir;
-    let resolvedDest = dest;
-    if (endsWithSlash(dest)) {
-      dir = resolvedDest;
-      resolvedDest = resolvedDest + relative(base, source);
-    } else {
-      dir = dirname(resolvedDest);
-    }
-    fs.ensureDirSync(dir);
-    promises.push(options.handler(source, resolvedDest));
+function C(e, t, s) {
+  const n = [];
+  e = O(e, s.outDir), t = O(t, s.outDir);
+  const i = vt(e), o = q(e) ? L.globSync(e.replace(/\\/g, "/"), s.globOptions) : [e];
+  for (let r of o) {
+    let c, a = t;
+    wt(t) ? (c = a, a = a + g(i, r)) : c = F(a), d.ensureDirSync(c), n.push(s.handler(r, a));
   }
-  return promises;
+  return n;
 }
-function moveFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
+function dt(e, t, s) {
+  const n = [];
+  for (const { src: i, dest: o, options: r } of e) {
+    const c = C(
+      i,
+      o,
       {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Moving file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
-          return fs.move(src2, dest2, { overwrite: true });
-        },
-        globOptions: { onlyFiles: true }
+        outDir: t,
+        handler: async (a, u) => (s.info(`Moving file from ${g(t, a)} to ${g(t, u)}`), d.move(a, u, { overwrite: !0 })),
+        globOptions: { onlyFiles: !0 }
       }
     );
-    promises.push(...ps);
+    n.push(...c);
   }
-  return Promise.all(promises);
+  return Promise.all(n);
 }
-function copyFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
+function ht(e, t, s) {
+  const n = [];
+  for (const { src: i, dest: o, options: r } of e) {
+    const c = C(
+      i,
+      o,
       {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Copy file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
-          return fs.copy(src2, dest2, { overwrite: true });
-        },
-        globOptions: { onlyFiles: true }
+        outDir: t,
+        handler: async (a, u) => (s.info(`Copy file from ${g(t, a)} to ${g(t, u)}`), d.copy(a, u, { overwrite: !0 })),
+        globOptions: { onlyFiles: !0 }
       }
     );
-    promises.push(...ps);
+    n.push(...c);
   }
-  return Promise.all(promises);
+  return Promise.all(n);
 }
-function linkFilesAndLog(tasks, outDir, logger) {
-  const promises = [];
-  for (const { src, dest, options } of tasks) {
-    const ps = handleFilesOperation(
-      src,
-      dest,
+function mt(e, t, s) {
+  const n = [];
+  for (const { src: i, dest: o, options: r } of e) {
+    const c = C(
+      i,
+      o,
       {
-        outDir,
-        handler: async (src2, dest2) => {
-          logger.info(`Link file from ${relative(outDir, src2)} to ${relative(outDir, dest2)}`);
-          return symlink(src2, dest2, options?.force ?? false);
-        },
-        globOptions: { onlyFiles: false }
+        outDir: t,
+        handler: async (a, u) => (s.info(`Link file from ${g(t, a)} to ${g(t, u)}`), yt(a, u, r?.force ?? !1)),
+        globOptions: { onlyFiles: !1 }
       }
     );
-    promises.push(...ps);
+    n.push(...c);
   }
-  return Promise.all(promises);
+  return Promise.all(n);
 }
-function cleanFiles(patterns, outDir) {
-  const promises = [];
-  outDir = outDir.replace(/\\/g, "/");
-  for (let src of patterns) {
-    src = normalizeFilePath(src, outDir);
-    src = resolve(src);
-    const sources = isGlob(src) ? fg.globSync(src.replace(/\\/g, "/"), { onlyFiles: false }) : [src];
-    const protectDir = resolve(outDir + "/upload").replace(/\\/g, "/");
-    for (let source of sources) {
-      if (source.replace(/\\/g, "/").startsWith(protectDir)) {
+function gt(e, t) {
+  const s = [];
+  t = t.replace(/\\/g, "/");
+  for (let n of e) {
+    n = O(n, t), n = f(n);
+    const i = q(n) ? L.globSync(n.replace(/\\/g, "/"), { onlyFiles: !1 }) : [n], o = f(t + "/upload").replace(/\\/g, "/");
+    for (let r of i) {
+      if (r.replace(/\\/g, "/").startsWith(o))
         throw new Error("Refuse to delete `upload/*` folder.");
-      }
-      promises.push(fs.remove(source));
+      s.push(d.remove(r));
     }
   }
-  return Promise.all(promises);
+  return Promise.all(s);
 }
-async function copyGlob(src, dest) {
-  const promises = handleFilesOperation(
-    src,
-    dest,
+async function ae(e, t) {
+  const s = C(
+    e,
+    t,
     {
       outDir: process.cwd(),
-      handler: async (src2, dest2) => fs.copy(src2, dest2, { overwrite: true }),
-      globOptions: { onlyFiles: true }
+      handler: async (n, i) => d.copy(n, i, { overwrite: !0 }),
+      globOptions: { onlyFiles: !0 }
     }
   );
-  await Promise.all(promises);
+  await Promise.all(s);
 }
-async function moveGlob(src, dest) {
-  const promises = handleFilesOperation(
-    src,
-    dest,
+async function le(e, t) {
+  const s = C(
+    e,
+    t,
     {
       outDir: process.cwd(),
-      handler: async (src2, dest2) => fs.move(src2, dest2, { overwrite: true }),
-      globOptions: { onlyFiles: true }
+      handler: async (n, i) => d.move(n, i, { overwrite: !0 }),
+      globOptions: { onlyFiles: !0 }
     }
   );
-  await Promise.all(promises);
+  await Promise.all(s);
 }
-async function symlink(target, link, force = false) {
-  if (isWindows() && !fs.lstatSync(target).isFile()) {
-    return fs.ensureSymlink(target, link, "junction");
-  }
-  if (isWindows() && fs.lstatSync(target).isFile() && force) {
-    return fs.ensureLink(target, link);
-  }
-  return fs.ensureSymlink(target, link);
+async function yt(e, t, s = !1) {
+  return _() && !d.lstatSync(e).isFile() ? d.ensureSymlink(e, t, "junction") : _() && d.lstatSync(e).isFile() && s ? d.ensureLink(e, t) : d.ensureSymlink(e, t);
 }
-function endsWithSlash(path) {
-  return path.endsWith("/") || path.endsWith("\\");
+function wt(e) {
+  return e.endsWith("/") || e.endsWith("\\");
 }
-function getBaseFromPattern(pattern) {
-  const specialChars = ["*", "?", "[", "]"];
-  const idx = [...pattern].findIndex((c) => specialChars.includes(c));
-  if (idx === -1) {
-    return dirname(pattern);
-  }
-  return dirname(pattern.slice(0, idx + 1));
+function vt(e) {
+  const t = ["*", "?", "[", "]"], s = [...e].findIndex((n) => t.includes(n));
+  return s === -1 ? F(e) : F(e.slice(0, s + 1));
 }
-function isGlob(pattern) {
-  const specialChars = ["*", "?", "[", "]"];
-  return specialChars.some((c) => pattern.includes(c));
+function q(e) {
+  return ["*", "?", "[", "]"].some((s) => e.includes(s));
 }
-function normalizeFilePath(path, outDir) {
-  if (path.startsWith(".")) {
-    path = resolve(path);
-  } else if (!isAbsolute(path)) {
-    path = outDir + "/" + path;
-  }
-  return path;
+function O(e, t) {
+  return e.startsWith(".") ? e = f(e) : N(e) || (e = t + "/" + e), e;
 }
-function fileToId(input, group) {
-  input = normalize(input);
-  group ||= randomBytes(4).toString("hex");
-  return group + "-" + shortHash(input);
+function kt(e, t) {
+  return e = z(e), t ||= Z(4).toString("hex"), t + "-" + pt(e);
 }
-
-class BuildTask {
-  constructor(input, group) {
-    this.input = input;
-    this.group = group;
-    this.id = BuildTask.toFileId(input, group);
-    this.input = normalize(input);
+class j {
+  constructor(t, s) {
+    this.input = t, this.group = s, this.id = j.toFileId(t, s), this.input = z(t);
   }
   id;
   output;
   postCallbacks = [];
-  dest(output) {
-    if (typeof output === "string") {
-      output = this.normalizeOutput(output);
-    }
-    this.output = output;
-    return this;
+  dest(t) {
+    return typeof t == "string" && (t = this.normalizeOutput(t)), this.output = t, this;
   }
-  addPostCallback(callback) {
-    this.postCallbacks.push(callback);
-    return this;
+  addPostCallback(t) {
+    return this.postCallbacks.push(t), this;
   }
-  normalizeOutput(output, ext = ".js") {
-    if (output.endsWith("/") || output.endsWith("\\")) {
-      output += parse(this.input).name + ext;
-    }
-    return output;
+  normalizeOutput(t, s = ".js") {
+    return (t.endsWith("/") || t.endsWith("\\")) && (t += S(this.input).name + s), t;
   }
-  static toFileId(input, group) {
-    return fileToId(input, group);
+  static toFileId(t, s) {
+    return kt(t, s);
   }
 }
-
-function mergeOptions(base, ...overrides) {
-  if (!overrides.length) {
-    return base;
-  }
-  for (const override of overrides) {
-    if (!override) {
-      continue;
-    }
-    if (typeof override === "function") {
-      base = override(base) ?? base;
-    } else {
-      base = mergeConfig(base, override);
-    }
-  }
-  return base;
+function bt(e, ...t) {
+  if (!t.length)
+    return e;
+  for (const s of t)
+    s && (typeof s == "function" ? e = s(e) ?? e : e = w(e, s));
+  return e;
 }
-function show(data, depth = 10) {
-  console.log(inspect(data, { depth, colors: true }));
+function Ct(e, t = 10) {
+  console.log(tt(e, { depth: t, colors: !0 }));
 }
-
-class ConfigBuilder {
-  constructor(config, env, fusionOptions) {
-    this.config = config;
-    this.env = env;
-    this.fusionOptions = fusionOptions;
-    this.config = mergeConfig(this.config, {
+class E {
+  constructor(t, s, n) {
+    this.config = t, this.env = s, this.fusionOptions = n, this.config = w(this.config, {
       build: {
         manifest: "manifest.json",
         rollupOptions: {
@@ -457,19 +326,18 @@ class ConfigBuilder {
           //   }
           // },
         },
-        emptyOutDir: false,
-        sourcemap: env.mode !== "production" ? "inline" : false
+        emptyOutDir: !1,
+        sourcemap: s.mode !== "production" ? "inline" : !1
       },
       plugins: [],
       css: {
-        devSourcemap: true
+        devSourcemap: !0
       },
       esbuild: {
         // Todo: Remove if esbuild supports decorators by default
         target: "es2022"
       }
-    });
-    this.addTask("hidden:placeholder");
+    }), this.addTask("hidden:placeholder");
   }
   static globalOverrideConfig = {};
   overrideConfig = {};
@@ -486,100 +354,74 @@ class ConfigBuilder {
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
   cleans = [];
   tasks = /* @__PURE__ */ new Map();
-  merge(override) {
-    if (typeof override === "function") {
-      this.config = override(this.config) ?? this.config;
-      return this;
-    }
-    this.config = mergeConfig(this.config, override);
-    return this;
+  merge(t) {
+    return typeof t == "function" ? (this.config = t(this.config) ?? this.config, this) : (this.config = w(this.config, t), this);
   }
   getDefaultOutput() {
     return {
-      entryFileNames: (chunkInfo) => {
-        const name = this.getChunkNameFromTask(chunkInfo);
-        if (name) {
-          return name;
-        }
-        for (const entryFileNamesCallback of this.entryFileNamesCallbacks) {
-          const name2 = entryFileNamesCallback(chunkInfo);
-          if (name2) {
-            return name2;
-          }
+      entryFileNames: (t) => {
+        const s = this.getChunkNameFromTask(t);
+        if (s)
+          return s;
+        for (const n of this.entryFileNamesCallbacks) {
+          const i = n(t);
+          if (i)
+            return i;
         }
         return "[name].js";
       },
-      chunkFileNames: (chunkInfo) => {
-        const name = this.getChunkNameFromTask(chunkInfo);
-        if (name) {
-          return name;
+      chunkFileNames: (t) => {
+        const s = this.getChunkNameFromTask(t);
+        if (s)
+          return s;
+        for (const i of this.chunkFileNamesCallbacks) {
+          const o = i(t);
+          if (o)
+            return o;
         }
-        for (const chunkFileNamesCallback of this.chunkFileNamesCallbacks) {
-          const name2 = chunkFileNamesCallback(chunkInfo);
-          if (name2) {
-            return name2;
-          }
-        }
-        const chunkDir = this.getChunkDir();
-        return `${chunkDir}/[name]-[hash].js`;
+        return `${this.getChunkDir()}/[name]-[hash].js`;
       },
-      assetFileNames: (assetInfo) => {
-        for (const assetFileNamesCallback of this.assetFileNamesCallbacks) {
-          const name = assetFileNamesCallback(assetInfo);
-          if (name) {
-            return name;
-          }
+      assetFileNames: (t) => {
+        for (const s of this.assetFileNamesCallbacks) {
+          const n = s(t);
+          if (n)
+            return n;
         }
         return "[name].[ext]";
       }
     };
   }
   getChunkDir() {
-    let chunkDir = this.fusionOptions.chunkDir ?? "chunks";
-    chunkDir.replace(/\\/g, "/");
-    if (chunkDir && !chunkDir.endsWith("/")) {
-      chunkDir += "/";
-    }
-    if (chunkDir === "./" || chunkDir === "/") {
-      chunkDir = "";
-    }
-    return chunkDir;
+    let t = this.fusionOptions.chunkDir ?? "chunks";
+    return t.replace(/\\/g, "/"), t && !t.endsWith("/") && (t += "/"), (t === "./" || t === "/") && (t = ""), t;
   }
-  getChunkNameFromTask(chunkInfo) {
-    if (this.tasks.has(chunkInfo.name)) {
-      const output = this.tasks.get(chunkInfo.name)?.output;
-      if (output) {
-        const name = typeof output === "function" ? output(chunkInfo) : output;
-        if (!isAbsolute(name)) {
-          return name;
-        }
+  getChunkNameFromTask(t) {
+    if (this.tasks.has(t.name)) {
+      const s = this.tasks.get(t.name)?.output;
+      if (s) {
+        const n = typeof s == "function" ? s(t) : s;
+        if (!N(n))
+          return n;
       }
     }
-    return void 0;
   }
-  ensurePath(path, def = {}) {
-    if (get(this.config, path) == null) {
-      set(this.config, path, def);
-    }
-    return this;
+  ensurePath(t, s = {}) {
+    return $(this.config, t) == null && B(this.config, t, s), this;
   }
-  get(path) {
-    return get(this.config, path);
+  get(t) {
+    return $(this.config, t);
   }
-  set(path, value) {
-    set(this.config, path, value);
-    return this;
+  set(t, s) {
+    return B(this.config, t, s), this;
   }
-  addTask(input, group) {
-    const task = new BuildTask(input, group);
-    this.tasks.set(task.id, task);
-    const inputOptions = this.config.build.rollupOptions.input;
-    inputOptions[task.id] = task.input;
-    return task;
+  addTask(t, s) {
+    const n = new j(t, s);
+    this.tasks.set(n.id, n);
+    const i = this.config.build.rollupOptions.input;
+    return i[n.id] = n.input, n;
   }
-  addCleans(...paths) {
-    this.cleans.push(...paths);
-    return this;
+  addCleans(...t) {
+    return this.cleans.push(...t), this;
   }
   // addExternals(externals: Externalize) {
   //   if (Array.isArray(externals)) {
@@ -611,60 +453,50 @@ class ConfigBuilder {
   //     return true;
   //   });
   // }
-  relativePath(to) {
-    return relative(process.cwd(), to);
+  relativePath(t) {
+    return g(process.cwd(), t);
   }
   debug() {
-    show(this.config);
+    Ct(this.config);
   }
 }
-
-function getArgsAfterDoubleDashes(argv) {
-  argv ??= process.argv;
-  return argv.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
+function Ft(e) {
+  return e ??= process.argv, e.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((t) => t !== "");
 }
-function parseArgv(argv) {
-  const app = yargs();
-  app.option("cwd", {
+function Tt(e) {
+  const t = et();
+  return t.option("cwd", {
     type: "string",
     description: "Current working directory"
-  });
-  app.option("list", {
+  }), t.option("list", {
     alias: "l",
     type: "boolean",
     description: "List all available tasks"
-  });
-  app.option("config", {
+  }), t.option("config", {
     alias: "c",
     type: "string",
     description: "Path to config file"
-  });
-  app.option("server-file", {
+  }), t.option("server-file", {
     alias: "s",
     type: "string",
     description: "Path to server file"
-  });
-  app.option("verbose", {
+  }), t.option("verbose", {
     alias: "v",
     type: "count",
     description: "Increase verbosity of output. Use multiple times for more verbosity."
-  });
-  return app.parseSync(argv);
+  }), t.parseSync(e);
 }
-
-async function loadConfigFile(configFile) {
-  let path = configFile.path;
+async function Pt(e) {
+  let t = e.path;
   if (process.platform === "win32") {
-    const winPath = path.replace(/\\/g, "/");
-    if (!winPath.startsWith("file://")) {
-      path = `file:///${winPath}`;
-    }
+    const s = t.replace(/\\/g, "/");
+    s.startsWith("file://") || (t = `file:///${s}`);
   }
-  if (configFile.ts) {
-    const buildResult = await build({
-      entryPoints: [configFile.path],
-      bundle: true,
-      write: false,
+  if (e.ts) {
+    const n = (await st({
+      entryPoints: [e.path],
+      bundle: !0,
+      write: !1,
       outdir: "dist",
       platform: "node",
       format: "cjs",
@@ -672,468 +504,345 @@ async function loadConfigFile(configFile) {
       external: ["../dist", "../dist/*"],
       packages: "external",
       sourcemap: "inline"
-    });
-    const output = buildResult.outputFiles[0];
-    const code = Buffer.from(output.contents).toString("utf8");
-    writeFileSync(output.path, code);
-    const m = new Module(output.path, void 0);
-    m.filename = output.path;
-    m.paths = Module._nodeModulePaths(dirname(output.path));
-    m._compile(code, output.path);
-    return expandModules(m.exports);
+    })).outputFiles[0], i = Buffer.from(n.contents).toString("utf8");
+    H(n.path, i);
+    const o = new M(n.path, void 0);
+    return o.filename = n.path, o.paths = M._nodeModulePaths(F(n.path)), o._compile(i, n.path), T(o.exports);
   } else {
-    const modules = await import(path);
-    return expandModules(modules);
+    const s = await import(t);
+    return T(s);
   }
 }
-function expandModules(modules) {
-  modules = { ...modules };
-  if (modules.__esModule) {
-    delete modules.__esModule;
-  }
-  return modules;
+function T(e) {
+  return e = { ...e }, e.__esModule && delete e.__esModule, e;
 }
-async function resolveTaskOptions(task, resolveSubFunctions = false) {
-  task = await task;
-  if (!resolveSubFunctions && Array.isArray(task)) {
-    const results = await Promise.all(task.map((task2) => resolveTaskOptions(task2, true)));
-    return results.flat();
-  }
-  if (typeof task === "function") {
-    return resolvePromisesToFlatArray(await task(), task?.name);
-  }
-  return resolvePromisesToFlatArray(await task, task?.name);
+async function W(e, t = !1) {
+  return e = await e, !t && Array.isArray(e) ? (await Promise.all(e.map((n) => W(n, !0)))).flat() : G(typeof e == "function" ? await e() : await e, e?.name);
 }
-async function resolvePromisesToFlatArray(tasks, name) {
-  if (!Array.isArray(tasks)) {
-    return [await tasks];
-  }
-  const resolvedTasks = await Promise.all(tasks);
-  const returnTasks = [];
-  for (const resolvedTask of resolvedTasks) {
-    if (Array.isArray(resolvedTask)) {
-      returnTasks.push(...resolvedTask);
-    } else {
-      returnTasks.push(resolvedTask);
-    }
-  }
-  return returnTasks;
+async function G(e, t) {
+  if (!Array.isArray(e))
+    return [await e];
+  const s = await Promise.all(e), n = [];
+  for (const i of s)
+    Array.isArray(i) ? n.push(...i) : n.push(i);
+  return n;
 }
-function mustGetAvailableConfigFile(root, params) {
-  const found = getAvailableConfigFile(root, params);
-  if (!found) {
+function At(e, t) {
+  const s = Ot(e, t);
+  if (!s)
     throw new Error("No config file found. Please create a fusionfile.js or fusionfile.ts in the root directory.");
-  }
-  return found;
+  return s;
 }
-function getAvailableConfigFile(root, params) {
-  let found = params?.config;
-  if (found) {
-    if (!isAbsolute(found)) {
-      found = resolve(root, found);
-    }
-    if (existsSync(found)) {
-      return {
-        path: found,
-        // get filename from file path
-        filename: found.split("/").pop() || "",
-        type: getConfigModuleType(found),
-        ts: isConfigTypeScript(found)
-      };
-    }
-    return null;
-  }
-  return findDefaultConfig(root);
+function Ot(e, t) {
+  let s = t?.config;
+  return s ? (N(s) || (s = f(e, s)), k(s) ? {
+    path: s,
+    // get filename from file path
+    filename: s.split("/").pop() || "",
+    type: St(s),
+    ts: Nt(s)
+  } : null) : xt(e);
 }
-function findDefaultConfig(root) {
-  let file = resolve(root, "fusionfile.js");
-  if (existsSync(file)) {
-    return {
-      path: file,
-      // get filename from file path
-      filename: file.split("/").pop() || "",
-      type: "commonjs",
-      ts: false
-    };
-  }
-  file = resolve(root, "fusionfile.mjs");
-  if (existsSync(file)) {
-    return {
-      path: file,
-      // get filename from file path
-      filename: file.split("/").pop() || "",
-      type: "module",
-      ts: false
-    };
-  }
-  file = resolve(root, "fusionfile.ts");
-  if (existsSync(file)) {
-    return {
-      path: file,
-      // get filename from file path
-      filename: file.split("/").pop() || "",
-      type: "module",
-      ts: true
-    };
-  }
-  file = resolve(root, "fusionfile.mts");
-  if (existsSync(file)) {
-    return {
-      path: file,
-      // get filename from file path
-      filename: file.split("/").pop() || "",
-      type: "module",
-      ts: true
-    };
-  }
-  return null;
+function xt(e) {
+  let t = f(e, "fusionfile.js");
+  return k(t) ? {
+    path: t,
+    // get filename from file path
+    filename: t.split("/").pop() || "",
+    type: "commonjs",
+    ts: !1
+  } : (t = f(e, "fusionfile.mjs"), k(t) ? {
+    path: t,
+    // get filename from file path
+    filename: t.split("/").pop() || "",
+    type: "module",
+    ts: !1
+  } : (t = f(e, "fusionfile.ts"), k(t) ? {
+    path: t,
+    // get filename from file path
+    filename: t.split("/").pop() || "",
+    type: "module",
+    ts: !0
+  } : (t = f(e, "fusionfile.mts"), k(t) ? {
+    path: t,
+    // get filename from file path
+    filename: t.split("/").pop() || "",
+    type: "module",
+    ts: !0
+  } : null)));
 }
-function getConfigModuleType(file) {
-  let type = "unknown";
-  if (file.endsWith(".cjs")) {
-    type = "commonjs";
-  } else if (file.endsWith(".mjs")) {
-    type = "module";
-  } else if (file.endsWith(".ts") || file.endsWith(".mts")) {
-    type = "module";
+function St(e) {
+  let t = "unknown";
+  return e.endsWith(".cjs") ? t = "commonjs" : (e.endsWith(".mjs") || e.endsWith(".ts") || e.endsWith(".mts")) && (t = "module"), t;
+}
+function Nt(e) {
+  return e.endsWith(".ts") || e.endsWith(".mts");
+}
+async function Dt(e) {
+  const t = Object.keys(e);
+  t.sort((i, o) => i === "default" ? -1 : o === "default" ? 1 : i.localeCompare(o));
+  const s = [];
+  for (const i of t) {
+    const o = e[i];
+    s.push(await J(i, o));
   }
-  return type;
-}
-function isConfigTypeScript(file) {
-  return file.endsWith(".ts") || file.endsWith(".mts");
-}
-
-async function displayAvailableTasks(tasks) {
-  const keys = Object.keys(tasks);
-  keys.sort((a, b) => {
-    if (a === "default") {
-      return -1;
-    }
-    if (b === "default") {
-      return 1;
-    }
-    return a.localeCompare(b);
+  const n = nt({
+    label: b.magenta("Available Tasks"),
+    nodes: s
   });
-  const nodes = [];
-  for (const key of keys) {
-    const task = tasks[key];
-    nodes.push(await describeTasks(key, task));
-  }
-  const text = archy({
-    label: chalk.magenta("Available Tasks"),
-    nodes
-  });
-  console.log(text);
+  console.log(n);
 }
-async function describeTasks(name, tasks) {
-  const nodes = [];
-  tasks = forceArray(await tasks);
-  for (let task of tasks) {
-    const processors = await resolveTaskOptions(task, true);
-    for (const processor of processors) {
-      if (typeof processor === "function") {
-        nodes.push(
-          await describeTasks(processor.name, processor)
-        );
-      } else {
-        nodes.push(...await describeProcessor(processor));
-      }
-    }
+async function J(e, t) {
+  const s = [];
+  t = y(await t);
+  for (let n of t) {
+    const i = await W(n, !0);
+    for (const o of i)
+      typeof o == "function" ? s.push(
+        await J(o.name, o)
+      ) : s.push(...await jt(o));
   }
   return {
-    label: chalk.cyan(name),
-    nodes
+    label: b.cyan(e),
+    nodes: s
   };
 }
-async function describeProcessor(processor) {
-  const results = await processor.preview();
-  return Promise.all(results.map((result) => describeProcessorPreview(result)));
+async function jt(e) {
+  const t = await e.preview();
+  return Promise.all(t.map((s) => Wt(s)));
 }
-async function describeProcessorPreview(preview) {
-  const str = [];
-  const { input: entry, output, extra } = preview;
-  const inputStr = chalk.yellow(entry);
-  str.push(`Input: ${inputStr}`);
-  const outStr = chalk.green(output);
-  str.push(`Output: ${outStr}`);
-  return str.join(" - ");
+async function Wt(e) {
+  const t = [], { input: s, output: n, extra: i } = e, o = b.yellow(s);
+  t.push(`Input: ${o}`);
+  const r = b.green(n);
+  return t.push(`Output: ${r}`), t.join(" - ");
 }
-
-function selectRunningTasks(input, tasks) {
-  input = uniq(input);
-  if (input.length === 0) {
-    input.push("default");
+function $t(e, t) {
+  e = R(e), e.length === 0 && e.push("default");
+  const s = {};
+  for (const n of e)
+    if (t[n])
+      s[n] = t[n];
+    else
+      throw new Error(`Task "${b.cyan(n)}" not found in fusion config.`);
+  return s;
+}
+async function Bt(e) {
+  const t = {}, s = {};
+  for (const n in e) {
+    const i = e[n];
+    s[n] = await x(n, i, t);
   }
-  const selected = {};
-  for (const name of input) {
-    if (tasks[name]) {
-      selected[name] = tasks[name];
-    } else {
-      throw new Error(`Task "${chalk.cyan(name)}" not found in fusion config.`);
+  return s;
+}
+async function x(e, t, s) {
+  const n = [];
+  if (Array.isArray(t))
+    for (const i in t) {
+      const o = t[i];
+      n.push(...await x(i, o, s));
     }
-  }
-  return selected;
-}
-async function resolveAllTasksAsProcessors(tasks) {
-  const cache = {};
-  const allTasks = {};
-  for (const name in tasks) {
-    const task = tasks[name];
-    allTasks[name] = await resolveTaskAsFlat(name, task, cache);
-  }
-  return allTasks;
-}
-async function resolveTaskAsFlat(name, task, cache) {
-  const results = [];
-  if (Array.isArray(task)) {
-    for (const n in task) {
-      const t = task[n];
-      results.push(...await resolveTaskAsFlat(n, t, cache));
-    }
-  } else if (typeof task === "function") {
-    name = task.name || name;
-    if (cache[name]) {
+  else if (typeof t == "function") {
+    if (e = t.name || e, s[e])
       return [];
-    }
-    cache[name] = task;
-    const resolved = await resolveTaskOptions(task, true);
-    if (Array.isArray(resolved)) {
-      for (const n in resolved) {
-        const t = resolved[n];
-        results.push(...await resolveTaskAsFlat(n, t, cache));
+    s[e] = t;
+    const i = await W(t, !0);
+    if (Array.isArray(i))
+      for (const o in i) {
+        const r = i[o];
+        n.push(...await x(o, r, s));
       }
-    }
-  } else {
-    results.push(await task);
-  }
-  return results;
+  } else
+    n.push(await t);
+  return n;
 }
-
-let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
-prepareParams(params);
-let builder;
-const originalTasks = params._;
-const extraVitePlugins = [];
-function useFusion(fusionOptions = {}, tasks) {
-  let logger;
-  let resolvedConfig;
-  let exitHandlersBound = false;
-  const resolvedOptions = prepareFusionOptions(fusionOptions);
-  if (tasks !== void 0 || Array.isArray(tasks) && tasks.length > 0) {
-    params._ = forceArray(tasks);
-  } else {
-    params._ = originalTasks;
-  }
-  params = mergeOptions(params, resolvedOptions.cliParams);
-  return [
+let p = Tt(Ft(process.argv));
+ut(p);
+let l;
+const Mt = p._, K = [];
+function ue(e = {}, t) {
+  let s, n, i = !1;
+  const o = It(e);
+  return typeof t == "string" || Array.isArray(t) && t.length > 0 ? p._ = y(t) : p._ = Mt, p = bt(p, o.cliParams), [
     {
       name: "fusion",
-      configResolved(config) {
-        resolvedConfig = config;
-        logger = config.logger;
-        config.plugins.push(...extraVitePlugins);
-        for (const plugin2 of config.plugins) {
-          if ("buildConfig" in plugin2) {
-            plugin2.buildConfig?.(builder);
-          }
-        }
+      configResolved(r) {
+        n = r, s = r.logger, r.plugins.push(...K);
+        for (const c of r.plugins)
+          "buildConfig" in c && c.buildConfig?.(l);
       },
-      async config(config, env) {
-        let root;
-        if (config.root) {
-          root = resolve(config.root);
-        } else {
-          root = params.cwd || process.cwd();
-        }
-        delete config.root;
-        process.chdir(root);
-        builder = new ConfigBuilder(config, env, resolvedOptions);
-        let tasks2;
-        if (typeof resolvedOptions.fusionfile === "string" || !resolvedOptions.fusionfile) {
-          params.config ??= resolvedOptions.fusionfile;
-          const configFile = mustGetAvailableConfigFile(root, params);
-          tasks2 = await loadConfigFile(configFile);
-        } else if (typeof resolvedOptions.fusionfile === "function") {
-          tasks2 = expandModules(await resolvedOptions.fusionfile());
-        } else {
-          tasks2 = expandModules(resolvedOptions.fusionfile);
-        }
-        if (params.list) {
-          await displayAvailableTasks(tasks2);
+      async config(r, c) {
+        let a;
+        r.root ? a = f(r.root) : a = p.cwd || process.cwd(), delete r.root, process.chdir(a), l = new E(r, c, o);
+        let u;
+        if (typeof o.fusionfile == "string" || !o.fusionfile) {
+          p.config ??= o.fusionfile;
+          const m = At(a, p);
+          u = await Pt(m);
+        } else typeof o.fusionfile == "function" ? u = T(await o.fusionfile()) : u = T(o.fusionfile);
+        if (p.list) {
+          await Dt(u);
           return;
         }
-        const selectedTasks = selectRunningTasks([...params._], tasks2);
-        const runningTasks = await resolveAllTasksAsProcessors(selectedTasks);
-        for (const taskName in runningTasks) {
-          const processors = runningTasks[taskName];
-          for (const processor of processors) {
-            await processor.config(taskName, builder);
-          }
+        const h = $t([...p._], u), v = await Bt(h);
+        for (const m in v) {
+          const Q = v[m];
+          for (const X of Q)
+            await X.config(m, l);
         }
-        builder.merge(ConfigBuilder.globalOverrideConfig);
-        builder.merge(builder.overrideConfig);
-        return builder.config;
+        return l.merge(E.globalOverrideConfig), l.merge(l.overrideConfig), l.config;
       },
-      outputOptions(options) {
-        if (resolvedConfig.build.emptyOutDir) {
-          const dir = resolvedConfig.build.outDir;
-          const uploadDir = resolve(dir, "upload");
-          if (existsSync(uploadDir)) {
+      outputOptions(r) {
+        if (n.build.emptyOutDir) {
+          const c = n.build.outDir, a = f(c, "upload");
+          if (k(a))
             throw new Error(
-              `The output directory: "${dir}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
+              `The output directory: "${c}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
             );
-          }
         }
       },
-      async buildStart(options) {
-        if (builder.cleans.length > 0) {
-          await cleanFiles(builder.cleans, resolvedConfig.build.outDir || process.cwd());
-        }
+      async buildStart(r) {
+        l.cleans.length > 0 && await gt(l.cleans, n.build.outDir || process.cwd());
       },
       // Server
-      configureServer(server) {
-        server.httpServer?.once("listening", () => {
-          const scheme = server.config.server.https ? "https" : "http";
-          const address = server.httpServer?.address();
-          const host = address && typeof address !== "string" ? address.address : "localhost";
-          const port = address && typeof address !== "string" ? address.port : 80;
-          const url = `${scheme}://${host}:${port}/`;
-          const serverFile = resolve(
-            server.config.root,
-            resolvedOptions.cliParams?.serverFile ?? "tmp/vite-server"
+      configureServer(r) {
+        r.httpServer?.once("listening", () => {
+          const c = r.config.server.https ? "https" : "http", a = r.httpServer?.address(), u = a && typeof a != "string" ? a.address : "localhost", h = a && typeof a != "string" ? a.port : 80, v = `${c}://${u}:${h}/`, m = f(
+            r.config.root,
+            o.cliParams?.serverFile ?? "tmp/vite-server"
           );
-          writeFileSync(resolve(server.config.root, serverFile), url);
-          if (!exitHandlersBound) {
-            process.on("exit", () => {
-              if (fs$1.existsSync(serverFile)) {
-                fs$1.rmSync(serverFile);
-              }
-            });
-            process.on("SIGINT", () => process.exit());
-            process.on("SIGTERM", () => process.exit());
-            process.on("SIGHUP", () => process.exit());
-            exitHandlersBound = true;
-          }
+          H(f(r.config.root, m), v), i || (process.on("exit", () => {
+            I.existsSync(m) && I.rmSync(m);
+          }), process.on("SIGINT", () => process.exit()), process.on("SIGTERM", () => process.exit()), process.on("SIGHUP", () => process.exit()), i = !0);
         });
       }
     },
     {
       name: "fusion:pre-handles",
       enforce: "pre",
-      async resolveId(source, importer, options) {
-        for (const resolveId of builder.resolveIdCallbacks) {
-          const result = await resolveId(source, importer, options);
-          if (result) {
-            return result;
-          }
+      async resolveId(r, c, a) {
+        for (const u of l.resolveIdCallbacks) {
+          if (typeof u != "function")
+            continue;
+          const h = await u.call(this, r, c, a);
+          if (h)
+            return h;
         }
-        if (source.startsWith("hidden:")) {
-          return source;
-        }
+        if (r.startsWith("hidden:"))
+          return r;
       },
-      async load(source, options) {
-        for (const load of builder.loadCallbacks) {
-          const result = await load(source, options);
-          if (result) {
-            return result;
-          }
+      async load(r, c) {
+        for (const a of l.loadCallbacks) {
+          if (typeof a != "function")
+            continue;
+          const u = await a.call(this, r, c);
+          if (u)
+            return u;
         }
-        if (source.startsWith("hidden:")) {
+        if (r.startsWith("hidden:"))
           return "";
-        }
       }
     },
     {
       name: "fusion:post-handles",
-      generateBundle(options, bundle) {
-        for (const [fileName, chunk] of Object.entries(bundle)) {
-          if (chunk.type === "chunk" && chunk.facadeModuleId?.startsWith("hidden:")) {
-            delete bundle[fileName];
-          }
-        }
+      generateBundle(r, c) {
+        for (const [a, u] of Object.entries(c))
+          u.type === "chunk" && u.facadeModuleId?.startsWith("hidden:") && delete c[a];
       },
-      async writeBundle(options, bundle) {
-        const outDir2 = resolvedConfig.build.outDir || process.cwd();
-        await moveFilesAndLog(builder.moveTasks, outDir2, logger);
-        await copyFilesAndLog(builder.copyTasks, outDir2, logger);
-        await linkFilesAndLog(builder.linkTasks, outDir2, logger);
-        for (const callback of builder.postBuildCallbacks) {
-          await callback();
-        }
-        for (const [name, task] of builder.tasks) {
-          for (const callback of task.postCallbacks) {
-            await callback();
-          }
-        }
+      async writeBundle(r, c) {
+        const a = n.build.outDir || process.cwd();
+        await dt(l.moveTasks, a, s), await ht(l.copyTasks, a, s), await mt(l.linkTasks, a, s);
+        for (const u of l.postBuildCallbacks)
+          await u();
+        for (const [u, h] of l.tasks)
+          for (const v of h.postCallbacks)
+            await v();
       }
     }
   ];
 }
-function prepareFusionOptions(options) {
-  if (typeof options === "string") {
-    return {
-      fusionfile: options
-    };
-  }
-  if (typeof options === "function") {
-    return {
-      fusionfile: options
-    };
-  }
-  return options;
+function It(e) {
+  return typeof e == "string" ? {
+    fusionfile: e
+  } : typeof e == "function" ? {
+    fusionfile: e
+  } : e;
 }
-function configureBuilder(handler) {
-  handler(builder);
+function ce(e) {
+  e(l);
 }
-function mergeViteConfig(config) {
-  if (config === null) {
-    builder.overrideConfig = {};
+function fe(e) {
+  if (e === null) {
+    l.overrideConfig = {};
     return;
   }
-  builder.overrideConfig = mergeConfig(builder.overrideConfig, config);
+  l.overrideConfig = w(l.overrideConfig, e);
 }
-function outDir(outDir2) {
-  builder.overrideConfig = mergeConfig(builder.overrideConfig, {
+function pe(e) {
+  l.overrideConfig = w(l.overrideConfig, {
     build: {
-      outDir: outDir2
+      outDir: e
     }
   });
 }
-function chunkDir(dir) {
-  builder.fusionOptions.chunkDir = dir;
+function de(e) {
+  l.fusionOptions.chunkDir = e;
 }
-function alias(src, dest) {
-  builder.overrideConfig = mergeConfig(builder.overrideConfig, {
+function he(e, t) {
+  l.overrideConfig = w(l.overrideConfig, {
     resolve: {
       alias: {
-        [src]: dest
+        [e]: t
       }
     }
   });
 }
-function external(match, varName) {
-  const globals = {};
-  if (varName) {
-    globals[match] = varName;
-  }
-  builder.overrideConfig = mergeConfig(builder.overrideConfig, {
+function me(e, t) {
+  const s = {};
+  t && (s[e] = t), l.overrideConfig = w(l.overrideConfig, {
     build: {
       rollupOptions: {
-        external: [match],
+        external: [e],
         output: {
-          globals
+          globals: s
         }
       }
     }
   });
 }
-function plugin(...plugins) {
-  extraVitePlugins.push(...plugins);
+function ge(...e) {
+  K.push(...e);
 }
-function clean(...paths) {
-  builder.addCleans(...paths);
-  builder.cleans = uniq(builder.cleans);
+function ye(...e) {
+  l.addCleans(...e), l.cleans = R(l.cleans);
 }
-
-export { alias, builder, callback, callbackAfterBuild, chunkDir, clean, configureBuilder, copy, copyGlob, css, external, fileToId, isDev, isProd, isVerbose, isWindows, js, link, mergeViteConfig, move, moveGlob, outDir, params$1 as params, plugin, shortHash, symlink, useFusion };
+export {
+  he as alias,
+  l as builder,
+  ie as callback,
+  oe as callbackAfterBuild,
+  de as chunkDir,
+  ye as clean,
+  ce as configureBuilder,
+  se as copy,
+  ae as copyGlob,
+  Zt as css,
+  me as external,
+  kt as fileToId,
+  re as isDev,
+  ft as isProd,
+  ct as isVerbose,
+  _ as isWindows,
+  te as js,
+  ne as link,
+  fe as mergeViteConfig,
+  ee as move,
+  le as moveGlob,
+  pe as outDir,
+  P as params,
+  ge as plugin,
+  pt as shortHash,
+  yt as symlink,
+  ue as useFusion
+};
 //# sourceMappingURL=index.js.map

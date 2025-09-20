@@ -7,6 +7,8 @@ export { copyGlob, moveGlob, symlink, fileToId } from '@/utilities/fs';
 
 export type {
   FusionPlugin,
-} from '@/types/plugin.ts';
+  MaybePromise,
+  MaybeArray,
+} from '@/types';
 export type { default as BuildTask } from '@/builder/BuildTask.ts';
 export type { default as ConfigBuilder } from '@/builder/ConfigBuilder.ts';

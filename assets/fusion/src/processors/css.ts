@@ -4,7 +4,7 @@ import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInte
 import { CssOptions, TaskInput, TaskOutput } from '@/types';
 import { forceArray, handleForceArray, handleMaybeArray } from '@/utilities/arr';
 import { basename, parse } from 'node:path';
-import { MaybePromise } from 'rollup';
+import { MaybePromise } from '@/types';
 
 export function css(
   input: TaskInput,

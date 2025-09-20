@@ -62,7 +62,7 @@ export function handleCloneAssets(builder: ConfigBuilder, clonePatterns: string[
 
 export function handleReposition(builder: ConfigBuilder, reposition: Record<string, string>) {
   builder.assetFileNamesCallbacks.push((assetInfo) => {
-    const fileName = assetInfo.originalFileName;
+    const fileName = assetInfo.originalFileName!;
 
     for (const base in reposition) {
       if (match(fileName, base)) {

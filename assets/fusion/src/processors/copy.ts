@@ -2,7 +2,7 @@ import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
 import { TaskInput } from '@/types';
 import { forceArray, handleMaybeArray } from '@/utilities/arr.ts';
-import { MaybePromise } from 'rollup';
+import { MaybePromise } from '@/types';
 
 export function copy(input: TaskInput, dest: string) {
   return new CopyProcessor(input, dest);

@@ -3,7 +3,8 @@ import { FileTasks, FusionVitePluginOptions, LinkOptions, RunnerCliParams } from
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
-import { MaybePromise, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
+import { PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
+import { MaybePromise } from '@/types';
 import { ConfigEnv, mergeConfig, PluginOption, UserConfig, Plugin } from 'vite';
 
 export default class ConfigBuilder {

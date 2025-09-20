@@ -47,6 +47,7 @@ $data = [
     <script>
         window.externalPublicPath = '{{ $asset->handleUri('@core/debugger/') }}'
     </script>
+    <script src="{{ $asset->path('vendor/systemjs/dist/system.js') }}"></script>
     <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/debugger.js')) }}"></script>
 </body>
 </html>

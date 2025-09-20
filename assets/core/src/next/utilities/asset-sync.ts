@@ -12,7 +12,7 @@ export function findModules(suffix = ''): string[] {
     .map((file) => loadJson(file))
     .filter(pkgJson => pkgJson?.extra?.windwalker != null)
     .map(pkgJson => {
-      return pkgJson?.extra?.windwalker?.modules?.map((module) => {
+      return pkgJson?.extra?.windwalker?.modules?.map((module: string) => {
         return `vendor/${pkgJson.name}/${module}/${suffix}`;
       }) || [];
     })

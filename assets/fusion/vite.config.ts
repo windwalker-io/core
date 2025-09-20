@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
         tsconfigPath: './tsconfig.json',
         insertTypesEntry: true,
         // merge to 1 file
-        // rollupTypes: true,
+        rollupTypes: true,
       }),
     ],
   };

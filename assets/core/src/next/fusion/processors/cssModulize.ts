@@ -75,7 +75,7 @@ function parseStylesFromBlades(patterns: string | string[]) {
 
     return html.querySelectorAll('style[type],script[type]')
       .filter(
-        (el) => ['text/scss', 'text/css'].includes(el.getAttribute('type'))
+        (el) => ['text/scss', 'text/css'].includes(el.getAttribute('type') || '')
       )
       .map((el) => {
         const scope = el.getAttribute('data-scope');

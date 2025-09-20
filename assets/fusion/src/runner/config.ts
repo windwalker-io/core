@@ -4,7 +4,7 @@ import { build } from 'esbuild';
 import Module from 'module';
 import { existsSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
-import { MaybeArray, MaybePromise } from 'rollup';
+import { MaybeArray, MaybePromise } from '@/types';
 import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '@/types';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
@@ -44,7 +44,9 @@ export async function loadConfigFile(configFile: ConfigResult): Promise<Record<s
     writeFileSync(output.path, code);
     const m = new Module(output.path, undefined);
     m.filename = output.path;
+    // @ts-ignore
     m.paths = Module._nodeModulePaths(dirname(output.path));
+    // @ts-ignore
     m._compile(code, output.path);
 
     return expandModules(m.exports);
@@ -80,10 +82,10 @@ export async function resolveTaskOptions(task: LoadedConfigTask, resolveSubFunct
   }
 
   if (typeof task === 'function') {
-    return resolvePromisesToFlatArray(await task(), task?.name);
+    return resolvePromisesToFlatArray(await task() as any, task?.name);
   }
 
-  return resolvePromisesToFlatArray((await task) as MaybeArray<ProcessorInterface>, task?.name);
+  return resolvePromisesToFlatArray((await task) as MaybeArray<ProcessorInterface>, (task as any)?.name);
 }
 
 async function resolvePromisesToFlatArray(tasks: MaybeArray<MaybePromise<ProcessorInterface>>, name?: string) {

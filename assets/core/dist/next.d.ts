@@ -1,12 +1,14 @@
-import { cloneAssets } from './cloneAssets';
 import { ConfigBuilder } from '@windwalker-io/fusion-next';
 import { css } from '@windwalker-io/fusion-next';
 import { FusionPlugin } from '@windwalker-io/fusion-next';
-import { installVendors } from './installVendors';
+import { MaybePromise } from 'rollup';
 import { ProcessorInterface } from '@windwalker-io/fusion-next';
 import { ProcessorPreview } from '@windwalker-io/fusion-next';
 
-export { cloneAssets }
+export declare function cloneAssets(patterns: Record<string, string>): {
+    config(taskName: string, builder: ConfigBuilder): MaybePromise<any>;
+    preview(): MaybePromise<ProcessorPreview[]>;
+};
 
 export declare function containsMiddleGlob(str: string): boolean;
 
@@ -16,10 +18,15 @@ declare class CssModulizeProcessor implements ProcessorInterface {
     protected processor: ReturnType<typeof css>;
     protected bladePatterns: string[];
     protected cssPatterns: string[];
+
     constructor(processor: ReturnType<typeof css>, bladePatterns?: string[], cssPatterns?: string[]);
+
     parseBlades(...bladePatterns: (string[] | string)[]): this;
+
     mergeCss(...css: (string[] | string)[]): this;
+
     config(taskName: string, builder: ConfigBuilder): undefined;
+
     preview(): ProcessorPreview[];
 }
 
@@ -27,7 +34,10 @@ export declare function ensureDirPath(path: string, slash?: '/' | '\\'): string;
 
 export declare function findModules(suffix?: string): string[];
 
-export { installVendors }
+export declare function installVendors(npmVendors?: string[], to?: string): {
+    config(taskName: string, builder: ConfigBuilder): MaybePromise<any>;
+    preview(): MaybePromise<ProcessorPreview[]>;
+};
 
 export declare function loadJson(file: string): any;
 

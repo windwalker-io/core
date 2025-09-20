@@ -13,8 +13,9 @@
     "declaration": false,
     "emitDeclarationOnly": false,
     "sourceMap": true,
+    "stripInternal": true,
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [

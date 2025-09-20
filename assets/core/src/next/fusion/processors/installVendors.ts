@@ -112,7 +112,7 @@ async function doInstall(source: string, dest: string) {
   }
 }
 
-function findNpmVendors(composerJsons: string[] = []) {
+function findNpmVendors(composerJsons: any[] = []) {
   const pkg = path.resolve(process.cwd(), 'package.json');
   const pkgJson = loadJson(pkg);
 

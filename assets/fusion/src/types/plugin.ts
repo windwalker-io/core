@@ -1,5 +1,5 @@
 import ConfigBuilder from '@/builder/ConfigBuilder';
-import { MaybePromise } from 'rollup';
+import { MaybePromise } from '@/types/index.ts';
 import { PluginOption } from 'vite';
 
 export type FusionPlugin = PluginOption & {

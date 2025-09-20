@@ -1,6 +1,6 @@
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
-import { MaybePromise } from 'rollup';
+import { MaybePromise } from '@/types';
 
 type CallbackHandler = (taskName: string, builder: ConfigBuilder) => MaybePromise<any>;
 
@@ -13,7 +13,12 @@ export function callbackAfterBuild(handler: CallbackHandler) {
 }
 
 class CallbackProcessor implements ProcessorInterface {
-  constructor(protected handler: CallbackHandler, protected afterBuild = false) {
+  constructor(
+    /** @internal */
+    private handler: CallbackHandler,
+    /** @internal */
+    private afterBuild = false
+  ) {
   }
 
   config(taskName: string, builder: ConfigBuilder): MaybePromise<any> {

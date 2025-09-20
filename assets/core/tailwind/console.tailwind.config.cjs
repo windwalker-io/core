@@ -5,7 +5,7 @@ module.exports = {
     mode: 'layers',
     layers: ['base', 'components', 'utilities'],
     content: [
-      './../../views/debugger/console.blade.php',
+      '../../views/debugger/console.blade.php',
       // './src/**/*.vue',
     ],
   },

@@ -1,6 +1,6 @@
 import { FusionPlugin } from '@/types/plugin.ts';
-import { RunnerCliParams } from '@/types/runner';
-import { MaybePromise } from 'rollup';
+import { RunnerCliParams } from '@/types/runner.ts';
+import { MaybePromise } from '@/types/index.ts';
 
 export interface FusionVitePluginOptions {
   fusionfile?: string | Fusionfile;
