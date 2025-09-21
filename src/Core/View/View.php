@@ -423,22 +423,40 @@ class View implements EventAwareInterface, \ArrayAccess
             }
         }
 
-        foreach ($jsList as $name => $js) {
-            if (is_numeric($name)) {
-                $asset->js("@view/{$vmName}/{$js}");
-            } elseif ($name === $this->layout) {
-                foreach ((array) $js as $j) {
-                    $asset->js("@view/{$vmName}/{$j}");
+        if ($asset->vite->isActive()) {
+            foreach ($jsList as $name => $js) {
+                if (is_numeric($name)) {
+                    $asset->importModule(
+                        "@main",
+                        "module.loader.import('{$vmName}/$js')"
+                    );
+                } elseif ($name === $this->layout) {
+                    foreach ((array) $js as $j) {
+                        $asset->importModule(
+                            "@main",
+                            "module.loader.import('{$vmName}/$j')"
+                        );
+                    }
                 }
             }
-        }
+        } else {
+            foreach ($jsList as $name => $js) {
+                if (is_numeric($name)) {
+                    $asset->js("@view/{$vmName}/{$js}");
+                } elseif ($name === $this->layout) {
+                    foreach ((array) $js as $j) {
+                        $asset->js("@view/{$vmName}/{$j}");
+                    }
+                }
+            }
 
-        foreach ($modules as $name => $js) {
-            if (is_numeric($name)) {
-                $asset->module("@view/{$vmName}/{$js}");
-            } elseif ($name === $this->layout) {
-                foreach ((array) $js as $j) {
-                    $asset->module("@view/{$vmName}/{$j}");
+            foreach ($modules as $name => $js) {
+                if (is_numeric($name)) {
+                    $asset->module("@view/{$vmName}/{$js}");
+                } elseif ($name === $this->layout) {
+                    foreach ((array) $js as $j) {
+                        $asset->module("@view/{$vmName}/{$j}");
+                    }
                 }
             }
         }

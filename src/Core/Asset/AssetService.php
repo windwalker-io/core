@@ -198,9 +198,34 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
+    public function importModule(string $url, ?string $body = null, array $options = []): static
+    {
+        $code = "import('$url')";
+
+        if ($body) {
+            $code .= ".then(function(module) {\n$body\n});";
+        }
+
+        return $this->internalModule($code, $options);
+    }
+
+    public function importByLoader(string $module): static
+    {
+        $this->importModule(
+            "@main",
+            "module.loader.import('$module')"
+        );
+
+        return $this;
+    }
+
     public function addLink(string $type, string $url, array $options = [], array $attrs = []): AssetLink
     {
         $url = $this->handleUri($url);
+
+        if ($this->vite->isDevServerUri($url)) {
+            $options['version'] = false;
+        }
 
         // Cache same url and options to enhance performance
         $key = "$type:$url";
@@ -264,6 +289,13 @@ class AssetService implements EventAwareInterface
         $this->internalScripts[] = new AssetItem($content, $options);
 
         return $this;
+    }
+
+    public function internalModule(string $content, array $options = []): static
+    {
+        $options['module'] = true;
+
+        return $this->internalJS($content, $options);
     }
 
     /**
@@ -434,7 +466,15 @@ class AssetService implements EventAwareInterface
             $html[] = (string) h(
                 'script',
                 $event->internalAttrs,
-                "\n" . $this->renderInternalJS() . "\n" . $this->indents
+                "\n" . $this->renderInternalJS(false) . "\n" . $this->indents
+            );
+            $html[] = (string) h(
+                'script',
+                [
+                    ...$event->internalAttrs,
+                    'type' => 'module'
+                ],
+                "\n" . $this->renderInternalJS(true) . "\n" . $this->indents
             );
         }
 
@@ -457,11 +497,15 @@ class AssetService implements EventAwareInterface
     }
 
     /**
+     * @param  bool  $module
+     *
      * @return  string
      */
-    public function renderInternalJS(): string
+    public function renderInternalJS(bool $module = false): string
     {
-        return implode(";\n", $this->internalScripts);
+        $scripts = array_filter($this->internalScripts, fn ($item) => $item->isModule() === $module);
+
+        return implode(";\n", $scripts);
     }
 
     /**

@@ -32,6 +32,11 @@ class AssetItem implements \Stringable
         return (bool) ($this->options['footer'] ?? false);
     }
 
+    public function isModule(): bool
+    {
+        return (bool) ($this->options['module'] ?? false);
+    }
+
     /**
      * @inheritDoc
      */

@@ -69,6 +69,9 @@ export default defineConfig({
       },
       writeBundle() {
         fs.moveSync('./dist/debugger/debugger-console.css', './dist/debugger-console.css', { overwrite: true });
+
+        const systemJSFile = resolveModuleRealpath(import.meta.url, 'systemjs/dist/system.min.js');
+        fs.copySync(systemJSFile, './dist/debugger/system.min.js', { overwrite: true });
       }
     },
     publicPath({

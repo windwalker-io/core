@@ -354,7 +354,8 @@ class WindwalkerExtension implements
     public function getParsers(): array
     {
         return [
-            $this->stripInPageScripts(...)
+            $this->stripInPageScripts(...),
+            $this->inlineTsToLoader(...),
         ];
     }
 
@@ -366,14 +367,27 @@ class WindwalkerExtension implements
 
             // Remove <script lang="scss">...</style>
             '/<script\b[^>]*\blang\s*=\s*(?:("|\')scss("|\'))[^>]*>.*?<\/script>/is',
-
-            // Remove <script lang="ts">...</script>
-            '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*>.*?<\/script>/is',
         ];
 
         return preg_replace(
             $regexes,
             '',
+            $content
+        );
+    }
+
+    protected function inlineTsToLoader(string $content): string
+    {
+        // Parse `<script lang="ts" data-as="any.string">*</script>`
+        $regex = '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*\bdata-as\s*=\s*(?:("|\'))([^"\']+)\3[^>]*>(.*?)<\/script>/is';
+
+        return preg_replace_callback(
+            $regex,
+            function ($matches) {
+                $as = $matches[4];
+
+                return "<?php \$asset->importByLoader('inline:$as'); ?>";
+            },
             $content
         );
     }

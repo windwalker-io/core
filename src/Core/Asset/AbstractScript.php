@@ -15,6 +15,7 @@ use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
  * @method AssetService js(string $url, array $options = [], array $attrs = [])
  * @method AssetService internalCSS(string $content)
  * @method AssetService internalJS(string $content)
+ * @method AssetService internalModule(string $content)
  * @method bool|string has(string $uri, bool $strict = false)
  */
 abstract class AbstractScript

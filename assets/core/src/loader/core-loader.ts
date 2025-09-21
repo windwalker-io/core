@@ -13,7 +13,7 @@ export class CoreLoader {
 
   add(route: string, target: Function | string) {
     if (typeof target === 'string') {
-      target = () => import(`${target as string}`);
+      target = () => import(/* @vite-ignore */`${target as string}`);
     }
 
     this.routes[route] = target;

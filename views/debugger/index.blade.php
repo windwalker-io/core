@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+namespace Windwalker\Core\View\Debugger;
+
 /**
  * Global variables
  * --------------------------------------------------------------
@@ -11,8 +15,6 @@
  * @var $asset     AssetService    The Asset manage service.
  * @var $lang      LangService     The language translation service.
  */
-
-declare(strict_types=1);
 
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Asset\AssetService;
@@ -47,7 +49,7 @@ $data = [
     <script>
         window.externalPublicPath = '{{ $asset->handleUri('@core/debugger/') }}'
     </script>
-    <script src="{{ $asset->path('vendor/systemjs/dist/system.js') }}"></script>
+    <script src="{{ $asset->handleUri('@core/debugger/system.min.js') }}"></script>
     <script src="{{ $asset->appendVersion($asset->handleUri('@core/debugger/debugger.js')) }}"></script>
 </body>
 </html>

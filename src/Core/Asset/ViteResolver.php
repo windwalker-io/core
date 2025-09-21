@@ -25,6 +25,24 @@ class ViteResolver
         $this->config = $this->config->proxy('asset.vite');
     }
 
+    public function isActive(): bool
+    {
+        return $this->getManifest() !== null || $this->serverIsRunning();
+    }
+
+    public function isDevServerUri(string $uri): bool
+    {
+        $host = $this->getServerHost();
+
+        if (!$host || !$this->serverIsRunning()) {
+            return false;
+        }
+
+        $serverHostString = $host->toString(Uri::FULL_HOST);
+
+        return str_starts_with($uri, $serverHostString);
+    }
+
     public function resolve(string $uri): string
     {
         $path = str_replace($this->alias, $this->base, $uri);
@@ -86,7 +104,7 @@ class ViteResolver
         return $this->getServerHost() !== null;
     }
 
-    public function getServerHost(): ?UriInterface
+    public function getServerHost(): ?Uri
     {
         return $this->once(
             'server.host',
@@ -94,7 +112,7 @@ class ViteResolver
         );
     }
 
-    protected function loadServerFile(): ?UriInterface
+    protected function loadServerFile(): ?Uri
     {
         $serverFile = $this->pathResolver->resolve(
             $this->config->getDeep('vite.server_file') ?? 'tmp/vite-server'

@@ -1,4 +1,3 @@
-import { tree } from 'gulp';
 import path from "node:path";
 import { resolve } from 'path';
 import { defineConfig } from "vite";
