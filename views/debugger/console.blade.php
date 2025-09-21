@@ -106,4 +106,4 @@ $profiler = $collector->getDeep('profiler.main');
         </div>
     </a>
 </div>
-<script src="{{ $js }}" nonce="{{ $nonce }}"></script>
+{{--<script src="{{ $js }}" nonce="{{ $nonce }}"></script>--}}

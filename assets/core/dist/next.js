@@ -1,70 +1,70 @@
-import { getGlobBaseFromPattern as M, callback as T, css as q, js as V, shortHash as B, callbackAfterBuild as D, copyGlob as I, symlink as W } from "@windwalker-io/fusion-next";
-import S from "is-glob";
+import { getGlobBaseFromPattern as M, callback as D, css as V, js as q, shortHash as T, plugin as B, callbackAfterBuild as R, copyGlob as W, symlink as E } from "@windwalker-io/fusion-next";
+import j from "is-glob";
 import J from "micromatch";
-import $, { relative as j, normalize as P, resolve as h } from "node:path";
-import w from "node:fs";
-import v from "fast-glob";
-import { randomBytes as R } from "node:crypto";
-import { createRequire as G } from "node:module";
+import $, { relative as x, normalize as v, resolve as m } from "node:path";
+import S from "node:fs";
+import w from "fast-glob";
+import { randomBytes as G } from "node:crypto";
+import { createRequire as z } from "node:module";
 import a from "fs-extra";
-import { parse as x } from "node-html-parser";
+import { parse as P } from "node-html-parser";
 function b(t) {
-  return w.existsSync(t) ? JSON.parse(w.readFileSync(t, "utf8")) : null;
+  return S.existsSync(t) ? JSON.parse(S.readFileSync(t, "utf8")) : null;
 }
-function z(t) {
-  return S(F(t));
+function H(t) {
+  return j(F(t));
 }
 function F(t) {
   return t.replace(/(\/\*|\/\*\*?|\*\*\/\*?)$/, "");
 }
-const E = process.platform === "win32" ? "\\" : "/";
-function he(t, e = E) {
+const K = process.platform === "win32" ? "\\" : "/";
+function ye(t, e = K) {
   return t.endsWith(e) ? t : t + e;
 }
-function C(t) {
+function A(t) {
   let e = [];
   for (const s of t)
     e = [
       ...e,
-      ...H(s)
+      ...Q(s)
     ];
   return e;
 }
-function H(t) {
-  return v.globSync(t).map((e) => (e = e.replace(/\\/g, "/"), {
+function Q(t) {
+  return w.globSync(t).map((e) => (e = e.replace(/\\/g, "/"), {
     fullpath: e,
-    relativePath: j(M(t), e).replace(/\\/g, "/")
+    relativePath: x(M(t), e).replace(/\\/g, "/")
   }));
 }
-function ye(t = "") {
+function ge(t = "") {
   const e = $.resolve(process.cwd(), "composer.json"), s = b(e), r = Object.keys(s.require || {}).concat(Object.keys(s["require-dev"] || {})).map((o) => `vendor/${o}/composer.json`).map((o) => b(o)).filter((o) => o?.extra?.windwalker != null).map((o) => o?.extra?.windwalker?.modules?.map((n) => `vendor/${o.name}/${n}/${t}`) || []).flat();
   return [...new Set(r)];
 }
-function Q(t = "", e = 16) {
-  let s = R(e).toString("hex");
+function U(t = "", e = 16) {
+  let s = G(e).toString("hex");
   return t && (s = t + s), s;
 }
-function ge(t, e) {
-  return G(t).resolve(e);
+function $e(t, e) {
+  return z(t).resolve(e);
 }
-function A(t) {
+function C(t) {
   const e = t.indexOf("?");
   return e !== -1 ? t.substring(0, e) : t;
 }
-function $e(t) {
-  return T((e, s) => {
-    const r = N(t);
-    return _(s, r), O(s, Object.keys(t)), null;
+function be(t) {
+  return D((e, s) => {
+    const r = O(t);
+    return N(s, r), _(s, Object.keys(t)), null;
   });
 }
-function N(t) {
+function O(t) {
   const e = {};
   for (const s in t)
-    z(s) || (e[s] = t[s]);
+    H(s) || (e[s] = t[s]);
   return e;
 }
-function O(t, e) {
-  const s = Q("hidden:clone-asset-") + ".js";
+function _(t, e) {
+  const s = U("hidden:clone-asset-") + ".js";
   t.addTask(s), t.resolveIdCallbacks.push((r) => {
     if (r === s)
       return s;
@@ -74,37 +74,37 @@ function O(t, e) {
 `;
   });
 }
-function _(t, e) {
+function N(t, e) {
   t.assetFileNamesCallbacks.push((s) => {
     const r = s.originalFileName;
     for (const o in e)
-      if (U(r, o))
-        return P(e[o] + j(F(o), r)).replace(/\\/g, "/");
+      if (X(r, o))
+        return v(e[o] + x(F(o), r)).replace(/\\/g, "/");
   });
 }
-function U(t, e) {
-  return S(e) ? J.isMatch(t, e) : t.startsWith(e);
+function X(t, e) {
+  return j(e) ? J.isMatch(t, e) : t.startsWith(e);
 }
-function be(t) {
+function ke(t) {
   return {
     name: "core:global-assets",
     buildConfig(e) {
       const s = t.clone || {};
       let r = t.reposition || {};
-      r = { ...r, ...N(s) }, _(e, r);
+      r = { ...r, ...O(s) }, N(e, r);
       const o = Object.keys(s);
-      o.length > 0 && O(e, o);
+      o.length > 0 && _(e, o);
     }
   };
 }
-function ke(t, e) {
-  return t ??= h("node_modules/systemjs/dist/system.min.js"), {
+function ve(t, e) {
+  return t ??= m("node_modules/systemjs/dist/system.min.js"), {
     name: "core:inject-systemjs",
     async generateBundle(s, r) {
       if (s.format !== "system")
         return;
       const o = a.readFileSync(
-        h(t),
+        m(t),
         "utf-8"
       );
       for (const n of Object.values(r))
@@ -113,7 +113,7 @@ function ke(t, e) {
     }
   };
 }
-function ve() {
+function we() {
   return {
     name: "core:systemjs-css-fix",
     async generateBundle(t, e) {
@@ -128,10 +128,10 @@ function ve() {
     }
   };
 }
-function we(t, e) {
-  return new K(q(t, e));
+function Se(t, e) {
+  return new Y(V(t, e));
 }
-class K {
+class Y {
   constructor(e, s = [], r = []) {
     this.processor = e, this.bladePatterns = s, this.cssPatterns = r;
   }
@@ -144,18 +144,18 @@ class K {
   config(e, s) {
     const r = this.processor.config(e, s);
     for (const o of r)
-      s.loadCallbacks.push((n, u) => {
-        const f = A(n);
-        if (P(f) === h(o.input)) {
-          const c = v.globSync(
-            this.cssPatterns.map((p) => h(p)).map((p) => p.replace(/\\/g, "/"))
-          ).map((p) => `@import "${p}";`).concat(X(this.bladePatterns)).join(`
+      s.loadCallbacks.push((n, d) => {
+        const l = C(n);
+        if (v(l) === m(o.input)) {
+          const c = w.globSync(
+            this.cssPatterns.map((p) => m(p)).map((p) => p.replace(/\\/g, "/"))
+          ).map((p) => `@import "${p}";`).concat(Z(this.bladePatterns)).join(`
 `);
-          let l = a.readFileSync(f, "utf-8");
-          return l += `
+          let u = a.readFileSync(l, "utf-8");
+          return u += `
 
 ${c}
-`, l;
+`, u;
         }
       });
   }
@@ -163,23 +163,23 @@ ${c}
     return [];
   }
 }
-function X(t) {
-  return v.globSync(t).map((s) => {
+function Z(t) {
+  return w.globSync(t).map((s) => {
     const r = a.readFileSync(s, "utf8");
-    return x(r).querySelectorAll("style[type],script[type]").filter(
+    return P(r).querySelectorAll("style[type],script[type]").filter(
       (n) => ["text/scss", "text/css"].includes(n.getAttribute("type") || "")
     ).map((n) => {
-      const u = n.getAttribute("data-scope");
-      return u ? `${u} {
+      const d = n.getAttribute("data-scope");
+      return d ? `${d} {
           ${n.innerHTML}
         }` : n.innerHTML;
     });
   }).filter((s) => s.length > 0).flat();
 }
-function Se(t, e, s = {}) {
-  return new Y(V(t, e), s);
+function je(t, e, s = {}) {
+  return new ee(q(t, e), s);
 }
-class Y {
+class ee {
   constructor(e, s = {}) {
     this.processor = e, this.options = s;
   }
@@ -187,51 +187,62 @@ class Y {
   bladePatterns = [];
   stagePrefix = "";
   config(e, s) {
-    this.processor.config(e, s);
-    const r = this.options.tmpPath ?? h("./tmp/fusion/jsmodules/").replace(/\\/g, "/"), o = this.options.cleanTmp ?? !0, n = "js/" + this.stagePrefix + "/app.js", u = "resources/assets/src/" + this.stagePrefix + "/app.js", f = s.addTask(n);
-    o && s.postBuildCallbacks.push(() => {
-      a.removeSync(r);
-    }), s.merge({
-      resolve: {
-        alias: {
-          //
-        }
-      }
-    }), s.entryFileNamesCallbacks.push((i) => {
-      if (i.facadeModuleId === u)
-        return n;
-    }), s.resolveIdCallbacks.push((i) => {
-      if (i === f.input)
-        return u;
-    }), s.loadCallbacks.push((i, c) => {
-      if (A(i), i === u) {
-        const l = C(this.scriptPatterns);
+    const o = this.processor.config(e, s)[0], n = this.options.tmpPath ?? m("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
+    (this.options.cleanTmp ?? !0) && s.postBuildCallbacks.push(() => {
+      a.removeSync(n);
+    }), this.ignoreMainImport(o), s.resolveIdCallbacks.push((l) => {
+      if (l === "@main")
+        return { id: l, external: !0 };
+    }), s.loadCallbacks.push((l, i) => {
+      const c = C(l);
+      if (v(c) === m(o.input)) {
+        const u = A(this.scriptPatterns);
         let p = `{
 `;
-        for (const m of l) {
-          let g = m.fullpath;
+        for (const h of u) {
+          let g = h.fullpath;
           if (g.endsWith(".d.ts"))
             continue;
-          let d = m.relativePath.replace(/assets\//, "").toLowerCase();
-          g = h(g).replace(/\\/g, "/"), d = d.substring(0, d.lastIndexOf(".")) + ".js", this.stagePrefix && (d = this.stagePrefix + "/" + d), p += `'${d}': () => import('${g}'),
+          let f = h.relativePath.replace(/assets\//, "").toLowerCase();
+          g = m(g).replace(/\\/g, "/"), f = f.substring(0, f.lastIndexOf(".")) + ".js", this.stagePrefix && (f = this.stagePrefix + "/" + f), p += `'${f}': () => import('${g}'),
 `;
         }
-        const y = Z(this.bladePatterns);
-        a.ensureDirSync(r);
-        for (const m of y) {
-          let g = m.as;
-          const d = r + "/" + m.path.replace(/\\|\//g, "_") + "-" + B(m.code) + ".ts";
-          a.writeFileSync(d, m.code), p += `'inline:${g}': () => import('${d}'),
+        const y = te(this.bladePatterns);
+        a.ensureDirSync(n);
+        for (const h of y) {
+          let g = h.as;
+          const f = n + "/" + h.path.replace(/\\|\//g, "_") + "-" + T(h.code) + ".ts";
+          a.writeFileSync(f, h.code), p += `'inline:${g}': () => import('${f}'),
 `;
         }
-        return p += "}", `
-import { App } from '${h("./vendor/windwalker/core/assets/core/src/next/app.ts").replace(/\\/g, "/")}';
+        p += "}";
+        const L = `
+import { App } from '${m("./vendor/windwalker/core/assets/core/src/next/app.ts").replace(/\\/g, "/")}';
 
 const app = new App();
 app.registerRoutes(${p});
 
 export default app;
   `;
+        return a.readFileSync(c, "utf-8") + `
+
+` + L;
+      }
+    });
+  }
+  /**
+   * @see https://github.com/vitejs/vite/issues/6393#issuecomment-1006819717
+   * @see https://stackoverflow.com/questions/76259677/vite-dev-server-throws-error-when-resolving-external-path-from-importmap
+   */
+  ignoreMainImport(e) {
+    const s = "/@id/", r = ["@main"], o = new RegExp(
+      `${s}(${r.join("|")})`,
+      "g"
+    );
+    B({
+      name: "keep-main-external-" + e.id,
+      transform(n) {
+        return o.test(n) ? n.replace(o, (d, l) => l) : n;
       }
     });
   }
@@ -248,10 +259,10 @@ export default app;
     return this.stagePrefix = e, this;
   }
 }
-function Z(t) {
-  return C(Array.isArray(t) ? t : [t]).map((s) => {
+function te(t) {
+  return A(Array.isArray(t) ? t : [t]).map((s) => {
     const r = a.readFileSync(s.fullpath, "utf8");
-    return x(r).querySelectorAll("script[lang][data-as]").filter(
+    return P(r).querySelectorAll("script[lang][data-as]").filter(
       (n) => ["ts", "typescript"].includes(n.getAttribute("lang") || "")
     ).map((n) => ({
       as: n.getAttribute("data-as") || "",
@@ -261,45 +272,45 @@ function Z(t) {
     })).filter((n) => n.code.trim() !== "");
   }).flat();
 }
-function je(t = [], e = "www/assets/vendor") {
-  return D(() => ee(t, e));
+function xe(t = [], e = "www/assets/vendor") {
+  return R(() => se(t, e));
 }
-async function ee(t = [], e = "www/assets/vendor") {
+async function se(t = [], e = "www/assets/vendor") {
   const s = e;
   let r = t;
   const o = process.env.INSTALL_VENDOR === "hard" ? "Copy" : "Link";
   console.log(""), a.existsSync(s) || a.mkdirSync(s);
   const n = a.readdirSync(s, { withFileTypes: !0 }).filter((i) => i.isDirectory()).map((i) => $.join(s, i.name));
   n.unshift(s), n.forEach((i) => {
-    L(i);
+    I(i);
   });
-  const u = se().map((i) => `vendor/${i}/composer.json`).map((i) => b(i)).filter((i) => i?.extra?.windwalker != null);
-  r = te(u).concat(r), r = [...new Set(r)];
+  const d = re().map((i) => `vendor/${i}/composer.json`).map((i) => b(i)).filter((i) => i?.extra?.windwalker != null);
+  r = ne(d).concat(r), r = [...new Set(r)];
   for (const i of r)
     a.existsSync(`node_modules/${i}/`) && (console.log(`[${o} NPM] node_modules/${i}/ => ${s}/${i}/`), k(`node_modules/${i}/`, `${s}/${i}/`));
-  for (const i of u) {
+  for (const i of d) {
     const c = i.name;
-    let l = i?.extra?.windwalker?.assets?.link;
-    l && (l.endsWith("/") || (l += "/"), a.existsSync(`vendor/${c}/${l}`) && (console.log(`[${o} Composer] vendor/${c}/${l} => ${s}/${c}/`), k(`vendor/${c}/${l}`, `${s}/${c}/`)));
+    let u = i?.extra?.windwalker?.assets?.link;
+    u && (u.endsWith("/") || (u += "/"), a.existsSync(`vendor/${c}/${u}`) && (console.log(`[${o} Composer] vendor/${c}/${u} => ${s}/${c}/`), k(`vendor/${c}/${u}`, `${s}/${c}/`)));
   }
-  const f = "resources/assets/vendor/";
-  if (a.existsSync(f)) {
-    const i = a.readdirSync(f);
+  const l = "resources/assets/vendor/";
+  if (a.existsSync(l)) {
+    const i = a.readdirSync(l);
     for (const c of i)
       if (c.startsWith("@")) {
-        const l = a.readdirSync(f + c);
-        for (const p of l) {
+        const u = a.readdirSync(l + c);
+        for (const p of u) {
           const y = c + "/" + p;
-          console.log(`[${o} Local] resources/assets/vendor/${y}/ => ${s}/${y}/`), k(f + y + "/", `${s}/${y}/`);
+          console.log(`[${o} Local] resources/assets/vendor/${y}/ => ${s}/${y}/`), k(l + y + "/", `${s}/${y}/`);
         }
       } else
-        console.log(`[${o} Local] resources/assets/vendor/${c}/ => ${s}/${c}/`), k(f + c, `${s}/${c}/`);
+        console.log(`[${o} Local] resources/assets/vendor/${c}/ => ${s}/${c}/`), k(l + c, `${s}/${c}/`);
   }
 }
 async function k(t, e) {
-  process.env.INSTALL_VENDOR === "hard" ? await I(t + "/**/*", e) : await W(t, e);
+  process.env.INSTALL_VENDOR === "hard" ? await W(t + "/**/*", e) : await E(t, e);
 }
-function te(t = []) {
+function ne(t = []) {
   const e = $.resolve(process.cwd(), "package.json"), s = b(e);
   let r = Object.keys(s.devDependencies || {}).concat(Object.keys(s.dependencies || {})).map((n) => `node_modules/${n}/package.json`).map((n) => b(n)).filter((n) => n?.windwalker != null).map((n) => n?.windwalker.vendors || []).flat();
   const o = t.map((n) => [
@@ -309,7 +320,7 @@ function te(t = []) {
   ]).flat();
   return [...new Set(r.concat(o))];
 }
-function se() {
+function re() {
   const t = $.resolve(process.cwd(), "composer.json"), e = b(t);
   return [
     ...new Set(
@@ -317,29 +328,29 @@ function se() {
     )
   ];
 }
-function L(t) {
+function I(t) {
   if (!a.existsSync(t))
     return;
   const e = a.readdirSync(t, { withFileTypes: !0 });
   for (const s of e)
-    s.isSymbolicLink() || s.isFile() ? a.unlinkSync($.join(t, s.name)) : s.isDirectory() && L($.join(t, s.name));
+    s.isSymbolicLink() || s.isFile() ? a.unlinkSync($.join(t, s.name)) : s.isDirectory() && I($.join(t, s.name));
   a.rmdirSync(t);
 }
 export {
-  $e as cloneAssets,
-  z as containsMiddleGlob,
-  we as cssModulize,
-  he as ensureDirPath,
-  C as findFilesFromGlobArray,
-  ye as findModules,
-  be as globalAssets,
-  ke as injectSystemJS,
-  je as installVendors,
-  Se as jsModulize,
+  be as cloneAssets,
+  H as containsMiddleGlob,
+  Se as cssModulize,
+  ye as ensureDirPath,
+  A as findFilesFromGlobArray,
+  ge as findModules,
+  ke as globalAssets,
+  ve as injectSystemJS,
+  xe as installVendors,
+  je as jsModulize,
   b as loadJson,
   F as removeLastGlob,
-  ge as resolveModuleRealpath,
-  A as stripUrlQuery,
-  ve as systemCSSFix,
-  Q as uniqId
+  $e as resolveModuleRealpath,
+  C as stripUrlQuery,
+  we as systemCSSFix,
+  U as uniqId
 };

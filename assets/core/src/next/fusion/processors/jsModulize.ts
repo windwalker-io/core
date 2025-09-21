@@ -2,10 +2,12 @@ import { findFilesFromGlobArray, stripUrlQuery } from '@/next';
 import {
   type BuildTask,
   type ConfigBuilder,
-  js,
   type MaybePromise,
   type ProcessorInterface,
-  type ProcessorPreview, shortHash
+  type ProcessorPreview,
+  js,
+  shortHash,
+  plugin as addPlugin,
 } from '@windwalker-io/fusion-next';
 import fs from 'fs-extra';
 import { parse } from 'node-html-parser';
@@ -32,13 +34,13 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
   config(taskName: string, builder: ConfigBuilder) {
     const tasks = this.processor.config(taskName, builder) as BuildTask[];
-    // const task = tasks[0];
+    const task = tasks[0];
     const tmpPath = this.options.tmpPath ?? resolve('./tmp/fusion/jsmodules/').replace(/\\/g, '/');
     const clean = this.options.cleanTmp ?? true;
 
-    const appFileName = 'js/' + this.stagePrefix + '/app.js';
-    const appSrcFileName = 'resources/assets/src/' + this.stagePrefix + '/app.js';
-    const task = builder.addTask(appFileName);
+    // const appFileName = 'js/' + this.stagePrefix + '/app.js';
+    // const appSrcFileName = 'resources/assets/src/' + this.stagePrefix + '/app.js';
+    // const task = builder.addTask(appFileName);
 
     if (clean) {
       builder.postBuildCallbacks.push(() => {
@@ -46,31 +48,39 @@ export class JsModulizeProcessor implements ProcessorInterface {
       });
     }
 
-    builder.merge({
-      resolve: {
-        alias: {
-          //
-        }
-      }
-    });
+    // builder.merge({
+    //   resolve: {
+    //     alias: {
+    //       '@main': task.input
+    //     }
+    //   }
+    // });
 
-    builder.entryFileNamesCallbacks.push((chunkInfo) => {
-      if (chunkInfo.facadeModuleId === appSrcFileName) {
-        return appFileName;
-      }
-    });
+    // builder.entryFileNamesCallbacks.push((chunkInfo) => {
+    //   if (chunkInfo.facadeModuleId === appSrcFileName) {
+    //     return appFileName;
+    //   }
+    // });
+    //
+    // builder.resolveIdCallbacks.push((id) => {
+    //   if (id === task.input) {
+    //     return appSrcFileName;
+    //   }
+    // });
+
+    this.ignoreMainImport(task);
 
     builder.resolveIdCallbacks.push((id) => {
-      if (id === task.input) {
-        return appSrcFileName;
+      if (id === '@main') {
+        return { id, external: true };
       }
     });
 
     builder.loadCallbacks.push((src, options) => {
       const file = stripUrlQuery(src);
 
-      if (src === appSrcFileName) {
-      // if (normalize(file) === resolve(task.input)) {
+      // if (src === appSrcFileName) {
+      if (normalize(file) === resolve(task.input)) {
         const files = findFilesFromGlobArray(this.scriptPatterns);
         let listJS = "{\n";
 
@@ -125,12 +135,32 @@ app.registerRoutes(${listJS});
 export default app;
   `;
 
-        return ts;
-        // return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
+        // return ts;
+        return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
       }
     });
 
     return undefined;
+  }
+
+  /**
+   * @see https://github.com/vitejs/vite/issues/6393#issuecomment-1006819717
+   * @see https://stackoverflow.com/questions/76259677/vite-dev-server-throws-error-when-resolving-external-path-from-importmap
+   */
+  private ignoreMainImport(task: BuildTask) {
+    const VALID_ID_PREFIX = `/@id/`;
+    const importKeys = ['@main'];
+    const reg = new RegExp(
+      `${VALID_ID_PREFIX}(${importKeys.join("|")})`,
+      "g"
+    );
+
+    addPlugin({
+      name: 'keep-main-external-' + task.id,
+      transform(code) {
+        return reg.test(code) ? code.replace(reg, (m, s1) => s1) : code;
+      }
+    });
   }
 
   preview(): MaybePromise<ProcessorPreview[]> {
