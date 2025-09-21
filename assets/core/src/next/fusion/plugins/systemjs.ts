@@ -7,7 +7,7 @@ export function injectSystemJS(systemPath?: string, filter?: (file: OutputAsset 
   systemPath ??= resolve('node_modules/systemjs/dist/system.min.js');
 
   return {
-    name: 'inject-systemjs',
+    name: 'core:inject-systemjs',
     async generateBundle(options, bundle) {
       if (options.format !== 'system') {
         return;
@@ -33,7 +33,7 @@ export function injectSystemJS(systemPath?: string, filter?: (file: OutputAsset 
 
 export function systemCSSFix(): PluginOption {
   return {
-    name: 'systemjs.css.fix',
+    name: 'core:systemjs-css-fix',
     async generateBundle(options, bundle) {
       if (options.format !== 'system') {
         return;

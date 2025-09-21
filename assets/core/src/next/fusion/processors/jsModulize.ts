@@ -32,9 +32,13 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
   config(taskName: string, builder: ConfigBuilder) {
     const tasks = this.processor.config(taskName, builder) as BuildTask[];
-    const task = tasks[0];
+    // const task = tasks[0];
     const tmpPath = this.options.tmpPath ?? resolve('./tmp/fusion/jsmodules/').replace(/\\/g, '/');
     const clean = this.options.cleanTmp ?? true;
+
+    const appFileName = 'js/' + this.stagePrefix + '/app.js';
+    const appSrcFileName = 'resources/assets/src/' + this.stagePrefix + '/app.js';
+    const task = builder.addTask(appFileName);
 
     if (clean) {
       builder.postBuildCallbacks.push(() => {
@@ -45,15 +49,28 @@ export class JsModulizeProcessor implements ProcessorInterface {
     builder.merge({
       resolve: {
         alias: {
-          '@main': task.input
+          //
         }
+      }
+    });
+
+    builder.entryFileNamesCallbacks.push((chunkInfo) => {
+      if (chunkInfo.facadeModuleId === appSrcFileName) {
+        return appFileName;
+      }
+    });
+
+    builder.resolveIdCallbacks.push((id) => {
+      if (id === task.input) {
+        return appSrcFileName;
       }
     });
 
     builder.loadCallbacks.push((src, options) => {
       const file = stripUrlQuery(src);
 
-      if (normalize(file) === resolve(task.input)) {
+      if (src === appSrcFileName) {
+      // if (normalize(file) === resolve(task.input)) {
         const files = findFilesFromGlobArray(this.scriptPatterns);
         let listJS = "{\n";
 
@@ -96,19 +113,20 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         listJS += "}";
 
-        const loaderPath = resolve('./vendor/windwalker/core/assets/core/src/loader/core-loader.ts')
+        const loaderPath = resolve('./vendor/windwalker/core/assets/core/src/next/app.ts')
           .replace(/\\/g, '/');
 
         const ts = `
-import { CoreLoader } from '${loaderPath}';
+import { App } from '${loaderPath}';
 
-const loader = new CoreLoader();
-loader.register(${listJS});
+const app = new App();
+app.registerRoutes(${listJS});
 
-export { loader };
+export default app;
   `;
 
-        return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
+        return ts;
+        // return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
       }
     });
 

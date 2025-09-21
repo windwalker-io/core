@@ -6,9 +6,9 @@ export interface WindwalkerAssetsOptions {
   reposition?: Record<string, string>;
 }
 
-export function windwalkerAssets(options: WindwalkerAssetsOptions): FusionPlugin {
+export function globalAssets(options: WindwalkerAssetsOptions): FusionPlugin {
   return {
-    name: 'ww:assets',
+    name: 'core:global-assets',
     buildConfig(builder) {
       const clone = options.clone || {};
       let reposition = options.reposition || {};

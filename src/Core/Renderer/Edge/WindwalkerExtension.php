@@ -383,10 +383,10 @@ class WindwalkerExtension implements
 
         return preg_replace_callback(
             $regex,
-            function ($matches) {
+            static function ($matches) {
                 $as = $matches[4];
 
-                return "<?php \$asset->importByLoader('inline:$as'); ?>";
+                return "<?php \$asset->importByLoaderStatic('inline:$as'); ?>";
             },
             $content
         );

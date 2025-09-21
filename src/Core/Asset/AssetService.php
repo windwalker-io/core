@@ -198,22 +198,49 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
+    public function importModuleStatic(string $url, array $options = []): static
+    {
+        $code = "import('$url')";
+
+        return $this->internalModule($code, $options);
+    }
+
+    public function importByLoaderStatic(string $module, array $options = []): static
+    {
+        return $this->internalModule("main.import('$module')", $options);
+    }
+
     public function importModule(string $url, ?string $body = null, array $options = []): static
     {
         $code = "import('$url')";
 
         if ($body) {
-            $code .= ".then(function(module) {\n$body\n});";
+            $moduleVar = $options['moduleVar'] ?? 'module';
+
+            $code .= ".then(function($moduleVar) {\n$body\n});";
         }
 
         return $this->internalModule($code, $options);
     }
 
-    public function importByLoader(string $module): static
+    public function importMainThen(string $body, array $options = []): static
     {
         $this->importModule(
-            "@main",
-            "module.loader.import('$module')"
+            $this->getMainModuleName(),
+            $body,
+            $options
+        );
+
+        return $this;
+    }
+
+    public function importByLoader(string $module, array $options = []): static
+    {
+        $moduleVar = $options['moduleVar'] ?? 'module';
+
+        $this->importMainThen(
+            "{$moduleVar}.default.import('$module')",
+            $options
         );
 
         return $this;
@@ -472,9 +499,10 @@ class AssetService implements EventAwareInterface
                 'script',
                 [
                     ...$event->internalAttrs,
-                    'type' => 'module'
+                    'type' => 'module',
                 ],
-                "\n" . $this->renderInternalJS(true) . "\n" . $this->indents
+                "import main from '{$this->getMainModuleName()}';\n"
+                . $this->renderInternalJS(true) . "\n" . $this->indents
             );
         }
 
@@ -503,7 +531,7 @@ class AssetService implements EventAwareInterface
      */
     public function renderInternalJS(bool $module = false): string
     {
-        $scripts = array_filter($this->internalScripts, fn ($item) => $item->isModule() === $module);
+        $scripts = array_filter($this->internalScripts, fn($item) => $item->isModule() === $module);
 
         return implode(";\n", $scripts);
     }
@@ -1331,5 +1359,13 @@ class AssetService implements EventAwareInterface
         }
 
         return UriNormalizer::ensureDir($this->folder);
+    }
+
+    /**
+     * @return  mixed|string
+     */
+    public function getMainModuleName(): mixed
+    {
+        return $this->config->getDeep('modules.main') ?? '@main';
     }
 }

@@ -404,7 +404,7 @@ class E {
           if (i)
             return i;
         }
-        return `${this.getChunkDir()}/[name]-[hash].js`;
+        return `${this.getChunkDir()}[name]-[hash].js`;
       },
       assetFileNames: (t) => {
         for (const s of this.assetFileNamesCallbacks) {

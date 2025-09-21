@@ -1,24 +1,24 @@
-import { getGlobBaseFromPattern as q, callback as T, css as V, js as B, shortHash as D, callbackAfterBuild as W, copyGlob as I, symlink as J } from "@windwalker-io/fusion-next";
-import j from "is-glob";
-import G from "micromatch";
-import $, { relative as P, normalize as w, resolve as p } from "node:path";
-import S from "node:fs";
+import { getGlobBaseFromPattern as M, callback as T, css as q, js as V, shortHash as B, callbackAfterBuild as D, copyGlob as I, symlink as W } from "@windwalker-io/fusion-next";
+import S from "is-glob";
+import J from "micromatch";
+import $, { relative as j, normalize as P, resolve as h } from "node:path";
+import w from "node:fs";
 import v from "fast-glob";
 import { randomBytes as R } from "node:crypto";
-import { createRequire as z } from "node:module";
+import { createRequire as G } from "node:module";
 import a from "fs-extra";
 import { parse as x } from "node-html-parser";
-function k(t) {
-  return S.existsSync(t) ? JSON.parse(S.readFileSync(t, "utf8")) : null;
+function b(t) {
+  return w.existsSync(t) ? JSON.parse(w.readFileSync(t, "utf8")) : null;
 }
-function E(t) {
-  return j(F(t));
+function z(t) {
+  return S(F(t));
 }
 function F(t) {
   return t.replace(/(\/\*|\/\*\*?|\*\*\/\*?)$/, "");
 }
-const H = process.platform === "win32" ? "\\" : "/";
-function he(t, e = H) {
+const E = process.platform === "win32" ? "\\" : "/";
+function he(t, e = E) {
   return t.endsWith(e) ? t : t + e;
 }
 function C(t) {
@@ -26,26 +26,26 @@ function C(t) {
   for (const s of t)
     e = [
       ...e,
-      ...Q(s)
+      ...H(s)
     ];
   return e;
 }
-function Q(t) {
+function H(t) {
   return v.globSync(t).map((e) => (e = e.replace(/\\/g, "/"), {
     fullpath: e,
-    relativePath: P(q(t), e).replace(/\\/g, "/")
+    relativePath: j(M(t), e).replace(/\\/g, "/")
   }));
 }
 function ye(t = "") {
-  const e = $.resolve(process.cwd(), "composer.json"), s = k(e), r = Object.keys(s.require || {}).concat(Object.keys(s["require-dev"] || {})).map((o) => `vendor/${o}/composer.json`).map((o) => k(o)).filter((o) => o?.extra?.windwalker != null).map((o) => o?.extra?.windwalker?.modules?.map((n) => `vendor/${o.name}/${n}/${t}`) || []).flat();
+  const e = $.resolve(process.cwd(), "composer.json"), s = b(e), r = Object.keys(s.require || {}).concat(Object.keys(s["require-dev"] || {})).map((o) => `vendor/${o}/composer.json`).map((o) => b(o)).filter((o) => o?.extra?.windwalker != null).map((o) => o?.extra?.windwalker?.modules?.map((n) => `vendor/${o.name}/${n}/${t}`) || []).flat();
   return [...new Set(r)];
 }
-function U(t = "", e = 16) {
+function Q(t = "", e = 16) {
   let s = R(e).toString("hex");
   return t && (s = t + s), s;
 }
 function ge(t, e) {
-  return z(t).resolve(e);
+  return G(t).resolve(e);
 }
 function A(t) {
   const e = t.indexOf("?");
@@ -53,18 +53,18 @@ function A(t) {
 }
 function $e(t) {
   return T((e, s) => {
-    const r = O(t);
-    return N(s, r), L(s, Object.keys(t)), null;
+    const r = N(t);
+    return _(s, r), O(s, Object.keys(t)), null;
   });
 }
-function O(t) {
+function N(t) {
   const e = {};
   for (const s in t)
-    E(s) || (e[s] = t[s]);
+    z(s) || (e[s] = t[s]);
   return e;
 }
-function L(t, e) {
-  const s = U("hidden:clone-asset-") + ".js";
+function O(t, e) {
+  const s = Q("hidden:clone-asset-") + ".js";
   t.addTask(s), t.resolveIdCallbacks.push((r) => {
     if (r === s)
       return s;
@@ -74,37 +74,37 @@ function L(t, e) {
 `;
   });
 }
-function N(t, e) {
+function _(t, e) {
   t.assetFileNamesCallbacks.push((s) => {
     const r = s.originalFileName;
     for (const o in e)
-      if (K(r, o))
-        return w(e[o] + P(F(o), r)).replace(/\\/g, "/");
+      if (U(r, o))
+        return P(e[o] + j(F(o), r)).replace(/\\/g, "/");
   });
 }
-function K(t, e) {
-  return j(e) ? G.isMatch(t, e) : t.startsWith(e);
+function U(t, e) {
+  return S(e) ? J.isMatch(t, e) : t.startsWith(e);
 }
-function ke(t) {
+function be(t) {
   return {
-    name: "ww:assets",
+    name: "core:global-assets",
     buildConfig(e) {
       const s = t.clone || {};
       let r = t.reposition || {};
-      r = { ...r, ...O(s) }, N(e, r);
+      r = { ...r, ...N(s) }, _(e, r);
       const o = Object.keys(s);
-      o.length > 0 && L(e, o);
+      o.length > 0 && O(e, o);
     }
   };
 }
-function be(t, e) {
-  return t ??= p("node_modules/systemjs/dist/system.min.js"), {
-    name: "inject-systemjs",
+function ke(t, e) {
+  return t ??= h("node_modules/systemjs/dist/system.min.js"), {
+    name: "core:inject-systemjs",
     async generateBundle(s, r) {
       if (s.format !== "system")
         return;
       const o = a.readFileSync(
-        p(t),
+        h(t),
         "utf-8"
       );
       for (const n of Object.values(r))
@@ -113,9 +113,9 @@ function be(t, e) {
     }
   };
 }
-function we() {
+function ve() {
   return {
-    name: "systemjs.css.fix",
+    name: "core:systemjs-css-fix",
     async generateBundle(t, e) {
       if (t.format === "system") {
         for (const [s, r] of Object.entries(e))
@@ -128,10 +128,10 @@ function we() {
     }
   };
 }
-function ve(t, e) {
-  return new X(V(t, e));
+function we(t, e) {
+  return new K(q(t, e));
 }
-class X {
+class K {
   constructor(e, s = [], r = []) {
     this.processor = e, this.bladePatterns = s, this.cssPatterns = r;
   }
@@ -144,14 +144,14 @@ class X {
   config(e, s) {
     const r = this.processor.config(e, s);
     for (const o of r)
-      s.loadCallbacks.push((n, m) => {
-        const d = A(n);
-        if (w(d) === p(o.input)) {
+      s.loadCallbacks.push((n, u) => {
+        const f = A(n);
+        if (P(f) === h(o.input)) {
           const c = v.globSync(
-            this.cssPatterns.map((u) => p(u)).map((u) => u.replace(/\\/g, "/"))
-          ).map((u) => `@import "${u}";`).concat(Y(this.bladePatterns)).join(`
+            this.cssPatterns.map((p) => h(p)).map((p) => p.replace(/\\/g, "/"))
+          ).map((p) => `@import "${p}";`).concat(X(this.bladePatterns)).join(`
 `);
-          let l = a.readFileSync(d, "utf-8");
+          let l = a.readFileSync(f, "utf-8");
           return l += `
 
 ${c}
@@ -163,23 +163,23 @@ ${c}
     return [];
   }
 }
-function Y(t) {
+function X(t) {
   return v.globSync(t).map((s) => {
     const r = a.readFileSync(s, "utf8");
     return x(r).querySelectorAll("style[type],script[type]").filter(
       (n) => ["text/scss", "text/css"].includes(n.getAttribute("type") || "")
     ).map((n) => {
-      const m = n.getAttribute("data-scope");
-      return m ? `${m} {
+      const u = n.getAttribute("data-scope");
+      return u ? `${u} {
           ${n.innerHTML}
         }` : n.innerHTML;
     });
   }).filter((s) => s.length > 0).flat();
 }
 function Se(t, e, s = {}) {
-  return new Z(B(t, e), s);
+  return new Y(V(t, e), s);
 }
-class Z {
+class Y {
   constructor(e, s = {}) {
     this.processor = e, this.options = s;
   }
@@ -187,49 +187,51 @@ class Z {
   bladePatterns = [];
   stagePrefix = "";
   config(e, s) {
-    const o = this.processor.config(e, s)[0], n = this.options.tmpPath ?? p("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
-    (this.options.cleanTmp ?? !0) && s.postBuildCallbacks.push(() => {
-      a.removeSync(n);
+    this.processor.config(e, s);
+    const r = this.options.tmpPath ?? h("./tmp/fusion/jsmodules/").replace(/\\/g, "/"), o = this.options.cleanTmp ?? !0, n = "js/" + this.stagePrefix + "/app.js", u = "resources/assets/src/" + this.stagePrefix + "/app.js", f = s.addTask(n);
+    o && s.postBuildCallbacks.push(() => {
+      a.removeSync(r);
     }), s.merge({
       resolve: {
         alias: {
-          "@main": o.input
+          //
         }
       }
-    }), s.loadCallbacks.push((d, i) => {
-      const c = A(d);
-      if (w(c) === p(o.input)) {
+    }), s.entryFileNamesCallbacks.push((i) => {
+      if (i.facadeModuleId === u)
+        return n;
+    }), s.resolveIdCallbacks.push((i) => {
+      if (i === f.input)
+        return u;
+    }), s.loadCallbacks.push((i, c) => {
+      if (A(i), i === u) {
         const l = C(this.scriptPatterns);
-        let u = `{
+        let p = `{
 `;
-        for (const h of l) {
-          let g = h.fullpath;
+        for (const m of l) {
+          let g = m.fullpath;
           if (g.endsWith(".d.ts"))
             continue;
-          let f = h.relativePath.replace(/assets\//, "").toLowerCase();
-          g = p(g).replace(/\\/g, "/"), f = f.substring(0, f.lastIndexOf(".")) + ".js", this.stagePrefix && (f = this.stagePrefix + "/" + f), u += `'${f}': () => import('${g}'),
+          let d = m.relativePath.replace(/assets\//, "").toLowerCase();
+          g = h(g).replace(/\\/g, "/"), d = d.substring(0, d.lastIndexOf(".")) + ".js", this.stagePrefix && (d = this.stagePrefix + "/" + d), p += `'${d}': () => import('${g}'),
 `;
         }
-        const y = ee(this.bladePatterns);
-        a.ensureDirSync(n);
-        for (const h of y) {
-          let g = h.as;
-          const f = n + "/" + h.path.replace(/\\|\//g, "_") + "-" + D(h.code) + ".ts";
-          a.writeFileSync(f, h.code), u += `'inline:${g}': () => import('${f}'),
+        const y = Z(this.bladePatterns);
+        a.ensureDirSync(r);
+        for (const m of y) {
+          let g = m.as;
+          const d = r + "/" + m.path.replace(/\\|\//g, "_") + "-" + B(m.code) + ".ts";
+          a.writeFileSync(d, m.code), p += `'inline:${g}': () => import('${d}'),
 `;
         }
-        u += "}";
-        const M = `
-import { CoreLoader } from '${p("./vendor/windwalker/core/assets/core/src/loader/core-loader.ts").replace(/\\/g, "/")}';
+        return p += "}", `
+import { App } from '${h("./vendor/windwalker/core/assets/core/src/next/app.ts").replace(/\\/g, "/")}';
 
-const loader = new CoreLoader();
-loader.register(${u});
+const app = new App();
+app.registerRoutes(${p});
 
-export { loader };
+export default app;
   `;
-        return a.readFileSync(c, "utf-8") + `
-
-` + M;
       }
     });
   }
@@ -246,7 +248,7 @@ export { loader };
     return this.stagePrefix = e, this;
   }
 }
-function ee(t) {
+function Z(t) {
   return C(Array.isArray(t) ? t : [t]).map((s) => {
     const r = a.readFileSync(s.fullpath, "utf8");
     return x(r).querySelectorAll("script[lang][data-as]").filter(
@@ -260,46 +262,46 @@ function ee(t) {
   }).flat();
 }
 function je(t = [], e = "www/assets/vendor") {
-  return W(() => te(t, e));
+  return D(() => ee(t, e));
 }
-async function te(t = [], e = "www/assets/vendor") {
+async function ee(t = [], e = "www/assets/vendor") {
   const s = e;
   let r = t;
   const o = process.env.INSTALL_VENDOR === "hard" ? "Copy" : "Link";
   console.log(""), a.existsSync(s) || a.mkdirSync(s);
   const n = a.readdirSync(s, { withFileTypes: !0 }).filter((i) => i.isDirectory()).map((i) => $.join(s, i.name));
   n.unshift(s), n.forEach((i) => {
-    _(i);
+    L(i);
   });
-  const m = ne().map((i) => `vendor/${i}/composer.json`).map((i) => k(i)).filter((i) => i?.extra?.windwalker != null);
-  r = se(m).concat(r), r = [...new Set(r)];
+  const u = se().map((i) => `vendor/${i}/composer.json`).map((i) => b(i)).filter((i) => i?.extra?.windwalker != null);
+  r = te(u).concat(r), r = [...new Set(r)];
   for (const i of r)
-    a.existsSync(`node_modules/${i}/`) && (console.log(`[${o} NPM] node_modules/${i}/ => ${s}/${i}/`), b(`node_modules/${i}/`, `${s}/${i}/`));
-  for (const i of m) {
+    a.existsSync(`node_modules/${i}/`) && (console.log(`[${o} NPM] node_modules/${i}/ => ${s}/${i}/`), k(`node_modules/${i}/`, `${s}/${i}/`));
+  for (const i of u) {
     const c = i.name;
     let l = i?.extra?.windwalker?.assets?.link;
-    l && (l.endsWith("/") || (l += "/"), a.existsSync(`vendor/${c}/${l}`) && (console.log(`[${o} Composer] vendor/${c}/${l} => ${s}/${c}/`), b(`vendor/${c}/${l}`, `${s}/${c}/`)));
+    l && (l.endsWith("/") || (l += "/"), a.existsSync(`vendor/${c}/${l}`) && (console.log(`[${o} Composer] vendor/${c}/${l} => ${s}/${c}/`), k(`vendor/${c}/${l}`, `${s}/${c}/`)));
   }
-  const d = "resources/assets/vendor/";
-  if (a.existsSync(d)) {
-    const i = a.readdirSync(d);
+  const f = "resources/assets/vendor/";
+  if (a.existsSync(f)) {
+    const i = a.readdirSync(f);
     for (const c of i)
       if (c.startsWith("@")) {
-        const l = a.readdirSync(d + c);
-        for (const u of l) {
-          const y = c + "/" + u;
-          console.log(`[${o} Local] resources/assets/vendor/${y}/ => ${s}/${y}/`), b(d + y + "/", `${s}/${y}/`);
+        const l = a.readdirSync(f + c);
+        for (const p of l) {
+          const y = c + "/" + p;
+          console.log(`[${o} Local] resources/assets/vendor/${y}/ => ${s}/${y}/`), k(f + y + "/", `${s}/${y}/`);
         }
       } else
-        console.log(`[${o} Local] resources/assets/vendor/${c}/ => ${s}/${c}/`), b(d + c, `${s}/${c}/`);
+        console.log(`[${o} Local] resources/assets/vendor/${c}/ => ${s}/${c}/`), k(f + c, `${s}/${c}/`);
   }
 }
-async function b(t, e) {
-  process.env.INSTALL_VENDOR === "hard" ? await I(t + "/**/*", e) : await J(t, e);
+async function k(t, e) {
+  process.env.INSTALL_VENDOR === "hard" ? await I(t + "/**/*", e) : await W(t, e);
 }
-function se(t = []) {
-  const e = $.resolve(process.cwd(), "package.json"), s = k(e);
-  let r = Object.keys(s.devDependencies || {}).concat(Object.keys(s.dependencies || {})).map((n) => `node_modules/${n}/package.json`).map((n) => k(n)).filter((n) => n?.windwalker != null).map((n) => n?.windwalker.vendors || []).flat();
+function te(t = []) {
+  const e = $.resolve(process.cwd(), "package.json"), s = b(e);
+  let r = Object.keys(s.devDependencies || {}).concat(Object.keys(s.dependencies || {})).map((n) => `node_modules/${n}/package.json`).map((n) => b(n)).filter((n) => n?.windwalker != null).map((n) => n?.windwalker.vendors || []).flat();
   const o = t.map((n) => [
     ...n?.extra?.windwalker?.asset_vendors || [],
     ...n?.extra?.windwalker?.assets?.exposes || [],
@@ -307,37 +309,37 @@ function se(t = []) {
   ]).flat();
   return [...new Set(r.concat(o))];
 }
-function ne() {
-  const t = $.resolve(process.cwd(), "composer.json"), e = k(t);
+function se() {
+  const t = $.resolve(process.cwd(), "composer.json"), e = b(t);
   return [
     ...new Set(
       Object.keys(e.require || {}).concat(Object.keys(e["require-dev"] || {}))
     )
   ];
 }
-function _(t) {
+function L(t) {
   if (!a.existsSync(t))
     return;
   const e = a.readdirSync(t, { withFileTypes: !0 });
   for (const s of e)
-    s.isSymbolicLink() || s.isFile() ? a.unlinkSync($.join(t, s.name)) : s.isDirectory() && _($.join(t, s.name));
+    s.isSymbolicLink() || s.isFile() ? a.unlinkSync($.join(t, s.name)) : s.isDirectory() && L($.join(t, s.name));
   a.rmdirSync(t);
 }
 export {
   $e as cloneAssets,
-  E as containsMiddleGlob,
-  ve as cssModulize,
+  z as containsMiddleGlob,
+  we as cssModulize,
   he as ensureDirPath,
   C as findFilesFromGlobArray,
   ye as findModules,
-  be as injectSystemJS,
+  be as globalAssets,
+  ke as injectSystemJS,
   je as installVendors,
   Se as jsModulize,
-  k as loadJson,
+  b as loadJson,
   F as removeLastGlob,
   ge as resolveModuleRealpath,
   A as stripUrlQuery,
-  we as systemCSSFix,
-  U as uniqId,
-  ke as windwalkerAssets
+  ve as systemCSSFix,
+  Q as uniqId
 };

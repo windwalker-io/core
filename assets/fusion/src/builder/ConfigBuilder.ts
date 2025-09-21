@@ -119,7 +119,7 @@ export default class ConfigBuilder {
 
         const chunkDir = this.getChunkDir();
 
-        return `${chunkDir}/[name]-[hash].js`;
+        return `${chunkDir}[name]-[hash].js`;
       },
       assetFileNames: (assetInfo) => {
         // if (this.fileNameMap[assetInfo.name]) {

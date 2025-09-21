@@ -1,17 +1,17 @@
-export class CoreLoader {
+export class App {
   routes: Record<string, Function> = {};
 
-  register(routes: Record<string, Function | string>) {
+  registerRoutes(routes: Record<string, Function | string>) {
     for (const route in routes) {
       let target = routes[route];
 
-      this.add(route, target);
+      this.addRoute(route, target);
     }
 
     return this;
   }
 
-  add(route: string, target: Function | string) {
+  addRoute(route: string, target: Function | string) {
     if (typeof target === 'string') {
       target = () => import(/* @vite-ignore */`${target as string}`);
     }
@@ -19,7 +19,7 @@ export class CoreLoader {
     this.routes[route] = target;
   }
 
-  remove(route: string) {
+  removeRoute(route: string) {
     delete this.routes[route];
 
     return this;

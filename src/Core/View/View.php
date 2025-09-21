@@ -426,16 +426,10 @@ class View implements EventAwareInterface, \ArrayAccess
         if ($asset->vite->isActive()) {
             foreach ($jsList as $name => $js) {
                 if (is_numeric($name)) {
-                    $asset->importModule(
-                        "@main",
-                        "module.loader.import('{$vmName}/$js')"
-                    );
+                    $asset->importByLoaderStatic("{$vmName}/$js");
                 } elseif ($name === $this->layout) {
                     foreach ((array) $js as $j) {
-                        $asset->importModule(
-                            "@main",
-                            "module.loader.import('{$vmName}/$j')"
-                        );
+                        $asset->importByLoaderStatic("{$vmName}/$j");
                     }
                 }
             }
