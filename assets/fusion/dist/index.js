@@ -1,16 +1,16 @@
-import nt from "crypto";
-import G from "fast-glob";
+import ot from "crypto";
+import z from "fast-glob";
 import d from "fs-extra";
-import { randomBytes as ot } from "node:crypto";
-import { basename as A, parse as N, normalize as L, resolve as p, relative as g, dirname as T, isAbsolute as D } from "node:path";
-import { inspect as it } from "node:util";
+import { randomBytes as it } from "node:crypto";
+import { basename as A, parse as N, normalize as L, dirname as T, resolve as p, relative as g, isAbsolute as D } from "node:path";
+import { inspect as rt } from "node:util";
 import { mergeConfig as w } from "vite";
 import { get as B, set as _, uniq as R } from "lodash-es";
-import rt from "yargs";
-import { build as at } from "esbuild";
+import at from "yargs";
+import { build as lt } from "esbuild";
 import M from "module";
 import { writeFileSync as V, existsSync as k } from "node:fs";
-import lt from "archy";
+import ut from "archy";
 import b from "chalk";
 import I from "fs";
 function y(e) {
@@ -22,10 +22,10 @@ function j(e, t) {
 function H(e, t) {
   return e = y(e), e.map(t);
 }
-function ut(e, t, s = {}) {
-  return new ct(e, t, s);
+function ct(e, t, s = {}) {
+  return new ft(e, t, s);
 }
-class ct {
+class ft {
   constructor(t, s, n = {}) {
     this.input = t, this.output = s, this.options = n;
   }
@@ -47,10 +47,10 @@ class ct {
     }));
   }
 }
-function ft(e, t) {
-  return new pt(e, t);
+function pt(e, t) {
+  return new dt(e, t);
 }
-class pt {
+class dt {
   constructor(t, s) {
     this.input = t, this.output = s;
   }
@@ -72,10 +72,10 @@ class pt {
     }));
   }
 }
-function dt(e, t) {
-  return new ht(e, t);
+function ht(e, t) {
+  return new mt(e, t);
 }
-class ht {
+class mt {
   constructor(t, s) {
     this.input = t, this.dest = s;
   }
@@ -92,10 +92,10 @@ class ht {
     }));
   }
 }
-function mt(e, t) {
-  return new gt(e, t);
+function gt(e, t) {
+  return new yt(e, t);
 }
-class gt {
+class yt {
   constructor(t, s) {
     this.input = t, this.dest = s;
   }
@@ -112,10 +112,10 @@ class gt {
     }));
   }
 }
-function yt(e, t, s = {}) {
-  return new wt(e, t, s);
+function wt(e, t, s = {}) {
+  return new vt(e, t, s);
 }
-class wt {
+class vt {
   constructor(t, s, n = {}) {
     this.input = t, this.dest = s, this.options = n;
   }
@@ -132,10 +132,10 @@ class wt {
     }));
   }
 }
-function vt(e) {
+function kt(e) {
   return new U(e);
 }
-function kt(e) {
+function bt(e) {
   return new U(e, !0);
 }
 class U {
@@ -150,29 +150,29 @@ class U {
   }
 }
 let F;
-function bt(e) {
+function Ct(e) {
   return F = e, q = F?.verbose ? F?.verbose > 0 : !1, e;
 }
 let q = !1;
-const J = process.env.NODE_ENV === "production", Ct = !J;
+const J = process.env.NODE_ENV === "production", Ft = !J;
 function O() {
   return process.platform === "win32";
 }
 function K(e, t = 8) {
-  let s = nt.createHash("sha1").update(e).digest("hex");
+  let s = ot.createHash("sha1").update(e).digest("hex");
   return t && t > 0 && (s = s.substring(0, t)), s;
 }
 function C(e, t, s) {
   const n = [];
   e = x(e, s.outDir), t = x(t, s.outDir);
-  const o = Nt(e), i = X(e) ? G.globSync(e.replace(/\\/g, "/"), s.globOptions) : [e];
+  const o = X(e), i = Y(e) ? z.globSync(e.replace(/\\/g, "/"), s.globOptions) : [e];
   for (let r of i) {
     let c, a = t;
-    St(t) ? (c = a, a = a + g(o, r)) : c = T(a), d.ensureDirSync(c), n.push(s.handler(r, a));
+    Nt(t) ? (c = a, a = a + g(o, r)) : c = T(a), d.ensureDirSync(c), n.push(s.handler(r, a));
   }
   return n;
 }
-function Ft(e, t, s) {
+function Tt(e, t, s) {
   const n = [];
   for (const { src: o, dest: i, options: r } of e) {
     const c = C(
@@ -188,7 +188,7 @@ function Ft(e, t, s) {
   }
   return Promise.all(n);
 }
-function Tt(e, t, s) {
+function Pt(e, t, s) {
   const n = [];
   for (const { src: o, dest: i, options: r } of e) {
     const c = C(
@@ -204,7 +204,7 @@ function Tt(e, t, s) {
   }
   return Promise.all(n);
 }
-function Pt(e, t, s) {
+function At(e, t, s) {
   const n = [];
   for (const { src: o, dest: i, options: r } of e) {
     const c = C(
@@ -220,12 +220,12 @@ function Pt(e, t, s) {
   }
   return Promise.all(n);
 }
-function At(e, t) {
+function Ot(e, t) {
   const s = [];
   t = t.replace(/\\/g, "/");
   for (let n of e) {
     n = x(n, t), n = p(n);
-    const o = X(n) ? G.globSync(n.replace(/\\/g, "/"), { onlyFiles: !1 }) : [n], i = p(t + "/upload").replace(/\\/g, "/");
+    const o = Y(n) ? z.globSync(n.replace(/\\/g, "/"), { onlyFiles: !1 }) : [n], i = p(t + "/upload").replace(/\\/g, "/");
     for (let r of o) {
       if (r.replace(/\\/g, "/").startsWith(i))
         throw new Error("Refuse to delete `upload/*` folder.");
@@ -234,7 +234,7 @@ function At(e, t) {
   }
   return Promise.all(s);
 }
-async function Ot(e, t) {
+async function xt(e, t) {
   const s = C(
     e,
     t,
@@ -246,7 +246,7 @@ async function Ot(e, t) {
   );
   await Promise.all(s);
 }
-async function xt(e, t) {
+async function St(e, t) {
   const s = C(
     e,
     t,
@@ -261,40 +261,41 @@ async function xt(e, t) {
 async function Q(e, t, s = !1) {
   return O() && !d.lstatSync(e).isFile() ? d.ensureSymlink(e, t, "junction") : O() && d.lstatSync(e).isFile() && s ? d.ensureLink(e, t) : d.ensureSymlink(e, t);
 }
-function St(e) {
+function Nt(e) {
   return e.endsWith("/") || e.endsWith("\\");
 }
-function Nt(e) {
+function X(e) {
   const t = ["*", "?", "[", "]"], s = [...e].findIndex((n) => t.includes(n));
   return s === -1 ? T(e) : T(e.slice(0, s + 1));
 }
-function X(e) {
+function Y(e) {
   return ["*", "?", "[", "]"].some((s) => e.includes(s));
 }
 function x(e, t) {
   return e.startsWith(".") ? e = p(e) : D(e) || (e = t + "/" + e), e;
 }
-function Y(e, t) {
-  return e = L(e), t ||= ot(4).toString("hex"), t + "-" + K(e);
+function Z(e, t) {
+  return e = L(e), t ||= it(4).toString("hex"), t + "-" + K(e);
 }
 const Dt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  callback: vt,
-  callbackAfterBuild: kt,
-  copy: mt,
-  copyGlob: Ot,
-  css: ut,
-  fileToId: Y,
-  isDev: Ct,
+  callback: kt,
+  callbackAfterBuild: bt,
+  copy: gt,
+  copyGlob: xt,
+  css: ct,
+  fileToId: Z,
+  getGlobBaseFromPattern: X,
+  isDev: Ft,
   isProd: J,
   get isVerbose() {
     return q;
   },
   isWindows: O,
-  js: ft,
-  link: yt,
-  move: dt,
-  moveGlob: xt,
+  js: pt,
+  link: wt,
+  move: ht,
+  moveGlob: St,
   get params() {
     return F;
   },
@@ -318,7 +319,7 @@ class W {
     return (t.endsWith("/") || t.endsWith("\\")) && (t += N(this.input).name + s), t;
   }
   static toFileId(t, s) {
-    return Y(t, s);
+    return Z(t, s);
   }
 }
 function jt(e, ...t) {
@@ -329,7 +330,7 @@ function jt(e, ...t) {
   return e;
 }
 function Wt(e, t = 10) {
-  console.log(it(e, { depth: t, colors: !0 }));
+  console.log(rt(e, { depth: t, colors: !0 }));
 }
 class E {
   constructor(t, s, n) {
@@ -488,7 +489,7 @@ function $t(e) {
   return e ??= process.argv, e.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((t) => t !== "");
 }
 function Bt(e) {
-  const t = rt();
+  const t = at();
   return t.option("cwd", {
     type: "string",
     description: "Current working directory"
@@ -517,7 +518,7 @@ async function _t(e) {
     s.startsWith("file://") || (t = `file:///${s}`);
   }
   if (e.ts) {
-    const n = (await at({
+    const n = (await lt({
       entryPoints: [e.path],
       bundle: !0,
       write: !1,
@@ -541,9 +542,9 @@ function P(e) {
   return e = { ...e }, e.__esModule && delete e.__esModule, e;
 }
 async function $(e, t = !1) {
-  return e = await e, !t && Array.isArray(e) ? (await Promise.all(e.map((n) => $(n, !0)))).flat() : z(typeof e == "function" ? await e() : await e, e?.name);
+  return e = await e, !t && Array.isArray(e) ? (await Promise.all(e.map((n) => $(n, !0)))).flat() : G(typeof e == "function" ? await e() : await e, e?.name);
 }
-async function z(e, t) {
+async function G(e, t) {
   if (!Array.isArray(e))
     return [await e];
   const s = await Promise.all(e), n = [];
@@ -563,8 +564,8 @@ function It(e, t) {
     path: s,
     // get filename from file path
     filename: s.split("/").pop() || "",
-    type: zt(s),
-    ts: Gt(s)
+    type: Gt(s),
+    ts: zt(s)
   } : null) : Et(e);
 }
 function Et(e) {
@@ -595,11 +596,11 @@ function Et(e) {
     ts: !0
   } : null)));
 }
-function zt(e) {
+function Gt(e) {
   let t = "unknown";
   return e.endsWith(".cjs") ? t = "commonjs" : (e.endsWith(".mjs") || e.endsWith(".ts") || e.endsWith(".mts")) && (t = "module"), t;
 }
-function Gt(e) {
+function zt(e) {
   return e.endsWith(".ts") || e.endsWith(".mts");
 }
 async function Lt(e) {
@@ -608,22 +609,22 @@ async function Lt(e) {
   const s = [];
   for (const o of t) {
     const i = e[o];
-    s.push(await Z(o, i));
+    s.push(await tt(o, i));
   }
-  const n = lt({
+  const n = ut({
     label: b.magenta("Available Tasks"),
     nodes: s
   });
   console.log(n);
 }
-async function Z(e, t) {
+async function tt(e, t) {
   const s = [];
   t = y(await t);
   for (let n of t) {
     const o = await $(n, !0);
     for (const i of o)
       typeof i == "function" ? s.push(
-        await Z(i.name, i)
+        await tt(i.name, i)
       ) : s.push(...await Rt(i));
   }
   return {
@@ -681,9 +682,9 @@ async function S(e, t, s) {
   return n;
 }
 let f = Bt($t(process.argv));
-bt(f);
+Ct(f);
 let l;
-const qt = f._, tt = [];
+const qt = f._, et = [];
 function Jt(e = {}, t) {
   let s, n, o = !1;
   const i = Kt(e);
@@ -691,7 +692,7 @@ function Jt(e = {}, t) {
     {
       name: "fusion",
       configResolved(r) {
-        n = r, s = r.logger, r.plugins.push(...tt);
+        n = r, s = r.logger, r.plugins.push(...et);
         for (const c of r.plugins)
           "buildConfig" in c && c.buildConfig?.(l);
       },
@@ -710,9 +711,9 @@ function Jt(e = {}, t) {
         }
         const h = Ht([...f._], u), v = await Ut(h);
         for (const m in v) {
-          const et = v[m];
-          for (const st of et)
-            await st.config(m, l);
+          const st = v[m];
+          for (const nt of st)
+            await nt.config(m, l);
         }
         return l.merge(E.globalOverrideConfig), l.merge(l.overrideConfig), l.config;
       },
@@ -726,7 +727,7 @@ function Jt(e = {}, t) {
         }
       },
       async buildStart(r) {
-        l.cleans.length > 0 && await At(l.cleans, n.build.outDir || process.cwd());
+        l.cleans.length > 0 && await Ot(l.cleans, n.build.outDir || process.cwd());
       },
       // Server
       configureServer(r) {
@@ -775,7 +776,7 @@ function Jt(e = {}, t) {
       },
       async writeBundle(r, c) {
         const a = n.build.outDir || process.cwd();
-        await Ft(l.moveTasks, a, s), await Tt(l.copyTasks, a, s), await Pt(l.linkTasks, a, s);
+        await Tt(l.moveTasks, a, s), await Pt(l.copyTasks, a, s), await At(l.linkTasks, a, s);
         for (const u of l.postBuildCallbacks)
           await u();
         for (const [u, h] of l.tasks)
@@ -835,7 +836,7 @@ function ee(e, t) {
   });
 }
 function se(...e) {
-  tt.push(...e);
+  et.push(...e);
 }
 function ne(...e) {
   l.addCleans(...e), l.cleans = R(l.cleans);
@@ -856,26 +857,27 @@ const ve = {
 export {
   te as alias,
   l as builder,
-  vt as callback,
-  kt as callbackAfterBuild,
+  kt as callback,
+  bt as callbackAfterBuild,
   Zt as chunkDir,
   ne as clean,
   Qt as configureBuilder,
-  mt as copy,
-  Ot as copyGlob,
-  ut as css,
+  gt as copy,
+  xt as copyGlob,
+  ct as css,
   ve as default,
   ee as external,
-  Y as fileToId,
-  Ct as isDev,
+  Z as fileToId,
+  X as getGlobBaseFromPattern,
+  Ft as isDev,
   J as isProd,
   q as isVerbose,
   O as isWindows,
-  ft as js,
-  yt as link,
+  pt as js,
+  wt as link,
   Xt as mergeViteConfig,
-  dt as move,
-  xt as moveGlob,
+  ht as move,
+  St as moveGlob,
   Yt as outDir,
   F as params,
   se as plugin,

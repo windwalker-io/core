@@ -3,7 +3,7 @@ export { isVerbose, isDev, isProd, params } from '@/params';
 
 export { isWindows } from '@/utilities/env';
 export { shortHash } from '@/utilities/crypto';
-export { copyGlob, moveGlob, symlink, fileToId } from '@/utilities/fs';
+export { copyGlob, moveGlob, symlink, fileToId, getGlobBaseFromPattern } from '@/utilities/fs';
 
 export type {
   FusionPlugin,

@@ -82,33 +82,33 @@ export default loader;
   return r;
 }
 
-function findFilesFromGlobArray(sources) {
-  let files = [];
+  function findFilesFromGlobArray(sources) {
+    let files = [];
 
-  for (const source of sources) {
-    files = [
-      ...files,
-      ...findFiles(source)
-    ];
+    for (const source of sources) {
+      files = [
+        ...files,
+        ...findFiles(source)
+      ];
+    }
+
+    return files;
   }
 
-  return files;
-}
+  /**
+   * @param {string} src
+   */
+  function findFiles(src) {
+    const i = src.lastIndexOf('**');
 
-/**
- * @param {string} src
- */
-function findFiles(src) {
-  const i = src.lastIndexOf('**');
+    const path = src.substring(0, i);
 
-  const path = src.substring(0, i);
+    return globSync(src).map((file) => {
+      file = file.replace(/\\/g, '/');
 
-  return globSync(src).map((file) => {
-    file = file.replace(/\\/g, '/');
-
-    return {
-      fullpath: file,
-      relativePath: file.substring(path.length)
-    };
-  });
-}
+      return {
+        fullpath: file,
+        relativePath: file.substring(path.length)
+      };
+    });
+  }

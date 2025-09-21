@@ -499,6 +499,7 @@ declare const _default: {
     moveGlob: typeof fusion.moveGlob;
     symlink: typeof fusion.symlink;
     fileToId: typeof fusion.fileToId;
+    getGlobBaseFromPattern: typeof fusion.getGlobBaseFromPattern;
     css: typeof fusion.css;
     js: typeof fusion.js;
     move: typeof fusion.move;
@@ -564,6 +565,7 @@ declare namespace fusion {
         moveGlob_2 as moveGlob,
         symlink_2 as symlink,
         fileToId_2 as fileToId,
+        getGlobBaseFromPattern_2 as getGlobBaseFromPattern,
         FusionPlugin_2 as FusionPlugin,
         MaybePromise_2 as MaybePromise,
         MaybeArray_2 as MaybeArray,
@@ -608,6 +610,19 @@ declare interface FusionVitePluginOptions_2 {
 }
 
 declare type FusionVitePluginUnresolved = FusionVitePluginOptions | string | (() => MaybePromise<Record<string, any>>);
+
+export declare function getGlobBaseFromPattern(pattern: string): string;
+
+declare function getGlobBaseFromPattern_2(pattern: string) {
+    const specialChars = ["*", "?", "[", "]"];
+    const idx = [...pattern].findIndex(c => specialChars.includes(c));
+
+    if (idx === -1) {
+        return dirname(pattern);
+    }
+
+    return dirname(pattern.slice(0, idx + 1));
+}
 
 export declare const isDev: boolean;
 

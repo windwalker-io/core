@@ -41,5 +41,3 @@ export class CoreLoader {
     return this;
   }
 }
-
-export default new CoreLoader();

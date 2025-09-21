@@ -1,3 +1,4 @@
+import { stripUrlQuery } from '@/next';
 import { type ConfigBuilder, css, type ProcessorInterface, type ProcessorPreview } from '@windwalker-io/fusion-next';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
@@ -19,13 +20,13 @@ class CssModulizeProcessor implements ProcessorInterface {
   }
 
   parseBlades(...bladePatterns: (string[] | string)[]) {
-    this.bladePatterns = bladePatterns.flat();
+    this.bladePatterns = this.bladePatterns.concat(bladePatterns.flat());
 
     return this;
   }
 
   mergeCss(...css: (string[] | string)[]) {
-    this.cssPatterns = css.flat();
+    this.cssPatterns = this.cssPatterns.concat(css.flat());
 
     return this;
   }
@@ -91,14 +92,4 @@ function parseStylesFromBlades(patterns: string | string[]) {
   })
     .filter((c) => c.length > 0)
     .flat();
-}
-
-function stripUrlQuery(src: string) {
-  const qPos = src.indexOf('?');
-
-  if (qPos !== -1) {
-    return src.substring(0, qPos);
-  }
-
-  return src;
 }

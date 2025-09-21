@@ -20,7 +20,7 @@ function handleFilesOperation(
   src = normalizeFilePath(src, options.outDir);
   dest = normalizeFilePath(dest, options.outDir);
 
-  const base = getBaseFromPattern(src);
+  const base = getGlobBaseFromPattern(src);
   const sources = isGlob(src)
     ? fg.globSync(src.replace(/\\/g, '/'), options.globOptions)
     : [src];
@@ -183,7 +183,7 @@ export function endsWithSlash(path: string): boolean {
   return path.endsWith('/') || path.endsWith('\\');
 }
 
-function getBaseFromPattern(pattern: string) {
+export function getGlobBaseFromPattern(pattern: string) {
   const specialChars = ["*", "?", "[", "]"];
   const idx = [...pattern].findIndex(c => specialChars.includes(c));
 

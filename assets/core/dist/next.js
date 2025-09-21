@@ -1,12 +1,12 @@
-import { callback, css, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
+import { getGlobBaseFromPattern, callback, css, js, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
 import isGlob from "is-glob";
 import micromatch from "micromatch";
-import path, { normalize, relative, resolve } from "node:path";
+import path, { relative, normalize, resolve } from "node:path";
 import fs from "node:fs";
+import fg from "fast-glob";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import fs$1 from "fs-extra";
-import fg from "fast-glob";
 import { parse } from "node-html-parser";
 function loadJson(file) {
   if (!fs.existsSync(file)) {
@@ -26,6 +26,25 @@ function ensureDirPath(path2, slash = ds) {
     return path2 + slash;
   }
   return path2;
+}
+function findFilesFromGlobArray(sources) {
+  let files = [];
+  for (const source of sources) {
+    files = [
+      ...files,
+      ...findFiles(source)
+    ];
+  }
+  return files;
+}
+function findFiles(src) {
+  return fg.globSync(src).map((file) => {
+    file = file.replace(/\\/g, "/");
+    return {
+      fullpath: file,
+      relativePath: relative(getGlobBaseFromPattern(src), file).replace(/\\/g, "/")
+    };
+  });
 }
 function findModules(suffix = "") {
   const pkg = path.resolve(process.cwd(), "composer.json");
@@ -47,6 +66,13 @@ function uniqId(prefix = "", size = 16) {
 function resolveModuleRealpath(url, module) {
   const require2 = createRequire(url);
   return require2.resolve(module);
+}
+function stripUrlQuery(src) {
+  const qPos = src.indexOf("?");
+  if (qPos !== -1) {
+    return src.substring(0, qPos);
+  }
+  return src;
 }
 function cloneAssets(patterns) {
   return callback((taskName, builder) => {
@@ -164,11 +190,11 @@ class CssModulizeProcessor {
     this.cssPatterns = cssPatterns;
   }
   parseBlades(...bladePatterns) {
-    this.bladePatterns = bladePatterns.flat();
+    this.bladePatterns = this.bladePatterns.concat(bladePatterns.flat());
     return this;
   }
   mergeCss(...css2) {
-    this.cssPatterns = css2.flat();
+    this.cssPatterns = this.cssPatterns.concat(css2.flat());
     return this;
   }
   config(taskName, builder) {
@@ -215,12 +241,64 @@ function parseStylesFromBlades(patterns) {
     });
   }).filter((c) => c.length > 0).flat();
 }
-function stripUrlQuery(src) {
-  const qPos = src.indexOf("?");
-  if (qPos !== -1) {
-    return src.substring(0, qPos);
+function jsModulize(entry, dest) {
+  return new JsModulizeProcessor(js(entry, dest));
+}
+class JsModulizeProcessor {
+  constructor(processor) {
+    this.processor = processor;
   }
-  return src;
+  jsPatterns = [];
+  config(taskName, builder) {
+    const tasks = this.processor.config(taskName, builder);
+    const task = tasks[0];
+    builder.merge({
+      resolve: {
+        alias: {
+          "@main": task.input
+        }
+      }
+    });
+    builder.loadCallbacks.push((src, options) => {
+      const file = stripUrlQuery(src);
+      if (normalize(file) === resolve(task.input)) {
+        const files = findFilesFromGlobArray(this.jsPatterns);
+        let listJS = "{\n";
+        for (const file2 of files) {
+          let fullpath = file2.fullpath;
+          if (fullpath.endsWith(".d.ts")) {
+            continue;
+          }
+          let key = file2.relativePath.replace(/assets$/, "").toLowerCase();
+          fullpath = resolve(fullpath).replace(/\\/g, "/");
+          key = key.substring(0, key.lastIndexOf("."));
+          listJS += `'${key}': () => import('${fullpath}'),
+`;
+        }
+        listJS += "}";
+        const loaderPath = resolve("./vendor/windwalker/core/assets/core/src/loader/core-loader.ts").replace(/\\/g, "/");
+        const ts = `
+import { CoreLoader } from '${loaderPath}';
+
+const loader = new CoreLoader();
+loader.register(${listJS});
+
+export { loader };
+  `;
+        return fs$1.readFileSync(file, "utf-8") + `
+
+` + ts;
+      }
+    });
+    return void 0;
+  }
+  preview() {
+    return [];
+  }
+  modules(...patterns) {
+    this.jsPatterns = this.jsPatterns.concat(patterns.flat());
+    return this;
+  }
 }
 var define_process_env_default = {};
 function installVendors(npmVendors = [], to = "www/assets/vendor") {
@@ -328,12 +406,15 @@ export {
   containsMiddleGlob,
   cssModulize,
   ensureDirPath,
+  findFilesFromGlobArray,
   findModules,
   injectSystemJS,
   installVendors,
+  jsModulize,
   loadJson,
   removeLastGlob,
   resolveModuleRealpath,
+  stripUrlQuery,
   systemCSSFix,
   uniqId,
   windwalkerAssets
