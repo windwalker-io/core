@@ -1,42 +1,42 @@
-import Y from "crypto";
-import L from "fast-glob";
+import nt from "crypto";
+import G from "fast-glob";
 import d from "fs-extra";
-import { randomBytes as Z } from "node:crypto";
-import { basename as A, parse as S, normalize as z, resolve as f, relative as g, dirname as F, isAbsolute as N } from "node:path";
-import { inspect as tt } from "node:util";
+import { randomBytes as ot } from "node:crypto";
+import { basename as A, parse as N, normalize as L, resolve as p, relative as g, dirname as T, isAbsolute as D } from "node:path";
+import { inspect as it } from "node:util";
 import { mergeConfig as w } from "vite";
-import { get as $, set as B, uniq as R } from "lodash-es";
-import et from "yargs";
-import { build as st } from "esbuild";
+import { get as B, set as _, uniq as R } from "lodash-es";
+import rt from "yargs";
+import { build as at } from "esbuild";
 import M from "module";
-import { writeFileSync as H, existsSync as k } from "node:fs";
-import nt from "archy";
+import { writeFileSync as V, existsSync as k } from "node:fs";
+import lt from "archy";
 import b from "chalk";
 import I from "fs";
 function y(e) {
   return Array.isArray(e) ? e : [e];
 }
-function D(e, t) {
+function j(e, t) {
   return Array.isArray(e) ? e.map(t) : t(e);
 }
-function V(e, t) {
+function H(e, t) {
   return e = y(e), e.map(t);
 }
-function Zt(e, t, s = {}) {
-  return new it(e, t, s);
+function ut(e, t, s = {}) {
+  return new ct(e, t, s);
 }
-class it {
+class ct {
   constructor(t, s, n = {}) {
     this.input = t, this.output = s, this.options = n;
   }
   config(t, s) {
-    return V(this.input, (n) => {
-      const i = s.addTask(n, t);
-      return s.assetFileNamesCallbacks.push((o) => {
-        const r = o.names[0];
-        if (r && A(r, ".css") === i.id)
-          return this.output ? i.normalizeOutput(this.output, ".css") : S(n).name + ".css";
-      }), i;
+    return H(this.input, (n) => {
+      const o = s.addTask(n, t);
+      return s.assetFileNamesCallbacks.push((i) => {
+        const r = i.names[0];
+        if (r && A(r, ".css") === o.id)
+          return this.output ? o.normalizeOutput(this.output, ".css") : N(n).name + ".css";
+      }), o;
     });
   }
   preview() {
@@ -47,21 +47,21 @@ class it {
     }));
   }
 }
-function te(e, t) {
-  return new ot(e, t);
+function ft(e, t) {
+  return new pt(e, t);
 }
-class ot {
+class pt {
   constructor(t, s) {
     this.input = t, this.output = s;
   }
   config(t, s) {
-    return V(this.input, (n) => {
-      const i = s.addTask(n, t);
-      return s.entryFileNamesCallbacks.push((o) => {
-        const r = o.name;
-        if (r && r === i.id)
-          return this.output ? i.normalizeOutput(this.output) : S(n).name + ".js";
-      }), i;
+    return H(this.input, (n) => {
+      const o = s.addTask(n, t);
+      return s.entryFileNamesCallbacks.push((i) => {
+        const r = i.name;
+        if (r && r === o.id)
+          return this.output ? o.normalizeOutput(this.output) : N(n).name + ".js";
+      }), o;
     });
   }
   preview() {
@@ -72,15 +72,15 @@ class ot {
     }));
   }
 }
-function ee(e, t) {
-  return new rt(e, t);
+function dt(e, t) {
+  return new ht(e, t);
 }
-class rt {
+class ht {
   constructor(t, s) {
     this.input = t, this.dest = s;
   }
   config(t, s) {
-    D(this.input, (n) => {
+    j(this.input, (n) => {
       s.moveTasks.push({ src: n, dest: this.dest, options: {} });
     });
   }
@@ -92,15 +92,15 @@ class rt {
     }));
   }
 }
-function se(e, t) {
-  return new at(e, t);
+function mt(e, t) {
+  return new gt(e, t);
 }
-class at {
+class gt {
   constructor(t, s) {
     this.input = t, this.dest = s;
   }
   config(t, s) {
-    D(this.input, (n) => {
+    j(this.input, (n) => {
       s.copyTasks.push({ src: n, dest: this.dest, options: {} });
     });
   }
@@ -112,15 +112,15 @@ class at {
     }));
   }
 }
-function ne(e, t, s = {}) {
-  return new lt(e, t, s);
+function yt(e, t, s = {}) {
+  return new wt(e, t, s);
 }
-class lt {
+class wt {
   constructor(t, s, n = {}) {
     this.input = t, this.dest = s, this.options = n;
   }
   config(t, s) {
-    D(this.input, (n) => {
+    j(this.input, (n) => {
       s.linkTasks.push({ src: n, dest: this.dest, options: this.options });
     });
   }
@@ -132,10 +132,10 @@ class lt {
     }));
   }
 }
-function ie(e) {
+function vt(e) {
   return new U(e);
 }
-function oe(e) {
+function kt(e) {
   return new U(e, !0);
 }
 class U {
@@ -149,35 +149,35 @@ class U {
     return [];
   }
 }
-let P;
-function ut(e) {
-  return P = e, ct = P?.verbose ? P?.verbose > 0 : !1, e;
+let F;
+function bt(e) {
+  return F = e, q = F?.verbose ? F?.verbose > 0 : !1, e;
 }
-let ct = !1;
-const ft = process.env.NODE_ENV === "production", re = !ft;
-function _() {
+let q = !1;
+const J = process.env.NODE_ENV === "production", Ct = !J;
+function O() {
   return process.platform === "win32";
 }
-function pt(e, t = 8) {
-  let s = Y.createHash("sha1").update(e).digest("hex");
+function K(e, t = 8) {
+  let s = nt.createHash("sha1").update(e).digest("hex");
   return t && t > 0 && (s = s.substring(0, t)), s;
 }
 function C(e, t, s) {
   const n = [];
-  e = O(e, s.outDir), t = O(t, s.outDir);
-  const i = vt(e), o = q(e) ? L.globSync(e.replace(/\\/g, "/"), s.globOptions) : [e];
-  for (let r of o) {
+  e = x(e, s.outDir), t = x(t, s.outDir);
+  const o = Nt(e), i = X(e) ? G.globSync(e.replace(/\\/g, "/"), s.globOptions) : [e];
+  for (let r of i) {
     let c, a = t;
-    wt(t) ? (c = a, a = a + g(i, r)) : c = F(a), d.ensureDirSync(c), n.push(s.handler(r, a));
+    St(t) ? (c = a, a = a + g(o, r)) : c = T(a), d.ensureDirSync(c), n.push(s.handler(r, a));
   }
   return n;
 }
-function dt(e, t, s) {
+function Ft(e, t, s) {
   const n = [];
-  for (const { src: i, dest: o, options: r } of e) {
+  for (const { src: o, dest: i, options: r } of e) {
     const c = C(
-      i,
       o,
+      i,
       {
         outDir: t,
         handler: async (a, u) => (s.info(`Moving file from ${g(t, a)} to ${g(t, u)}`), d.move(a, u, { overwrite: !0 })),
@@ -188,12 +188,12 @@ function dt(e, t, s) {
   }
   return Promise.all(n);
 }
-function ht(e, t, s) {
+function Tt(e, t, s) {
   const n = [];
-  for (const { src: i, dest: o, options: r } of e) {
+  for (const { src: o, dest: i, options: r } of e) {
     const c = C(
-      i,
       o,
+      i,
       {
         outDir: t,
         handler: async (a, u) => (s.info(`Copy file from ${g(t, a)} to ${g(t, u)}`), d.copy(a, u, { overwrite: !0 })),
@@ -204,15 +204,15 @@ function ht(e, t, s) {
   }
   return Promise.all(n);
 }
-function mt(e, t, s) {
+function Pt(e, t, s) {
   const n = [];
-  for (const { src: i, dest: o, options: r } of e) {
+  for (const { src: o, dest: i, options: r } of e) {
     const c = C(
-      i,
       o,
+      i,
       {
         outDir: t,
-        handler: async (a, u) => (s.info(`Link file from ${g(t, a)} to ${g(t, u)}`), yt(a, u, r?.force ?? !1)),
+        handler: async (a, u) => (s.info(`Link file from ${g(t, a)} to ${g(t, u)}`), Q(a, u, r?.force ?? !1)),
         globOptions: { onlyFiles: !1 }
       }
     );
@@ -220,66 +220,90 @@ function mt(e, t, s) {
   }
   return Promise.all(n);
 }
-function gt(e, t) {
+function At(e, t) {
   const s = [];
   t = t.replace(/\\/g, "/");
   for (let n of e) {
-    n = O(n, t), n = f(n);
-    const i = q(n) ? L.globSync(n.replace(/\\/g, "/"), { onlyFiles: !1 }) : [n], o = f(t + "/upload").replace(/\\/g, "/");
-    for (let r of i) {
-      if (r.replace(/\\/g, "/").startsWith(o))
+    n = x(n, t), n = p(n);
+    const o = X(n) ? G.globSync(n.replace(/\\/g, "/"), { onlyFiles: !1 }) : [n], i = p(t + "/upload").replace(/\\/g, "/");
+    for (let r of o) {
+      if (r.replace(/\\/g, "/").startsWith(i))
         throw new Error("Refuse to delete `upload/*` folder.");
       s.push(d.remove(r));
     }
   }
   return Promise.all(s);
 }
-async function ae(e, t) {
+async function Ot(e, t) {
   const s = C(
     e,
     t,
     {
       outDir: process.cwd(),
-      handler: async (n, i) => d.copy(n, i, { overwrite: !0 }),
+      handler: async (n, o) => d.copy(n, o, { overwrite: !0 }),
       globOptions: { onlyFiles: !0 }
     }
   );
   await Promise.all(s);
 }
-async function le(e, t) {
+async function xt(e, t) {
   const s = C(
     e,
     t,
     {
       outDir: process.cwd(),
-      handler: async (n, i) => d.move(n, i, { overwrite: !0 }),
+      handler: async (n, o) => d.move(n, o, { overwrite: !0 }),
       globOptions: { onlyFiles: !0 }
     }
   );
   await Promise.all(s);
 }
-async function yt(e, t, s = !1) {
-  return _() && !d.lstatSync(e).isFile() ? d.ensureSymlink(e, t, "junction") : _() && d.lstatSync(e).isFile() && s ? d.ensureLink(e, t) : d.ensureSymlink(e, t);
+async function Q(e, t, s = !1) {
+  return O() && !d.lstatSync(e).isFile() ? d.ensureSymlink(e, t, "junction") : O() && d.lstatSync(e).isFile() && s ? d.ensureLink(e, t) : d.ensureSymlink(e, t);
 }
-function wt(e) {
+function St(e) {
   return e.endsWith("/") || e.endsWith("\\");
 }
-function vt(e) {
+function Nt(e) {
   const t = ["*", "?", "[", "]"], s = [...e].findIndex((n) => t.includes(n));
-  return s === -1 ? F(e) : F(e.slice(0, s + 1));
+  return s === -1 ? T(e) : T(e.slice(0, s + 1));
 }
-function q(e) {
+function X(e) {
   return ["*", "?", "[", "]"].some((s) => e.includes(s));
 }
-function O(e, t) {
-  return e.startsWith(".") ? e = f(e) : N(e) || (e = t + "/" + e), e;
+function x(e, t) {
+  return e.startsWith(".") ? e = p(e) : D(e) || (e = t + "/" + e), e;
 }
-function kt(e, t) {
-  return e = z(e), t ||= Z(4).toString("hex"), t + "-" + pt(e);
+function Y(e, t) {
+  return e = L(e), t ||= ot(4).toString("hex"), t + "-" + K(e);
 }
-class j {
+const Dt = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  callback: vt,
+  callbackAfterBuild: kt,
+  copy: mt,
+  copyGlob: Ot,
+  css: ut,
+  fileToId: Y,
+  isDev: Ct,
+  isProd: J,
+  get isVerbose() {
+    return q;
+  },
+  isWindows: O,
+  js: ft,
+  link: yt,
+  move: dt,
+  moveGlob: xt,
+  get params() {
+    return F;
+  },
+  shortHash: K,
+  symlink: Q
+}, Symbol.toStringTag, { value: "Module" }));
+class W {
   constructor(t, s) {
-    this.input = t, this.group = s, this.id = j.toFileId(t, s), this.input = z(t);
+    this.input = t, this.group = s, this.id = W.toFileId(t, s), this.input = L(t);
   }
   id;
   output;
@@ -291,21 +315,21 @@ class j {
     return this.postCallbacks.push(t), this;
   }
   normalizeOutput(t, s = ".js") {
-    return (t.endsWith("/") || t.endsWith("\\")) && (t += S(this.input).name + s), t;
+    return (t.endsWith("/") || t.endsWith("\\")) && (t += N(this.input).name + s), t;
   }
   static toFileId(t, s) {
-    return kt(t, s);
+    return Y(t, s);
   }
 }
-function bt(e, ...t) {
+function jt(e, ...t) {
   if (!t.length)
     return e;
   for (const s of t)
     s && (typeof s == "function" ? e = s(e) ?? e : e = w(e, s));
   return e;
 }
-function Ct(e, t = 10) {
-  console.log(tt(e, { depth: t, colors: !0 }));
+function Wt(e, t = 10) {
+  console.log(it(e, { depth: t, colors: !0 }));
 }
 class E {
   constructor(t, s, n) {
@@ -364,9 +388,9 @@ class E {
         if (s)
           return s;
         for (const n of this.entryFileNamesCallbacks) {
-          const i = n(t);
-          if (i)
-            return i;
+          const o = n(t);
+          if (o)
+            return o;
         }
         return "[name].js";
       },
@@ -374,10 +398,10 @@ class E {
         const s = this.getChunkNameFromTask(t);
         if (s)
           return s;
-        for (const i of this.chunkFileNamesCallbacks) {
-          const o = i(t);
-          if (o)
-            return o;
+        for (const o of this.chunkFileNamesCallbacks) {
+          const i = o(t);
+          if (i)
+            return i;
         }
         return `${this.getChunkDir()}/[name]-[hash].js`;
       },
@@ -400,25 +424,25 @@ class E {
       const s = this.tasks.get(t.name)?.output;
       if (s) {
         const n = typeof s == "function" ? s(t) : s;
-        if (!N(n))
+        if (!D(n))
           return n;
       }
     }
   }
   ensurePath(t, s = {}) {
-    return $(this.config, t) == null && B(this.config, t, s), this;
+    return B(this.config, t) == null && _(this.config, t, s), this;
   }
   get(t) {
-    return $(this.config, t);
+    return B(this.config, t);
   }
   set(t, s) {
-    return B(this.config, t, s), this;
+    return _(this.config, t, s), this;
   }
   addTask(t, s) {
-    const n = new j(t, s);
+    const n = new W(t, s);
     this.tasks.set(n.id, n);
-    const i = this.config.build.rollupOptions.input;
-    return i[n.id] = n.input, n;
+    const o = this.config.build.rollupOptions.input;
+    return o[n.id] = n.input, n;
   }
   addCleans(...t) {
     return this.cleans.push(...t), this;
@@ -457,14 +481,14 @@ class E {
     return g(process.cwd(), t);
   }
   debug() {
-    Ct(this.config);
+    Wt(this.config);
   }
 }
-function Ft(e) {
+function $t(e) {
   return e ??= process.argv, e.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((t) => t !== "");
 }
-function Tt(e) {
-  const t = et();
+function Bt(e) {
+  const t = rt();
   return t.option("cwd", {
     type: "string",
     description: "Current working directory"
@@ -486,14 +510,14 @@ function Tt(e) {
     description: "Increase verbosity of output. Use multiple times for more verbosity."
   }), t.parseSync(e);
 }
-async function Pt(e) {
+async function _t(e) {
   let t = e.path;
   if (process.platform === "win32") {
     const s = t.replace(/\\/g, "/");
     s.startsWith("file://") || (t = `file:///${s}`);
   }
   if (e.ts) {
-    const n = (await st({
+    const n = (await at({
       entryPoints: [e.path],
       bundle: !0,
       write: !1,
@@ -504,66 +528,66 @@ async function Pt(e) {
       external: ["../dist", "../dist/*"],
       packages: "external",
       sourcemap: "inline"
-    })).outputFiles[0], i = Buffer.from(n.contents).toString("utf8");
-    H(n.path, i);
-    const o = new M(n.path, void 0);
-    return o.filename = n.path, o.paths = M._nodeModulePaths(F(n.path)), o._compile(i, n.path), T(o.exports);
+    })).outputFiles[0], o = Buffer.from(n.contents).toString("utf8");
+    V(n.path, o);
+    const i = new M(n.path, void 0);
+    return i.filename = n.path, i.paths = M._nodeModulePaths(T(n.path)), i._compile(o, n.path), P(i.exports);
   } else {
     const s = await import(t);
-    return T(s);
+    return P(s);
   }
 }
-function T(e) {
+function P(e) {
   return e = { ...e }, e.__esModule && delete e.__esModule, e;
 }
-async function W(e, t = !1) {
-  return e = await e, !t && Array.isArray(e) ? (await Promise.all(e.map((n) => W(n, !0)))).flat() : G(typeof e == "function" ? await e() : await e, e?.name);
+async function $(e, t = !1) {
+  return e = await e, !t && Array.isArray(e) ? (await Promise.all(e.map((n) => $(n, !0)))).flat() : z(typeof e == "function" ? await e() : await e, e?.name);
 }
-async function G(e, t) {
+async function z(e, t) {
   if (!Array.isArray(e))
     return [await e];
   const s = await Promise.all(e), n = [];
-  for (const i of s)
-    Array.isArray(i) ? n.push(...i) : n.push(i);
+  for (const o of s)
+    Array.isArray(o) ? n.push(...o) : n.push(o);
   return n;
 }
-function At(e, t) {
-  const s = Ot(e, t);
+function Mt(e, t) {
+  const s = It(e, t);
   if (!s)
     throw new Error("No config file found. Please create a fusionfile.js or fusionfile.ts in the root directory.");
   return s;
 }
-function Ot(e, t) {
+function It(e, t) {
   let s = t?.config;
-  return s ? (N(s) || (s = f(e, s)), k(s) ? {
+  return s ? (D(s) || (s = p(e, s)), k(s) ? {
     path: s,
     // get filename from file path
     filename: s.split("/").pop() || "",
-    type: St(s),
-    ts: Nt(s)
-  } : null) : xt(e);
+    type: zt(s),
+    ts: Gt(s)
+  } : null) : Et(e);
 }
-function xt(e) {
-  let t = f(e, "fusionfile.js");
+function Et(e) {
+  let t = p(e, "fusionfile.js");
   return k(t) ? {
     path: t,
     // get filename from file path
     filename: t.split("/").pop() || "",
     type: "commonjs",
     ts: !1
-  } : (t = f(e, "fusionfile.mjs"), k(t) ? {
+  } : (t = p(e, "fusionfile.mjs"), k(t) ? {
     path: t,
     // get filename from file path
     filename: t.split("/").pop() || "",
     type: "module",
     ts: !1
-  } : (t = f(e, "fusionfile.ts"), k(t) ? {
+  } : (t = p(e, "fusionfile.ts"), k(t) ? {
     path: t,
     // get filename from file path
     filename: t.split("/").pop() || "",
     type: "module",
     ts: !0
-  } : (t = f(e, "fusionfile.mts"), k(t) ? {
+  } : (t = p(e, "fusionfile.mts"), k(t) ? {
     path: t,
     // get filename from file path
     filename: t.split("/").pop() || "",
@@ -571,53 +595,53 @@ function xt(e) {
     ts: !0
   } : null)));
 }
-function St(e) {
+function zt(e) {
   let t = "unknown";
   return e.endsWith(".cjs") ? t = "commonjs" : (e.endsWith(".mjs") || e.endsWith(".ts") || e.endsWith(".mts")) && (t = "module"), t;
 }
-function Nt(e) {
+function Gt(e) {
   return e.endsWith(".ts") || e.endsWith(".mts");
 }
-async function Dt(e) {
+async function Lt(e) {
   const t = Object.keys(e);
-  t.sort((i, o) => i === "default" ? -1 : o === "default" ? 1 : i.localeCompare(o));
+  t.sort((o, i) => o === "default" ? -1 : i === "default" ? 1 : o.localeCompare(i));
   const s = [];
-  for (const i of t) {
-    const o = e[i];
-    s.push(await J(i, o));
+  for (const o of t) {
+    const i = e[o];
+    s.push(await Z(o, i));
   }
-  const n = nt({
+  const n = lt({
     label: b.magenta("Available Tasks"),
     nodes: s
   });
   console.log(n);
 }
-async function J(e, t) {
+async function Z(e, t) {
   const s = [];
   t = y(await t);
   for (let n of t) {
-    const i = await W(n, !0);
-    for (const o of i)
-      typeof o == "function" ? s.push(
-        await J(o.name, o)
-      ) : s.push(...await jt(o));
+    const o = await $(n, !0);
+    for (const i of o)
+      typeof i == "function" ? s.push(
+        await Z(i.name, i)
+      ) : s.push(...await Rt(i));
   }
   return {
     label: b.cyan(e),
     nodes: s
   };
 }
-async function jt(e) {
+async function Rt(e) {
   const t = await e.preview();
-  return Promise.all(t.map((s) => Wt(s)));
+  return Promise.all(t.map((s) => Vt(s)));
 }
-async function Wt(e) {
-  const t = [], { input: s, output: n, extra: i } = e, o = b.yellow(s);
-  t.push(`Input: ${o}`);
+async function Vt(e) {
+  const t = [], { input: s, output: n, extra: o } = e, i = b.yellow(s);
+  t.push(`Input: ${i}`);
   const r = b.green(n);
   return t.push(`Output: ${r}`), t.join(" - ");
 }
-function $t(e, t) {
+function Ht(e, t) {
   e = R(e), e.length === 0 && e.push("default");
   const s = {};
   for (const n of e)
@@ -627,74 +651,74 @@ function $t(e, t) {
       throw new Error(`Task "${b.cyan(n)}" not found in fusion config.`);
   return s;
 }
-async function Bt(e) {
+async function Ut(e) {
   const t = {}, s = {};
   for (const n in e) {
-    const i = e[n];
-    s[n] = await x(n, i, t);
+    const o = e[n];
+    s[n] = await S(n, o, t);
   }
   return s;
 }
-async function x(e, t, s) {
+async function S(e, t, s) {
   const n = [];
   if (Array.isArray(t))
-    for (const i in t) {
-      const o = t[i];
-      n.push(...await x(i, o, s));
+    for (const o in t) {
+      const i = t[o];
+      n.push(...await S(o, i, s));
     }
   else if (typeof t == "function") {
     if (e = t.name || e, s[e])
       return [];
     s[e] = t;
-    const i = await W(t, !0);
-    if (Array.isArray(i))
-      for (const o in i) {
-        const r = i[o];
-        n.push(...await x(o, r, s));
+    const o = await $(t, !0);
+    if (Array.isArray(o))
+      for (const i in o) {
+        const r = o[i];
+        n.push(...await S(i, r, s));
       }
   } else
     n.push(await t);
   return n;
 }
-let p = Tt(Ft(process.argv));
-ut(p);
+let f = Bt($t(process.argv));
+bt(f);
 let l;
-const Mt = p._, K = [];
-function ue(e = {}, t) {
-  let s, n, i = !1;
-  const o = It(e);
-  return typeof t == "string" || Array.isArray(t) && t.length > 0 ? p._ = y(t) : p._ = Mt, p = bt(p, o.cliParams), [
+const qt = f._, tt = [];
+function Jt(e = {}, t) {
+  let s, n, o = !1;
+  const i = Kt(e);
+  return typeof t == "string" || Array.isArray(t) && t.length > 0 ? f._ = y(t) : f._ = qt, f = jt(f, i.cliParams), [
     {
       name: "fusion",
       configResolved(r) {
-        n = r, s = r.logger, r.plugins.push(...K);
+        n = r, s = r.logger, r.plugins.push(...tt);
         for (const c of r.plugins)
           "buildConfig" in c && c.buildConfig?.(l);
       },
       async config(r, c) {
         let a;
-        r.root ? a = f(r.root) : a = p.cwd || process.cwd(), delete r.root, process.chdir(a), l = new E(r, c, o);
+        r.root ? a = p(r.root) : a = f.cwd || process.cwd(), delete r.root, process.chdir(a), l = new E(r, c, i);
         let u;
-        if (typeof o.fusionfile == "string" || !o.fusionfile) {
-          p.config ??= o.fusionfile;
-          const m = At(a, p);
-          u = await Pt(m);
-        } else typeof o.fusionfile == "function" ? u = T(await o.fusionfile()) : u = T(o.fusionfile);
-        if (p.list) {
-          await Dt(u);
+        if (typeof i.fusionfile == "string" || !i.fusionfile) {
+          f.config ??= i.fusionfile;
+          const m = Mt(a, f);
+          u = await _t(m);
+        } else typeof i.fusionfile == "function" ? u = P(await i.fusionfile()) : u = P(i.fusionfile);
+        if (f.list) {
+          await Lt(u);
           return;
         }
-        const h = $t([...p._], u), v = await Bt(h);
+        const h = Ht([...f._], u), v = await Ut(h);
         for (const m in v) {
-          const Q = v[m];
-          for (const X of Q)
-            await X.config(m, l);
+          const et = v[m];
+          for (const st of et)
+            await st.config(m, l);
         }
         return l.merge(E.globalOverrideConfig), l.merge(l.overrideConfig), l.config;
       },
       outputOptions(r) {
         if (n.build.emptyOutDir) {
-          const c = n.build.outDir, a = f(c, "upload");
+          const c = n.build.outDir, a = p(c, "upload");
           if (k(a))
             throw new Error(
               `The output directory: "${c}" contains an "upload" folder, please move this folder away or set an different fusion outDir.`
@@ -702,18 +726,18 @@ function ue(e = {}, t) {
         }
       },
       async buildStart(r) {
-        l.cleans.length > 0 && await gt(l.cleans, n.build.outDir || process.cwd());
+        l.cleans.length > 0 && await At(l.cleans, n.build.outDir || process.cwd());
       },
       // Server
       configureServer(r) {
         r.httpServer?.once("listening", () => {
-          const c = r.config.server.https ? "https" : "http", a = r.httpServer?.address(), u = a && typeof a != "string" ? a.address : "localhost", h = a && typeof a != "string" ? a.port : 80, v = `${c}://${u}:${h}/`, m = f(
+          const c = r.config.server.https ? "https" : "http", a = r.httpServer?.address(), u = a && typeof a != "string" ? a.address : "localhost", h = a && typeof a != "string" ? a.port : 80, v = `${c}://${u}:${h}/`, m = p(
             r.config.root,
-            o.cliParams?.serverFile ?? "tmp/vite-server"
+            i.cliParams?.serverFile ?? "tmp/vite-server"
           );
-          H(f(r.config.root, m), v), i || (process.on("exit", () => {
+          V(p(r.config.root, m), v), o || (process.on("exit", () => {
             I.existsSync(m) && I.rmSync(m);
-          }), process.on("SIGINT", () => process.exit()), process.on("SIGTERM", () => process.exit()), process.on("SIGHUP", () => process.exit()), i = !0);
+          }), process.on("SIGINT", () => process.exit()), process.on("SIGTERM", () => process.exit()), process.on("SIGHUP", () => process.exit()), o = !0);
         });
       }
     },
@@ -751,7 +775,7 @@ function ue(e = {}, t) {
       },
       async writeBundle(r, c) {
         const a = n.build.outDir || process.cwd();
-        await dt(l.moveTasks, a, s), await ht(l.copyTasks, a, s), await mt(l.linkTasks, a, s);
+        await Ft(l.moveTasks, a, s), await Tt(l.copyTasks, a, s), await Pt(l.linkTasks, a, s);
         for (const u of l.postBuildCallbacks)
           await u();
         for (const [u, h] of l.tasks)
@@ -761,34 +785,34 @@ function ue(e = {}, t) {
     }
   ];
 }
-function It(e) {
+function Kt(e) {
   return typeof e == "string" ? {
     fusionfile: e
   } : typeof e == "function" ? {
     fusionfile: e
   } : e;
 }
-function ce(e) {
+function Qt(e) {
   e(l);
 }
-function fe(e) {
+function Xt(e) {
   if (e === null) {
     l.overrideConfig = {};
     return;
   }
   l.overrideConfig = w(l.overrideConfig, e);
 }
-function pe(e) {
+function Yt(e) {
   l.overrideConfig = w(l.overrideConfig, {
     build: {
       outDir: e
     }
   });
 }
-function de(e) {
+function Zt(e) {
   l.fusionOptions.chunkDir = e;
 }
-function he(e, t) {
+function te(e, t) {
   l.overrideConfig = w(l.overrideConfig, {
     resolve: {
       alias: {
@@ -797,7 +821,7 @@ function he(e, t) {
     }
   });
 }
-function me(e, t) {
+function ee(e, t) {
   const s = {};
   t && (s[e] = t), l.overrideConfig = w(l.overrideConfig, {
     build: {
@@ -810,39 +834,53 @@ function me(e, t) {
     }
   });
 }
-function ge(...e) {
-  K.push(...e);
+function se(...e) {
+  tt.push(...e);
 }
-function ye(...e) {
+function ne(...e) {
   l.addCleans(...e), l.cleans = R(l.cleans);
 }
+const ve = {
+  ...Dt,
+  useFusion: Jt,
+  configureBuilder: Qt,
+  mergeViteConfig: Xt,
+  outDir: Yt,
+  chunkDir: Zt,
+  alias: te,
+  external: ee,
+  plugin: se,
+  clean: ne,
+  params: f
+};
 export {
-  he as alias,
+  te as alias,
   l as builder,
-  ie as callback,
-  oe as callbackAfterBuild,
-  de as chunkDir,
-  ye as clean,
-  ce as configureBuilder,
-  se as copy,
-  ae as copyGlob,
-  Zt as css,
-  me as external,
-  kt as fileToId,
-  re as isDev,
-  ft as isProd,
-  ct as isVerbose,
-  _ as isWindows,
-  te as js,
-  ne as link,
-  fe as mergeViteConfig,
-  ee as move,
-  le as moveGlob,
-  pe as outDir,
-  P as params,
-  ge as plugin,
-  pt as shortHash,
-  yt as symlink,
-  ue as useFusion
+  vt as callback,
+  kt as callbackAfterBuild,
+  Zt as chunkDir,
+  ne as clean,
+  Qt as configureBuilder,
+  mt as copy,
+  Ot as copyGlob,
+  ut as css,
+  ve as default,
+  ee as external,
+  Y as fileToId,
+  Ct as isDev,
+  J as isProd,
+  q as isVerbose,
+  O as isWindows,
+  ft as js,
+  yt as link,
+  Xt as mergeViteConfig,
+  dt as move,
+  xt as moveGlob,
+  Yt as outDir,
+  F as params,
+  se as plugin,
+  K as shortHash,
+  Q as symlink,
+  Jt as useFusion
 };
 //# sourceMappingURL=index.js.map

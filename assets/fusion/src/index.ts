@@ -1,4 +1,5 @@
 export * from '@/dep';
+import * as fusion from '@/dep';
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
 import { prepareParams } from '@/params';
 import { getArgsAfterDoubleDashes, parseArgv } from '@/runner/app';
@@ -333,3 +334,17 @@ export function clean(...paths: string[]) {
 
   builder.cleans = uniq(builder.cleans);
 }
+
+export default {
+  ...fusion,
+  useFusion,
+  configureBuilder,
+  mergeViteConfig,
+  outDir,
+  chunkDir,
+  alias,
+  external,
+  plugin,
+  clean,
+  params,
+};
