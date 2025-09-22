@@ -198,26 +198,21 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
-    public function importModuleStatic(string $url, array $options = []): static
-    {
-        $code = "import('$url')";
-
-        return $this->internalModule($code, $options);
-    }
-
-    public function importByLoaderStatic(string $module, array $options = []): static
-    {
-        return $this->internalModule("main.import('$module')", $options);
-    }
-
     public function importModule(string $url, ?string $body = null, array $options = []): static
     {
         $code = "import('$url')";
 
         if ($body) {
             $moduleVar = $options['moduleVar'] ?? 'module';
+            $inline = $options['inline'] ?? false;
+            $async = '';
 
-            $code .= ".then(function($moduleVar) {\n$body\n});";
+            if (!$inline) {
+                $body = "{\n$body\n}";
+                $async = 'async ';
+            }
+
+            $code .= ".then($async($moduleVar) => $body);";
         }
 
         return $this->internalModule($code, $options);
@@ -234,9 +229,18 @@ class AssetService implements EventAwareInterface
         return $this;
     }
 
+    /**
+     * @param  string  $module
+     * @param  array   $options
+     *
+     * @return  static
+     *
+     * @internal
+     */
     public function importByLoader(string $module, array $options = []): static
     {
         $moduleVar = $options['moduleVar'] ?? 'module';
+        $options['inline'] = true;
 
         $this->importMainThen(
             "{$moduleVar}.default.import('$module')",
@@ -490,20 +494,28 @@ class AssetService implements EventAwareInterface
         }
 
         if ($withInternal && $this->internalScripts) {
-            $html[] = (string) h(
-                'script',
-                $event->internalAttrs,
-                "\n" . $this->renderInternalJS(false) . "\n" . $this->indents
-            );
-            $html[] = (string) h(
-                'script',
-                [
-                    ...$event->internalAttrs,
-                    'type' => 'module',
-                ],
-                "import main from '{$this->getMainModuleName()}';\n"
-                . $this->renderInternalJS(true) . "\n" . $this->indents
-            );
+            $body = $this->renderInternalJS(false);
+
+            if (trim($body)) {
+                $html[] = (string) h(
+                    'script',
+                    $event->internalAttrs,
+                    "\n" . $body . "\n" . $this->indents
+                );
+            }
+
+            $body = $this->renderInternalJS(true);
+
+            if (trim($body)) {
+                $html[] = (string) h(
+                    'script',
+                    [
+                        ...$event->internalAttrs,
+                        'type' => 'module',
+                    ],
+                    "\n" . $body . "\n" . $this->indents
+                );
+            }
         }
 
         return implode("\n" . $this->indents, $html);
@@ -1149,7 +1161,7 @@ class AssetService implements EventAwareInterface
                 }
             }
 
-            return $this->addAssetBase($uri, 'path');
+            return $this->handleUri($uri, 'path');
         }
 
         return UriNormalizer::ensureDir($this->path);
@@ -1181,7 +1193,7 @@ class AssetService implements EventAwareInterface
                 }
             }
 
-            return $this->addAssetBase($uri, 'root');
+            return $this->handleUri($uri, 'root');
         }
 
         return UriNormalizer::ensureDir($this->root);

@@ -228,12 +228,12 @@ function parseScriptsFromBlades(patterns: string | string[]): ScriptResult[] {
     const html = parse(bladeText);
     // const key = file.relativePath.replace(/.blade.php$/, '').toLowerCase();
 
-    return html.querySelectorAll('script[lang][data-as]')
+    return html.querySelectorAll('script[lang][id]')
       .filter(
         (el) => ['ts', 'typescript'].includes(el.getAttribute('lang') || '')
       )
       .map((el) => ({
-        as: el.getAttribute('data-as') || '',
+        as: el.getAttribute('id') || '',
         file: file,
         path: file.relativePath.replace(/.blade.php$/, ''),
         code: el.innerHTML

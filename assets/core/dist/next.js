@@ -1,7 +1,7 @@
 import { getGlobBaseFromPattern as V, callback as q, css as T, js as B, shortHash as R, plugin as W, callbackAfterBuild as E, copyGlob as J, symlink as G } from "@windwalker-io/fusion-next";
 import P from "is-glob";
 import z from "micromatch";
-import b, { relative as F, normalize as w, resolve as m } from "node:path";
+import b, { relative as F, normalize as w, resolve as h } from "node:path";
 import j from "node:fs";
 import v from "fast-glob";
 import { randomBytes as H } from "node:crypto";
@@ -98,13 +98,13 @@ function we(t) {
   };
 }
 function ve(t, e) {
-  return t ??= m("node_modules/systemjs/dist/system.min.js"), {
+  return t ??= h("node_modules/systemjs/dist/system.min.js"), {
     name: "core:inject-systemjs",
     async generateBundle(s, r) {
       if (s.format !== "system")
         return;
       const o = c.readFileSync(
-        m(t),
+        h(t),
         "utf-8"
       );
       for (const n of Object.values(r))
@@ -120,7 +120,12 @@ function xe() {
       if (t.format === "system") {
         for (const [s, r] of Object.entries(e))
           if (s.endsWith(".css") && "code" in r) {
-            const o = /__vite_style__\.textContent\s*=\s*"([\s\S]*?)";/, n = r.code.match(o);
+            const o = /__vite_style__\.textContent\s*=\s*"([\s\S]*?)";/;
+            let n = r.code.match(o);
+            if (!n) {
+              const d = /\.textContent\s*=\s*`([\s\S]*?)`/;
+              n = r.code.match(d);
+            }
             n && n[1] && (r.code = n[1].replace(/\\"/g, '"').replace(/\\n/g, `
 `).replace(/\\t/g, "	").replace(/\\\\/g, "\\").replace(/\/\*\$vite\$:\d+\*\/$/, ""));
           }
@@ -144,11 +149,11 @@ class ee {
   config(e, s) {
     const r = this.processor.config(e, s);
     for (const o of r)
-      s.loadCallbacks.push((n, h) => {
+      s.loadCallbacks.push((n, d) => {
         const l = N(n);
-        if (w(l) === m(o.input)) {
+        if (w(l) === h(o.input)) {
           const a = v.globSync(
-            this.cssPatterns.map((f) => m(f)).map((f) => f.replace(/\\/g, "/"))
+            this.cssPatterns.map((f) => h(f)).map((f) => f.replace(/\\/g, "/"))
           ).map((f) => `@import "${f}";`).concat(te(this.bladePatterns)).join(`
 `);
           let u = c.readFileSync(l, "utf-8");
@@ -169,8 +174,8 @@ function te(t) {
     return A(r).querySelectorAll("style[type],script[type]").filter(
       (n) => ["text/scss", "text/css"].includes(n.getAttribute("type") || "")
     ).map((n) => {
-      const h = n.getAttribute("data-scope");
-      return h ? `${h} {
+      const d = n.getAttribute("data-scope");
+      return d ? `${d} {
           ${n.innerHTML}
         }` : n.innerHTML;
     });
@@ -187,7 +192,7 @@ class se {
   bladePatterns = [];
   stagePrefix = "";
   config(e, s) {
-    const o = this.processor.config(e, s)[0], n = this.options.tmpPath ?? m("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
+    const o = this.processor.config(e, s)[0], n = this.options.tmpPath ?? h("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
     (this.options.cleanTmp ?? !0) && s.postBuildCallbacks.push((l, i) => {
       c.removeSync(n);
     }), this.ignoreMainImport(o), s.resolveIdCallbacks.push((l) => {
@@ -195,31 +200,31 @@ class se {
         return { id: l, external: !0 };
     }), s.loadCallbacks.push((l, i) => {
       const a = N(l);
-      if (w(a) === m(o.input)) {
+      if (w(a) === h(o.input)) {
         const u = O(this.scriptPatterns);
         let f = `{
 `;
-        for (const d of u) {
-          let $ = d.fullpath;
+        for (const m of u) {
+          let $ = m.fullpath;
           if ($.endsWith(".d.ts"))
             continue;
-          let p = d.relativePath.replace(/assets\//, "").toLowerCase();
-          $ = m($).replace(/\\/g, "/"), p = p.substring(0, p.lastIndexOf(".")) + ".js", this.stagePrefix && (p = this.stagePrefix + "/" + p), f += `'${p}': () => import('${$}'),
+          let p = m.relativePath.replace(/assets\//, "").toLowerCase();
+          $ = h($).replace(/\\/g, "/"), p = p.substring(0, p.lastIndexOf(".")) + ".js", this.stagePrefix && (p = this.stagePrefix + "/" + p), f += `'${p}': () => import('${$}'),
 `;
         }
         const y = ne(this.bladePatterns), g = [];
         c.ensureDirSync(n);
-        for (const d of y) {
-          let $ = d.as;
-          const p = n + "/" + d.path.replace(/\\|\//g, "_") + "-" + R(d.code) + ".ts";
-          (!c.existsSync(p) || c.readFileSync(p, "utf8") !== d.code) && c.writeFileSync(p, d.code), f += `'inline:${$}': () => import('${p}'),
+        for (const m of y) {
+          let $ = m.as;
+          const p = n + "/" + m.path.replace(/\\|\//g, "_") + "-" + R(m.code) + ".ts";
+          (!c.existsSync(p) || c.readFileSync(p, "utf8") !== m.code) && c.writeFileSync(p, m.code), f += `'inline:${$}': () => import('${p}'),
 `;
-          const x = m(d.file.fullpath).replace(/\\/g, "/");
+          const x = h(m.file.fullpath).replace(/\\/g, "/");
           g.includes(x) || g.push(x);
         }
         f += "}";
         const D = `
-import { App } from '${m("./vendor/windwalker/core/assets/core/src/next/app.ts").replace(/\\/g, "/")}';
+import { App } from '${h("./vendor/windwalker/core/assets/core/src/next/app.ts").replace(/\\/g, "/")}';
 
 const app = new App();
 app.registerRoutes(${f});
@@ -244,7 +249,7 @@ export default app;
     W({
       name: "keep-main-external-" + e.id,
       transform(n) {
-        return o.test(n) ? n.replace(o, (h, l) => l) : n;
+        return o.test(n) ? n.replace(o, (d, l) => l) : n;
       }
     });
   }
@@ -264,10 +269,10 @@ export default app;
 function ne(t) {
   return O(Array.isArray(t) ? t : [t]).map((s) => {
     const r = c.readFileSync(s.fullpath, "utf8");
-    return A(r).querySelectorAll("script[lang][data-as]").filter(
+    return A(r).querySelectorAll("script[lang][id]").filter(
       (n) => ["ts", "typescript"].includes(n.getAttribute("lang") || "")
     ).map((n) => ({
-      as: n.getAttribute("data-as") || "",
+      as: n.getAttribute("id") || "",
       file: s,
       path: s.relativePath.replace(/.blade.php$/, ""),
       code: n.innerHTML
@@ -286,13 +291,13 @@ async function re(t = [], e = "www/assets/vendor") {
   n.unshift(s), n.forEach((i) => {
     M(i);
   });
-  const h = ie().map((i) => `vendor/${i}/composer.json`).map((i) => k(i)).filter((i) => i?.extra?.windwalker != null);
-  r = oe(h).concat(r), r = [...new Set(r)];
+  const d = ie().map((i) => `vendor/${i}/composer.json`).map((i) => k(i)).filter((i) => i?.extra?.windwalker != null);
+  r = oe(d).concat(r), r = [...new Set(r)];
   for (const i of r) {
     const a = `node_modules/${i}/`;
     c.existsSync(a) && (console.log(`[${o} NPM] node_modules/${i}/ => ${s}/${i}/`), S(a, `${s}/${i}/`));
   }
-  for (const i of h) {
+  for (const i of d) {
     const a = i.name;
     let u = i?.extra?.windwalker?.assets?.link;
     u && (u.endsWith("/") || (u += "/"), c.existsSync(`vendor/${a}/${u}`) && (console.log(`[${o} Composer] vendor/${a}/${u} => ${s}/${a}/`), S(`vendor/${a}/${u}`, `${s}/${a}/`)));

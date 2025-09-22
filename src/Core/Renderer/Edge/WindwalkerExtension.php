@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer\Edge;
 
+use Dom\Element;
+use Dom\HTMLDocument;
+use Dom\HTMLElement;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\DateTime\ChronosService;
@@ -12,6 +15,7 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\DOM\HTML5Factory;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
 use Windwalker\Edge\Extension\EdgeExtensionInterface;
 use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
@@ -354,12 +358,12 @@ class WindwalkerExtension implements
     public function getParsers(): array
     {
         return [
-            $this->stripInPageScripts(...),
+            $this->handleInPageAssets(...),
             $this->inlineTsToLoader(...),
         ];
     }
 
-    protected function stripInPageScripts(string $content): string
+    protected function handleInPageAssets(string $content): string
     {
         $regexes = [
             // Remove <style type="text/scss">...</style>
@@ -378,15 +382,22 @@ class WindwalkerExtension implements
 
     protected function inlineTsToLoader(string $content): string
     {
-        // Parse `<script lang="ts" data-as="any.string">*</script>`
-        $regex = '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*\bdata-as\s*=\s*(?:("|\'))([^"\']+)\3[^>]*>(.*?)<\/script>/is';
+        $regex = '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*>.*?<\/script>/is';
 
         return preg_replace_callback(
             $regex,
             static function ($matches) {
-                $as = $matches[4];
+                /** @var Element $element */
+                $element = HTML5Factory::parse($matches[0]);
 
-                return "<?php \$asset->importByLoaderStatic('inline:$as'); ?>";
+                if (
+                    $element->getAttribute('lang') === 'ts'
+                    && $element->id
+                ) {
+                    return "<?php \$asset->importByLoader('inline:{$element->id}'); ?>";
+                }
+
+                return $matches[0];
             },
             $content
         );

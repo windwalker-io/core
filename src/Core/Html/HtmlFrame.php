@@ -142,6 +142,10 @@ class HtmlFrame
      */
     public function setFavicon(?string $favicon): static
     {
+        if (is_string($favicon)) {
+            $favicon = $this->asset->handleUri($favicon);
+        }
+
         $this->favicon = $favicon;
 
         return $this;

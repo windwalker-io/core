@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
       target: 'esnext',
       outDir: 'dist',
       emptyOutDir: true,
-      minify: mode === 'production',
+      minify: false,
     },
     plugins: [
       dts({

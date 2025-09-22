@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
       },
       outDir: 'dist',
       emptyOutDir: false,
-      minify: mode === 'production',
+      minify: false,
     },
     plugins: [
       dtsPlugin({

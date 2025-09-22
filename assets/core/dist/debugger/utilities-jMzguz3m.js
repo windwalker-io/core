@@ -1,0 +1,1 @@
+System.register([],(function(n,f){"use strict";return{execute:(function(){n({h:t,s:i});function i(r,e){return r>e*2?"danger":r>e*1.5?"warning":r<e/2?"success":"info"}function t(r){return r>=300&&r<400?"info":r>=400&&r<500?"warning":r>=200&&r<300?"success":"danger"}})}}));

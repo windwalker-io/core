@@ -141,7 +141,7 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         }
       },
       async buildStart(options) {
-        if (builder.cleans.length > 0) {
+        if (builder.cleans.length > 0 && resolvedConfig.command !== 'serve') {
           await cleanFiles(builder.cleans, resolvedConfig.build.outDir || process.cwd());
         }
       },

@@ -42,7 +42,13 @@ export function systemCSSFix(): PluginOption {
       for (const [fileName, chunk] of Object.entries(bundle)) {
         if (fileName.endsWith('.css') && 'code' in chunk) {
           const regex = /__vite_style__\.textContent\s*=\s*"([\s\S]*?)";/;
-          const match = chunk.code.match(regex);
+          let match = chunk.code.match(regex);
+
+          // For minified
+          if (!match) {
+            const regex = /\.textContent\s*=\s*`([\s\S]*?)`/;
+            match = chunk.code.match(regex);
+          }
 
           if (match && match[1]) {
             chunk.code = match[1]
