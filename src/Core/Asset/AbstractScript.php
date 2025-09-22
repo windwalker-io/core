@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
 
+use Windwalker\Core\Attributes\Ref;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
@@ -24,6 +25,9 @@ abstract class AbstractScript
 
     #[Inject]
     protected AssetService $asset;
+
+    #[Ref('unicorn.modules.next')]
+    public bool $next = false;
 
     protected array $inited = [];
 

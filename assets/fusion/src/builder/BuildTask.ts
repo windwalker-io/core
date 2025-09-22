@@ -1,12 +1,12 @@
 import { MaybePromise } from '@/types';
 import { fileToId } from '@/utilities/fs.ts';
 import { normalize, parse } from 'node:path';
-import { PreRenderedChunk } from 'rollup';
+import { NormalizedOutputOptions, OutputBundle, PreRenderedChunk } from 'rollup';
 
 export default class BuildTask {
   id: string;
   output?: string | ((chunkInfo: PreRenderedChunk) => any);
-  postCallbacks: (() => MaybePromise<any>)[] = [];
+  postCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<any>)[] = [];
 
   constructor(public input: string, public group?: string) {
     this.id = BuildTask.toFileId(input, group);

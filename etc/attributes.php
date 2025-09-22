@@ -28,7 +28,7 @@ use Windwalker\DI\Container;
 return [
     // Declaration
     ...Container::getDefaultAttributes(),
-    Ref::class => AttributeType::PARAMETERS,
+    Ref::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Assert::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Filter::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
 

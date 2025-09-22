@@ -3,7 +3,7 @@ import { FileTasks, FusionVitePluginOptions, LinkOptions, RunnerCliParams } from
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
-import { PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
+import { NormalizedOutputOptions, OutputBundle, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
 import { MaybePromise } from '@/types';
 import { ConfigEnv, mergeConfig, PluginOption, UserConfig, Plugin } from 'vite';
 
@@ -18,12 +18,13 @@ export default class ConfigBuilder {
   moveTasks: FileTasks = [];
   copyTasks: FileTasks = [];
   linkTasks: FileTasks<'link'> = [];
-  postBuildCallbacks: (() => MaybePromise<void>)[] = [];
+  postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<void>)[] = [];
   resolveIdCallbacks: Exclude<Plugin['resolveId'], undefined>[] = [];
   loadCallbacks: Exclude<Plugin['load'], undefined>[] = [];
   // fileNameMap: Record<string, string> = {};
 
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
+  watches: string[] = [];
   cleans: string[] = [];
 
   tasks: Map<string, BuildTask> = new Map();

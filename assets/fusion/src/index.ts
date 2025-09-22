@@ -10,10 +10,12 @@ import { FusionPlugin, FusionVitePluginOptions, FusionVitePluginUnresolved, Load
 import { forceArray } from '@/utilities/arr.ts';
 import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
 import { mergeOptions, show } from '@/utilities/utilities.ts';
+import chalk from 'chalk';
 import fs from 'fs';
 import { uniq } from 'lodash-es';
 import { existsSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
+import micromatch from 'micromatch';
 import { Logger, mergeConfig, PluginOption, ResolvedConfig, UserConfig } from 'vite';
 
 let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
@@ -147,12 +149,15 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
       // Server
       configureServer(server) {
         server.httpServer?.once('listening', () => {
+          // Build listening Host
           const scheme = server.config.server.https ? 'https' : 'http';
           const address = server.httpServer?.address();
           const host = address && typeof address !== 'string' ? address.address : 'localhost';
           const port = address && typeof address !== 'string' ? address.port : 80;
 
           const url = `${scheme}://${host}:${port}/`;
+
+          // Build & write server file
           const serverFile = resolve(
             server.config.root,
             resolvedOptions.cliParams?.serverFile ?? 'tmp/vite-server'
@@ -160,6 +165,7 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
           writeFileSync(resolve(server.config.root, serverFile), url);
 
+          // Bind exit signals
           if (!exitHandlersBound) {
             process.on("exit", () => {
               if (fs.existsSync(serverFile)) {
@@ -172,7 +178,50 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
             exitHandlersBound = true;
           }
         });
-      }
+
+        const watches = builder.watches.map((p) => resolve(p).replace(/\\/g, '/'));
+
+        server.watcher.add(watches);
+
+        const checkReload = (path: string) => {
+          if (micromatch.isMatch(path, watches)) {
+            server.ws.send({ type: 'full-reload', path: '*' });
+
+            logger.info(
+              `${chalk.green('full reload')} ${chalk.dim(relative(process.cwd(), path))}`,
+              { timestamp: true }
+            )
+          }
+        };
+
+        server.watcher.on('add', checkReload);
+        server.watcher.on('change', checkReload);
+      },
+      // async handleHotUpdate(ctx) {
+      //   if (builder.watches.includes(ctx.file)) {
+      //     if (ctx.modules.length > 0) {
+      //       return ctx.modules;
+      //     }
+      //
+      //     const modules = ctx.server.moduleGraph.getModulesByFile(ctx.file);
+      //
+      //     if (modules) {
+      //       return [...modules];
+      //     }
+      //
+      //     // const resolved = await ctx.server.pluginContainer.resolveId(ctx.file);
+      //     // if (resolved) {
+      //     //   const vm = server.moduleGraph.getModuleById(resolved.id) || server.moduleGraph.getModuleById(virtualPrefixId)
+      //     //   if (vm) {
+      //     //     return [vm]
+      //     //   }
+      //     // }
+      //
+      //     ctx.server.ws.send({ type: 'full-reload', path: '*' })
+      //
+      //     return [];
+      //   }
+      // }
     },
     {
       name: 'fusion:pre-handles',
@@ -231,12 +280,12 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         await linkFilesAndLog(builder.linkTasks, outDir, logger);
 
         for (const callback of builder.postBuildCallbacks) {
-          await callback();
+          await callback(options, bundle);
         }
 
         for (const [name, task] of builder.tasks) {
           for (const callback of task.postCallbacks) {
-            await callback();
+            await callback(options, bundle);
           }
         }
       },
@@ -335,6 +384,12 @@ export function clean(...paths: string[]) {
   builder.cleans = uniq(builder.cleans);
 }
 
+export function fullReloads(...paths: string[]) {
+  builder.watches.push(...paths);
+
+  builder.watches = uniq(builder.watches);
+}
+
 export default {
   ...fusion,
   useFusion,
@@ -346,5 +401,6 @@ export default {
   external,
   plugin,
   clean,
+  fullReloads,
   params,
 };

@@ -2,6 +2,8 @@ import { Arguments } from 'yargs';
 import { ConfigEnv } from 'vite';
 import { default as Crypto_2 } from 'crypto';
 import { default as default_2 } from 'crypto';
+import { NormalizedOutputOptions } from 'rollup';
+import { OutputBundle } from 'rollup';
 import { Plugin as Plugin_2 } from 'vite';
 import { PluginOption } from 'vite';
 import { PreRenderedAsset } from 'rollup';
@@ -18,7 +20,7 @@ export declare class BuildTask {
     group?: string | undefined;
     id: string;
     output?: string | ((chunkInfo: PreRenderedChunk) => any);
-    postCallbacks: (() => MaybePromise<any>)[];
+    postCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<any>)[];
     constructor(input: string, group?: string | undefined);
     dest(output?: string | ((chunkInfo: PreRenderedChunk) => any)): this;
     addPostCallback(callback: () => void): this;
@@ -29,7 +31,7 @@ export declare class BuildTask {
 declare class BuildTask_2 {
     id: string;
     output?: string | ((chunkInfo: PreRenderedChunk) => any);
-    postCallbacks: (() => MaybePromise_2<any>)[] = [];
+    postCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise_2<any>)[] = [];
 
     constructor(public input: string, public group?: string) {
         this.id = BuildTask.toFileId(input, group);
@@ -111,9 +113,10 @@ export declare class ConfigBuilder {
     moveTasks: FileTasks;
     copyTasks: FileTasks;
     linkTasks: FileTasks<'link'>;
-    postBuildCallbacks: (() => MaybePromise<void>)[];
+    postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<void>)[];
     resolveIdCallbacks: Exclude<Plugin_2['resolveId'], undefined>[];
     loadCallbacks: Exclude<Plugin_2['load'], undefined>[];
+    watches: string[];
     cleans: string[];
     tasks: Map<string, BuildTask>;
     constructor(config: UserConfig, env: ConfigEnv, fusionOptions: FusionVitePluginOptions);
@@ -141,12 +144,13 @@ declare class ConfigBuilder_2 {
     moveTasks: FileTasks_2 = [];
     copyTasks: FileTasks_2 = [];
     linkTasks: FileTasks_2<'link'> = [];
-    postBuildCallbacks: (() => MaybePromise_2<void>)[] = [];
+    postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise_2<void>)[] = [];
     resolveIdCallbacks: Exclude<Plugin_2['resolveId'], undefined>[] = [];
     loadCallbacks: Exclude<Plugin_2['load'], undefined>[] = [];
     // fileNameMap: Record<string, string> = {};
 
     // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
+    watches: string[] = [];
     cleans: string[] = [];
 
     tasks: Map<string, BuildTask_2> = new Map();
@@ -489,6 +493,7 @@ declare const _default: {
     external: typeof external_2;
     plugin: typeof plugin;
     clean: typeof clean;
+    fullReloads: typeof fullReloads;
     params: RunnerCliParams;
     isVerbose: boolean;
     isDev: boolean;
@@ -552,6 +557,8 @@ declare function fileToId_2(input: string, group?: string) {
 
     return group + '-' + shortHash(input);
 }
+
+export declare function fullReloads(...paths: string[]): void;
 
 declare namespace fusion {
     export {
@@ -805,6 +812,9 @@ declare function shortHash_2(bufferOrString: Crypto_2.BinaryLike, short: number 
 export declare function symlink(target: string, link: string, force?: boolean): Promise<void>;
 
 declare async function symlink_2(target: string, link: string, force = false) {
+    target = resolve(target);
+    link = resolve(link);
+
     if (isWindows() && !fs.lstatSync(target).isFile()) {
         return fs.ensureSymlink(target, link, 'junction');
     }

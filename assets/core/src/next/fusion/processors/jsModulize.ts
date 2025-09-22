@@ -1,4 +1,4 @@
-import { findFilesFromGlobArray, stripUrlQuery } from '@/next';
+import { type FindFileResult, findFilesFromGlobArray, stripUrlQuery } from '@/next';
 import {
   type BuildTask,
   type ConfigBuilder,
@@ -43,7 +43,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
     // const task = builder.addTask(appFileName);
 
     if (clean) {
-      builder.postBuildCallbacks.push(() => {
+      builder.postBuildCallbacks.push((options, bundle) => {
         fs.removeSync(tmpPath);
       });
     }
@@ -106,19 +106,29 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         // Parse from blades
         const results = parseScriptsFromBlades(this.bladePatterns);
+        const listens: string[] = [];
 
         fs.ensureDirSync(tmpPath);
 
         for (const result of results) {
           let key = result.as;
           const tmpFile = tmpPath + '/' + result.path.replace(/\\|\//g, '_') + '-' + shortHash(result.code) + '.ts';
-          fs.writeFileSync(tmpFile, result.code);
+
+          if (!fs.existsSync(tmpFile) || fs.readFileSync(tmpFile, 'utf8') !== result.code) {
+            fs.writeFileSync(tmpFile, result.code);
+          }
 
           // if (this.stagePrefix) {
           //   key = this.stagePrefix + '/' + key;
           // }
 
           listJS += `'inline:${key}': () => import('${tmpFile}'),\n`;
+
+          const fullpath = resolve(result.file.fullpath).replace(/\\/g, '/');
+
+          if (!listens.includes(fullpath)) {
+            listens.push(fullpath);
+          }
         }
 
         listJS += "}";
@@ -134,6 +144,9 @@ app.registerRoutes(${listJS});
 
 export default app;
   `;
+
+        // Listen extra files
+        builder.watches.push(...listens);
 
         // return ts;
         return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
@@ -188,7 +201,7 @@ export default app;
 
 interface ScriptResult {
   as: string;
-  file: string;
+  file: FindFileResult;
   path: string;
   code: string;
 }
@@ -221,7 +234,7 @@ function parseScriptsFromBlades(patterns: string | string[]): ScriptResult[] {
       )
       .map((el) => ({
         as: el.getAttribute('data-as') || '',
-        file: file.relativePath,
+        file: file,
         path: file.relativePath.replace(/.blade.php$/, ''),
         code: el.innerHTML
       }))

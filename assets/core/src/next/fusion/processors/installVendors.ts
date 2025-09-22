@@ -46,9 +46,10 @@ export async function findAndInstall(npmVendors: string[] = [], to = 'www/assets
   vendors = [...new Set(vendors)];
 
   for (const vendor of vendors) {
-    if (fs.existsSync(`node_modules/${vendor}/`)) {
+    const source = `node_modules/${vendor}/`;
+    if (fs.existsSync(source)) {
       console.log(`[${action} NPM] node_modules/${vendor}/ => ${root}/${vendor}/`);
-      doInstall(`node_modules/${vendor}/`, `${root}/${vendor}/`);
+      doInstall(source, `${root}/${vendor}/`);
     }
   }
 
@@ -93,12 +94,20 @@ export async function findAndInstall(npmVendors: string[] = [], to = 'www/assets
 
         for (const subVendor of subVendors) {
           const subVendorName = staticVendor + '/' + subVendor;
-          console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
-          doInstall(staticVendorDir + subVendorName + '/', `${root}/${subVendorName}/`);
+          const source = staticVendorDir + subVendorName + '/';
+
+          if (fs.existsSync(source)) {
+            console.log(`[${action} Local] resources/assets/vendor/${subVendorName}/ => ${root}/${subVendorName}/`);
+            doInstall(source, `${root}/${subVendorName}/`);
+          }
         }
       } else {
-        console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
-        doInstall(staticVendorDir + staticVendor, `${root}/${staticVendor}/`);
+        let source = staticVendorDir + staticVendor;
+
+        if (fs.existsSync(source)) {
+          console.log(`[${action} Local] resources/assets/vendor/${staticVendor}/ => ${root}/${staticVendor}/`);
+          doInstall(source, `${root}/${staticVendor}/`);
+        }
       }
     }
   }

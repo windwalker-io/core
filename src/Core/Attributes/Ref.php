@@ -30,10 +30,19 @@ class Ref implements ContainerAttributeInterface
     public function __invoke(AttributeHandler $handler): callable
     {
         $container = $handler->container;
-        $ref = $handler->reflector;
         $v = ref($this->path, $this->delimiter);
 
-        return fn() => $container->getDependencyResolver()
-            ->resolveParameterValue($v, $ref, Container::IGNORE_ATTRIBUTES);
+        return static function () use ($handler, $container, $v) {
+            $def = $handler();
+
+            $value = $container->getDependencyResolver()
+                ->resolveParameterValue($v) ?? $def;
+
+            if ($handler->reflector instanceof \ReflectionProperty) {
+                $handler->reflector->setValue($handler->object, $value);
+            }
+
+            return $value;
+        };
     }
 }

@@ -72,7 +72,7 @@ class ViteResolver
 
     protected function getBase(): string
     {
-        return $this->config->getDeep('alias') ?? 'resources';
+        return $this->config->getDeep('base') ?? 'resources/assets';
     }
 
     public function getManifest(bool $refresh = false): ?array

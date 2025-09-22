@@ -168,6 +168,9 @@ export async function moveGlob(src: string, dest: string): Promise<void> {
 }
 
 export async function symlink(target: string, link: string, force = false) {
+  target = resolve(target);
+  link = resolve(link);
+
   if (isWindows() && !fs.lstatSync(target).isFile()) {
     return fs.ensureSymlink(target, link, 'junction');
   }

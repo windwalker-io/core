@@ -40,7 +40,7 @@ class AssetItem implements \Stringable
     /**
      * @inheritDoc
      */
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->content;
     }
