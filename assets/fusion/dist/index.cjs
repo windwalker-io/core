@@ -469,35 +469,38 @@ class ConfigBuilder {
     this.config = config;
     this.env = env;
     this.fusionOptions = fusionOptions;
-    this.config = vite.mergeConfig(this.config, {
-      build: {
-        manifest: "manifest.json",
-        rollupOptions: {
-          preserveEntrySignatures: "strict",
-          input: {},
-          output: this.getDefaultOutput()
-          // external: (source: string, importer: string | undefined, isResolved: boolean) => {
-          //   for (const external of this.externals) {
-          //     const result = external(source, importer, isResolved);
-          //
-          //     if (result) {
-          //       return true;
-          //     }
-          //   }
-          // },
+    this.config = vite.mergeConfig(
+      {
+        build: {
+          manifest: "manifest.json",
+          rollupOptions: {
+            preserveEntrySignatures: "strict",
+            input: {},
+            output: this.getDefaultOutput()
+            // external: (source: string, importer: string | undefined, isResolved: boolean) => {
+            //   for (const external of this.externals) {
+            //     const result = external(source, importer, isResolved);
+            //
+            //     if (result) {
+            //       return true;
+            //     }
+            //   }
+            // },
+          },
+          emptyOutDir: false,
+          sourcemap: env.mode !== "production" ? "inline" : false
         },
-        emptyOutDir: false,
-        sourcemap: env.mode !== "production" ? "inline" : false
+        plugins: [],
+        css: {
+          devSourcemap: true
+        },
+        esbuild: {
+          // Todo: Remove if esbuild supports decorators by default
+          target: "es2022"
+        }
       },
-      plugins: [],
-      css: {
-        devSourcemap: true
-      },
-      esbuild: {
-        // Todo: Remove if esbuild supports decorators by default
-        target: "es2022"
-      }
-    });
+      this.config
+    );
     this.addTask("hidden:placeholder");
   }
   static globalOverrideConfig = {};
@@ -525,6 +528,7 @@ class ConfigBuilder {
     return this;
   }
   getDefaultOutput() {
+    let serial = 0;
     return {
       entryFileNames: (chunkInfo) => {
         const name = this.getChunkNameFromTask(chunkInfo);
@@ -540,6 +544,7 @@ class ConfigBuilder {
         return "[name].js";
       },
       chunkFileNames: (chunkInfo) => {
+        serial++;
         const name = this.getChunkNameFromTask(chunkInfo);
         if (name) {
           return name;
@@ -551,6 +556,9 @@ class ConfigBuilder {
           }
         }
         const chunkDir = this.getChunkDir();
+        if (this.env.mode === "production" && this.fusionOptions.chunkNameObfuscation) {
+          return `${chunkDir}${serial}.js`;
+        }
         return `${chunkDir}[name]-[hash].js`;
       },
       assetFileNames: (assetInfo) => {
@@ -944,11 +952,16 @@ prepareParams(params);
 exports.builder = void 0;
 const originalTasks = params._;
 const extraVitePlugins = [];
+const defaultFusionOptions = {
+  chunkDir: "chunks",
+  chunkNameObfuscation: true
+};
+let overrideFusionOptions = {};
 function useFusion(fusionOptions = {}, tasks) {
   let logger;
   let resolvedConfig;
   let exitHandlersBound = false;
-  const resolvedOptions = prepareFusionOptions(fusionOptions);
+  let resolvedOptions = mergeOptions(defaultFusionOptions, prepareFusionOptions(fusionOptions));
   if (typeof tasks === "string" || Array.isArray(tasks) && tasks.length > 0) {
     params._ = forceArray(tasks);
   } else {
@@ -988,6 +1001,7 @@ function useFusion(fusionOptions = {}, tasks) {
         } else {
           tasks2 = expandModules(resolvedOptions.fusionfile);
         }
+        exports.builder.fusionOptions = mergeOptions(exports.builder.fusionOptions, overrideFusionOptions);
         if (params.list) {
           await displayAvailableTasks(tasks2);
           return;
@@ -1159,12 +1173,15 @@ function prepareFusionOptions(options) {
 function configureBuilder(handler) {
   handler(exports.builder);
 }
-function mergeViteConfig(config) {
+function overrideViteConfig(config) {
   if (config === null) {
     exports.builder.overrideConfig = {};
     return;
   }
   exports.builder.overrideConfig = vite.mergeConfig(exports.builder.overrideConfig, config);
+}
+function overrideOptions(options) {
+  return overrideFusionOptions = mergeOptions(overrideFusionOptions, options);
 }
 function outDir(outDir2) {
   exports.builder.overrideConfig = vite.mergeConfig(exports.builder.overrideConfig, {
@@ -1216,7 +1233,8 @@ const index = {
   ...fusion,
   useFusion,
   configureBuilder,
-  mergeViteConfig,
+  overrideViteConfig,
+  overrideOptions,
   outDir,
   chunkDir,
   alias,
@@ -1246,10 +1264,11 @@ exports.isProd = isProd;
 exports.isWindows = isWindows;
 exports.js = js;
 exports.link = link;
-exports.mergeViteConfig = mergeViteConfig;
 exports.move = move;
 exports.moveGlob = moveGlob;
 exports.outDir = outDir;
+exports.overrideOptions = overrideOptions;
+exports.overrideViteConfig = overrideViteConfig;
 exports.plugin = plugin;
 exports.shortHash = shortHash;
 exports.symlink = symlink;

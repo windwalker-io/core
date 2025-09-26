@@ -420,11 +420,19 @@ class View implements EventAwareInterface, \ArrayAccess
 
         if ($asset->vite->isActive()) {
             foreach ($jsList as $name => $js) {
+                $js = Path::stripExtension($js);
+
                 if (is_numeric($name)) {
-                    $asset->importByLoader("{$vmName}/$js");
+                    $asset->importByApp(
+                        'view:' . md5("{$vmName}/$js"),
+                        $this->app->isDebug() ? ['comment' => "/* {$vmName}/$js */"] : []
+                    );
                 } elseif ($name === $this->layout) {
                     foreach ((array) $js as $j) {
-                        $asset->importByLoader("{$vmName}/$j");
+                        $asset->importByApp(
+                            'view:' . md5("{$vmName}/$j"),
+                            $this->app->isDebug() ? ['comment' => "/* {$vmName}/$j */"] : []
+                        );
                     }
                 }
             }

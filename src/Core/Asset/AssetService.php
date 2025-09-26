@@ -205,6 +205,7 @@ class AssetService implements EventAwareInterface
         if ($body) {
             $moduleVar = $options['moduleVar'] ?? 'module';
             $inline = $options['inline'] ?? false;
+            $comment = $options['comment'] ?? '';
             $async = '';
 
             if (!$inline) {
@@ -212,7 +213,7 @@ class AssetService implements EventAwareInterface
                 $async = 'async ';
             }
 
-            $code .= ".then($async($moduleVar) => $body);";
+            $code .= ".then($async($moduleVar) => $body);$comment";
         }
 
         return $this->internalModule($code, $options);
@@ -237,8 +238,14 @@ class AssetService implements EventAwareInterface
      *
      * @internal
      */
-    public function importByLoader(string $module, array $options = []): static
+    public function importByApp(string $module, array $options = []): static
     {
+        $handler = $this->config->getDeep('modules.importHandler');
+
+        if ($handler instanceof \Closure) {
+            return $this->internalModule($handler($module, $options), $options);
+        }
+
         $moduleVar = $options['moduleVar'] ?? 'module';
         $options['inline'] = true;
 

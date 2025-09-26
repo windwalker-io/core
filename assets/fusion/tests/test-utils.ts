@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { rimrafSync } from 'rimraf';
 import { defineConfig, mergeConfig, UserConfig, build, createBuilder, InlineConfig } from 'vite';
 import { useFusion } from '../dist';
-import { FusionVitePluginUnresolved, FusionVitePluginOptions } from '../src/types';
+import { FusionPluginOptionsUnresolved, FusionPluginOptions } from '../src/types';
 import { show } from '../src/utilities/utilities';
 
 export function clearDest() {
@@ -22,13 +22,13 @@ export function importFusionfile() {
   return () => import('./fusionfile');
 }
 
-export async function viteBuild(options: FusionVitePluginUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
+export async function viteBuild(options: FusionPluginOptionsUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
   const config = createViteConfig(options, tasks, viteConfig);
 
   return build(config);
 }
 
-export function createViteConfig(options: FusionVitePluginUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
+export function createViteConfig(options: FusionPluginOptionsUnresolved, tasks?: string | string[], viteConfig: InlineConfig = {}) {
   return defineConfig(mergeConfig<InlineConfig, InlineConfig>(
     {
       configFile: false,

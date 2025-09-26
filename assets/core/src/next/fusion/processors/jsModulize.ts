@@ -10,6 +10,7 @@ import {
   plugin as addPlugin,
 } from '@windwalker-io/fusion-next';
 import fs from 'fs-extra';
+import crypto from 'node:crypto';
 import { parse } from 'node-html-parser';
 import { normalize, resolve } from 'node:path';
 
@@ -21,8 +22,6 @@ export interface JsModulizeOptions {
 export function jsModulize(entry: string, dest: string, options: JsModulizeOptions = {}) {
   return new JsModulizeProcessor(js(entry, dest), options);
 }
-
-type ParsedModule = { main: string; scripts: string[]; };
 
 export class JsModulizeProcessor implements ProcessorInterface {
   protected scriptPatterns: string[] = [];
@@ -95,11 +94,14 @@ export class JsModulizeProcessor implements ProcessorInterface {
           let key = file.relativePath.replace(/assets\//, '').toLowerCase();
           fullpath = resolve(fullpath).replace(/\\/g, '/');
 
-          key = key.substring(0, key.lastIndexOf('.')) + '.js';
+          key = key.substring(0, key.lastIndexOf('.'));
 
           if (this.stagePrefix) {
             key = this.stagePrefix + '/' + key;
           }
+
+          // md5
+          key = 'view:' + crypto.createHash('md5').update(key).digest('hex');
 
           listJS += `'${key}': () => import('${fullpath}'),\n`;
         }
@@ -133,23 +135,27 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         listJS += "}";
 
-        const loaderPath = resolve('./vendor/windwalker/core/assets/core/src/next/app.ts')
-          .replace(/\\/g, '/');
-
-        const ts = `
-import { App } from '${loaderPath}';
-
-const app = new App();
-app.registerRoutes(${listJS});
-
-export default app;
-  `;
+//         const loaderPath = resolve('./vendor/windwalker/core/assets/core/src/next/app.ts')
+//           .replace(/\\/g, '/');
+//
+//         const ts = `
+// import { App } from '${loaderPath}';
+//
+// const app = new App();
+// app.registerRoutes(${listJS});
+//
+// export default app;
+//   `;
 
         // Listen extra files
         builder.watches.push(...listens);
 
-        // return ts;
-        return fs.readFileSync(file, 'utf-8') + `\n\n` + ts;
+        let { code, comments } = stripComments(fs.readFileSync(file, 'utf-8'));
+
+        // Replace `defineJsModules(...)`
+        code = code.replace(/defineJsModules\((.*?)\)/g, listJS);
+
+        return restoreComments(code, comments);
       }
     });
 
@@ -206,7 +212,7 @@ interface ScriptResult {
   code: string;
 }
 
-// function parseScriptsFromBlade(file: string, modules: Record<string, ParsedModule>): string[] {
+// function parseScriptsFromBlade(file: string, service: Record<string, ParsedModule>): string[] {
 //   const bladeText = fs.readFileSync(file, 'utf8');
 //
 //   const html = parse(bladeText);
@@ -241,4 +247,38 @@ function parseScriptsFromBlades(patterns: string | string[]): ScriptResult[] {
       .filter((c) => c.code.trim() !== '');
   })
     .flat();
+}
+
+type CommentPlaceholder = { key: string; value: string; };
+
+function stripComments(code: string): { code: string; comments: CommentPlaceholder[] } {
+  const comments: CommentPlaceholder[] = [];
+  let i = 0;
+
+  code = code
+    // Multi-line /* */
+    .replace(/\/\*[\s\S]*?\*\//g, match => {
+      const key = `__COMMENT_BLOCK_${i}__`;
+      comments.push({ key, value: match });
+      i++;
+      return key;
+    })
+    // Single-line //
+    .replace(/\/\/.*$/gm, match => {
+      const key = `__COMMENT_LINE_${i}__`;
+      comments.push({ key, value: match });
+      i++;
+      return key;
+    });
+
+  return { code, comments };
+}
+
+function restoreComments(code: string, comments: CommentPlaceholder[]): string {
+  for (const { key, value } of comments) {
+    const re = new RegExp(key, 'g');
+    code = code.replace(re, value);
+  }
+
+  return code;
 }

@@ -6,7 +6,7 @@ import { getArgsAfterDoubleDashes, parseArgv } from '@/runner/app';
 import { expandModules, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
-import { FusionPlugin, FusionVitePluginOptions, FusionVitePluginUnresolved, LoadedConfigTask } from '@/types';
+import { FusionPlugin, FusionPluginOptions, FusionPluginOptionsUnresolved, LoadedConfigTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
 import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
 import { mergeOptions, show } from '@/utilities/utilities.ts';
@@ -25,13 +25,18 @@ export let builder: ConfigBuilder;
 
 const originalTasks = params._;
 const extraVitePlugins: FusionPlugin[] = [];
+const defaultFusionOptions: FusionPluginOptions = {
+  chunkDir: 'chunks',
+  chunkNameObfuscation: true,
+};
+let overrideFusionOptions: FusionPluginOptions = {};
 
-export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?: string | string[]): PluginOption {
+export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tasks?: string | string[]): PluginOption {
   let logger: Logger;
   let resolvedConfig: ResolvedConfig;
   let exitHandlersBound = false;
 
-  const resolvedOptions = prepareFusionOptions(fusionOptions);
+  let resolvedOptions = mergeOptions(defaultFusionOptions, prepareFusionOptions(fusionOptions));
 
   if (
     typeof tasks === 'string'
@@ -75,6 +80,7 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
 
         process.chdir(root);
 
+        // Now create builder
         builder = new ConfigBuilder(config, env, resolvedOptions);
 
         // Retrieve config file
@@ -91,6 +97,9 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
         } else {
           tasks = expandModules(resolvedOptions.fusionfile);
         }
+
+        // Override options by fusionfile
+        builder.fusionOptions = mergeOptions(builder.fusionOptions, overrideFusionOptions);
 
         // Describe tasks
         if (params.list) {
@@ -293,7 +302,7 @@ export function useFusion(fusionOptions: FusionVitePluginUnresolved = {}, tasks?
   ];
 }
 
-function prepareFusionOptions(options: FusionVitePluginUnresolved): FusionVitePluginOptions {
+function prepareFusionOptions(options: FusionPluginOptionsUnresolved): FusionPluginOptions {
   if (typeof options === 'string') {
     return {
       fusionfile: options,
@@ -313,7 +322,7 @@ export function configureBuilder(handler: (builder: ConfigBuilder) => void) {
   handler(builder);
 }
 
-export function mergeViteConfig(config: UserConfig | null) {
+export function overrideViteConfig(config: UserConfig | null) {
   // if (config === null) {
   //   ConfigBuilder.globalOverrideConfig = {};
   //   return;
@@ -326,6 +335,10 @@ export function mergeViteConfig(config: UserConfig | null) {
   }
 
   builder.overrideConfig = mergeConfig(builder.overrideConfig, config);
+}
+
+export function overrideOptions(options: FusionPluginOptions) {
+  return overrideFusionOptions = mergeOptions(overrideFusionOptions, options);
 }
 
 export function outDir(outDir: string) {
@@ -394,7 +407,8 @@ export default {
   ...fusion,
   useFusion,
   configureBuilder,
-  mergeViteConfig,
+  overrideViteConfig,
+  overrideOptions,
   outDir,
   chunkDir,
   alias,

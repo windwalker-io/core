@@ -1,11 +1,11 @@
 import BuildTask from '@/builder/BuildTask.ts';
-import { FileTasks, FusionVitePluginOptions, LinkOptions, RunnerCliParams } from '@/types';
+import { FileTasks, FusionPluginOptions, MaybePromise } from '@/types';
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
 import { NormalizedOutputOptions, OutputBundle, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
-import { MaybePromise } from '@/types';
-import { ConfigEnv, mergeConfig, PluginOption, UserConfig, Plugin } from 'vite';
+import { ConfigEnv, mergeConfig, Plugin, UserConfig } from 'vite';
+import crypto from 'node:crypto';
 
 export default class ConfigBuilder {
   static globalOverrideConfig: UserConfig = {};
@@ -29,7 +29,7 @@ export default class ConfigBuilder {
 
   tasks: Map<string, BuildTask> = new Map();
 
-  constructor(public config: UserConfig, public env: ConfigEnv, public fusionOptions: FusionVitePluginOptions) {
+  constructor(public config: UserConfig, public env: ConfigEnv, public fusionOptions: FusionPluginOptions) {
     // this.ensurePath('build', {});
     // this.ensurePath('build.rollupOptions', {
     //   input: {},
@@ -37,35 +37,38 @@ export default class ConfigBuilder {
     // });
     // this.ensurePath('plugins', []);
 
-    this.config = mergeConfig<UserConfig, UserConfig>(this.config, {
-      build: {
-        manifest: 'manifest.json',
-        rollupOptions: {
-          preserveEntrySignatures: 'strict',
-          input: {},
-          output: this.getDefaultOutput(),
-          // external: (source: string, importer: string | undefined, isResolved: boolean) => {
-          //   for (const external of this.externals) {
-          //     const result = external(source, importer, isResolved);
-          //
-          //     if (result) {
-          //       return true;
-          //     }
-          //   }
-          // },
+    this.config = mergeConfig<UserConfig, UserConfig>(
+      {
+        build: {
+          manifest: 'manifest.json',
+          rollupOptions: {
+            preserveEntrySignatures: 'strict',
+            input: {},
+            output: this.getDefaultOutput(),
+            // external: (source: string, importer: string | undefined, isResolved: boolean) => {
+            //   for (const external of this.externals) {
+            //     const result = external(source, importer, isResolved);
+            //
+            //     if (result) {
+            //       return true;
+            //     }
+            //   }
+            // },
+          },
+          emptyOutDir: false,
+          sourcemap: env.mode !== 'production' ? 'inline' : false,
         },
-        emptyOutDir: false,
-        sourcemap: env.mode !== 'production' ? 'inline' : false,
+        plugins: [],
+        css: {
+          devSourcemap: true,
+        },
+        esbuild: {
+          // Todo: Remove if esbuild supports decorators by default
+          target: 'es2022',
+        }
       },
-      plugins: [],
-      css: {
-        devSourcemap: true,
-      },
-      esbuild: {
-        // Todo: Remove if esbuild supports decorators by default
-        target: 'es2022',
-      }
-    });
+      this.config
+    );
 
     this.addTask('hidden:placeholder');
   }
@@ -83,6 +86,8 @@ export default class ConfigBuilder {
   }
 
   private getDefaultOutput(): RollupOptions['output'] {
+    let serial = 0;
+
     return {
       entryFileNames: (chunkInfo) => {
         const name = this.getChunkNameFromTask(chunkInfo);
@@ -104,6 +109,7 @@ export default class ConfigBuilder {
         return '[name].js';
       },
       chunkFileNames: (chunkInfo) => {
+        serial++;
         const name = this.getChunkNameFromTask(chunkInfo);
 
         if (name) {
@@ -119,6 +125,10 @@ export default class ConfigBuilder {
         }
 
         const chunkDir = this.getChunkDir();
+
+        if (this.env.mode === 'production' && this.fusionOptions.chunkNameObfuscation) {
+          return `${chunkDir}${serial}.js`;
+        }
 
         return `${chunkDir}[name]-[hash].js`;
       },

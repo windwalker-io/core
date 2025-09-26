@@ -104,7 +104,7 @@ export declare function clean(...paths: string[]): void;
 export declare class ConfigBuilder {
     config: UserConfig;
     env: ConfigEnv;
-    fusionOptions: FusionVitePluginOptions;
+    fusionOptions: FusionPluginOptions;
     static globalOverrideConfig: UserConfig;
     overrideConfig: UserConfig;
     entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
@@ -119,7 +119,7 @@ export declare class ConfigBuilder {
     watches: string[];
     cleans: string[];
     tasks: Map<string, BuildTask>;
-    constructor(config: UserConfig, env: ConfigEnv, fusionOptions: FusionVitePluginOptions);
+    constructor(config: UserConfig, env: ConfigEnv, fusionOptions: FusionPluginOptions);
     merge(override: UserConfig | ((config: UserConfig) => UserConfig)): this;
     private getDefaultOutput;
     private getChunkDir;
@@ -155,7 +155,7 @@ declare class ConfigBuilder_2 {
 
     tasks: Map<string, BuildTask_2> = new Map();
 
-    constructor(public config: UserConfig, public env: ConfigEnv, public fusionOptions: FusionVitePluginOptions_2) {
+    constructor(public config: UserConfig, public env: ConfigEnv, public fusionOptions: FusionPluginOptions_2) {
         // this.ensurePath('build', {});
         // this.ensurePath('build.rollupOptions', {
         //   input: {},
@@ -163,7 +163,8 @@ declare class ConfigBuilder_2 {
         // });
         // this.ensurePath('plugins', []);
 
-        this.config = mergeConfig<UserConfig, UserConfig>(this.config, {
+        this.config = mergeConfig<UserConfig, UserConfig>(
+            {
             build: {
                 manifest: 'manifest.json',
                 rollupOptions: {
@@ -191,7 +192,9 @@ declare class ConfigBuilder_2 {
                 // Todo: Remove if esbuild supports decorators by default
                 target: 'es2022',
             }
-        });
+        },
+        this.config
+        );
 
         this.addTask('hidden:placeholder');
     }
@@ -209,6 +212,8 @@ declare class ConfigBuilder_2 {
     }
 
     private getDefaultOutput(): RollupOptions['output'] {
+        let serial = 0;
+
         return {
             entryFileNames: (chunkInfo) => {
                 const name = this.getChunkNameFromTask(chunkInfo);
@@ -230,6 +235,7 @@ declare class ConfigBuilder_2 {
                 return '[name].js';
             },
             chunkFileNames: (chunkInfo) => {
+                serial++;
                 const name = this.getChunkNameFromTask(chunkInfo);
 
                 if (name) {
@@ -245,6 +251,10 @@ declare class ConfigBuilder_2 {
                 }
 
                 const chunkDir = this.getChunkDir();
+
+                if (this.env.mode === 'production' && this.fusionOptions.chunkNameObfuscation) {
+                    return `${chunkDir}${serial}.js`;
+                }
 
                 return `${chunkDir}[name]-[hash].js`;
             },
@@ -486,7 +496,8 @@ declare class CssProcessor_2 implements ProcessorInterface {
 declare const _default: {
     useFusion: typeof useFusion;
     configureBuilder: typeof configureBuilder;
-    mergeViteConfig: typeof mergeViteConfig;
+    overrideViteConfig: typeof overrideViteConfig;
+    overrideOptions: typeof overrideOptions;
     outDir: typeof outDir;
     chunkDir: typeof chunkDir;
     alias: typeof alias;
@@ -602,21 +613,23 @@ declare type FusionPlugin_2 = PluginOption & {
     buildConfig?: (builder: ConfigBuilder_2) => MaybePromise_2<any>;
 }
 
-declare interface FusionVitePluginOptions {
+declare interface FusionPluginOptions {
     fusionfile?: string | Fusionfile;
     chunkDir?: string;
+    chunkNameObfuscation?: boolean;
     plugins?: FusionPlugin[];
     cliParams?: RunnerCliParams;
 }
 
-declare interface FusionVitePluginOptions_2 {
+declare interface FusionPluginOptions_2 {
     fusionfile?: string | Fusionfile_2;
     chunkDir?: string;
+    chunkNameObfuscation?: boolean;
     plugins?: FusionPlugin_2[];
     cliParams?: RunnerCliParams_2;
 }
 
-declare type FusionVitePluginUnresolved = FusionVitePluginOptions | string | (() => MaybePromise<Record<string, any>>);
+declare type FusionPluginOptionsUnresolved = FusionPluginOptions | string | (() => MaybePromise<Record<string, any>>);
 
 export declare function getGlobBaseFromPattern(pattern: string): string;
 
@@ -686,8 +699,6 @@ export declare type MaybePromise<T> = T | Promise<T>;
 
 declare type MaybePromise_2<T> = T | Promise<T>;
 
-export declare function mergeViteConfig(config: UserConfig | null): void;
-
 export declare function move(input: TaskInput_2, dest: string): MoveProcessor;
 
 declare function move_2(input: TaskInput, dest: string) {
@@ -722,7 +733,11 @@ export declare function outDir(outDir: string): void;
 
 declare type OverrideOptions <T> = Partial<T> | ((options: Partial<T>) => T | undefined);
 
+export declare function overrideOptions(options: FusionPluginOptions): FusionPluginOptions;
+
 declare type OverrideOptions_2<T> = Partial<T> | ((options: Partial<T>) => T | undefined);
+
+export declare function overrideViteConfig(config: UserConfig | null): void;
 
 export declare let params: RunnerCliParams | undefined;
 
@@ -834,6 +849,6 @@ declare type TaskOutput = string;
 
 declare type TaskOutput_2 = string;
 
-export declare function useFusion(fusionOptions?: FusionVitePluginUnresolved, tasks?: string | string[]): PluginOption;
+export declare function useFusion(fusionOptions?: FusionPluginOptionsUnresolved, tasks?: string | string[]): PluginOption;
 
 export { }

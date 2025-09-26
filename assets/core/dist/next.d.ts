@@ -40,6 +40,8 @@ export declare function findFilesFromGlobArray(sources: string[]): FindFileResul
 
 export declare function findModules(suffix?: string): string[];
 
+export declare function globalAssets(options: WindwalkerAssetsOptions): FusionPlugin;
+
 export declare function injectSystemJS(systemPath?: string, filter?: (file: OutputAsset | OutputChunk) => any): PluginOption;
 
 export declare function installVendors(npmVendors?: string[], to?: string): {
@@ -62,6 +64,11 @@ declare class JsModulizeProcessor implements ProcessorInterface {
     protected stagePrefix: string;
     constructor(processor: ReturnType<typeof js>, options?: JsModulizeOptions);
     config(taskName: string, builder: ConfigBuilder): undefined;
+    /**
+     * @see https://github.com/vitejs/vite/issues/6393#issuecomment-1006819717
+     * @see https://stackoverflow.com/questions/76259677/vite-dev-server-throws-error-when-resolving-external-path-from-importmap
+     */
+    private ignoreMainImport;
     preview(): MaybePromise<ProcessorPreview[]>;
     mergeScripts(...patterns: (string | string[])[]): this;
     parseBlades(...bladePatterns: (string[] | string)[]): this;
@@ -79,8 +86,6 @@ export declare function stripUrlQuery(src: string): string;
 export declare function systemCSSFix(): PluginOption;
 
 export declare function uniqId(prefix?: string, size?: number): string;
-
-export declare function windwalkerAssets(options: WindwalkerAssetsOptions): FusionPlugin;
 
 export declare interface WindwalkerAssetsOptions {
     clone?: Record<string, string>;

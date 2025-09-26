@@ -17,6 +17,10 @@
       "types": "./dist/next.d.ts",
       "require": "./dist/next.js",
       "import": "./dist/next.js"
+    },
+    "./app": {
+      "require": "./src/app/index.ts",
+      "import": "./src/app/index.ts"
     }
   },
   "repository": "https://github.com/ventoviro/windwalker-core",
