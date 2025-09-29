@@ -46,7 +46,7 @@ function findFiles(src) {
     };
   });
 }
-function findModules(suffix = "") {
+function findModules(suffix = "", rootModule = "src/Module") {
   const pkg = path.resolve(process.cwd(), "composer.json");
   const pkgJson = loadJson(pkg);
   const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => {
@@ -54,6 +54,9 @@ function findModules(suffix = "") {
       return `vendor/${pkgJson2.name}/${module}/${suffix}`;
     }) || [];
   }).flat();
+  if (rootModule) {
+    vendors.unshift(rootModule + "/" + suffix);
+  }
   return [...new Set(vendors)];
 }
 function uniqId(prefix = "", size = 16) {
@@ -203,47 +206,54 @@ class CssModulizeProcessor {
   }
   config(taskName, builder) {
     const tasks = this.processor.config(taskName, builder);
-    for (const task of tasks) {
-      builder.loadCallbacks.push((src, options) => {
-        const file = stripUrlQuery(src);
-        if (normalize(file) === resolve(task.input)) {
-          const patterns = fg.globSync(
-            this.cssPatterns.map((v) => resolve(v)).map((v) => v.replace(/\\/g, "/"))
-          );
-          const imports = patterns.map((pattern) => `@import "${pattern}";`).concat(parseStylesFromBlades(this.bladePatterns)).join("\n");
-          let main = fs$1.readFileSync(file, "utf-8");
-          main += `
+    const task = tasks[0];
+    const inputFile = resolve(task.input);
+    const bladeFiles = fg.globSync(this.bladePatterns);
+    for (const file of bladeFiles) {
+      builder.watches.push({
+        file,
+        moduleFile: inputFile,
+        updateType: "css-update"
+      });
+    }
+    builder.loadCallbacks.push((src, options) => {
+      const file = stripUrlQuery(src);
+      if (normalize(file) === inputFile) {
+        const patterns = fg.globSync(
+          this.cssPatterns.map((v) => resolve(v)).map((v) => v.replace(/\\/g, "/"))
+        );
+        const imports = patterns.map((pattern) => `@import "${pattern}";`).concat(this.parseStylesFromBlades(bladeFiles)).join("\n");
+        let main = fs$1.readFileSync(file, "utf-8");
+        main += `
 
 ${imports}
 `;
-          return main;
+        return main;
+      }
+    });
+    return void 0;
+  }
+  parseStylesFromBlades(files) {
+    return files.map((file) => {
+      const bladeText = fs$1.readFileSync(file, "utf8");
+      const html = parse(bladeText);
+      return html.querySelectorAll("style[type][data-macro],script[type][data-macro]").filter(
+        (el) => ["text/scss", "text/css"].includes(el.getAttribute("type") || "")
+      ).map((el) => {
+        const scope = el.getAttribute("data-scope");
+        if (scope) {
+          return `${scope} {
+          ${el.innerHTML}
+        }`;
+        } else {
+          return el.innerHTML;
         }
       });
-    }
-    return void 0;
+    }).filter((c) => c.length > 0).flat();
   }
   preview() {
     return [];
   }
-}
-function parseStylesFromBlades(patterns) {
-  let files = fg.globSync(patterns);
-  return files.map((file) => {
-    const bladeText = fs$1.readFileSync(file, "utf8");
-    const html = parse(bladeText);
-    return html.querySelectorAll("style[type],script[type]").filter(
-      (el) => ["text/scss", "text/css"].includes(el.getAttribute("type") || "")
-    ).map((el) => {
-      const scope = el.getAttribute("data-scope");
-      if (scope) {
-        return `${scope} {
-          ${el.innerHTML}
-        }`;
-      } else {
-        return el.innerHTML;
-      }
-    });
-  }).filter((c) => c.length > 0).flat();
 }
 function jsModulize(entry, dest, options = {}) {
   return new JsModulizeProcessor(js(entry, dest), options);
@@ -259,6 +269,7 @@ class JsModulizeProcessor {
   config(taskName, builder) {
     const tasks = this.processor.config(taskName, builder);
     const task = tasks[0];
+    const inputFile = resolve(task.input);
     const tmpPath = this.options.tmpPath ?? resolve("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
     const clean = this.options.cleanTmp ?? true;
     if (clean) {
@@ -272,17 +283,18 @@ class JsModulizeProcessor {
         return { id, external: true };
       }
     });
+    const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
+    const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
     builder.loadCallbacks.push((src, options) => {
-      const file = stripUrlQuery(src);
-      if (normalize(file) === resolve(task.input)) {
-        const files = findFilesFromGlobArray(this.scriptPatterns);
+      const srcFile = stripUrlQuery(src);
+      if (normalize(srcFile) === inputFile) {
         let listJS = "{\n";
-        for (const file2 of files) {
-          let fullpath = file2.fullpath;
+        for (const scriptFile of scriptFiles) {
+          let fullpath = scriptFile.fullpath;
           if (fullpath.endsWith(".d.ts")) {
             continue;
           }
-          let key = file2.relativePath.replace(/assets\//, "").toLowerCase();
+          let key = scriptFile.relativePath.replace(/assets\//, "").toLowerCase();
           fullpath = resolve(fullpath).replace(/\\/g, "/");
           key = key.substring(0, key.lastIndexOf("."));
           if (this.stagePrefix) {
@@ -292,10 +304,9 @@ class JsModulizeProcessor {
           listJS += `'${key}': () => import('${fullpath}'),
 `;
         }
-        const results = parseScriptsFromBlades(this.bladePatterns);
         const listens = [];
         fs$1.ensureDirSync(tmpPath);
-        for (const result of results) {
+        for (const result of bladeFiles) {
           let key = result.as;
           const tmpFile = tmpPath + "/" + result.path.replace(/\\|\//g, "_") + "-" + shortHash(result.code) + ".ts";
           if (!fs$1.existsSync(tmpFile) || fs$1.readFileSync(tmpFile, "utf8") !== result.code) {
@@ -310,7 +321,7 @@ class JsModulizeProcessor {
         }
         listJS += "}";
         builder.watches.push(...listens);
-        let { code, comments } = stripComments(fs$1.readFileSync(file, "utf-8"));
+        let { code, comments } = stripComments(fs$1.readFileSync(srcFile, "utf-8"));
         code = code.replace(/defineJsModules\((.*?)\)/g, listJS);
         return restoreComments(code, comments);
       }
@@ -356,10 +367,10 @@ function parseScriptsFromBlades(patterns) {
   return files.map((file) => {
     const bladeText = fs$1.readFileSync(file.fullpath, "utf8");
     const html = parse(bladeText);
-    return html.querySelectorAll("script[lang][id]").filter(
+    return html.querySelectorAll("script[lang][data-macro]").filter(
       (el) => ["ts", "typescript"].includes(el.getAttribute("lang") || "")
     ).map((el) => ({
-      as: el.getAttribute("id") || "",
+      as: el.getAttribute("data-macro") || "",
       file,
       path: file.relativePath.replace(/.blade.php$/, ""),
       code: el.innerHTML

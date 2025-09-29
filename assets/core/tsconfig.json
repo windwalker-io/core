@@ -1,6 +1,6 @@
 {
   "extends": [
-    "@vue/tsconfig/tsconfig.dom.json"
+    //
   ],
   "include": [
     "src/**/*.ts"
@@ -12,6 +12,9 @@
     "reflect-metadata"
   ],
   "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

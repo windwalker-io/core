@@ -186,7 +186,12 @@ class RouteUri extends Uri implements NavConstantInterface
             $value = (string) $value;
         }
 
-        $new = $this->withVar($name, unwrap_enum($value));
+        return $this->withVar($name, unwrap_enum($value));
+    }
+
+    public function withVar(string $name, mixed $value): static
+    {
+        $new = parent::withVar($name, $value);
 
         if ($this->options->allowQuery === false) {
             $new = $new->allowQuery([$name], true);

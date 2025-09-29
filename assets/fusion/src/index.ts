@@ -1,22 +1,22 @@
 export * from '@/dep';
-import * as fusion from '@/dep';
 import ConfigBuilder from '@/builder/ConfigBuilder.ts';
+import * as fusion from '@/dep';
 import { prepareParams } from '@/params';
 import { getArgsAfterDoubleDashes, parseArgv } from '@/runner/app';
 import { expandModules, loadConfigFile, mustGetAvailableConfigFile } from '@/runner/config';
 import { displayAvailableTasks } from '@/runner/describe.ts';
 import { resolveAllTasksAsProcessors, selectRunningTasks } from '@/runner/tasks.ts';
-import { FusionPlugin, FusionPluginOptions, FusionPluginOptionsUnresolved, LoadedConfigTask } from '@/types';
+import { FusionPlugin, FusionPluginOptions, FusionPluginOptionsUnresolved, LoadedConfigTask, WatchTask } from '@/types';
 import { forceArray } from '@/utilities/arr.ts';
 import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from '@/utilities/fs.ts';
-import { mergeOptions, show } from '@/utilities/utilities.ts';
+import { mergeOptions } from '@/utilities/utilities.ts';
 import chalk from 'chalk';
 import fs from 'fs';
 import { uniq } from 'lodash-es';
+import micromatch from 'micromatch';
 import { existsSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import micromatch from 'micromatch';
-import { Logger, mergeConfig, PluginOption, ResolvedConfig, UserConfig } from 'vite';
+import { Logger, mergeConfig, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 
 let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
@@ -32,6 +32,7 @@ const defaultFusionOptions: FusionPluginOptions = {
 let overrideFusionOptions: FusionPluginOptions = {};
 
 export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tasks?: string | string[]): PluginOption {
+  let devServer: ViteDevServer;
   let logger: Logger;
   let resolvedConfig: ResolvedConfig;
   let exitHandlersBound = false;
@@ -157,6 +158,7 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
 
       // Server
       configureServer(server) {
+        builder.server = server;
         server.httpServer?.once('listening', () => {
           // Build listening Host
           const scheme = server.config.server.https ? 'https' : 'http';
@@ -188,23 +190,72 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           }
         });
 
-        const watches = builder.watches.map((p) => resolve(p).replace(/\\/g, '/'));
+        const fullReloadWatches: string[] = [];
+        const customWatches: Exclude<WatchTask, string>[] = [];
 
-        server.watcher.add(watches);
+        const checkReload = (event: 'add' | 'change') => {
+          return (path: string) => {
+            // Custom HMR
+            for (const watchTask of customWatches) {
+              if (watchTask.file === path) {
+                const mods = server.moduleGraph.getModulesByFile(watchTask.moduleFile);
 
-        const checkReload = (path: string) => {
-          if (micromatch.isMatch(path, watches)) {
-            server.ws.send({ type: 'full-reload', path: '*' });
+                if (mods) {
+                  for (const mod of mods) {
+                    server.moduleGraph.invalidateModule(mod);
+                  }
 
-            logger.info(
-              `${chalk.green('full reload')} ${chalk.dim(relative(process.cwd(), path))}`,
-              { timestamp: true }
-            )
-          }
+                  const updateType = watchTask.updateType;
+
+                  logger.info(
+                    `${chalk.green(updateType)} ${chalk.dim(relative(process.cwd(), watchTask.file))}`,
+                    { timestamp: true }
+                  );
+
+                  if (updateType === 'full-reload') {
+                    server.ws.send({ type: 'full-reload', path: '*' });
+                  } else {
+                    server.ws.send({
+                      type: 'update',
+                      updates: [...mods].map((m) => ({
+                        type: updateType,
+                        path: m.url,
+                        acceptedPath: m.url,
+                        timestamp: Date.now()
+                      }))
+                    });
+                  }
+                }
+              }
+            }
+
+            // Full Reload
+            if (micromatch.isMatch(path, fullReloadWatches)) {
+              server.ws.send({ type: 'full-reload', path: '*' });
+
+              logger.info(
+                `${chalk.green('full reload')} ${chalk.dim(relative(process.cwd(), path))}`,
+                { timestamp: true }
+              );
+            }
+          };
         };
 
-        server.watcher.on('add', checkReload);
-        server.watcher.on('change', checkReload);
+        server.watcher.on('add', checkReload('add'));
+        server.watcher.on('change', checkReload('change'));
+
+        for (const watchTask of builder.watches) {
+          if (typeof watchTask === 'string') {
+            const file = resolve(watchTask).replace(/\\/g, '/');
+            fullReloadWatches.push(file);
+            server.watcher.add(file);
+            continue;
+          }
+
+          const file = resolve(watchTask.file).replace(/\\/g, '/');
+          customWatches.push(watchTask);
+          server.watcher.add(file);
+        }
       },
       // async handleHotUpdate(ctx) {
       //   if (builder.watches.includes(ctx.file)) {
@@ -368,20 +419,11 @@ export function alias(src: string, dest: string) {
   });
 }
 
-export function external(match: string, varName?: string) {
-  const globals: Record<string, string> = {};
-
-  if (varName) {
-    globals[match] = varName;
-  }
-
+export function externals(...externals: (string | RegExp)[]) {
   builder.overrideConfig = mergeConfig<UserConfig, UserConfig>(builder.overrideConfig, {
     build: {
       rollupOptions: {
-        external: [match],
-        output: {
-          globals
-        }
+        external: externals,
       }
     }
   });
@@ -412,7 +454,7 @@ export default {
   outDir,
   chunkDir,
   alias,
-  external,
+  externals,
   plugin,
   clean,
   fullReloads,

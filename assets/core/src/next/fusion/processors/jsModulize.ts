@@ -9,6 +9,7 @@ import {
   shortHash,
   plugin as addPlugin,
 } from '@windwalker-io/fusion-next';
+import { WatchTask } from '@windwalker-io/fusion-next/src/types';
 import fs from 'fs-extra';
 import crypto from 'node:crypto';
 import { parse } from 'node-html-parser';
@@ -34,6 +35,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
   config(taskName: string, builder: ConfigBuilder) {
     const tasks = this.processor.config(taskName, builder) as BuildTask[];
     const task = tasks[0];
+    const inputFile = resolve(task.input);
     const tmpPath = this.options.tmpPath ?? resolve('./tmp/fusion/jsmodules/').replace(/\\/g, '/');
     const clean = this.options.cleanTmp ?? true;
 
@@ -75,23 +77,33 @@ export class JsModulizeProcessor implements ProcessorInterface {
       }
     });
 
+    const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
+    const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
+
+    // for (const bladeFile of bladeFiles) {
+    //   builder.watches.push({
+    //     file: resolve(bladeFile.file.fullpath),
+    //     moduleFile: inputFile,
+    //     updateType: 'full-reload',
+    //   } satisfies WatchTask);
+    // }
+
     builder.loadCallbacks.push((src, options) => {
-      const file = stripUrlQuery(src);
+      const srcFile = stripUrlQuery(src);
 
       // if (src === appSrcFileName) {
-      if (normalize(file) === resolve(task.input)) {
-        const files = findFilesFromGlobArray(this.scriptPatterns);
+      if (normalize(srcFile) === inputFile) {
         let listJS = "{\n";
 
         // Merge standalone ts files
-        for (const file of files) {
-          let fullpath = file.fullpath;
+        for (const scriptFile of scriptFiles) {
+          let fullpath = scriptFile.fullpath;
 
           if (fullpath.endsWith('.d.ts')) {
             continue;
           }
 
-          let key = file.relativePath.replace(/assets\//, '').toLowerCase();
+          let key = scriptFile.relativePath.replace(/assets\//, '').toLowerCase();
           fullpath = resolve(fullpath).replace(/\\/g, '/');
 
           key = key.substring(0, key.lastIndexOf('.'));
@@ -107,12 +119,11 @@ export class JsModulizeProcessor implements ProcessorInterface {
         }
 
         // Parse from blades
-        const results = parseScriptsFromBlades(this.bladePatterns);
         const listens: string[] = [];
 
         fs.ensureDirSync(tmpPath);
 
-        for (const result of results) {
+        for (const result of bladeFiles) {
           let key = result.as;
           const tmpFile = tmpPath + '/' + result.path.replace(/\\|\//g, '_') + '-' + shortHash(result.code) + '.ts';
 
@@ -150,7 +161,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
         // Listen extra files
         builder.watches.push(...listens);
 
-        let { code, comments } = stripComments(fs.readFileSync(file, 'utf-8'));
+        let { code, comments } = stripComments(fs.readFileSync(srcFile, 'utf-8'));
 
         // Replace `defineJsModules(...)`
         code = code.replace(/defineJsModules\((.*?)\)/g, listJS);
@@ -234,12 +245,12 @@ function parseScriptsFromBlades(patterns: string | string[]): ScriptResult[] {
     const html = parse(bladeText);
     // const key = file.relativePath.replace(/.blade.php$/, '').toLowerCase();
 
-    return html.querySelectorAll('script[lang][id]')
+    return html.querySelectorAll('script[lang][data-macro]')
       .filter(
         (el) => ['ts', 'typescript'].includes(el.getAttribute('lang') || '')
       )
       .map((el) => ({
-        as: el.getAttribute('id') || '',
+        as: el.getAttribute('data-macro') || '',
         file: file,
         path: file.relativePath.replace(/.blade.php$/, ''),
         code: el.innerHTML

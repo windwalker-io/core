@@ -1,7 +1,7 @@
 import path from "node:path";
 import { resolve } from 'path';
 import { defineConfig } from "vite";
-import dts from "vite-plugin-dts";
+import dts from "unplugin-dts/vite";
 
 // Mark 3rd party packages as external
 const external = (id: string) =>
@@ -47,11 +47,12 @@ export default defineConfig(({ mode }) => {
       dts({
         // entryRoot: 'src',
         // pathsToAliases: true,
-        outDir: 'dist',
+        outDirs: 'dist',
         tsconfigPath: './tsconfig.json',
         insertTypesEntry: true,
         // merge to 1 file
-        rollupTypes: true,
+        // rollupTypes: true,
+        bundleTypes: true,
       }),
     ],
   };

@@ -366,11 +366,8 @@ class WindwalkerExtension implements
     protected function handleInPageAssets(string $content): string
     {
         $regexes = [
-            // Remove <style type="text/scss">...</style>
-            '/<style\b[^>]*\btype\s*=\s*(?:("|\')text\/scss("|\'))[^>]*>.*?<\/style>/is',
-
-            // Remove <script lang="scss">...</style>
-            '/<script\b[^>]*\blang\s*=\s*(?:("|\')scss("|\'))[^>]*>.*?<\/script>/is',
+            // Remove <style data-macro>...</style>
+            '/<style\b[^>]*\bdata-macro[^>]*>.*?<\/style>/is',
         ];
 
         return preg_replace(
@@ -382,7 +379,7 @@ class WindwalkerExtension implements
 
     protected function inlineTsToLoader(string $content): string
     {
-        $regex = '/<script\b[^>]*\blang\s*=\s*(?:("|\')ts("|\'))[^>]*>.*?<\/script>/is';
+        $regex = "'<script[^>]*>.*?</script>'si";
 
         return preg_replace_callback(
             $regex,
@@ -390,14 +387,15 @@ class WindwalkerExtension implements
                 /** @var Element $element */
                 $element = HTML5Factory::parse($matches[0]);
 
-                if (
-                    $element->getAttribute('lang') === 'ts'
-                    && $element->id
-                ) {
-                    return "<?php \$asset->importByApp('inline:{$element->id}'); ?>";
+                if (!$id = $element->getAttribute('data-macro')) {
+                    return $matches[0];
                 }
 
-                return $matches[0];
+                if ($element->getAttribute('lang') === 'ts') {
+                    return "<?php \$asset->importByApp('inline:{$id}'); ?>";
+                }
+
+                return '';
             },
             $content
         );

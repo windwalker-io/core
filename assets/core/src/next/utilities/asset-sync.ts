@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { loadJson } from './fs';
 
-export function findModules(suffix = ''): string[] {
+export function findModules(suffix = '', rootModule: string | null = 'src/Module'): string[] {
   const pkg = path.resolve(process.cwd(), 'composer.json');
 
   const pkgJson = loadJson(pkg);
@@ -17,6 +17,10 @@ export function findModules(suffix = ''): string[] {
       }) || [];
     })
     .flat();
+
+  if (rootModule) {
+    vendors.unshift(rootModule + '/' + suffix);
+  }
 
   return [...new Set(vendors)];
 }

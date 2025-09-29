@@ -1,13 +1,15 @@
 import BuildTask from '@/builder/BuildTask.ts';
-import { FileTasks, FusionPluginOptions, MaybePromise } from '@/types';
+import { FileTasks, FusionPluginOptions, MaybePromise, WatchTask } from '@/types';
 import { show } from '@/utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
 import { NormalizedOutputOptions, OutputBundle, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
-import { ConfigEnv, mergeConfig, Plugin, UserConfig } from 'vite';
+import { ConfigEnv, mergeConfig, Plugin, UserConfig, ViteDevServer } from 'vite';
 import crypto from 'node:crypto';
 
 export default class ConfigBuilder {
+  server: ViteDevServer | null = null;
+
   static globalOverrideConfig: UserConfig = {};
   overrideConfig: UserConfig = {};
 
@@ -24,7 +26,7 @@ export default class ConfigBuilder {
   // fileNameMap: Record<string, string> = {};
 
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
-  watches: string[] = [];
+  watches: WatchTask[] = [];
   cleans: string[] = [];
 
   tasks: Map<string, BuildTask> = new Map();

@@ -10,6 +10,7 @@ import { PreRenderedAsset } from 'rollup';
 import { PreRenderedChunk } from 'rollup';
 import { RollupOptions } from 'rollup';
 import { UserConfig } from 'vite';
+import { ViteDevServer } from 'vite';
 
 export declare function alias(src: string, dest: string): void;
 
@@ -105,6 +106,7 @@ export declare class ConfigBuilder {
     config: UserConfig;
     env: ConfigEnv;
     fusionOptions: FusionPluginOptions;
+    server: ViteDevServer | null;
     static globalOverrideConfig: UserConfig;
     overrideConfig: UserConfig;
     entryFileNamesCallbacks: ((chunkInfo: PreRenderedChunk) => string | undefined | void)[];
@@ -116,7 +118,7 @@ export declare class ConfigBuilder {
     postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<void>)[];
     resolveIdCallbacks: Exclude<Plugin_2['resolveId'], undefined>[];
     loadCallbacks: Exclude<Plugin_2['load'], undefined>[];
-    watches: string[];
+    watches: WatchTask[];
     cleans: string[];
     tasks: Map<string, BuildTask>;
     constructor(config: UserConfig, env: ConfigEnv, fusionOptions: FusionPluginOptions);
@@ -134,6 +136,8 @@ export declare class ConfigBuilder {
 }
 
 declare class ConfigBuilder_2 {
+    server: ViteDevServer | null = null;
+
     static globalOverrideConfig: UserConfig = {};
     overrideConfig: UserConfig = {};
 
@@ -150,7 +154,7 @@ declare class ConfigBuilder_2 {
     // fileNameMap: Record<string, string> = {};
 
     // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
-    watches: string[] = [];
+    watches: WatchTask_2[] = [];
     cleans: string[] = [];
 
     tasks: Map<string, BuildTask_2> = new Map();
@@ -501,7 +505,7 @@ declare const _default: {
     outDir: typeof outDir;
     chunkDir: typeof chunkDir;
     alias: typeof alias;
-    external: typeof external_2;
+    externals: typeof externals;
     plugin: typeof plugin;
     clean: typeof clean;
     fullReloads: typeof fullReloads;
@@ -526,8 +530,7 @@ declare const _default: {
 };
 export default _default;
 
-declare function external_2(match: string, varName?: string): void;
-export { external_2 as external }
+export declare function externals(...externals: (string | RegExp)[]): void;
 
 declare type ExtraViteOptions = OverrideOptions<ConfigBuilder_2>;
 
@@ -850,5 +853,18 @@ declare type TaskOutput = string;
 declare type TaskOutput_2 = string;
 
 export declare function useFusion(fusionOptions?: FusionPluginOptionsUnresolved, tasks?: string | string[]): PluginOption;
+
+declare type WatchTask = string | {
+    file: string;
+    moduleFile: string;
+    updateType: 'js-update' | 'css-update';
+};
+
+declare type WatchTask_2 = string | {
+    file: string,
+    moduleFile: string;
+    updateType: 'js-update' | 'css-update' | 'full-reload';
+    // handler: WatchTaskHandler;
+};
 
 export { }

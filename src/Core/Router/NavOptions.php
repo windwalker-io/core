@@ -61,7 +61,7 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
 
     public function addAllowQuery(string $name): void
     {
-        if ($this->allowQuery === false) {
+        if ($this->allowQuery === false || $this->allowQuery === null) {
             $this->allowQuery = [];
         }
 

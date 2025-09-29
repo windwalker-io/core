@@ -503,6 +503,7 @@ class ConfigBuilder {
     );
     this.addTask("hidden:placeholder");
   }
+  server = null;
   static globalOverrideConfig = {};
   overrideConfig = {};
   entryFileNamesCallbacks = [];
@@ -1036,6 +1037,7 @@ function useFusion(fusionOptions = {}, tasks) {
       },
       // Server
       configureServer(server) {
+        exports.builder.server = server;
         server.httpServer?.once("listening", () => {
           const scheme = server.config.server.https ? "https" : "http";
           const address = server.httpServer?.address();
@@ -1059,19 +1061,60 @@ function useFusion(fusionOptions = {}, tasks) {
             exitHandlersBound = true;
           }
         });
-        const watches = exports.builder.watches.map((p) => node_path.resolve(p).replace(/\\/g, "/"));
-        server.watcher.add(watches);
-        const checkReload = (path) => {
-          if (micromatch.isMatch(path, watches)) {
-            server.ws.send({ type: "full-reload", path: "*" });
-            logger.info(
-              `${chalk.green("full reload")} ${chalk.dim(node_path.relative(process.cwd(), path))}`,
-              { timestamp: true }
-            );
-          }
+        const fullReloadWatches = [];
+        const customWatches = [];
+        const checkReload = (event) => {
+          return (path) => {
+            for (const watchTask of customWatches) {
+              if (watchTask.file === path) {
+                const mods = server.moduleGraph.getModulesByFile(watchTask.moduleFile);
+                if (mods) {
+                  for (const mod of mods) {
+                    server.moduleGraph.invalidateModule(mod);
+                  }
+                  const updateType = watchTask.updateType;
+                  logger.info(
+                    `${chalk.green(updateType)} ${chalk.dim(node_path.relative(process.cwd(), watchTask.file))}`,
+                    { timestamp: true }
+                  );
+                  if (updateType === "full-reload") {
+                    server.ws.send({ type: "full-reload", path: "*" });
+                  } else {
+                    server.ws.send({
+                      type: "update",
+                      updates: [...mods].map((m) => ({
+                        type: updateType,
+                        path: m.url,
+                        acceptedPath: m.url,
+                        timestamp: Date.now()
+                      }))
+                    });
+                  }
+                }
+              }
+            }
+            if (micromatch.isMatch(path, fullReloadWatches)) {
+              server.ws.send({ type: "full-reload", path: "*" });
+              logger.info(
+                `${chalk.green("full reload")} ${chalk.dim(node_path.relative(process.cwd(), path))}`,
+                { timestamp: true }
+              );
+            }
+          };
         };
-        server.watcher.on("add", checkReload);
-        server.watcher.on("change", checkReload);
+        server.watcher.on("add", checkReload());
+        server.watcher.on("change", checkReload());
+        for (const watchTask of exports.builder.watches) {
+          if (typeof watchTask === "string") {
+            const file2 = node_path.resolve(watchTask).replace(/\\/g, "/");
+            fullReloadWatches.push(file2);
+            server.watcher.add(file2);
+            continue;
+          }
+          const file = node_path.resolve(watchTask.file).replace(/\\/g, "/");
+          customWatches.push(watchTask);
+          server.watcher.add(file);
+        }
       }
       // async handleHotUpdate(ctx) {
       //   if (builder.watches.includes(ctx.file)) {
@@ -1202,18 +1245,11 @@ function alias(src, dest) {
     }
   });
 }
-function external(match, varName) {
-  const globals = {};
-  if (varName) {
-    globals[match] = varName;
-  }
+function externals(...externals2) {
   exports.builder.overrideConfig = vite.mergeConfig(exports.builder.overrideConfig, {
     build: {
       rollupOptions: {
-        external: [match],
-        output: {
-          globals
-        }
+        external: externals2
       }
     }
   });
@@ -1238,7 +1274,7 @@ const index = {
   outDir,
   chunkDir,
   alias,
-  external,
+  externals,
   plugin,
   clean,
   fullReloads,
@@ -1255,7 +1291,7 @@ exports.copy = copy;
 exports.copyGlob = copyGlob;
 exports.css = css;
 exports.default = index;
-exports.external = external;
+exports.externals = externals;
 exports.fileToId = fileToId;
 exports.fullReloads = fullReloads;
 exports.getGlobBaseFromPattern = getGlobBaseFromPattern;
