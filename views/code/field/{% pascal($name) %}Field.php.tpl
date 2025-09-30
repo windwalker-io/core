@@ -16,7 +16,7 @@ class {% pascal($name) %}Field extends AbstractField
      */
     public function prepareInput(DOMElement $input): DOMElement
     {
-        return $input;
+        return parent::prepareInput($input);
     }
 
     /**
