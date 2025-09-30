@@ -28,7 +28,10 @@ class DebuggerPackage extends AbstractPackage implements ServiceProviderInterfac
 
     public function install(PackageInstaller $installer): void
     {
-        //
+        $installer->installConfig(
+            __DIR__ . '/../../etc/*.config.php',
+            'config'
+        );
     }
 
     public static function getName(): string

@@ -34,7 +34,7 @@ class PackagePostInstallCommand implements CommandInterface
         );
 
         $this->app->runProcess(
-            'php windwalker pkg:install --tag config --no-details',
+            'php windwalker pkg:install --tag config --details 2',
             null,
             $io
         );

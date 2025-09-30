@@ -89,9 +89,9 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         $command->addOption(
             'details',
             null,
-            InputOption::VALUE_NEGATABLE,
+            InputOption::VALUE_REQUIRED,
             'Show details of each file operation.',
-            true
+            3
         );
     }
 
@@ -108,7 +108,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
         $packages = (array) $io->getArgument('packages');
         $tags = (array) $io->getOption('tag');
-        $details = $this->io->getOption('details');
+        $details = (int) $this->io->getOption('details');
 
         $registry = $this->app->make(PackageRegistry::class);
 
@@ -143,7 +143,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
         $resultSet = [];
 
-        if (!$details) {
+        if ($details < 2) {
             $io->writeln("Installing selected resources...");
         }
 
@@ -153,7 +153,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
             $callbacks = $pkgInstaller->getAllCallbacks($tags);
 
-            if ($details) {
+            if ($details > 2) {
                 $io->writeln("Installing: <comment>$package</comment>");
             }
 
@@ -347,14 +347,14 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
     public function getFilCloner(): FileCloner
     {
         $dry = $this->io->getOption('dry-run') !== false;
-        $details = $this->io->getOption('details');
+        $details = (int) $this->io->getOption('details');
 
         return $this->fileCloner ??= new FileCloner(
             output: $this->io,
             link: $this->io->getOption('link') !== false,
             dryRun: $dry,
             printSourcePath: true,
-            verbosity: $details ? 3 : 1,
+            verbosity: $details,
         );
     }
 }
