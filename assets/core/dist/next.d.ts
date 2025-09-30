@@ -41,6 +41,8 @@ export declare function findFilesFromGlobArray(sources: string[]): FindFileResul
 
 export declare function findModules(suffix?: string, rootModule?: string | null): string[];
 
+export declare function findPackages(suffix?: string, withRoot?: boolean): string[];
+
 export declare function globalAssets(options: WindwalkerAssetsOptions): FusionPlugin;
 
 export declare function injectSystemJS(systemPath?: string, filter?: (file: OutputAsset | OutputChunk) => any): PluginOption;

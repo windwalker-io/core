@@ -59,6 +59,15 @@ function findModules(suffix = "", rootModule = "src/Module") {
   }
   return [...new Set(vendors)];
 }
+function findPackages(suffix = "", withRoot = true) {
+  const pkg = path.resolve(process.cwd(), "composer.json");
+  const pkgJson = loadJson(pkg);
+  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => `vendor/${pkgJson2.name}/${suffix}`).flat();
+  if (withRoot) {
+    vendors.unshift(suffix);
+  }
+  return [...new Set(vendors)];
+}
 function uniqId(prefix = "", size = 16) {
   let id = randomBytes(size).toString("hex");
   if (prefix) {
@@ -514,6 +523,7 @@ export {
   ensureDirPath,
   findFilesFromGlobArray,
   findModules,
+  findPackages,
   globalAssets,
   injectSystemJS,
   installVendors,
