@@ -1,6 +1,6 @@
-import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
-import { LoadedConfigTask } from '@/types';
-import { forceArray } from '@/utilities/arr.ts';
+import { ProcessorInterface, ProcessorPreview } from '../processors/ProcessorInterface.ts';
+import { LoadedConfigTask } from '../types';
+import { forceArray } from '../utilities/arr.ts';
 import archy, { type Data } from 'archy';
 import chalk from 'chalk';
 import { MaybeArray } from 'rollup';

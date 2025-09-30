@@ -1,11 +1,11 @@
-import { ProcessorInterface } from '@/processors/ProcessorInterface.ts';
-import { forceArray } from '@/utilities/arr.ts';
+import { ProcessorInterface } from '../processors/ProcessorInterface.ts';
+import { forceArray } from '../utilities/arr.ts';
 import { build } from 'esbuild';
 import Module from 'module';
 import { existsSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
-import { MaybeArray, MaybePromise } from '@/types';
-import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '@/types';
+import { MaybeArray, MaybePromise } from '../types';
+import { ConfigResult, LoadedConfigTask, RunnerCliParams } from '../types';
 
 export async function loadConfigFile(configFile: ConfigResult): Promise<Record<string, LoadedConfigTask>> {
   let path = configFile.path;

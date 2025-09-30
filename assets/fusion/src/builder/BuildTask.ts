@@ -1,5 +1,5 @@
-import { MaybePromise } from '@/types';
-import { fileToId } from '@/utilities/fs.ts';
+import { MaybePromise } from '../types';
+import { fileToId } from '../utilities/fs.ts';
 import { normalize, parse } from 'node:path';
 import { NormalizedOutputOptions, OutputBundle, PreRenderedChunk } from 'rollup';
 

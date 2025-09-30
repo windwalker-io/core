@@ -1,4 +1,4 @@
-import ConfigBuilder from '@/builder/ConfigBuilder.ts';
+import ConfigBuilder from '../builder/ConfigBuilder.ts';
 import { UserConfig } from 'vite';
 
 export type TaskInput = string | string[];

@@ -6,7 +6,8 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules/**/*"
+    "node_modules/**/*",
+    "src/*.mjs"
   ],
   "types": [
     "reflect-metadata"
@@ -16,6 +17,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,

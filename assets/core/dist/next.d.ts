@@ -25,7 +25,8 @@ declare class CssModulizeProcessor implements ProcessorInterface {
     constructor(processor: ReturnType<typeof css>, bladePatterns?: string[], cssPatterns?: string[]);
     parseBlades(...bladePatterns: (string[] | string)[]): this;
     mergeCss(...css: (string[] | string)[]): this;
-    config(taskName: string, builder: ConfigBuilder): undefined;
+    config(taskName: string, builder: ConfigBuilder): any;
+    parseStylesFromBlades(files: string[]): string[];
     preview(): ProcessorPreview[];
 }
 
@@ -38,7 +39,7 @@ export declare interface FindFileResult {
 
 export declare function findFilesFromGlobArray(sources: string[]): FindFileResult[];
 
-export declare function findModules(suffix?: string): string[];
+export declare function findModules(suffix?: string, rootModule?: string | null): string[];
 
 export declare function globalAssets(options: WindwalkerAssetsOptions): FusionPlugin;
 
@@ -63,7 +64,7 @@ declare class JsModulizeProcessor implements ProcessorInterface {
     protected bladePatterns: string[];
     protected stagePrefix: string;
     constructor(processor: ReturnType<typeof js>, options?: JsModulizeOptions);
-    config(taskName: string, builder: ConfigBuilder): undefined;
+    config(taskName: string, builder: ConfigBuilder): any;
     /**
      * @see https://github.com/vitejs/vite/issues/6393#issuecomment-1006819717
      * @see https://stackoverflow.com/questions/76259677/vite-dev-server-throws-error-when-resolving-external-path-from-importmap

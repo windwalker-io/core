@@ -1,6 +1,6 @@
-import { FusionPlugin } from '@/types/plugin.ts';
-import { RunnerCliParams } from '@/types/runner.ts';
-import { MaybePromise } from '@/types/index.ts';
+import { FusionPlugin } from '../types/plugin.ts';
+import { RunnerCliParams } from '../types/runner.ts';
+import { MaybePromise } from '../types/index.ts';
 
 export interface FusionPluginOptions {
   fusionfile?: string | Fusionfile;

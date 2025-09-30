@@ -15,7 +15,7 @@
     "sourceMap": true,
     "stripInternal": true,
     "paths": {
-      "@/*": ["./src/*"]
+//      "@/*": ["./src/*"]
     }
   },
   "include": [

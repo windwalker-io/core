@@ -1,4 +1,4 @@
-import { RunnerCliParams } from '@/types';
+import { RunnerCliParams } from './types';
 
 let params: RunnerCliParams | undefined = undefined;
 

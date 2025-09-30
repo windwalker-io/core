@@ -1,9 +1,9 @@
-import { ProcessorInterface } from '@/processors/ProcessorInterface.ts';
+import { ProcessorInterface } from '../processors/ProcessorInterface.ts';
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
 import { MaybeArray } from 'rollup';
-import { resolveTaskOptions } from '@/runner/config';
-import { LoadedConfigTask, RunningTasks } from '@/types/runner.ts';
+import { resolveTaskOptions } from '../runner/config';
+import { LoadedConfigTask, RunningTasks } from '../types/runner.ts';
 import { UserConfig } from 'vite';
 
 export function selectRunningTasks(

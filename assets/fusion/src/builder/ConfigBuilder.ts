@@ -1,6 +1,6 @@
-import BuildTask from '@/builder/BuildTask.ts';
-import { FileTasks, FusionPluginOptions, MaybePromise, WatchTask } from '@/types';
-import { show } from '@/utilities/utilities.ts';
+import BuildTask from '../builder/BuildTask.ts';
+import { FileTasks, FusionPluginOptions, MaybePromise, WatchTask } from '../types';
+import { show } from '../utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
 import { NormalizedOutputOptions, OutputBundle, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';

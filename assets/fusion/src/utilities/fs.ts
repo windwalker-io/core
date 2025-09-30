@@ -1,6 +1,6 @@
-import { FileTasks } from '@/types';
-import { isWindows } from '@/utilities/env.ts';
-import { shortHash } from '@/utilities/crypto.ts';
+import { FileTasks } from '../types';
+import { isWindows } from '../utilities/env.ts';
+import { shortHash } from '../utilities/crypto.ts';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
 import { randomBytes } from 'node:crypto';

@@ -1,4 +1,4 @@
-import { OverrideOptions } from '@/types';
+import { OverrideOptions } from '../types';
 import { cloneDeep, merge } from 'lodash-es';
 import { inspect } from 'node:util';
 import { OutputOptions } from 'rollup';

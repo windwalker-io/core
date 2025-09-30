@@ -1,10 +1,10 @@
-import BuildTask from '@/builder/BuildTask.ts';
-import ConfigBuilder from '@/builder/ConfigBuilder.ts';
-import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
-import { TaskInput, TaskOutput } from '@/types';
-import { forceArray, handleForceArray, handleMaybeArray } from '@/utilities/arr';
+import BuildTask from '../builder/BuildTask.ts';
+import ConfigBuilder from '../builder/ConfigBuilder.ts';
+import { ProcessorInterface, ProcessorPreview } from '../processors/ProcessorInterface.ts';
+import { TaskInput, TaskOutput } from '../types';
+import { forceArray, handleForceArray, handleMaybeArray } from '../utilities/arr';
 import { basename, parse } from 'node:path';
-import { MaybePromise } from '@/types';
+import { MaybePromise } from '../types';
 
 export function js(input: TaskInput, output?: TaskOutput): ProcessorInterface {
   return new JsProcessor(input, output);

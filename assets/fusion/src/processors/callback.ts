@@ -1,6 +1,6 @@
-import ConfigBuilder from '@/builder/ConfigBuilder.ts';
-import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
-import { MaybePromise } from '@/types';
+import ConfigBuilder from '../builder/ConfigBuilder.ts';
+import { ProcessorInterface, ProcessorPreview } from '../processors/ProcessorInterface.ts';
+import { MaybePromise } from '../types';
 
 type CallbackHandler = (taskName: string, builder: ConfigBuilder) => MaybePromise<any>;
 

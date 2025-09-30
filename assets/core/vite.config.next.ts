@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
-import dtsPlugin from 'vite-plugin-dts';
+import dtsPlugin from 'unplugin-dts/vite';
 
 const dependencies = JSON.parse(readFileSync('./package.json', 'utf8')).dependencies || {};
 
@@ -62,11 +62,12 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       dtsPlugin({
-        outDir: 'dist',
-        // tsconfigPath: './tsconfig.json',
+        outDirs: 'dist',
+        tsconfigPath: './tsconfig.json',
         insertTypesEntry: true,
         // merge to 1 file
-        rollupTypes: true,
+        bundleTypes: true,
+        exclude: ['./src/*.mjs']
         // include: ['./src/next/index.ts'],
       }),
     ]

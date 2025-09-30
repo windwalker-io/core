@@ -1,4 +1,4 @@
-import { RunnerCliParams } from '@/types/runner.ts';
+import { RunnerCliParams } from '../types/runner.ts';
 import yargs from 'yargs';
 
 export function getArgsAfterDoubleDashes(argv?: string[]): string[] {

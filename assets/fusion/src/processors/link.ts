@@ -1,8 +1,8 @@
-import ConfigBuilder from '@/builder/ConfigBuilder.ts';
-import { ProcessorInterface, ProcessorPreview } from '@/processors/ProcessorInterface.ts';
-import { LinkOptions, TaskInput } from '@/types';
-import { forceArray, handleMaybeArray } from '@/utilities/arr.ts';
-import { MaybePromise } from '@/types';
+import ConfigBuilder from '../builder/ConfigBuilder.ts';
+import { ProcessorInterface, ProcessorPreview } from '../processors/ProcessorInterface.ts';
+import { LinkOptions, TaskInput } from '../types';
+import { forceArray, handleMaybeArray } from '../utilities/arr.ts';
+import { MaybePromise } from '../types';
 
 export function link(input: TaskInput, dest: string, options: LinkOptions = {}) {
   return new LinkProcessor(input, dest, options);

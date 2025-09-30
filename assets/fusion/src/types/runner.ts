@@ -1,5 +1,5 @@
-import { ProcessorInterface } from '@/processors/ProcessorInterface.ts';
-import { MaybeArray, MaybePromise } from '@/types/index.ts';
+import { ProcessorInterface } from '../processors/ProcessorInterface.ts';
+import { MaybeArray, MaybePromise } from '../types/index.ts';
 import { UserConfig } from 'vite';
 import { Arguments } from 'yargs';
 
