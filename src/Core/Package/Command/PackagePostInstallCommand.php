@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Package\Command;
 
+use Composer\InstalledVersions;
 use Symfony\Component\Console\Command\Command;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
@@ -28,13 +29,13 @@ class PackagePostInstallCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         $this->app->runProcess(
-            'php windwalker pkg:migrate',
+            'php windwalker pkg:install --tag config --details 2',
             null,
             $io
         );
 
         $this->app->runProcess(
-            'php windwalker pkg:install --tag config --no-details',
+            'php windwalker pkg:migrate',
             null,
             $io
         );
