@@ -20,7 +20,7 @@ class PackageUpgrader
 
     public static function upgrade(PackageEvent $event)
     {
-        include __DIR__ . '/../../vendor/autoload.php';
+        include __DIR__ . '/../../../../../autoload.php';
 
         static::$uid ??= uid();
         static::$time = time();
