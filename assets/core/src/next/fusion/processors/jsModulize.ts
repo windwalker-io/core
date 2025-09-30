@@ -80,6 +80,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
     const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
     const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
 
+    // Watches
     // for (const bladeFile of bladeFiles) {
     //   builder.watches.push({
     //     file: resolve(bladeFile.file.fullpath),

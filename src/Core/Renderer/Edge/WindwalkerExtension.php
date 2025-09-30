@@ -391,7 +391,7 @@ class WindwalkerExtension implements
                     return $matches[0];
                 }
 
-                if ($element->getAttribute('lang') === 'ts') {
+                if ($element->getAttribute('lang') === 'ts' && trim($element->textContent)) {
                     return "<?php \$asset->importByApp('inline:{$id}'); ?>";
                 }
 
