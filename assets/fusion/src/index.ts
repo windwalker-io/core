@@ -11,7 +11,7 @@ import { forceArray } from './utilities/arr.ts';
 import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from './utilities/fs.ts';
 import { mergeOptions } from './utilities/utilities.ts';
 import chalk from 'chalk';
-import fs from 'fs';
+import fs from 'node:fs';
 import { uniq } from 'lodash-es';
 import micromatch from 'micromatch';
 import { existsSync, writeFileSync } from 'node:fs';

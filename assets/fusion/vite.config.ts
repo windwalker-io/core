@@ -1,12 +1,8 @@
-import path from "node:path";
+import { readFileSync } from 'node:fs';
 import { resolve } from 'path';
 import { defineConfig } from "vite";
 import dts from "unplugin-dts/vite";
-
-// Mark 3rd party packages as external
-const external = (id: string) =>
-  // All path that not starts with '.' or '/' are external
-  !id.startsWith(".") && !path.isAbsolute(id) && !id.startsWith("@/");
+const dependencies = JSON.parse(readFileSync('./package.json', 'utf8')).dependencies || {};
 
 export default defineConfig(({ mode }) => {
   return {
@@ -22,7 +18,21 @@ export default defineConfig(({ mode }) => {
       },
       sourcemap: true,
       rollupOptions: {
-        external,
+        external: [
+          /^node:/,
+          'fs',
+          'path',
+          'url',
+          'util',
+          'crypto',
+          'module',
+          'os',
+          'child_process',
+          'worker_threads',
+          'tty',
+          'vite',
+          ...Object.keys(dependencies),
+        ],
         output: [
           {
             format: 'es',

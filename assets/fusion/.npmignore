@@ -4,6 +4,7 @@
 yarn.lock
 README.md
 
+/src
 /tests
 /gulpfile.mjs
 tsconfig.json

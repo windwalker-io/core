@@ -1,12 +1,8 @@
-/**
- * Part of fusion project.
- *
- * @copyright  Copyright (C) 2018 Asikart.
- * @license    MIT
- */
-
-import { cliInput } from '../src/utilities/cli.js';
+import minimist from 'minimist';
 import { execSync as exec } from 'child_process';
+const packageName = '@windwalker-io/fusion-next';
+
+const cliInput = minimist(process.argv.slice(2));
 
 const args = cliInput._;
 
@@ -25,15 +21,18 @@ if (cliInput['help'] || cliInput['h']) {
   process.exit(0);
 }
 
+console.log(`>>> yarn build`);
+exec(`yarn build`, { stdio: 'inherit' });
+
 console.log(`>>> npm version ${args.join(' ')}`);
-const buffer = exec(`npm version ${args.join(' ')}`);
+const buffer = exec(`npm version ${args.join(' ')} --no-workspaces-update`);
 
 const ver = buffer.toString().split("\n")[1];
 
 console.log('>>> Git commit all');
 exec(`git add .`, { stdio: 'inherit' });
 try {
-  exec(`git commit -am "Prepare release @windwalker-io/fusion. ${ver}"`);
+  exec(`git commit -am "Prepare release JS ${packageName} ${ver}."`, { stdio: 'inherit' });
 } catch (e) {
   console.log(e.message);
 }
@@ -42,8 +41,7 @@ const branch = cliInput['b'] || 'master';
 
 console.log('>>> Push to git');
 
-exec(`git push origin ${branch}`);
-// exec(`git checkout ${branch}`);
+exec(`git push origin ${branch}`, { stdio: 'inherit' });
 
 console.log('>> Publish to npm');
 

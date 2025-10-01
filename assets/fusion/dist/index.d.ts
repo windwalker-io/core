@@ -1,6 +1,6 @@
 import { Arguments } from 'yargs';
 import { ConfigEnv } from 'vite';
-import { default as default_2 } from 'crypto';
+import { default as default_2 } from 'node:crypto';
 import { NormalizedOutputOptions } from 'rollup';
 import { OutputBundle } from 'rollup';
 import { Plugin as Plugin_2 } from 'vite';

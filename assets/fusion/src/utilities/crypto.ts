@@ -1,4 +1,4 @@
-import Crypto from 'crypto';
+import Crypto from 'node:crypto';
 
 export function shortHash(bufferOrString: Crypto.BinaryLike, short: number | null = 8): string {
   let hash = Crypto.createHash('sha1')
