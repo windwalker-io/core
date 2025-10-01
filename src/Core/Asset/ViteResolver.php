@@ -67,7 +67,12 @@ class ViteResolver
 
     public function shouldResolve(string $uri): bool
     {
-        return str_starts_with($uri, $this->alias) && $this->getManifest() !== null;
+        return str_starts_with($uri, $this->alias) && $this->hasViteEnvironment();
+    }
+
+    public function hasViteEnvironment(): bool
+    {
+        return $this->serverIsRunning() || $this->getManifest() !== null;
     }
 
     protected function getBase(): string
