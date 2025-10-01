@@ -54,7 +54,7 @@ class CreateCommand extends AbstractMigrationCommand implements InteractInterfac
         $command->addOption(
             'update',
             'u',
-            InputOption::VALUE_NONE,
+            InputOption::VALUE_NEGATABLE,
             'Is an update or create new entity',
         );
     }
@@ -100,7 +100,7 @@ class CreateCommand extends AbstractMigrationCommand implements InteractInterfac
         //         }
         //     )
         // );
-        if (!$io->getOption('update')) {
+        if (!$io->getOption('update') === null) {
             $update = $io->askChoice(
                 '<question>Is an update or create new entity?</question>',
                 [

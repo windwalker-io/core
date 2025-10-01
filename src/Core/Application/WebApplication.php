@@ -382,7 +382,7 @@ class WebApplication implements WebRootApplicationInterface
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
         } catch (ValidateFailException | InvalidTokenException $e) {
-            if ($app->isDebug() || $app->isApiCall()) {
+            if ($app->isApiCall()) {
                 throw $e;
             }
 
