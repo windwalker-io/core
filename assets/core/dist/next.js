@@ -66,7 +66,6 @@ function findPackages(suffix = "", withRoot = true) {
   if (withRoot) {
     vendors.unshift(suffix);
   }
-
   return [...new Set(vendors)];
 }
 function uniqId(prefix = "", size = 16) {
@@ -374,7 +373,6 @@ class JsModulizeProcessor {
 }
 function parseScriptsFromBlades(patterns) {
   let files = findFilesFromGlobArray(Array.isArray(patterns) ? patterns : [patterns]);
-  
   return files.map((file) => {
     const bladeText = fs$1.readFileSync(file.fullpath, "utf8");
     const html = parse(bladeText);

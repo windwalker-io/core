@@ -1,6 +1,6 @@
 {
   "name": "@windwalker-io/core",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "type": "module",
   "description": "Windwalker Core JS package",
   "scripts": {
@@ -23,6 +23,13 @@
       "import": "./src/app/index.ts"
     }
   },
+  "files": [
+    "dist",
+    "images",
+    "scss",
+    "src",
+    "package.json"
+  ],
   "repository": "https://github.com/ventoviro/windwalker-core",
   "author": "Simon Asika",
   "license": "MIT",

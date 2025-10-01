@@ -4,10 +4,4 @@ yarn.lock
 package-lock.json
 .yarn
 !.gitkeep
-
-# Dev
-/dist/debugger/dev
-
-# Test
-#/fusionfile.js
-/test/dest/*
+!/dist

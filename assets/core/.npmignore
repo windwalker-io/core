@@ -2,8 +2,6 @@
 .gitignore
 .editorconfig
 yarn.lock
-README.md
+node_modules
 
-/test
-/gulpfile.mjs
 tsconfig.json
