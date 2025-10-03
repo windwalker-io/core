@@ -310,7 +310,7 @@ export declare function useFusion(fusionOptions?: FusionPluginOptionsUnresolved,
 declare type WatchTask = string | {
     file: string;
     moduleFile: string;
-    updateType: 'js-update' | 'css-update' | 'full-reload';
+    updateType: 'js-update' | 'css-update';
 };
 
 export { }
