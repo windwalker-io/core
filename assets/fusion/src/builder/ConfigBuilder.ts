@@ -48,6 +48,7 @@ export default class ConfigBuilder {
         },
         build: {
           manifest: 'manifest.json',
+          assetsInlineLimit: 0,
           rollupOptions: {
             preserveEntrySignatures: 'strict',
             input: {},
