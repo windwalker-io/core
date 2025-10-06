@@ -7,9 +7,6 @@ namespace Windwalker\Core\Composer;
 use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\Installer\PackageEvent;
 
-use function Windwalker\fs;
-use function Windwalker\uid;
-
 class PackageUpgrader
 {
     public static array $packages = [];
@@ -18,16 +15,15 @@ class PackageUpgrader
 
     public static int $time;
 
-    public static function upgrade(PackageEvent $event)
+    public static function upgrade(PackageEvent $event): void
     {
-        include __DIR__ . '/../../../../../autoload.php';
-
-        static::$uid ??= uid();
+        static::$uid ??= uniqid('pkup__', true);
         static::$time = time();
 
         $root = dirname($event->getComposer()->getConfig()->get('vendor-dir'));
         $tmpPath = $event->getComposer()->getPackage()->getExtra()['windwalker']['upgrade-tmp'] ?? 'tmp/upgrades.json';
-        $tmpFile = fs($tmpPath, $root);
+
+        $tmpFile = new \SplFileObject($root . '/' . $tmpPath);
 
         $op = $event->getOperation();
 
@@ -40,8 +36,23 @@ class PackageUpgrader
                 $target->getVersion(),
             ];
 
-            $tmpFile->getParent()->mkdir();
-            $tmpFile->write(
+            if (
+                !is_dir($tmpFile->getPath())
+                && !mkdir(
+                    $concurrentDirectory = $tmpFile->getPath(),
+                    0777,
+                    true
+                )
+                && !is_dir($concurrentDirectory)
+            ) {
+                trigger_error(
+                    sprintf('Directory "%s" was not created', $concurrentDirectory),
+                    E_USER_WARNING
+                );
+            }
+
+            file_put_contents(
+                $tmpFile->getPathname(),
                 json_encode(
                     [
                         'uid' => static::$uid,
