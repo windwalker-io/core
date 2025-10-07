@@ -161,7 +161,8 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
         $options = compact('props', 'methods', 'hooks');
 
         if ($ns === '*') {
-            $ns = 'App\\Entity\\*';
+            $ns = $this->getPackageNamespace($io, 'Entity') ?? 'App\\Entity\\';
+            $ns .= '*';
         }
 
         if (str_contains($ns, '*')) {
