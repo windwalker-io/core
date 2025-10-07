@@ -133,7 +133,7 @@ trait EntityHooksConcernTrait
                     }
 
                     $setHook = $this->createHookAssignValue(
-                        $propName,
+                        $propRef,
                         new Node\Identifier($typeString),
                         $factory->staticCall(
                             new Node\Name($typeClass),
@@ -149,7 +149,7 @@ trait EntityHooksConcernTrait
                 if ($this->isEnum($className)) {
                     /** @var class-string<\UnitEnum> $className */
                     $setHook = $this->createHookAssignValue(
-                        $propName,
+                        $propRef,
                         $type,
                         new Node\Expr\Variable('value')
                     );
