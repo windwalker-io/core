@@ -150,7 +150,7 @@ class PackageInstaller
     /**
      * Example: $installer->installMVCModules('Banner', ['Front', 'Admin'], true);
      *
-     * @param  string  $name
+     * @param  string  $entity
      * @param  array   $modules
      * @param  bool    $model
      *
@@ -159,24 +159,31 @@ class PackageInstaller
      * @throws \ReflectionException
      */
     public function installMVCModules(
-        string $name,
+        string $entity,
         array $modules = [
             'Front',
             'Admin',
         ],
         bool $model = true,
     ): static {
-        $snake = StrNormalize::toSnakeCase($name);
+        if (str_contains($entity, '\\')) {
+            $segments = explode('\\', $entity);
+            $entity = (string) array_pop($segments);
+        }
+
+        $snake = StrNormalize::toSnakeCase($entity);
+        $entity = StrNormalize::toPascalCase($entity);
 
         $ref = new \ReflectionClass($this->package);
         $ns = $ref->getNamespaceName();
 
         foreach ($modules as $module) {
             $snakeModule = StrNormalize::toSnakeCase($module);
+            $module = StrNormalize::toPascalCase($module);
 
             $this->installModules(
                 [
-                    $this->package::path("src/Module/$module/$name/**/*") => "@source/Module/Admin/$name",
+                    $this->package::path("src/Module/$module/$entity/**/*") => "@source/Module/Admin/$entity",
                 ],
                 [$ns . "\\Module\\$module" => "App\\Module\\$module"],
                 ['modules', $snake . '_' . $snakeModule],
@@ -186,8 +193,8 @@ class PackageInstaller
         if ($model) {
             $this->installModules(
                 [
-                    $this->package::path("src/Entity/$name.php") => '@source/Entity',
-                    $this->package::path("src/Repository/{$name}Repository.php") => '@source/Repository',
+                    $this->package::path("src/Entity/$entity.php") => '@source/Entity',
+                    $this->package::path("src/Repository/{$entity}Repository.php") => '@source/Repository',
                 ],
                 [
                     $ns . '\\Entity' => 'App\\Entity',

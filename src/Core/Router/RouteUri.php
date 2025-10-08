@@ -193,7 +193,7 @@ class RouteUri extends Uri implements NavConstantInterface
     {
         $new = parent::withVar($name, $value);
 
-        if ($this->options->allowQuery === false) {
+        if ($this->options->allowQuery === false || is_array($this->options->allowQuery)) {
             $new = $new->allowQuery([$name], true);
         }
 
