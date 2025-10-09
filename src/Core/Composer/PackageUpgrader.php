@@ -23,7 +23,7 @@ class PackageUpgrader
         $root = dirname($event->getComposer()->getConfig()->get('vendor-dir'));
         $tmpPath = $event->getComposer()->getPackage()->getExtra()['windwalker']['upgrade-tmp'] ?? 'tmp/upgrades.json';
 
-        $tmpFile = new \SplFileObject($root . '/' . $tmpPath);
+        $tmpFile = new \SplFileInfo($root . '/' . $tmpPath);
 
         $op = $event->getOperation();
 
