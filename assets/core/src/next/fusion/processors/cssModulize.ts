@@ -1,4 +1,5 @@
 import { stripUrlQuery } from '@/next';
+import { findModules, findPackages } from '@windwalker-io/core/next';
 import { type ConfigBuilder, css, type ProcessorInterface, type ProcessorPreview } from '@windwalker-io/fusion-next';
 import { WatchTask } from '@windwalker-io/fusion-next/src/types';
 import fg from 'fast-glob';
@@ -8,6 +9,28 @@ import { normalize, resolve } from 'node:path';
 
 export function cssModulize(entry: string, dest: string) {
   return new CssModulizeProcessor(css(entry, dest));
+}
+
+export interface CssModulizeDeepOptions {
+  mergeCss?: boolean;
+  parseBlades?: boolean;
+}
+
+export function cssModulizeDeep(stage: string, entry: string, dest: string, options: CssModulizeDeepOptions = {}) {
+  const processor = cssModulize(entry, dest);
+
+  if (options.mergeCss ?? true) {
+    processor.mergeCss(findModules(`${stage}/**/assets/*.scss`));
+  }
+
+  if (options.parseBlades ?? true) {
+    processor.parseBlades(
+      findModules(`${stage}/**/*.blade.php`),
+      findPackages('views/**/*.blade.php'),
+    );
+  }
+
+  return processor;
 }
 
 class CssModulizeProcessor implements ProcessorInterface {

@@ -8,7 +8,7 @@ import crypto, { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import fs$1 from "fs-extra";
 import { parse } from "node-html-parser";
-function loadJson(file) {
+function loadJson$1(file) {
   if (!fs.existsSync(file)) {
     return null;
   }
@@ -46,10 +46,10 @@ function findFiles(src) {
     };
   });
 }
-function findModules(suffix = "", rootModule = "src/Module") {
+function findModules$1(suffix = "", rootModule = "src/Module") {
   const pkg = path.resolve(process.cwd(), "composer.json");
-  const pkgJson = loadJson(pkg);
-  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => {
+  const pkgJson = loadJson$1(pkg);
+  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson$1(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => {
     return pkgJson2?.extra?.windwalker?.modules?.map((module) => {
       return `vendor/${pkgJson2.name}/${module}/${suffix}`;
     }) || [];
@@ -59,10 +59,10 @@ function findModules(suffix = "", rootModule = "src/Module") {
   }
   return [...new Set(vendors)];
 }
-function findPackages(suffix = "", withRoot = true) {
+function findPackages$1(suffix = "", withRoot = true) {
   const pkg = path.resolve(process.cwd(), "composer.json");
-  const pkgJson = loadJson(pkg);
-  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => `vendor/${pkgJson2.name}/${suffix}`).flat();
+  const pkgJson = loadJson$1(pkg);
+  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson$1(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => `vendor/${pkgJson2.name}/${suffix}`).flat();
   if (withRoot) {
     vendors.unshift(suffix);
   }
@@ -196,8 +196,106 @@ function systemCSSFix() {
     }
   };
 }
+function loadJson(file) {
+  if (!fs.existsSync(file)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+process.platform === "win32" ? "\\" : "/";
+function findModules(suffix = "", rootModule = "src/Module") {
+  const pkg = path.resolve(process.cwd(), "composer.json");
+  const pkgJson = loadJson(pkg);
+  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => {
+    return pkgJson2?.extra?.windwalker?.modules?.map((module) => {
+      return `vendor/${pkgJson2.name}/${module}/${suffix}`;
+    }) || [];
+  }).flat();
+  if (rootModule) {
+    vendors.unshift(rootModule + "/" + suffix);
+  }
+  return [...new Set(vendors)];
+}
+function findPackages(suffix = "", withRoot = true) {
+  const pkg = path.resolve(process.cwd(), "composer.json");
+  const pkgJson = loadJson(pkg);
+  const vendors = Object.keys(pkgJson["require"] || {}).concat(Object.keys(pkgJson["require-dev"] || {})).map((id) => `vendor/${id}/composer.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.extra?.windwalker != null).map((pkgJson2) => `vendor/${pkgJson2.name}/${suffix}`).flat();
+  if (withRoot) {
+    vendors.unshift(suffix);
+  }
+  return [...new Set(vendors)];
+}
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
+process.platform === "win32" ? "\\" : "/";
 function cssModulize(entry, dest) {
   return new CssModulizeProcessor(css(entry, dest));
+}
+function cssModulizeDeep(stage, entry, dest, options = {}) {
+  const processor = cssModulize(entry, dest);
+  if (options.mergeCss ?? true) {
+    processor.mergeCss(findModules(`${stage}/**/assets/*.scss`));
+  }
+  if (options.parseBlades ?? true) {
+    processor.parseBlades(
+      findModules(`${stage}/**/*.blade.php`),
+      findPackages("views/**/*.blade.php")
+    );
+  }
+  return processor;
 }
 class CssModulizeProcessor {
   constructor(processor, bladePatterns = [], cssPatterns = []) {
@@ -266,6 +364,21 @@ ${imports}
 }
 function jsModulize(entry, dest, options = {}) {
   return new JsModulizeProcessor(js(entry, dest), options);
+}
+function jsModulizeDeep(stage, entry, dest, options = {}) {
+  const processor = jsModulize(entry, dest, options).stage(stage.toLowerCase());
+  if (options.mergeScripts ?? true) {
+    processor.mergeScripts(
+      findModules(`${stage}/**/assets/*.ts`)
+    );
+  }
+  if (options.parseBlades ?? true) {
+    processor.parseBlades(
+      findModules(`${stage}/**/*.blade.php`),
+      findPackages("views/**/*.blade.php")
+    );
+  }
+  return processor;
 }
 class JsModulizeProcessor {
   constructor(processor, options = {}) {
@@ -425,7 +538,7 @@ async function findAndInstall(npmVendors = [], to = "www/assets/vendor") {
   dirs.forEach((dir) => {
     deleteExists(dir);
   });
-  const composerJsons = getInstalledComposerVendors().map((cv) => `vendor/${cv}/composer.json`).map((file) => loadJson(file)).filter((composerJson) => composerJson?.extra?.windwalker != null);
+  const composerJsons = getInstalledComposerVendors().map((cv) => `vendor/${cv}/composer.json`).map((file) => loadJson$1(file)).filter((composerJson) => composerJson?.extra?.windwalker != null);
   vendors = findNpmVendors(composerJsons).concat(vendors);
   vendors = [...new Set(vendors)];
   for (const vendor of vendors) {
@@ -482,8 +595,8 @@ async function doInstall(source, dest) {
 }
 function findNpmVendors(composerJsons = []) {
   const pkg = path.resolve(process.cwd(), "package.json");
-  const pkgJson = loadJson(pkg);
-  let vendors = Object.keys(pkgJson.devDependencies || {}).concat(Object.keys(pkgJson.dependencies || {})).map((id) => `node_modules/${id}/package.json`).map((file) => loadJson(file)).filter((pkgJson2) => pkgJson2?.windwalker != null).map((pkgJson2) => pkgJson2?.windwalker.vendors || []).flat();
+  const pkgJson = loadJson$1(pkg);
+  let vendors = Object.keys(pkgJson.devDependencies || {}).concat(Object.keys(pkgJson.dependencies || {})).map((id) => `node_modules/${id}/package.json`).map((file) => loadJson$1(file)).filter((pkgJson2) => pkgJson2?.windwalker != null).map((pkgJson2) => pkgJson2?.windwalker.vendors || []).flat();
   const vendorsFromComposer = composerJsons.map((composerJson) => {
     return [
       ...composerJson?.extra?.windwalker?.asset_vendors || [],
@@ -495,7 +608,7 @@ function findNpmVendors(composerJsons = []) {
 }
 function getInstalledComposerVendors() {
   const composerFile = path.resolve(process.cwd(), "composer.json");
-  const composerJson = loadJson(composerFile);
+  const composerJson = loadJson$1(composerFile);
   return [
     ...new Set(
       Object.keys(composerJson["require"] || {}).concat(Object.keys(composerJson["require-dev"] || {}))
@@ -520,15 +633,17 @@ export {
   cloneAssets,
   containsMiddleGlob,
   cssModulize,
+  cssModulizeDeep,
   ensureDirPath,
   findFilesFromGlobArray,
-  findModules,
-  findPackages,
+  findModules$1 as findModules,
+  findPackages$1 as findPackages,
   globalAssets,
   injectSystemJS,
   installVendors,
   jsModulize,
-  loadJson,
+  jsModulizeDeep,
+  loadJson$1 as loadJson,
   removeLastGlob,
   resolveModuleRealpath,
   stripUrlQuery,

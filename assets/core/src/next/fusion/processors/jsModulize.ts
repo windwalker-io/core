@@ -1,4 +1,5 @@
 import { type FindFileResult, findFilesFromGlobArray, stripUrlQuery } from '@/next';
+import { findModules, findPackages } from '@windwalker-io/core/next';
 import {
   type BuildTask,
   type ConfigBuilder,
@@ -9,7 +10,6 @@ import {
   shortHash,
   plugin as addPlugin,
 } from '@windwalker-io/fusion-next';
-import { WatchTask } from '@windwalker-io/fusion-next/src/types';
 import fs from 'fs-extra';
 import crypto from 'node:crypto';
 import { parse } from 'node-html-parser';
@@ -22,6 +22,31 @@ export interface JsModulizeOptions {
 
 export function jsModulize(entry: string, dest: string, options: JsModulizeOptions = {}) {
   return new JsModulizeProcessor(js(entry, dest), options);
+}
+
+export interface JsModulizeDeepOptions extends JsModulizeOptions {
+  mergeScripts?: boolean;
+  parseBlades?: boolean;
+}
+
+export function jsModulizeDeep(stage: string, entry: string, dest: string, options: JsModulizeDeepOptions = {}) {
+  const processor = jsModulize(entry, dest, options)
+    .stage(stage.toLowerCase());
+
+  if (options.mergeScripts ?? true) {
+    processor.mergeScripts(
+      findModules(`${stage}/**/assets/*.ts`),
+    );
+  }
+
+  if (options.parseBlades ?? true) {
+    processor.parseBlades(
+      findModules(`${stage}/**/*.blade.php`),
+      findPackages('views/**/*.blade.php'),
+    );
+  }
+
+  return processor;
 }
 
 export class JsModulizeProcessor implements ProcessorInterface {

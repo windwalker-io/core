@@ -6,10 +6,10 @@
   "scripts": {
     "build": "yarn build:next && yarn build:debugger",
     "dev": "yarn dev:debugger",
-    "build:next": "vite build --config vite.config.next.ts",
+    "build:next": "vite build --config vite.next.config.ts",
     "dev:next": "yarn build:next --watch",
-    "build:debugger": "vite build --config vite.config.debugger.ts",
-    "dev:debugger": "vite --config vite.config.debugger.ts"
+    "build:debugger": "vite build --config vite.debugger.config.ts",
+    "dev:debugger": "vite --config vite.debugger.config.ts"
   },
   "exports": {
     ".": "./src/index.js",

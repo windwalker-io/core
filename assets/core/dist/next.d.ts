@@ -18,6 +18,13 @@ export declare function containsMiddleGlob(str: string): boolean;
 
 export declare function cssModulize(entry: string, dest: string): CssModulizeProcessor;
 
+export declare function cssModulizeDeep(stage: string, entry: string, dest: string, options?: CssModulizeDeepOptions): CssModulizeProcessor;
+
+export declare interface CssModulizeDeepOptions {
+    mergeCss?: boolean;
+    parseBlades?: boolean;
+}
+
 declare class CssModulizeProcessor implements ProcessorInterface {
     protected processor: ReturnType<typeof css>;
     protected bladePatterns: string[];
@@ -54,7 +61,14 @@ export declare function installVendors(npmVendors?: string[], to?: string): {
 
 export declare function jsModulize(entry: string, dest: string, options?: JsModulizeOptions): JsModulizeProcessor;
 
-declare interface JsModulizeOptions {
+export declare function jsModulizeDeep(stage: string, entry: string, dest: string, options?: JsModulizeDeepOptions): JsModulizeProcessor;
+
+export declare interface JsModulizeDeepOptions extends JsModulizeOptions {
+    mergeScripts?: boolean;
+    parseBlades?: boolean;
+}
+
+export declare interface JsModulizeOptions {
     tmpPath?: string;
     cleanTmp?: boolean;
 }
