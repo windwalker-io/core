@@ -24,35 +24,35 @@ class HtmlFrame
      *
      * @var string|null
      */
-    protected ?string $title = null;
+    public protected(set) ?string $title = null;
 
     /**
      * Property siteName.
      *
      * @var string|null
      */
-    protected ?string $siteName = null;
+    public protected(set) ?string $siteName = null;
 
     /**
      * Property favicon.
      *
      * @var string|null
      */
-    protected ?string $favicon = null;
+    public protected(set) ?string $favicon = null;
 
     /**
      * Property metadata.
      *
      * @var  Metadata
      */
-    protected Metadata $metadata;
+    public protected(set) Metadata $metadata;
 
     /**
      * Property customTags.
      *
      * @var  array
      */
-    protected array $customTags = [];
+    public protected(set) array $customTags = [];
 
     /**
      * Property indents.
@@ -61,9 +61,9 @@ class HtmlFrame
      */
     protected string $indents = '    ';
 
-    protected HTMLElement $body;
+    public protected(set) HTMLElement $bodyElement;
 
-    protected HTMLElement $html;
+    public protected(set) HTMLElement $htmlElement;
 
     /**
      * HtmlHeaderManager constructor.
@@ -74,8 +74,8 @@ class HtmlFrame
         protected AssetService $asset,
         ?Metadata $metadata = null
     ) {
-        $this->body = HTMLElement::new('body');
-        $this->html = HTMLElement::new('html');
+        $this->bodyElement = HTMLElement::new('body');
+        $this->htmlElement = HTMLElement::new('html');
         $this->metadata = $metadata ?? new Metadata();
     }
 
@@ -545,7 +545,7 @@ class HtmlFrame
      */
     public function getBodyElement(): HTMLElement
     {
-        return $this->body;
+        return $this->bodyElement;
     }
 
     /**
@@ -555,19 +555,19 @@ class HtmlFrame
      */
     public function setBodyElement(HTMLElement $body): static
     {
-        $this->body = $body;
+        $this->bodyElement = $body;
 
         return $this;
     }
 
     public function addBodyClass(string $class): HTMLElement
     {
-        return $this->body->addClass($class);
+        return $this->bodyElement->addClass($class);
     }
 
     public function bodyAttributes(): string
     {
-        return HTMLElement::buildAttributes($this->body);
+        return HTMLElement::buildAttributes($this->bodyElement);
     }
 
     /**
@@ -575,7 +575,7 @@ class HtmlFrame
      */
     public function getHtmlElement(): HTMLElement
     {
-        return $this->html;
+        return $this->htmlElement;
     }
 
     /**
@@ -585,18 +585,18 @@ class HtmlFrame
      */
     public function setHtmlElement(HTMLElement $html): static
     {
-        $this->html = $html;
+        $this->htmlElement = $html;
 
         return $this;
     }
 
     public function addHtmlClass(string $class): HTMLElement
     {
-        return $this->html->addClass($class);
+        return $this->htmlElement->addClass($class);
     }
 
     public function htmlAttributes(): string
     {
-        return HTMLElement::buildAttributes($this->html);
+        return HTMLElement::buildAttributes($this->htmlElement);
     }
 }
