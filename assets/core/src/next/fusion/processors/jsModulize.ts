@@ -1,19 +1,18 @@
-import { type FindFileResult, findFilesFromGlobArray, stripUrlQuery } from '@/next';
-import { findModules, findPackages } from '@windwalker-io/core/next';
 import {
   type BuildTask,
   type ConfigBuilder,
+  js,
   type MaybePromise,
+  plugin as addPlugin,
   type ProcessorInterface,
   type ProcessorPreview,
-  js,
   shortHash,
-  plugin as addPlugin,
 } from '@windwalker-io/fusion-next';
 import fs from 'fs-extra';
-import crypto from 'node:crypto';
 import { parse } from 'node-html-parser';
+import crypto from 'node:crypto';
 import { normalize, resolve } from 'node:path';
+import { type FindFileResult, findFilesFromGlobArray, findModules, findPackages, stripUrlQuery } from '../../utilities';
 
 export interface JsModulizeOptions {
   tmpPath?: string;
@@ -64,35 +63,11 @@ export class JsModulizeProcessor implements ProcessorInterface {
     const tmpPath = this.options.tmpPath ?? resolve('./tmp/fusion/jsmodules/').replace(/\\/g, '/');
     const clean = this.options.cleanTmp ?? true;
 
-    // const appFileName = 'js/' + this.stagePrefix + '/app.js';
-    // const appSrcFileName = 'resources/assets/src/' + this.stagePrefix + '/app.js';
-    // const task = builder.addTask(appFileName);
-
     if (clean) {
       builder.postBuildCallbacks.push((options, bundle) => {
         fs.removeSync(tmpPath);
       });
     }
-
-    // builder.merge({
-    //   resolve: {
-    //     alias: {
-    //       '@main': task.input
-    //     }
-    //   }
-    // });
-
-    // builder.entryFileNamesCallbacks.push((chunkInfo) => {
-    //   if (chunkInfo.facadeModuleId === appSrcFileName) {
-    //     return appFileName;
-    //   }
-    // });
-    //
-    // builder.resolveIdCallbacks.push((id) => {
-    //   if (id === task.input) {
-    //     return appSrcFileName;
-    //   }
-    // });
 
     this.ignoreMainImport(task);
 
@@ -106,6 +81,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
     const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
 
     // Watches
+    // Currently we don't watch blade files because not necessary.
     // for (const bladeFile of bladeFiles) {
     //   builder.watches.push({
     //     file: resolve(bladeFile.file.fullpath),
@@ -116,11 +92,10 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
     builder.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
+      const scripts: Record<string, string> = {};
 
       // if (src === appSrcFileName) {
       if (normalize(srcFile) === inputFile) {
-        let listJS = "{\n";
-
         // Merge standalone ts files
         for (const scriptFile of scriptFiles) {
           let fullpath = scriptFile.fullpath;
@@ -141,7 +116,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
           // md5
           key = 'view:' + crypto.createHash('md5').update(key).digest('hex');
 
-          listJS += `'${key}': () => import('${fullpath}'),\n`;
+          scripts[key] = fullpath;
         }
 
         // Parse from blades
@@ -157,11 +132,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
             fs.writeFileSync(tmpFile, result.code);
           }
 
-          // if (this.stagePrefix) {
-          //   key = this.stagePrefix + '/' + key;
-          // }
-
-          listJS += `'inline:${key}': () => import('${tmpFile}'),\n`;
+          scripts[`inline:${key}`] = tmpFile;
 
           const fullpath = resolve(result.file.fullpath).replace(/\\/g, '/');
 
@@ -170,19 +141,14 @@ export class JsModulizeProcessor implements ProcessorInterface {
           }
         }
 
-        listJS += "}";
+        let listJS = `{\n`;
 
-//         const loaderPath = resolve('./vendor/windwalker/core/assets/core/src/next/app.ts')
-//           .replace(/\\/g, '/');
-//
-//         const ts = `
-// import { App } from '${loaderPath}';
-//
-// const app = new App();
-// app.registerRoutes(${listJS});
-//
-// export default app;
-//   `;
+        for (const key in scripts) {
+          const fullpath = scripts[key];
+          listJS += `'${key}': () => import('${fullpath}'),\n`;
+        }
+
+        listJS += `}`;
 
         // Listen extra files
         builder.watches.push(...listens);

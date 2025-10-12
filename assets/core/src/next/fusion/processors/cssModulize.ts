@@ -1,11 +1,10 @@
-import { stripUrlQuery } from '@/next';
-import { findModules, findPackages } from '@windwalker-io/core/next';
 import { type ConfigBuilder, css, type ProcessorInterface, type ProcessorPreview } from '@windwalker-io/fusion-next';
 import { WatchTask } from '@windwalker-io/fusion-next/src/types';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
 import { parse } from 'node-html-parser';
 import { normalize, resolve } from 'node:path';
+import { findModules, findPackages, stripUrlQuery } from '../../utilities';
 
 export function cssModulize(entry: string, dest: string) {
   return new CssModulizeProcessor(css(entry, dest));
