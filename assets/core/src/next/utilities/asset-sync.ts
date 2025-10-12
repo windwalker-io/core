@@ -19,7 +19,7 @@ export function findModules(suffix = '', rootModule: string | null = 'src/Module
     .flat();
 
   if (rootModule) {
-    vendors.unshift(rootModule + '/' + suffix);
+    vendors.push(rootModule + '/' + suffix);
   }
 
   return [...new Set(vendors)];
