@@ -59,7 +59,7 @@ class MailerFactory implements ServiceFactoryInterface
 
     public function createMailer(array $options = []): MailerInterface
     {
-        return $this->container->call(static::createMailer($options));
+        return $this->container->call(static::mailer($options));
     }
 
     public static function createEnvelope(array $options): ?Envelope
