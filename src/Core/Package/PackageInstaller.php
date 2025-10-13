@@ -271,6 +271,10 @@ class PackageInstaller
         $callbacks = $this->installResources->getCallbacks();
 
         foreach ($tags as $tag) {
+            if (!isset($this->tags[$tag])) {
+                continue;
+            }
+
             foreach ($this->tags[$tag]->getCallbacks() ?? [] as $callback) {
                 $callbacks[] = $callback;
             }

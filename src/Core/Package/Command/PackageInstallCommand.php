@@ -161,6 +161,10 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
                 $resultSet[] = $this->install($pkgInstaller->installResources, $callbacks);
             } else {
                 foreach ($tags as $tag) {
+                    if (!isset($pkgInstaller->tags[$tag])) {
+                        continue;
+                    }
+
                     $resultSet [] = $this->install($pkgInstaller->tags[$tag], $callbacks);
                 }
             }
@@ -306,7 +310,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
             foreach ($tags as $tag) {
                 if (!isset($installer->tags[$tag])) {
-                    throw new InvalidArgumentException("Package: $package has no tag: $tag.");
+                    $this->io->style()->warning("Package: $package has no tag: $tag.");
                 }
             }
         }
