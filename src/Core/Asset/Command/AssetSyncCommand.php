@@ -92,6 +92,23 @@ class AssetSyncCommand implements CommandInterface
             $vendors = $json['extra']['windwalker']['assets']['vendors'] ?? [];
 
             foreach ($vendors as $vendor => $versions) {
+                if (
+                    str_starts_with($versions, 'portal:')
+                    || str_starts_with($versions, 'file:')
+                    || str_starts_with($versions, 'link:')
+                ) {
+                    $packageJson->setDeep(
+                        'dependencies#' . $vendor,
+                        $versions,
+                        '#'
+                    );
+
+                    $override = true;
+
+                    $io->writeln("Local Link: <info>\"$vendor\"</info> to \"$versions\"");
+                    continue;
+                }
+
                 $constraints = $versionParser->parseConstraints($versions);
 
                 if ($currentVersions = $packageJson->getDeep('dependencies#' . $vendor, '#')) {
