@@ -77,25 +77,29 @@ export class JsModulizeProcessor implements ProcessorInterface {
       }
     });
 
+    // Todo: Must dynamic changes in load() hook
     const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
-    const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
+    const bladeFiles = findBladeFiles(this.bladePatterns);
 
     // Watches
-    // Currently we don't watch blade files because not necessary.
-    // for (const bladeFile of bladeFiles) {
+    // Currently we don't watch blade files because not necessary to reload full-pages.
+    // for (const bladeFile of bladeScripts) {
     //   builder.watches.push({
     //     file: resolve(bladeFile.file.fullpath),
     //     moduleFile: inputFile,
-    //     updateType: 'full-reload',
+    //     updateType: 'js-update',
     //   } satisfies WatchTask);
     // }
 
     builder.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
       const scripts: Record<string, string> = {};
-
+      
       // if (src === appSrcFileName) {
       if (normalize(srcFile) === inputFile) {
+        const bladeScripts = parseScriptsFromBlades(bladeFiles);
+        fs.removeSync(tmpPath);
+
         // Merge standalone ts files
         for (const scriptFile of scriptFiles) {
           let fullpath = scriptFile.fullpath;
@@ -124,7 +128,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         fs.ensureDirSync(tmpPath);
 
-        for (const result of bladeFiles) {
+        for (const result of bladeScripts) {
           let key = result.as;
           const tmpFile = tmpPath + '/' + result.path.replace(/\\|\//g, '_') + '-' + shortHash(result.code) + '.ts';
 
@@ -228,9 +232,11 @@ interface ScriptResult {
 //     .filter((c) => c.trim() !== '');
 // }
 
-function parseScriptsFromBlades(patterns: string | string[]): ScriptResult[] {
-  let files = findFilesFromGlobArray(Array.isArray(patterns) ? patterns : [patterns]);
+function findBladeFiles(patterns: string | string[]) {
+  return findFilesFromGlobArray(Array.isArray(patterns) ? patterns : [patterns]);
+}
 
+function parseScriptsFromBlades(files: FindFileResult[]): ScriptResult[] {
   return files.map((file) => {
     const bladeText = fs.readFileSync(file.fullpath, 'utf8');
 

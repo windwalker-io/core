@@ -257,6 +257,27 @@ class AssetService implements EventAwareInterface
         return $this;
     }
 
+    public function importSyncByApp(string $module, array $props = [], array $options = []): static
+    {
+        $handler = $this->config->getDeep('modules.importSyncHandler');
+
+        $propsString = static::getJSObject($props ?: new \stdClass());
+
+        if ($handler instanceof \Closure) {
+            return $this->internalModule($handler($module, $propsString, $options), $options);
+        }
+
+        $moduleVar = $options['moduleVar'] ?? 'module';
+        $options['inline'] = true;
+
+        $this->importMainThen(
+            "{$moduleVar}.default.importSync('$module', $propsString)",
+            $options
+        );
+
+        return $this;
+    }
+
     public function addLink(string $type, string $url, array $options = [], array $attrs = []): AssetLink
     {
         $url = $this->handleUri($url);

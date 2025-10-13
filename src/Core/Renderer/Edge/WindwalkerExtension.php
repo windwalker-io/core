@@ -21,6 +21,7 @@ use Windwalker\Edge\Extension\EdgeExtensionInterface;
 use Windwalker\Edge\Extension\GlobalVariablesExtensionInterface;
 use Windwalker\Edge\Extension\ParsersExtensionInterface;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
+use Windwalker\Utilities\Str;
 
 /**
  * The WindwalkerExtension class.
@@ -384,7 +385,6 @@ class WindwalkerExtension implements
         return preg_replace_callback(
             $regex,
             static function ($matches) {
-                /** @var Element $element */
                 $element = HTML5Factory::parse($matches[0]);
 
                 if (!$id = $element->getAttribute('data-macro')) {
@@ -392,7 +392,23 @@ class WindwalkerExtension implements
                 }
 
                 if ($element->getAttribute('lang') === 'ts' && trim($element->textContent)) {
-                    return "<?php \$asset->importByApp('inline:{$id}'); ?>";
+                    $propString = '[';
+                    foreach ($element->dataset->toArray() as $k => $v) {
+                        if (!str_starts_with($k, 'props')) {
+                            continue;
+                        }
+
+                        if ($k === 'props') {
+                            $propString .= "...$v,";
+                            continue;
+                        }
+
+                        $k = str_replace("'", "\'", Str::removeLeft($k, 'props:'));
+                        $propString .= "'$k' => $v,";
+                    }
+                    $propString .= ']';
+
+                    return "<?php \$asset->importSyncByApp('inline:{$id}', $propString); ?>";
                 }
 
                 return '';

@@ -55,7 +55,7 @@ function findModules(suffix = "", rootModule = "src/Module") {
     }) || [];
   }).flat();
   if (rootModule) {
-    vendors.unshift(rootModule + "/" + suffix);
+    vendors.push(rootModule + "/" + suffix);
   }
   return [...new Set(vendors)];
 }
@@ -321,11 +321,13 @@ class JsModulizeProcessor {
       }
     });
     const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
-    const bladeFiles = parseScriptsFromBlades(this.bladePatterns);
+    const bladeFiles = findBladeFiles(this.bladePatterns);
     builder.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
       const scripts = {};
       if (normalize(srcFile) === inputFile) {
+        const bladeScripts = parseScriptsFromBlades(bladeFiles);
+        fs$1.removeSync(tmpPath);
         for (const scriptFile of scriptFiles) {
           let fullpath = scriptFile.fullpath;
           if (fullpath.endsWith(".d.ts")) {
@@ -342,7 +344,7 @@ class JsModulizeProcessor {
         }
         const listens = [];
         fs$1.ensureDirSync(tmpPath);
-        for (const result of bladeFiles) {
+        for (const result of bladeScripts) {
           let key = result.as;
           const tmpFile = tmpPath + "/" + result.path.replace(/\\|\//g, "_") + "-" + shortHash(result.code) + ".ts";
           if (!fs$1.existsSync(tmpFile) || fs$1.readFileSync(tmpFile, "utf8") !== result.code) {
@@ -404,8 +406,10 @@ class JsModulizeProcessor {
     return this;
   }
 }
-function parseScriptsFromBlades(patterns) {
-  let files = findFilesFromGlobArray(Array.isArray(patterns) ? patterns : [patterns]);
+function findBladeFiles(patterns) {
+  return findFilesFromGlobArray(Array.isArray(patterns) ? patterns : [patterns]);
+}
+function parseScriptsFromBlades(files) {
   return files.map((file) => {
     const bladeText = fs$1.readFileSync(file.fullpath, "utf8");
     const html = parse(bladeText);

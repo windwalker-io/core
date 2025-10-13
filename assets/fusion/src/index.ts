@@ -217,12 +217,21 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
                   } else {
                     server.ws.send({
                       type: 'update',
-                      updates: [...mods].map((m) => ({
-                        type: updateType,
-                        path: m.url,
-                        acceptedPath: m.url,
-                        timestamp: Date.now()
-                      }))
+                      updates: [...mods].map((m) => {
+                        let url = m.url;
+
+                        // remove query
+                        if (url.indexOf('?') !== -1) {
+                          url = url.substring(0, url.indexOf('?'));
+                        }
+
+                        return ({
+                          type: updateType,
+                          path: url,
+                          acceptedPath: url,
+                          timestamp: Date.now()
+                        });
+                      })
                     });
                   }
                 }
