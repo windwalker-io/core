@@ -92,20 +92,29 @@ class AssetSyncCommand implements CommandInterface
             $vendors = $json['extra']['windwalker']['assets']['vendors'] ?? [];
 
             foreach ($vendors as $vendor => $versions) {
+                // Override with local protocol
                 if (
-                    str_starts_with($versions, 'portal:')
-                    || str_starts_with($versions, 'file:')
-                    || str_starts_with($versions, 'link:')
+                    $this->hasProtocol($versions)
+                    || str_starts_with($versions, './')
                 ) {
-                    $packageJson->setDeep(
-                        'dependencies#' . $vendor,
-                        $versions,
-                        '#'
-                    );
+                    if (!$this->hasProtocol($versions)) {
+                        $versions = 'file:' . $versions;
+                    }
 
-                    $override = true;
+                    if (
+                        !($currentVersions = $packageJson->getDeep('dependencies#' . $vendor, '#'))
+                        || !$this->hasProtocol($currentVersions)
+                    ) {
+                        $packageJson->setDeep(
+                            'dependencies#' . $vendor,
+                            $versions,
+                            '#'
+                        );
 
-                    $io->writeln("Local Link: <info>\"$vendor\"</info> to \"$versions\"");
+                        $override = true;
+
+                        $io->writeln("Use Protocol: <info>\"$vendor\"</info> to \"$versions\"");
+                    }
                     continue;
                 }
 
@@ -117,7 +126,7 @@ class AssetSyncCommand implements CommandInterface
                     if (!Intervals::isSubsetOf($constraints, $currentConstraints)) {
                         $packageJson->setDeep(
                             'dependencies#' . $vendor,
-                            $newVersion = $currentVersions . '|' . $versions,
+                            $newVersion = $currentVersions . '||' . $versions,
                             '#'
                         );
 
@@ -154,5 +163,15 @@ class AssetSyncCommand implements CommandInterface
         }
 
         return 0;
+    }
+
+    /**
+     * @param  mixed  $versions
+     *
+     * @return  bool
+     */
+    public function hasProtocol(mixed $versions): bool
+    {
+        return str_contains($versions, ':');
     }
 }
