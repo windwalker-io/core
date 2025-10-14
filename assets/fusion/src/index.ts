@@ -179,6 +179,10 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           // Bind exit signals
           if (!exitHandlersBound) {
             process.on("exit", () => {
+              for (const callback of builder.serverStopCallbacks) {
+                callback(resolvedConfig, server);
+              }
+
               if (fs.existsSync(serverFile)) {
                 fs.rmSync(serverFile);
               }

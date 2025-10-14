@@ -67,6 +67,9 @@ export class JsModulizeProcessor implements ProcessorInterface {
       builder.postBuildCallbacks.push((options, bundle) => {
         fs.removeSync(tmpPath);
       });
+      builder.serverStopCallbacks.push((options, bundle) => {
+        fs.removeSync(tmpPath);
+      });
     }
 
     this.ignoreMainImport(task);
@@ -98,7 +101,6 @@ export class JsModulizeProcessor implements ProcessorInterface {
       // if (src === appSrcFileName) {
       if (normalize(srcFile) === inputFile) {
         const bladeScripts = parseScriptsFromBlades(bladeFiles);
-        fs.removeSync(tmpPath);
 
         // Merge standalone ts files
         for (const scriptFile of scriptFiles) {
@@ -130,7 +132,8 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         for (const result of bladeScripts) {
           let key = result.as;
-          const tmpFile = tmpPath + '/' + result.path.replace(/\\|\//g, '_') + '-' + shortHash(result.code) + '.ts';
+          const filename = result.path.replace(/\\|\//g, '_');
+          const tmpFile = tmpPath + '/' + filename + '.ts';
 
           if (!fs.existsSync(tmpFile) || fs.readFileSync(tmpFile, 'utf8') !== result.code) {
             fs.writeFileSync(tmpFile, result.code);

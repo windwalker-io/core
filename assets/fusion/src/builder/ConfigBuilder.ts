@@ -4,7 +4,7 @@ import { show } from '../utilities/utilities.ts';
 import { get, set } from 'lodash-es';
 import { isAbsolute, relative } from 'node:path';
 import { NormalizedOutputOptions, OutputBundle, PreRenderedAsset, PreRenderedChunk, RollupOptions } from 'rollup';
-import { ConfigEnv, mergeConfig, Plugin, UserConfig, ViteDevServer } from 'vite';
+import { ConfigEnv, mergeConfig, Plugin, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 import crypto from 'node:crypto';
 
 export default class ConfigBuilder {
@@ -21,6 +21,7 @@ export default class ConfigBuilder {
   copyTasks: FileTasks = [];
   linkTasks: FileTasks<'link'> = [];
   postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<void>)[] = [];
+  serverStopCallbacks: ((config: ResolvedConfig, server: ViteDevServer) => MaybePromise<void>)[] = [];
   resolveIdCallbacks: Exclude<Plugin['resolveId'], undefined>[] = [];
   loadCallbacks: Exclude<Plugin['load'], undefined>[] = [];
   // fileNameMap: Record<string, string> = {};

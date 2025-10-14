@@ -1,4 +1,4 @@
-import { getGlobBaseFromPattern, callback, css, js, shortHash, plugin, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
+import { getGlobBaseFromPattern, callback, css, js, plugin, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
 import isGlob from "is-glob";
 import micromatch from "micromatch";
 import path, { relative, normalize, resolve } from "node:path";
@@ -313,6 +313,9 @@ class JsModulizeProcessor {
       builder.postBuildCallbacks.push((options, bundle) => {
         fs$1.removeSync(tmpPath);
       });
+      builder.serverStopCallbacks.push((options, bundle) => {
+        fs$1.removeSync(tmpPath);
+      });
     }
     this.ignoreMainImport(task);
     builder.resolveIdCallbacks.push((id) => {
@@ -327,7 +330,6 @@ class JsModulizeProcessor {
       const scripts = {};
       if (normalize(srcFile) === inputFile) {
         const bladeScripts = parseScriptsFromBlades(bladeFiles);
-        fs$1.removeSync(tmpPath);
         for (const scriptFile of scriptFiles) {
           let fullpath = scriptFile.fullpath;
           if (fullpath.endsWith(".d.ts")) {
@@ -346,7 +348,8 @@ class JsModulizeProcessor {
         fs$1.ensureDirSync(tmpPath);
         for (const result of bladeScripts) {
           let key = result.as;
-          const tmpFile = tmpPath + "/" + result.path.replace(/\\|\//g, "_") + "-" + shortHash(result.code) + ".ts";
+          const filename = result.path.replace(/\\|\//g, "_");
+          const tmpFile = tmpPath + "/" + filename + ".ts";
           if (!fs$1.existsSync(tmpFile) || fs$1.readFileSync(tmpFile, "utf8") !== result.code) {
             fs$1.writeFileSync(tmpFile, result.code);
           }

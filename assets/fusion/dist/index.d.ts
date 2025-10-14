@@ -7,6 +7,7 @@ import { Plugin as Plugin_2 } from 'vite';
 import { PluginOption } from 'vite';
 import { PreRenderedAsset } from 'rollup';
 import { PreRenderedChunk } from 'rollup';
+import { ResolvedConfig } from 'vite';
 import { UserConfig } from 'vite';
 import { ViteDevServer } from 'vite';
 
@@ -61,6 +62,7 @@ export declare class ConfigBuilder {
     copyTasks: FileTasks;
     linkTasks: FileTasks<'link'>;
     postBuildCallbacks: ((options: NormalizedOutputOptions, bundle: OutputBundle) => MaybePromise<void>)[];
+    serverStopCallbacks: ((config: ResolvedConfig, server: ViteDevServer) => MaybePromise<void>)[];
     resolveIdCallbacks: Exclude<Plugin_2['resolveId'], undefined>[];
     loadCallbacks: Exclude<Plugin_2['load'], undefined>[];
     watches: WatchTask[];
