@@ -2008,6 +2008,9 @@ class ConfigBuilder {
           emptyOutDir: false,
           sourcemap: env.mode !== "production" ? "inline" : false
         },
+        server: {
+          hmr: fusionOptions.cliParams?.hmr
+        },
         plugins: [],
         css: {
           devSourcemap: true
@@ -2179,7 +2182,7 @@ class ConfigBuilder {
 
 function getArgsAfterDoubleDashes(argv) {
   argv ??= process.argv;
-  return argv.slice(2).join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
+  return argv.join(" ").split(" -- ").slice(1).join(" -- ").trim().split(" ").filter((v) => v !== "");
 }
 function parseArgv(argv) {
   const app = yargs();
@@ -2201,6 +2204,10 @@ function parseArgv(argv) {
     alias: "s",
     type: "string",
     description: "Path to server file"
+  });
+  app.option("no-hmr", {
+    type: "boolean",
+    description: "Disable HMR for dev server"
   });
   app.option("verbose", {
     alias: "v",
@@ -8843,7 +8850,7 @@ function useFusion(fusionOptions = {}, tasks) {
   } else {
     params._ = originalTasks;
   }
-  params = mergeOptions(params, resolvedOptions.cliParams);
+  resolvedOptions.cliParams = params = mergeOptions(params, resolvedOptions.cliParams);
   return [
     {
       name: "fusion",

@@ -74,6 +74,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
         $names = array_map(StrNormalize::toKebabCase(...), $names);
 
         $name = $names[array_key_last($names)];
+        $stage = $names[array_key_first($names)];
 
         if (($suffix && str_ends_with($name, $suffix)) || !$suffix) {
             array_pop($names);
@@ -81,7 +82,7 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
 
         $dest = implode('/', $names);
 
-        return [$dest, $name];
+        return [$dest, $name, $stage];
     }
 
     /**

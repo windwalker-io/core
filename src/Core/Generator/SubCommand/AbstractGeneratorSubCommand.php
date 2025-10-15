@@ -183,6 +183,12 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return $this->app->path('@root');
     }
 
+    /**
+     * @param  IOInterface  $io
+     * @param  string|null  $suffix
+     *
+     * @return  array{ string, string, string }  dest, name, stage
+     */
     protected function getNameParts(IOInterface $io, ?string $suffix = null): array
     {
         $name = $io->getArgument('name');
@@ -190,10 +196,17 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return static::splitNameParts($name, $suffix);
     }
 
+    /**
+     * @param  string       $name
+     * @param  string|null  $suffix
+     *
+     * @return  array{ string, string, string }  dest, name, stage
+     */
     public static function splitNameParts(string $name, ?string $suffix = null): array
     {
         $names = preg_split('/\/|\\\\/', $name);
         $name = $names[array_key_last($names)];
+        $stage = $names[array_key_first($names)];
 
         if (($suffix && str_ends_with($name, $suffix)) || !$suffix) {
             array_pop($names);
@@ -201,7 +214,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
         $dest = implode('/', $names);
 
-        return [$dest, $name];
+        return [$dest, $name, $stage];
     }
 
     protected function getViewPath(string $suffix = ''): string

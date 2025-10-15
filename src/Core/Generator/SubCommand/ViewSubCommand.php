@@ -25,7 +25,7 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
      */
     public function execute(IOInterface $io): int
     {
-        [, $name] = $this->getNameParts($io, 'View');
+        [, $name, $stage] = $this->getNameParts($io, 'View');
         $force = $io->getOption('force');
 
         if (!$name) {
@@ -41,6 +41,7 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
                     'className' => Str::ensureRight($name, 'View'),
                     'name' => Str::removeRight($name, 'View'),
                     'ns' => $this->getNamespace($io, 'View'),
+                    'stage' => $stage,
                 ],
                 $force
             );

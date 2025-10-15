@@ -295,6 +295,7 @@ declare type RunnerCliOptions = {
     verbose?: number;
     serverFile?: string;
     s?: string;
+    noHmr?: boolean;
 };
 
 declare type RunnerCliParams = Arguments<RunnerCliOptions>;

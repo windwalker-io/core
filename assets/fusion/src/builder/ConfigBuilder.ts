@@ -67,6 +67,9 @@ export default class ConfigBuilder {
           emptyOutDir: false,
           sourcemap: env.mode !== 'production' ? 'inline' : false,
         },
+        server: {
+          hmr: fusionOptions.cliParams?.hmr,
+        },
         plugins: [],
         css: {
           devSourcemap: true,

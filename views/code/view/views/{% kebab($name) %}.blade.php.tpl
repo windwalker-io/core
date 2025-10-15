@@ -26,6 +26,14 @@ use Windwalker\Core\Router\SystemUri;
 
 {% $phpClose %}
 
+@push('macro')
+<style data-macro type="text/scss" data-scope=".view-{% kebab($name) %}">
+</style>
+
+<script data-macro="{% dot($name) %}" lang="ts" type="module">
+</script>
+@endpush
+
 @extends('global.body')
 
 @section('content')

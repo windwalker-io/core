@@ -48,7 +48,7 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
     params._ = originalTasks;
   }
 
-  params = mergeOptions(params, resolvedOptions.cliParams);
+  resolvedOptions.cliParams = params = mergeOptions(params, resolvedOptions.cliParams);
 
   return [
     {
@@ -75,7 +75,7 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
         } else {
           root = params.cwd || process.cwd();
         }
-
+  
         delete config.root;
         // delete builder.config.root;
 

@@ -4,7 +4,7 @@ import yargs from 'yargs';
 export function getArgsAfterDoubleDashes(argv?: string[]): string[] {
   argv ??= process.argv;
 
-  return argv.slice(2).join(' ')
+  return argv.join(' ')
     // Split by -- and remove the first part
     .split(' -- ').slice(1)
     // Join back and split by space
@@ -43,6 +43,11 @@ export function parseArgv(argv: string[]): RunnerCliParams {
     alias: 's',
     type: 'string',
     description: 'Path to server file',
+  });
+
+  app.option('no-hmr', {
+    type: 'boolean',
+    description: 'Disable HMR for dev server',
   });
 
   // app.option('series', {

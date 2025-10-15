@@ -348,8 +348,8 @@ class JsModulizeProcessor {
         fs$1.ensureDirSync(tmpPath);
         for (const result of bladeScripts) {
           let key = result.as;
-          const filename = result.path.replace(/\\|\//g, "_");
-          const tmpFile = tmpPath + "/" + filename + ".ts";
+          const filename = result.path.split(/\\|\//g).pop().replace(/\\|\//g, "_");
+          const tmpFile = tmpPath + "/" + filename + "__" + result.as.replace(/\./g, "-") + ".ts";
           if (!fs$1.existsSync(tmpFile) || fs$1.readFileSync(tmpFile, "utf8") !== result.code) {
             fs$1.writeFileSync(tmpFile, result.code);
           }

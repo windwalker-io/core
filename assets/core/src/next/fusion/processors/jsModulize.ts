@@ -132,8 +132,12 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
         for (const result of bladeScripts) {
           let key = result.as;
-          const filename = result.path.replace(/\\|\//g, '_');
-          const tmpFile = tmpPath + '/' + filename + '.ts';
+          const filename = result.path
+            .split(/\\|\//g)
+            .pop()
+            .replace(/\\|\//g, '_');
+
+          const tmpFile = tmpPath + '/' + filename + '__' + result.as.replace(/\./g, '-') + '.ts';
 
           if (!fs.existsSync(tmpFile) || fs.readFileSync(tmpFile, 'utf8') !== result.code) {
             fs.writeFileSync(tmpFile, result.code);

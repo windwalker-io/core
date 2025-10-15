@@ -15,6 +15,7 @@ export type RunnerCliOptions = {
   verbose?: number;
   serverFile?: string;
   s?: string;
+  hmr?: boolean;
   // series?: boolean;
   // s?: boolean;
 }
