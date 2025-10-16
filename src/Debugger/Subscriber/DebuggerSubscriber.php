@@ -291,8 +291,6 @@ class DebuggerSubscriber
             return;
         }
 
-        $session = $this->container->get(Session::class);
-
         /** @var Collection $collector */
         $collector = $this->getCollector();
 
@@ -303,8 +301,14 @@ class DebuggerSubscriber
         // $systemCollector['framework_version'] = InstalledVersions::getPrettyVersion('windwalker/framework');
         $systemCollector['core_version'] = InstalledVersions::getPrettyVersion('windwalker/core');
         $systemCollector['php_version'] = PHP_VERSION;
-        $systemCollector['messages'] = $session->getFlashBag()->peek();
         $systemCollector['config'] = FormatRegistry::makeDumpable($this->container->getParameters()->dump(true));
+
+        if (InstalledVersions::isInstalled('windwalker/session')) {
+            $session = $this->container->get(Session::class);
+            $systemCollector['messages'] = $session->getFlashBag()->peek();
+        } else {
+            $systemCollector['messages'] = [];
+        }
 
         // Timeline
         $profiler = $this->container->get(ProfilerFactory::class)->getInstances();

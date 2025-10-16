@@ -34,7 +34,10 @@ class PackagePostInstallCommand implements CommandInterface
             $io
         );
 
-        if (is_file(WINDWALKER_ROOT . '/.env')) {
+        if (
+            is_file(WINDWALKER_ROOT . '/.env')
+            && InstalledVersions::isInstalled('windwalker/database')
+        ) {
             $this->app->runProcess(
                 'php windwalker pkg:migrate',
                 null,

@@ -31,14 +31,14 @@ class CsrfService
     /**
      * CsrfService constructor.
      *
-     * @param  Config       $config
-     * @param  Session      $session
-     * @param  LangService  $langService
+     * @param  Config            $config
+     * @param  LangService|null  $langService
+     * @param  Session|null      $session
      */
     public function __construct(
         protected Config $config,
-        protected Session $session,
-        protected LangService $langService
+        protected ?LangService $langService = null,
+        protected ?Session $session = null,
     ) {
         //
     }
@@ -67,6 +67,10 @@ class CsrfService
 
     public function getToken(bool $refresh = false): string
     {
+        if (!$this->session) {
+            return '';
+        }
+
         $this->session->start();
 
         $key = $this->getTokenKey();
@@ -94,6 +98,10 @@ class CsrfService
 
     public function checkToken(AppRequest $request, string|false|null $method = null): bool
     {
+        if (!$this->session) {
+            return true;
+        }
+
         $token = $this->getToken();
 
         if ($request->getHeader('X-CSRF-Token') === $token) {
@@ -142,6 +150,10 @@ class CsrfService
      */
     public function getInvalidMessage(): string
     {
+        if (!$this->langService) {
+            return 'Invalid CSRF Token';
+        }
+
         $this->langService::checkLanguageInstalled();
 
         return $this->trans('windwalker.security.message.csrf.invalid');
