@@ -293,9 +293,32 @@ class AppContext implements WebApplicationInterface, AppContextInterface
 
     public function addMessage(string|array $messages, ?string $type = 'info'): static
     {
-        $this->service(Session::class)->addFlash($messages, $type ?? 'info');
+        if (!class_exists(Session::class)) {
+            throw new \DomainException('Please install `windwalker/session` package to use flash messages');
+        }
+
+        $this->retrieve(Session::class)->addFlash($messages, $type ?? 'info');
 
         return $this;
+    }
+
+    public function getMessages(?string $type = null, bool $peek = false): array
+    {
+        if ($this->container->has(Session::class)) {
+            $flashBag = $this->retrieve(Session::class)->getFlashBag();
+
+            if ($peek) {
+                return $flashBag->peek($type);
+            }
+
+            if ($type) {
+                return $flashBag->get($type);
+            }
+
+            return $flashBag->all();
+        }
+
+        return [];
     }
 
     public function getStage(): ?string

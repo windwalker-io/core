@@ -7,6 +7,8 @@ namespace Windwalker\Core\Application;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use Windwalker\DI\Definition\StoreDefinitionInterface;
+use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DefinitionResolveException;
@@ -38,6 +40,11 @@ trait ServiceAwareTrait
         return $this->getContainer()->get($id, $forceNew, $tag);
     }
 
+    public function hasService(string $id, \UnitEnum|string|null $tag = null): bool
+    {
+        return $this->getContainer()->has($id, tag: $tag);
+    }
+
     /**
      * Create a single use object.
      *
@@ -45,13 +52,13 @@ trait ServiceAwareTrait
      *
      * @param  class-string<T>  $class
      * @param  array            $args
-     * @param  int              $options
+     * @param  int|DIOptions    $options
      *
-     * @return  T
+     * @return T
      * @throws DefinitionResolveException
      * @throws ReflectionException
      */
-    public function make(string $class, array $args = [], int $options = 0): object
+    public function make(string $class, array $args = [], int|DIOptions $options = new DIOptions()): object
     {
         return $this->getContainer()->newInstance($class, $args, $options);
     }
@@ -63,21 +70,19 @@ trait ServiceAwareTrait
      *
      * @param  class-string<T>        $class
      * @param  array                  $args
-     * @param  int                    $options
+     * @param  int|DIOptions          $options
      * @param  \UnitEnum|string|null  $tag
      *
-     * @return  T
+     * @return T
      *
-     * @throws ContainerExceptionInterface
+     * @throws DefinitionException
      * @throws DefinitionNotFoundException
      * @throws DependencyResolutionException
-     * @throws DefinitionException
-     * @throws NotFoundExceptionInterface
      */
     public function service(
         string $class,
         array $args = [],
-        int $options = 0,
+        int|DIOptions $options = new DIOptions(),
         \UnitEnum|string|null $tag = null
     ): object {
         $container = $this->getContainer();
@@ -92,18 +97,25 @@ trait ServiceAwareTrait
     /**
      *  Call a function or method.
      *
-     * @param  mixed        $callable
-     * @param  array        $args
-     * @param  object|null  $context
-     * @param  int          $options
+     * @param  mixed          $callable
+     * @param  array          $args
+     * @param  object|null    $context
+     * @param  int|DIOptions  $options
      *
      * @return  mixed
      *
-     * @throws ReflectionException
      * @throws ContainerExceptionInterface
+     * @throws DefinitionResolveException
+     * @throws DependencyResolutionException
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
-    public function call(mixed $callable, array $args = [], ?object $context = null, int $options = 0): mixed
-    {
+    public function call(
+        mixed $callable,
+        array $args = [],
+        ?object $context = null,
+        int|DIOptions $options = new DIOptions()
+    ): mixed {
         return $this->getContainer()->call($callable, $args, $context, $options);
     }
 
@@ -112,18 +124,20 @@ trait ServiceAwareTrait
      *
      * @param  string                 $id
      * @param  mixed                  $value
-     * @param  int                    $options
+     * @param  int|DIOptions          $options
      * @param  \UnitEnum|string|null  $tag
      *
-     * @return  static
+     * @return  StoreDefinitionInterface
      *
      * @throws DefinitionException
      */
-    public function bind(string $id, mixed $value, int $options = 0, \UnitEnum|string|null $tag = null): mixed
-    {
-        $this->getContainer()->bind($id, $value, $options, $tag);
-
-        return $this;
+    public function bind(
+        string $id,
+        mixed $value,
+        int|DIOptions $options = new DIOptions(),
+        \UnitEnum|string|null $tag = null
+    ): StoreDefinitionInterface {
+        return $this->getContainer()->bind($id, $value, $options, $tag);
     }
 
     /**
@@ -133,7 +147,7 @@ trait ServiceAwareTrait
      *
      * @param  mixed|class-string<T>  $source
      * @param  array                  $args
-     * @param  int                    $options
+     * @param  int|DIOptions          $options
      * @param  \UnitEnum|string|null  $tag
      *
      * @return mixed|T
@@ -142,8 +156,12 @@ trait ServiceAwareTrait
      * @throws DependencyResolutionException
      * @throws ReflectionException
      */
-    public function resolve(mixed $source, array $args = [], int $options = 0, \UnitEnum|string|null $tag = null): mixed
-    {
+    public function resolve(
+        mixed $source,
+        array $args = [],
+        int|DIOptions $options = new DIOptions(),
+        \UnitEnum|string|null $tag = null
+    ): mixed {
         return $this->getContainer()->resolve($source, $args, $options, $tag);
     }
 }

@@ -23,6 +23,16 @@ interface ServiceAwareInterface
     public function retrieve(string $id, bool $forceNew = false, ?string $tag = null): mixed;
 
     /**
+     * Is this service registered?
+     *
+     * @param  string                 $id
+     * @param  \UnitEnum|string|null  $tag
+     *
+     * @return  bool
+     */
+    public function hasService(string $id, \UnitEnum|string|null $tag = null): bool;
+
+    /**
      * Create a single use object.
      *
      * @template T

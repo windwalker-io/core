@@ -533,4 +533,9 @@ class WebApplication implements WebRootApplicationInterface
     {
         return $this;
     }
+
+    public function getMessages(?string $type = null, bool $peek = false): array
+    {
+        return [];
+    }
 }

@@ -47,4 +47,6 @@ interface WebApplicationInterface extends ApplicationInterface
      * @since  4.0
      */
     public static function anyToResponse(mixed $res): ResponseInterface;
+
+    public function getMessages(?string $type = null, bool $peek = false): array;
 }
