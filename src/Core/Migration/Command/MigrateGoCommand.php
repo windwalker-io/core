@@ -127,7 +127,11 @@ class MigrateGoCommand extends AbstractMigrationCommand
             }
 
             if (is_dir($seed)) {
-                $seed .= '/main.php';
+                if (is_file($seed . '/main.seeder.php')) {
+                    $seed .= '/main.seeder.php';
+                } else {
+                    $seed .= '/main.php';
+                }
             }
 
             $count = $seedService->import(new FileObject($seed));
