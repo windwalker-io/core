@@ -67,15 +67,11 @@ class StarterInstaller
         $file = getcwd() . '/.gitignore';
         $ignore = file_get_contents($file);
 
-        $ignore = str_replace(
-            ['yarn.lock', 'composer.lock'],
-            ['# yarn.lock', '# composer.lock'],
-            $ignore
-        );
+        $ignore = preg_replace('~# @Dev(.*)# @EndDev\s+~sm', '', $ignore);
 
         file_put_contents($file, $ignore);
 
-        $io->write('Remove .lock files from .gitignore.');
+        $io->write('Remove .gitignore dev files.');
     }
 
     /**
@@ -159,7 +155,7 @@ class StarterInstaller
         if ($installDb) {
             $isInstalled = InstalledVersions::isInstalled('windwalker/orm');
 
-            if ($isInstalled) {
+            if (!$isInstalled) {
                 exec($composer . ' require windwalker/orm:^4.0');
             }
         }
