@@ -1,4 +1,4 @@
-import { findModules } from '@windwalker-io/core/src/index.mjs';
+import { findModules } from '../../index.mjs';
 import { dest as toDest, src, ts } from '@windwalker-io/fusion';
 import { postStream, prepareStream } from '@windwalker-io/fusion/src/lifecycles.js';
 import { extractDest } from '@windwalker-io/fusion/src/utilities/utilities.js';
