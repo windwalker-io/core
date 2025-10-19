@@ -106,9 +106,11 @@ class AppProvider implements ServiceProviderInterface
 
     protected function prepareUtilities(Container $container): void
     {
-        $container->prepareSharedObject(FilterFactory::class, options: new DIOptions(isolation: true));
-        $container->prepareSharedObject(FilterService::class, options: new DIOptions(isolation: true));
-        $container->prepareSharedObject(ScheduleService::class, options: new DIOptions(isolation: true));
+        $options = new DIOptions(isolation: true);
+
+        $container->prepareSharedObject(FilterFactory::class, options: $options);
+        $container->prepareSharedObject(FilterService::class, options: $options);
+        $container->prepareSharedObject(ScheduleService::class, options: $options);
     }
 
     protected function prepareCliWeb(Container $container): void

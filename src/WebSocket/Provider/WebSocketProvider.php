@@ -162,6 +162,8 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
             ->alias(WebSocketRequestInterface::class, WebSocketRequest::class)
             ->alias(ServerRequest::class, WebSocketRequest::class);
 
+        $options = new DIOptions(isolation: true);
+
         // System Uri
         $container->share(
             SystemUri::class,
@@ -170,11 +172,11 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
                     SystemUri::parseFromRequest($container->get(ServerRequestInterface::class))
                 );
             },
-            new DIOptions(isolation: true)
+            $options
         );
 
         // Proxy
-        $container->prepareSharedObject(ProxyResolver::class, null, new DIOptions(isolation: true));
+        $container->prepareSharedObject(ProxyResolver::class, null, $options);
 
         // App Request
         $container->set(

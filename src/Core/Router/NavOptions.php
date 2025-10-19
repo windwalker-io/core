@@ -32,6 +32,10 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
 
     public static function wrap(mixed $values, bool $clone = false): static
     {
+        if ($values instanceof static) {
+            return $clone ? clone $values : $values;
+        }
+
         if (is_int($values)) {
             if ($values & NavConstantInterface::TYPE_RAW) {
                 $mode = NavMode::RAW;
@@ -57,6 +61,23 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
         }
 
         return static::parentWrap($values, $clone);
+    }
+
+    public function merge(mixed $values, bool $recursive = false, bool $ignoreNulls = false): static
+    {
+        if (is_object($values)) {
+            $values = get_object_vars($values);
+        }
+
+        foreach ($values as $key => $value) {
+            if ($ignoreNulls && $value === null) {
+                continue;
+            }
+
+            $this->$key = $value;
+        }
+
+        return $this;
     }
 
     public function addAllowQuery(string $name): void
