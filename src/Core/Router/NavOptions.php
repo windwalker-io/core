@@ -100,4 +100,9 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
     {
         return get_object_values($this);
     }
+
+    protected function normalizeKey(int|string $key): string|int
+    {
+        return $key;
+    }
 }
