@@ -8,4 +8,3 @@
 export * from './asset-sync.mjs';
 export * from './asset-bundler.mjs';
 export * from './install-vendors.mjs';
-export * from './app.ts';

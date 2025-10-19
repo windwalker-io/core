@@ -12,7 +12,7 @@
     "dev:debugger": "vite --config vite.debugger.config.ts"
   },
   "exports": {
-    ".": "./src/index.js",
+    ".": "./src/index.mjs",
     "./next": {
       "types": "./dist/next.d.ts",
       "require": "./dist/next.js",
