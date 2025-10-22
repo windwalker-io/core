@@ -183,7 +183,7 @@ class PackageInstaller
 
             $this->installModules(
                 [
-                    $this->package::path("src/Module/$module/$entity/**/*") => "@source/Module/Admin/$entity",
+                    $this->package::path("src/Module/$module/$entity/**/*") => "@source/Module/$module/$entity",
                 ],
                 [$ns . "\\Module\\$module" => "App\\Module\\$module"],
                 ['modules', $snake . '_' . $snakeModule],
