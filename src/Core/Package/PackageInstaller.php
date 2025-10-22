@@ -266,9 +266,13 @@ class PackageInstaller
     /**
      * @return  array<callable>
      */
-    public function getAllCallbacks(array $tags): array
+    public function getAllCallbacks(?array $tags = null): array
     {
         $callbacks = $this->installResources->getCallbacks();
+
+        if ($tags === null) {
+            $tags = array_keys($this->tags);
+        }
 
         foreach ($tags as $tag) {
             if (!isset($this->tags[$tag])) {

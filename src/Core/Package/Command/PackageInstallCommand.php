@@ -24,6 +24,8 @@ use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
 
+use function Windwalker\depth;
+
 /**
  * The PackageInstallCommand class.
  */
@@ -64,6 +66,12 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             't',
             InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
             'Tags to install.'
+        );
+        $command->addOption(
+            'all',
+            'a',
+            InputOption::VALUE_NONE,
+            'Install all.'
         );
         $command->addOption(
             'dry-run',
@@ -109,13 +117,18 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         $packages = (array) $io->getArgument('packages');
         $tags = (array) $io->getOption('tag');
         $details = (int) $this->io->getOption('details');
+        $all = $this->io->getOption('all');
 
         $registry = $this->app->make(PackageRegistry::class);
 
         // Discover and prepare-install
         $installer = $registry->prepareInstall();
 
-        if (!$tags) {
+        if ($all && $packages === []) {
+            throw new InvalidArgumentException('You must specify packages when using --all option.');
+        }
+
+        if (!$tags && !$all) {
             $targets = $this->askForTargets($registry);
         } else {
             $targets = [];
@@ -151,15 +164,17 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         foreach ($targets as $package => $tags) {
             $pkgInstaller = $installer->getChild($registry->getPackage($package));
 
-            $callbacks = $pkgInstaller->getAllCallbacks($tags);
-
             if ($details > 2) {
                 $io->writeln("Installing: <comment>$package</comment>");
             }
 
             if ($tags === []) {
+                $callbacks = $pkgInstaller->getAllCallbacks();
+
                 $resultSet[] = $this->install($pkgInstaller->installResources, $callbacks);
             } else {
+                $callbacks = $pkgInstaller->getAllCallbacks($tags);
+
                 foreach ($tags as $tag) {
                     if (!isset($pkgInstaller->tags[$tag])) {
                         continue;
@@ -192,7 +207,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         $filCloner = $this->getFilCloner();
         $results = [];
 
-        foreach ($installResource->dump() as $files) {
+        foreach ($installResource->dump() as $name => $files) {
             if ($files !== []) {
                 foreach ($files as $src => $dest) {
                     $results[] = $result = $filCloner->copyFile($src, $dest, $force);
@@ -214,7 +229,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
                         }
                     }
 
-                    if ($filCloner->getOutputLevel() === 3) {
+                    if ($filCloner->getOutputLevel() === 2) {
                         $filCloner->printSingleResult($result);
                     }
                 }
