@@ -91,6 +91,28 @@ namespace Windwalker {
         }
     }
 
+    if (!function_exists('\Windwalker\include_glob')) {
+        function include_glob(string $path, array $contextData = [], bool $merge = false): array
+        {
+            $files = \Windwalker\glob($path);
+
+            extract($contextData, EXTR_OVERWRITE);
+            unset($contextData);
+
+            $results = [];
+
+            foreach ($files as $file) {
+                $results[] = include $file;
+            }
+
+            if ($merge) {
+                $results = array_merge(...$results);
+            }
+
+            return $results;
+        }
+    }
+
     if (!function_exists('\Windwalker\cmd')) {
         function cmd(string|Closure $cmd, ?string $input = null, bool $ignoreError = false): CmdWrapper
         {
