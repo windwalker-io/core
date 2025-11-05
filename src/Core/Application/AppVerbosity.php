@@ -26,9 +26,24 @@ enum AppVerbosity: int
      */
     case VERY_VERBOSE = 3;
 
+    public function isHidden(): bool
+    {
+        return $this->value === self::HIDDEN->value;
+    }
+
+    public function isNormal(): bool
+    {
+        return $this->value === self::NORMAL->value;
+    }
+
     public function isVerbose(): bool
     {
         return $this->value >= self::VERBOSE->value;
+    }
+
+    public function isVeryVerbose(): bool
+    {
+        return $this->value >= self::VERY_VERBOSE->value;
     }
 
     public function displayMessage(\Throwable|string $e, string $fallback = 'Something went wrong'): string

@@ -147,7 +147,7 @@ trait ApplicationTrait
 
     public function isVerbose(): bool
     {
-        return $this->getVerbosity() >= 1;
+        return $this->getVerbosity()->isVerbose();
     }
 
     public function getSecret(): string

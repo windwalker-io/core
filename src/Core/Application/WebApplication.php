@@ -386,6 +386,10 @@ class WebApplication implements WebRootApplicationInterface
                 throw $e;
             }
 
+            if ($app->isDebug() && $app->getVerbosity()->isVeryVerbose()) {
+                throw $e;
+            }
+
             $app->addMessage($this->getVerbosity()->displayMessage($e), 'warning');
             $nav = $app->service(Navigator::class);
 
