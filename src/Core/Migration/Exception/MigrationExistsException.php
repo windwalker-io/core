@@ -34,7 +34,7 @@ class MigrationExistsException extends RuntimeException
     /**
      * @return Migration
      */
-    public function getMigration(): Migration
+    public function getMigration(): AbstractMigration
     {
         return $this->migration;
     }
