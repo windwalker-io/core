@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Seed;
 
 use Windwalker\Core\Events\Console\MessageOutputTrait;
+use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Core\Migration\Migration;
 use Windwalker\Environment\Environment;
 
@@ -31,7 +32,7 @@ trait CountingOutputTrait
 
     public function printCounting(): static
     {
-        if ($this instanceof Migration && $this->count === 0) {
+        if ($this instanceof AbstractMigration && $this->count === 0) {
             $this->emitMessage('');
         }
 
