@@ -22,6 +22,11 @@ use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\Edge\Component\ComponentAttributes;
+
+/**
+* @var $attributes ComponentAttributes
+*/
 
 ?>
 <div>{% pascal($name) %}</div>
