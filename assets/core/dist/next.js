@@ -1,4 +1,4 @@
-import { getGlobBaseFromPattern, callback, css, js, plugin, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
+import { getGlobBaseFromPattern, callback, css, js, plugin, builder, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
 import isGlob from "is-glob";
 import micromatch from "micromatch";
 import path, { relative, normalize, resolve } from "node:path";
@@ -87,10 +87,10 @@ function stripUrlQuery(src) {
   return src;
 }
 function cloneAssets(patterns) {
-  return callback((taskName, builder) => {
+  return callback((taskName, builder2) => {
     const reposition = getAvailableForReposition(patterns);
-    handleReposition(builder, reposition);
-    handleCloneAssets(builder, Object.keys(patterns));
+    handleReposition(builder2, reposition);
+    handleCloneAssets(builder2, Object.keys(patterns));
     return null;
   });
 }
@@ -103,15 +103,15 @@ function getAvailableForReposition(patterns) {
   }
   return reposition;
 }
-function handleCloneAssets(builder, clonePatterns) {
+function handleCloneAssets(builder2, clonePatterns) {
   const id = uniqId("hidden:clone-asset-") + ".js";
-  builder.addTask(id);
-  builder.resolveIdCallbacks.push((src) => {
+  builder2.addTask(id);
+  builder2.resolveIdCallbacks.push((src) => {
     if (src === id) {
       return id;
     }
   });
-  builder.loadCallbacks.push((src) => {
+  builder2.loadCallbacks.push((src) => {
     if (src === id) {
       const glob = clonePatterns.map((v) => v.replace(/\\/g, "/")).map((v) => v.startsWith("./") || !v.startsWith("/") ? `/${v}` : v).map((v) => `'${v}'`).join(", ");
       return `import.meta.glob(${glob});
@@ -119,8 +119,8 @@ function handleCloneAssets(builder, clonePatterns) {
     }
   });
 }
-function handleReposition(builder, reposition) {
-  builder.assetFileNamesCallbacks.push((assetInfo) => {
+function handleReposition(builder2, reposition) {
+  builder2.assetFileNamesCallbacks.push((assetInfo) => {
     const fileName = assetInfo.originalFileName;
     for (const base in reposition) {
       if (match(fileName, base)) {
@@ -138,14 +138,14 @@ function match(str, pattern) {
 function globalAssets(options) {
   return {
     name: "core:global-assets",
-    buildConfig(builder) {
+    buildConfig(builder2) {
       const clone = options.clone || {};
       let reposition = options.reposition || {};
       reposition = { ...reposition, ...getAvailableForReposition(clone) };
-      handleReposition(builder, reposition);
+      handleReposition(builder2, reposition);
       const clonePatterns = Object.keys(clone);
       if (clonePatterns.length > 0) {
-        handleCloneAssets(builder, clonePatterns);
+        handleCloneAssets(builder2, clonePatterns);
       }
     }
   };
@@ -226,21 +226,22 @@ class CssModulizeProcessor {
     this.cssPatterns = this.cssPatterns.concat(css2.flat());
     return this;
   }
-  config(taskName, builder) {
-    const tasks = this.processor.config(taskName, builder);
+  config(taskName, builder2) {
+    const tasks = this.processor.config(taskName, builder2);
     const task = tasks[0];
     const inputFile = resolve(task.input);
-    const bladeFiles = fg.globSync(this.bladePatterns);
-    for (const file of bladeFiles) {
-      builder.watches.push({
-        file,
-        moduleFile: inputFile,
-        updateType: "css-update"
-      });
-    }
-    builder.loadCallbacks.push((src, options) => {
+    builder2.loadCallbacks.push((src, options) => {
       const file = stripUrlQuery(src);
       if (normalize(file) === inputFile) {
+        const bladeFiles = fg.globSync(this.bladePatterns);
+        for (const file2 of bladeFiles) {
+          const realpath = resolve(file2).replace(/\\/g, "/");
+          builder2.addWatch(realpath, {
+            file: realpath,
+            moduleFile: inputFile,
+            updateType: "css-update"
+          });
+        }
         const patterns = fg.globSync(
           this.cssPatterns.map((v) => resolve(v)).map((v) => v.replace(/\\/g, "/"))
         );
@@ -303,32 +304,32 @@ class JsModulizeProcessor {
   scriptPatterns = [];
   bladePatterns = [];
   stagePrefix = "";
-  config(taskName, builder) {
-    const tasks = this.processor.config(taskName, builder);
+  config(taskName, builder2) {
+    const tasks = this.processor.config(taskName, builder2);
     const task = tasks[0];
     const inputFile = resolve(task.input);
     const tmpPath = this.options.tmpPath ?? resolve("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
     const clean = this.options.cleanTmp ?? true;
     if (clean) {
-      builder.postBuildCallbacks.push((options, bundle) => {
+      builder2.postBuildCallbacks.push((options, bundle) => {
         fs$1.removeSync(tmpPath);
       });
-      builder.serverStopCallbacks.push((options, bundle) => {
+      builder2.serverStopCallbacks.push((options, bundle) => {
         fs$1.removeSync(tmpPath);
       });
     }
     this.ignoreMainImport(task);
-    builder.resolveIdCallbacks.push((id) => {
+    builder2.resolveIdCallbacks.push((id) => {
       if (id === "@main") {
         return { id, external: true };
       }
     });
     const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
-    const bladeFiles = findBladeFiles(this.bladePatterns);
-    builder.loadCallbacks.push((src, options) => {
+    builder2.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
       const scripts = {};
       if (normalize(srcFile) === inputFile) {
+        const bladeFiles = findBladeFiles(this.bladePatterns);
         const bladeScripts = parseScriptsFromBlades(bladeFiles);
         for (const scriptFile of scriptFiles) {
           let fullpath = scriptFile.fullpath;
@@ -344,7 +345,6 @@ class JsModulizeProcessor {
           key = "view:" + crypto.createHash("md5").update(key).digest("hex");
           scripts[key] = fullpath;
         }
-        const listens = [];
         fs$1.ensureDirSync(tmpPath);
         for (const result of bladeScripts) {
           let key = result.as;
@@ -354,10 +354,7 @@ class JsModulizeProcessor {
             fs$1.writeFileSync(tmpFile, result.code);
           }
           scripts[`inline:${key}`] = tmpFile;
-          const fullpath = resolve(result.file.fullpath).replace(/\\/g, "/");
-          if (!listens.includes(fullpath)) {
-            listens.push(fullpath);
-          }
+          resolve(result.file.fullpath).replace(/\\/g, "/");
         }
         let listJS = `{
 `;
@@ -367,7 +364,6 @@ class JsModulizeProcessor {
 `;
         }
         listJS += `}`;
-        builder.watches.push(...listens);
         let { code, comments } = stripComments(fs$1.readFileSync(srcFile, "utf-8"));
         code = code.replace(/defineJsModules\((.*?)\)/g, listJS);
         return restoreComments(code, comments);
@@ -450,6 +446,11 @@ function restoreComments(code, comments) {
   return code;
 }
 function installVendors(npmVendors = [], to = "www/assets/vendor") {
+  builder.merge({
+    build: {
+      manifest: false
+    }
+  });
   return callbackAfterBuild(() => findAndInstall(npmVendors, to));
 }
 async function findAndInstall(npmVendors = [], to = "www/assets/vendor") {

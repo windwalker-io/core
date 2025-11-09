@@ -229,6 +229,18 @@ export default class ConfigBuilder {
     return this;
   }
 
+  addWatch(file: string, watch: WatchTask) {
+    this.watches = this.watches.filter((watch) => {
+      if (watch === file) {
+        return false;
+      }
+
+      return !(typeof watch === 'object' && watch.file === file);
+    });
+
+    this.watches.push(watch);
+  }
+
   // addExternals(externals: Externalize) {
   //   if (Array.isArray(externals)) {
   //     this.externals.push((rollupOptions) => {

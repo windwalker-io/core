@@ -82,7 +82,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
     // Todo: Must dynamic changes in load() hook
     const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
-    const bladeFiles = findBladeFiles(this.bladePatterns);
+    // const bladeFiles = findBladeFiles(this.bladePatterns);
 
     // Watches
     // Currently we don't watch blade files because not necessary to reload full-pages.
@@ -100,6 +100,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
       
       // if (src === appSrcFileName) {
       if (normalize(srcFile) === inputFile) {
+        const bladeFiles = findBladeFiles(this.bladePatterns);
         const bladeScripts = parseScriptsFromBlades(bladeFiles);
 
         // Merge standalone ts files
@@ -147,9 +148,11 @@ export class JsModulizeProcessor implements ProcessorInterface {
 
           const fullpath = resolve(result.file.fullpath).replace(/\\/g, '/');
 
-          if (!listens.includes(fullpath)) {
-            listens.push(fullpath);
-          }
+          // builder.addWatch(fullpath, fullpath);
+
+          // if (!listens.includes(fullpath)) {
+          //   listens.push(fullpath);
+          // }
         }
 
         let listJS = `{\n`;
@@ -162,7 +165,10 @@ export class JsModulizeProcessor implements ProcessorInterface {
         listJS += `}`;
 
         // Listen extra files
-        builder.watches.push(...listens);
+        // builder.watches.push(...listens);
+        // for (const listen of listens) {
+        //   builder.addWatch(listen, listen);
+        // }
 
         let { code, comments } = stripComments(fs.readFileSync(srcFile, 'utf-8'));
 

@@ -1,4 +1,4 @@
-import { callbackAfterBuild, copyGlob, symlink } from '@windwalker-io/fusion-next';
+import fusion, { callbackAfterBuild, copyGlob, symlink, builder } from '@windwalker-io/fusion-next';
 import fs from 'fs-extra';
 import path from 'node:path';
 import { loadJson } from '../../utilities';
@@ -7,6 +7,12 @@ export function installVendors(
   npmVendors: string[] = [],
   to: string = 'www/assets/vendor',
 ) {
+  builder.merge({
+    build: {
+      manifest: false
+    }
+  });
+
   return callbackAfterBuild(() => findAndInstall(npmVendors, to));
 }
 

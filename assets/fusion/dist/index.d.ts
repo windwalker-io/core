@@ -78,6 +78,7 @@ export declare class ConfigBuilder {
     set(path: string, value: any): this;
     addTask(input: string, group?: string): BuildTask;
     addCleans(...paths: string[]): this;
+    addWatch(file: string, watch: WatchTask): void;
     relativePath(to: string): string;
     debug(): void;
 }

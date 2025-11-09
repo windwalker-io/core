@@ -1,4 +1,10 @@
 export * from './dep';
+import chalk from 'chalk';
+import { uniq } from 'lodash-es';
+import micromatch from 'micromatch';
+import fs, { existsSync, writeFileSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
+import { Logger, mergeConfig, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 import ConfigBuilder from './builder/ConfigBuilder.ts';
 import * as fusion from './dep';
 import { prepareParams } from './params';
@@ -10,13 +16,6 @@ import { FusionPlugin, FusionPluginOptions, FusionPluginOptionsUnresolved, Loade
 import { forceArray } from './utilities/arr.ts';
 import { cleanFiles, copyFilesAndLog, linkFilesAndLog, moveFilesAndLog } from './utilities/fs.ts';
 import { mergeOptions } from './utilities/utilities.ts';
-import chalk from 'chalk';
-import fs from 'node:fs';
-import { uniq } from 'lodash-es';
-import micromatch from 'micromatch';
-import { existsSync, writeFileSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
-import { Logger, mergeConfig, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 
 let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
@@ -75,7 +74,7 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
         } else {
           root = params.cwd || process.cwd();
         }
-  
+
         delete config.root;
         // delete builder.config.root;
 
@@ -194,55 +193,29 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           }
         });
 
-        const fullReloadWatches: string[] = [];
-        const customWatches: Exclude<WatchTask, string>[] = [];
+        // const fullReloadWatches: string[] = [];
+        // const customWatches: Exclude<WatchTask, string>[] = [];
 
         const checkReload = (event: 'add' | 'change') => {
           return (path: string) => {
-            // Custom HMR
-            for (const watchTask of customWatches) {
+            const fullReloadWatches: string[] = [];
+
+            for (const watchTask of builder.watches) {
+              // Pre-save full-reload paths
+              if (typeof watchTask === 'string') {
+                const file = resolve(watchTask).replace(/\\/g, '/');
+                fullReloadWatches.push(file);
+                server.watcher.add(file);
+                continue;
+              }
+
               if (watchTask.file === path) {
-                const mods = server.moduleGraph.getModulesByFile(watchTask.moduleFile);
-
-                if (mods) {
-                  for (const mod of mods) {
-                    server.moduleGraph.invalidateModule(mod);
-                  }
-
-                  const updateType = watchTask.updateType;
-
-                  logger.info(
-                    `${chalk.green(updateType)} ${chalk.dim(relative(process.cwd(), watchTask.file))}`,
-                    { timestamp: true }
-                  );
-
-                  if (updateType === 'full-reload') {
-                    server.ws.send({ type: 'full-reload', path: '*' });
-                  } else {
-                    server.ws.send({
-                      type: 'update',
-                      updates: [...mods].map((m) => {
-                        let url = m.url;
-
-                        // remove query
-                        if (url.indexOf('?') !== -1) {
-                          url = url.substring(0, url.indexOf('?'));
-                        }
-
-                        return ({
-                          type: updateType,
-                          path: url,
-                          acceptedPath: url,
-                          timestamp: Date.now()
-                        });
-                      })
-                    });
-                  }
-                }
+                console.log(watchTask);
+                handleCustomWatchReload(server, watchTask, logger);
               }
             }
 
-            // Full Reload
+            // Full-reload
             if (micromatch.isMatch(path, fullReloadWatches)) {
               server.ws.send({ type: 'full-reload', path: '*' });
 
@@ -257,18 +230,18 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
         server.watcher.on('add', checkReload('add'));
         server.watcher.on('change', checkReload('change'));
 
-        for (const watchTask of builder.watches) {
-          if (typeof watchTask === 'string') {
-            const file = resolve(watchTask).replace(/\\/g, '/');
-            fullReloadWatches.push(file);
-            server.watcher.add(file);
-            continue;
-          }
-
-          const file = resolve(watchTask.file).replace(/\\/g, '/');
-          customWatches.push(watchTask);
-          server.watcher.add(file);
-        }
+        // for (const watchTask of builder.watches) {
+        //   if (typeof watchTask === 'string') {
+        //     const file = resolve(watchTask).replace(/\\/g, '/');
+        //     fullReloadWatches.push(file);
+        //     server.watcher.add(file);
+        //     continue;
+        //   }
+        //
+        //   const file = resolve(watchTask.file).replace(/\\/g, '/');
+        //   customWatches.push(watchTask);
+        //   server.watcher.add(file);
+        // }
       },
       // async handleHotUpdate(ctx) {
       //   if (builder.watches.includes(ctx.file)) {
@@ -364,6 +337,50 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
       },
     },
   ];
+}
+
+function handleCustomWatchReload(
+  server: ViteDevServer,
+  watchTask: Exclude<WatchTask, string>,
+  logger: Logger
+) {
+  const mods = server.moduleGraph.getModulesByFile(watchTask.moduleFile);
+
+  if (mods) {
+    for (const mod of mods) {
+      server.moduleGraph.invalidateModule(mod);
+    }
+
+    const updateType = watchTask.updateType;
+
+    logger.info(
+      `${chalk.green(updateType)} ${chalk.dim(relative(process.cwd(), watchTask.file))}`,
+      { timestamp: true }
+    );
+
+    if (updateType === 'full-reload') {
+      server.ws.send({ type: 'full-reload', path: '*' });
+    } else {
+      server.ws.send({
+        type: 'update',
+        updates: [...mods].map((m) => {
+          let url = m.url;
+
+          // remove query
+          if (url.indexOf('?') !== -1) {
+            url = url.substring(0, url.indexOf('?'));
+          }
+
+          return ({
+            type: updateType,
+            path: url,
+            acceptedPath: url,
+            timestamp: Date.now()
+          });
+        })
+      });
+    }
+  }
 }
 
 function prepareFusionOptions(options: FusionPluginOptionsUnresolved): FusionPluginOptions {

@@ -59,21 +59,22 @@ class CssModulizeProcessor implements ProcessorInterface {
     const task = tasks[0];
     const inputFile = resolve(task.input);
 
-    // get blade styles and add watches
-    const bladeFiles = fg.globSync(this.bladePatterns);
-
-    for (const file of bladeFiles) {
-      builder.watches.push({
-        file,
-        moduleFile: inputFile,
-        updateType: 'css-update',
-      } satisfies WatchTask);
-    }
-
     builder.loadCallbacks.push((src, options) => {
       const file = stripUrlQuery(src);
 
       if (normalize(file) === inputFile) {
+        // get blade styles and add watches
+        const bladeFiles = fg.globSync(this.bladePatterns);
+
+        for (const file of bladeFiles) {
+          const realpath = resolve(file).replace(/\\/g, '/');
+          builder.addWatch(realpath, {
+            file: realpath,
+            moduleFile: inputFile,
+            updateType: 'css-update',
+          } satisfies WatchTask);
+        }
+
         const patterns = fg.globSync(
           this.cssPatterns.map((v) => resolve(v))
             .map(v => v.replace(/\\/g, '/'))
