@@ -232,7 +232,11 @@ namespace Windwalker {
     if (!function_exists('\Windwalker\response')) {
         function response(mixed $data = '', int $status = 200, array $headers = []): CoreResponse
         {
-            return CoreResponse::fromString($data, $status, $headers);
+            if (is_string($data)) {
+                return CoreResponse::fromString($data, $status, $headers);
+            }
+
+            return new CoreResponse($data, $status, $headers);
         }
     }
 
