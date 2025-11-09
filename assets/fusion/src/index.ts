@@ -2,7 +2,7 @@ export * from './dep';
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
 import micromatch from 'micromatch';
-import fs, { existsSync, writeFileSync } from 'node:fs';
+import fs, { existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 import { Logger, mergeConfig, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 import ConfigBuilder from './builder/ConfigBuilder.ts';
@@ -158,7 +158,7 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
       // Server
       configureServer(server) {
         builder.server = server;
-        server.httpServer?.once('listening', () => {
+        server.httpServer?.once('listening', async () => {
           // Build listening Host
           const scheme = server.config.server.https ? 'https' : 'http';
           const address = server.httpServer?.address();
@@ -172,8 +172,17 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
             server.config.root,
             resolvedOptions.cliParams?.serverFile ?? 'tmp/vite-server'
           );
+          const serverFileFull = resolve(server.config.root, serverFile);
 
-          writeFileSync(resolve(server.config.root, serverFile), url);
+          if (existsSync(serverFileFull)) {
+            console.log(chalk.yellow(`There may be a dev server running!`));
+            console.log(`The server host file exists: ${chalk.cyan(serverFile)}`);
+            console.log(`If you want to start a new server, you need to remove this file first.`);
+
+            process.exit(1);
+          }
+
+          writeFileSync(serverFileFull, url);
 
           // Bind exit signals
           if (!exitHandlersBound) {
@@ -210,7 +219,6 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
               }
 
               if (watchTask.file === path) {
-                console.log(watchTask);
                 handleCustomWatchReload(server, watchTask, logger);
               }
             }

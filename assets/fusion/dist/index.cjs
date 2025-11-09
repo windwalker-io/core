@@ -8929,7 +8929,7 @@ function useFusion(fusionOptions = {}, tasks) {
       // Server
       configureServer(server) {
         exports.builder.server = server;
-        server.httpServer?.once("listening", () => {
+        server.httpServer?.once("listening", async () => {
           const scheme = server.config.server.https ? "https" : "http";
           const address = server.httpServer?.address();
           const host = address && typeof address !== "string" ? address.address : "localhost";
@@ -8939,7 +8939,14 @@ function useFusion(fusionOptions = {}, tasks) {
             server.config.root,
             resolvedOptions.cliParams?.serverFile ?? "tmp/vite-server"
           );
-          fs$1.writeFileSync(node_path.resolve(server.config.root, serverFile), url);
+          const serverFileFull = node_path.resolve(server.config.root, serverFile);
+          if (fs$1.existsSync(serverFileFull)) {
+            console.log(chalk.yellow(`There may be a dev server running!`));
+            console.log(`The server host file exists: ${chalk.cyan(serverFile)}`);
+            console.log(`If you want to start a new server, you need to remove this file first.`);
+            process.exit(1);
+          }
+          fs$1.writeFileSync(serverFileFull, url);
           if (!exitHandlersBound) {
             process.on("exit", () => {
               for (const callback of exports.builder.serverStopCallbacks) {
@@ -8966,7 +8973,6 @@ function useFusion(fusionOptions = {}, tasks) {
                 continue;
               }
               if (watchTask.file === path) {
-                console.log(watchTask);
                 handleCustomWatchReload(server, watchTask, logger);
               }
             }
