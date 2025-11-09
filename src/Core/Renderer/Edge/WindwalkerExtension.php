@@ -13,6 +13,7 @@ use Windwalker\Core\DateTime\ChronosService;
 use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\DOM\HTML5Factory;
@@ -336,10 +337,10 @@ class WindwalkerExtension implements
                 // $globals['theme'] = $this->app->resolve(ThemeInterface::class);
                 $globals['lang'] = $this->app->resolve(LangService::class);
 
-                $navOptions = RouteUri::MODE_MUTE;
+                $navOptions = new NavOptions(mute: true);
 
                 if ($this->app->isDebug()) {
-                    $navOptions |= RouteUri::DEBUG_ALERT;
+                    $navOptions->debugAlert = true;
                 }
 
                 $globals['nav'] = $this->app->resolve(Navigator::class)
