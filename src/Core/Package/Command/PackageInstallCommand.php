@@ -229,7 +229,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
                         }
                     }
 
-                    if ($filCloner->getOutputLevel() === 2) {
+                    if ($result->action !== $filCloner::IGNORE && $filCloner->getOutputLevel() === 2) {
                         $filCloner->printSingleResult($result);
                     }
                 }
