@@ -11,7 +11,9 @@ use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\Event\BuildEntityHookEvent;
 use Windwalker\Data\Collection;
 use Windwalker\Data\RecordInterface;
+use Windwalker\Data\RecordTrait;
 use Windwalker\Database\Schema\Ddl\Column;
+use Windwalker\Utilities\Classes\TraitHelper;
 use Windwalker\Utilities\Enum\EnumMetaInterface;
 
 trait EntityHooksConcernTrait
@@ -72,6 +74,7 @@ trait EntityHooksConcernTrait
                         is_a($className, Collection::class, true)
                         // || is_a($className, ValueObject::class, true)
                         || is_a($className, RecordInterface::class, true)
+                        || TraitHelper::uses($className, RecordTrait::class)
                     )
                 ) {
                     $getHook = new Node\PropertyHook(
@@ -123,6 +126,7 @@ trait EntityHooksConcernTrait
                 if (
                     is_a($className, Collection::class, true)
                     || is_a($className, RecordInterface::class, true)
+                    || TraitHelper::uses($className, RecordTrait::class)
                 ) {
                     /** @var class-string<Collection> $className */
                     $typeClass = (string) $typeNode;
