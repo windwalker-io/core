@@ -394,16 +394,16 @@ class WindwalkerExtension implements
                 if ($element->getAttribute('lang') === 'ts' && trim($element->textContent)) {
                     $propString = '[';
                     foreach ($element->dataset->toArray() as $k => $v) {
-                        if (!str_starts_with($k, 'props')) {
-                            continue;
-                        }
-
                         if ($k === 'props') {
                             $propString .= "...$v,";
                             continue;
                         }
 
-                        $k = str_replace("'", "\'", Str::removeLeft($k, 'props:'));
+                        if (!str_starts_with($k, 'prop:')) {
+                            continue;
+                        }
+
+                        $k = str_replace("'", "\'", Str::removeLeft($k, 'prop:'));
                         $propString .= "'$k' => $v,";
                     }
                     $propString .= ']';

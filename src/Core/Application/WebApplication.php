@@ -275,7 +275,7 @@ class WebApplication implements WebRootApplicationInterface
             $response = $this->runContext($appContext);
             $statusCode = $response->getStatusCode();
 
-            $event->setResponse($response);
+            $event->response = $response;
         } catch (\Throwable $e) {
             $statusCode = $e->getCode();
 
@@ -297,7 +297,7 @@ class WebApplication implements WebRootApplicationInterface
                 }
             }
         } finally {
-            $event->setEndHandler(fn() => $this->stopContext($appContext));
+            $event->endHandler = fn() => $this->stopContext($appContext);
 
             $duration = round((microtime(true) - $start) * 1000);
 
@@ -318,7 +318,7 @@ class WebApplication implements WebRootApplicationInterface
     {
         $appContext = $this->createContextFromServerEvent($event);
 
-        $event->setEndHandler(fn() => $this->stopContext($appContext));
+        $event->endHandler = fn() => $this->stopContext($appContext);
 
         return $this->runContext($appContext);
     }
