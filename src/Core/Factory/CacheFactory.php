@@ -90,8 +90,9 @@ class CacheFactory implements ServiceFactoryInterface
             $storage,
             $serializer
         ): CachePool {
+            $cacheTag = $instanceName;
             return new CachePool(
-                $container->resolve('cache.factories.storages.' . $storage, compact('instanceName')),
+                $container->resolve('cache.factories.storages.' . $storage, compact('instanceName', 'cacheTag')),
                 $container->resolve($serializer),
                 $container->get(LoggerInterface::class, tag: 'error')
             );
