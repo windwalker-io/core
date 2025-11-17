@@ -138,7 +138,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
             new RequestGetValueEvent(
                 appRequest: $this,
                 type: RequestGetValueEvent::TYPE_QUERY,
-                values: $this->getUri()->getQueryValues()
+                values: (array) $this->getUri()->getQueryValues()
             )
         );
 
@@ -155,7 +155,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
             new RequestGetValueEvent(
                 appRequest: $this,
                 type: RequestGetValueEvent::TYPE_URL_VARS,
-                values: $this->matchedRoute->getVars()
+                values: (array) $this->matchedRoute->getVars()
             )
         );
 
@@ -168,7 +168,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
             new RequestGetValueEvent(
                 appRequest: $this,
                 type: RequestGetValueEvent::TYPE_BODY,
-                values: $this->getServerRequest()->getParsedBody()
+                values: (array) $this->getServerRequest()->getParsedBody()
             )
         );
 
