@@ -25,12 +25,12 @@ trait CountingOutputTrait
      *
      * @deprecated  Use printCounting() instead.
      */
-    public function outCounting(): static
+    public function outCounting(int $count = 1): static
     {
-        return $this->printCounting();
+        return $this->printCounting($count);
     }
 
-    public function printCounting(): static
+    public function printCounting(int $count = 1): static
     {
         if ($this instanceof AbstractMigration && $this->count === 0) {
             $this->emitMessage('');
@@ -43,7 +43,7 @@ trait CountingOutputTrait
             $loading = ['◐', '◓', '◑', '◒'];
         }
 
-        $this->count++;
+        $this->count += $count;
 
         $icon = $loading[$this->count % count($loading)];
 
