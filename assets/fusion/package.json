@@ -15,7 +15,8 @@
     "dev": "vite build --watch --mode development",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "try": "yarn clean && yarn vite build ./tests",
-    "vite": "vite"
+    "vite": "vite",
+    "upgrade": "yarn up '**' -R"
   },
   "dependencies": {
     "archy": "^1.0.0",

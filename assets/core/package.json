@@ -9,7 +9,8 @@
     "build:next": "vite build --config vite.next.config.ts",
     "dev:next": "yarn build:next --watch",
     "build:debugger": "vite build --config vite.debugger.config.ts",
-    "dev:debugger": "vite --config vite.debugger.config.ts"
+    "dev:debugger": "vite --config vite.debugger.config.ts",
+    "upgrade": "yarn up '**' -R"
   },
   "exports": {
     ".": "./src/index.mjs",
