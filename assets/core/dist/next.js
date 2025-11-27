@@ -121,7 +121,7 @@ function handleCloneAssets(builder2, clonePatterns) {
 }
 function handleReposition(builder2, reposition) {
   builder2.assetFileNamesCallbacks.push((assetInfo) => {
-    const fileName = assetInfo.originalFileName;
+    const fileName = assetInfo.originalFileName || assetInfo.name || assetInfo.names[0] || "";
     for (const base in reposition) {
       if (match(fileName, base)) {
         return normalize(reposition[base] + relative(removeLastGlob(base), fileName)).replace(/\\/g, "/");
