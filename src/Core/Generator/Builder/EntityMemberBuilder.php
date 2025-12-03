@@ -278,7 +278,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         return array_values($hooks);
     }
 
-    protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn): array
+    protected function getTypeAndDefaultFromDbColumn(DbColumn $dbColumn, bool $isPrimary): array
     {
         $dt = $this->getORM()->getDb()->getPlatform()->getDataType();
         $default = $dbColumn->getColumnDefault();
@@ -310,7 +310,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             $default = Symbol::none();
 
-            if ($dbColumn->getIsNullable()) {
+            if ($isPrimary || $dbColumn->getIsNullable()) {
                 $type = '?' . $type;
                 $default = null;
             }
@@ -483,8 +483,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         }
 
         $propName = StrNormalize::toCamelCase($colName);
+        $isPrimary = in_array($dbColumn->getColumnName(), $this->getPks(), true);
 
-        [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn);
+        [$type, $default] = $this->getTypeAndDefaultFromDbColumn($dbColumn, $isPrimary);
 
         $propBuilder = $factory->property($propName)
             ->makePublic()
@@ -506,7 +507,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             ),
         ];
 
-        if (in_array($dbColumn->getColumnName(), $this->getPks(), true)) {
+        if ($isPrimary) {
             $this->addUse(PK::class);
             $attrs[] = $this->attribute('PK');
         }
@@ -532,7 +533,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
         // UUID binary(16)
         if ($type === '?UuidInterface' || $type === 'UuidInterface') {
-            $this->addUse(CastNullable::class);
+            // $this->addUse(CastNullable::class);
             $this->addUse(UUIDBin::class);
             $prop->setAttribute('fullType', UuidInterface::class);
             // $prop->attrGroups[] = $this->attributeGroup(
@@ -544,7 +545,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
 
             $uuidDefault = 'UUID7';
 
-            if (!$dbColumn->getIsNullable()) {
+            if (!$isPrimary && !$dbColumn->getIsNullable()) {
                 $uuidDefault = 'NIL';
             }
 

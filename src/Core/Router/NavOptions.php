@@ -6,8 +6,8 @@ namespace Windwalker\Core\Router;
 
 use Windwalker\Utilities\Options\RecordOptionsTrait;
 
-use function Windwalker\get_object_props;
-use function Windwalker\get_object_values;
+use function Windwalker\get_object_dump_props;
+use function Windwalker\get_object_dump_values;
 
 class NavOptions implements NavConstantInterface, \JsonSerializable
 {
@@ -98,7 +98,7 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return get_object_values($this);
+        return get_object_dump_values($this);
     }
 
     protected function normalizeKey(int|string $key): string|int

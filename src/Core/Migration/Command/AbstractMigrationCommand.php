@@ -209,7 +209,9 @@ abstract class AbstractMigrationCommand implements CommandInterface
      */
     protected function backup(IOInterface $io): void
     {
-        if ($io->getOption('no-backup') === false) {
+        $noBackup = (bool) (env('DB_BACKUP_DISABLED') ?? $io->getOption('no-backup'));
+
+        if ($noBackup === false) {
             $io->writeln('');
             $io->writeln('<fg=gray>Backing up SQL...</>');
 

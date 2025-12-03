@@ -42,6 +42,8 @@ use Windwalker\Query\Query;
  * @method $this rightJoin($table, ?string $alias = null, ...$on)
  * @method $this outerJoin($table, ?string $alias = null, ...$on)
  * @method $this innerJoin($table, ?string $alias = null, ...$on)
+ * @method $this leftJoinLateral($table, ?string $alias = null, ...$on)
+ * @method $this innerJoinLateral($table, ?string $alias = null, ...$on)
  * @method $this whereIn($column, array $values)
  * @method $this whereNotIn($column, array $values)
  * @method $this whereBetween($column, $start, $end)
