@@ -84,7 +84,6 @@ export class App {
 }
 
 export function useMacroProps<T extends Record<string, any> = Record<string, any>>(): T {
-  console.log('get');
   if (currentProps == null) {
     throw new Error('Cannot get macro props.');
   }
