@@ -12,8 +12,8 @@ enum {% pascal($name) %}{% $type %} implements EnumRichInterface
     use EnumRichTrait;
 
 <?php if ($cases): ?>
-<?php foreach ($cases as $name => $value): ?>
-    case <?= $name ?> = '<?= $value ?>';
+<?php foreach ($cases as $case => $value): ?>
+    case <?= $case ?> = '<?= $value ?>';
 <?php endforeach; ?>
 <?php else: ?>
     // case CASE = '';
