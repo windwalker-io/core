@@ -32,7 +32,7 @@ class Input implements ContainerAttributeInterface
                 ?? $this->getValueFromRequest($handler->container->get(AppRequestInterface::class), $field)
                 ?? $default;
 
-            if ($value === null && !$isOptional && !$ref->allowsNull()) {
+            if ($value === null && !$isOptional && !static::allowsNull($ref)) {
                 throw new \RuntimeException(
                     sprintf(
                         'Field "%s" is missing in request.',
@@ -43,6 +43,15 @@ class Input implements ContainerAttributeInterface
 
             return $value;
         };
+    }
+
+    protected static function allowsNull(\ReflectionProperty|\ReflectionParameter $ref): bool
+    {
+        if ($ref instanceof \ReflectionParameter) {
+            return $ref->allowsNull();
+        }
+
+        return $ref->getType()?->allowsNull() ?? true;
     }
 
     protected function getValueFromRequest(AppRequestInterface $appRequest, string $name): mixed
