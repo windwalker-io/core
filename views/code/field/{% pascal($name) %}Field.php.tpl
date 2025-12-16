@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace {% $ns %};
 
-use Windwalker\DOM\DOMElement;
+use Windwalker\DOM\HTMLElement;
 use Windwalker\Form\Field\AbstractField;
 
 class {% pascal($name) %}Field extends AbstractField
 {
     /**
-     * @param  DOMElement  $input
+     * @param  HTMLElement  $input
      *
-     * @return  DOMElement
+     * @return  HTMLElement
      */
-    public function prepareInput(DOMElement $input): DOMElement
+    public function prepareInput(DOMElement $input): HTMLElement
     {
         return parent::prepareInput($input);
     }
