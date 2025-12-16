@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 
@@ -30,7 +31,7 @@ class MessageOutputEvent
      *
      * @return  static
      */
-    public function writeWith(OutputInterface|ApplicationInterface $output): static
+    public function writeWith(OutputInterface|ApplicationInterface|LoggerInterface|\Closure $output): static
     {
         if ($output instanceof ApplicationInterface) {
             $messages = $this->messages;
@@ -40,8 +41,14 @@ class MessageOutputEvent
             }
 
             $output->addMessage($messages);
-        } else {
+        } elseif ($output instanceof OutputInterface) {
             $output->write($this->messages, $this->newLine, $this->options);
+        } elseif ($output instanceof LoggerInterface) {
+            foreach ((string) $this->messages as $message) {
+                $output->info((string) $message);
+            }
+        } elseif ($output instanceof \Closure) {
+            $output($this);
         }
 
         return $this;
