@@ -44,7 +44,7 @@ class MessageOutputEvent
         } elseif ($output instanceof OutputInterface) {
             $output->write($this->messages, $this->newLine, $this->options);
         } elseif ($output instanceof LoggerInterface) {
-            foreach ((string) $this->messages as $message) {
+            foreach ((array) $this->messages as $message) {
                 $output->info((string) $message);
             }
         } elseif ($output instanceof \Closure) {
