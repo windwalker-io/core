@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Events\Console;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Event\CoreEventAwareTrait;
@@ -15,8 +16,18 @@ trait MessageOutputTrait
 {
     use CoreEventAwareTrait;
 
-    public function setMessageOutput(OutputInterface|ApplicationInterface $output): static
+    public function removeMessageListeners()
     {
+        $this->getEventDispatcher()->off(MessageOutputEvent::class);
+        $this->getEventDispatcher()->off(ErrorMessageOutputEvent::class);
+
+        return $this;
+    }
+
+    public function setMessageOutput(OutputInterface|ApplicationInterface|LoggerInterface $output): static
+    {
+        $this->removeMessageListeners();
+
         $this->onMessages(
             function (MessageOutputEvent $event) use ($output) {
                 $event->writeWith($output);
