@@ -2,6 +2,8 @@ type Route = string | RouteLoader;
 type RouteLoader = () => Promise<any>;
 
 let currentProps: Record<string, any> | null = null;
+let currentRoute: string = '';
+let readyHooks: Record<string, ((...args: any[]) => any)> = {};
 
 export class App {
   routes: Record<string, RouteLoader> = {};
@@ -56,7 +58,19 @@ export class App {
 
       this.queue.push(async () => {
         currentProps = props;
-        resolve(await target());
+        currentRoute = route;
+
+        let module = await target();
+
+        if (module.default && typeof module.default === 'function') {
+          module.default();
+        }
+
+        if (readyHooks[currentRoute]) {
+          readyHooks[currentRoute]();
+        }
+
+        resolve(module);
       });
 
       this.runQueue();
@@ -87,6 +101,14 @@ export function useMacroProps<T extends Record<string, any> = Record<string, any
   if (currentProps == null) {
     throw new Error('Cannot get macro props.');
   }
-  
+
   return { ...currentProps } as T;
+}
+
+export function onMacroReady(handler: () => any): void {
+  if (!currentRoute) {
+    throw new Error('Cannot find current script name for macro ready.');
+  }
+
+  readyHooks[currentRoute] = handler;
 }
