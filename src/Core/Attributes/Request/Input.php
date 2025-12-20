@@ -37,7 +37,8 @@ class Input implements ContainerAttributeInterface
                     sprintf(
                         'Field "%s" is missing in request.',
                         $field
-                    )
+                    ),
+                    400
                 );
             }
 

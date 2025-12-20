@@ -30,7 +30,7 @@ trait CountingOutputTrait
         return $this->printCounting($count);
     }
 
-    public function printCounting(int $count = 1): static
+    public function printCounting(int $count = 1, string $message = ''): static
     {
         if ($this instanceof AbstractMigration && $this->count === 0) {
             $this->emitMessage('');
@@ -47,7 +47,7 @@ trait CountingOutputTrait
 
         $icon = $loading[$this->count % count($loading)];
 
-        $this->emitMessage("\r  ({$this->count}) $icon ", false);
+        $this->emitMessage("\r  ({$this->count}) $icon $message", false);
 
         return $this;
     }
