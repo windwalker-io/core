@@ -270,13 +270,13 @@ class AssetService implements EventAwareInterface
 
     public function importSyncByApp(string $module, array $props = [], array $options = []): static
     {
-        $handler = $this->config->getDeep('modules.importSyncHandler');
-
+        // $handler = $this->config->getDeep('modules.importSyncHandler');
+        //
         $propsString = static::getJSObject($props ?: new \stdClass());
-
-        if ($handler instanceof \Closure) {
-            return $this->internalModule($handler($module, $propsString, $options), $options);
-        }
+        //
+        // if ($handler instanceof \Closure) {
+        //     return $this->internalModule($handler($module, $propsString, $options), $options);
+        // }
 
         $moduleVar = $options['moduleVar'] ?? 'module';
         $options['inline'] = true;
