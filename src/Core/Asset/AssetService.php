@@ -107,6 +107,13 @@ class AssetService implements EventAwareInterface
      */
     protected string $folder = '';
 
+    protected PromiseScope $mainScope;
+
+    /**
+     * @var array<PromiseScope>
+     */
+    protected array $importScopes = [];
+
     /**
      * @var Teleport[]
      */
@@ -200,23 +207,27 @@ class AssetService implements EventAwareInterface
 
     public function importModule(string $url, ?string $body = null, array $options = []): static
     {
-        $code = "import('$url')";
+        if ($this->importScopes[$url] ?? null) {
+            $scope = $this->importScopes[$url];
+        } else {
+            $this->importScopes[$url] = $scope = new PromiseScope("import('$url')", 'module');
 
-        if ($body) {
-            $moduleVar = $options['moduleVar'] ?? 'module';
-            $inline = $options['inline'] ?? false;
-            $comment = $options['comment'] ?? '';
-            $async = '';
-
-            if (!$inline) {
-                $body = "{\n$body\n}";
-                $async = 'async ';
-            }
-
-            $code .= ".then($async($moduleVar) => $body);$comment";
+            $this->internalModule($scope, $options);
         }
 
-        return $this->internalModule($code, $options);
+        if ($body) {
+            $comment = $options['comment'] ?? '';
+
+            if ($comment) {
+                $body = Str::ensureRight($body, ';') . $comment;
+            }
+
+            $body .= "\n";
+
+            $scope->add($body);
+        }
+
+        return $this;
     }
 
     public function importMainThen(string $body, array $options = []): static
@@ -240,11 +251,11 @@ class AssetService implements EventAwareInterface
      */
     public function importByApp(string $module, array $options = []): static
     {
-        $handler = $this->config->getDeep('modules.importHandler');
-
-        if ($handler instanceof \Closure) {
-            return $this->internalModule($handler($module, $options), $options);
-        }
+        // $handler = $this->config->getDeep('modules.importHandler');
+        //
+        // if ($handler instanceof \Closure) {
+        //     return $this->internalModule($handler($module, $options), $options);
+        // }
 
         $moduleVar = $options['moduleVar'] ?? 'module';
         $options['inline'] = true;
@@ -317,40 +328,28 @@ class AssetService implements EventAwareInterface
         );
     }
 
-    /**
-     * @param  string  $content
-     * @param  array   $options
-     *
-     * @return  static
-     */
-    public function internalCSS(string $content, array $options = []): static
+    public function internalCSS(string|\Stringable|\Closure $content, array $options = []): static
     {
         $this->internalStyles[] = new AssetItem($content, $options);
 
         return $this;
     }
 
-    public function footerInternalCSS(string $content, array $options = []): static
+    public function footerInternalCSS(string|\Stringable|\Closure $content, array $options = []): static
     {
         $options['footer'] = true;
 
         return $this->internalCSS($content, $options);
     }
 
-    /**
-     * @param  string  $content
-     * @param  array   $options
-     *
-     * @return  static
-     */
-    public function internalJS(string $content, array $options = []): static
+    public function internalJS(string|\Stringable|\Closure $content, array $options = []): static
     {
         $this->internalScripts[] = new AssetItem($content, $options);
 
         return $this;
     }
 
-    public function internalModule(string $content, array $options = []): static
+    public function internalModule(string|\Stringable|\Closure $content, array $options = []): static
     {
         $options['module'] = true;
 

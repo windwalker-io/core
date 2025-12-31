@@ -6,21 +6,23 @@ namespace Windwalker\Core\Asset;
 
 use Windwalker\Utilities\Options\OptionAccessTrait;
 
+use function Windwalker\value;
+
 class AssetItem implements \Stringable
 {
     use OptionAccessTrait;
 
-    public function __construct(protected string $content = '', array $options = [])
+    public function __construct(protected string|\Stringable|\Closure $content = '', array $options = [])
     {
         $this->options = $options;
     }
 
-    public function getContent(): string
+    public function getContent(): string|\Stringable|\Closure
     {
         return $this->content;
     }
 
-    public function setContent(string $content): static
+    public function setContent(string|\Stringable|\Closure $content): static
     {
         $this->content = $content;
 
@@ -42,6 +44,6 @@ class AssetItem implements \Stringable
      */
     public function __toString(): string
     {
-        return (string) $this->content;
+        return (string) value($this->content);
     }
 }
