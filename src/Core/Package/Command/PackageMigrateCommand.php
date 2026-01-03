@@ -11,7 +11,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Database\ORMAwareTrait;
 use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\Generator\FileCloner;
 use Windwalker\Core\Package\AbstractPackage;
@@ -28,8 +27,6 @@ use function Windwalker\fs;
 )]
 class PackageMigrateCommand implements CommandInterface
 {
-    use ORMAwareTrait;
-
     public function __construct(protected PackageRegistry $registry)
     {
     }
@@ -63,6 +60,12 @@ class PackageMigrateCommand implements CommandInterface
         $force = $io->getOption('force');
         $dryRun = $io->getOption('dry-run');
         $keepTmp = $io->getOption('keep-tmp');
+
+        if (!InstalledVersions::isInstalled('windwalker/database')) {
+            $io->writeln('Package windwalker/database is not installed. Skip migration.');
+
+            return 0;
+        }
 
         $this->registry->discover();
 

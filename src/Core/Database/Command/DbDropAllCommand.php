@@ -21,21 +21,15 @@ use Windwalker\Core\Manager\DatabaseManager;
 )]
 class DbDropAllCommand implements CommandInterface
 {
-    /**
-     * DbExportCommand constructor.
-     *
-     * @param  DatabaseManager       $databaseManager
-     * @param  ApplicationInterface  $app
-     */
     public function __construct(
-        protected DatabaseManager $databaseManager,
         protected ApplicationInterface $app,
+        protected ?DatabaseManager $databaseManager = null,
     ) {
     }
 
     public function configure(Command $command): void
     {
-        $default = $this->databaseManager->getDefaultName();
+        $default = $this->databaseManager?->getDefaultName() ?? 'local';
 
         $command->addOption(
             'force',
