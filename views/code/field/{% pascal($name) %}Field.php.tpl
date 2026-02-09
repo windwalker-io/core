@@ -14,7 +14,7 @@ class {% pascal($name) %}Field extends AbstractField
      *
      * @return  HTMLElement
      */
-    public function prepareInput(DOMElement $input): HTMLElement
+    public function prepareInput(HTMLElement $input): HTMLElement
     {
         return parent::prepareInput($input);
     }

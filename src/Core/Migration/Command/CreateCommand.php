@@ -104,10 +104,10 @@ class CreateCommand extends AbstractMigrationCommand implements InteractInterfac
             $update = $io->askChoice(
                 '<question>Is an update or create new entity?</question>',
                 [
-                    'create',
-                    'update',
+                    '1' => 'create',
+                    '2' => 'update',
                 ],
-                0
+                '1'
             );
 
             $io->setOption('update', $update === 'update');
