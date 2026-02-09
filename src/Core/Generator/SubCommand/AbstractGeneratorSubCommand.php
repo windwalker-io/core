@@ -88,6 +88,8 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             InputOption::VALUE_NONE,
             'Force override files'
         );
+
+        $this->addYesAllOption($command);
     }
 
     /**
@@ -106,6 +108,21 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         // if (!$io->getArgument('dest') && $this->requireDest) {
         //     $io->setArgument('dest', $io->ask("Dest path (<comment>from: $dir/</comment>): "));
         // }
+    }
+
+    /**
+     * @param  Command  $command
+     *
+     * @return  void
+     */
+    public function addYesAllOption(Command $command): void
+    {
+        $command->addOption(
+            'yes-all',
+            'y',
+            InputOption::VALUE_NONE,
+            'Answer yes for all questions.'
+        );
     }
 
     protected function getNamespace(IOInterface $io, ?string $suffix = null): string
@@ -280,5 +297,25 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
     public function getDefaultDir(): string
     {
         return Str::ensureRight($this->baseDir, '/') . $this->defaultDir;
+    }
+
+    protected function checkNamespaceHasStage(IOInterface $io, string $ns): void
+    {
+        if (!str_contains($ns, '\\') && !str_contains($ns, '/')) {
+            $y = $io->getOption('yes-all');
+
+            if (!$y) {
+                $y = $io->askConfirmation(
+                    "Seems you are using a single level name [<info>$ns</info>]. " .
+                    "Usually we recommend add s stage, like \"<info>[Front|Admin]/$ns</info>\". " .
+                    "Do you want to force create? [N/y]",
+                    false
+                );
+
+                if (!$y) {
+                    throw new \RuntimeException("Please provide a namespace with stage, like \"Admin/$ns\".");
+                }
+            }
+        }
     }
 }

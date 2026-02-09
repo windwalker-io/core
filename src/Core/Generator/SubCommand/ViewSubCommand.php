@@ -34,6 +34,8 @@ class ViewSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
+        $this->checkNamespaceHasStage($io, $name);
+
         $this->codeGenerator->from($this->getViewPath('view/**/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io, 'View'),
