@@ -161,6 +161,7 @@ class MigrationService implements EventAwareInterface
         );
 
         $migration->addEventDealer($this);
+        $this->app->getContainer()->getAttributesResolver()->resolveObjectMembers($migration);
 
         try {
             $this->app->call($handler);

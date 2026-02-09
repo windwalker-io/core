@@ -72,6 +72,7 @@ class SeedService implements EventAwareInterface
                 ->init(fs($seederFile), $this->db, $this->fakerService);
 
             if ($seeder->getImportHandler()) {
+                $app->getContainer()->getAttributesResolver()->resolveObjectMembers($seeder);
                 $this->runImport($seeder);
                 $count++;
             }
@@ -113,6 +114,8 @@ class SeedService implements EventAwareInterface
                 ->init(fs($seederFile), $this->db, $this->fakerService);
 
             if ($seeder->getClearHandler()) {
+                $app->getContainer()->getAttributesResolver()->resolveObjectMembers($seeder);
+
                 $this->runClear($seeder);
 
                 $count++;
