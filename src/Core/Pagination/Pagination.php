@@ -8,6 +8,7 @@ use Closure;
 use InvalidArgumentException;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
 
@@ -21,52 +22,52 @@ class Pagination
     /**
      * Number of the first page
      */
-    public const BASE_PAGE = 1;
+    public const int BASE_PAGE = 1;
 
     /**
      * First page
      */
-    public const FIRST = 'first';
+    public const string FIRST = 'first';
 
     /**
      * The page before the previous neighbour pages
      */
-    public const LESS = 'less';
+    public const string LESS = 'less';
 
     /**
      * Previous pages
      */
-    public const PREVIOUS = 'previous';
+    public const string PREVIOUS = 'previous';
 
     /**
      * Previous pages
      */
-    public const LOWER = 'lower';
+    public const string LOWER = 'lower';
 
     /**
      * Current page
      */
-    public const CURRENT = 'current';
+    public const string CURRENT = 'current';
 
     /**
      * Next pages
      */
-    public const HIGHER = 'higher';
+    public const string HIGHER = 'higher';
 
     /**
      * Next pages
      */
-    public const NEXT = 'next';
+    public const string NEXT = 'next';
 
     /**
      * The page after the next neighbour pages
      */
-    public const MORE = 'more';
+    public const string MORE = 'more';
 
     /**
      * Last page
      */
-    public const LAST = 'last';
+    public const string LAST = 'last';
 
     /**
      * Total Items
@@ -80,28 +81,28 @@ class Pagination
      *
      * @var int
      */
-    protected int $current = 1;
+    public protected(set) int $current = 1;
 
     /**
      * Items per page
      *
      * @var int
      */
-    protected int $limit = 10;
+    public protected(set) int $limit = 10;
 
     /**
      * Offset
      *
      * @var int
      */
-    protected int $offset = 0;
+    public protected(set) int $offset = 0;
 
     /**
      * Number of neighboring pages at the left and the right sides
      *
      * @var int
      */
-    protected int $neighbours = 4;
+    public protected(set) int $neighbours = 4;
 
     /**
      * Property template.
@@ -115,19 +116,21 @@ class Pagination
      *
      * @var RouteUri|null
      */
-    protected RouteUri|null $route = null;
+    public protected(set) RouteUri|null $route = null;
 
-    protected bool $simple = false;
+    public protected(set) bool $simple = false;
+
+    public protected(set) array|bool|null $allowQuery = null;
 
     /**
      * Pagination constructor.
      *
-     * @param  Navigator  $navigator
-     * @param  SystemUri  $systemUri
+     * @param  Navigator        $nav
+     * @param  SystemUri        $systemUri
      * @param  RendererService  $rendererService
      */
     public function __construct(
-        protected Navigator $navigator,
+        public protected(set) Navigator $nav,
         protected SystemUri $systemUri,
         protected RendererService $rendererService
     ) {
@@ -364,7 +367,7 @@ class Pagination
         $route = $this->route;
 
         if ($route === null) {
-            return $this->navigator->self()->page($page);
+            return $this->nav->self()->page($page);
         }
 
         return $route->withVar('page', $page);
@@ -395,5 +398,19 @@ class Pagination
         if (is_int($this->current) && $this->current < self::BASE_PAGE) {
             $this->current = self::BASE_PAGE;
         }
+    }
+
+    public function configureNavigator(\Closure $callback): static
+    {
+        $this->nav = $callback($this->nav) ?? $this->nav;
+
+        return $this;
+    }
+
+    public function allowQuery(array|bool|null $allowQuery = null, bool $replace = false): static
+    {
+        $this->nav = $this->nav->allowQuery($allowQuery, $replace);
+
+        return $this;
     }
 }
