@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Stringable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Event\CoreEventAwareTrait;
+use Windwalker\Core\Http\OutsideRedirectResponse;
 use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
@@ -230,7 +231,25 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $uri = $this->validateRedirectUrl($uri);
         }
 
-        return $this->app->redirect($uri, $code, (bool) $options->instant);
+        $res = $this->app->redirect($uri, $code, (bool) $options->instant);
+
+        if ($options->allowOutside) {
+            $res = OutsideRedirectResponse::from($res);
+        }
+
+        return $res;
+    }
+
+    public function redirectOutside(
+        Stringable|string $uri,
+        int $code = 303,
+        NavOptions|int $options = new NavOptions()
+    ): ResponseInterface {
+        $options = $this->mergeDefaultOptions($options);
+
+        $options->allowOutside = true;
+
+        return $this->redirect($uri, $code, $options);
     }
 
     public function redirectTo(
