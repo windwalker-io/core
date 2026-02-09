@@ -162,8 +162,12 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           // Build listening Host
           const scheme = server.config.server.https ? 'https' : 'http';
           const address = server.httpServer?.address();
-          const host = address && typeof address !== 'string' ? address.address : 'localhost';
+          let host = address && typeof address !== 'string' ? address.address : 'localhost';
           const port = address && typeof address !== 'string' ? address.port : 80;
+
+          if (host === '::1') {
+            host = `[${host}]`;
+          }
 
           const url = `${scheme}://${host}:${port}/`;
 
@@ -174,12 +178,26 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           );
           const serverFileFull = resolve(server.config.root, serverFile);
 
+          await new Promise<void>(resolve => setTimeout(() => resolve(), 500));
+
           if (existsSync(serverFileFull)) {
             console.log(chalk.yellow(`There may be a dev server running!`));
             console.log(`The server host file exists: ${chalk.cyan(serverFile)}`);
-            console.log(`If you want to start a new server, you need to remove this file first.`);
+            console.log('Do you want to kill other process and start a new server? [N/y]');
 
-            process.exit(1);
+            const answer = await new Promise<string>((resolve) => {
+              process.stdin.once('data', (data) => {
+                resolve(data.toString().trim());
+              });
+            });
+
+            if (answer.toLowerCase() === 'y') {
+              unlinkSync(serverFileFull);
+              console.log(chalk.green(`Start running new server on: ${url}`));
+            } else {
+              console.log(chalk.yellow('Aborting server start.'));
+              process.exit(0);
+            }
           }
 
           writeFileSync(serverFileFull, url);
