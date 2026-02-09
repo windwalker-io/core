@@ -12,6 +12,8 @@ use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareI
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
@@ -237,5 +239,33 @@ class CommandWrapper extends Command implements
         }
 
         return null;
+    }
+
+    public static function getCommandWrapper(object $handler): static
+    {
+        return ObjectMetadata::getInstance('windwalker.console')->get($handler, 'command');
+    }
+
+    public static function getIOInstance(object $handler): static
+    {
+        return ObjectMetadata::getInstance('windwalker.console')->get($handler, 'io');
+    }
+
+    public static function getInputDefinition(object $handler): InputDefinition
+    {
+        return static::getCommandWrapper($handler)->getDefinition();
+    }
+
+    public static function getInputForCompletion(object $handler, CompletionContext $context): ArgvInput
+    {
+        $args = $context->getWords();
+        array_shift($args);
+
+        return static::getCustomInput($handler, $args);
+    }
+
+    public static function getCustomInput(object $handler, array $args): ArgvInput
+    {
+        return new ArgvInput($args, static::getInputDefinition($handler));
     }
 }

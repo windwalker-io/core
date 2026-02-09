@@ -327,14 +327,7 @@ class BuildEntityCommand implements CommandInterface, CompletionAwareInterface
     public function completeArgumentValues($argumentName, CompletionContext $context)
     {
         if ($argumentName === 'ns') {
-            // Todo: Rewrite CommandWrapper to support modern features.
-            /** @var CommandWrapper $command */
-            $objectMetadata = ObjectMetadata::getInstance('windwalker.console');
-            $command = $objectMetadata->get($this, 'command');
-
-            $args = $context->getRawWords();
-            array_shift($args);
-            $input = new ArgvInput($args, $command->getDefinition());
+            $input = CommandWrapper::getInputForCompletion($this, $context);
 
             $ns = $this->getPackageNamespace($input, 'Entity') ?? 'App\\Entity\\';
 
