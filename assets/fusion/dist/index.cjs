@@ -6211,7 +6211,7 @@ class ConfigBuilder {
         }
         const chunkDir = this.getChunkDir();
         if (this.env.mode === "production" && this.fusionOptions.chunkNameObfuscation) {
-          return `${chunkDir}${serial}.js`;
+          return `${chunkDir}${serial}-[hash].js`;
         }
         return `${chunkDir}[name]-[hash].js`;
       },
