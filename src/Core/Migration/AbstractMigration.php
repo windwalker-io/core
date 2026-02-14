@@ -168,6 +168,8 @@ abstract class AbstractMigration
             foreach ($columns as $column) {
                 $tm->dropColumn($column);
             }
+
+            $tm->cacheReset();
         }
 
         return $this;
