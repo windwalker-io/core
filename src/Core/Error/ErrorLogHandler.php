@@ -45,7 +45,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
             [
                 'enabled' => false,
                 'channel' => $this->config->getDeep('error.log_channel') ?: 'error',
-                'ignore_40x' => false,
+                'ignore_40x' => true,
                 'print' => false,
                 'backtraces' => true,
             ]
