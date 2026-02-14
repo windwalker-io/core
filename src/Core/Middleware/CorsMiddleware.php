@@ -9,9 +9,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Http\CorsHandler;
 use Windwalker\Core\Manager\Logger;
+use Windwalker\DI\Attributes\NoAutowire;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\Response;
 use Windwalker\Utilities\Arr;
@@ -30,6 +32,7 @@ class CorsMiddleware implements MiddlewareInterface
         protected string|array|null $allowOrigins = null,
         protected bool $sendInstantly = false,
         protected ?\Closure $configure = null,
+        #[NoAutowire]
         protected \Closure|LoggerInterface|string|null $logger = null,
         /**
          * @deprecated  Use constructor arguments instead.
@@ -196,18 +199,20 @@ class CorsMiddleware implements MiddlewareInterface
 
     protected function getLogCallback(): ?\Closure
     {
-        if ($this->logger instanceof \Closure) {
-            return $this->logger;
+        $logger = $this->logger;
+
+        if ($logger instanceof \Closure) {
+            return $logger;
         }
 
-        if (is_string($this->logger)) {
-            return function ($message, $context = []) {
-                $this->container->get(LoggerInterface::class, tag: $this->logger)
+        if (is_string($logger)) {
+            return function ($message, $context = []) use ($logger) {
+                $this->container->get(LoggerInterface::class, tag: $logger)
                     ->debug($message, $context);
             };
         }
 
-        if ($this->logger instanceof LoggerInterface) {
+        if ($logger instanceof LoggerInterface) {
             return function ($message, $context = []) {
                 $this->logger->debug($message, $context);
             };
