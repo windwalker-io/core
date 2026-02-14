@@ -73,7 +73,7 @@ class LayoutPathResolver
             }
         }
 
-        return throw new RuntimeException(
+        return throw new LayoutNotFoundException(
             sprintf(
                 'Unable to find layout: %s - Paths: %s',
                 $layout,

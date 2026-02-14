@@ -5,37 +5,30 @@ declare(strict_types=1);
 namespace Windwalker\Core\Form;
 
 use Windwalker\Core\Renderer\RendererService;
-use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 use Windwalker\Form\Field\AbstractField;
 use Windwalker\Form\Renderer\FormRendererInterface;
+use Windwalker\Form\Renderer\SimpleRenderer;
 
 /**
  * The FormRenderer class.
  */
 class FormRenderer implements FormRendererInterface
 {
-    /**
-     * FormRenderer constructor.
-     *
-     * @param  RendererService  $rendererService
-     */
+    public FormRendererInterface $fallbackRenderer;
+
     public function __construct(protected RendererService $rendererService)
     {
+        $this->fallbackRenderer = new SimpleRenderer();
     }
 
-    /**
-     * renderField
-     *
-     * @param  AbstractField  $field
-     * @param  HTMLElement    $wrapper
-     * @param  array          $options
-     *
-     * @return string
-     */
     public function renderField(AbstractField $field, HTMLElement $wrapper, array $options = []): string
     {
         $renderer = $this;
+
+        if (!$this->rendererService->hasLayout('@theme::form.field-wrapper')) {
+            return $this->fallbackRenderer->renderField($field, $wrapper, $options);
+        }
 
         return $this->rendererService->render(
             '@theme::form.field-wrapper',
@@ -43,18 +36,13 @@ class FormRenderer implements FormRendererInterface
         );
     }
 
-    /**
-     * renderLabel
-     *
-     * @param  AbstractField  $field
-     * @param  HTMLElement    $label
-     * @param  array          $options
-     *
-     * @return string
-     */
     public function renderLabel(AbstractField $field, HTMLElement $label, array $options = []): string
     {
         $renderer = $this;
+
+        if (!$this->rendererService->hasLayout('@theme::form.label')) {
+            return $this->fallbackRenderer->renderLabel($field, $label, $options);
+        }
 
         return $this->rendererService->render(
             '@theme::form.label',
@@ -62,18 +50,13 @@ class FormRenderer implements FormRendererInterface
         );
     }
 
-    /**
-     * renderInput
-     *
-     * @param  AbstractField  $field
-     * @param  HTMLElement    $input
-     * @param  array          $options
-     *
-     * @return string
-     */
     public function renderInput(AbstractField $field, HTMLElement $input, array $options = []): string
     {
         $renderer = $this;
+
+        if (!$this->rendererService->hasLayout('@theme::form.input')) {
+            return $this->fallbackRenderer->renderInput($field, $input, $options);
+        }
 
         return $this->rendererService->render(
             '@theme::form.input',

@@ -105,6 +105,20 @@ class RendererService
         return $this->pathResolver->resolveLayout($layout, $this->getSupportedExtensions());
     }
 
+    public function resolveLayoutIfExists(string $layout): ?string
+    {
+        try {
+            return $this->pathResolver->resolveLayout($layout, $this->getSupportedExtensions());
+        } catch (LayoutNotFoundException) {
+            return null;
+        }
+    }
+
+    public function hasLayout(string $layout): bool
+    {
+        return $this->resolveLayoutIfExists($layout) !== null;
+    }
+
     protected function prepareGlobals(array $globals): array
     {
         // $globals['app'] = $this->app;
