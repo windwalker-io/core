@@ -60,6 +60,47 @@ class ViteResolver
         return $uri;
     }
 
+    /**
+     * @param  string  $uri
+     *
+     * @return  array{
+     *     file: string,
+     *     name: string,
+     *     src: string,
+     *     isEntry: bool,
+     *     imports: array<string>,
+     *     dynamicImports: array<string>,
+     *     css: array<string>,
+     *  }|null
+     */
+    public function resolveUriManifest(string $uri): ?array
+    {
+        if ($this->serverIsRunning()) {
+            return null;
+        }
+
+        $path = str_replace($this->alias, $this->base, $uri);
+
+        $manifest = $this->getManifest();
+
+        if ($manifest === null) {
+            return null;
+        }
+
+        return $manifest[$path] ?? null;
+    }
+
+    public function resolveUriCssEntries(string $uri): array
+    {
+        $manifest = $this->resolveUriManifest($uri);
+
+        if (!$manifest) {
+            return [];
+        }
+
+        return $manifest['css'] ?? [];
+    }
+
     public function prependHost(string $uri): string
     {
         return rtrim((string) $this->getServerHost(), '/') . '/' . ltrim($uri, '/');

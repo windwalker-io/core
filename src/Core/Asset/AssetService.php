@@ -181,6 +181,20 @@ class AssetService implements EventAwareInterface
         return $this->addLink('scripts', $url, $options, $attrs);
     }
 
+    public function viteEntry(string $url, array $options = [], array $attrs = []): array
+    {
+        $links = [];
+        $links[] = $this->js($url, $options, $attrs);
+
+        $cssEntries = $this->vite->resolveUriCssEntries($url);
+
+        foreach ($cssEntries as $css) {
+            $links[] = $this->css($css);
+        }
+
+        return $links;
+    }
+
     /**
      * addScript
      *
