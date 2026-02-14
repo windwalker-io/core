@@ -60,6 +60,8 @@ class MigrationService implements EventAwareInterface
      */
     public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): int
     {
+        $this->db->getDriver()->options->debug = true;
+
         $migrations = $this->getMigrations($path);
         $versions = $this->getVersions();
         $currentVersion = $this->getCurrentVersion();

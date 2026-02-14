@@ -44,6 +44,8 @@ class SeedService implements EventAwareInterface
 
     public function import(string|SplFileInfo $file): int
     {
+        $this->db->getDriver()->options->debug = true;
+
         $entry = FileObject::wrap($file);
 
         $seeder = new Seeder();
