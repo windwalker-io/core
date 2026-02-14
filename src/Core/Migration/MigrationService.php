@@ -160,8 +160,8 @@ class MigrationService implements EventAwareInterface
             false
         );
 
-        $migration->addEventDealer($this);
         $this->app->getContainer()->getAttributesResolver()->resolveObjectMembers($migration);
+        $migration->addEventDealer($this);
 
         try {
             $this->app->call($handler);
