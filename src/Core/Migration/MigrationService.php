@@ -68,6 +68,10 @@ class MigrationService implements EventAwareInterface
             throw new RuntimeException('No migrations found.');
         }
 
+        if ($targetVersion !== null) {
+            $targetVersion = $this->normalizeVersion($targetVersion, $migrations);
+        }
+
         if ($targetVersion === null) {
             $targetVersion = max(array_merge($versions, array_keys($migrations)));
         } elseif ($targetVersion !== '0' && empty($migrations[$targetVersion])) {
@@ -459,5 +463,30 @@ class MigrationService implements EventAwareInterface
                 break;
             }
         }
+    }
+
+    /**
+     * @param  string  $targetVersion
+     * @param  array<string, Migration>   $migrations
+     *
+     * @return  string
+     */
+    protected function normalizeVersion(string $targetVersion, array $migrations): string
+    {
+        if ($targetVersion === '0') {
+            return $targetVersion;
+        }
+
+        if ($migrations[$targetVersion] ?? null) {
+            return $targetVersion;
+        }
+
+        foreach ($migrations as $version => $migration) {
+            if (strtolower($migration->name) === strtolower($targetVersion)) {
+                return $migration->version;
+            }
+        }
+
+        throw new RuntimeException("Version `$targetVersion` is not valid.");
     }
 }

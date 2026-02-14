@@ -222,6 +222,17 @@ class CommandWrapper extends Command implements
      */
     public function completeOptionValues($optionName, CompletionContext $context)
     {
+        if ($this->handler instanceof CompletionHandlerInterface) {
+            $newContext = new \Windwalker\Console\CompletionContext(
+                CompletionType::OPTION,
+                $optionName,
+                $this,
+                $context
+            );
+
+            return $this->handler->handleCompletions($newContext);
+        }
+
         if ($this->handler instanceof CompletionAwareInterface) {
             return $this->handler->completeOptionValues($optionName, $context);
         }
@@ -234,6 +245,17 @@ class CommandWrapper extends Command implements
      */
     public function completeArgumentValues($argumentName, CompletionContext $context)
     {
+        if ($this->handler instanceof CompletionHandlerInterface) {
+            $newContext = new \Windwalker\Console\CompletionContext(
+                CompletionType::ARGUMENT,
+                $argumentName,
+                $this,
+                $context
+            );
+
+            return $this->handler->handleCompletions($newContext);
+        }
+
         if ($this->handler instanceof CompletionAwareInterface) {
             return $this->handler->completeArgumentValues($argumentName, $context);
         }
@@ -246,7 +268,7 @@ class CommandWrapper extends Command implements
         return ObjectMetadata::getInstance('windwalker.console')->get($handler, 'command');
     }
 
-    public static function getIOInstance(object $handler): static
+    public static function getIOInstance(object $handler): IOInterface
     {
         return ObjectMetadata::getInstance('windwalker.console')->get($handler, 'io');
     }

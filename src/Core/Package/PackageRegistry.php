@@ -147,6 +147,21 @@ class PackageRegistry
     }
 
     /**
+     * @return  AbstractPackage[]
+     *
+     * @throws JsonException
+     */
+    public function getPackagesKeyByName(): array
+    {
+        $packages = $this->getPackages();
+
+        return array_combine(
+            array_map(static fn($package) => $package::getName(), $packages),
+            $packages
+        );
+    }
+
+    /**
      * @param  AbstractPackage[]  $packages
      *
      * @return  static  Return self to support chaining.
