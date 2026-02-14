@@ -46,7 +46,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
      */
     public function boot(Container $container): void
     {
-        if (!$this->app->getType()->isCliWeb()) {
+        if ($this->app->getType()->isWeb()) {
             $iniValues = $this->config->get('ini') ?? [];
 
             static::setINIValues($iniValues, $container);
@@ -77,6 +77,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
                 });
 
                 // To hide default uncaught errors and backtraces.
+                error_reporting(E_ALL);
                 $error->register(false, E_ALL, true);
                 break;
         }

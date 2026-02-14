@@ -30,6 +30,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\ApplicationTrait;
+use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Command\RunCommand;
@@ -265,7 +266,21 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     {
         parent::configureIO($input, $output);
 
+        $this->output = $output;
+
         static::addColors($output);
+    }
+
+    public function getVerbosity(): AppVerbosity
+    {
+        $output = $this->getOutput();
+
+        return match ($output->getVerbosity()) {
+            OutputInterface::VERBOSITY_QUIET => AppVerbosity::HIDDEN,
+            OutputInterface::VERBOSITY_VERBOSE => AppVerbosity::VERBOSE,
+            OutputInterface::VERBOSITY_VERY_VERBOSE, OutputInterface::VERBOSITY_DEBUG => AppVerbosity::VERY_VERBOSE,
+            default => AppVerbosity::NORMAL,
+        };
     }
 
     public static function addColors(OutputInterface $output): void
