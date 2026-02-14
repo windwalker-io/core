@@ -296,13 +296,11 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $options = $this->mergeDefaultOptions($options);
 
-        $systemUri = $this->getSystemUri();
+        if ($options->base) {
+            return SystemUri::addPrefix($url, $options->base);
+        }
 
-        // if (!$systemUri) {
-        //     return Str::ensureLeft($url, '/');
-        // }
-
-        return $systemUri->absolute(
+        return $this->getSystemUri()->absolute(
             $url,
             $options->mode === NavMode::FULL
         );

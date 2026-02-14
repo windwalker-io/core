@@ -26,6 +26,7 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
         public ?bool $withoutQuery = null,
         public ?bool $ignoreEvents = null,
         public array|bool|null $allowQuery = null,
+        public ?string $base = null,
         public ?array $extra = null,
     ) {
     }
