@@ -72,6 +72,7 @@ export declare class ConfigBuilder {
     merge(override: UserConfig | ((config: UserConfig) => UserConfig)): this;
     private getDefaultOutput;
     private getChunkDir;
+    getAssetDefaultSubdir(assetInfo: PreRenderedAsset): string;
     private getChunkNameFromTask;
     ensurePath(path: string, def?: any): this;
     get(path: string): any;

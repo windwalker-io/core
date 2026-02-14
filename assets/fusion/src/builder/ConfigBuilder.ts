@@ -150,6 +150,8 @@ export default class ConfigBuilder {
         //   return assetInfo.name;
         // }
 
+        const chunkDir = this.getChunkDir();
+
         for (const assetFileNamesCallback of this.assetFileNamesCallbacks) {
           const name = assetFileNamesCallback(assetInfo);
 
@@ -158,7 +160,9 @@ export default class ConfigBuilder {
           }
         }
 
-        return '[name].[ext]';
+        const dir = this.getAssetDefaultSubdir(assetInfo);
+
+        return `${chunkDir}${dir}[name]-[hash].[ext]`;
       }
     };
   }
@@ -177,6 +181,27 @@ export default class ConfigBuilder {
     }
 
     return chunkDir;
+  }
+
+  public getAssetDefaultSubdir(assetInfo: PreRenderedAsset): string {
+    let dir = '';
+
+    // CSS
+    if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+      dir = 'css/';
+    }
+
+    // Fonts
+    if (assetInfo.name && /\.(woff2?|ttf|otf|eot)$/.test(assetInfo.name)) {
+      dir = 'fonts/';
+    }
+
+    // Images
+    if (assetInfo.name && /\.(png|jpe?g|gif|svg|webp)$/.test(assetInfo.name)) {
+      dir = 'images/';
+    }
+
+    return dir;
   }
 
   private getChunkNameFromTask(chunkInfo: PreRenderedChunk) {

@@ -6216,13 +6216,15 @@ class ConfigBuilder {
         return `${chunkDir}[name]-[hash].js`;
       },
       assetFileNames: (assetInfo) => {
+        const chunkDir = this.getChunkDir();
         for (const assetFileNamesCallback of this.assetFileNamesCallbacks) {
           const name = assetFileNamesCallback(assetInfo);
           if (name) {
             return name;
           }
         }
-        return "[name].[ext]";
+        const dir = this.getAssetDefaultSubdir(assetInfo);
+        return `${chunkDir}${dir}[name]-[hash].[ext]`;
       }
     };
   }
@@ -6236,6 +6238,19 @@ class ConfigBuilder {
       chunkDir = "";
     }
     return chunkDir;
+  }
+  getAssetDefaultSubdir(assetInfo) {
+    let dir = "";
+    if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+      dir = "css/";
+    }
+    if (assetInfo.name && /\.(woff2?|ttf|otf|eot)$/.test(assetInfo.name)) {
+      dir = "fonts/";
+    }
+    if (assetInfo.name && /\.(png|jpe?g|gif|svg|webp)$/.test(assetInfo.name)) {
+      dir = "images/";
+    }
+    return dir;
   }
   getChunkNameFromTask(chunkInfo) {
     if (this.tasks.has(chunkInfo.name)) {
