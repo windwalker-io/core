@@ -6,9 +6,12 @@ namespace Windwalker\Console;
 
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext as SymfonyCompletionContext;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
+
+use function Windwalker\ds;
 
 class CompletionContext
 {
@@ -59,12 +62,17 @@ class CompletionContext
         return $this->currentCommand->getDefinition();
     }
 
-    public function getInput(): ArgvInput
+    public function getInput(): CompletionInput
     {
         $words = $this->words;
         array_shift($words);
 
-        return new ArgvInput($words, $this->getDefinition());
+        $definition = $this->getDefinition();
+
+        $input = CompletionInput::fromTokens($words, $this->currentWordIndex);
+        $input->bind($definition);
+
+        return $input;
     }
 
     public function getIO(): IOInterface
