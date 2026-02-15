@@ -324,10 +324,10 @@ class JsModulizeProcessor {
         return { id, external: true };
       }
     });
-    const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
     builder2.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
       const scripts = {};
+      const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
       if (normalize(srcFile) === inputFile) {
         const bladeFiles = findBladeFiles(this.bladePatterns);
         const bladeScripts = parseScriptsFromBlades(bladeFiles);

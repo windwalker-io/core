@@ -81,7 +81,7 @@ export class JsModulizeProcessor implements ProcessorInterface {
     });
 
     // Todo: Must dynamic changes in load() hook
-    const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
+    // const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
     // const bladeFiles = findBladeFiles(this.bladePatterns);
 
     // Watches
@@ -97,7 +97,8 @@ export class JsModulizeProcessor implements ProcessorInterface {
     builder.loadCallbacks.push((src, options) => {
       const srcFile = stripUrlQuery(src);
       const scripts: Record<string, string> = {};
-      
+      const scriptFiles = findFilesFromGlobArray(this.scriptPatterns);
+
       // if (src === appSrcFileName) {
       if (normalize(srcFile) === inputFile) {
         const bladeFiles = findBladeFiles(this.bladePatterns);
