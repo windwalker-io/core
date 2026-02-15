@@ -5,7 +5,7 @@ import { basename, parse, resolve, normalize, dirname, relative, isAbsolute } fr
 import chalk from 'chalk';
 import require$$0 from 'util';
 import require$$0$1 from 'path';
-import fs$1, { writeFileSync, existsSync, unlinkSync } from 'node:fs';
+import fs$1, { writeFileSync, existsSync, readFileSync, unlinkSync } from 'node:fs';
 import { mergeConfig } from 'vite';
 import { inspect } from 'node:util';
 import yargs from 'yargs';
@@ -8852,6 +8852,7 @@ async function resolveTaskAsFlat(name, task, cache) {
 
 let params = parseArgv(getArgsAfterDoubleDashes(process.argv));
 prepareParams(params);
+let serverRunning = false;
 let builder;
 const originalTasks = params._;
 const extraVitePlugins = [];
@@ -8954,10 +8955,15 @@ function useFusion(fusionOptions = {}, tasks) {
             resolvedOptions.cliParams?.serverFile ?? "tmp/vite-server"
           );
           const serverFileFull = resolve(server.config.root, serverFile);
-          await new Promise((resolve2) => setTimeout(() => resolve2(), 500));
-          if (existsSync(serverFileFull)) {
+          const pidFile = resolve(
+            server.config.root,
+            resolvedOptions.cliParams?.pidFile ?? "tmp/vite-pid"
+          );
+          const anotherServerRunning = existsSync(serverFileFull) || existsSync(pidFile);
+          await sleep(500);
+          if (!serverRunning && anotherServerRunning) {
             console.log(chalk.yellow(`There may be a dev server running!`));
-            console.log(`The server host file exists: ${chalk.cyan(serverFile)}`);
+            console.log(`The server host file: ${chalk.cyan(serverFile)} or PID file: ${chalk.cyan(pidFile)} exists.`);
             console.log("Do you want to kill other process and start a new server? [N/y]");
             const answer = await new Promise((resolve2) => {
               process.stdin.once("data", (data) => {
@@ -8965,14 +8971,27 @@ function useFusion(fusionOptions = {}, tasks) {
               });
             });
             if (answer.toLowerCase() === "y") {
+              if (existsSync(pidFile)) {
+                const pid = readFileSync(pidFile, "utf-8");
+                try {
+                  process.kill(parseInt(pid), "SIGTERM");
+                  console.log(`Killed process with PID: ${chalk.yellow(pid)}`);
+                } catch (err) {
+                  console.log(`Failed to kill process with PID: ${chalk.yellow(pid)}. It may have already exited.`);
+                }
+              }
               unlinkSync(serverFileFull);
-              console.log(chalk.green(`Start running new server on: ${url}`));
+              unlinkSync(pidFile);
+              console.log(`Start running new server on: ${chalk.green(url)} and PID: ${chalk.green(process.pid)}`);
             } else {
               console.log(chalk.yellow("Aborting server start."));
               process.exit(0);
             }
           }
+          serverRunning = true;
+          await sleep(300);
           writeFileSync(serverFileFull, url);
+          writeFileSync(pidFile, process.pid.toString());
           if (!exitHandlersBound) {
             process.on("exit", () => {
               for (const callback of builder.serverStopCallbacks) {
@@ -8980,6 +8999,9 @@ function useFusion(fusionOptions = {}, tasks) {
               }
               if (fs$1.existsSync(serverFile)) {
                 fs$1.rmSync(serverFile);
+              }
+              if (fs$1.existsSync(pidFile)) {
+                fs$1.rmSync(pidFile);
               }
             });
             process.on("SIGINT", () => process.exit());
@@ -9194,6 +9216,9 @@ function clean(...paths) {
 function fullReloads(...paths) {
   builder.watches.push(...paths);
   builder.watches = uniq(builder.watches);
+}
+function sleep(ms) {
+  return new Promise((resolve2) => setTimeout(() => resolve2(), ms));
 }
 const index = {
   ...fusion,
