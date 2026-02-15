@@ -299,8 +299,10 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return Str::ensureRight($this->baseDir, '/') . $this->defaultDir;
     }
 
-    protected function checkNamespaceHasStage(IOInterface $io, string $ns): void
+    protected function askForStage(IOInterface $io): void
     {
+        $ns = $io->getArgument('name');
+
         if (!str_contains($ns, '\\') && !str_contains($ns, '/')) {
             $y = $io->getOption('yes-all');
 
