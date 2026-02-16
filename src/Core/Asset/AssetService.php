@@ -1027,6 +1027,11 @@ class AssetService implements EventAwareInterface
         return $this->addAssetBase($uri, $path);
     }
 
+    public function resolveViteUri(string $uri): string
+    {
+        return $this->vite->resolve($uri);
+    }
+
     /**
      * normalizeUri
      *
