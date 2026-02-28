@@ -124,11 +124,14 @@ interface ApplicationInterface extends
     public function isCliRuntime(): bool;
 
     /**
-     * Get App Secret.
+     * Get App Secret or derive it.
+     *
+     * @param  string|null  $deriveFor
+     * @param  string       $salt
      *
      * @return  string
      */
-    public function getSecret(): string;
+    public function getSecret(?string $deriveFor = null, string $salt = ''): string;
 
     /**
      * Is this application under maintenance.

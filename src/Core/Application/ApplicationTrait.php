@@ -150,9 +150,21 @@ trait ApplicationTrait
         return $this->getVerbosity()->isVerbose();
     }
 
-    public function getSecret(): string
+    public function getSecret(?string $deriveFor = null, string $salt = ''): string
     {
-        return (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
+        $secret = (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
+
+        if ($deriveFor) {
+            $secret = hash_hkdf(
+                'sha256',
+                $secret,
+                32,
+                $deriveFor,
+                $salt
+            );
+        }
+
+        return $secret;
     }
 
     public function isMaintenance(): bool
