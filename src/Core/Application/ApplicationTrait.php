@@ -150,7 +150,7 @@ trait ApplicationTrait
         return $this->getVerbosity()->isVerbose();
     }
 
-    public function getSecret(?string $deriveFor = null, string $salt = ''): string
+    public function getSecret(?string $deriveFor = null): string
     {
         $secret = (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
 
@@ -160,7 +160,6 @@ trait ApplicationTrait
                 $secret,
                 32,
                 $deriveFor,
-                $salt
             );
         }
 

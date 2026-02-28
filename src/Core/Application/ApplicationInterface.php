@@ -127,11 +127,10 @@ interface ApplicationInterface extends
      * Get App Secret or derive it.
      *
      * @param  string|null  $deriveFor
-     * @param  string       $salt
      *
      * @return  string
      */
-    public function getSecret(?string $deriveFor = null, string $salt = ''): string;
+    public function getSecret(?string $deriveFor = null): string;
 
     /**
      * Is this application under maintenance.

@@ -38,7 +38,7 @@ class CryptSecretCommand implements CommandInterface
             'length',
             InputArgument::OPTIONAL,
             'The bytes length.',
-            '16'
+            '32'
         );
 
         $command->addOption(

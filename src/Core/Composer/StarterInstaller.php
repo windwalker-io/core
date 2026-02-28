@@ -17,6 +17,8 @@ use Windwalker\Crypt\SecretToolkit;
  */
 class StarterInstaller
 {
+    public const int SECRET_LENGTH = 32;
+
     /**
      * Do install.
      *
@@ -176,10 +178,10 @@ class StarterInstaller
     public static function genSecretCode(): string
     {
         if (class_exists(SecretToolkit::class)) {
-            return SecretToolkit::genSecret();
+            return SecretToolkit::genSecret(static::SECRET_LENGTH);
         }
 
-        return 'base64url:' . Base64Url::encode(random_bytes(16));
+        return 'base64url:' . Base64Url::encode(random_bytes(static::SECRET_LENGTH));
     }
 
     /**
