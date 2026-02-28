@@ -238,7 +238,7 @@ class WindwalkerExtension implements
      */
     public function ds(string $expression): string
     {
-        return "<?php ds{$expression}; ?>";
+        return "<?php \Windwalker\ds{$expression}; ?>";
     }
 
     /**
