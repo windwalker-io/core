@@ -253,6 +253,7 @@ class AppState implements JsonSerializable
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withPrefix(string $prefix): static
     {
         $new = clone $this;

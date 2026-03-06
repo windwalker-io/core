@@ -64,6 +64,7 @@ class AppRequest implements AppRequestInterface, JsonSerializable
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withRequest(ServerRequestInterface $request): static
     {
         $new = clone $this;

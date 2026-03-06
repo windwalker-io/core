@@ -32,6 +32,7 @@ trait AppRequestTrait
 
     protected ProxyResolver $proxyResolver;
 
+    #[\NoDiscard]
     public function withClientIp(?string $clientIp): static
     {
         $new = clone $this;
@@ -70,6 +71,7 @@ trait AppRequestTrait
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withUri(UriInterface $uri): static
     {
         $new = clone $this;
@@ -103,6 +105,7 @@ trait AppRequestTrait
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withUrlVars(array $vars): static
     {
         $new = clone $this;
@@ -127,6 +130,7 @@ trait AppRequestTrait
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withInput(array $input): static
     {
         $new = clone $this;
@@ -232,6 +236,7 @@ trait AppRequestTrait
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withSystemUri(SystemUri $uri): static
     {
         $new = clone $this;
@@ -253,6 +258,7 @@ trait AppRequestTrait
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withMatchedRoute(?Route $matchedRoute): static
     {
         $new = clone $this;

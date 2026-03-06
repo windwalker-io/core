@@ -26,6 +26,7 @@ class BrowserNext extends Parser
         return new static($headers, $request->getHeaderLine('User-Agent'));
     }
 
+    #[\NoDiscard]
     public function with(
         array|ServerRequestInterface|null $headers = null,
         ?string $userAgent = null,

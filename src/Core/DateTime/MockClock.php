@@ -46,6 +46,7 @@ class MockClock implements ChronosClockInterface
         return $this;
     }
 
+    #[\NoDiscard]
     public function withModify(string $modifier): static
     {
         $new = clone $this;
@@ -61,6 +62,7 @@ class MockClock implements ChronosClockInterface
         return $this;
     }
 
+    #[\NoDiscard]
     public function withSleep(int $seconds): static
     {
         $new = clone $this;
@@ -76,6 +78,7 @@ class MockClock implements ChronosClockInterface
         return $this;
     }
 
+    #[\NoDiscard]
     public function withUsleep(int $microseconds): static
     {
         $new = clone $this;

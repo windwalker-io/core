@@ -247,6 +247,7 @@ class LangService implements LanguageInterface
      *
      * @return  static
      */
+    #[\NoDiscard]
     public function extract(string $namespace): static
     {
         $new = clone $this;
@@ -256,6 +257,7 @@ class LangService implements LanguageInterface
         return $new;
     }
 
+    #[\NoDiscard]
     public function cloneForLocale(string $locale): static
     {
         $new = clone $this;

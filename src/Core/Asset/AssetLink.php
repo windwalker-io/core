@@ -27,6 +27,7 @@ class AssetLink extends Link
         $this->prepareOptions([], $options);
     }
 
+    #[\NoDiscard]
     public function withAttributes(array $attrs): static
     {
         $new = clone $this;
@@ -38,6 +39,7 @@ class AssetLink extends Link
         return $new;
     }
 
+    #[\NoDiscard]
     public function withOption(string $name, mixed $value): static
     {
         $new = clone $this;
@@ -46,6 +48,7 @@ class AssetLink extends Link
         return $new;
     }
 
+    #[\NoDiscard]
     public function withOptions(array|ArrayAccess|AccessibleInterface $options): static
     {
         $new = clone $this;
