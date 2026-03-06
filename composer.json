@@ -15,14 +15,14 @@
         "monolog/monolog": "^2.0||^3.0",
         "nikic/fast-route": "^1.0",
         "nikic/php-parser": "^4.10||^5.0",
-        "stecman/symfony-console-completion": "^0.11.0||^0.12.0||^0.13.0||^0.14.0",
-        "symfony/console": "^5.2||^6.0||^7.0",
-        "symfony/dotenv": "^5.2||^6.0||^7.0",
+        "stecman/symfony-console-completion": "^0.13.0||^0.14.0||^0.15.0",
+        "symfony/console": "^6.0||^7.0||^8.0",
+        "symfony/dotenv": "^6.0||^7.0||^8.0",
         "symfony/event-dispatcher-contracts": "^2.0||^3.0",
-        "symfony/options-resolver": "^5.0||^6.0||^7.0",
-        "symfony/polyfill-php83": "^1.0",
-        "symfony/process": "^5.2||^6.0||^7.0",
-        "symfony/stopwatch": "^5.0||^6.0||^7.0",
+        "symfony/options-resolver": "^6.0||^7.0||^8.0",
+        "symfony/polyfill-php85": "^1.0",
+        "symfony/process": "^6.0||^7.0||^8.0",
+        "symfony/stopwatch": "^6.0||^7.0||^8.0",
         "webmozart/glob": "^4.0",
         "windwalker/attributes": "^4.0",
         "windwalker/cache": "^4.0",
@@ -40,8 +40,8 @@
         "asika/object-metadata": "^1.0"
     },
     "suggest": {
-        "dragonmantank/cron-expression": "Install ^3.1 to support schedule runner.",
-        "symfony/mailer": "Install ^5.2||^6.0||^7.0 to send mail.",
+        "dragonmantank/cron-expression": "Install ^3.0 to support schedule runner.",
+        "symfony/mailer": "Install it to send mail.",
         "tijsverkoyen/css-to-inline-styles": "Install ~2.0 if you want to use mail css inliner."
     },
     "archive": {
