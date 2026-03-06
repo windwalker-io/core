@@ -70,6 +70,7 @@ class RouteUri extends Uri implements NavConstantInterface
      *
      * @return  $this
      */
+    #[\NoDiscard]
     public function options(int|NavOptions $options): static
     {
         $new = clone $this;
@@ -404,26 +405,12 @@ class RouteUri extends Uri implements NavConstantInterface
         return $this;
     }
 
+    #[\NoDiscard]
     public function allowQuery(array|bool|null $fields, bool $replace = false): static
     {
         $new = clone $this;
 
-        if (is_array($fields)) {
-            $fields = array_values($fields);
-        }
-
-        if ($replace || is_bool($fields)) {
-            $new->options->allowQuery = $fields;
-        } else {
-            if ($new->options->allowQuery === false) {
-                $new->options->allowQuery = [];
-            }
-
-            $new->options->allowQuery = array_merge(
-                $new->options->allowQuery ?? [],
-                array_values((array) $fields)
-            );
-        }
+        $new->options->allowQuery($fields, $replace);
 
         return $new;
     }
@@ -441,6 +428,7 @@ class RouteUri extends Uri implements NavConstantInterface
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withStatus(int $status): static
     {
         $new = clone $this;

@@ -92,6 +92,26 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
         }
     }
 
+    public function allowQuery(array|bool|null $fields, bool $replace = false): void
+    {
+        if (is_array($fields)) {
+            $fields = array_values($fields);
+        }
+
+        if ($replace || is_bool($fields)) {
+            $this->allowQuery = $fields;
+        } else {
+            if (is_bool($this->allowQuery)) {
+                $this->allowQuery = [];
+            }
+
+            $this->allowQuery = array_merge(
+                $this->allowQuery ?? [],
+                array_values((array) $fields)
+            );
+        }
+    }
+
     public function allowAllQuery(bool $allow = true): void
     {
         $this->allowQuery = $allow;

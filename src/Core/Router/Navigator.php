@@ -55,7 +55,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     public function back(NavOptions|int $options = new NavOptions()): RouteUri
     {
         $options = $this->mergeDefaultOptions($options);
-        $options->allowQuery ??= false;
+        $options->allowQuery ??= true;
 
         $to = $this->localReferrer() ?? $this->getSystemUri()->root();
 
@@ -306,26 +306,12 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         );
     }
 
+    #[\NoDiscard]
     public function allowQuery(array|bool|null $fields, bool $replace = false): static
     {
         $new = clone $this;
 
-        if (is_array($fields)) {
-            $fields = array_values($fields);
-        }
-
-        if ($replace || is_bool($fields)) {
-            $new->options->allowQuery = $fields;
-        } else {
-            if ($new->options->allowQuery === false) {
-                $new->options->allowQuery = [];
-            }
-
-            $new->options->allowQuery = array_merge(
-                $new->options->allowQuery ?? [],
-                array_values((array) $fields)
-            );
-        }
+        $new->options->allowQuery($fields, $replace);
 
         return $new;
     }
@@ -345,6 +331,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      *
      * @return  $this
      */
+    #[\NoDiscard]
     public function withOptions(NavOptions|int $options): static
     {
         $new = clone $this;
