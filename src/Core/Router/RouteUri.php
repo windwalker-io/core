@@ -360,6 +360,10 @@ class RouteUri extends Uri implements NavConstantInterface
                 $uri->port = $this->port;
             }
 
+            if ($this->fragment) {
+                $uri->fragment = $this->fragment;
+            }
+
             if ($vars !== []) {
                 if ($this->options->allowQuery === false) {
                     $vars = [];
