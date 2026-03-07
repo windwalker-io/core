@@ -6,10 +6,12 @@ namespace Windwalker\Core\Factory;
 
 use Psr\Log\LoggerInterface;
 use Windwalker\Cache\CachePool;
+use Windwalker\Cache\Storage\DatabaseStorage;
 use Windwalker\Cache\Storage\FileStorage;
 use Windwalker\Cache\Storage\StorageInterface;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
+use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
@@ -75,6 +77,24 @@ class CacheFactory implements ServiceFactoryInterface
         ): FileStorage => new FileStorage(
             $container->getParam('@cache') . '/' . $cacheTag,
             []
+        );
+    }
+
+    public static function dbStorage(
+        ?string $connection = null,
+        string $table = 'cache_items',
+        array $columns = [],
+    ): \Closure {
+        return #[Factory]
+        static fn(
+            Container $container,
+            string $cacheTag,
+            ?string $tag
+        ): DatabaseStorage => new DatabaseStorage(
+            db: $container->get(DatabaseAdapter::class, tag: $connection),
+            group: $cacheTag,
+            table: $table,
+            columns: $columns,
         );
     }
 
