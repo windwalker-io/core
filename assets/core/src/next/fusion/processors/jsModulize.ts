@@ -63,6 +63,16 @@ export class JsModulizeProcessor implements ProcessorInterface {
     const tmpPath = this.options.tmpPath ?? resolve('./tmp/fusion/jsmodules/').replace(/\\/g, '/');
     const clean = this.options.cleanTmp ?? true;
 
+    builder.merge({
+      build: {
+        watch: {
+          exclude: [
+            tmpPath + '/**',
+          ],
+        }
+      }
+    });
+
     if (clean) {
       builder.postBuildCallbacks.push((options, bundle) => {
         fs.removeSync(tmpPath);

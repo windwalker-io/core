@@ -8984,6 +8984,9 @@ function useFusion(fusionOptions = {}, tasks) {
           await cleanFiles(builder.cleans, resolvedConfig.build.outDir || process.cwd());
         }
       },
+      watchChange(id, change) {
+        console.log("CHANGED", id, change);
+      },
       // Server
       configureServer(server) {
         builder.server = server;
