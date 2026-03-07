@@ -7,6 +7,7 @@ return [
     'view' => \Windwalker\Core\Generator\SubCommand\ViewSubCommand::class,
     'model' => \Windwalker\Core\Generator\SubCommand\ModelSubCommand::class,
     'entity' => \Windwalker\Core\Generator\SubCommand\EntitySubCommand::class,
+    'data' => \Windwalker\Core\Generator\SubCommand\DataSubCommand::class,
     'form' => \Windwalker\Core\Generator\SubCommand\FormSubCommand::class,
     'route' => \Windwalker\Core\Generator\SubCommand\RouteSubCommand::class,
     'enum' => \Windwalker\Core\Generator\SubCommand\EnumSubCommand::class,
