@@ -299,7 +299,7 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
         return Str::ensureRight($this->baseDir, '/') . $this->defaultDir;
     }
 
-    protected function askForStage(IOInterface $io): void
+    protected function askForStage(IOInterface $io, string $example = 'Front|Admin'): void
     {
         $ns = $io->getArgument('name');
 
@@ -307,10 +307,18 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
             $y = $io->getOption('yes-all');
 
             if (!$y) {
+                $io->writeln(
+                    "Seems you are using a single level name [<comment>$ns</comment>]. " .
+                    "Usually we recommend add s stage, like \"<info>[$example]/$ns</info>\". "
+                );
+                $io->writeln(
+                    "[<info>N</info>] (default) Cancel and re-enter the name."
+                );
+                $io->writeln(
+                    "[<comment>y</comment>] Force create with [<info>$ns</info>] without stage."
+                );
                 $y = $io->askConfirmation(
-                    "Seems you are using a single level name [<info>$ns</info>]. " .
-                    "Usually we recommend add s stage, like \"<info>[Front|Admin]/$ns</info>\". " .
-                    "Do you want to force create? [N/y]",
+                    '[N/y]: ',
                     false
                 );
 

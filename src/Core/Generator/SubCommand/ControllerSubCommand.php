@@ -47,6 +47,8 @@ class ControllerSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
+        $this->askForStage($io);
+
         $this->codeGenerator->from($this->getViewPath('controller/*'))
             ->replaceTo(
                 $this->getDestPath($io, 'Controller'),

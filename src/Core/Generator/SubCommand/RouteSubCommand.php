@@ -52,6 +52,8 @@ class RouteSubCommand extends AbstractGeneratorSubCommand
             return 255;
         }
 
+        $this->askForStage($io, 'front|admin');
+
         $this->codeGenerator->from($this->getViewPath('route/*'))
             ->replaceTo(
                 $this->getDestPath($io),
