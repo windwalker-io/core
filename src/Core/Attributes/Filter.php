@@ -35,7 +35,7 @@ use Windwalker\DI\Attributes\ContainerAttributeInterface;
  *  - bool([strict])
  *  - object([strict])
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class Filter implements ContainerAttributeInterface
 {
     public function __construct(
