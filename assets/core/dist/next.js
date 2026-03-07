@@ -310,15 +310,17 @@ class JsModulizeProcessor {
     const inputFile = resolve(task.input);
     const tmpPath = this.options.tmpPath ?? resolve("./tmp/fusion/jsmodules/").replace(/\\/g, "/");
     const clean = this.options.cleanTmp ?? true;
-    builder2.merge({
-      build: {
-        watch: {
-          exclude: [
-            tmpPath + "/**"
-          ]
+    if (builder2.config.build.watch) {
+      builder2.merge({
+        build: {
+          watch: {
+            exclude: [
+              tmpPath + "/**"
+            ]
+          }
         }
-      }
-    });
+      });
+    }
     if (clean) {
       builder2.postBuildCallbacks.push((options, bundle) => {
         fs$1.removeSync(tmpPath);

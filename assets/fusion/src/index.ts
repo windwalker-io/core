@@ -162,10 +162,6 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
         }
       },
 
-      watchChange(id, change) {
-        console.log('CHANGED', id, change);
-      },
-
       // Server
       configureServer(server) {
         builder.server = server;
