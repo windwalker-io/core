@@ -6168,6 +6168,7 @@ class ConfigBuilder {
   serverStopCallbacks = [];
   resolveIdCallbacks = [];
   loadCallbacks = [];
+  transformCallbacks = [];
   // fileNameMap: Record<string, string> = {};
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];
   watches = [];
@@ -6334,6 +6335,49 @@ class ConfigBuilder {
     show(this.config);
   }
 }
+
+const KNOWN_ASSET_TYPES = [
+  // images
+  "apng",
+  "bmp",
+  "png",
+  "jpe?g",
+  "jfif",
+  "pjpeg",
+  "pjp",
+  "gif",
+  "svg",
+  "ico",
+  "webp",
+  "avif",
+  "cur",
+  "jxl",
+  // media
+  "mp4",
+  "webm",
+  "ogg",
+  "mp3",
+  "wav",
+  "flac",
+  "aac",
+  "opus",
+  "mov",
+  "m4a",
+  "vtt",
+  // fonts
+  "woff2?",
+  "eot",
+  "ttf",
+  "otf",
+  // other
+  "webmanifest",
+  "pdf",
+  "txt"
+];
+const DEFAULT_ASSETS_RE = new RegExp(
+  `\\.(` + KNOWN_ASSET_TYPES.join("|") + `)(\\?.*)?$`,
+  "i"
+);
 
 function getArgsAfterDoubleDashes(argv) {
   argv ??= process.argv;
@@ -8869,6 +8913,8 @@ function useFusion(fusionOptions = {}, tasks) {
   let logger;
   let resolvedConfig;
   let exitHandlersBound = false;
+  let serverUrl = "";
+  let serverRoot = "";
   let resolvedOptions = mergeOptions(defaultFusionOptions, prepareFusionOptions(fusionOptions));
   if (typeof tasks === "string" || Array.isArray(tasks) && tasks.length > 0) {
     params._ = forceArray(tasks);
@@ -8954,6 +9000,8 @@ function useFusion(fusionOptions = {}, tasks) {
             host = `[${host}]`;
           }
           const url = `${scheme}://${host}:${port}/`;
+          serverUrl = url;
+          serverRoot = server.config.root;
           const serverFile = node_path.resolve(
             server.config.root,
             resolvedOptions.cliParams?.serverFile ?? "tmp/vite-server"
@@ -9096,6 +9144,17 @@ function useFusion(fusionOptions = {}, tasks) {
         if (source.startsWith("hidden:")) {
           return "";
         }
+      },
+      async transform(code, id, options) {
+        for (const callback of exports.builder.transformCallbacks) {
+          if (typeof callback !== "function") {
+            continue;
+          }
+          const result = await callback.call(this, code, id, options);
+          if (result) {
+            return result;
+          }
+        }
       }
     },
     {
@@ -9119,6 +9178,35 @@ function useFusion(fusionOptions = {}, tasks) {
           for (const callback of task.postCallbacks) {
             await callback(options, bundle);
           }
+        }
+      }
+    },
+    {
+      name: "fusion:asset-urls",
+      enforce: "pre",
+      async transform(code, id) {
+        const [path, query] = id.split("?");
+        const params2 = new URLSearchParams(query);
+        if (shouldBeAbsolute(id, params2)) {
+          const resolvedUrl = serverUrl.slice(0, -1) + vite.normalizePath(realpathToUrl(path));
+          return `export default ${JSON.stringify(resolvedUrl)}`;
+        }
+        function realpathToUrl(path2, base = "") {
+          return vite.normalizePath(path2).replace(vite.normalizePath(serverRoot), base);
+        }
+        function shouldBeAbsolute(id2, params3) {
+          if (DEFAULT_ASSETS_RE.test(id2) && !params3.has("raw") && !params3.has("inline")) {
+            return true;
+          }
+          if (params3.has("full")) {
+            params3.delete("full");
+            return true;
+          }
+          if (params3.has("url")) {
+            params3.delete("url");
+            return true;
+          }
+          return false;
         }
       }
     }

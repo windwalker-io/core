@@ -65,6 +65,7 @@ export declare class ConfigBuilder {
     serverStopCallbacks: ((config: ResolvedConfig, server: ViteDevServer) => MaybePromise<void>)[];
     resolveIdCallbacks: Exclude<Plugin_2['resolveId'], undefined>[];
     loadCallbacks: Exclude<Plugin_2['load'], undefined>[];
+    transformCallbacks: Exclude<Plugin_2['transform'], undefined>[];
     watches: WatchTask[];
     cleans: string[];
     tasks: Map<string, BuildTask>;

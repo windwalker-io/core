@@ -24,6 +24,7 @@ export default class ConfigBuilder {
   serverStopCallbacks: ((config: ResolvedConfig, server: ViteDevServer) => MaybePromise<void>)[] = [];
   resolveIdCallbacks: Exclude<Plugin['resolveId'], undefined>[] = [];
   loadCallbacks: Exclude<Plugin['load'], undefined>[] = [];
+  transformCallbacks: Exclude<Plugin['transform'], undefined>[] = [];
   // fileNameMap: Record<string, string> = {};
 
   // externals: ((source: string, importer: string | undefined, isResolved: boolean) => boolean | string | NullValue)[] = [];

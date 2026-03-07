@@ -2,10 +2,11 @@ export * from './dep';
 import chalk from 'chalk';
 import { uniq } from 'lodash-es';
 import micromatch from 'micromatch';
-import fs, { existsSync, unlinkSync, writeFileSync, readFileSync } from 'node:fs';
+import fs, { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { Logger, mergeConfig, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
+import { Logger, mergeConfig, normalizePath, type PluginOption, ResolvedConfig, UserConfig, ViteDevServer } from 'vite';
 import ConfigBuilder from './builder/ConfigBuilder.ts';
+import { DEFAULT_ASSETS_RE } from './constants.ts';
 import * as fusion from './dep';
 import { prepareParams } from './params';
 import { getArgsAfterDoubleDashes, parseArgv } from './runner/app';
@@ -37,6 +38,11 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
   let resolvedConfig: ResolvedConfig;
   let exitHandlersBound = false;
 
+  // Server
+  let serverUrl: string = '';
+  let serverRoot: string = '';
+
+  // Options
   let resolvedOptions = mergeOptions(defaultFusionOptions, prepareFusionOptions(fusionOptions));
 
   if (
@@ -171,6 +177,8 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           }
 
           const url = `${scheme}://${host}:${port}/`;
+          serverUrl = url;
+          serverRoot = server.config.root;
 
           // Build & write server file
           const serverFile = resolve(
@@ -359,6 +367,19 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
           return '';
         }
       },
+      async transform(code, id, options) {
+        for (const callback of builder.transformCallbacks) {
+          if (typeof callback !== 'function') {
+            continue;
+          }
+
+          const result = await callback.call(this, code, id, options);
+
+          if (result) {
+            return result;
+          }
+        }
+      },
     },
     {
       name: 'fusion:post-handles',
@@ -389,6 +410,46 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
         }
       },
     },
+    {
+      name: 'fusion:asset-urls',
+      enforce: 'pre',
+      async transform(code, id) {
+        const [path, query] = id.split('?');
+        const params = new URLSearchParams(query);
+
+        if (shouldBeAbsolute(id, params)) {
+          const resolvedUrl = serverUrl.slice(0, -1) + normalizePath(realpathToUrl(path));
+
+          return `export default ${JSON.stringify(resolvedUrl)}`;
+        }
+
+        function realpathToUrl(path: string, base = '') {
+          return normalizePath(path).replace(normalizePath(serverRoot), base);
+        }
+
+        function shouldBeAbsolute(id: string, params: URLSearchParams) {
+          if (
+            DEFAULT_ASSETS_RE.test(id)
+            && !params.has('raw')
+            && !params.has('inline')
+          ) {
+            return true;
+          }
+
+          if (params.has('full')) {
+            params.delete('full');
+            return true;
+          }
+
+          if (params.has('url')) {
+            params.delete('url');
+            return true;
+          }
+
+          return false;
+        }
+      }
+    }
   ];
 }
 
