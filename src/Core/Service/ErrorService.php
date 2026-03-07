@@ -168,7 +168,7 @@ class ErrorService
 
         $e = new ErrorException($content, 500, $code, $file, $line);
 
-        if ($code === E_USER_DEPRECATED || $code === E_DEPRECATED) {
+        if (($code === E_USER_DEPRECATED || $code === E_DEPRECATED)) {
             $this->handleDeprecation($e);
 
             return;
