@@ -37,7 +37,7 @@ use Windwalker\Filter\Exception\ValidateException;
  *  - bool([strict])
  *  - object([strict])
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class Assert implements ContainerAttributeInterface
 {
     public function __construct(
@@ -72,7 +72,8 @@ class Assert implements ContainerAttributeInterface
                     $message .= ' - ' . $e->getMessage();
                 }
 
-                throw new \RuntimeException(
+                throw ValidateException::create(
+                    $e->getValidator(),
                     $message,
                     400,
                     $e

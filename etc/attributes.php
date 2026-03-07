@@ -20,6 +20,7 @@ use Windwalker\Core\Attributes\Request\QueryParam;
 use Windwalker\Core\Attributes\Request\InputCompact;
 use Windwalker\Core\Attributes\Request\RouteParam;
 use Windwalker\Core\Attributes\Request\UrlVar;
+use Windwalker\Core\Attributes\Required;
 use Windwalker\Core\Attributes\Transaction;
 use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Attributes\AttributeType;
@@ -30,6 +31,7 @@ return [
     ...Container::getDefaultAttributes(),
     Ref::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Assert::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
+    Required::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Filter::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
 
     // Decorators
