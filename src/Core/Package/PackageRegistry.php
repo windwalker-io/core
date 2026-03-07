@@ -151,7 +151,7 @@ class PackageRegistry
      *
      * @throws JsonException
      */
-    public function getPackagesKeyByName(): array
+    public function getPackageNames(): array
     {
         $packages = $this->getPackages();
 

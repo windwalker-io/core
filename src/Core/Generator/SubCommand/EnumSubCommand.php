@@ -7,6 +7,8 @@ namespace Windwalker\Core\Generator\SubCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\CompletionContext;
+use Windwalker\Console\CompletionHandlerInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\StrNormalize;
@@ -17,7 +19,7 @@ use Windwalker\Utilities\StrNormalize;
 #[CommandWrapper(
     description: 'Generate Windwalker enum.'
 )]
-class EnumSubCommand extends AbstractGeneratorSubCommand
+class EnumSubCommand extends AbstractGeneratorSubCommand implements CompletionHandlerInterface
 {
     protected string $defaultNamespace = 'Enum';
 
@@ -107,5 +109,19 @@ class EnumSubCommand extends AbstractGeneratorSubCommand
             );
 
         return 0;
+    }
+
+    #[\Override]
+    public function handleCompletions(CompletionContext $context): ?array
+    {
+        if ($context->isOption()) {
+            if ($context->name === 'pkg') {
+                return [
+                    'lyert'
+                ];
+            }
+        }
+
+        return null;
     }
 }

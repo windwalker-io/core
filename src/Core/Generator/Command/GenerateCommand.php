@@ -16,10 +16,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\CompletionHandlerInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Console\SubCommandAwareInterface;
+use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\DI\Exception\DefinitionException;
+
+use function Windwalker\ds;
 
 /**
  * The GenerateCommand class.
@@ -28,14 +32,14 @@ use Windwalker\DI\Exception\DefinitionException;
     description: 'Generate files.',
     aliases: 'g'
 )]
-class GenerateCommand implements CommandInterface, SubCommandAwareInterface, CompletionAwareInterface
+class GenerateCommand implements CommandInterface, SubCommandAwareInterface, CompletionHandlerInterface
 {
     protected ?array $subCommands = null;
 
     /**
      * GenerateCommand constructor.
      */
-    public function __construct(protected ConsoleApplication $app)
+    public function __construct(protected ConsoleApplication $app, protected PackageRegistry $packageRegistry)
     {
     }
 
@@ -249,20 +253,33 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
         return $this->subCommands ??= $this->app->config('generator.commands');
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function completeOptionValues($optionName, CompletionContext $context)
+    #[\Override]
+    public function handleCompletions(\Windwalker\Console\CompletionContext $context): ?array
     {
-    }
+        if ($context->isArgument()) {
+            if ($context->name === 'options') {
+                if ($context->currentWordIndex === 2) {
+                    return array_keys($this->getSubCommands());
+                }
 
-    /**
-     * @inheritDoc
-     */
-    public function completeArgumentValues($argumentName, CompletionContext $context)
-    {
-        if ($argumentName === 'options' && $context->getWordIndex() === 2) {
-            return array_keys($this->getSubCommands());
+                if (($context->words[$context->currentWordIndex - 1] ?? null) === '--pkg') {
+                    return array_keys($this->packageRegistry->getPackageNames());
+                }
+
+                if ($context->currentWordIndex > 2) {
+                    $task = $context->currentWord;
+
+                    if ($command = $this->getSubCommand($task)) {
+                        $command = $this->resolveSubCommand($task, $command);
+
+                        if ($command instanceof CompletionHandlerInterface) {
+                            return $command->handleCompletions($context);
+                        }
+                    }
+                }
+            }
         }
+
+        return null;
     }
 }
