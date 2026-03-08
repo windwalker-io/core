@@ -62,7 +62,7 @@ class DumpServerCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         if (!class_exists(DumpServer::class)) {
-            throw new DomainException('Please install symfony/var-dumper ^5.0 first.');
+            throw new DomainException('Please install symfony/var-dumper first.');
         }
 
         $descriptor = match ($format = $io->getOption('format')) {
