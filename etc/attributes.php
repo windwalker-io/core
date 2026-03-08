@@ -9,6 +9,7 @@ use Windwalker\Core\Attributes\Csrf;
 use Windwalker\Core\Attributes\Filter;
 use Windwalker\Core\Attributes\Json;
 use Windwalker\Core\Attributes\JsonApi;
+use Windwalker\Core\Attributes\MapTo;
 use Windwalker\Core\Attributes\Method;
 use Windwalker\Core\Attributes\Module;
 use Windwalker\Core\Attributes\Ref;
@@ -33,6 +34,7 @@ return [
     Assert::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Required::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
     Filter::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
+    MapTo::class => AttributeType::PARAMETERS | AttributeType::PROPERTIES,
 
     // Decorators
     Module::class => AttributeType::CLASSES,
