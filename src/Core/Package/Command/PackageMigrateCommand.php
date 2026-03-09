@@ -53,6 +53,14 @@ class PackageMigrateCommand implements CommandInterface
             InputOption::VALUE_NONE,
             'Keep the tmp upgrade file after operation.'
         );
+
+        $command->addOption(
+            'test',
+            't',
+            InputOption::VALUE_OPTIONAL,
+            'Test run or choose a package to test',
+            false
+        );
     }
 
     public function execute(IOInterface $io): int
@@ -60,6 +68,7 @@ class PackageMigrateCommand implements CommandInterface
         $force = $io->getOption('force');
         $dryRun = $io->getOption('dry-run');
         $keepTmp = $io->getOption('keep-tmp');
+        $test = $io->getOption('test') ?? true;
 
         if (!InstalledVersions::isInstalled('windwalker/database')) {
             $io->writeln('Package windwalker/database is not installed. Skip migration.');
@@ -69,32 +78,62 @@ class PackageMigrateCommand implements CommandInterface
 
         $this->registry->discover();
 
-        $composerJson = $this->registry->rootComposerJson;
-        $tmpFile = $composerJson['extra']['windwalker']['upgrade-tmp'] ?? 'tmp/upgrades.json';
-        $upgradeFile = fs(Path::makeAbsolute($tmpFile, WINDWALKER_ROOT));
-
-        if (!$upgradeFile->isFile()) {
-            $io->writeln('No upgrade-tmp file found.');
-
-            return 0;
-        }
-
-        $upgradeJson = $upgradeFile->readAndParse();
-
-        $expiredTime = chronos()->modify('-12hours');
-        $upgradedTime = Chronos::createFromTimestamp($upgradeJson['time']);
-
-        if ($expiredTime > $upgradedTime) {
-            throw new \RuntimeException(
-                'upgrade-tmp file expired. Please re-run `composer update` to restart a package migrating process.'
-            );
-        }
-
-        $upgradedPackages = $upgradeJson['packages'] ?? [];
-
         $composerPackages = $this->registry->getComposerPackagesMap();
 
-        $shouldUpgradePackages = array_intersect_key($composerPackages, $upgradedPackages);
+        if ($test === true) {
+            // Test all packages
+            $shouldUpgradePackages = $composerPackages;
+
+            foreach ($shouldUpgradePackages as $pkgName => $packages) {
+                $upgradedPackagesVersions[$pkgName] = [
+                    '0.0.0',
+                    '999.99.99',
+                ];
+            }
+        } elseif (is_string($test)) {
+            // Test single package
+            if (isset($composerPackages[$test])) {
+                $shouldUpgradePackages = [
+                    $test => $composerPackages[$test],
+                ];
+
+                $upgradedPackagesVersions[$test] = [
+                    '0.0.0',
+                    '999.99.99',
+                ];
+            } else {
+                throw new \RuntimeException(
+                    sprintf('Package %s not found in composer packages.', $test)
+                );
+            }
+        } else {
+            // Real upgrade process
+            $composerJson = $this->registry->rootComposerJson;
+            $tmpFile = $composerJson['extra']['windwalker']['upgrade-tmp'] ?? 'tmp/upgrades.json';
+            $upgradeFile = fs(Path::makeAbsolute($tmpFile, WINDWALKER_ROOT));
+
+            if (!$upgradeFile->isFile()) {
+                $io->writeln('No upgrade-tmp file found.');
+
+                return 0;
+            }
+
+            $upgradeJson = $upgradeFile->readAndParse();
+
+            $expiredTime = chronos()->modify('-12hours');
+            $upgradedTime = Chronos::createFromTimestamp($upgradeJson['time']);
+
+            if ($expiredTime > $upgradedTime) {
+                throw new \RuntimeException(
+                    'upgrade-tmp file expired. Please re-run `composer update` to restart a package migrating process.'
+                );
+            }
+
+            /** @var array<string, array{ string, string }> $upgradedPackagesVersions */
+            $upgradedPackagesVersions = $upgradeJson['packages'] ?? [];
+
+            $shouldUpgradePackages = array_intersect_key($composerPackages, $upgradedPackagesVersions);
+        }
         $migrator = $this->registry->prepareMigrate();
 
         $fileCloner = new FileCloner($io, dryRun: $dryRun);
@@ -108,7 +147,7 @@ class PackageMigrateCommand implements CommandInterface
                 );
             }
 
-            [$previousVersion, $currentVersion] = $upgradedPackages[$upgradeComposerPackage];
+            [$previousVersion, $currentVersion] = $upgradedPackagesVersions[$upgradeComposerPackage];
 
             // Do not handle when downgrade or same version.
             if (Comparator::compare($currentVersion, '<=', $previousVersion)) {
@@ -141,10 +180,12 @@ class PackageMigrateCommand implements CommandInterface
 
         $fileCloner->printListResults($results);
 
-        if ($keepTmp) {
-            $io->style()->note('Keeping the tmp upgrade file not deleted: ' . $upgradeFile->getPathname());
-        } else {
-            $upgradeFile->deleteIfExists();
+        if (!$test && isset($upgradeFile)) {
+            if ($keepTmp) {
+                $io->style()->note('Keeping the tmp upgrade file not deleted: ' . $upgradeFile->getPathname());
+            } else {
+                $upgradeFile->deleteIfExists();
+            }
         }
 
         return 0;
