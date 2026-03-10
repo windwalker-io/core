@@ -1,9 +1,9 @@
 import { getGlobBaseFromPattern, callback, css, js, plugin, builder, callbackAfterBuild, copyGlob, symlink } from "@windwalker-io/fusion-next";
+import fg from "fast-glob";
 import isGlob from "is-glob";
 import micromatch from "micromatch";
 import path, { relative, normalize, resolve } from "node:path";
 import fs from "node:fs";
-import fg from "fast-glob";
 import crypto, { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import fs$1 from "fs-extra";
@@ -113,9 +113,11 @@ function handleCloneAssets(builder2, clonePatterns) {
   });
   builder2.loadCallbacks.push((src) => {
     if (src === id) {
-      const glob = clonePatterns.map((v) => v.replace(/\\/g, "/")).map((v) => v.startsWith("./") || !v.startsWith("/") ? `/${v}` : v).map((v) => `'${v}'`).join(", ");
-      return `import.meta.glob(${glob});
-`;
+      const glob = clonePatterns.map((v) => v.replace(/\\/g, "/"));
+      const images = fg.globSync(glob).map((v) => v.startsWith("./") || !v.startsWith("/") ? `/${v}` : v);
+      const lines = images.map((v, i) => `import img${i++} from '${v}';`);
+      lines.push(`export default [${images.map((_, index) => `img${index}`).join(", ")}];`);
+      return lines.join("\n") + "\n";
     }
   });
 }

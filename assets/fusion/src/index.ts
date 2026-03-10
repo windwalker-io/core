@@ -411,15 +411,19 @@ export function useFusion(fusionOptions: FusionPluginOptionsUnresolved = {}, tas
       },
     },
     {
-      name: 'fusion:asset-urls',
+      name: 'fusion:dev-asset-urls',
       enforce: 'pre',
       async transform(code, id) {
+        // Only handle server url in dev server.
+        if (!serverRunning) {
+          return code;
+        }
+
         const [path, query] = id.split('?');
         const params = new URLSearchParams(query);
 
         if (shouldBeAbsolute(id, params)) {
           const resolvedUrl = serverUrl.slice(0, -1) + normalizePath(realpathToUrl(path));
-
           return `export default ${JSON.stringify(resolvedUrl)}`;
         }
 

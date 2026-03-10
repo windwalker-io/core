@@ -1,8 +1,8 @@
 import { callback, type ConfigBuilder } from '@windwalker-io/fusion-next';
+import fg from 'fast-glob';
 import isGlob from 'is-glob';
 import micromatch from 'micromatch';
-import { normalize } from 'node:path';
-import { relative } from 'node:path';
+import { normalize, relative } from 'node:path';
 import { containsMiddleGlob, removeLastGlob, uniqId } from '../../utilities';
 
 export function cloneAssets(patterns: Record<string, string>) {
@@ -47,15 +47,19 @@ export function handleCloneAssets(builder: ConfigBuilder, clonePatterns: string[
     if (src === id) {
       const glob = clonePatterns
         // Replace slash to unix style
-        .map(v => v.replace(/\\/g, '/'))
-        // Glob in virtual module should start with /
-        .map(v => v.startsWith('./') || !v.startsWith('/') ? `/${v}` : v)
-        // wrap with quotes
-        .map(v => `'${v}'`)
-        // join it to string.
-        .join(', ');
+        .map(v => v.replace(/\\/g, '/'));
 
-      return `import.meta.glob(${glob});\n`;
+      // Find images and handle paths
+      const images = fg.globSync(glob)
+        .map(v => v.startsWith('./') || !v.startsWith('/') ? `/${v}` : v);
+
+      // Build imports
+      const lines = images.map((v, i) => `import img${i++} from '${v}';`);
+
+      // export as array to keep from treeshake
+      lines.push(`export default [${images.map((_, index) => `img${index}`).join(', ')}];`);
+
+      return lines.join('\n') + '\n';
     }
   });
 }

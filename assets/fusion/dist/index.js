@@ -1,7 +1,7 @@
 import Crypto, { randomBytes } from 'node:crypto';
 import fg from 'fast-glob';
 import fs from 'fs-extra';
-import { basename, parse, resolve, normalize, dirname, relative, isAbsolute } from 'node:path';
+import { basename, parse, normalize, dirname, resolve, relative, isAbsolute } from 'node:path';
 import chalk from 'chalk';
 import require$$0 from 'util';
 import require$$0$1 from 'path';
@@ -1931,9 +1931,9 @@ var hasRequiredUtils$1;
 function requireUtils$1 () {
 	if (hasRequiredUtils$1) return utils$1;
 	hasRequiredUtils$1 = 1;
-	(function (exports) {
+	(function (exports$1) {
 
-		exports.isInteger = num => {
+		exports$1.isInteger = num => {
 		  if (typeof num === 'number') {
 		    return Number.isInteger(num);
 		  }
@@ -1947,15 +1947,15 @@ function requireUtils$1 () {
 		 * Find a node of the given type
 		 */
 
-		exports.find = (node, type) => node.nodes.find(node => node.type === type);
+		exports$1.find = (node, type) => node.nodes.find(node => node.type === type);
 
 		/**
 		 * Find a node of the given type
 		 */
 
-		exports.exceedsLimit = (min, max, step = 1, limit) => {
+		exports$1.exceedsLimit = (min, max, step = 1, limit) => {
 		  if (limit === false) return false;
-		  if (!exports.isInteger(min) || !exports.isInteger(max)) return false;
+		  if (!exports$1.isInteger(min) || !exports$1.isInteger(max)) return false;
 		  return ((Number(max) - Number(min)) / Number(step)) >= limit;
 		};
 
@@ -1963,7 +1963,7 @@ function requireUtils$1 () {
 		 * Escape the given node with '\\' before node.value
 		 */
 
-		exports.escapeNode = (block, n = 0, type) => {
+		exports$1.escapeNode = (block, n = 0, type) => {
 		  const node = block.nodes[n];
 		  if (!node) return;
 
@@ -1979,7 +1979,7 @@ function requireUtils$1 () {
 		 * Returns true if the given brace node should be enclosed in literal braces
 		 */
 
-		exports.encloseBrace = node => {
+		exports$1.encloseBrace = node => {
 		  if (node.type !== 'brace') return false;
 		  if ((node.commas >> 0 + node.ranges >> 0) === 0) {
 		    node.invalid = true;
@@ -1992,7 +1992,7 @@ function requireUtils$1 () {
 		 * Returns true if a brace node is invalid.
 		 */
 
-		exports.isInvalidBrace = block => {
+		exports$1.isInvalidBrace = block => {
 		  if (block.type !== 'brace') return false;
 		  if (block.invalid === true || block.dollar) return true;
 		  if ((block.commas >> 0 + block.ranges >> 0) === 0) {
@@ -2010,7 +2010,7 @@ function requireUtils$1 () {
 		 * Returns true if a node is an open or close node
 		 */
 
-		exports.isOpenOrClose = node => {
+		exports$1.isOpenOrClose = node => {
 		  if (node.type === 'open' || node.type === 'close') {
 		    return true;
 		  }
@@ -2021,7 +2021,7 @@ function requireUtils$1 () {
 		 * Reduce an array of text nodes.
 		 */
 
-		exports.reduce = nodes => nodes.reduce((acc, node) => {
+		exports$1.reduce = nodes => nodes.reduce((acc, node) => {
 		  if (node.type === 'text') acc.push(node.value);
 		  if (node.type === 'range') node.type = 'text';
 		  return acc;
@@ -2031,7 +2031,7 @@ function requireUtils$1 () {
 		 * Flatten an array
 		 */
 
-		exports.flatten = (...args) => {
+		exports$1.flatten = (...args) => {
 		  const result = [];
 
 		  const flat = arr => {
@@ -3639,7 +3639,7 @@ var hasRequiredUtils;
 function requireUtils () {
 	if (hasRequiredUtils) return utils;
 	hasRequiredUtils = 1;
-	(function (exports) {
+	(function (exports$1) {
 
 		const path = require$$0$1;
 		const win32 = process.platform === 'win32';
@@ -3650,19 +3650,19 @@ function requireUtils () {
 		  REGEX_SPECIAL_CHARS_GLOBAL
 		} = /*@__PURE__*/ requireConstants();
 
-		exports.isObject = val => val !== null && typeof val === 'object' && !Array.isArray(val);
-		exports.hasRegexChars = str => REGEX_SPECIAL_CHARS.test(str);
-		exports.isRegexChar = str => str.length === 1 && exports.hasRegexChars(str);
-		exports.escapeRegex = str => str.replace(REGEX_SPECIAL_CHARS_GLOBAL, '\\$1');
-		exports.toPosixSlashes = str => str.replace(REGEX_BACKSLASH, '/');
+		exports$1.isObject = val => val !== null && typeof val === 'object' && !Array.isArray(val);
+		exports$1.hasRegexChars = str => REGEX_SPECIAL_CHARS.test(str);
+		exports$1.isRegexChar = str => str.length === 1 && exports$1.hasRegexChars(str);
+		exports$1.escapeRegex = str => str.replace(REGEX_SPECIAL_CHARS_GLOBAL, '\\$1');
+		exports$1.toPosixSlashes = str => str.replace(REGEX_BACKSLASH, '/');
 
-		exports.removeBackslashes = str => {
+		exports$1.removeBackslashes = str => {
 		  return str.replace(REGEX_REMOVE_BACKSLASH, match => {
 		    return match === '\\' ? '' : match;
 		  });
 		};
 
-		exports.supportsLookbehinds = () => {
+		exports$1.supportsLookbehinds = () => {
 		  const segs = process.version.slice(1).split('.').map(Number);
 		  if (segs.length === 3 && segs[0] >= 9 || (segs[0] === 8 && segs[1] >= 10)) {
 		    return true;
@@ -3670,21 +3670,21 @@ function requireUtils () {
 		  return false;
 		};
 
-		exports.isWindows = options => {
+		exports$1.isWindows = options => {
 		  if (options && typeof options.windows === 'boolean') {
 		    return options.windows;
 		  }
 		  return win32 === true || path.sep === '\\';
 		};
 
-		exports.escapeLast = (input, char, lastIdx) => {
+		exports$1.escapeLast = (input, char, lastIdx) => {
 		  const idx = input.lastIndexOf(char, lastIdx);
 		  if (idx === -1) return input;
-		  if (input[idx - 1] === '\\') return exports.escapeLast(input, char, idx - 1);
+		  if (input[idx - 1] === '\\') return exports$1.escapeLast(input, char, idx - 1);
 		  return `${input.slice(0, idx)}\\${input.slice(idx)}`;
 		};
 
-		exports.removePrefix = (input, state = {}) => {
+		exports$1.removePrefix = (input, state = {}) => {
 		  let output = input;
 		  if (output.startsWith('./')) {
 		    output = output.slice(2);
@@ -3693,7 +3693,7 @@ function requireUtils () {
 		  return output;
 		};
 
-		exports.wrapOutput = (input, state = {}, options = {}) => {
+		exports$1.wrapOutput = (input, state = {}, options = {}) => {
 		  const prepend = options.contains ? '' : '^';
 		  const append = options.contains ? '' : '$';
 
@@ -7052,8 +7052,8 @@ is not a problem with esbuild. You need to fix your environment instead.
 	    if (isFirstPacket) {
 	      isFirstPacket = false;
 	      let binaryVersion = String.fromCharCode(...bytes);
-	      if (binaryVersion !== "0.25.9") {
-	        throw new Error(`Cannot start service: Host version "${"0.25.9"}" does not match binary version ${quote(binaryVersion)}`);
+	      if (binaryVersion !== "0.27.3") {
+	        throw new Error(`Cannot start service: Host version "${"0.27.3"}" does not match binary version ${quote(binaryVersion)}`);
 	      }
 	      return;
 	    }
@@ -8179,7 +8179,7 @@ for your current platform.`);
 	        "node_modules",
 	        ".cache",
 	        "esbuild",
-	        `pnpapi-${pkg.replace("/", "-")}-${"0.25.9"}-${path.basename(subpath)}`
+	        `pnpapi-${pkg.replace("/", "-")}-${"0.27.3"}-${path.basename(subpath)}`
 	      );
 	      if (!fs.existsSync(binTargetPath)) {
 	        fs.mkdirSync(path.dirname(binTargetPath), { recursive: true });
@@ -8214,7 +8214,7 @@ for your current platform.`);
 	  }
 	}
 	var _a;
-	var isInternalWorkerThread = ((_a = worker_threads == null ? void 0 : worker_threads.workerData) == null ? void 0 : _a.esbuildVersion) === "0.25.9";
+	var isInternalWorkerThread = ((_a = worker_threads == null ? void 0 : worker_threads.workerData) == null ? void 0 : _a.esbuildVersion) === "0.27.3";
 	var esbuildCommandAndArgs = () => {
 	  if ((!ESBUILD_BINARY_PATH || false) && (path2.basename(__filename) !== "main.js" || path2.basename(__dirname) !== "lib")) {
 	    throw new Error(
@@ -8279,7 +8279,7 @@ for your current platform.`);
 	    }
 	  }
 	};
-	var version = "0.25.9";
+	var version = "0.27.3";
 	var build = (options) => ensureServiceIsRunning().build(options);
 	var context = (buildOptions) => ensureServiceIsRunning().context(buildOptions);
 	var transform = (input, options) => ensureServiceIsRunning().transform(input, options);
@@ -8382,7 +8382,7 @@ for your current platform.`);
 	var ensureServiceIsRunning = () => {
 	  if (longLivedService) return longLivedService;
 	  let [command, args] = esbuildCommandAndArgs();
-	  let child = child_process.spawn(command, args.concat(`--service=${"0.25.9"}`, "--ping"), {
+	  let child = child_process.spawn(command, args.concat(`--service=${"0.27.3"}`, "--ping"), {
 	    windowsHide: true,
 	    stdio: ["pipe", "pipe", "inherit"],
 	    cwd: defaultWD
@@ -8486,7 +8486,7 @@ for your current platform.`);
 	    esbuild: node_exports
 	  });
 	  callback(service);
-	  let stdout = child_process.execFileSync(command, args.concat(`--service=${"0.25.9"}`), {
+	  let stdout = child_process.execFileSync(command, args.concat(`--service=${"0.27.3"}`), {
 	    cwd: defaultWD,
 	    windowsHide: true,
 	    input: stdin,
@@ -8506,7 +8506,7 @@ for your current platform.`);
 	var startWorkerThreadService = (worker_threads2) => {
 	  let { port1: mainPort, port2: workerPort } = new worker_threads2.MessageChannel();
 	  let worker = new worker_threads2.Worker(__filename, {
-	    workerData: { workerPort, defaultWD, esbuildVersion: "0.25.9" },
+	    workerData: { workerPort, defaultWD, esbuildVersion: "0.27.3" },
 	    transferList: [workerPort],
 	    // From node's documentation: https://nodejs.org/api/worker_threads.html
 	    //
@@ -9178,9 +9178,12 @@ function useFusion(fusionOptions = {}, tasks) {
       }
     },
     {
-      name: "fusion:asset-urls",
+      name: "fusion:dev-asset-urls",
       enforce: "pre",
       async transform(code, id) {
+        if (!serverRunning) {
+          return code;
+        }
         const [path, query] = id.split("?");
         const params2 = new URLSearchParams(query);
         if (shouldBeAbsolute(id, params2)) {
