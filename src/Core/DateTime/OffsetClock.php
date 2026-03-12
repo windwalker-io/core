@@ -19,7 +19,7 @@ class OffsetClock implements ChronosClockInterface
 
     public function now(): Chronos
     {
-        return $this->baseClock->now()->addSeconds($this->offsetSeconds);
+        return $this->baseClock->now()->modify('+' . $this->offsetSeconds . 'seconds');
     }
 
     public function addSeconds(int $seconds): static

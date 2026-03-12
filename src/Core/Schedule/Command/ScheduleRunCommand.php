@@ -122,6 +122,8 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
 
                 if ($catch = $event->getCatch()) {
                     $this->app->call($catch, ['exception' => $e, 'e' => $e, \Throwable::class => $e]);
+                } else {
+                    $io->errorStyle()->error($e->getMessage());
                 }
             }
         }
