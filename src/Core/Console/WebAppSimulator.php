@@ -42,4 +42,10 @@ class WebAppSimulator implements WebApplicationInterface
     {
         return $this;
     }
+
+    #[\Override]
+    public function getMessages(?string $type = null, bool $peek = false): array
+    {
+        return [];
+    }
 }

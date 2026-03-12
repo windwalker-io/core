@@ -42,6 +42,7 @@ use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Core\Provider\AppProvider;
 use Windwalker\Core\Provider\ConsoleProvider;
 use Windwalker\Core\Provider\WebProvider;
+use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\Filesystem\Path;
@@ -430,19 +431,24 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     public function prepareWebSimulator(string|UriInterface|null $uri = null, ?string $docroot = null): WebAppSimulator
     {
         $uri ??= Uri::wrap($this->config('web_simulator.uri') ?: 'https://local.dev');
-        $docroot = Path::normalize(
+        $normalizedDocroot = Path::normalize(
             $docroot ?? $this->config('web_simulator.docroot') ?? Path::findRoot(__DIR__)
         );
         $index = $this->path('@public/index.php');
 
-        $script = Str::removeLeft($index, $docroot);
+        $script = Str::removeLeft($index, $normalizedDocroot);
         $script = Path::clean($script, '/');
 
-        return $this->prepareWebSimulatorByRequest(ServerRequestFactory::createFromUri($uri, $script));
+        return $this->prepareWebSimulatorByRequest(
+            ServerRequestFactory::createFromUri($uri, $script),
+            $docroot ? null : $uri
+        );
     }
 
-    public function prepareWebSimulatorByRequest(?ServerRequestInterface $request = null): WebAppSimulator
-    {
+    public function prepareWebSimulatorByRequest(
+        ?ServerRequestInterface $request = null,
+        UriInterface|string|null $baseUri = null
+    ): WebAppSimulator {
         if ($this->webSimulator) {
             return $this->webSimulator;
         }
@@ -457,6 +463,15 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         $container->alias(ApplicationInterface::class, static::class);
 
         $container->share(ServerRequest::class, $request);
+
+        if ($baseUri) {
+            $systemUri = new SystemUri((string) $baseUri)
+                ->withOriginal((string) $baseUri);
+        } else {
+            $systemUri = SystemUri::parseFromRequest($request);
+        }
+
+        $container->share(SystemUri::class, $systemUri);
 
         return $this->webSimulator = $app;
     }
