@@ -11,7 +11,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Mailer\Event\BeforeSendEvent;
@@ -19,8 +18,6 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\DI\Container;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filter\OutputFilter;
-use Windwalker\Utilities\Arr;
-use Windwalker\Utilities\Options\OptionsResolverTrait;
 
 use function Windwalker\str;
 
@@ -206,7 +203,15 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
 
         $layout ??= $this->container->getParam('mail.builder.layout') ?? 'mail.mail-layout';
 
-        $body = $this->container->call($handler, ['mailer' => $this, 'builder' => $builder]) ?? $builder;
+        $body = $this->container->call(
+            $handler,
+            [
+                'mailer' => $this,
+                MailerInterface::class => $this,
+                'builder' => $builder,
+                MailBuilder::class => $builder,
+            ]
+        ) ?? $builder;
 
         if ($layout === false) {
             return (string) $body;
