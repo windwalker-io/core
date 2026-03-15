@@ -127,7 +127,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
         }
 
         // First
-        if ($current - $pagination->getNeighbours() > Pagination::BASE_PAGE) {
+        if ($current - $neighbours > Pagination::BASE_PAGE) {
             $this->first = $this->getItem(Pagination::FIRST, Pagination::BASE_PAGE);
         }
 
