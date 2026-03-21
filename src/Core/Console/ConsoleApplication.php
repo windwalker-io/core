@@ -431,9 +431,9 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     public function prepareWebSimulator(string|UriInterface|null $uri = null, ?string $docroot = null): WebAppSimulator
     {
         $uri ??= Uri::wrap($this->config('web_simulator.uri') ?: 'https://local.dev');
-        $normalizedDocroot = Path::normalize(
-            $docroot ?? $this->config('web_simulator.docroot') ?? Path::findRoot(__DIR__)
-        );
+        $docroot ??= $this->config('web_simulator.docroot');
+        $normalizedDocroot = Path::normalize($docroot);
+
         $index = $this->path('@public/index.php');
 
         $script = Str::removeLeft($index, $normalizedDocroot);
