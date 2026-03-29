@@ -16,6 +16,9 @@ use Windwalker\Utilities\Enum\EnumExtendedInterface;
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class MapTo implements ContainerAttributeInterface
 {
+    /**
+     * @var array<\Closure(mixed $value, MapTo $attribute, AttributeHandler $handler): mixed>
+     */
     public static array $mapHandlers = [];
 
     public function __construct(
@@ -86,7 +89,7 @@ class MapTo implements ContainerAttributeInterface
 
         // Custom map handler
         foreach (static::$mapHandlers as $mapHandler) {
-            $result = $mapHandler($this, $value, $handler);
+            $result = $mapHandler($value, $this, $handler);
 
             if ($result !== null) {
                 return $result;

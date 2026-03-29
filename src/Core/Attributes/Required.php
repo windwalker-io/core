@@ -27,7 +27,7 @@ class Required extends Assert
         return static function () use ($handler, $closure) {
             try {
                 return $closure();
-            } catch (\Throwable $e) {
+            } catch (ValidateException $e) {
                 throw ValidateException::create(
                     $e->getValidator(),
                     sprintf(
