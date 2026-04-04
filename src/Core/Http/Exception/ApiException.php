@@ -7,6 +7,8 @@ namespace Windwalker\Core\Http\Exception;
 use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\Attributes\Enum\Title;
 
+use function Windwalker\ds;
+
 /**
  * The ApiException class.
  */
@@ -46,13 +48,11 @@ class ApiException extends \RuntimeException
 
     public static function fromEnum(\UnitEnum $enum, ?string $message = null, ?\Throwable $previous = null): static
     {
-        static::checkBackedEnumType($enum);
-
         $message = $message ?: static::getAttrFromEnum($enum, Title::class)?->string;
 
         [$code, $statusCode] = static::getStatusCodeFromEnum($enum);
-
-        return new static($message, (int) $code, $statusCode, $previous);
+ds($code, $statusCode);
+        return new static($message, $code, $statusCode, $previous);
     }
 
     public static function wrap(\Throwable $e): static
@@ -137,7 +137,7 @@ class ApiException extends \RuntimeException
     /**
      * @param  \UnitEnum  $enum
      *
-     * @return  array{ 0: int, 1: int }
+     * @return  array{ 0: int|string, 1: int }
      *
      * @throws \ReflectionException
      */
@@ -152,28 +152,11 @@ class ApiException extends \RuntimeException
         } else {
             static::checkEnumBacked($enum);
 
-            $code = $statusCode = $enum->value;
+            $code = $enum->value;
+            $statusCode = 500;
         }
 
         return [$code, $statusCode];
-    }
-
-    /**
-     * @param  \UnitEnum  $enum
-     *
-     * @return  void
-     *
-     * @throws \ReflectionException
-     */
-    protected static function checkBackedEnumType(\UnitEnum $enum): void
-    {
-        if ($enum instanceof \BackedEnum) {
-            $ref = new \ReflectionEnum($enum);
-
-            if ($ref->getBackingType()?->getName() !== 'int') {
-                throw new \LogicException('The BackedEnum used as error code must be int type.');
-            }
-        }
     }
 
     public function getErrCode(): string|int
