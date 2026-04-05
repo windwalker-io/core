@@ -51,7 +51,7 @@ class ApiException extends \RuntimeException
         $message = $message ?: static::getAttrFromEnum($enum, Title::class)?->string;
 
         [$code, $statusCode] = static::getStatusCodeFromEnum($enum);
-ds($code, $statusCode);
+
         return new static($message, $code, $statusCode, $previous);
     }
 
