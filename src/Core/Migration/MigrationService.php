@@ -271,6 +271,10 @@ class MigrationService implements EventAwareInterface
     {
         $versions = $this->getVersions();
 
+        if ($versions === []) {
+            return '0';
+        }
+
         return (string) ($versions[array_key_last($versions)] ?? '0');
     }
 
