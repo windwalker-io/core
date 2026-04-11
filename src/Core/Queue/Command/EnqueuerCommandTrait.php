@@ -99,7 +99,7 @@ trait EnqueuerCommandTrait
                     $controller = $event->controller;
                     $e = $event->exception;
 
-                    Logger::error('enqueuer-error', $e);
+                    Logger::error('system/enqueuer-error', $e);
 
                     $this->app->addMessage(
                         sprintf(
