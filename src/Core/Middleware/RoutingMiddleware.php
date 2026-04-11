@@ -103,7 +103,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
         try {
             if ($this->preMatch) {
                 $matched = $this->app->call(
-                    $this->fallback,
+                    $this->preMatch,
                     [
                         'request' => $request,
                         ServerRequestInterface::class => $request,
