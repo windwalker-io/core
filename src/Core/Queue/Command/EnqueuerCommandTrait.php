@@ -102,13 +102,15 @@ trait EnqueuerCommandTrait
                     Logger::error('system/enqueuer-error', $e);
 
                     $this->app->addMessage(
-                        sprintf(
+                        $msg = sprintf(
                             'Enqueue failed - Channel: <info>%s</info> - %s.',
                             $controller->channel,
                             $event->exception->getMessage(),
                         ),
                         'error'
                     );
+
+                    $this->logger->error($msg);
 
                     if ($io->getOption('once')) {
                         throw $e;
@@ -151,7 +153,7 @@ trait EnqueuerCommandTrait
                     $e = $event->exception;
 
                     $this->app->addMessage(
-                        sprintf(
+                        $msg = sprintf(
                             '%s File: %s (%s)',
                             $e->getMessage(),
                             $e->getFile(),
@@ -159,6 +161,8 @@ trait EnqueuerCommandTrait
                         ),
                         'error'
                     );
+
+                    $this->logger->error($msg);
 
                     $this->app->renderThrowable($e, $io->getOutput());
                 }
