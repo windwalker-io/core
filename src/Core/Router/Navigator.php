@@ -13,6 +13,7 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Http\OutsideRedirectResponse;
 use Windwalker\Core\Router\Event\AfterRouteBuildEvent;
 use Windwalker\Core\Router\Event\BeforeRouteBuildEvent;
+use Windwalker\Core\Router\Event\PrepareRouteBuildEvent;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Data\Collection;
 use Windwalker\Event\EventAwareInterface;
@@ -140,7 +141,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                 if (!$options->ignoreEvents) {
                     $event = $this->emit(
-                        new BeforeRouteBuildEvent(
+                        new PrepareRouteBuildEvent(
                             route: $route,
                             query: $query,
                             navigator: $navigator,
@@ -158,6 +159,21 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
                     if (!$routeObject) {
                         throw new RouteNotFoundException('Route: ' . $route . ' not found.');
+                    }
+
+                    if (!$options->ignoreEvents) {
+                        $event = $this->emit(
+                            new BeforeRouteBuildEvent(
+                                route: $route,
+                                query: $query,
+                                navigator: $navigator,
+                                options: $options
+                            )
+                        );
+
+                        $route = $event->route;
+                        $options = $event->options;
+                        $query = $event->query;
                     }
 
                     [$url, $query] = $this->routeBuilder->build($routeObject->getPattern(), $query);

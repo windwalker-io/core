@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Windwalker\Core\Router\Event;
+
+use Windwalker\Core\Router\Navigator;
+use Windwalker\Core\Router\NavOptions;
+use Windwalker\Event\BaseEvent;
+use Windwalker\Utilities\Accessible\AccessorBCTrait;
+
+/**
+ * The BeforeRouteToStringEvent class.
+ */
+class PrepareRouteBuildEvent extends BaseEvent
+{
+    use AccessorBCTrait;
+
+    public function __construct(
+        public string $route,
+        public array $query,
+        public Navigator $navigator,
+        public NavOptions $options
+    ) {
+    }
+
+    /**
+     * @return string
+     *
+     * @deprecated  Use property instead.
+     */
+    public function &getRoute(): string
+    {
+        return $this->route;
+    }
+
+    /**
+     * @return array
+     *
+     * @deprecated  Use property instead.
+     */
+    public function &getQuery(): array
+    {
+        return $this->query;
+    }
+}
