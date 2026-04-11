@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Security\CsrfService;
+use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Attributes\Service;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\Utilities\Options\OptionAccessTrait;
@@ -34,6 +35,7 @@ class CsrfMiddleware implements AttributeMiddlewareInterface
         protected ?array $workingMethods = null,
         protected ?string $inputMethod = null,
         protected ?string $invalidMessage = null,
+        protected ?\Closure $onInvalid = null,
         /**
          * @deprecated  Use constructor arguments instead.
          */
@@ -66,11 +68,28 @@ class CsrfMiddleware implements AttributeMiddlewareInterface
                 ? 'GET'
                 : $this->getOption('input_method', $this->inputMethod);
 
-            $this->csrfService->validate(
-                $this->app->getAppRequest(),
-                $inputMethod,
-                $this->getOption('invalid_message', $this->invalidMessage),
-            );
+            try {
+                $this->csrfService->validate(
+                    $this->app->getAppRequest(),
+                    $inputMethod,
+                    $this->getOption('invalid_message', $this->invalidMessage),
+                );
+            } catch (InvalidTokenException $e) {
+                if (!$this->onInvalid) {
+                    throw $e;
+                }
+
+                $this->app->call(
+                    $this->onInvalid,
+                    [
+                        'e' => $e,
+                        'exception' => $e,
+                        InvalidTokenException::class => $e,
+                        'request' => $request,
+                        ServerRequestInterface::class => $request,
+                    ]
+                );
+            }
         }
 
         return $next($request);
