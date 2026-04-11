@@ -9,7 +9,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\CoreCommand;
+use Windwalker\Console\CompletionContext;
+use Windwalker\Console\CompletionHandlerInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Filesystem\Filesystem;
 
@@ -17,9 +18,9 @@ use Windwalker\Filesystem\Filesystem;
  * The ClearCommand class.
  */
 #[CommandWrapper(
-    description: 'Clear cache'
+    description: 'Clear cache by folders.',
 )]
-class CacheClearCommand implements CommandInterface
+class CacheClearCommand implements CommandInterface, CompletionHandlerInterface
 {
     /**
      * @inheritDoc
@@ -65,14 +66,22 @@ class CacheClearCommand implements CommandInterface
     protected function clearCacheRoot(IOInterface $io): void
     {
         /** @var SplFileInfo $file */
+        foreach ($this->listFolders() as $file) {
+            Filesystem::delete($file->getPathname());
+
+            $io->writeln(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
+        }
+    }
+
+    protected function listFolders(): \Generator
+    {
+        /** @var SplFileInfo $file */
         foreach (Filesystem::items(WINDWALKER_CACHE, false) as $file) {
             if (in_array($file->getBasename(), ['.gitignore', '.htaccess', 'web.config'])) {
                 continue;
             }
 
-            Filesystem::delete($file->getPathname());
-
-            $io->writeln(sprintf('[Deleted] <info>%s</info>', $file->getPathname()));
+            yield $file;
         }
     }
 
@@ -93,5 +102,22 @@ class CacheClearCommand implements CommandInterface
         }
 
         $io->writeln(sprintf('[Deleted] <info>%s</info>', $path));
+    }
+
+    public function handleCompletions(CompletionContext $context): ?array
+    {
+        if ($context->isArgument()) {
+            if ($context->name === 'folders') {
+                $folders = [];
+
+                foreach ($this->listFolders() as $file) {
+                    $folders[] = $file->getBasename();
+                }
+
+                return $folders;
+            }
+        }
+
+        return null;
     }
 }

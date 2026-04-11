@@ -10,6 +10,7 @@ return [
     'site:up' => \Windwalker\Core\Command\SiteUpCommand::class,
 
     'cache:clear' => \Windwalker\Core\Command\CacheClearCommand::class,
+    'cache:purge' => \Windwalker\Core\Command\CachePurgeCommand::class,
 
     'g' => \Windwalker\Core\Generator\Command\GenerateCommand::class,
     'generate:make' => \Windwalker\Core\Generator\Command\GenerateCommand::class,
