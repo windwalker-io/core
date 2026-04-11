@@ -6,6 +6,7 @@ namespace Windwalker\Core\Queue\Command;
 
 use DomainException;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -304,7 +305,7 @@ class QueueWorkerCommand implements CommandInterface
         $worker->on(
             BeforeJobRunEvent::class,
             function (BeforeJobRunEvent $event) {
-                $this->app->addMessage(
+                $this->logMessage(
                     sprintf(
                         'Run Job: <info>%s</info> - Message ID: <info>%s</info>',
                         get_debug_type($event->job),
@@ -319,7 +320,7 @@ class QueueWorkerCommand implements CommandInterface
                     $controller = $event->controller;
 
                     if ($controller->defer) {
-                        $this->app->addMessage(
+                        $this->logMessage(
                             sprintf(
                                 'Job Message: <info>%s</info> %s',
                                 $event->message->getId(),
@@ -327,7 +328,7 @@ class QueueWorkerCommand implements CommandInterface
                             )
                         );
                     } elseif ($controller->abandoned) {
-                        $this->app->addMessage(
+                        $this->logMessage(
                             sprintf(
                                 'Job Message: <info>%s</info> END - %s',
                                 $event->message->getId(),
@@ -335,7 +336,7 @@ class QueueWorkerCommand implements CommandInterface
                             )
                         );
                     } else {
-                        $this->app->addMessage(
+                        $this->logMessage(
                             sprintf(
                                 'Job Message: <info>%s</info> END',
                                 $event->message->getId()
@@ -363,7 +364,7 @@ class QueueWorkerCommand implements CommandInterface
                     Logger::error('system/queue-error', $e);
 
                     if ($controller->shouldDelete) {
-                        $this->app->addMessage(
+                        $this->logMessage(
                             sprintf(
                                 'Job %s failed - ID: <info>%s</info> - %s. %s, will not retry.',
                                 get_debug_type($event->job),
@@ -376,7 +377,7 @@ class QueueWorkerCommand implements CommandInterface
                             'error'
                         );
                     } else {
-                        $this->app->addMessage(
+                        $this->logMessage(
                             sprintf(
                                 'Job %s failed - ID: <info>%s</info> - %s. Will retry after %d seconds.',
                                 get_debug_type($event->job),
@@ -430,7 +431,7 @@ class QueueWorkerCommand implements CommandInterface
                 function (LoopFailureEvent $event) use ($io) {
                     $e = $event->exception;
 
-                    $this->app->addMessage(
+                    $this->logMessage(
                         sprintf(
                             '%s File: %s (%s)',
                             $e->getMessage(),
@@ -454,6 +455,13 @@ class QueueWorkerCommand implements CommandInterface
                 StopEvent::class,
                 fn(StopEvent $event) => $io->writeln($event->reason)
             );
+    }
+
+    public function logMessage(string $message, ?string $type = null): void
+    {
+        $this->app->addMessage($message, $type);
+
+        $this->logger->log($type ?? LogLevel::INFO, strip_tags($message));
     }
 
     /**
