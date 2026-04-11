@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\SubCommand;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Utilities\Str;
@@ -14,13 +13,13 @@ use Windwalker\Utilities\Str;
  * The GenEnumSubCommand class.
  */
 #[CommandWrapper(
-    description: 'Generate Windwalker middleware.'
+    description: 'Generate Windwalker queue job.'
 )]
-class MiddlewareSubCommand extends AbstractGeneratorSubCommand
+class QueueJobSubCommand extends AbstractGeneratorSubCommand
 {
-    protected string $defaultNamespace = 'Middleware';
+    protected string $defaultNamespace = 'Queue';
 
-    protected string $defaultDir = 'Middleware';
+    protected string $defaultDir = 'Queue';
 
     protected bool $requireDest = false;
 
@@ -49,17 +48,17 @@ class MiddlewareSubCommand extends AbstractGeneratorSubCommand
         $force = $io->getOption('force');
 
         if (!$name) {
-            $io->errorStyle()->error('No middleware name');
+            $io->errorStyle()->error('No job name');
 
             return 255;
         }
 
-        $this->codeGenerator->from($this->getViewPath('middleware/*.tpl'))
+        $this->codeGenerator->from($this->getViewPath('job/*.tpl'))
             ->replaceTo(
                 $this->getDestPath($io),
                 [
-                    'className' => Str::ensureEnd($name, 'Middleware'),
-                    'name' => Str::removeEnd($name, 'Middleware'),
+                    'className' => Str::ensureEnd($name, 'Job'),
+                    'name' => Str::removeEnd($name, 'Job'),
                     'ns' => $this->getNamespace($io),
                 ],
                 $force
