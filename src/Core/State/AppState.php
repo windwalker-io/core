@@ -54,7 +54,7 @@ class AppState implements JsonSerializable
         return trim($this->prefix . '.' . $key, '.');
     }
 
-    protected function resolvePersistDriver(mixed $driverName): PersistenceInterface
+    public function getPersistDriver(mixed $driverName): PersistenceInterface
     {
         if ($driverName === false) {
             return new NullPersistence();
@@ -98,7 +98,7 @@ class AppState implements JsonSerializable
     public function &get(string $key, mixed $driver = null): mixed
     {
         $key = $this->getKeyName($key);
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
         $value = $this->state->get($key) ?? $driver->get($key);
 
         return $value;
@@ -120,7 +120,7 @@ class AppState implements JsonSerializable
     ): mixed {
         $inputField ??= $key;
 
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
 
         $inputValue = $this->getRequest()->input($inputField);
 
@@ -138,7 +138,7 @@ class AppState implements JsonSerializable
     ): mixed {
         $inputField ??= $key;
 
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
 
         $inputValue = $this->getRequest()->input($inputField);
 
@@ -158,7 +158,7 @@ class AppState implements JsonSerializable
     public function remember(string $key, mixed $value, mixed $driver = null): mixed
     {
         $key = $this->getKeyName($key);
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
 
         $driver->store($key, $value);
 
@@ -181,7 +181,7 @@ class AppState implements JsonSerializable
     public function has(string $key, mixed $driver = null): bool
     {
         $key = $this->getKeyName($key);
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
         $value = $driver->get($key);
 
         if ($value !== null) {
@@ -194,7 +194,7 @@ class AppState implements JsonSerializable
     public function forget(string $key, mixed $driver = null): static
     {
         $key = $this->getKeyName($key);
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
 
         $driver->forget($key);
 
@@ -206,16 +206,18 @@ class AppState implements JsonSerializable
      */
     public function all(mixed $driver = null): Generator
     {
-        $driver = $this->resolvePersistDriver($driver);
+        $driver = $this->getPersistDriver($driver);
 
         $iter = new AppendIterator();
-        $iter->append($this->state->getIterator());
         $iter->append($driver->all());
+        $iter->append(new \NoRewindIterator($this->state->getIterator()));
 
-        foreach (new UniqueIterator($iter) as $key => $item) {
-            if (str_starts_with($key, $this->prefix . '.')) {
-                yield $key => $item;
+        foreach ($iter as $key => $item) {
+            if ($this->prefix && !str_starts_with($key, $this->prefix . '.')) {
+                continue;
             }
+
+            yield $key => $item;
         }
     }
 
