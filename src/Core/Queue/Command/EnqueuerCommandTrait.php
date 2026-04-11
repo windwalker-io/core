@@ -78,7 +78,7 @@ trait EnqueuerCommandTrait
             function (BeforeEnqueueEvent $event) use ($io) {
                 $controller = $event->controller;
 
-                if ($this->canShowLog(LogLevel::INFO)) {
+                if ($this->canShowLog(LogLevel::DEBUG)) {
                     $io->writeln("Enqueuing Start - Channel: <info>{$controller->channel}</info>.");
                 }
             }
@@ -88,7 +88,7 @@ trait EnqueuerCommandTrait
                 function (AfterEnqueueEvent $event) use ($io) {
                     $controller = $event->controller;
 
-                    if ($this->canShowLog(LogLevel::INFO)) {
+                    if ($this->canShowLog(LogLevel::DEBUG)) {
                         $io->writeln("  Enqueue End - Channel: <info>{$controller->channel}</info>.");
                     }
                 }

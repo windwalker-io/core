@@ -229,7 +229,7 @@ class ScheduleWorker
                     $e = $event->exception;
                     $backoff = $event->backoff;
 
-                    Logger::error('queue-error', $e);
+                    Logger::error('system/queue-error', $e);
 
                     if ($controller->shouldDelete) {
                         $this->app->addMessage(
