@@ -250,24 +250,24 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * @see https://stackoverflow.com/a/22381301/8134785
      *
-     * @param  DateInterval|string  $diff
+     * @param  DateInterval|string  $interval
      *
      * @return  int
      * @throws Exception
      */
-    public static function intervalToSeconds(DateInterval|string $diff): int
+    public static function intervalToSeconds(DateInterval|string $interval): int
     {
-        if (!$diff instanceof DateInterval) {
-            $diff = new DateInterval($diff);
+        if (!$interval instanceof DateInterval) {
+            $interval = new DateInterval($interval);
         }
 
-        return (int) ($diff->format('%r') . (
-                ($diff->s) +
-                (60 * ($diff->i)) +
-                (60 * 60 * ($diff->h)) +
-                (24 * 60 * 60 * ($diff->d)) +
-                (30 * 24 * 60 * 60 * ($diff->m)) +
-                (365 * 24 * 60 * 60 * ($diff->y))
+        return (int) ($interval->format('%r') . (
+                ($interval->s) +
+                (60 * ($interval->i)) +
+                (60 * 60 * ($interval->h)) +
+                (24 * 60 * 60 * ($interval->d)) +
+                (30 * 24 * 60 * 60 * ($interval->m)) +
+                (365 * 24 * 60 * 60 * ($interval->y))
             ));
     }
 
