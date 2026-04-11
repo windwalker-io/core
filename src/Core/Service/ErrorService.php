@@ -168,7 +168,9 @@ class ErrorService
 
         $e = new ErrorException($content, 500, $code, $file, $line);
 
-        if (($code === E_USER_DEPRECATED || $code === E_DEPRECATED)) {
+        $deprecationAsFatal = (bool) (env('DEPRECATION_AS_FATAL_ERROR') ?? $this->app->isVerbose());
+
+        if (($code === E_USER_DEPRECATED || $code === E_DEPRECATED) && !$deprecationAsFatal) {
             $this->handleDeprecation($e);
 
             return;
