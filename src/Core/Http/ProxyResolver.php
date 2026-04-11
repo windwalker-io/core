@@ -40,7 +40,7 @@ class ProxyResolver
             return null;
         }
 
-        return $this->request->getHeaderLine($name);
+        return $this->request->getHeader($name)[0] ?? null;
     }
 
     public function isProxy(): bool
