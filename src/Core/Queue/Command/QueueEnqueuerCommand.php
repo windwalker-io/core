@@ -148,6 +148,14 @@ class QueueEnqueuerCommand implements CommandInterface
 
         $this->listenToEnqueuer($enqueuer, $io, $connection);
 
+        $this->runEnqueuerConfigScripts(
+            'init_scripts',
+            $enqueuer,
+            null,
+            $io,
+            $connection
+        );
+
         // Show enqueuer start information
         $io->writeln(
             sprintf(

@@ -201,6 +201,41 @@ class QueueWorkerCommand implements CommandInterface
 
         $this->listenToWorker($worker, $io, $connection);
 
+        $this->runConfigScripts(
+            'init_scripts',
+            $worker,
+            null,
+            $io,
+            $connection
+        );
+
+        // Enqueuer
+        if ($io->getOption('enqueuer')) {
+            $io->style()->warning(
+                [
+                    'Running Enqueuer with queue worker.',
+                    'We recommend you to run enqueuer in another process for better performance.',
+                ]
+            );
+
+            $enqueuer = $this->createEnqueuer($connection, $options);
+            $this->prepareEnqueuer($enqueuer);
+            $enqueuer->addEventDealer($this->app);
+            $this->listenToEnqueuer($enqueuer, $io, $connection);
+
+            $this->prepareDebugServices($io, $enqueuer);
+
+            $worker->enqueuer = $enqueuer;
+
+            $this->runEnqueuerConfigScripts(
+                'init_scripts',
+                $enqueuer,
+                null,
+                $io,
+                $connection
+            );
+        }
+
         if ($io->getOption('once')) {
             $file = $io->getOption('file');
 
@@ -221,24 +256,6 @@ class QueueWorkerCommand implements CommandInterface
                 $worker->next($channels);
             }
         } else {
-            if ($io->getOption('enqueuer')) {
-                $io->style()->warning(
-                    [
-                        'Running Enqueuer with queue worker.',
-                        'We recommend you to run enqueuer in another process for better performance.',
-                    ]
-                );
-
-                $enqueuer = $this->createEnqueuer($connection, $options);
-                $this->prepareEnqueuer($enqueuer);
-                $enqueuer->addEventDealer($this->app);
-                $this->listenToEnqueuer($enqueuer, $io, $connection);
-
-                $this->prepareDebugServices($io, $enqueuer);
-
-                $worker->enqueuer = $enqueuer;
-            }
-
             $io->writeln(
                 sprintf(
                     "Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
@@ -326,7 +343,7 @@ class QueueWorkerCommand implements CommandInterface
                         );
                     }
 
-                    $this->runEndScripts(
+                    $this->runConfigScripts(
                         'job_end_scripts',
                         $worker,
                         $event,
@@ -430,7 +447,7 @@ class QueueWorkerCommand implements CommandInterface
                 LoopEndEvent::class,
                 function (LoopEndEvent $event) use ($connection, $io, $worker) {
                     // Stop connections.
-                    $this->runEndScripts('loop_end_scripts', $worker, $event, $io, $connection);
+                    $this->runConfigScripts('loop_end_scripts', $worker, $event, $io, $connection);
                 }
             )
             ->on(
@@ -457,10 +474,10 @@ class QueueWorkerCommand implements CommandInterface
         );
     }
 
-    protected function runEndScripts(
+    protected function runConfigScripts(
         string $configName,
         Worker $worker,
-        EventInterface $event,
+        ?EventInterface $event,
         IOInterface $io,
         string $connection
     ): void {

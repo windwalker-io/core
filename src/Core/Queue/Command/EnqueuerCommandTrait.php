@@ -167,7 +167,7 @@ trait EnqueuerCommandTrait
                 LoopEndEvent::class,
                 function (LoopEndEvent $event) use ($connection, $io, $enqueuer) {
                     // Stop connections.
-                    $this->runEnqueuerEndScripts('loop_end_scripts', $enqueuer, $event, $io, $connection);
+                    $this->runEnqueuerConfigScripts('loop_end_scripts', $enqueuer, $event, $io, $connection);
                 }
             )
             ->on(
@@ -176,10 +176,10 @@ trait EnqueuerCommandTrait
             );
     }
 
-    protected function runEnqueuerEndScripts(
+    protected function runEnqueuerConfigScripts(
         string $configName,
         Enqueuer $enqueuer,
-        EventInterface $event,
+        ?EventInterface $event,
         IOInterface $io,
         string $connection
     ): void {
