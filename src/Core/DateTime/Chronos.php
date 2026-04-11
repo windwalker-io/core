@@ -61,7 +61,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         }
 
         if ($date instanceof DateTimeInterface) {
-            return static::createFromFormat('U.u', $date->format('U.u'), $date->getTimezone());
+            return static::createFromInterface($date);
         }
 
         return static::create($date, $tz);
@@ -379,12 +379,44 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
 
     public function isFuture(): bool
     {
-        return $this->getTimestamp() > time();
+        return $this->isGt('now');
     }
 
     public function isPast(): bool
     {
-        return $this->getTimestamp() < time();
+        return $this->isLt('now');
+    }
+
+    /**
+     * Is greater than.
+     */
+    public function isGt(\DateTimeInterface|ClockInterface|string|int $now = 'now'): bool
+    {
+        return $this > static::wrap($now);
+    }
+
+    /**
+     * Is greater than or equal to.
+     */
+    public function isGte(\DateTimeInterface|ClockInterface|string|int $now = 'now'): bool
+    {
+        return $this >= static::wrap($now);
+    }
+
+    /**
+     * Is less than.
+     */
+    public function isLt(\DateTimeInterface|ClockInterface|string|int $now = 'now'): bool
+    {
+        return $this < static::wrap($now);
+    }
+
+    /**
+     * Is less than or equal to.
+     */
+    public function isLte(\DateTimeInterface|ClockInterface|string|int $now = 'now'): bool
+    {
+        return $this <= static::wrap($now);
     }
 
     /**
