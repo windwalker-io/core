@@ -166,7 +166,9 @@ class MigrationService implements EventAwareInterface
             false
         );
 
-        $this->app->getContainer()->getAttributesResolver()->resolveObjectMembers($migration);
+        $container = $this->app->getContainer();
+        $container->share(MigrationService::class, $this);
+        $container->getAttributesResolver()->resolveObjectMembers($migration);
         $migration->addEventDealer($this);
 
         try {
