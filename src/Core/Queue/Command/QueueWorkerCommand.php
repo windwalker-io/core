@@ -161,7 +161,7 @@ class QueueWorkerCommand implements CommandInterface
         $command->addOption(
             'enqueuer',
             'e',
-            InputOption::VALUE_NONE,
+            InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
             'Also run the enqueuer service in the worker.',
         );
 
@@ -211,7 +211,11 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         // Enqueuer
-        if ($io->getOption('enqueuer')) {
+        $enqueuerChannels = $io->getOption('enqueuer');
+
+        if (count($enqueuerChannels) > 0) {
+            $enqueuerChannels = array_filter($enqueuerChannels) ?: null;
+
             $io->style()->warning(
                 [
                     'Running Enqueuer with queue worker.',
@@ -227,6 +231,7 @@ class QueueWorkerCommand implements CommandInterface
             $this->prepareDebugServices($io, $enqueuer);
 
             $worker->enqueuer = $enqueuer;
+            $worker->enqueuerChannels = $enqueuerChannels;
 
             $this->runEnqueuerConfigScripts(
                 'init_scripts',
