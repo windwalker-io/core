@@ -99,7 +99,7 @@ class MySQLExporter extends AbstractExporter
         $user = addslashes($options->user ?? 'root');
         $password = addslashes($options->password ?? '');
         $host = addslashes($options->host ?? 'localhost');
-        $port = addslashes($options->port ?? '3306');
+        $port = addslashes((string) ($options->port ?? '3306'));
 
         $content = <<<CNF
 [mysqldump]
