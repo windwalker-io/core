@@ -50,6 +50,7 @@ class CacheFactory implements ServiceFactoryInterface
     public static function createCachePool(
         string $storage,
         string|ObjectBuilderDefinition $serializer,
+        string|\UnitEnum|null|false $tagStorage = false,
     ) {
         return #[Factory]
         static function (
@@ -57,12 +58,18 @@ class CacheFactory implements ServiceFactoryInterface
             string|\UnitEnum|null $tag = null,
         ) use (
             $storage,
-            $serializer
+            $serializer,
+            $tagStorage,
         ): CachePool {
+            if ($tagStorage !== false && $tagStorage !== null) {
+                $tagStorage = $container->get(StorageInterface::class, tag: $tagStorage);
+            }
+
             return new CachePool(
                 $container->resolve(StorageInterface::class, ['cacheTag' => $tag], tag: $storage),
                 $container->resolve($serializer),
-                $container->get(LoggerInterface::class, tag: 'error')
+                $container->get(LoggerInterface::class, tag: 'cache'),
+                tagPool: $tagStorage
             );
         };
     }
