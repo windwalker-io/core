@@ -62,6 +62,14 @@ class CryptSecretCommand implements CommandInterface
             InputOption::VALUE_OPTIONAL,
             'The key prefix'
         );
+
+        $command->addOption(
+            'replace',
+            'r',
+            InputOption::VALUE_OPTIONAL,
+            'Replace APP_SECRET env variable.',
+            false,
+        );
     }
 
     /**
@@ -75,13 +83,14 @@ class CryptSecretCommand implements CommandInterface
     public function execute(IOInterface $io): int
     {
         $length = $io->getArgument('length');
+        $replace = $io->getOption('replace');
 
         $encode = $io->getOption('encode');
 
-        $str = SecretToolkit::genSecretString((int) $length, $encode);
+        $secret = SecretToolkit::genSecretString((int) $length, $encode);
 
         $prefix = $io->getOption('prefix');
-        $str = $prefix . $str;
+        $secret = $prefix . $secret;
 
         $output = $io->getOption('output');
 
@@ -89,9 +98,24 @@ class CryptSecretCommand implements CommandInterface
             $output = Path::realpath($output);
             Filesystem::mkdir(dirname($output));
 
-            Filesystem::write($output, $str);
+            Filesystem::write($output, $secret);
         } else {
-            $io->writeln($str);
+            $io->writeln($secret);
+        }
+
+        if ($replace !== false) {
+            $replace ??= '.env';
+            $replace = Path::realpath($replace);
+
+            if (is_file($replace)) {
+                $content = file_get_contents($replace);
+                $content = preg_replace('/^APP_SECRET=.*$/m', 'APP_SECRET=' . $secret, $content);
+                file_put_contents($replace, $content);
+
+                $io->writeln('Replace APP_SECRET in file: ' . $replace);
+            } else {
+                $io->error('Replace file not exists: ' . $replace);
+            }
         }
 
         return 0;

@@ -196,9 +196,9 @@ class StarterInstaller
     {
         $value = static::handleEnvVar($value);
 
-        if (str_contains($env, $key)) {
+        if (preg_match('~' . preg_quote($key, '~') . '=.*$~m', $env)) {
             return preg_replace(
-                '/' . $key . '=(.*)/',
+                '~' . preg_quote($key, '~') . '=.*$~m',
                 $key . '=' . $value,
                 $env
             );
