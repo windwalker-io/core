@@ -70,6 +70,13 @@ class CryptSecretCommand implements CommandInterface
             'Replace APP_SECRET env variable.',
             false,
         );
+
+        $command->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force replace APP_SECRET env variable.',
+        );
     }
 
     /**
@@ -84,6 +91,7 @@ class CryptSecretCommand implements CommandInterface
     {
         $length = $io->getArgument('length');
         $replace = $io->getOption('replace');
+        $force = $io->getOption('force');
 
         $encode = $io->getOption('encode');
 
@@ -109,7 +117,18 @@ class CryptSecretCommand implements CommandInterface
 
             if (is_file($replace)) {
                 $content = file_get_contents($replace);
-                $content = preg_replace('/^APP_SECRET=.*$/m', 'APP_SECRET=' . $secret, $content);
+                
+                if (!preg_match('/^APP_SECRET=.*$/m', $content)) {
+                    $content .= "\nAPP_SECRET=" . $secret . "\n";
+                } else {
+                    if (!$force && !$io->askConfirmation("APP_SECRET already exists in file: <info>$replace</info>, do you want to replace it? [N/y] ", false)) {
+                        $io->writeln('User canceled.');
+                        return 0;
+                    }
+                    
+                    $content = preg_replace('/^APP_SECRET=.*$/m', 'APP_SECRET=' . $secret, $content);
+                }
+                
                 file_put_contents($replace, $content);
 
                 $io->writeln('Replace APP_SECRET in file: ' . $replace);
