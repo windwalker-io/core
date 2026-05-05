@@ -133,7 +133,7 @@ class CryptSecretCommand implements CommandInterface
 
                 $io->writeln('Replace APP_SECRET in file: ' . $replace);
             } else {
-                $io->error('Replace file not exists: ' . $replace);
+                throw new \RuntimeException('Replace file not exists: ' . $replace);
             }
         }
 
