@@ -51,6 +51,9 @@ class CacheFactory implements ServiceFactoryInterface
         string $storage,
         string|ObjectBuilderDefinition $serializer,
         string|\UnitEnum|null|false $tagStorage = false,
+        ?string $group = null,
+        ?int $defaultTtl = null,
+        string $className = CachePool::class,
     ) {
         return #[Factory]
         static function (
@@ -60,15 +63,20 @@ class CacheFactory implements ServiceFactoryInterface
             $storage,
             $serializer,
             $tagStorage,
+            $className,
+            $defaultTtl,
         ): CachePool {
+            $tag = $group ?? $tag;
+
             if ($tagStorage !== false && $tagStorage !== null) {
                 $tagStorage = $container->get(StorageInterface::class, tag: $tagStorage);
             }
 
-            return new CachePool(
+            return new $className(
                 $container->resolve(StorageInterface::class, ['cacheTag' => $tag], tag: $storage),
                 $container->resolve($serializer),
                 $container->get(LoggerInterface::class, tag: 'cache'),
+                defaultTtl: $defaultTtl,
                 tagPool: $tagStorage
             );
         };
@@ -108,7 +116,9 @@ class CacheFactory implements ServiceFactoryInterface
     public static function cachePoolFactory(
         string $storage,
         string|ObjectBuilderDefinition $serializer,
+        string|\UnitEnum|null|false $tagStorage = false,
         ?string $group = null,
+        ?int $defaultTtl = null,
         string $className = CachePool::class,
     ): \Closure {
         return #[Factory]
@@ -119,12 +129,22 @@ class CacheFactory implements ServiceFactoryInterface
             $storage,
             $serializer,
             $group,
+            $tagStorage,
+            $className,
+            $defaultTtl,
         ): CachePool {
             $cacheTag = $group ?? $instanceName;
+
+            if ($tagStorage !== false && $tagStorage !== null) {
+                $tagStorage = $container->get(StorageInterface::class, tag: $tagStorage);
+            }
+
             return new $className(
                 $container->resolve('cache.factories.storages.' . $storage, compact('instanceName', 'cacheTag')),
                 $container->resolve($serializer),
-                $container->get(LoggerInterface::class, tag: 'error')
+                $container->get(LoggerInterface::class, tag: 'error'),
+                defaultTtl: $defaultTtl,
+                tagPool: $tagStorage,
             );
         };
     }
