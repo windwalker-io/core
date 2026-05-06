@@ -108,6 +108,8 @@ class CacheFactory implements ServiceFactoryInterface
     public static function cachePoolFactory(
         string $storage,
         string|ObjectBuilderDefinition $serializer,
+        ?string $group = null,
+        string $className = CachePool::class,
     ): \Closure {
         return #[Factory]
         static function (
@@ -115,10 +117,11 @@ class CacheFactory implements ServiceFactoryInterface
             string $instanceName
         ) use (
             $storage,
-            $serializer
+            $serializer,
+            $group,
         ): CachePool {
-            $cacheTag = $instanceName;
-            return new CachePool(
+            $cacheTag = $group ?? $instanceName;
+            return new $className(
                 $container->resolve('cache.factories.storages.' . $storage, compact('instanceName', 'cacheTag')),
                 $container->resolve($serializer),
                 $container->get(LoggerInterface::class, tag: 'error')
