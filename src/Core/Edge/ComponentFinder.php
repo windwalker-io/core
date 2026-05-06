@@ -36,7 +36,7 @@ class ComponentFinder
         }
 
         $caches = $this->getCache()
-            ->call(
+            ->fetch(
                 'caches.json',
                 fn () => $this->scan()
             );

@@ -12,6 +12,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\CompletionContext;
 use Windwalker\Console\CompletionHandlerInterface;
+use Windwalker\Console\Input\InputOption;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\DI\Exception\DependencyResolutionException;
@@ -37,6 +38,20 @@ class CachePurgeCommand implements CommandInterface, CompletionHandlerInterface
             'profiles',
             InputArgument::IS_ARRAY,
             'Clear these profiles, if not provided, will clear all profiles.'
+        );
+
+        $command->addOption(
+            'group',
+            'g',
+            InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+            'Clear these groups, default is empty group.'
+        );
+
+        $command->addOption(
+            'tag',
+            't',
+            InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+            'Invalidate tags, if not provided, will clear all tags.'
         );
     }
 
@@ -68,9 +83,52 @@ class CachePurgeCommand implements CommandInterface, CompletionHandlerInterface
     {
         $cache = $this->app->retrieve(CachePool::class, tag: $profile);
 
-        $cache->clear();
+        $groups = (array) $io->getOption('group');
+        $tags = (array) $io->getOption('tag');
 
-        $io->writeln(sprintf('[Clear] <info>%s</info>', $profile));
+        if ($groups === []) {
+            $caches = ['__main__' => $cache];
+            $hasGroups = false;
+        } else {
+            $caches = [];
+            $hasGroups = true;
+
+            foreach ($groups as $group) {
+                if (!$cache->isGroupSupported()) {
+                    continue;
+                }
+
+                $caches[$group] = $cache->withGroup($group);
+            }
+        }
+
+        if ($caches !== []) {
+            foreach ($caches as $group => $cache) {
+                if ($tags === []) {
+                    $cache->clear();
+
+                    $io->writeln(
+                        sprintf(
+                            '[Clear] <info>%s%s</info>',
+                            $profile,
+                            $hasGroups ? ':' . $group : ''
+                        )
+                    );
+                } else {
+                    $cache->invalidateTags(...$tags);
+
+                    $io->writeln(
+                        sprintf(
+                            '[Invalidate] <info>%s%s</info> - Tags: <comment>%s</comment>',
+                            $profile,
+                            $hasGroups ? ':' . $group : '',
+                            implode(',', $tags)
+                        )
+                    );
+                }
+            }
+        }
+
     }
 
     /**
