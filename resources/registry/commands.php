@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 return [
+    'exec' => \Windwalker\Core\Command\ReplCommand::class,
+
     'server:start' => \Windwalker\Core\CliServer\Command\ServerStartCommand::class,
     'server:stop' => \Windwalker\Core\CliServer\Command\ServerStopCommand::class,
     'server:dumper' => \Windwalker\Core\Command\DumpServerCommand::class,
