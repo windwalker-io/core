@@ -28,6 +28,7 @@ return [
     'mig:squash' => \Windwalker\Core\Migration\Command\MigSquashCommand::class,
     'db:export' => \Windwalker\Core\Database\Command\DbExportCommand::class,
     'db:drop-all' => \Windwalker\Core\Database\Command\DbDropAllCommand::class,
+    'db:ping' => \Windwalker\Core\Database\Command\DbPingCommand::class,
     'seed:import' => \Windwalker\Core\Seed\Command\SeedImportCommand::class,
     'seed:clear' => \Windwalker\Core\Seed\Command\SeedClearCommand::class,
     'seed:create' => \Windwalker\Core\Seed\Command\SeedCreateCommand::class,

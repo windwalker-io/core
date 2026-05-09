@@ -8,15 +8,19 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
+use Windwalker\Console\CompletionContext;
+use Windwalker\Console\CompletionHandlerInterface;
+use Windwalker\Console\Input\InputArgument;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Migration\Migration;
 use Windwalker\Core\Migration\MigrationService;
 
 /**
  * The StatusCommand class.
  */
 #[CommandWrapper(description: 'Show migration status.')]
-class StatusCommand extends AbstractMigrationCommand
+class StatusCommand extends AbstractMigrationCommand implements CompletionHandlerInterface
 {
     /**
      * StatusCommand constructor.
@@ -42,6 +46,19 @@ class StatusCommand extends AbstractMigrationCommand
             InputOption::VALUE_REQUIRED,
             'Do not auto create database or schema.'
         );
+
+        $command->addArgument(
+            'task',
+            InputArgument::OPTIONAL,
+            'The subtask: `current`|`last`|`is-done`.'
+        );
+
+        $command->addOption(
+            'show-name',
+            'N',
+            InputOption::VALUE_NONE,
+            'Display version as name.'
+        );
     }
 
     /**
@@ -59,11 +76,62 @@ class StatusCommand extends AbstractMigrationCommand
             | static::CREATE_DATABASE
         );
 
+        $task = $io->getArgument('task');
+        $showName = $io->getOption('show-name');
+
         /** @var ConsoleApplication $app */
         $app = $this->app;
 
         $migrationService = $this->app->make(MigrationService::class);
         $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));
+
+        if ($task === 'current') {
+            $currentVersion = $migrationService->getCurrentVersion();
+
+            if ($currentVersion) {
+                if ($showName) {
+                    /** @var ?Migration $mig */
+                    $mig = $migrations[$currentVersion] ?? null;
+
+                    if ($mig) {
+                        $currentVersion = $mig->name;
+                    }
+                }
+
+                $io->writeln($currentVersion);
+            }
+
+            return 0;
+        }
+
+        if ($task === 'last') {
+            $lastMig = $migrations[array_key_last($migrations)] ?? null;
+
+            if ($lastMig) {
+                if ($showName) {
+                    $io->writeln($lastMig->version);
+                } else {
+                    $io->writeln($lastMig->name);
+                }
+            }
+
+            return 0;
+        }
+
+        if ($task === 'is-done') {
+            ksort($migrations);
+            $versions = $migrationService->getVersions();
+
+            foreach ($migrations as $migration) {
+                if (!in_array($migration->version, $versions, true)) {
+                    return 0;
+                }
+            }
+
+            $io->writeln('done');
+
+            return 0;
+        }
 
         if ($migrations === []) {
             $io->writeln('No migrations found.');
@@ -97,5 +165,21 @@ class StatusCommand extends AbstractMigrationCommand
         $io->newLine();
 
         return 0;
+    }
+
+    #[\Override]
+    public function handleCompletions(CompletionContext $context): ?array
+    {
+        if ($context->isArgument()) {
+            if ($context->name === 'task') {
+                return [
+                    'current',
+                    'last',
+                    'is-done',
+                ];
+            }
+        }
+
+        return null;
     }
 }
