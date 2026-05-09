@@ -9,6 +9,7 @@ use Windwalker\Cache\CachePool;
 use Windwalker\Cache\Storage\DatabaseStorage;
 use Windwalker\Cache\Storage\FileStorage;
 use Windwalker\Cache\Storage\StorageInterface;
+use Windwalker\Cache\TaggedCachePool;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Database\DatabaseAdapter;
@@ -50,7 +51,6 @@ class CacheFactory implements ServiceFactoryInterface
     public static function createCachePool(
         string $storage,
         string|ObjectBuilderDefinition $serializer,
-        string|\UnitEnum|null|false $tagStorage = false,
         ?string $group = null,
         ?int $defaultTtl = null,
         string $className = CachePool::class,
@@ -62,22 +62,16 @@ class CacheFactory implements ServiceFactoryInterface
         ) use (
             $storage,
             $serializer,
-            $tagStorage,
             $className,
             $defaultTtl,
         ): CachePool {
             $tag = $group ?? $tag;
-
-            if ($tagStorage !== false && $tagStorage !== null) {
-                $tagStorage = $container->get(StorageInterface::class, tag: $tagStorage);
-            }
 
             return new $className(
                 $container->resolve(StorageInterface::class, ['cacheTag' => $tag], tag: $storage),
                 $container->resolve($serializer),
                 $container->get(LoggerInterface::class, tag: 'cache'),
                 defaultTtl: $defaultTtl,
-                tagPool: $tagStorage
             );
         };
     }
@@ -116,10 +110,39 @@ class CacheFactory implements ServiceFactoryInterface
     public static function cachePoolFactory(
         string $storage,
         string|ObjectBuilderDefinition $serializer,
-        string|\UnitEnum|null|false $tagStorage = false,
         ?string $group = null,
         ?int $defaultTtl = null,
         string $className = CachePool::class,
+    ): \Closure {
+        return #[Factory]
+        static function (
+            Container $container,
+            string $instanceName
+        ) use (
+            $storage,
+            $serializer,
+            $group,
+            $className,
+            $defaultTtl,
+        ): CachePool {
+            $cacheTag = $group ?? $instanceName;
+
+            return new $className(
+                $container->resolve('cache.factories.storages.' . $storage, compact('instanceName', 'cacheTag')),
+                $container->resolve($serializer),
+                $container->get(LoggerInterface::class, tag: 'error'),
+                defaultTtl: $defaultTtl,
+            );
+        };
+    }
+
+    public static function taggedCachePool(
+        string $storage,
+        string|ObjectBuilderDefinition $serializer,
+        string|\UnitEnum|null $tagStorage = null,
+        ?string $group = null,
+        ?int $defaultTtl = null,
+        string $className = TaggedCachePool::class,
     ): \Closure {
         return #[Factory]
         static function (
