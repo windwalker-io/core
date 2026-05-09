@@ -50,11 +50,7 @@ trait AppRequestTrait
         $remoteAddr = $this->request->getServerParams()['REMOTE_ADDR'] ?? '';
 
         if ($this->proxyResolver->isProxy()) {
-            if (!$this->proxyResolver->isTrustedProxy()) {
-                return $remoteAddr;
-            }
-
-            return $this->proxyResolver->getForwardedIP() ?: $remoteAddr;
+            return $this->proxyResolver->getTrustedProxyIP();
         }
 
         return $remoteAddr;

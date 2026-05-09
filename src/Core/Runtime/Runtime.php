@@ -149,11 +149,15 @@ class Runtime
         $httpForwardedFor = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null;
 
         if (isset($httpForwardedFor)) {
-            if (!static::isTrusted($remoteAddr)) {
+            $ips = ProxyResolver::splitIps($httpForwardedFor);
+            $userIp = array_shift($ips);
+            $ips[] = $remoteAddr;
+
+            if (!static::isTrusted(array_reverse($ips))) {
                 return true;
             }
 
-            $clientIp = $httpForwardedFor;
+            $clientIp = $userIp;
         } else {
             if (isset($clientIp) && $clientIp !== $remoteAddr) {
                 return true;
@@ -175,11 +179,22 @@ class Runtime
         }
     }
 
-    private static function isTrusted(string $remoteAttr): bool
+    private static function isTrusted(array $ipChain): bool
     {
+        $ipChain = array_values($ipChain);
+
+        $remoteAttr = $ipChain[0] ?? '';
+
         $trustedProxies = ProxyResolver::handleTrustedProxies(env('PROXY_TRUSTED_IPS') ?? '', $remoteAttr);
 
-        return IpHelper::checkIp($remoteAttr, $trustedProxies);
+        foreach ($ipChain as $ip) {
+            if (!IpHelper::checkIp($ip, $trustedProxies)) {
+                return false;
+            }
+        }
+
+        // All IPs must trust.
+        return true;
     }
 
     public static function forbidden(array $headers = []): never

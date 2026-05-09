@@ -50,12 +50,61 @@ class ProxyResolver
 
     public function isTrustedProxy(): bool
     {
-        return (bool) $this->getTrustedProxyIP();
+        return $this->getNearestClientIp() === $this->getTrustedProxyIP();
     }
 
     public function getForwardedIP(): ?string
     {
-        return $this->getHeader('forwarded-for');
+        $ips = $this->getForwardedIPs();
+
+        return array_shift($ips);
+    }
+
+    public function getForwardedIPs(): array
+    {
+        $header = $this->getHeader('forwarded-for');
+
+        if (!$header) {
+            return [];
+        }
+
+        return static::splitIps($header);
+    }
+
+    /**
+     * If ips like:
+     *
+     * ```
+     * X-Forwarded-For: client, proxy1, proxy2
+     * REMOTE_ADDR: proxy3
+     * ```
+     *
+     * Will return [client, proxy1, proxy2, proxy3 (remote_addr)]
+     *
+     * @return  array
+     */
+    public function getIpsChain(): array
+    {
+        $forwards = $this->getForwardedIPs();
+
+        return [
+            ...$forwards,
+            $this->getRemoteAddr()
+        ];
+    }
+
+    public function getNearestServerIp(): ?string
+    {
+        $proxyIps = $this->getIpsChain();
+
+        return array_pop($proxyIps);
+    }
+
+    public function getNearestClientIp(): ?string
+    {
+        $proxyIps = $this->getIpsChain();
+
+        return array_shift($proxyIps);
     }
 
     public function getForwardedHost(): ?string
@@ -76,17 +125,18 @@ class ProxyResolver
     public function getTrustedProxyIP(): ?string
     {
         $trustedProxies = $this->getTrustedProxies();
-        $ip = $this->getRemoteAddr();
 
-        if (!$ip) {
-            return null;
+        $proxyIps = $this->getIpsChain();
+
+        $proxyIps = array_reverse($proxyIps);
+
+        foreach ($proxyIps as $proxyIp) {
+            if (!IpHelper::checkIp($proxyIp, $trustedProxies)) {
+                return $proxyIp;
+            }
         }
 
-        if (IpHelper::checkIp($ip, $trustedProxies)) {
-            return $ip;
-        }
-
-        return null;
+        return $this->getRemoteAddr();
     }
 
     public function getTrustedProxies(): array
@@ -161,5 +211,15 @@ class ProxyResolver
         }
 
         return $trustedProxies;
+    }
+
+    public static function splitIps(string $ipString): array
+    {
+        $ips = Arr::explodeAndClear(
+            ',',
+            $ipString
+        );
+
+        return array_filter($ips, static fn($ip) => IpHelper::isIp($ip));
     }
 }
