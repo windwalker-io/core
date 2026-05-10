@@ -33,6 +33,11 @@ enum AppVerbosity: int
 
     public function isNormal(): bool
     {
+        return $this->value >= self::NORMAL->value;
+    }
+
+    public function isExactlyNormal(): bool
+    {
         return $this->value === self::NORMAL->value;
     }
 
@@ -41,9 +46,19 @@ enum AppVerbosity: int
         return $this->value >= self::VERBOSE->value;
     }
 
+    public function isExactlyVerbose(): bool
+    {
+        return $this->value == self::VERBOSE->value;
+    }
+
     public function isVeryVerbose(): bool
     {
         return $this->value >= self::VERY_VERBOSE->value;
+    }
+
+    public function isExactlyVeryVerbose(): bool
+    {
+        return $this->value === self::VERY_VERBOSE->value;
     }
 
     public function displayMessage(\Throwable|string $e, string $fallback = 'Something went wrong'): string

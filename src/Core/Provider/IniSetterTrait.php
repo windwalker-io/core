@@ -13,7 +13,7 @@ use Windwalker\DI\Container;
  */
 trait IniSetterTrait
 {
-    public static function setINI(string $key, $value, Container $container): void
+    public static function setINI(string $key, mixed $value, Container $container): void
     {
         if (is_callable($value)) {
             $value = $container->call($value, [$container]);
@@ -25,6 +25,10 @@ trait IniSetterTrait
     protected static function setINIValues(array $values, Container $container): void
     {
         foreach ($values as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
             static::setINI($key, $value, $container);
         }
     }

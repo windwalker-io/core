@@ -58,8 +58,20 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
             case AppClient::WEB:
             default:
                 // Runtime CLI do not restore exception handler, let console app handle it.
-                if (!$this->app->isCliRuntime()) {
+                if ($this->app->isCliRuntime()) {
                     ini_set('display_errors', 'stderr');
+                } else {
+                    // In web mode, error message will display on browser,
+                    // We should crefully set display_errors depends on app verbosity.
+                    // Set APP_VERBOSITY=0 to hide all error messages on production.
+                    ini_set(
+                        'display_errors',
+                        $this->app->getVerbosity()->isNormal() ? 'on' : 'off'
+                    );
+                    ini_set(
+                        'fatal_error_backtraces',
+                        $this->app->getVerbosity()->isVerbose() ? 'on' : 'off'
+                    );
 
                     $error->register(
                         (bool) ($this->config->get('restore') ?? true),
