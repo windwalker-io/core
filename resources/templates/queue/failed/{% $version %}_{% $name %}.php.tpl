@@ -22,6 +22,8 @@ return new /** {% $version %}_{% $name %} */ class extends AbstractMigration {
                 $schema->longtext('body');
                 $schema->longtext('exception');
                 $schema->datetime('created');
+
+                $schema->addIndex('created');
             }
         );
     }

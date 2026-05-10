@@ -24,7 +24,7 @@ return new /** {% $version %}_{% $name %} */ class extends AbstractMigration {
                 $schema->datetime('visibility')->nullable(true);
                 $schema->datetime('reserved')->nullable(true);
 
-                $schema->addIndex('channel');
+                $schema->addIndex(['channel', 'visibility', 'id']);
             }
         );
     }
