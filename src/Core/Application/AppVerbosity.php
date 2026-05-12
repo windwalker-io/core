@@ -64,7 +64,7 @@ enum AppVerbosity: int
     public function displayMessage(\Throwable|string $e, string $fallback = 'Something went wrong'): string
     {
         if ($e instanceof \Throwable) {
-            if ($e instanceof VerbosityExceptionInterface) {
+            if ($this->isVerbose() && $e instanceof VerbosityExceptionInterface) {
                 $e = $e->getMessageByVerbosity($this->value);
             } else {
                 $e = $e->getMessage();

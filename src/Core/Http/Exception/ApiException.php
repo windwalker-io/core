@@ -164,6 +164,11 @@ class ApiException extends \RuntimeException
         return $this->errCode ?: $this->code;
     }
 
+    public function getRawErrCode(): string
+    {
+        return $this->errCode;
+    }
+
     public function setData(array $data): static
     {
         $this->data = $data;

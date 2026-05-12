@@ -14,6 +14,7 @@ use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
+use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Session\Session;
@@ -137,17 +138,29 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 
         $verbosity = $this->app->getVerbosity();
 
-        $message = !$verbosity->isVerbose()
-            ? $verbosity->displayMessage($e)
-            : sprintf(
+        $erroCode = $apiException->getErrCode();
+
+        if (ResponseHelper::isClientError($apiException->getStatusCode())) {
+            $message = $apiException->getMessage();
+        } elseif ($verbosity->isVerbose()) {
+            $message = sprintf(
                 '#%d %s - File: %s (%d)',
-                $apiException->getErrCode() ?: $e->getCode(),
-                $e->getMessage(),
+                $erroCode,
+                $verbosity->displayMessage($e),
                 $e->getFile(),
                 $e->getLine()
             );
+        } else {
+            $message = $verbosity->displayMessage($e);
 
-        $buffer = new JsonBuffer($message, $data, false, $apiException->getErrCode());
+            $erroCode = $apiException->getRawErrCode() ?: '500';
+
+            if ($verbosity->isHidden()) {
+                $erroCode = '500';
+            }
+        }
+
+        $buffer = new JsonBuffer($message, $data, false, $erroCode);
         $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());
 
         return new JsonResponse($buffer)
