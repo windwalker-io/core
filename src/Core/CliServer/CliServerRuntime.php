@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Terminal;
 use Whoops\Run;
+use Windwalker\Core\CliServer\PhpNative\TestInspector;
 use Windwalker\Core\CliServer\Swoole\SwooleInspector;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Http\Helper\ResponseHelper;
@@ -25,7 +26,7 @@ class CliServerRuntime
 {
     public static int $gcThrottle = 50;
 
-    protected static SwooleInspector $inspector;
+    protected static CliServerInspectorInterface $inspector;
 
     protected static CliServerStateManager $cliServerStateManager;
 
@@ -39,7 +40,11 @@ class CliServerRuntime
     {
         self::$state = self::parseArgv($argv);
 
-        self::$inspector = new SwooleInspector(self::$state);
+        self::$inspector = match ($engine) {
+            'test' => new TestInspector(),
+            'swoole' => new SwooleInspector(self::$state),
+            default => throw new \InvalidArgumentException("Unsupported engine: $engine"),
+        };
 
         return self::$state;
     }
@@ -111,7 +116,7 @@ class CliServerRuntime
         return new SymfonyStyle(new ArrayInput([]), self::getOutput());
     }
 
-    public static function getInspector(): SwooleInspector
+    public static function getInspector(): CliServerInspectorInterface
     {
         return self::$inspector;
     }

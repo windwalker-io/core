@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\CliServer\Swoole;
 
 use Swoole\Server;
+use Windwalker\Core\CliServer\CliServerInspectorInterface;
 use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\CliServer\CliServerState;
 use Windwalker\Reactor\Swoole\SwooleServer;
@@ -12,7 +13,7 @@ use Windwalker\Reactor\Swoole\SwooleServer;
 /**
  * The SwooleInspector class.
  */
-class SwooleInspector
+class SwooleInspector implements CliServerInspectorInterface
 {
     public function __construct(protected CliServerState $serverState)
     {
