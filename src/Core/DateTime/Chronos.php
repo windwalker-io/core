@@ -234,8 +234,12 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @throws Exception
      */
-    public static function createInterval(string|int $duration): DateInterval
+    public static function createInterval(\DateInterval|string|int $duration): DateInterval
     {
+        if ($duration instanceof \DateInterval) {
+            return $duration;
+        }
+
         if (is_int($duration)) {
             $duration = 'PT' . $duration . 'S';
         }
