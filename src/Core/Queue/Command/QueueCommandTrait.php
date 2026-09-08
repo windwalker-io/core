@@ -43,8 +43,11 @@ trait QueueCommandTrait
     {
         $style = $this->io->style();
 
+        $shuffled = $options->shuffleChannels ? ' (shuffled)' : '';
+
         $info1[] = "Connection: <info>{$connection}</info>";
-        $info1[] = 'Channels: <info>' . (is_array($channels) ? implode(', ', $channels) : $channels) . '</info>';
+        $info1[] = 'Channels: <info>' . (is_array($channels) ? implode(', ', $channels) : $channels)
+            . '</info>' . $shuffled;
         $info1[] = 'Memory limit: <info>' . static::unit($options->memoryLimit, 'MB', 'no limit') . '</info>';
         $info1[] = 'Sleep: <info>' . static::unit($options->sleep, 's', 'no sleep') . '</info>';
 
@@ -97,7 +100,9 @@ trait QueueCommandTrait
                             '[%s] %s %s',
                             $event->level,
                             $event->message,
-                            $event->context ? json_encode($event->context) : ''
+                            $event->context
+                                ? json_encode($event->context, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                                : ''
                         )
                     );
                 }

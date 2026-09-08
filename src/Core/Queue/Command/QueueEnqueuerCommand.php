@@ -51,6 +51,20 @@ class QueueEnqueuerCommand implements CommandInterface
         );
 
         $command->addOption(
+            'all-channels',
+            'a',
+            InputOption::VALUE_NONE,
+            'Run all channels, the driver must support getChannels().'
+        );
+
+        $command->addOption(
+            'shuffle-channels',
+            'S',
+            InputOption::VALUE_NONE,
+            'Shuffle channels ordering in every loop.'
+        );
+
+        $command->addOption(
             'connection',
             'c',
             InputOption::VALUE_REQUIRED,
@@ -136,8 +150,13 @@ class QueueEnqueuerCommand implements CommandInterface
         $this->io = $io;
 
         $channels = $io->getArgument('channels') ?: 'default';
+        $all = $io->getOption('all-channels');
         $options = $this->getRunnerOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
+
+        if ($all) {
+            $channels = ['*'];
+        }
 
         $enqueuer = $this->createEnqueuer($connection, $options);
         $this->prepareEnqueuer($enqueuer);
@@ -195,6 +214,7 @@ class QueueEnqueuerCommand implements CommandInterface
             timeout: (int) $io->getOption('timeout'),
             maxRuns: (int) $io->getOption('max-runs'),
             lifetime: (int) $io->getOption('lifetime'),
+            shuffleChannels: (bool) $io->getOption('shuffle-channels'),
             stopWhenEmpty: (bool) $io->getOption('stop-when-empty'),
             restartSignal: $this->app->path('@temp') . '/queue/enqueuer-restart',
         );

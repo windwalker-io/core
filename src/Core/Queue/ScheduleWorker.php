@@ -78,6 +78,10 @@ class ScheduleWorker
             $cliOptions['--max-runs'] = $options->maxRuns;
         }
 
+        if ($options->shuffleChannels) {
+            $cliOptions['--shuffle-channels'] = true;
+        }
+
         if ($options->stopWhenEmpty) {
             $cliOptions['--stop-when-empty'] = true;
         }

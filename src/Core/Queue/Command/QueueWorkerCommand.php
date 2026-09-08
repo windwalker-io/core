@@ -67,6 +67,20 @@ class QueueWorkerCommand implements CommandInterface
         );
 
         $command->addOption(
+            'all-channels',
+            'a',
+            InputOption::VALUE_NONE,
+            'Run all channels, the driver must support getChannels().'
+        );
+
+        $command->addOption(
+            'shuffle-channels',
+            'S',
+            InputOption::VALUE_NONE,
+            'Shuffle channels ordering in every loop.'
+        );
+
+        $command->addOption(
             'connection',
             'c',
             InputOption::VALUE_REQUIRED,
@@ -129,7 +143,7 @@ class QueueWorkerCommand implements CommandInterface
 
         $command->addOption(
             'timeout',
-            null,
+            'T',
             InputOption::VALUE_REQUIRED,
             'Number of seconds that a job can run.',
             '60'
@@ -145,7 +159,7 @@ class QueueWorkerCommand implements CommandInterface
 
         $command->addOption(
             'lifetime',
-            null,
+            'L',
             InputOption::VALUE_REQUIRED,
             'The max seconds to run the worker before exit. 0 for unlimited.',
             '0'
@@ -190,8 +204,13 @@ class QueueWorkerCommand implements CommandInterface
         $this->io = $io;
 
         $channels = $io->getArgument('channels') ?: 'default';
+        $all = $io->getOption('all-channels');
         $options = $this->getWorkOptions($io);
         $connection = $io->getOption('connection') ?: $this->app->config('queue.default');
+
+        if ($all) {
+            $channels = ['*'];
+        }
 
         $worker = $this->createWorker($connection, $options);
         $worker->setInvoker($this->createInvoker());
@@ -288,6 +307,7 @@ class QueueWorkerCommand implements CommandInterface
             timeout: (int) $io->getOption('timeout'),
             maxRuns: (int) $io->getOption('max-runs'),
             lifetime: (int) $io->getOption('lifetime'),
+            shuffleChannels: (bool) $io->getOption('shuffle-channels'),
             stopWhenEmpty: (bool) $io->getOption('stop-when-empty'),
             restartSignal: $this->app->path('@temp') . '/queue/restart',
         );

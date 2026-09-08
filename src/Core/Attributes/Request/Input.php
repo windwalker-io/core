@@ -48,9 +48,9 @@ class Input implements ContainerAttributeInterface
 
     protected static function allowsNull(\ReflectionProperty|\ReflectionParameter $ref): bool
     {
-        if ($ref instanceof \ReflectionParameter) {
-            return $ref->allowsNull();
-        }
+        // if ($ref instanceof \ReflectionParameter) {
+        //     return $ref->getType()->allowsNull();
+        // }
 
         return $ref->getType()?->allowsNull() ?? true;
     }

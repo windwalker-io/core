@@ -18,6 +18,7 @@ class ScheduleWorkerOptions extends RunnerOptions
         int $timeout = 60,
         int $maxRuns = 0,
         int $lifetime = 0,
+        bool $shuffleChannels = false,
         bool $stopWhenEmpty = false,
         ?string $restartSignal = null,
         ?\Closure $controllerFactory = null,
@@ -33,6 +34,7 @@ class ScheduleWorkerOptions extends RunnerOptions
             timeout: $timeout,
             maxRuns: $maxRuns,
             lifetime: $lifetime,
+            shuffleChannels: $shuffleChannels,
             stopWhenEmpty: $stopWhenEmpty,
             restartSignal: $restartSignal,
             controllerFactory: $controllerFactory
