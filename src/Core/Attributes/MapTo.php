@@ -13,6 +13,8 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Enum\EnumExtendedInterface;
 
+use function Windwalker\ds;
+
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class MapTo implements ContainerAttributeInterface
 {
@@ -44,6 +46,10 @@ class MapTo implements ContainerAttributeInterface
     protected function mapValue(mixed $value, AttributeHandler $handler): mixed
     {
         $className = $this->className;
+
+        if ($value instanceof $className) {
+            return $value;
+        }
 
         // Enum
         if (is_string($className) && enum_exists($className)) {
