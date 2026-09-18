@@ -69,18 +69,44 @@ class Route implements JsonSerializable
         return $this->options['pattern'] ?? '';
     }
 
-    public function handler(string|array|callable $handler, ?string $task = null): static
+    /**
+     * @param  string|array|callable  $handler
+     * @param  string|null            ...$tasks  Supports methods:
+     *                                           - get, query, post, put, patch, delete, options, head
+     *                                           - fetch: get, query
+     *                                           - save: post, put, patch
+     *
+     * @return  $this
+     */
+    public function handler(string|array|callable $handler, ?string ...$tasks): static
     {
-        if ($task !== null) {
-            $handler = [$handler, $task];
+        if ($tasks === []) {
+            return $this->allHandlers($handler);
         }
 
-        return $this->allHandlers($handler);
+        if (array_is_list($tasks)) {
+            $handler = [$handler, $tasks[0]];
+
+            return $this->allHandlers($handler);
+        }
+
+        $handlers = array_map(static fn($task) => [$handler, $task], $tasks);
+
+        return $this->handlers(...$handlers);
     }
 
-    public function controller(string|array|callable $handler, ?string $task = null): static
+    /**
+     * @param  string|array|callable  $handler
+     * @param  string|null            ...$tasks  Supports methods:
+     *                                           - get, query, post, put, patch, delete, options, head
+     *                                           - fetch: get, query
+     *                                           - save: post, put, patch
+     *
+     * @return  $this
+     */
+    public function controller(string|array|callable $handler, ?string ...$tasks): static
     {
-        return $this->handler($handler, $task);
+        return $this->handler($handler, ...$tasks);
     }
 
     public function redirect(mixed $to, array $query = [], int $options = NavConstantInterface::TYPE_PATH): static
