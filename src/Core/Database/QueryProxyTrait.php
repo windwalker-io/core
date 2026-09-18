@@ -11,6 +11,9 @@ use Windwalker\Query\Query;
 /**
  * Trait QueryProxyTrait
  *
+ * @psalm-type QueryCallback = \Closure(Query): mixed
+ * @psalm-type QueryCallable = callable(Query): mixed
+ *
  * @method  $this  select(...$columns)
  * @method  $this  selectAs(mixed $column, ?string $alias = null, bool $isColumn = true)
  * @method  $this  selectRaw(mixed $column, ...$args)
@@ -18,14 +21,8 @@ use Windwalker\Query\Query;
  * @method  $this  join(string $type, mixed $table, ?string $alias = null, ...$on)
  * @method  $this  where(mixed $column, mixed ...$args)
  * @method  $this  whereRaw(Clause|string $string, ...$args)
- * @method  $this  whereExists(Query|callable $conditions)
- * @method  $this  whereNotExists(Query|callable $conditions)
- * @method  $this  orWhere(array|Closure $wheres)
  * @method  $this  having(mixed $column, mixed ...$args)
  * @method  $this  havingRaw(mixed $string, mixed ...$args)
- * @method  $this  havingExists(Query|callable $conditions)
- * @method  $this  havingNotExists(Query|callable $conditions)
- * @method  $this  orHaving(array|Closure $wheres)
  * @method  $this  order(mixed $column, ?string $dir = null)
  * @method  $this  orderRaw(string|Clause $order, mixed ...$args)
  * @method  $this  group(...$columns)
@@ -67,6 +64,66 @@ use Windwalker\Query\Query;
 trait QueryProxyTrait
 {
     abstract protected function getInnerQuery(): Query;
+
+    /**
+     * @param  Query|QueryCallable  $conditions
+     */
+    public function whereExists(Query|callable $conditions): static
+    {
+        $this->getInnerQuery()->whereExists($conditions);
+
+        return $this;
+    }
+
+    /**
+     * @param  Query|QueryCallable  $conditions
+     */
+    public function whereNotExists(Query|callable $conditions): static
+    {
+        $this->getInnerQuery()->whereNotExists($conditions);
+
+        return $this;
+    }
+
+    /**
+     * @param  array|QueryCallback  $wheres
+     */
+    public function orWhere(array|Closure $wheres): static
+    {
+        $this->getInnerQuery()->orWhere($wheres);
+
+        return $this;
+    }
+
+    /**
+     * @param  Query|QueryCallable  $conditions
+     */
+    public function havingExists(Query|callable $conditions): static
+    {
+        $this->getInnerQuery()->havingExists($conditions);
+
+        return $this;
+    }
+
+    /**
+     * @param  Query|QueryCallable  $conditions
+     */
+    public function havingNotExists(Query|callable $conditions): static
+    {
+        $this->getInnerQuery()->havingNotExists($conditions);
+
+        return $this;
+    }
+
+    /**
+     * @param  array|QueryCallback  $wheres
+     */
+    public function orHaving(array|Closure $wheres): static
+    {
+        $this->getInnerQuery()->orHaving($wheres);
+
+        return $this;
+    }
 
     public function __call(string $name, array $args = []): mixed
     {
