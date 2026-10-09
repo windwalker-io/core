@@ -47,7 +47,7 @@ class MapTo implements ContainerAttributeInterface
     {
         $className = $this->className;
 
-        if ($value instanceof $className) {
+        if (is_a($value, $className, true)) {
             return $value;
         }
 
@@ -110,6 +110,6 @@ class MapTo implements ContainerAttributeInterface
             $className = new $className();
         }
 
-        return new SimpleHydrator()->hydrate($className, $value);
+        return new SimpleHydrator()->hydrate($value, $className);
     }
 }
