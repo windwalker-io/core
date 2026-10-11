@@ -12,6 +12,8 @@ use Exception;
 use InvalidArgumentException;
 use JsonSerializable;
 use Psr\Clock\ClockInterface;
+use SebastianBergmann\Invoker\TimeoutException;
+use Time\Duration;
 
 /**
  * The Chronos class.
@@ -273,6 +275,44 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
                 (30 * 24 * 60 * 60 * ($interval->m)) +
                 (365 * 24 * 60 * 60 * ($interval->y))
             ));
+    }
+
+    public static function wrapDuration(
+        Duration|\DateInterval|string|int $duration
+    ): Duration {
+        if ($duration instanceof \DateInterval) {
+            $duration = static::intervalToSeconds($duration);
+        }
+
+        if (is_int($duration)) {
+            return Duration::fromSeconds($duration);
+        }
+
+        if (is_string($duration)) {
+            if (str_starts_with($duration, 'P')) {
+                return Duration::fromIso8601DurationString($duration);
+            } else {
+                return Duration::fromSeconds(
+                    static::intervalToSeconds(DateInterval::createFromDateString($duration))
+                );
+            }
+        }
+
+        return $duration;
+    }
+
+    public static function tryDuration(
+        Duration|\DateInterval|string|int|null $duration
+    ): ?Duration {
+        if ($duration === null) {
+            return null;
+        }
+
+        try {
+            return static::wrapDuration($duration);
+        } catch (TimeoutException) {
+            return null;
+        }
     }
 
     /**
