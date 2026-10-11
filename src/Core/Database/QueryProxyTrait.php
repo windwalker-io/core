@@ -23,7 +23,7 @@ use Windwalker\Query\Query;
  * @method  $this  whereRaw(Clause|string $string, ...$args)
  * @method  $this  having(mixed $column, mixed ...$args)
  * @method  $this  havingRaw(mixed $string, mixed ...$args)
- * @method  $this  order(mixed $column, ?string $dir = null)
+ * @method  $this  order(mixed $column, string|\SortDirection|null $dir = null)
  * @method  $this  orderRaw(string|Clause $order, mixed ...$args)
  * @method  $this  group(...$columns)
  * @method  $this  limit(?int $limit)
