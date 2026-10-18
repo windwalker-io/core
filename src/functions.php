@@ -52,6 +52,7 @@ namespace Windwalker {
     use DateTimeInterface;
     use DateTimeZone;
     use Exception;
+    use JetBrains\PhpStorm\Deprecated;
     use Psr\Log\LogLevel;
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
@@ -76,6 +77,7 @@ namespace Windwalker {
          *
          * @since  3.4.6
          */
+        #[Deprecated('This is a debug function, remember to remove it before production.')]
         function ds(...$args)
         {
             $dumper = new Dumper();

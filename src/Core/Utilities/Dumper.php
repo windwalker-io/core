@@ -7,6 +7,9 @@ namespace Windwalker\Core\Utilities;
 use DomainException;
 use ErrorException;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
+use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Server\Connection;
 
 use function count;
@@ -45,7 +48,15 @@ class Dumper
 
         $this->host = $host ?: env('VAR_DUMP_SERVER_HOST') ?: 'tcp://127.0.0.1:9912';
 
-        $this->connection = new Connection($this->host);
+        $this->connection = new Connection(
+            $this->host,
+            [
+                'cli' => new CliContextProvider(),
+                'source' => new SourceContextProvider(
+                    projectDir: WINDWALKER_ROOT,
+                ),
+            ]
+        );
     }
 
     /**
