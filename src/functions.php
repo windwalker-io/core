@@ -80,7 +80,7 @@ namespace Windwalker {
         {
             $dumper = new Dumper();
 
-            $dumper->dump(...$args);
+            $dumper->dumpToServer(...$args);
         }
     }
 
