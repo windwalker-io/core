@@ -98,14 +98,14 @@ class Dumper
      */
     protected function handleValues(array $args): mixed
     {
-        if (count($args) === 1) {
-            $values = $args[0];
-        } else {
+        if (array_is_list($args)) {
             $values = [];
 
             foreach ($args as $i => $arg) {
                 $values['Value ' . ($i + 1)] = $arg;
             }
+        } else {
+            $values = $args;
         }
 
         return $values;
