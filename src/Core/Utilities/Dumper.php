@@ -110,6 +110,10 @@ class Dumper
     protected function handleValues(array $args): mixed
     {
         if (array_is_list($args)) {
+            if (count($args) === 1) {
+                return $args[0];
+            }
+
             $values = [];
 
             foreach ($args as $i => $arg) {
