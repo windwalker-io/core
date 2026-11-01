@@ -567,6 +567,27 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             );
         }
 
+        if (preg_match('/^\\??(BigInteger|BigNumber|BigDecimal)$/', $type, $matches)) {
+            if ($dbColumn->getIsNullable()) {
+                $cast = 'CastNullable';
+                $this->addUse(CastNullable::class);
+            } else {
+                $cast = 'Cast';
+                $this->addUse(Cast::class);
+            }
+
+            $className = $matches[1];
+
+            $this->addUse('Brick\\Math\\' . $className);
+            $prop->setAttribute('fullType', 'Brick\\Math\\' . $className);
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    $cast,
+                    new Node\Expr\ClassConstFetch(new Node\Name($className), 'class')
+                ),
+            );
+        }
+
         if ($type === 'BasicState') {
             $this->addUse(Cast::class);
             $prop->setAttribute('fullType', BasicState::class);

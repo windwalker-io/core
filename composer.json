@@ -38,7 +38,8 @@
         "composer/semver": "^3.4",
         "whichbrowser/parser": "^2.1",
         "asika/object-metadata": "^1.0",
-        "psy/psysh": "^0.12.22"
+        "psy/psysh": "^0.12.22",
+        "symfony/polyfill-time": "^1.42"
     },
     "suggest": {
         "dragonmantank/cron-expression": "Install ^3.0 to support schedule runner.",

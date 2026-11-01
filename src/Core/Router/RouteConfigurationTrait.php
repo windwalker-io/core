@@ -19,17 +19,15 @@ trait RouteConfigurationTrait
     use OptionAccessTrait;
 
     /**
-     * methods
-     *
      * @param  string|array  $methods
      *
      * @return  static
      *
      * @since  3.5
      */
-    public function methods(string|array $methods): static
+    public function methods(string|array ...$methods): static
     {
-        $methods = (array) $methods;
+        $methods = Arr::collapse($methods);
 
         $this->options['method'] = $methods;
 
@@ -60,18 +58,34 @@ trait RouteConfigurationTrait
     }
 
     /**
-     * action
+     * Supports methods:
+     * - get, query, post, put, patch, delete, options, head
+     * - fetch: get, query
+     * - save: post, put, patch
      *
-     * @param  string|array                $methods
-     * @param  callable|array|string|null  $handler
-     * @param  string|null                 $task
+     * @param  callable|array|string|null  ...$handlers
      *
      * @return  static
      *
-     * @since  3.5
+     * @since   3.5
      */
-    public function handlers(string|array $methods, callable|array|string|null $handler, ?string $task = null): static
+    public function handlers(callable|array|string|null ...$handlers): static
     {
+        $keys = array_keys($handlers);
+        $keys = array_map(strtolower(...), $keys);
+
+        if (array_is_list($handlers) || array_intersect(['methods', 'handler', 'task'], $keys)) {
+            return $this->methodHandler(...$handlers);
+        }
+
+        return $this->handlersMapping(...$handlers);
+    }
+
+    public function methodHandler(
+        string|array $methods,
+        callable|array|string|null $handler,
+        ?string $task = null
+    ): static {
         if ($task !== null) {
             $handler = [$handler, $task];
         }
@@ -80,6 +94,30 @@ trait RouteConfigurationTrait
 
         foreach ($methods as $method) {
             $this->options['handlers'][strtolower($method)] = $handler;
+        }
+
+        return $this;
+    }
+
+    protected function handlersMapping(callable|array|string|null ...$handlers): static
+    {
+        foreach ($handlers as $method => $handler) {
+            if (is_numeric($method)) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Handler mapping should provide method name as string, got numeric key: %s',
+                        $method
+                    )
+                );
+            }
+
+            $method = strtolower($method);
+
+            match ($method) {
+                'fetch' => $this->fetchHandler($handler),
+                'save' => $this->saveHandler($handler),
+                default => $this->methodHandler($method, $handler)
+            };
         }
 
         return $this;
@@ -97,7 +135,7 @@ trait RouteConfigurationTrait
      */
     public function allHandlers(callable|array|string|null $handler, ?string $task = null): static
     {
-        $this->handlers('*', $handler, $task);
+        $this->methodHandler('*', $handler, $task);
 
         return $this;
     }
@@ -117,6 +155,24 @@ trait RouteConfigurationTrait
         $this->postHandler($handler, $task);
         $this->putHandler($handler, $task);
         $this->patchHandler($handler, $task);
+
+        return $this;
+    }
+
+    /**
+     * Save handlers: get, query
+     *
+     * @param  callable|array|string|null  $handler
+     * @param  string|null                 $task
+     *
+     * @return  static
+     *
+     * @since  3.5
+     */
+    public function fetchHandler(callable|array|string|null $handler, ?string $task = null): static
+    {
+        $this->getHandler($handler, $task);
+        $this->queryHandler($handler, $task);
 
         return $this;
     }
@@ -462,7 +518,7 @@ trait RouteConfigurationTrait
     public function __call(string $name, array $args = [])
     {
         if (Str::endsWith(strtolower($name), 'handler')) {
-            return $this->handlers(Str::removeRight(strtolower($name), 'handler'), ...$args);
+            return $this->methodHandler(Str::removeEnd(strtolower($name), 'handler'), ...$args);
         }
 
         throw new BadMethodCallException(sprintf('Method: %s not exists', $name));

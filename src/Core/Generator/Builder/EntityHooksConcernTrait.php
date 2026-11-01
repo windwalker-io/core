@@ -54,6 +54,7 @@ trait EntityHooksConcernTrait
             $specialSetHook = match ((string) $typeNode) {
                 'UuidInterface' => $this->buildUuidInterfaceSetHook(...),
                 'Chronos', 'DateTimeInterface' => $this->buildChronosSetHook(...),
+                'BigInteger', 'BigDecimal' => $this->buildBrickMathSetHook($typeNode),
                 default => null,
             };
         }
@@ -346,5 +347,35 @@ trait EntityHooksConcernTrait
                 ]
             )
         );
+    }
+
+    /**
+     * @return  \Closure
+     */
+    public function buildBrickMathSetHook(Node\Name $typeNode): \Closure
+    {
+        return function ($prop, $propNode, $column) use ($typeNode) {
+            $factory = $this->createNodeFactory();
+            $this->addUse('Brick\\Math\\' . $typeNode);
+            $typeStr = $typeNode . '|string|float|int';
+            $funcName = (string) $typeNode === 'BigDecimal' ? 'try_big_decimal' : 'try_big_integer';
+
+            $this->addFunctionUse('Windwalker\\' . $funcName);
+
+            if ($prop->getType()?->allowsNull()) {
+                $typeStr .= '|null';
+            }
+
+            return $this->createHookAssignValue(
+                $prop,
+                new Node\Identifier($typeStr),
+                $factory->funcCall(
+                    $funcName,
+                    [
+                        new Node\Expr\Variable('value'),
+                    ]
+                )
+            );
+        };
     }
 }

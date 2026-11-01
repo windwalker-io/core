@@ -35,6 +35,34 @@ class RouteCreator implements RouteCreatorInterface
      *
      * @since  3.5
      */
+    public function query(string $name, string|callable|null $pattern = null, array $options = []): Route
+    {
+        return $this->any($name, $pattern, $options)->methods('QUERY');
+    }
+
+    /**
+     * @param  string       $name
+     * @param  string|null  $pattern
+     * @param  array        $options
+     *
+     * @return  Route
+     *
+     * @since  3.5
+     */
+    public function fetch(string $name, string|callable|null $pattern = null, array $options = []): Route
+    {
+        return $this->any($name, $pattern, $options)->methods(['GET', 'QUERY']);
+    }
+
+    /**
+     * @param  string       $name
+     * @param  string|null  $pattern
+     * @param  array        $options
+     *
+     * @return  Route
+     *
+     * @since  3.5
+     */
     public function post(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('POST');
