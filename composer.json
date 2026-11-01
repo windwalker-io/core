@@ -54,12 +54,16 @@
     },
     "autoload" : {
         "psr-4" : {
-            "Windwalker\\" : "src/",
-            "Windwalker\\Core\\Test\\": "test/"
+            "Windwalker\\" : "src/"
         },
         "files": [
             "src/bootstrap.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Windwalker\\Tests\\": "tests/"
+        }
     },
     "config": {
         "platform": {
