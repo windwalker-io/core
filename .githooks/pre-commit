@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Run PHP-CS-Fixer on staged PHP files and re-stage them.
+
+set -e
+
+hook_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+core_root=$(dirname "$hook_dir")
+cd "$core_root"
+
+files=()
+while IFS= read -r -d '' file; do
+    files+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z -- '*.php')
+
+[ "${#files[@]}" -eq 0 ] && exit 0
+
+fixer="$core_root/vendor/bin/php-cs-fixer"
+
+if [ ! -x "$fixer" ]; then
+    search_dir=$(dirname "$core_root")
+
+    while [ "$search_dir" != "/" ]; do
+        candidate="$search_dir/vendor/bin/php-cs-fixer"
+
+        if [ -x "$candidate" ]; then
+            fixer="$candidate"
+            break
+        fi
+
+        search_dir=$(dirname "$search_dir")
+    done
+fi
+
+if [ ! -x "$fixer" ]; then
+    echo "pre-commit: PHP-CS-Fixer not found in Core or any parent host application; run composer install. Skipping." >&2
+    exit 0
+fi
+
+partial_files=()
+while IFS= read -r -d '' file; do
+    partial_files+=("$file")
+done < <(git diff --name-only -z -- "${files[@]}")
+
+"$fixer" fix \
+    --config="$core_root/.php-cs-fixer.dist.php" \
+    --using-cache=no \
+    --quiet \
+    -- "${files[@]}" || exit 1
+
+for file in "${files[@]}"; do
+    partial=false
+
+    for partial_file in "${partial_files[@]}"; do
+        if [ "$file" = "$partial_file" ]; then
+            partial=true
+            break
+        fi
+    done
+
+    if [ "$partial" = true ]; then
+        echo "pre-commit: $file has unstaged changes, fixed but not re-staged." >&2
+    else
+        git add -- "$file"
+    fi
+done
+
+exit 0
