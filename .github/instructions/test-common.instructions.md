@@ -2,101 +2,171 @@
 applyTo: "**/{test,Test,tests,Tests}/**/*.php"
 ---
 
-# Shared PHP testing instructions
+# Testing Instructions
 
-These rules are reusable across PHP projects using PHPUnit. They do not
-require a particular framework, application, repository layout, or test helper.
-Check the project's selected PHPUnit version before using version-specific
-APIs.
+For the full workflow of adding, updating, and running tests, see the
+[test skill](../skills/test/SKILL.md).
 
-## Test scope and quality
+## Account for local PHPUnit scope settings
 
-- Prefer existing project helpers over duplicating dependency-injection,
-  database, or controller setup. Keep tests independent of real services
-  unless those services are part of the behavior under test.
-- Check the selected PHPUnit configuration for disabled suites or service
-  scopes. Tests that did not run are not passing tests. Use CLI options or a
-  temporary configuration based on the appropriate distribution config to
-  enable the requested scope, preserve existing local configuration, and
-  remove temporary configuration when finished.
-- When adding missing tests, use coverage to identify uncovered lines and
-  branches in the requested scope when a coverage driver is available.
-  Assert meaningful behavior, including edge cases and error paths, and
-  rerun the same coverage scope. Do not inflate coverage with assertion-free
-  tests or new exclusions. Report unavailable coverage rather than claiming
-  unverified gaps are covered.
-- Add class docblocks to test-only fixtures and integration targets explaining
-  their role, which behavior depends on them, and when they can be removed.
-- Do not run real-database suites in parallel when they share mutable fixtures
-  or database state.
+The root `phpunit.xml` is the primary test configuration, but a user's local settings may disable test scopes such as
+database, service, or package suites. If the requested scope is disabled, do not treat tests that were not run as
+passing: use a temporary configuration based on `phpunit.xml.dist` and remove it when finished, or supply the needed
+settings through PHPUnit CLI options where available. Preserve any pre-existing local `phpunit.xml`.
 
-## Lifecycle hooks
+## Prefer `#[Test]` for test methods
 
-- Prefer PHPUnit's `#[Before]`, `#[After]`, `#[BeforeClass]`, `#[AfterClass]`,
-  `#[PreCondition]`, and `#[PostCondition]` attributes over conventional hooks
-  such as `setUp()` and `tearDown()`.
-- Import attributes from `PHPUnit\Framework\Attributes`, use descriptive
-  method names and `void` return types, and make class-level hooks static.
-- Avoid empty hooks. Preserve inherited parent and trait behavior and
-  execution order when migrating hooks.
-
-## Filesystem fixtures
-
-- Normalize paths before asserting equality when Windows and Unix separator
-  differences are irrelevant. Do not compare raw platform-dependent paths.
-  Distinguish path normalization from resolving an existing path with
-  `realpath()`.
-- Use isolated virtual filesystem fixtures when the API supports stream
-  wrappers and native filesystem behavior is not under test. Otherwise use
-  real temporary files and clean them up after the test.
-
-## Coverage exclusions
-
-- Do not write separate tests solely for logic-free getters/setters that only
-  return or assign a property, optionally returning `$this`, or simple proxy
-  methods that merely delegate without changing behavior. If otherwise
-  uncovered, mark these methods with `@codeCoverageIgnore`.
-- Remove that exclusion and test the behavior if validation, normalization,
-  lazy initialization, side effects, or parameter/return transformations
-  are added.
-- Test reachable branches with conditions, transformations, fallbacks, side
-  effects, or thrown exceptions. Do not exclude them just to raise coverage.
-- Exclude genuinely unexercisable code only with an explicit reason, such as
-  an unavailable external driver or process-level exit/signal handling.
-  Verify that defensive branches are unreachable through public behavior
-  before using `@codeCoverageIgnoreStart` / `@codeCoverageIgnoreEnd` or a
-  method-level exclusion, and explain why they cannot be reached.
-
-## PHPUnit APIs and test doubles
-
-Use the following APIs when running PHPUnit 13; check the selected test
-runner's version before relying on version-specific methods.
-
-- Replace deprecated `expectExceptionMessage()` with
-  `expectExceptionMessageIsOrContains()` for an exact-or-substring match,
-  `expectExceptionMessageIs()` for an exact match, or
-  `expectExceptionMessageMatches()` for a regular-expression match.
-- Call mock invocation matchers on `$this`, not `self::`, including `once()`,
-  `never()`, `any()`, `exactly()`, `atLeastOnce()`, and `atMost()`.
-- Isolate collaborators with test doubles instead of wiring real services
-  or databases for every test. Use real dependencies when the integration
-  itself is the behavior under test.
-- Use `$this->createStub()` when only return values are needed, configure
-  it with `method()->willReturn()`, and do not call `expects()` on a stub.
-- Use `$this->createMock()` when verifying interactions with `expects()`.
-  A mock with no expectations produces a notice; use a stub instead.
-- For multi-interface doubles, use `createStubForIntersectionOfInterfaces()`
-  or `createMockForIntersectionOfInterfaces()`.
-- Use `willReturnCallback()`, `willReturnOnConsecutiveCalls()`, or
-  `willReturnMap()`; do not use the removed `withConsecutive()`.
-- Do not use `setMethods()`, `addMethods()`, or `onlyMethods()`; mock an
-  interface or extract a collaborator instead.
-- Prefer anonymous classes or small named stubs for plain value objects.
+Prefer the `#[Test]` attribute (`PHPUnit\Framework\Attributes\Test`) over the `test` method-name prefix, and give
+methods descriptive names that state the behavior under test. Do not use the `@test` docblock annotation.
 
 ```php
-$repository = $this->createStub(UserRepository::class);
-$repository->method('find')->willReturn($user);
+// Bad
+public function testFindReturnsNullWhenMissing(): void
 
+// Good
+#[Test]
+public function findReturnsNullWhenMissing(): void
+```
+
+Keep the existing style when only editing a few methods in a file that consistently uses the `test` prefix.
+
+## Prefer attributes for lifecycle hooks
+
+Prefer `#[Before]` / `#[After]`, `#[BeforeClass]` / `#[AfterClass]`, and `#[PreCondition]` / `#[PostCondition]`
+over conventional hooks (`setUp()`, `tearDown()`, etc.). Import from `PHPUnit\Framework\Attributes`; use descriptive
+method names, `void` returns, and static methods for class-level hooks. Avoid empty hooks and preserve inherited
+parent/trait behavior and execution order when migrating.
+
+## Use coverage to find missing tests
+
+When the user asks to add missing tests, use code coverage when a coverage driver is available to identify
+uncovered lines and branches in the requested scope. Add meaningful behavior assertions for those gaps, including
+edge cases and error paths, then rerun the same coverage scope to check the improvement. Do not chase percentages
+with assertion-free tests or new coverage exclusions; preserve the logic-free getter/setter exception below.
+If coverage cannot run, report the limitation rather than claiming the gaps are covered.
+
+## Document test fixtures and integration targets
+
+Add a class docblock to test-only fixtures and integration targets explaining their role and the behavior or tests that
+depend on them. State when the fixture can be removed (for example, once the covered behavior is removed and no tests
+reference it), so future maintainers can distinguish intentional test support from unused code.
+
+## Keep app-level tooling out of package test scope
+
+Files such as `src/*Package.php`, `etc/*.config.php` and `src/Command/*` or some DI service providers are generally wiring or tools used by a
+Windwalker framework application, rather than package behavior that needs standalone tests. Do not add tests solely
+for these files or include them in a package's coverage target by default. Test them only when they contain
+meaningful, independently testable logic or the requested change specifically requires validating their behavior.
+
+Tests touching a real database: see [Database Testing](../docs/database-testing.md) (never run DB suites in parallel).
+
+See [Testing and Coverage](../docs/testing.md) for test selectors, driver setup, report commands, and scope caveats.
+
+## Filesystem tests: cross-platform paths and virtual storage
+
+- When testing the real filesystem, use
+  [`FilesystemTestTrait`](../../packages/filesystem/test/FilesystemTestTrait.php)
+  (`Windwalker\Filesystem\Test\FilesystemTestTrait`) for path comparisons across Windows and Unix-like systems.
+  Use `assertPathEquals()` (`Path::clean()`) or `assertRealpathEquals()` (`Path::normalize()`) as appropriate;
+  do not compare raw path strings when separator differences are irrelevant to the behavior under test.
+  Despite its name, `assertRealpathEquals()` normalizes paths; it does not resolve them with PHP's `realpath()`.
+- For file storage/read/write tests that do not require real filesystem or OS-specific behavior, VFS
+  (`org\bovigo\vfs\vfsStream`, `vfs://` paths) can provide isolated virtual fixtures instead of writing to disk.
+  Reuse [`AbstractVfsTestCase`](../../packages/filesystem/test/AbstractVfsTestCase.php) when its fixture setup fits.
+  Use real temporary files when the API does not support stream wrappers or the test requires native filesystem
+  semantics, and clean them up after the test.
+
+## Exclude logic-free getters/setters or simple proxy methods from code coverage and tests
+
+Do not write separate tests solely to exercise pure getters/setters (only return or assign a property, optionally
+`return $this`). If such a method has no meaningful coverage through other behavior tests, exclude it from code
+coverage with `@codeCoverageIgnore` in the method docblock. If logic is later added (validation, normalization, lazy
+init, side effects, etc.), you **must** remove the ignore tag and cover the behavior with tests.
+
+```php
+/**
+ * @codeCoverageIgnore
+ */
+public function setOptions(array $options): static
+{
+    $this->options = $options;
+
+    return $this;
+}
+```
+
+Also exclude simple proxy methods that only call another method or service without adding meaningful behavior.
+But if the parameters or return value are transformed, validated, or otherwise processed, cover the behavior with tests.
+
+```php
+/**
+ * @codeCoverageIgnore
+ */
+public function createAnyInstance(array $options): static
+{
+    return $this->builder->createAnyInstance($options);
+}
+```
+
+## Never ignore branches with logic or thrown errors
+
+`@codeCoverageIgnore` is only for logic-free getters/setters and simple proxy methods. Any branch that contains logic
+(conditions, transformation, fallback, side effects) or throws an exception **must** be tested, even if it is only a
+few lines. Do not ignore such branches to raise coverage. Only code that truly cannot be exercised (e.g. an
+unavailable external driver or process-level `exit`/signal handling) may be ignored, with the reason stated in the tag.
+
+A branch that is purely defensive or a fallback and is proven unreachable through the public behavior (e.g. a caller
+already guarantees the condition) may also be ignored. Wrap it with `@codeCoverageIgnoreStart` / `End` (or tag the
+method) and explain in a comment why it cannot be reached. Verify the claim first; if it is reachable, test it.
+
+## Deprecated / Preferred APIs (Quick Rules)
+
+Add new "use / don't use" rules here as bullets so they stay easy to scan.
+
+### Exception Message Matchers
+
+Don't use `expectExceptionMessage()` (deprecated in PHPUnit 13).
+
+- Use `expectExceptionMessageIsOrContains()` for exact-or-substring match.
+- Use `expectExceptionMessageIs()` for an exact match.
+- Use `expectExceptionMessageMatches()` for a regex match.
+
+### PHPUnit Mock – Invocation Count Matchers
+
+Don't use `self::` for PHPUnit mock invocation count matchers; use `$this->` (applies to `once()`, `never()`,
+`any()`, `exactly($n)`, `atLeastOnce()`, `atMost($n)`).
+
+```php
+// Bad
+$mock->expects(self::once())->method('foo');
+
+// Good
+$mock->expects($this->once())->method('foo');
+```
+
+### Test Doubles (Mock / Stub)
+
+When the subject calls many other objects or services, isolate it with test doubles instead of building real data or
+wiring real dependencies for every test. Use real fixtures/DB only when the behavior under test is the integration
+itself.
+
+Use the PHPUnit 13 APIs:
+
+- `$this->createStub(Foo::class)` for a double that only supplies return values (no expectations). Configure with
+  `->method('x')->willReturn(...)`. Do not call `expects()` on a stub.
+- `$this->createMock(Foo::class)` only when the test verifies interactions via `expects($this->once())` etc. A mock
+  with no `expects()` is reported as a notice; use `createStub()` instead.
+- `createStubForIntersectionOfInterfaces()` / `createMockForIntersectionOfInterfaces()` for multi-interface doubles.
+- Use `willReturnCallback()`, `willReturnOnConsecutiveCalls()` or `willReturnMap()`; `withConsecutive()` no longer exists.
+- Don't use `setMethods()`, `addMethods()` or `onlyMethods()`; mock an interface or extract a collaborator instead.
+- Prefer anonymous classes or small named test stubs for plain value objects.
+
+```php
+// Good: only needs a return value
+$repo = $this->createStub(UserRepository::class);
+$repo->method('find')->willReturn($user);
+
+// Good: verifies the interaction
 $logger = $this->createMock(LoggerInterface::class);
 $logger->expects($this->once())->method('error');
 ```

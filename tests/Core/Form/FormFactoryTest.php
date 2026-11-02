@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Form;
 
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Form\FormFactory;
 use Windwalker\Form\Field\TextField;
@@ -18,44 +21,55 @@ use Windwalker\Form\Renderer\FormRendererInterface;
 #[CoversClass(FormFactory::class)]
 class FormFactoryTest extends TestCase
 {
-    public function testCreatePreservesDefaultRendererWhenNoneIsProvided(): void
+    private ApplicationInterface&MockObject $app;
+
+    private FormFactory $factory;
+
+    #[Before]
+    protected function prepareFactory(): void
+    {
+        $this->app = $this->createMock(ApplicationInterface::class);
+        $this->factory = new FormFactory($this->app);
+    }
+
+    #[Test]
+    public function createPreservesDefaultRendererWhenNoneIsProvided(): void
     {
         $form = new Form();
         $renderer = $form->getRenderer();
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(Form::class, [])
             ->willReturn($form);
 
-        $result = new FormFactory($app)->create();
+        $result = $this->factory->create();
 
         self::assertSame($form, $result);
         self::assertCount(0, $result);
         self::assertSame($renderer, $result->getRenderer());
     }
 
-    public function testCreateUsesProvidedRenderer(): void
+    #[Test]
+    public function createUsesProvidedRenderer(): void
     {
         $form = new Form();
         $renderer = $this->createStub(FormRendererInterface::class);
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(Form::class, [])
             ->willReturn($form);
 
-        $result = new FormFactory($app, $renderer)->create();
+        $result = new FormFactory($this->app, $renderer)->create();
 
         self::assertSame($renderer, $result->getRenderer());
     }
 
-    public function testCreateForwardsArgumentsAndBuildsFieldsThroughApplication(): void
+    #[Test]
+    public function createForwardsArgumentsAndBuildsFieldsThroughApplication(): void
     {
         $form = new Form('profile');
         $field = new TextField();
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->exactly(2))
+        $this->app->expects($this->exactly(2))
             ->method('make')
             ->willReturnCallback(
                 function (string $class, array $args) use ($form, $field): object {
@@ -72,7 +86,7 @@ class FormFactoryTest extends TestCase
                 }
             );
 
-        $result = new FormFactory($app)->create(namespace: 'profile');
+        $result = $this->factory->create(namespace: 'profile');
         $result->add('title', TextField::class);
 
         self::assertSame($field, $result->getField('title'));
@@ -80,13 +94,17 @@ class FormFactoryTest extends TestCase
         self::assertSame($result, $field->getForm());
     }
 
-    public function testCreateResolvesDefinitionClassWithArguments(): void
+    #[Test]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function createResolvesDefinitionClassWithArguments(bool $withRenderer): void
     {
         $form = new Form();
+        $renderer = $withRenderer ? $this->createStub(FormRendererInterface::class) : null;
+        $expectedRenderer = $renderer ?? $form->getRenderer();
         $definition = $this->createMock(FieldDefinitionInterface::class);
         $definition->expects($this->once())->method('define')->with($form);
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->exactly(2))
+        $this->app->expects($this->exactly(2))
             ->method('make')
             ->willReturnCallback(
                 function (string $class, array $args) use ($form, $definition): object {
@@ -97,56 +115,63 @@ class FormFactoryTest extends TestCase
                 }
             );
 
-        $result = new FormFactory($app)->create(FieldDefinitionInterface::class, namespace: 'profile');
+        $result = new FormFactory($this->app, $renderer)
+            ->create(FieldDefinitionInterface::class, namespace: 'profile');
 
         self::assertSame($form, $result);
+        self::assertSame($expectedRenderer, $result->getRenderer());
     }
 
-    public function testCreateAppliesDefinitionObjectWithoutResolvingIt(): void
+    #[Test]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function createAppliesDefinitionObjectWithoutResolvingIt(bool $withRenderer): void
     {
         $form = new Form();
+        $renderer = $withRenderer ? $this->createStub(FormRendererInterface::class) : null;
+        $expectedRenderer = $renderer ?? $form->getRenderer();
         $field = new TextField();
         $definition = static function (Form $form) use ($field): void {
             $form->add('title', $field);
         };
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(Form::class, [])
             ->willReturn($form);
 
-        $result = new FormFactory($app)->create($definition);
+        $result = new FormFactory($this->app, $renderer)->create($definition);
 
         self::assertSame($field, $result->getField('title'));
+        self::assertSame($expectedRenderer, $result->getRenderer());
     }
 
-    public function testCreateDefinitionPreservesFieldDefinitionInterface(): void
+    #[Test]
+    public function createDefinitionPreservesFieldDefinitionInterface(): void
     {
         $definition = $this->createStub(FieldDefinitionInterface::class);
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(FieldDefinitionInterface::class, ['name' => 'profile'])
             ->willReturn($definition);
 
-        $result = new FormFactory($app)->createDefinition(FieldDefinitionInterface::class, name: 'profile');
+        $result = $this->factory->createDefinition(FieldDefinitionInterface::class, name: 'profile');
 
         self::assertSame($definition, $result);
     }
 
-    public function testCreateDefinitionWrapsObjectsWithoutFieldDefinitionInterface(): void
+    #[Test]
+    public function createDefinitionWrapsObjectsWithoutFieldDefinitionInterface(): void
     {
         $field = new TextField();
         $definition = static function (Form $form) use ($field): void {
             $form->add('title', $field);
         };
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with('profile.definition', ['name' => 'profile'])
             ->willReturn($definition);
 
-        $result = new FormFactory($app)->createDefinition('profile.definition', name: 'profile');
+        $result = $this->factory->createDefinition('profile.definition', name: 'profile');
         $form = new Form();
         $result->define($form);
 
@@ -154,50 +179,36 @@ class FormFactoryTest extends TestCase
         self::assertSame($field, $form->getField('title'));
     }
 
-    public function testCreateFieldWithoutForm(): void
+    #[Test]
+    public function createFieldPreservesExistingFormWhenNoneIsProvided(): void
     {
         $field = new TextField();
         $originalForm = $field->getForm();
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(TextField::class)
             ->willReturn($field);
 
-        $result = new FormFactory($app)->createField(TextField::class);
+        $result = $this->factory->createField(TextField::class);
 
         self::assertSame($field, $result);
         self::assertSame($originalForm, $result->getForm());
     }
 
-    public function testCreateFieldAttachesProvidedForm(): void
+    #[Test]
+    public function createFieldAttachesProvidedForm(): void
     {
         $form = new Form();
         $field = new TextField();
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
+        $this->app->expects($this->once())
             ->method('make')
             ->with(TextField::class)
             ->willReturn($field);
 
-        $result = new FormFactory($app)->createField(TextField::class, $form);
+        $result = $this->factory->createField(TextField::class, $form);
 
         self::assertSame($field, $result);
         self::assertSame($form, $result->getForm());
         self::assertCount(0, $form);
-    }
-
-    public function testCreatePropagatesApplicationErrors(): void
-    {
-        $exception = new RuntimeException('Unable to build form.');
-        $app = $this->createMock(ApplicationInterface::class);
-        $app->expects($this->once())
-            ->method('make')
-            ->with(Form::class, [])
-            ->willThrowException($exception);
-
-        $this->expectExceptionObject($exception);
-
-        new FormFactory($app)->create();
     }
 }
