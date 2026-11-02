@@ -15,7 +15,7 @@
         "monolog/monolog": "^2.0||^3.0",
         "nikic/fast-route": "^1.0",
         "nikic/php-parser": "^4.10||^5.0",
-        "stecman/symfony-console-completion": "^0.13.0||^0.14.0||^0.15.0",
+        "stecman/symfony-console-completion": "^0.13.0||^0.14.0||^0.15.0||^v0.16.0",
         "symfony/console": "^6.0||^7.0||^8.0",
         "symfony/dotenv": "^6.0||^7.0||^8.0",
         "symfony/event-dispatcher-contracts": "^2.0||^3.0",
@@ -40,6 +40,16 @@
         "asika/object-metadata": "^1.0",
         "psy/psysh": "^0.12.22",
         "symfony/polyfill-time": "^1.42"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-check": "php-cs-fixer check --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "prepare-hooks": "git config core.hooksPath .githooks",
+        "remove-hooks": "git config --local --unset core.hooksPath"
     },
     "suggest": {
         "dragonmantank/cron-expression": "Install ^3.0 to support schedule runner.",

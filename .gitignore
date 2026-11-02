@@ -26,6 +26,19 @@ package-lock.json
 # Test #
 phpunit.xml
 .phpunit.result.cache
+.phpunit.cache
+.scannerwork
+
+# Code Style #
+.php-cs-fixer.cache
+.php-cs-fixer.php
+.php_cs.cache
+.php_cs
+
+# Docker #
+docker-compose.yml
+docker-compose.override.yml
+.env
 
 # Extra #
 !.gitkeep
