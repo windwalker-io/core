@@ -21,6 +21,8 @@ Use the version that matches the project or team language, or maintain both when
 ## Organization
 
 - `templates`: shared Markdown document templates
+- `host-application-and-testing.md`: how a consuming app boots Core and what
+  app context and services Core integration tests require
 
 ## Maintenance
 

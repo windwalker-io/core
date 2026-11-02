@@ -1,0 +1,95 @@
+# Using Windwalker Core from a host application
+
+## Package and application boundary
+
+`windwalker/core` is a Composer framework package, not a particular application.
+A consuming app may use any name and may live outside this repository; it
+installs Core and supplies application-specific bootstrap, configuration,
+routes, resources, and environment. The app's Composer autoloading maps its own
+namespace (for example, `App\`) to its source directory, while Core maps
+`Windwalker\` to Core's `src/`. Each package loads its own bootstrap file.
+
+Core code should use framework contracts and package APIs; app-specific
+behavior and configuration belong in the consuming app. The Earth repository
+is only one example of a host app, not a required test fixture or naming
+convention. Earth-specific paths and architecture must not be assumed when
+working in another workspace.
+
+## Determine whether a host app is available
+
+Before relying on application-specific context, inspect the current Core
+package and its test configuration. If the task clearly identifies a consuming
+app, or the workspace has an evident parent app that owns the Core checkout,
+use that app as the integration context. Do not assume the app is named Earth
+or is always located at a fixed relative path.
+
+If no host app can be identified, treat Core as an independently checked-out
+and independently tested package. Use Core's own `composer.json`,
+`phpunit.xml.dist`, source, and test support; do not search for or invent an
+application bootstrap, app config, routes, or migrations. Run isolated Core
+tests directly. Add only a minimal test bootstrap or fixture required by the
+specific behavior under test. If the behavior genuinely requires a host app or
+external service, make that prerequisite explicit and report it as unavailable
+rather than silently binding the test to an unrelated project.
+
+## What the host app supplies at runtime
+
+When Core functionality depends on a fully booted application, the host app
+must provide the following integration points:
+
+- **Application root and paths:** when the scenario needs them, define the
+  application root and standard paths for configuration, routes, resources,
+  views, public files, logs, cache, and temporary files. For example, an app
+  may define `WINDWALKER_*` constants, load environment files, and derive
+  debug/cache/temp settings in its own bootstrap.
+- **Environment and configuration:** load the app environment and assemble
+  application, dependency-injection, and installed-package configuration.
+  The location and format are owned by the app.
+- **Runtime and application boot:** boot Core's `Runtime` with the host
+  application's root and work directories, then construct and boot the
+  appropriate Core application with its configured container. The host app
+  owns this lifecycle; Core's Composer autoload alone does not boot an app.
+- **Routes and app features:** register the routes, middleware, controllers,
+  view models, and package routes needed by the integration scenario.
+- **Writable runtime directories:** ensure any directories used by the
+  scenario (such as temporary files, logs, or cache) exist and are writable.
+- **External dependencies:** configure services exercised by the scenario,
+  such as a database, Redis, or a queue backend. These are not required for
+  tests that do not use them.
+
+An integration test should state which host capabilities it requires. Do not
+make unit tests boot a complete consuming app when a focused test double or
+isolated container can cover the behavior.
+
+## Testing Core with an application context
+
+Core's test support includes `tests/TestApp.php`. It extends
+`WebApplication` and creates request contexts; database-backed test support
+uses `tests/Testing/Traits/DatabaseTestTrait.php` to obtain the configured
+`DatabaseAdapter` and ORM. A database test bootstrap must create the app
+container, configure the database provider, initialize `TestApp::$instance`,
+and prepare `TestApp::$appContext` before database-backed traits are used.
+Composer autoloading alone does not provide this application state. This test
+app can be configured by a consuming app when one is available, or by Core's
+own isolated test bootstrap when Core is tested independently.
+
+For database integration tests:
+
+- Configure a dedicated disposable test database using the DSN constants
+  documented in `phpunit.xml.dist` (`WINDWALKER_TEST_DB_DSN_*`) and provide
+  matching database configuration in the test app or standalone test fixture.
+- Provide `WINDWALKER_MIGRATIONS` and `WINDWALKER_TEMP` when using
+  `TestApp::initializeDatabase()`.
+- `TestApp::resetDatabase()` drops and recreates the selected database before
+  running its migrations. The configured database account therefore needs
+  permission to drop and create the test schema. Never point it at a developer,
+  shared, staging, or production database.
+- If the test depends on app-provided migrations, providers, or services,
+  install and configure those in the identified host app. Without a host app,
+  provide only the explicit fixtures needed by the test.
+
+Tests for optional external services should be opt-in and require their
+service-specific configuration, as indicated by the commented flags in
+`phpunit.xml.dist`. Prefer isolated unit or component tests unless app boot,
+routes, database migrations, or real external services are part of the behavior
+under test.

@@ -28,6 +28,12 @@
 - When adding a documentation category, update `docs/index.md` and this
   guidance so contributors know when to load it.
 - Keep the documentation index and guidance concise and expandable.
+- Before writing Core integration tests, read
+  `docs/host-application-and-testing.md` to identify the host-app bootstrap,
+  configuration, and external services the test needs.
+- A consuming app may have any name or location. If no host app is clearly
+  available in the workspace, treat Core as standalone and use its own test
+  setup; do not assume or depend on Earth.
 
 ## Package scope
 
@@ -47,6 +53,9 @@
 - Keep public API changes deliberate and compatible with existing consumers.
 - Add or update focused tests for behavior changes. Do not change unrelated
   framework behavior or tests.
+- Keep unit tests independent of the consuming app when possible. For tests
+  requiring a booted app or real services, declare and configure those
+  integration prerequisites explicitly.
 
 ## Validation
 
