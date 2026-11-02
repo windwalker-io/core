@@ -12,9 +12,11 @@ This directory stores the "instruction layer" of the shared toolkit. It contains
 ## Contents
 
 - [`instruction.instructions.md`](instruction.instructions.md): explains how to route content between `instructions`, `skills`, `docs`, and `prompts`
-- [`testing.instructions.md`](testing.instructions.md): test placement,
+- [`architecture.instructions.md`](architecture.instructions.md): placement,
+  container-layer, and extension-point rules for Core structure
+- [`test.instructions.md`](test.instructions.md): test placement,
   dependency-injection, database, and controller conventions specific to Core
-- [`testing-common.instructions.md`](testing-common.instructions.md):
+- [`test-common.instructions.md`](test-common.instructions.md):
   portable PHPUnit code style, test quality, fixtures, and coverage rules
 - additional repo-level guidance files can be added here as new topics emerge
 
