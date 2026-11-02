@@ -71,6 +71,10 @@
 - Run `composer cs-check` for the configured PHP-CS-Fixer check.
 - `composer cs-fix` modifies files; use it only when formatting changes are
   intended.
+- Both style commands use [`bin/php-cs-fixer`](../bin/php-cs-fixer), which
+  prefers Core's own `vendor/bin/php-cs-fixer`, then searches parent directories
+  for a host app's fixer. They run from Core's root to use its configuration;
+  if no fixer is available, they fail with an explicit installation message.
 - For changes limited to Markdown guidance or templates, confirm the content is
   Markdown and follows the intended file role; PHP checks are not needed.
 - When referring to another file or directory, prefer a Markdown link such as

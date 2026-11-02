@@ -46,8 +46,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "cs-check": "php-cs-fixer check --diff",
-        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "bash bin/php-cs-fixer check --diff",
+        "cs-fix": "bash bin/php-cs-fixer fix",
         "prepare-hooks": "git config core.hooksPath .githooks",
         "remove-hooks": "git config --local --unset core.hooksPath"
     },

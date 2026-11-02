@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+core_root=$(dirname "$script_dir")
+search_dir="$core_root"
+
+while true; do
+    fixer="$search_dir/vendor/bin/php-cs-fixer"
+
+    if [ -x "$fixer" ]; then
+        cd "$core_root"
+        exec "$fixer" "$@"
+    fi
+
+    parent_dir=$(dirname "$search_dir")
+
+    if [ "$parent_dir" = "$search_dir" ]; then
+        echo "PHP-CS-Fixer not found in Core or any parent host application; run composer install." >&2
+        exit 1
+    fi
+
+    search_dir="$parent_dir"
+done
