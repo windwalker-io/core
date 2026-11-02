@@ -21,7 +21,7 @@ class ServiceAwareTraitTest extends TestCase
     protected function setUpInstance(): void
     {
         $this->container = new Container();
-        $this->instance = (new ServiceAwareStub())->setContainer($this->container);
+        $this->instance = new ServiceAwareStub()->setContainer($this->container);
     }
 
     #[Test]

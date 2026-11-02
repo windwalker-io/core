@@ -35,7 +35,7 @@ class PaginationFactory
 
     public function create(int $current = 1, int $limit = 10, ?int $neighbours = null): Pagination
     {
-        return (new Pagination($this->navigator, $this->systemUri, $this->rendererService))
+        return new Pagination($this->navigator, $this->systemUri, $this->rendererService)
             ->currentPage($current)
             ->limit($limit)
             ->neighbours($neighbours ?? $this->getDefaultNeighbours())

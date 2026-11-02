@@ -106,7 +106,7 @@ class MiddlewareRunnerTest extends TestCase
                 new RawWrapper($this->tagger('A')),
                 new RawWrapper($this->tagger('B')),
             ],
-            static fn(ServerRequestInterface $req) => (new Response())
+            static fn(ServerRequestInterface $req) => new Response()
                 ->withHeader('X-Trace', $req->getAttribute('trace'))
         );
 
@@ -119,7 +119,7 @@ class MiddlewareRunnerTest extends TestCase
         $response = $this->instance->run(
             new ServerRequest(),
             [PassThroughMiddleware::class],
-            static fn(ServerRequestInterface $req) => (new Response())
+            static fn(ServerRequestInterface $req) => new Response()
                 ->withHeader('X-Trace', (string) $req->getAttribute('passed'))
         );
 
@@ -129,12 +129,12 @@ class MiddlewareRunnerTest extends TestCase
     #[Test]
     public function middlewareCanShortCircuit(): void
     {
-        $stop = static fn() => (new Response())->withHeader('X-Stop', '1');
+        $stop = static fn() => new Response()->withHeader('X-Stop', '1');
 
         $response = $this->instance->run(
             new ServerRequest(),
             [new RawWrapper($stop)],
-            static fn() => (new Response())->withHeader('X-Stop', '0')
+            static fn() => new Response()->withHeader('X-Stop', '0')
         );
 
         self::assertSame('1', $response->getHeaderLine('X-Stop'));

@@ -13,7 +13,7 @@ class MaintenanceConfigTest extends TestCase
     #[Test]
     public function addAllowedIpsMerges(): void
     {
-        $c = (new MaintenanceConfig())->setAllowedIps(['1.1.1.1']);
+        $c = new MaintenanceConfig()->setAllowedIps(['1.1.1.1']);
         $c->addAllowedIps('2.2.2.2', '3.3.3.3');
 
         self::assertSame(['1.1.1.1', '2.2.2.2', '3.3.3.3'], $c->getAllowedIps());

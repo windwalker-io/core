@@ -238,7 +238,7 @@ class Router implements EventAwareInterface
     {
         $items = [];
 
-        foreach ((new Std())->parse($pattern) as $parsedItem) {
+        foreach (new Std()->parse($pattern) as $parsedItem) {
             $items[] = $this->buildRegexForRoute($parsedItem);
         }
 

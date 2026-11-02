@@ -18,8 +18,8 @@ class MicroApplicationTest extends TestCase
     {
         $container = new Container();
 
-        self::assertSame($container, (new MicroApplication($container))->getContainer());
-        self::assertInstanceOf(Container::class, (new MicroApplication())->getContainer());
+        self::assertSame($container, new MicroApplication($container)->getContainer());
+        self::assertInstanceOf(Container::class, new MicroApplication()->getContainer());
     }
 
     #[Test]

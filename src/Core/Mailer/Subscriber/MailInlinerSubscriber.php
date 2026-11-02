@@ -66,6 +66,6 @@ class MailInlinerSubscriber
             $css .= $match[1] . "\n";
         }
 
-        $message->html((new CssToInlineStyles())->convert($body, $css));
+        $message->html(new CssToInlineStyles()->convert($body, $css));
     }
 }

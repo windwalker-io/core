@@ -97,7 +97,7 @@ class AppContextTest extends TestCase
 
         self::assertNull($ctx->getStage());
 
-        $ctx->setMatchedRoute((new Route('r', '/foo'))->extraValues(['namespace' => 'admin']));
+        $ctx->setMatchedRoute(new Route('r', '/foo')->extraValues(['namespace' => 'admin']));
 
         self::assertSame('admin', $ctx->getStage());
     }

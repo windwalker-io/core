@@ -112,7 +112,7 @@ abstract class AbstractPackage
      */
     public static function fileName(): string
     {
-        return (new ReflectionClass(static::class))->getFileName();
+        return new ReflectionClass(static::class)->getFileName();
     }
 
     /**
@@ -124,7 +124,7 @@ abstract class AbstractPackage
      */
     public static function namespace(): string
     {
-        return (new ReflectionClass(static::class))->getNamespaceName();
+        return new ReflectionClass(static::class)->getNamespaceName();
     }
 
     protected function mergeConfig(Container $container, array $data, bool $override = false): void

@@ -74,7 +74,7 @@ class FileWatcher extends Watch
     protected function getWatchProcess(): Process
     {
         $command = [
-            (new ExecutableFinder())->find('node'),
+            new ExecutableFinder()->find('node'),
             dirname(__DIR__, 3) . '/bin/file-watcher.js',
             json_encode($this->paths, JSON_THROW_ON_ERROR),
             json_encode($this->options, JSON_THROW_ON_ERROR),

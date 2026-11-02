@@ -50,7 +50,7 @@ class MaintenanceManagerTest extends TestCase
     public function downWritesConfigAndIsDown(): void
     {
         $this->instance->down(
-            (new MaintenanceConfig())->setSecret('abc')->setAllowedIps(['1.2.3.4'])->setRedirect('/x')
+            new MaintenanceConfig()->setSecret('abc')->setAllowedIps(['1.2.3.4'])->setRedirect('/x')
         );
 
         self::assertTrue($this->instance->isDown());

@@ -71,7 +71,7 @@ class Dumper
     {
         $values = $this->handleValues($args);
 
-        $data = (new VarCloner())->cloneVar($values);
+        $data = new VarCloner()->cloneVar($values);
 
         if ($this->connection->write($data) === false) {
             dump($values);
@@ -92,7 +92,7 @@ class Dumper
     {
         $values = $this->handleValues($args);
 
-        $data = (new VarCloner())->cloneVar($values);
+        $data = new VarCloner()->cloneVar($values);
 
         return $this->connection->write($data);
     }

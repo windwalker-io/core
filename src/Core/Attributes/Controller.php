@@ -46,10 +46,10 @@ class Controller implements ContainerAttributeInterface
             }
         }
 
-        return fn(...$args): DelegatingController => (new DelegatingController(
+        return fn(...$args): DelegatingController => new DelegatingController(
             $container->get(AppContextInterface::class),
             $handler(...$args)
-        ))
+        )
             ->setViewMap($this->views);
     }
 }

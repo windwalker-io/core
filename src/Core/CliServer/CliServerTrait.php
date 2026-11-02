@@ -14,7 +14,7 @@ trait CliServerTrait
 {
     protected function getPhpBinary(): false|string
     {
-        return (new PhpExecutableFinder())->find();
+        return new PhpExecutableFinder()->find();
     }
 
     public function createFileWatcher(string $mainFile): FileWatcher

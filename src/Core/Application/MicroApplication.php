@@ -27,7 +27,7 @@ class MicroApplication extends WebApplication
     {
         $config = new Config();
 
-        $this->container = $container ?? (new Container())->setParameters($config);
+        $this->container = $container ?? new Container()->setParameters($config);
         $this->container->share(Config::class, $config);
     }
 

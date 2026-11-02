@@ -40,7 +40,7 @@ trait CommandScheduleTrait
     public function getScheduleExpression(string $tz = '', bool|string|null $phpBinary = false): string
     {
         if ($phpBinary === true) {
-            $php = (new PhpExecutableFinder())->find();
+            $php = new PhpExecutableFinder()->find();
         } elseif ($phpBinary) {
             $php = $phpBinary;
         } else {

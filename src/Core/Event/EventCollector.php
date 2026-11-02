@@ -78,7 +78,7 @@ class EventCollector
      */
     protected function getListenerName(callable $listener): string
     {
-        $ref = (new ReflectionCallable($listener))->getReflector();
+        $ref = new ReflectionCallable($listener)->getReflector();
 
         if ($ref instanceof \ReflectionFunction) {
             $name = $ref->getName();

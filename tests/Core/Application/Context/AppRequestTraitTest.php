@@ -84,7 +84,7 @@ class AppRequestTraitTest extends TestCase
     #[Test]
     public function getQueryValuesMergesUrlVarsAndQuery(): void
     {
-        $req = $this->createRequest()->withMatchedRoute((new Route('r', '/foo'))->vars(['id' => '5', 'a' => 'var']));
+        $req = $this->createRequest()->withMatchedRoute(new Route('r', '/foo')->vars(['id' => '5', 'a' => 'var']));
 
         // Query values win over URL vars on key conflict (array_merge order).
         self::assertSame(['id' => '5', 'a' => '1', 'b' => '2'], $req->getQueryValues());
@@ -124,7 +124,7 @@ class AppRequestTraitTest extends TestCase
         $req = $this->createRequest();
         $req->input();
 
-        $route = (new Route('r', '/foo'))->vars(['z' => '1']);
+        $route = new Route('r', '/foo')->vars(['z' => '1']);
         $new = $req->withMatchedRoute($route);
 
         self::assertSame($route, $new->getMatchedRoute());

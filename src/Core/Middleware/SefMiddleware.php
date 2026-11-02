@@ -81,7 +81,7 @@ class SefMiddleware implements MiddlewareInterface
 
         // Search Hash anchor
         if (($this->flags & static::REPLACE_LINK_HASH) && str_contains($buffer, '#')) {
-            $fullPath = (new Uri($uri->full()))->toString(Uri::PATH | Uri::QUERY);
+            $fullPath = new Uri($uri->full())->toString(Uri::PATH | Uri::QUERY);
 
             $regex  = '#\shref="\#(?!/|\')([^"]*)"#m';
             $buffer = preg_replace($regex, ' href="' . $fullPath . '#$1"', $buffer);

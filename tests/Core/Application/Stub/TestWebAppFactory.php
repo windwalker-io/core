@@ -21,7 +21,7 @@ final class TestWebAppFactory
     public static function create(array $config = []): WebApplication
     {
         $params = new Config();
-        $container = (new Container())->setParameters($params);
+        $container = new Container()->setParameters($params);
         $container->share(Config::class, $params);
 
         $app = new WebApplication($container);

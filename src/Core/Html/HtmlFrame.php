@@ -236,7 +236,7 @@ class HtmlFrame
         ?string $type = null,
         ?string $media = null,
     ): HTMLElement {
-        $link = (new PreloadLink('preload', $href))
+        $link = new PreloadLink('preload', $href)
             ->withAs($as);
 
         if ($type) {
