@@ -6,7 +6,7 @@ namespace Windwalker\Tests\Testing\Traits;
 
 use PHPUnit\Framework\Attributes\BeforeClass;
 use ReflectionException;
-use Tests\TestApp;
+use Windwalker\Tests\TestApp;
 use UnitEnum;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Container;

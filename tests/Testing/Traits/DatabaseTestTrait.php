@@ -7,7 +7,7 @@ namespace Windwalker\Tests\Testing\Traits;
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use Tests\TestApp;
+use Windwalker\Tests\TestApp;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\ORM\ORM;
 

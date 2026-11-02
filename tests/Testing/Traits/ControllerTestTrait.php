@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Tests\Testing\Traits;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Tests\TestApp;
+use Windwalker\Tests\TestApp;
 
 trait ControllerTestTrait
 {

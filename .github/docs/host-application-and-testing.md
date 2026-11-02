@@ -51,6 +51,13 @@ neither app-aware configuration is available or suitable, use Core's
 [`phpunit.dist.xml`](../../phpunit.dist.xml) for standalone package tests, or
 report the missing app-specific setup when the test requires it.
 
+`phpunit.app.dist.xml` uses [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php),
+which loads the host autoloader (root from `WINDWALKER_TEST_APP_ROOT`, default
+`dirname(__DIR__, 4)`), boots the runtime, and sets
+`Windwalker\Tests\TestApp::$instance`. `TestApp::resetDatabase()` DROPS the
+configured database, so point `DATABASE_NAME` (via an `APP_ENV` `.env.*` file)
+at a disposable database before running DB tests.
+
 ## What the host app supplies at runtime
 
 When Core functionality depends on a fully booted application, the host app
