@@ -145,6 +145,16 @@ class WebApplicationTest extends TestCase
     }
 
     #[Test]
+    public function executeRunsGivenHandlerAsController(): void
+    {
+        $app = WebApplicationFactory::create();
+
+        $res = $app->execute(WebApplicationFactory::request(), fn() => 'from handler');
+
+        self::assertSame('from handler', (string) $res->getBody());
+    }
+
+    #[Test]
     public function configAccessorsReadAppConfig(): void
     {
         $app = WebApplicationFactory::create(['name' => 'Foo', 'debug' => true]);

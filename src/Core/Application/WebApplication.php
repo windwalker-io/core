@@ -345,7 +345,7 @@ class WebApplication implements WebRootApplicationInterface
             fn() => $this->stopContext($appContext)
         );
 
-        return $this->runContext($appContext);
+        return $this->runContext($appContext, $handler);
     }
 
     public function stopContext(AppContext $appContext): void
