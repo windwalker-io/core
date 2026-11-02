@@ -17,14 +17,14 @@ class PackageInstaller
     public InstallResource $installResources;
 
     /**
-     * @var array<InstallResource>
+     * @var  array<InstallResource>
      */
     public array $tags = [
         //
     ];
 
     /**
-     * @var static[]
+     * @var  static[]
      */
     public array $children = [];
 
@@ -156,7 +156,7 @@ class PackageInstaller
      *
      * @return  $this
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     public function installMVCModules(
         string $entity,

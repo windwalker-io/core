@@ -22,11 +22,10 @@ class BeforeSendEvent extends BaseEvent
         public MailerInterface $mailer,
         public ?Envelope $envelope = null,
         public int $flags = 0
-    ) {
-    }
+    ) {}
 
     /**
-     * @return int
+     * @return  int
      *
      * @deprecated  Use property instead.
      */

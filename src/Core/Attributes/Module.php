@@ -20,9 +20,7 @@ class Module implements ContainerAttributeInterface
     /**
      * Module constructor.
      */
-    public function __construct(public ?string $name = null, public string|array|null $config = null)
-    {
-    }
+    public function __construct(public ?string $name = null, public string|array|null $config = null) {}
 
     public function __invoke(AttributeHandler $handler): callable
     {

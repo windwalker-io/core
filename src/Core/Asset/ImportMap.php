@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Asset;
 
 use JsonException;
-use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
 /**
@@ -25,9 +24,7 @@ class ImportMap
      *
      * @param  bool  $isDebug
      */
-    public function __construct(protected bool $isDebug = false)
-    {
-    }
+    public function __construct(protected bool $isDebug = false) {}
 
     public function addImport(string $name, string $uri): static
     {
@@ -175,7 +172,7 @@ class ImportMap
      *
      * @return  string
      *
-     * @throws JsonException
+     * @throws  JsonException
      */
     public function render(string $type = 'importmap', int $jsonFlags = 0, array $attrs = []): string
     {
@@ -205,7 +202,7 @@ class ImportMap
     }
 
     /**
-     * @return bool
+     * @return  bool
      */
     public function isDebug(): bool
     {
@@ -225,7 +222,7 @@ class ImportMap
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getCspNonce(): string
     {

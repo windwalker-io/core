@@ -25,7 +25,7 @@ class StarterInstaller
      * @param  Event  $event  The command event.
      *
      * @return  void
-     * @throws Exception
+     * @throws  Exception
      */
     public static function rootInstall(Event $event): void
     {
@@ -82,7 +82,7 @@ class StarterInstaller
      * @param  Event  $event
      *
      * @return  void
-     * @throws Exception
+     * @throws  Exception
      */
     public static function genEnv(Event $event): void
     {
@@ -172,8 +172,8 @@ class StarterInstaller
      *
      * Use length 16 to generate 128bit secret.
      *
-     * @return string
-     * @throws Exception
+     * @return  string
+     * @throws  Exception
      */
     public static function genSecretCode(): string
     {
@@ -190,7 +190,7 @@ class StarterInstaller
      * @param  string  $value
      * @param  bool    $prepend
      *
-     * @return string
+     * @return  string
      */
     protected static function injectEnvVar(string $env, string $key, string $value, bool $prepend = true): string
     {
@@ -225,7 +225,7 @@ class StarterInstaller
     }
 
     /**
-     * @param $io
+     * @param   $io
      *
      * @return  string
      */

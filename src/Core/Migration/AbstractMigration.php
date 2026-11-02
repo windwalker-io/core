@@ -110,7 +110,7 @@ abstract class AbstractMigration
      * @param  callable  $callback
      * @param  array     $options
      *
-     * @return TableManager
+     * @return  TableManager
      */
     public function createTable(string $name, callable $callback, array $options = []): TableManager
     {
@@ -137,7 +137,7 @@ abstract class AbstractMigration
      * @param  callable  $callback
      * @param  array     $options
      *
-     * @return TableManager
+     * @return  TableManager
      */
     public function saveTable(string $name, callable $callback, $options = []): TableManager
     {

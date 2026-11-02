@@ -25,9 +25,7 @@ class SiteDownCommand implements CommandInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager) {}
 
     /**
      * @inheritDoc

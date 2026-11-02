@@ -21,7 +21,7 @@ class ScheduleExpression
     /**
      * Property expression.
      *
-     * @var CronExpression
+     * @var  CronExpression
      */
     protected CronExpression $expression;
 

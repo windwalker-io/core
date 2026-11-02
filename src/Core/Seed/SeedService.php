@@ -14,7 +14,6 @@ use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Event\EventAwareInterface;
 use Windwalker\Filesystem\FileObject;
-use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\StrNormalize;
 use Windwalker\Utilities\TypeCast;
 
@@ -39,8 +38,7 @@ class SeedService implements EventAwareInterface
         #[Autowire]
         protected FakerService $fakerService,
         protected ?DatabaseAdapter $db = null,
-    ) {
-    }
+    ) {}
 
     public function import(string|SplFileInfo $file): int
     {

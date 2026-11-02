@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer;
 
-use RuntimeException;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Data\Collection;
 use Windwalker\DI\Container;
@@ -22,7 +21,7 @@ class LayoutPathResolver
     protected array $aliases = [];
 
     /**
-     * @var array<PathsBag>
+     * @var  array<PathsBag>
      */
     protected array $pathsBags = [];
 
@@ -155,7 +154,7 @@ class LayoutPathResolver
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getAliases(): array
     {
@@ -211,7 +210,7 @@ class LayoutPathResolver
     }
 
     /**
-     * @return PathsBag[]
+     * @return  PathsBag[]
      */
     public function getPathsBags(): array
     {

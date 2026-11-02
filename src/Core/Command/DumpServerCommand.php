@@ -33,9 +33,7 @@ class DumpServerCommand implements CommandInterface
      *
      * @param  ConsoleApplication  $app
      */
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * @inheritDoc

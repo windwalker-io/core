@@ -17,7 +17,6 @@ use Windwalker\Core\Application\Context\AppRequestInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
 use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\Data\Collection;
@@ -32,7 +31,7 @@ use Windwalker\Session\Session;
 /**
  * The Context class.
  *
- * @method WebRootApplicationInterface getRootApp()
+ * @method  WebRootApplicationInterface  getRootApp()
  */
 #[Immutable(Immutable::PROTECTED_WRITE_SCOPE)]
 class AppContext implements WebApplicationInterface, AppContextInterface
@@ -45,7 +44,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     }
 
     /**
-     * @var Parameters|null
+     * @var  Parameters|null
      *
      * @deprecated  Use config() instead.
      */
@@ -148,7 +147,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     }
 
     /**
-     * @return Parameters|null
+     * @return  Parameters|null
      *
      * @deprecated  No-longer used.
      */
@@ -172,7 +171,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     }
 
     /**
-     * @return UriInterface
+     * @return  UriInterface
      */
     public function getUri(): UriInterface
     {
@@ -187,12 +186,12 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     public function sethUri(UriInterface $uri): static
     {
         return $this->modifyAppRequest(
-            fn (AppRequest $request) => $request->withUri($uri)
+            fn(AppRequest $request) => $request->withUri($uri)
         );
     }
 
     /**
-     * @return SystemUri
+     * @return  SystemUri
      */
     public function getSystemUri(): SystemUri
     {
@@ -207,14 +206,14 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     public function setSystemUri(SystemUri $uri): static
     {
         return $this->modifyAppRequest(
-            fn (AppRequest $request) => $request->withSystemUri($uri)
+            fn(AppRequest $request) => $request->withSystemUri($uri)
         );
     }
 
     /**
-     * @return AppRequest
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @return  AppRequest
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     public function getAppRequest(): AppRequest
     {
@@ -224,8 +223,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
     /**
      * @param  AppRequest  $request
      *
-     * @return  static  Return self to support chaining.
-     * @throws DefinitionException
+     * @return  static               Return self to support chaining.
+     * @throws  DefinitionException
      *
      * @deprecated  Use modifyAppRequest() instead.
      */

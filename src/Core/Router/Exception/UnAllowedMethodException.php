@@ -15,8 +15,8 @@ class UnAllowedMethodException extends RuntimeException
     /**
      * RouteNotFoundException constructor.
      *
-     * @param  string      $message
-     * @param  int         $code
+     * @param  string     $message
+     * @param  int        $code
      * @param  Throwable  $previous
      */
     public function __construct($message = 'Method not allowed', $code = 405, ?Throwable $previous = null)

@@ -28,16 +28,14 @@ class GenReviseCommand implements CommandInterface
     /**
      * GenReviseCommand constructor.
      */
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
      *
      * @param  Command  $command
      *
-     * @return    void
+     * @return  void
      */
     public function configure(Command $command): void
     {
@@ -81,7 +79,7 @@ class GenReviseCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return    int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {

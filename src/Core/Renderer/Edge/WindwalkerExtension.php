@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer\Edge;
 
-use Dom\Element;
-use Dom\HTMLDocument;
-use Dom\HTMLElement;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\DateTime\ChronosService;
@@ -14,7 +11,6 @@ use Windwalker\Core\Language\LangService;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\NavOptions;
-use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\DOM\HTML5Factory;
 use Windwalker\Edge\Extension\DirectivesExtensionInterface;
@@ -42,9 +38,7 @@ class WindwalkerExtension implements
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * getName
@@ -272,7 +266,7 @@ class WindwalkerExtension implements
             return "<?php if(\$app->isDebug()) { {$expression}; } ?>";
         }
 
-        return "<?php if(\$app->isDebug()): ?>";
+        return '<?php if($app->isDebug()): ?>';
     }
 
     /**
@@ -284,7 +278,7 @@ class WindwalkerExtension implements
      */
     public function enddebug(string $expression): string
     {
-        return "<?php endif; ?>";
+        return '<?php endif; ?>';
     }
 
     public function can(string $expression): string
@@ -307,7 +301,7 @@ class WindwalkerExtension implements
      *
      * @param  string  $expression
      *
-     * @return string
+     * @return  string
      */
     public static function stripParentheses(string $expression): string
     {

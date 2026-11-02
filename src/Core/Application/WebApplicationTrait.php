@@ -12,7 +12,6 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 use Windwalker\Core\CliServer\CliServerRuntime;
-use Windwalker\Core\Manager\LoggerManager;
 use Windwalker\Core\Router\NavConstantInterface;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\RouteUri;
@@ -100,8 +99,8 @@ trait WebApplicationTrait
      * @param  ResponseInterface  $response
      *
      * @return  void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function respond(ResponseInterface $response): void
     {
@@ -111,9 +110,9 @@ trait WebApplicationTrait
     /**
      * @param  mixed  $res
      *
-     * @return ResponseInterface
+     * @return  ResponseInterface
      *
-     * @throws \JsonException
+     * @throws  \JsonException
      * @since  4.0
      */
     public static function anyToResponse(mixed $res): ResponseInterface

@@ -7,7 +7,6 @@ namespace Windwalker\Core\View\Event;
 use Attribute;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
-use Windwalker\Core\View\ViewModelInterface;
 
 /**
  * The BeforeRenderEvent class.

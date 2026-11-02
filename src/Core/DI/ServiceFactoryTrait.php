@@ -17,12 +17,12 @@ trait ServiceFactoryTrait
     use CoreEventAwareTrait;
 
     /**
-     * @var Config
+     * @var  Config
      */
     protected Config $config;
 
     /**
-     * @var Container
+     * @var  Container
      */
     protected Container $container;
 
@@ -68,8 +68,8 @@ trait ServiceFactoryTrait
      * @param  mixed        ...$args
      *
      * @return  object
-     * @throws \ReflectionException
-     * @throws DefinitionResolveException
+     * @throws  \ReflectionException
+     * @throws  DefinitionResolveException
      */
     public function create(?string $name = null, ...$args): object
     {

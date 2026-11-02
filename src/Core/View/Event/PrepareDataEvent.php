@@ -7,6 +7,4 @@ namespace Windwalker\Core\View\Event;
 /**
  * The PrepareDataEvent class.
  */
-class PrepareDataEvent extends AbstractViewRenderEvent
-{
-}
+class PrepareDataEvent extends AbstractViewRenderEvent {}

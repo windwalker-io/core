@@ -34,7 +34,7 @@ class DateTimeProvider implements ServiceProviderInterface, BootableProviderInte
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function register(Container $container): void
     {

@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Crypt\SecretToolkit;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
@@ -84,8 +83,8 @@ class CryptSecretCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws \Exception
+     * @return  int         Return 0 is success, 1-255 is failure.
+     * @throws  \Exception
      */
     public function execute(IOInterface $io): int
     {
@@ -117,7 +116,7 @@ class CryptSecretCommand implements CommandInterface
 
             if (is_file($replace)) {
                 $content = file_get_contents($replace);
-                
+
                 if (!preg_match('/^APP_SECRET=.*$/m', $content)) {
                     $content .= "\nAPP_SECRET=" . $secret . "\n";
                 } else {
@@ -125,10 +124,10 @@ class CryptSecretCommand implements CommandInterface
                         $io->writeln('User canceled.');
                         return 0;
                     }
-                    
+
                     $content = preg_replace('/^APP_SECRET=.*$/m', 'APP_SECRET=' . $secret, $content);
                 }
-                
+
                 file_put_contents($replace, $content);
 
                 $io->writeln('Replace APP_SECRET in file: ' . $replace);

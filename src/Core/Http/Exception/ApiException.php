@@ -7,8 +7,6 @@ namespace Windwalker\Core\Http\Exception;
 use Windwalker\Utilities\Attributes\AttributesAccessor;
 use Windwalker\Utilities\Attributes\Enum\Title;
 
-use function Windwalker\ds;
-
 /**
  * The ApiException class.
  */
@@ -72,8 +70,8 @@ class ApiException extends \RuntimeException
     /**
      * @param  int|\UnitEnum  $statusCode
      *
-     * @return  static  Return self to support chaining.
-     * @throws \ReflectionException
+     * @return  static                Return self to support chaining.
+     * @throws  \ReflectionException
      */
     public function setStatusCode(int|\UnitEnum $statusCode): static
     {
@@ -107,7 +105,7 @@ class ApiException extends \RuntimeException
      *
      * @return  T|object|null
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     protected static function getAttrFromEnum(\UnitEnum $enum, string $attr): ?object
     {
@@ -139,7 +137,7 @@ class ApiException extends \RuntimeException
      *
      * @return  array{ 0: int|string, 1: int }
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     protected static function getStatusCodeFromEnum(\UnitEnum $enum): array
     {

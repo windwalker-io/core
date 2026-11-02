@@ -142,7 +142,7 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
     }
 
     /**
-     * @return Envelope|null
+     * @return  Envelope|null
      */
     public function getEnvelop(): ?Envelope
     {
@@ -227,7 +227,7 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
     }
 
     /**
-     * @return TransportInterface
+     * @return  TransportInterface
      */
     public function getTransport(): TransportInterface
     {

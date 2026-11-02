@@ -26,8 +26,7 @@ class SeedCreateCommand extends AbstractSeedCommand
     public function __construct(
         #[Service]
         protected SeedService $seedService
-    ) {
-    }
+    ) {}
 
     /**
      * configure

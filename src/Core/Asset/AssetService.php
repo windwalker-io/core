@@ -77,7 +77,7 @@ class AssetService implements EventAwareInterface
     /**
      * Property version.
      *
-     * @var string
+     * @var  string
      */
     protected ?string $version = null;
 
@@ -103,24 +103,24 @@ class AssetService implements EventAwareInterface
     protected string $root = '';
 
     /**
-     * @var string
+     * @var  string
      */
     protected string $folder = '';
 
     protected PromiseScope $mainScope;
 
     /**
-     * @var array<PromiseScope>
+     * @var  array<PromiseScope>
      */
     protected array $importScopes = [];
 
     /**
-     * @var Teleport[]
+     * @var  Teleport[]
      */
     protected array $teleports = [];
 
     /**
-     * @var ImportMap|null
+     * @var  ImportMap|null
      */
     protected ?ImportMap $importMap = null;
 
@@ -419,8 +419,8 @@ class AssetService implements EventAwareInterface
      * @param  array  $internalAttrs
      * @param  bool   $footer
      *
-     * @return string
-     * @throws Exception
+     * @return  string
+     * @throws  Exception
      */
     public function renderCSS(bool $withInternal = false, array $internalAttrs = [], bool $footer = false): string
     {
@@ -481,7 +481,7 @@ class AssetService implements EventAwareInterface
      * @param  bool   $withInternal
      * @param  array  $internalAttrs
      *
-     * @return string
+     * @return  string
      */
     public function renderJS(bool $withInternal = false, array $internalAttrs = []): string
     {
@@ -593,7 +593,7 @@ class AssetService implements EventAwareInterface
      * getVersion
      *
      * @return  string
-     * @throws Exception
+     * @throws  Exception
      */
     public function getVersion(): string
     {
@@ -624,7 +624,7 @@ class AssetService implements EventAwareInterface
      *
      * @return  string
      *
-     * @throws Exception
+     * @throws  Exception
      * @since  3.4.9.3
      */
     public function appendVersion(string $uri, ?string $version = null): string
@@ -1075,7 +1075,7 @@ class AssetService implements EventAwareInterface
      * @param  string  $uri
      * @param  string  $path
      *
-     * @return string
+     * @return  string
      *
      * @since  3.5.22.6
      */
@@ -1118,7 +1118,7 @@ class AssetService implements EventAwareInterface
      * @param  mixed  $data      The data to convert to JavaScript object notation
      * @param  bool   $quoteKey  Quote json key or not.
      *
-     * @return string JavaScript object notation representation of the array
+     * @return  string  JavaScript object notation representation of the array
      */
     public static function getJSObject(mixed $data, bool $quoteKey = false): string
     {
@@ -1154,7 +1154,7 @@ class AssetService implements EventAwareInterface
                     $output .= '[' . implode(',', $child) . ']';
                     break;
                 }
-            // No break
+                // no break
             case 'object':
                 $array = is_object($data) ? get_object_vars($data) : $data;
 
@@ -1187,8 +1187,8 @@ class AssetService implements EventAwareInterface
      * @param  string|null  $uri
      * @param  bool         $version
      *
-     * @return string
-     * @throws Exception
+     * @return  string
+     * @throws  Exception
      */
     public function path(?string $uri = null, string|bool $version = false): string
     {
@@ -1219,8 +1219,8 @@ class AssetService implements EventAwareInterface
      * @param  string|null  $uri
      * @param  bool         $version
      *
-     * @return string
-     * @throws Exception
+     * @return  string
+     * @throws  Exception
      */
     public function root(?string $uri = null, string|bool $version = false): string
     {
@@ -1302,7 +1302,7 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * @return bool
+     * @return  bool
      */
     public function isDebug(): bool
     {
@@ -1326,7 +1326,7 @@ class AssetService implements EventAwareInterface
     /**
      * @param  string  $name
      *
-     * @return Teleport
+     * @return  Teleport
      */
     public function getTeleport(string $name = 'main'): Teleport
     {
@@ -1347,7 +1347,7 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * @return ImportMap
+     * @return  ImportMap
      */
     public function getImportMap(): ImportMap
     {
@@ -1367,7 +1367,7 @@ class AssetService implements EventAwareInterface
     }
 
     /**
-     * @return Teleport[]
+     * @return  Teleport[]
      */
     public function getTeleports(): array
     {

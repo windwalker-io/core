@@ -25,8 +25,8 @@ class EntitySubCommand extends AbstractGeneratorSubCommand
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws ReflectionException
+     * @return  int                  Return 0 is success, 1-255 is failure.
+     * @throws  ReflectionException
      */
     public function execute(IOInterface $io): int
     {

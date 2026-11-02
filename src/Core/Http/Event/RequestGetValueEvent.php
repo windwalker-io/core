@@ -25,11 +25,10 @@ class RequestGetValueEvent extends BaseEvent
         public AppRequest $appRequest,
         public string $type = self::TYPE_BODY,
         public array $values = [],
-    ) {
-    }
+    ) {}
 
     /**
-     * @return array
+     * @return  array
      *
      * @deprecated  Use property instead.
      */

@@ -47,9 +47,7 @@ class QueueWorkerCommand implements CommandInterface
 
     protected IOInterface $io;
 
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
@@ -192,8 +190,8 @@ class QueueWorkerCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws DefinitionException
+     * @return  int                  Return 0 is success, 1-255 is failure.
+     * @throws  DefinitionException
      */
     public function execute(IOInterface $io): int
     {
@@ -283,7 +281,7 @@ class QueueWorkerCommand implements CommandInterface
         } else {
             $io->writeln(
                 sprintf(
-                    "Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
+                    'Queue worker started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>',
                     getmypid()
                 )
             );
@@ -315,7 +313,7 @@ class QueueWorkerCommand implements CommandInterface
 
     public function createInvoker(): \Closure
     {
-        return fn (JobController $controller, callable $invokable) => $this->app->call(
+        return fn(JobController $controller, callable $invokable) => $this->app->call(
             $invokable,
             [
                 'jobController' => $controller,
@@ -490,13 +488,13 @@ class QueueWorkerCommand implements CommandInterface
     }
 
     /**
-     * @param  ?string  $connection
+     * @param  ?string        $connection
      * @param  RunnerOptions  $options
      *
      * @return  Worker
      *
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     protected function createWorker(?string $connection, RunnerOptions $options): Worker
     {

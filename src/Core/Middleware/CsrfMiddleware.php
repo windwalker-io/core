@@ -6,8 +6,6 @@ namespace Windwalker\Core\Middleware;
 
 use Closure;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Security\CsrfService;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\DI\Attributes\Service;

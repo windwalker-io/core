@@ -14,9 +14,7 @@ use function Windwalker\fs;
  */
 class CliServerStateManager
 {
-    public function __construct(protected $filePath = '')
-    {
-    }
+    public function __construct(protected $filePath = '') {}
 
     public function getFilePath(): string
     {

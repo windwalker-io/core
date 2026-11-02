@@ -17,7 +17,7 @@ use Windwalker\Http\Exception\HttpRequestException;
 class Method implements ContainerAttributeInterface
 {
     /**
-     * @var array|string[]
+     * @var  array|string[]
      */
     protected array $methods;
 

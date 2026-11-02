@@ -44,8 +44,7 @@ class Assert implements ContainerAttributeInterface
         public string|array $command,
         public bool $nullable = true,
         public bool $strict = false
-    ) {
-    }
+    ) {}
 
     public function __invoke(AttributeHandler $handler): callable
     {
@@ -66,7 +65,7 @@ class Assert implements ContainerAttributeInterface
                 $debug = $handler->container->get(ApplicationInterface::class)->isDebug();
                 $name = $handler->reflector->getName();
 
-                $message = sprintf("Invalid type of field \"%s\"", $name);
+                $message = sprintf('Invalid type of field "%s"', $name);
 
                 if ($debug) {
                     $message .= ' - ' . $e->getMessage();

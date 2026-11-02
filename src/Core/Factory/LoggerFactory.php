@@ -8,8 +8,6 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
-use Psr\Log\LogLevel;
-use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Core\Runtime\Runtime;

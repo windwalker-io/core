@@ -21,7 +21,6 @@ use Windwalker\Stream\Stream;
 use Windwalker\Utilities\StrNormalize;
 
 use function Windwalker\tid;
-use function Windwalker\uid;
 
 use const Windwalker\Stream\WRITE_ONLY_RESET;
 
@@ -42,17 +41,16 @@ class DatabaseExportService
         protected ExporterFactory $exporterFactory,
         protected ApplicationInterface $app,
         protected DatabaseAdapter $db
-    ) {
-    }
+    ) {}
 
     /**
      * export
      *
      * @param  OutputInterface|null  $output
      *
-     * @return FileObject
+     * @return  FileObject
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public function export(?OutputInterface $output = null, array $options = []): FileObject
     {

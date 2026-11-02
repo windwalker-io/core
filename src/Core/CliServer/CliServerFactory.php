@@ -18,9 +18,7 @@ class CliServerFactory
 {
     public array $engineTypes = [];
 
-    public function __construct(protected Container $container)
-    {
-    }
+    public function __construct(protected Container $container) {}
 
     public function createEngine(
         string $engine,

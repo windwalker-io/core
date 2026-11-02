@@ -19,6 +19,5 @@ class TerminatingEvent extends BaseEvent
     public function __construct(
         public RootApplicationInterface $app,
         public Container $container
-    ) {
-    }
+    ) {}
 }

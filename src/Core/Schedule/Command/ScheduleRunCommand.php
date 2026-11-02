@@ -33,9 +33,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app, protected ScheduleService $scheduleService)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app, protected ScheduleService $scheduleService) {}
 
     /**
      * configure
@@ -94,7 +92,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -111,7 +109,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
                 Logger::error(
                     'system/schedule',
                     sprintf(
-                        "  [Error %s] %s - %s:%s",
+                        '  [Error %s] %s - %s:%s',
                         $e->getCode(),
                         $e->getMessage(),
                         $e->getFile(),
@@ -170,9 +168,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
     /**
      * @inheritDoc
      */
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     /**
      * @inheritDoc
@@ -184,7 +180,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
 
             $events = iterator_to_array($schedule->getEvents());
             $events = array_map(
-                static fn (ScheduleEvent $event) => $event->getName(),
+                static fn(ScheduleEvent $event) => $event->getName(),
                 $events
             );
 

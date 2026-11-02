@@ -28,7 +28,7 @@ class MySQLExporter extends AbstractExporter
      * @param  StreamInterface  $stream
      * @param  array            $options
      *
-     * @return void
+     * @return  void
      */
     protected function doExport(StreamInterface $stream, array $options = []): void
     {
@@ -61,7 +61,7 @@ class MySQLExporter extends AbstractExporter
                     $stream->write($buffer);
                 }
             );
-        } catch (ProcessFailedException | \DomainException $e) {
+        } catch (ProcessFailedException|\DomainException $e) {
             $this->emitMessage(
                 [
                     'Error: ' . $e->getMessage(),
@@ -123,7 +123,7 @@ CNF;
     /**
      * findMysqldump
      *
-     * @return string|null
+     * @return  string|null
      *
      * @since  3.5.22
      */
@@ -164,9 +164,9 @@ CNF;
     /**
      * getCreateTable
      *
-     * @param $table
+     * @param   $table
      *
-     * @return array|mixed|string
+     * @return  array|mixed|string
      */
     protected function getCreateTable(string $table): string
     {
@@ -194,10 +194,10 @@ CNF;
      *
      * @param  string  $table
      *
-     * @return string
+     * @return  string
      *
-     * @throws InvalidArgumentException
-     * @throws RuntimeException
+     * @throws  InvalidArgumentException
+     * @throws  RuntimeException
      */
     protected function getInserts(string $table): string
     {
@@ -218,7 +218,7 @@ CNF;
 
             $value = implode(', ', $data);
 
-            $sql[] = (string) sprintf("INSERT `%s` VALUES (%s)", $table, $value);
+            $sql[] = (string) sprintf('INSERT `%s` VALUES (%s)', $table, $value);
         }
 
         if ($sql === []) {

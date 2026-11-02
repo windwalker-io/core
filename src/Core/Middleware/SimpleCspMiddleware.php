@@ -114,7 +114,7 @@ class SimpleCspMiddleware implements MiddlewareInterface
 
                 if ($this->cspRules & static::FONT_SRC) {
                     $cspBuilder->addDirective('font-src', []);
-//                    $cspBuilder->addSource('font-src', '*');
+                    //                    $cspBuilder->addSource('font-src', '*');
                     $cspBuilder->setDataAllowed('font-src', true);
                     $cspBuilder->setBlobAllowed('font-src', true);
                     $cspBuilder->nonce('font-src', $nonce);

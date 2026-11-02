@@ -25,6 +25,5 @@ class BeforeRoutingEvent extends BaseEvent
         public SystemUri $systemUri,
         public ServerRequestInterface $request,
         public string $route
-    ) {
-    }
+    ) {}
 }

@@ -59,7 +59,7 @@ class WebApplication implements WebRootApplicationInterface
     protected bool $booted = false;
 
     /**
-     * @var MiddlewareInterface[]|callable[]
+     * @var  MiddlewareInterface[]|callable[]
      */
     protected array $middlewares = [];
 
@@ -88,7 +88,7 @@ class WebApplication implements WebRootApplicationInterface
      * boot
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function boot(): void
     {
@@ -181,7 +181,7 @@ class WebApplication implements WebRootApplicationInterface
      *
      * @return  AppContext
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function createContextFromServerEvent(RequestEvent $event): AppContext
     {
@@ -207,9 +207,9 @@ class WebApplication implements WebRootApplicationInterface
      *
      * @return  ResponseInterface
      *
-     * @throws Throwable
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws  Throwable
+     * @throws  \Psr\Container\ContainerExceptionInterface
+     * @throws  \Psr\Container\NotFoundExceptionInterface
      */
     public function runContext(AppContext $appContext, ?callable $handler = null): ResponseInterface
     {
@@ -330,9 +330,9 @@ class WebApplication implements WebRootApplicationInterface
      * @param  callable|null                $handler
      *
      * @return  ResponseInterface
-     * @throws Throwable
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  Throwable
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function execute(?ServerRequestInterface $request = null, ?callable $handler = null): ResponseInterface
     {
@@ -364,12 +364,12 @@ class WebApplication implements WebRootApplicationInterface
      * @param  ServerRequestInterface  $request
      * @param  iterable                $middlewares
      *
-     * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws DefinitionException
-     * @throws DefinitionResolveException
-     * @throws ReflectionException
-     * @throws Throwable
+     * @return  ResponseInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  DefinitionException
+     * @throws  DefinitionResolveException
+     * @throws  ReflectionException
+     * @throws  Throwable
      */
     protected function dispatch(
         AppContext $app,
@@ -381,7 +381,7 @@ class WebApplication implements WebRootApplicationInterface
         try {
             return $runner->createRequestHandler($middlewares)
                 ->handle($request);
-        } catch (ValidateFailException | InvalidTokenException $e) {
+        } catch (ValidateFailException|InvalidTokenException $e) {
             if ($app->isApiCall()) {
                 throw $e;
             }
@@ -418,8 +418,8 @@ class WebApplication implements WebRootApplicationInterface
      *
      * @return  void
      *
-     * @throws ReflectionException
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws  ReflectionException
+     * @throws  \Windwalker\DI\Exception\DefinitionException
      */
     protected function logError(Throwable $e): void
     {
@@ -452,8 +452,8 @@ class WebApplication implements WebRootApplicationInterface
      * @param  bool               $instant
      *
      * @return  ResponseInterface
-     * @throws \ReflectionException
-     * @throws DefinitionResolveException
+     * @throws  \ReflectionException
+     * @throws  DefinitionResolveException
      */
     public function redirect(string|Stringable $url, int $code = 303, bool $instant = false): ResponseInterface
     {

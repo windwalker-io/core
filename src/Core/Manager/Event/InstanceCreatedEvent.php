@@ -22,6 +22,5 @@ class InstanceCreatedEvent extends BaseEvent
         public object $instance,
         public string $instanceName = '',
         public array $args = []
-    ) {
-    }
+    ) {}
 }

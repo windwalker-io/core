@@ -32,8 +32,8 @@ interface MailerInterface
      * @param  Envelope|null  $envelope
      * @param  int            $flags
      *
-     * @return SentMessage
-     * @throws TransportExceptionInterface
+     * @return  SentMessage
+     * @throws  TransportExceptionInterface
      */
     public function send(MailMessage $message, ?Envelope $envelope = null, int $flags = 0): SentMessage;
 }

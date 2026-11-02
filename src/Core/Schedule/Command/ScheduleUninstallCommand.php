@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Schedule\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
@@ -22,8 +21,7 @@ class ScheduleUninstallCommand implements CommandInterface
 
     public function __construct(
         protected ScheduleService $scheduleService
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc
@@ -57,7 +55,7 @@ class ScheduleUninstallCommand implements CommandInterface
         $this->replaceCrontab($cronContent);
 
         $io->writeln("[REMOVE] >> {$matches[0]}");
-        $io->writeln("Uninstall schedule successfully.");
+        $io->writeln('Uninstall schedule successfully.');
 
         return 0;
     }

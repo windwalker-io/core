@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Seed;
 
-use Faker\Factory as FakerFactory;
-use Faker\Generator;
-use SplFileInfo;
-use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
-use Windwalker\Utilities\StrNormalize;
 
 /**
  * The Seeder class.

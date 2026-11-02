@@ -11,7 +11,6 @@ use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Security\Exception\InvalidTokenException;
 use Windwalker\Core\Utilities\Base64Url;
-use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 use Windwalker\Session\Session;
 
@@ -89,7 +88,7 @@ class CsrfService
     /**
      * @return  string
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public function createToken(): string
     {
@@ -126,7 +125,7 @@ class CsrfService
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getTokenKey(): string
     {
@@ -146,7 +145,7 @@ class CsrfService
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getInvalidMessage(): string
     {
@@ -160,7 +159,7 @@ class CsrfService
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getInputName(): string
     {

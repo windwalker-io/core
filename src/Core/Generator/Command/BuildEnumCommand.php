@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Generator\Builder\EnumBuilder;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\DI\Attributes\Autowire;
@@ -31,9 +30,7 @@ class BuildEnumCommand implements CommandInterface
     /**
      * BuildEntityCommand constructor.
      */
-    public function __construct(#[Autowire] protected ClassFinder $classFinder, protected ?ORM $orm = null)
-    {
-    }
+    public function __construct(#[Autowire] protected ClassFinder $classFinder, protected ?ORM $orm = null) {}
 
     /**
      * configure
@@ -74,7 +71,7 @@ class BuildEnumCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -127,7 +124,7 @@ class BuildEnumCommand implements CommandInterface
             $content = file_get_contents($ref->getFileName());
 
             $newCode = preg_replace_callback(
-            // @see https://stackoverflow.com/a/29290586
+                // @see https://stackoverflow.com/a/29290586
                 '/(?:\/\*(?:[^*]|(?:\*[^\/]))*\*\/)\s+class/',
                 function (array $matches) use ($ref) {
                     $methods = [];

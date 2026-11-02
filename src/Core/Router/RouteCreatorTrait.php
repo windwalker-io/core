@@ -16,7 +16,7 @@ use function Windwalker\glob_all;
 trait RouteCreatorTrait
 {
     /**
-     * @var Collection<Route>
+     * @var  Collection<Route>
      */
     protected Collection $routes;
 
@@ -111,9 +111,9 @@ trait RouteCreatorTrait
     }
 
     /**
-     * @param  string    $group
-     * @param  array     $data
-     * @param ?callable  $callback
+     * @param  string     $group
+     * @param  array      $data
+     * @param  ?callable  $callback
      *
      * @return  static
      *

@@ -7,7 +7,5 @@ namespace Windwalker\Core\Edge\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class EdgeComponent
 {
-    public function __construct(public $name)
-    {
-    }
+    public function __construct(public $name) {}
 }

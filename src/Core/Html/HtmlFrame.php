@@ -22,21 +22,21 @@ class HtmlFrame
     /**
      * Property title.
      *
-     * @var string|null
+     * @var  string|null
      */
     public protected(set) ?string $title = null;
 
     /**
      * Property siteName.
      *
-     * @var string|null
+     * @var  string|null
      */
     public protected(set) ?string $siteName = null;
 
     /**
      * Property favicon.
      *
-     * @var string|null
+     * @var  string|null
      */
     public protected(set) ?string $favicon = null;
 
@@ -84,7 +84,7 @@ class HtmlFrame
      *
      * @param  string  $separator
      *
-     * @return ?string
+     * @return  ?string
      */
     public function getPageTitle(string $separator = ' | '): ?string
     {
@@ -102,7 +102,7 @@ class HtmlFrame
     /**
      * getTitle
      *
-     * @return string|null
+     * @return  string|null
      */
     public function getTitle(): ?string
     {
@@ -267,8 +267,8 @@ class HtmlFrame
      * addCustomTag
      *
      * @param  string|LinkInterface|HTMLElement  $tag
-     * @param  string|Stringable|null           $content
-     * @param  array                            $attribs
+     * @param  string|Stringable|null            $content
+     * @param  array                             $attribs
      *
      * @return  HTMLElement
      */
@@ -321,7 +321,7 @@ class HtmlFrame
      * @param  string|Stringable  $content
      * @param  bool               $replace
      *
-     * @return static
+     * @return  static
      */
     public function addMetadata(string $name, string|Stringable $content, bool $replace = false): static
     {
@@ -337,7 +337,7 @@ class HtmlFrame
      * @param  string|Stringable  $content
      * @param  bool               $replace
      *
-     * @return static
+     * @return  static
      */
     public function addOpenGraph(string $type, string|Stringable $content, bool $replace = false): static
     {
@@ -349,7 +349,7 @@ class HtmlFrame
     /**
      * renderFavicon
      *
-     * @return string|null
+     * @return  string|null
      */
     public function renderFavicon(): ?string
     {
@@ -422,7 +422,7 @@ class HtmlFrame
     /**
      * Method to get property SiteName
      *
-     * @return string|null
+     * @return  string|null
      */
     public function getSiteName(): ?string
     {
@@ -571,7 +571,7 @@ class HtmlFrame
     }
 
     /**
-     * @return HTMLElement
+     * @return  HTMLElement
      */
     public function getHtmlElement(): HTMLElement
     {

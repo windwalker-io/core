@@ -154,7 +154,7 @@ class ControllerDispatcher
     }
 
     /**
-     * @param  mixed  $response
+     * @param  mixed                $response
      * @param  AppContextInterface  $app
      *
      * @return  mixed

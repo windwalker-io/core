@@ -31,8 +31,8 @@ class Controller implements ControllerInterface
      * @param  string  $task
      * @param  array   $args
      *
-     * @return mixed
-     * @throws ReflectionException
+     * @return  mixed
+     * @throws  ReflectionException
      */
     public function execute(string $task, array $args = []): mixed
     {

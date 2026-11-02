@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Renderer\Edge;
 
-use Windwalker\Dom\Builder\HtmlBuilder;
-use Windwalker\DOM\DOMElement;
 use Windwalker\DOM\HTMLElement;
 
 /**

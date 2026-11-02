@@ -60,7 +60,7 @@ class DatabaseMethod implements MethodInterface
      *
      * @param  array  $credential
      *
-     * @return AuthResult
+     * @return  AuthResult
      */
     public function authenticate(array $credential): AuthResult
     {
@@ -109,7 +109,7 @@ class DatabaseMethod implements MethodInterface
      *
      * @return  void
      *
-     * @throws JsonException
+     * @throws  JsonException
      * @since  1.4.6
      */
     protected function rehash(Collection $user, array $credential): void

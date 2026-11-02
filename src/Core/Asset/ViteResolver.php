@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset;
 
-use Psr\Http\Message\UriInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Uri\Uri;
@@ -63,15 +62,15 @@ class ViteResolver
     /**
      * @param  string  $uri
      *
-     * @return  array{
-     *     file: string,
-     *     name: string,
-     *     src: string,
-     *     isEntry: bool,
-     *     imports: array<string>,
-     *     dynamicImports: array<string>,
-     *     css: array<string>,
-     *  }|null
+     * @return    array{
+     *           file: string,
+     *           name: string,
+     *           src: string,
+     *           isEntry: bool,
+     *           imports: array<string>,
+     *           dynamicImports: array<string>,
+     *           css: array<string>,
+     *           }|null
      */
     public function resolveUriManifest(string $uri): ?array
     {
@@ -125,7 +124,7 @@ class ViteResolver
     {
         return $this->once(
             'manifest',
-            fn () => $this->loadManifest(),
+            fn() => $this->loadManifest(),
             $refresh
         );
     }
@@ -154,7 +153,7 @@ class ViteResolver
     {
         return $this->once(
             'server.host',
-            fn () => $this->loadServerFile()
+            fn() => $this->loadServerFile()
         );
     }
 

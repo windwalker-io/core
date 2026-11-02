@@ -25,7 +25,7 @@ use Windwalker\Queue\QueueMessage;
 /**
  * The QueueManager class.
  *
- * @method Queue get(?string $name = null, ...$args)
+ * @method  Queue  get(?string $name = null, ...$args)
  */
 #[Isolation]
 class QueueFactory implements ServiceFactoryInterface

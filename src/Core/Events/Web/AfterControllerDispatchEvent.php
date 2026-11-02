@@ -19,7 +19,5 @@ class AfterControllerDispatchEvent extends BaseEvent
      * @param  mixed                $response
      * @param  AppContextInterface  $app
      */
-    public function __construct(public AppContextInterface $app, public mixed $response)
-    {
-    }
+    public function __construct(public AppContextInterface $app, public mixed $response) {}
 }

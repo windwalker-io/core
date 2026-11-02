@@ -25,6 +25,5 @@ class BeforeAppDispatchEvent extends BaseEvent
         public ServerRequestInterface $request,
         public Container $container,
         public iterable $middlewares = [],
-    ) {
-    }
+    ) {}
 }

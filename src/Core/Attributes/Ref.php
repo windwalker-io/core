@@ -7,7 +7,6 @@ namespace Windwalker\Core\Attributes;
 use Attribute;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
-use Windwalker\DI\Container;
 
 use function Windwalker\ref;
 
@@ -23,9 +22,7 @@ class Ref implements ContainerAttributeInterface
      * @param  string       $path
      * @param  string|null  $delimiter
      */
-    public function __construct(protected string $path, protected ?string $delimiter = '.')
-    {
-    }
+    public function __construct(protected string $path, protected ?string $delimiter = '.') {}
 
     public function __invoke(AttributeHandler $handler): callable
     {

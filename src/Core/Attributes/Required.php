@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
-use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Attributes\AttributeHandler;
-use Windwalker\DI\Attributes\ContainerAttributeInterface;
 use Windwalker\Filter\Exception\ValidateException;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
@@ -17,7 +14,7 @@ class Required extends Assert
         public bool $nullable = false,
         public bool $strict = false
     ) {
-            parent::__construct('required', $nullable, $strict);
+        parent::__construct('required', $nullable, $strict);
     }
 
     public function __invoke(AttributeHandler $handler): callable

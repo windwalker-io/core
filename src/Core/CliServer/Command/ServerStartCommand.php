@@ -43,15 +43,14 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
         protected ConsoleApplication $app,
         #[Autowire]
         protected CliServerFactory $serverFactory
-    ) {
-    }
+    ) {}
 
     /**
      * configure
      *
      * @param  Command  $command
      *
-     * @return    void
+     * @return  void
      */
     public function configure(Command $command): void
     {
@@ -150,7 +149,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return    int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -268,9 +267,7 @@ class ServerStartCommand implements CommandInterface, SignalableCommandInterface
     /**
      * @inheritDoc
      */
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     /**
      * @inheritDoc

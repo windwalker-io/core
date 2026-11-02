@@ -16,11 +16,7 @@ class QuestionFactory
      *
      * @param  Container  $container
      */
-    public function __construct(protected Container $container)
-    {
-    }
+    public function __construct(protected Container $container) {}
 
-    public function create()
-    {
-    }
+    public function create() {}
 }

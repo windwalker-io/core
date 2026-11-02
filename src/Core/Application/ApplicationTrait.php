@@ -44,7 +44,7 @@ trait ApplicationTrait
     public LoggerInterface $logger;
 
     /**
-     * @var array<ServiceProviderInterface>
+     * @var  array<ServiceProviderInterface>
      */
     protected array $providers = [];
 
@@ -57,7 +57,7 @@ trait ApplicationTrait
      * If run in Swoole, ReactPHP or Amphp, this will be `cli_web`.
      * If run as Windwalker console, this will be `console`.
      *
-     * @return AppType
+     * @return  AppType
      */
     public function getType(): AppType
     {
@@ -99,7 +99,7 @@ trait ApplicationTrait
      * @param  string  $path
      *
      * @return  string
-     * @throws ReflectionException
+     * @throws  ReflectionException
      */
     public function path(string $path): string
     {
@@ -278,7 +278,7 @@ trait ApplicationTrait
 
                     $event?->listen(
                         $dispatcher,
-                        fn (...$args) => $container->call($listener, $args)
+                        fn(...$args) => $container->call($listener, $args)
                     );
                 } else {
                     // Simply listener class name.

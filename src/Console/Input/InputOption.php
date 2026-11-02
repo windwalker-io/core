@@ -10,6 +10,4 @@ use Attribute;
  * The InputOption class.
  */
 #[Attribute]
-class InputOption extends \Symfony\Component\Console\Input\InputOption
-{
-}
+class InputOption extends \Symfony\Component\Console\Input\InputOption {}

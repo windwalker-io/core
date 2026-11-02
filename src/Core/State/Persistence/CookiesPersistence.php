@@ -18,9 +18,7 @@ class CookiesPersistence implements PersistenceInterface
      *
      * @param  CookiesInterface  $cookies
      */
-    public function __construct(protected CookiesInterface $cookies)
-    {
-    }
+    public function __construct(protected CookiesInterface $cookies) {}
 
     public function get(string $key): mixed
     {

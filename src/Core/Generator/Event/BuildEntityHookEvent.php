@@ -27,6 +27,5 @@ class BuildEntityHookEvent extends BaseEvent
         public Node $type,
         public EntityMemberBuilder $entityMemberBuilder,
         public ?Node\PropertyHook $hook = null,
-    ) {
-    }
+    ) {}
 }

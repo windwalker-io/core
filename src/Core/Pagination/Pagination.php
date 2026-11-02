@@ -8,7 +8,6 @@ use Closure;
 use InvalidArgumentException;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Router\Navigator;
-use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\SystemUri;
 
@@ -72,35 +71,35 @@ class Pagination
     /**
      * Total Items
      *
-     * @var int|null|Closure
+     * @var  int|null|Closure
      */
-    protected int|null|Closure $total = null;
+    protected int|Closure|null $total = null;
 
     /**
      * Number of the current page
      *
-     * @var int
+     * @var  int
      */
     public protected(set) int $current = 1;
 
     /**
      * Items per page
      *
-     * @var int
+     * @var  int
      */
     public protected(set) int $limit = 10;
 
     /**
      * Offset
      *
-     * @var int
+     * @var  int
      */
     public protected(set) int $offset = 0;
 
     /**
      * Number of neighboring pages at the left and the right sides
      *
-     * @var int
+     * @var  int
      */
     public protected(set) int $neighbours = 4;
 
@@ -114,9 +113,9 @@ class Pagination
     /**
      * Property route.
      *
-     * @var RouteUri|null
+     * @var  RouteUri|null
      */
-    public protected(set) RouteUri|null $route = null;
+    public protected(set) ?RouteUri $route = null;
 
     public protected(set) bool $simple = false;
 
@@ -140,7 +139,7 @@ class Pagination
     /**
      * Display
      *
-     * @return PaginationResult
+     * @return  PaginationResult
      */
     public function compile(): PaginationResult
     {
@@ -222,7 +221,7 @@ class Pagination
      * @param  callable|string|null   $template
      * @param  array                  $options
      *
-     * @return string
+     * @return  string
      */
     public function render(
         ?PaginationResult $result = null,
@@ -333,7 +332,7 @@ class Pagination
      *
      * @param  callable|string|null  $template
      *
-     * @return static Return self to support chaining.
+     * @return  static  Return self to support chaining.
      */
     public function template(callable|string|null $template): static
     {
@@ -343,7 +342,7 @@ class Pagination
     }
 
     /**
-     * @return RouteUri|null
+     * @return  RouteUri|null
      */
     public function getRoute(): ?RouteUri
     {

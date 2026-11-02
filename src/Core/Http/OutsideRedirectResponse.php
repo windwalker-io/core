@@ -6,6 +6,4 @@ namespace Windwalker\Core\Http;
 
 use Windwalker\Http\Response\RedirectResponse;
 
-class OutsideRedirectResponse extends RedirectResponse
-{
-}
+class OutsideRedirectResponse extends RedirectResponse {}

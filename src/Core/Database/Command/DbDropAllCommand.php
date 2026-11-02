@@ -24,8 +24,7 @@ class DbDropAllCommand implements CommandInterface
     public function __construct(
         protected ApplicationInterface $app,
         protected ?DatabaseManager $databaseManager = null,
-    ) {
-    }
+    ) {}
 
     public function configure(Command $command): void
     {

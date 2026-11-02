@@ -4,19 +4,12 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
-use DateTime;
-use DateTimeZone;
-use DomainException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
-use Windwalker\Core\Mailer\MailerInterface;
-use Windwalker\Core\Manager\MailerManager;
 
 /**
  * The MailTestCommand class.
@@ -24,9 +17,7 @@ use Windwalker\Core\Manager\MailerManager;
 #[CommandWrapper(description: 'Make site online.')]
 class SiteUpCommand implements CommandInterface
 {
-    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app, protected MaintenanceManager $offlineManager) {}
 
     /**
      * @inheritDoc

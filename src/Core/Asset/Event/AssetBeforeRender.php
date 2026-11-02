@@ -27,11 +27,10 @@ class AssetBeforeRender extends BaseEvent
         public array $html = [],
         public array $links = [],
         public array $internalAttrs = [],
-    ) {
-    }
+    ) {}
 
     /**
-     * @return array
+     * @return  array
      *
      * @deprecated  Use property instead.
      */
@@ -41,7 +40,7 @@ class AssetBeforeRender extends BaseEvent
     }
 
     /**
-     * @return array<AssetLink>
+     * @return  array<AssetLink>
      *
      * @deprecated  Use property instead.
      */

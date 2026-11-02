@@ -20,7 +20,6 @@ use Windwalker\Session\Cookie\CookiesInterface;
 use Windwalker\Session\Session;
 use Windwalker\Session\SessionInterface;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
-use Windwalker\Utilities\Iterator\UniqueIterator;
 
 /**
  * The UserState class.
@@ -34,7 +33,7 @@ class AppState implements JsonSerializable
     protected string $prefix = '';
 
     /**
-     * @var null|AppRequest
+     * @var  null|AppRequest
      */
     protected ?AppRequest $request = null;
 
@@ -235,7 +234,7 @@ class AppState implements JsonSerializable
     }
 
     /**
-     * @return AppRequest
+     * @return  AppRequest
      */
     public function getRequest(): AppRequest
     {
@@ -243,7 +242,7 @@ class AppState implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getPrefix(): string
     {
@@ -265,7 +264,7 @@ class AppState implements JsonSerializable
     }
 
     /**
-     * @return Collection
+     * @return  Collection
      */
     public function getState(): Collection
     {

@@ -22,7 +22,7 @@ class ProxyResolver
     protected string $headerPrefix = 'x-';
 
     /**
-     * @var array
+     * @var  array
      */
     protected array $config;
 
@@ -173,7 +173,7 @@ class ProxyResolver
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getHeaderPrefix(): string
     {
@@ -196,7 +196,7 @@ class ProxyResolver
      * @param  mixed   $trustedProxies
      * @param  string  $remoteAddr
      *
-     * @return array
+     * @return  array
      */
     public static function handleTrustedProxies(string|array $trustedProxies, string $remoteAddr = ''): array
     {

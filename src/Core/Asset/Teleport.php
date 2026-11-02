@@ -119,8 +119,8 @@ class Teleport
     {
         if ($this->currentName) {
             throw new LogicException(
-                'Does not support nested teleport for: ' . $__assetTemplateName .
-                '. current teleport is: ' . $this->currentName
+                'Does not support nested teleport for: ' . $__assetTemplateName
+                . '. current teleport is: ' . $this->currentName
             );
         }
 

@@ -40,7 +40,7 @@ class CommandWrapper extends Command implements
     /**
      * Use another property to store callback that can support extra process flow for this class.
      *
-     * @var object|callable
+     * @var  object|callable
      */
     protected mixed $handler = null;
 
@@ -63,7 +63,7 @@ class CommandWrapper extends Command implements
     }
 
     /**
-     * @return callable|object
+     * @return  callable|object
      */
     public function getHandler(): mixed
     {
@@ -171,7 +171,7 @@ class CommandWrapper extends Command implements
      *
      * @param  callable|CommandInterface  $handler
      *
-     * @return callable|CommandInterface
+     * @return  callable|CommandInterface
      */
     protected function configureHandler(callable|CommandInterface $handler): callable|CommandInterface
     {

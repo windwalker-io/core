@@ -16,7 +16,6 @@ use Windwalker\Database\Platform\MySQLPlatform;
 use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
-use Windwalker\DI\Definition\ObjectBuilderDefinition;
 use Windwalker\ORM\ORM;
 
 use function Windwalker\DI\create;

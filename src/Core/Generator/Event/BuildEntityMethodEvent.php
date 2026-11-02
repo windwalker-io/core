@@ -39,8 +39,7 @@ class BuildEntityMethodEvent extends BaseEvent
         public ClassMethod $method,
         public Node $type,
         public EntityMemberBuilder $entityMemberBuilder,
-    ) {
-    }
+    ) {}
 
     /**
      * @return  bool

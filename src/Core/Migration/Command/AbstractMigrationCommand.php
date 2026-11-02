@@ -16,7 +16,6 @@ use Windwalker\Core\Database\Command\CommandDatabaseTrait;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Database\Driver\Pdo\DsnHelper;
 use Windwalker\DI\Attributes\Inject;
 use Windwalker\Environment\Environment;
 
@@ -205,7 +204,7 @@ abstract class AbstractMigrationCommand implements CommandInterface
      *
      * @return  void
      *
-     * @throws Exception
+     * @throws  Exception
      */
     protected function backup(IOInterface $io): void
     {

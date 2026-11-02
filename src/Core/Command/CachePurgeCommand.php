@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Command;
 
-use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Windwalker\Cache\CachePool;
@@ -25,9 +24,7 @@ use Windwalker\DI\Exception\DependencyResolutionException;
 )]
 class CachePurgeCommand implements CommandInterface, CompletionHandlerInterface
 {
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * @inheritDoc

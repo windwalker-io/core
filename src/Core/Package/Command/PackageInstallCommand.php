@@ -21,10 +21,7 @@ use Windwalker\Core\Generator\FileCloneResult;
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\InstallResource;
 use Windwalker\Core\Package\PackageRegistry;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
-
-use function Windwalker\depth;
 
 /**
  * The PackageInstallCommand class.
@@ -33,7 +30,7 @@ use function Windwalker\depth;
 class PackageInstallCommand implements CommandInterface, CompletionAwareInterface
 {
     /**
-     * @var IOInterface
+     * @var  IOInterface
      */
     private ?IOInterface $io = null;
 
@@ -44,9 +41,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * configure
@@ -108,7 +103,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -157,7 +152,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         $resultSet = [];
 
         if ($details < 2) {
-            $io->writeln("Installing selected resources...");
+            $io->writeln('Installing selected resources...');
         }
 
         // Install
@@ -301,12 +296,12 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
 
     /**
      * @param  PackageRegistry  $registry
-     * @param  string[]          $packages
-     * @param  string[]          $tags
+     * @param  string[]         $packages
+     * @param  string[]         $tags
      *
      * @return  void
      *
-     * @throws \JsonException
+     * @throws  \JsonException
      */
     protected function validateTargets(PackageRegistry $registry, array $packages, array $tags): void
     {
@@ -359,7 +354,7 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
         if ($argumentName === 'packages') {
             $registry = $this->app->make(PackageRegistry::class);
 
-            return array_map(static fn (AbstractPackage $pkg) => $pkg::getName(), $registry->getPackages());
+            return array_map(static fn(AbstractPackage $pkg) => $pkg::getName(), $registry->getPackages());
         }
     }
 

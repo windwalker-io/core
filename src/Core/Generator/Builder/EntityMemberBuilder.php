@@ -55,16 +55,14 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     protected array $addedFunctionUses = [];
 
     /**
-     * @var array<array{ string, string }>
+     * @var  array<array{ string, string }>
      */
     protected array $newEnums = [];
 
     /**
      * EntityMemberBuilder constructor.
      */
-    public function __construct(protected EntityMetadata $metadata)
-    {
-    }
+    public function __construct(protected EntityMetadata $metadata) {}
 
     public function getORM(): ORM
     {
@@ -379,7 +377,7 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
     }
 
     /**
-     * @return EntityMetadata
+     * @return  EntityMetadata
      */
     public function getMetadata(): EntityMetadata
     {

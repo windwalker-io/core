@@ -18,8 +18,7 @@ class MailerOptions
         public array|string|Dsn|null $dsn = null,
         public array|string|null $cc = null,
         public array|string|null $bcc = null,
-    ) {
-    }
+    ) {}
 
     public function getEnvelope(): ?Envelope
     {

@@ -16,7 +16,5 @@ class AfterRequestEvent extends BaseEvent
 {
     use AccessorBCTrait;
 
-    public function __construct(public Container $container, public ResponseInterface $response)
-    {
-    }
+    public function __construct(public Container $container, public ResponseInterface $response) {}
 }

@@ -20,9 +20,7 @@ class ClassFinder
     /**
      * ClassFinder constructor.
      */
-    public function __construct(protected PathResolver $pathResolver, protected ClassLoader $loader)
-    {
-    }
+    public function __construct(protected PathResolver $pathResolver, protected ClassLoader $loader) {}
 
     public function findDirsFromNamespace(string $ns): array
     {

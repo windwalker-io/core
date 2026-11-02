@@ -16,7 +16,5 @@ class BeforeRequestEvent extends BaseEvent
 {
     use AccessorBCTrait;
 
-    public function __construct(public Container $container, public ?ServerRequestInterface $request = null)
-    {
-    }
+    public function __construct(public Container $container, public ?ServerRequestInterface $request = null) {}
 }

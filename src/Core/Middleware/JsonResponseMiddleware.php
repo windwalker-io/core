@@ -7,14 +7,8 @@ namespace Windwalker\Core\Middleware;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Log\LoggerInterface;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Error\ErrorHandlerInterface;
-use Windwalker\Core\Error\ErrorLogHandler;
-use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\Http\Response\JsonResponse;
@@ -33,9 +27,7 @@ class JsonResponseMiddleware implements AttributeMiddlewareInterface
     /**
      * JsonResponseMiddleware constructor.
      */
-    public function __construct(protected AppContext $app)
-    {
-    }
+    public function __construct(protected AppContext $app) {}
 
     public function run(ServerRequestInterface $request, Closure $next): mixed
     {

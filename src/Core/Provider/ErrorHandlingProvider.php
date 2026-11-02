@@ -26,14 +26,14 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
     use IniSetterTrait;
 
     /**
-     * @var Config
+     * @var  Config
      */
     protected Config $config;
 
     /**
      * ErrorHandlingProvider constructor.
      *
-     * @param  Config  $config
+     * @param  Config                $config
      * @param  ApplicationInterface  $app
      */
     public function __construct(Config $config, protected ApplicationInterface $app)
@@ -131,7 +131,7 @@ class ErrorHandlingProvider implements ServiceProviderInterface, BootableProvide
         );
         $container->bind(
             ErrorHandlerInterface::class,
-            fn (TaggingFactory $factory, ?string $tag) => $factory->useConfig('error')
+            fn(TaggingFactory $factory, ?string $tag) => $factory->useConfig('error')
                 ->id('handlers')
                 ->get($tag),
             new DIOptions(isolation: true)

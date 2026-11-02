@@ -11,8 +11,6 @@ use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Service\ErrorService;
-use Windwalker\DI\Container;
-use Windwalker\Http\Output\Output;
 use Windwalker\Http\Output\OutputInterface;
 use Windwalker\Http\Output\StreamOutput;
 use Windwalker\Http\Response\HtmlResponse;
@@ -52,8 +50,8 @@ class SimpleErrorPageHandler implements ErrorHandlerInterface
      * @param  Throwable  $e
      *
      * @return  void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function __invoke(Throwable $e): void
     {

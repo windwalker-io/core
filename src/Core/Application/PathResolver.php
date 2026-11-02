@@ -18,9 +18,7 @@ class PathResolver
      *
      * @param  Config  $config
      */
-    public function __construct(protected Config $config)
-    {
-    }
+    public function __construct(protected Config $config) {}
 
     public function all(): array
     {

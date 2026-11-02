@@ -52,7 +52,7 @@ class FakerService implements EventAwareInterface
      *
      * @return  FakerGenerator
      *
-     * @throws InvalidArgumentException
+     * @throws  InvalidArgumentException
      *
      * @since  3.5
      */

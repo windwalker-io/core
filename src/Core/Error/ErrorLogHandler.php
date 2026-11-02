@@ -56,7 +56,7 @@ class ErrorLogHandler implements ErrorHandlerInterface
      * @param  Throwable  $e
      *
      * @return  void
-     * @throws Exception
+     * @throws  Exception
      */
     public function __invoke(Throwable $e): void
     {

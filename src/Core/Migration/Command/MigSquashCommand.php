@@ -15,9 +15,7 @@ use Windwalker\Core\Migration\MigrationSquashService;
 )]
 class MigSquashCommand extends AbstractMigrationCommand
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * configure
@@ -58,7 +56,7 @@ class MigSquashCommand extends AbstractMigrationCommand
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {

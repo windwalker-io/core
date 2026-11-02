@@ -12,7 +12,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class ProfilerFactory
 {
     /**
-     * @var array<Profiler>
+     * @var  array<Profiler>
      */
     protected array $instances = [];
 
@@ -42,7 +42,7 @@ class ProfilerFactory
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getInstances(): array
     {

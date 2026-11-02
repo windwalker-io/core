@@ -352,7 +352,7 @@ trait RouteConfigurationTrait
      * - (EventAware::class, Subscriber::class)
      * - (EventAware::class, EventName::class, callable)
      *
-     * @param ...$args
+     * @param   ...$args
      *
      * @return  $this
      */

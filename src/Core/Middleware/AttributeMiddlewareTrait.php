@@ -9,7 +9,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Controller\ControllerDispatcher;
 
 /**
  * Trait AttributeMiddlewareTrait

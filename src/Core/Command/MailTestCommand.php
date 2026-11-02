@@ -15,7 +15,6 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Mailer\MailerInterface;
-use Windwalker\Core\Manager\MailerManager;
 
 /**
  * The MailTestCommand class.
@@ -28,9 +27,7 @@ class MailTestCommand implements CommandInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * @inheritDoc

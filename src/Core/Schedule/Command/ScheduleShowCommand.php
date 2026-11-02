@@ -23,9 +23,7 @@ use Windwalker\Utilities\Arr;
 #[CommandWrapper(description: 'Run CRON schedule')]
 class ScheduleShowCommand implements CommandInterface
 {
-    public function __construct(protected ScheduleService $scheduleService)
-    {
-    }
+    public function __construct(protected ScheduleService $scheduleService) {}
 
     /**
      * @inheritDoc
@@ -149,7 +147,7 @@ class ScheduleShowCommand implements CommandInterface
         $io->newLine();
 
         if (!$canDescribe) {
-            $io->style()->warning("Consider install `lorisleiva/cron-translator` to describe CRON expression.");
+            $io->style()->warning('Consider install `lorisleiva/cron-translator` to describe CRON expression.');
         }
     }
 }

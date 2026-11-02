@@ -14,13 +14,11 @@ class PackageMigrator
     public protected(set) array $children = [];
 
     /**
-     * @var array<PackageDbMigrate>
+     * @var  array<PackageDbMigrate>
      */
     public protected(set) array $dbMigrates = [];
 
-    public function __construct(public readonly ?string $name, protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(public readonly ?string $name, protected ApplicationInterface $app) {}
 
     public function getChild(string $name): static
     {

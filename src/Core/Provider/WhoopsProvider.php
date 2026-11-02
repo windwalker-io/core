@@ -48,8 +48,8 @@ class WhoopsProvider implements ServiceProviderInterface, BootableProviderInterf
      * @param  Container  $container
      *
      * @return  void
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function bootBeforeRequest(Container $container): void
     {

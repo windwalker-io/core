@@ -18,6 +18,5 @@ class BeforeControllerDispatchEvent extends BaseEvent
     public function __construct(
         public mixed $controller,
         public AppContextInterface $app,
-    ) {
-    }
+    ) {}
 }

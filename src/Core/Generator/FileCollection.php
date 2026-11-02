@@ -24,9 +24,7 @@ class FileCollection implements EventAwareInterface
     /**
      * FileCollection constructor.
      */
-    public function __construct(protected FilesIterator $files)
-    {
-    }
+    public function __construct(protected FilesIterator $files) {}
 
     public function each(callable $callback): static
     {
@@ -94,7 +92,7 @@ class FileCollection implements EventAwareInterface
     }
 
     /**
-     * @return FilesIterator
+     * @return  FilesIterator
      */
     public function getFiles(): FilesIterator
     {
@@ -114,7 +112,7 @@ class FileCollection implements EventAwareInterface
     }
 
     /**
-     * @return array<FileObject>
+     * @return  array<FileObject>
      */
     public function getResults(): array
     {

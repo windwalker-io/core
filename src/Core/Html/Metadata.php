@@ -6,7 +6,6 @@ namespace Windwalker\Core\Html;
 
 use Stringable;
 use Windwalker\DOM\DOMElement;
-
 use Windwalker\DOM\HTMLElement;
 
 use function Windwalker\DOM\h;
@@ -39,7 +38,7 @@ class Metadata
      * @param  string|Stringable  $content
      * @param  bool               $replace
      *
-     * @return static
+     * @return  static
      */
     public function addMetadata(string $name, string|Stringable $content, bool $replace = false): static
     {
@@ -95,7 +94,7 @@ class Metadata
      * @param  string|Stringable  $content
      * @param  bool               $replace
      *
-     * @return static
+     * @return  static
      */
     public function addOpenGraph(string $type, string|Stringable $content, bool $replace = false)
     {

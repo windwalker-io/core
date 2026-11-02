@@ -19,8 +19,7 @@ abstract class AbstractBuffer implements ResponseBufferInterface
         public mixed $data = null,
         public bool $success = true,
         public int|string $code = '200'
-    ) {
-    }
+    ) {}
 
     /**
      * toString

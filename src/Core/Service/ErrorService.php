@@ -11,15 +11,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Throwable;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Error\DeprecatedException;
 use Windwalker\Core\Error\ErrorHandlerInterface;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\ResponseHelper;
-use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 use Windwalker\Utilities\Utf8String;
 
 use function is_string;
-use function Windwalker\str;
 
 /**
  * The ErrorService class.
@@ -43,7 +40,7 @@ class ErrorService
     protected array $handlers = [];
 
     /**
-     * @var array<callable>
+     * @var  array<callable>
      */
     protected array $deprecationHandlers = [];
 
@@ -78,7 +75,7 @@ class ErrorService
     ];
 
     /**
-     * @var Config
+     * @var  Config
      */
     protected Config $config;
 
@@ -134,7 +131,7 @@ class ErrorService
      * down
      *
      * @return  void
-     * @throws ErrorException
+     * @throws  ErrorException
      */
     public function down(): void
     {
@@ -148,10 +145,10 @@ class ErrorService
     /**
      * The error handler.
      *
-     * @param  integer  $code  The level of the error raised, as an integer.
+     * @param  integer  $code     The level of the error raised, as an integer.
      * @param  string   $message  The error message, as a string.
-     * @param  string   $file  The filename that the error was raised in, as a string.
-     * @param  integer  $line  The line number the error was raised at, as an integer.
+     * @param  string   $file     The filename that the error was raised in, as a string.
+     * @param  integer  $line     The line number the error was raised at, as an integer.
      *
      * @return  void
      *
@@ -239,7 +236,7 @@ class ErrorService
      * @param  Throwable  $exception
      *
      * @return  void
-     * @throws InvalidArgumentException
+     * @throws  InvalidArgumentException
      */
     protected function simpleHandler(Throwable $exception): void
     {
@@ -283,8 +280,8 @@ class ErrorService
      * @param  string  $errorTemplate
      * @param  string  $engine
      *
-     * @return void
-     * @throws InvalidArgumentException
+     * @return  void
+     * @throws  InvalidArgumentException
      */
     public function setErrorTemplate(string $errorTemplate, ?string $engine = null): void
     {
@@ -382,7 +379,7 @@ class ErrorService
      * @param  callable     $handler
      * @param  string|null  $name
      *
-     * @return static Return self to support chaining.
+     * @return  static  Return self to support chaining.
      */
     public function addHandler(callable $handler, ?string $name = null): static
     {

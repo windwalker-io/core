@@ -75,7 +75,7 @@ class ChronosService
         return $db->getNullDate();
     }
 
-    public function isNullDate(string|int|null|DateTimeInterface $date, ?DatabaseAdapter $db = null): bool
+    public function isNullDate(string|int|DateTimeInterface|null $date, ?DatabaseAdapter $db = null): bool
     {
         if (!class_exists(DatabaseAdapter::class)) {
             throw new DomainException('Please install windwalker/database first to use: ' . __METHOD__);
@@ -189,7 +189,7 @@ class ChronosService
      * @param  string|null               $operator
      *
      * @return  bool|int
-     * @throws Exception
+     * @throws  Exception
      */
     public static function compare(
         string|DateTimeInterface $date1,
@@ -294,9 +294,9 @@ class ChronosService
      * @param  string|DateTimeInterface  $date
      * @param  string                    $format
      *
-     * @return string
+     * @return  string
      *
-     * @throws Exception
+     * @throws  Exception
      * @since  3.2
      */
     public static function toFormat(string|DateTimeInterface $date, string $format): string
@@ -311,7 +311,7 @@ class ChronosService
      * @param  string|DateTimeZone|null  $tz
      *
      * @return  string
-     * @throws Exception
+     * @throws  Exception
      */
     public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
@@ -326,7 +326,7 @@ class ChronosService
      *
      * @return  Chronos
      *
-     * @throws Exception
+     * @throws  Exception
      * @since   2.1
      */
     public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
@@ -341,8 +341,8 @@ class ChronosService
      * @param  string                    $time      String representing the time.
      * @param  string|DateTimeZone|null  $timezone  A DateTimeZone object representing the desired time zone.
      *
-     * @return static|bool
-     * @throws Exception
+     * @return  static|bool
+     * @throws  Exception
      */
     public static function createFromFormat(
         string $format,

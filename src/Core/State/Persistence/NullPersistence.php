@@ -22,9 +22,7 @@ class NullPersistence implements PersistenceInterface
         return $value;
     }
 
-    public function forget(string $key): void
-    {
-    }
+    public function forget(string $key): void {}
 
     public function all(): Iterator
     {

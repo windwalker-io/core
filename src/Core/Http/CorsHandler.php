@@ -40,10 +40,10 @@ class CorsHandler
     /**
      * allowOrigin
      *
-     * @param string|array $domain
-     * @param bool         $replace
+     * @param  string|array  $domain
+     * @param  bool          $replace
      *
-     * @return static
+     * @return  static
      */
     public function allowOrigin(string|array $domain = '*', bool $replace = false): static
     {
@@ -61,7 +61,7 @@ class CorsHandler
     /**
      * allowMethods
      *
-     * @param string|array $methods
+     * @param  string|array  $methods
      *
      * @return  static
      */
@@ -78,7 +78,7 @@ class CorsHandler
     /**
      * allowHeaders
      *
-     * @param array|string $headers
+     * @param  array|string  $headers
      *
      * @return  static
      */
@@ -95,7 +95,7 @@ class CorsHandler
     /**
      * maxAge
      *
-     * @param int $seconds
+     * @param  int  $seconds
      *
      * @return  static
      */
@@ -109,7 +109,7 @@ class CorsHandler
     /**
      * allowCredentials
      *
-     * @param bool $bool
+     * @param  bool  $bool
      *
      * @return  static
      */
@@ -125,7 +125,7 @@ class CorsHandler
     /**
      * exposeHeaders
      *
-     * @param string|array $headers
+     * @param  string|array  $headers
      *
      * @return  static
      */
@@ -172,7 +172,7 @@ class CorsHandler
     /**
      * Method to set property response
      *
-     * @param   ResponseInterface $response
+     * @param  ResponseInterface  $response
      *
      * @return  static  Return self to support chaining.
      */

@@ -24,11 +24,11 @@ use function Windwalker\unwrap_enum;
 class RouteUri extends Uri implements NavConstantInterface
 {
     /**
-     * @var callable
+     * @var  callable
      */
     protected $handler;
 
-    protected array|null $handledData = null;
+    protected ?array $handledData = null;
 
     protected NavOptions $options;
 
@@ -291,7 +291,7 @@ class RouteUri extends Uri implements NavConstantInterface
     }
 
     /**
-     * @return NavOptions
+     * @return  NavOptions
      */
     public function getOptions(): NavOptions
     {
@@ -420,7 +420,7 @@ class RouteUri extends Uri implements NavConstantInterface
     }
 
     /**
-     * @return int
+     * @return  int
      */
     public function getStatus(): int
     {

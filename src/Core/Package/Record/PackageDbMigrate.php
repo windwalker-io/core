@@ -10,9 +10,7 @@ class PackageDbMigrate
 
     public array $entities = [];
 
-    public function __construct(public string $version = '')
-    {
-    }
+    public function __construct(public string $version = '') {}
 
     public function getMigrationFiles(): array
     {

@@ -31,9 +31,9 @@ trait ServiceAwareTrait
      * @param  bool                   $forceNew
      * @param  \UnitEnum|string|null  $tag
      *
-     * @return T
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @return  T
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     public function retrieve(string $id, bool $forceNew = false, \UnitEnum|string|null $tag = null): mixed
     {
@@ -54,9 +54,9 @@ trait ServiceAwareTrait
      * @param  array            $args
      * @param  int|DIOptions    $options
      *
-     * @return T
-     * @throws DefinitionResolveException
-     * @throws ReflectionException
+     * @return  T
+     * @throws  DefinitionResolveException
+     * @throws  ReflectionException
      */
     public function make(string $class, array $args = [], int|DIOptions $options = new DIOptions()): object
     {
@@ -73,11 +73,11 @@ trait ServiceAwareTrait
      * @param  int|DIOptions          $options
      * @param  \UnitEnum|string|null  $tag
      *
-     * @return T
+     * @return  T
      *
-     * @throws DefinitionException
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @throws  DefinitionException
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     public function service(
         string $class,
@@ -104,11 +104,11 @@ trait ServiceAwareTrait
      *
      * @return  mixed
      *
-     * @throws ContainerExceptionInterface
-     * @throws DefinitionResolveException
-     * @throws DependencyResolutionException
-     * @throws NotFoundExceptionInterface
-     * @throws ReflectionException
+     * @throws  ContainerExceptionInterface
+     * @throws  DefinitionResolveException
+     * @throws  DependencyResolutionException
+     * @throws  NotFoundExceptionInterface
+     * @throws  ReflectionException
      */
     public function call(
         mixed $callable,
@@ -129,7 +129,7 @@ trait ServiceAwareTrait
      *
      * @return  StoreDefinitionInterface
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function bind(
         string $id,
@@ -150,11 +150,11 @@ trait ServiceAwareTrait
      * @param  int|DIOptions          $options
      * @param  \UnitEnum|string|null  $tag
      *
-     * @return mixed|T
-     * @throws DefinitionNotFoundException
-     * @throws DefinitionResolveException
-     * @throws DependencyResolutionException
-     * @throws ReflectionException
+     * @return  mixed|T
+     * @throws  DefinitionNotFoundException
+     * @throws  DefinitionResolveException
+     * @throws  DependencyResolutionException
+     * @throws  ReflectionException
      */
     public function resolve(
         mixed $source,

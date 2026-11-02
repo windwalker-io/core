@@ -14,9 +14,7 @@ class ScheduleService
 {
     use InstanceCacheTrait;
 
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     public function getScheduleRoutes(): array
     {

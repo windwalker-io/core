@@ -18,9 +18,7 @@ class SessionPersistence implements PersistenceInterface
      *
      * @param  SessionInterface  $session
      */
-    public function __construct(protected SessionInterface $session)
-    {
-    }
+    public function __construct(protected SessionInterface $session) {}
 
     public function get(string $key): mixed
     {

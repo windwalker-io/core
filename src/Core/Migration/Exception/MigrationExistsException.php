@@ -24,7 +24,7 @@ class MigrationExistsException extends RuntimeException
      */
     public function __construct(
         protected AbstractMigration $migration,
-        $message = "",
+        $message = '',
         $code = 0,
         ?Throwable $previous = null
     ) {
@@ -32,7 +32,7 @@ class MigrationExistsException extends RuntimeException
     }
 
     /**
-     * @return Migration
+     * @return  Migration
      */
     public function getMigration(): AbstractMigration
     {

@@ -17,9 +17,7 @@ class MigrationSquashBuilder
 {
     protected array $uses = [];
 
-    public function __construct(protected DatabaseAdapter $db)
-    {
-    }
+    public function __construct(protected DatabaseAdapter $db) {}
 
     /**
      * @param  TableManager  $tableManager
@@ -96,9 +94,9 @@ PHP;
 
         if ($column->isPrimary() && $column->isAutoIncrement()) {
             if (($type === 'int' || $type === 'integer')) {
-                $method = "primary";
+                $method = 'primary';
             } elseif ($type === 'bigint') {
-                $method = "primaryBigint";
+                $method = 'primaryBigint';
             }
         }
 

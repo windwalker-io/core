@@ -29,8 +29,7 @@ class ConfigModule
         public int $priority = PriorityQueue::ABOVE_NORMAL,
         public string|array|null $env = null,
         public ?string $belongsTo = null,
-    ) {
-    }
+    ) {}
 
     public function isAvailable(): bool
     {

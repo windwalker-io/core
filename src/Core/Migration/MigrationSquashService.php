@@ -20,9 +20,7 @@ class MigrationSquashService
 {
     use MessageOutputTrait;
 
-    public function __construct(protected ApplicationInterface $app, protected MigrationService $migrationService)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app, protected MigrationService $migrationService) {}
 
     public function squash(
         DatabaseAdapter $db,

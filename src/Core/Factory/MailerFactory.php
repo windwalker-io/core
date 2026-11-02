@@ -6,7 +6,6 @@ namespace Windwalker\Core\Factory;
 
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\Dsn;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Core\Mailer\Mailer;
@@ -15,7 +14,6 @@ use Windwalker\Core\Mailer\MailerOptions;
 use Windwalker\DI\Attributes\Factory;
 use Windwalker\DI\Attributes\Isolation;
 use Windwalker\DI\Container;
-use Windwalker\Utilities\Arr;
 
 #[Isolation]
 class MailerFactory implements ServiceFactoryInterface

@@ -26,7 +26,6 @@ use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
 use function Windwalker\collect;
-use function Windwalker\ds;
 
 /**
  * The BuildEntityCommand class.
@@ -43,10 +42,10 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
      * BuildEntityCommand constructor.
      */
     public function __construct(
-        #[Autowire] protected ClassFinder $classFinder,
+        #[Autowire]
+        protected ClassFinder $classFinder,
         protected ConsoleApplication $app,
-    ) {
-    }
+    ) {}
 
     /**
      * configure
@@ -124,7 +123,7 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -189,8 +188,8 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
                 $io->getArgument('ns') ?: '',
                 ($pkg = $io->getOption('pkg')) ? "--pkg=$pkg" : '',
                 $connection ? "--connection=$connection" : '',
-                $io->getOption('methods') ? "--methods" : '',
-                $io->getOption('hooks') ? "--hooks" : '',
+                $io->getOption('methods') ? '--methods' : '',
+                $io->getOption('hooks') ? '--hooks' : '',
                 $io->getOption('dry-run') ? '--dry-run' : '',
             ];
 
@@ -310,9 +309,7 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
     /**
      * @inheritDoc
      */
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     public function handleCompletions(CompletionContext $context): ?array
     {

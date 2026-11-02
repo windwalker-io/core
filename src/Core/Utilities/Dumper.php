@@ -8,7 +8,6 @@ use DomainException;
 use ErrorException;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\CliContextProvider;
-use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\SourceContextProvider;
 use Symfony\Component\VarDumper\Server\Connection;
 
@@ -31,7 +30,7 @@ class Dumper
     /**
      * Property connection.
      *
-     * @var Connection
+     * @var  Connection
      */
     protected Connection $connection;
 
@@ -86,7 +85,7 @@ class Dumper
      *
      * @return  bool
      *
-     * @throws ErrorException
+     * @throws  ErrorException
      * @since  3.4.6
      */
     public function dumpToServer(...$args): bool

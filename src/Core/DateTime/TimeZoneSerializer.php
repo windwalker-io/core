@@ -11,9 +11,7 @@ use function Windwalker\chronos;
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class TimeZoneSerializer implements JsonSerializerInterface
 {
-    public function __construct(public \DateTimeZone|string $to = 'UTC')
-    {
-    }
+    public function __construct(public \DateTimeZone|string $to = 'UTC') {}
 
     public function serialize(mixed $data): mixed
     {

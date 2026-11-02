@@ -28,7 +28,7 @@ class CoreCompositeProvider extends CompositeListenerProvider
     }
 
     /**
-     * @return EventCollector
+     * @return  EventCollector
      */
     public function getCollector(): EventCollector
     {

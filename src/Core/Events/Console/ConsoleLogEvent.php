@@ -14,7 +14,7 @@ class ConsoleLogEvent
     use AccessorBCTrait;
 
     public array $messages {
-        set (mixed $value) {
+        set(mixed $value) {
             $this->messages = (array) $value;
         }
     }

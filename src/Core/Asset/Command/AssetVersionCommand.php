@@ -26,9 +26,7 @@ class AssetVersionCommand implements CommandInterface
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * configure
@@ -51,8 +49,8 @@ class AssetVersionCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws Exception
+     * @return  int        Return 0 is success, 1-255 is failure.
+     * @throws  Exception
      */
     public function execute(IOInterface $io): int
     {

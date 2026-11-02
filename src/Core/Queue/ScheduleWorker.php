@@ -29,9 +29,7 @@ class ScheduleWorker
 {
     use MessageOutputTrait;
 
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     public function runByCommand(
         int $lifetime,

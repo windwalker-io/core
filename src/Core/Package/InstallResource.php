@@ -76,7 +76,7 @@ class InstallResource
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getCallbacks(): array
     {

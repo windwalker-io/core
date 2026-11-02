@@ -49,9 +49,7 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      *
      * @param  WsApplicationInterface  $parentApp
      */
-    public function __construct(protected WsApplicationInterface $parentApp)
-    {
-    }
+    public function __construct(protected WsApplicationInterface $parentApp) {}
 
     /**
      * Create mapping object that can share cross processes.
@@ -60,8 +58,8 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      *
      * @return  void
      *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function boot(Container $container): void
     {
@@ -76,7 +74,7 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      *
      * @level 2
      */
@@ -85,7 +83,7 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
         $container->share(WsRootApplicationInterface::class, $this->parentApp);
         $container->share(
             MessageEmitterInterface::class,
-            fn (Container $container) => $container->get(WebSocketServerInterface::class)->getMessageEmitter()
+            fn(Container $container) => $container->get(WebSocketServerInterface::class)->getMessageEmitter()
         );
 
         $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
@@ -106,8 +104,8 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      * @param  Container  $container
      *
      * @return  WsAppRequest
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     protected function createAppRequest(Container $container): WsAppRequest
     {
@@ -123,7 +121,7 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function registerAppContext(Container $container): void
     {
@@ -153,7 +151,7 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function registerRequestObject(Container $container): void
     {

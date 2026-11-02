@@ -6,7 +6,6 @@ namespace Windwalker\Core\Router;
 
 use Windwalker\Utilities\Options\RecordOptionsTrait;
 
-use function Windwalker\get_object_dump_props;
 use function Windwalker\get_object_dump_values;
 
 class NavOptions implements NavConstantInterface, \JsonSerializable
@@ -28,8 +27,7 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
         public array|bool|null $allowQuery = null,
         public ?string $base = null,
         public ?array $extra = null,
-    ) {
-    }
+    ) {}
 
     public static function wrap(mixed $values, bool $clone = false): static
     {

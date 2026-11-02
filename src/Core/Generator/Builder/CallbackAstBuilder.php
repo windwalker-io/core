@@ -38,7 +38,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return Closure|null
+     * @return  Closure|null
      */
     public function getEnterNode(): ?Closure
     {
@@ -58,7 +58,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return Closure|null
+     * @return  Closure|null
      */
     public function getLeaveNode(): ?Closure
     {
@@ -78,7 +78,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return Closure|null
+     * @return  Closure|null
      */
     public function getBeforeTraverse(): ?Closure
     {
@@ -98,7 +98,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return Closure|null
+     * @return  Closure|null
      */
     public function getAfterTraverse(): ?Closure
     {
@@ -118,7 +118,7 @@ class CallbackAstBuilder extends AbstractAstBuilder
     }
 
     /**
-     * @return string|null
+     * @return  string|null
      */
     public function getCode(): ?string
     {

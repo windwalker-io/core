@@ -308,11 +308,11 @@ abstract class AbstractGeneratorSubCommand implements CommandInterface, Interact
 
             if (!$y) {
                 $io->writeln(
-                    "Seems you are using a single level name [<comment>$ns</comment>]. " .
-                    "Usually we recommend add s stage, like \"<info>[$example]/$ns</info>\". "
+                    "Seems you are using a single level name [<comment>$ns</comment>]. "
+                    . "Usually we recommend add s stage, like \"<info>[$example]/$ns</info>\". "
                 );
                 $io->writeln(
-                    "[<info>N</info>] (default) Cancel and re-enter the name."
+                    '[<info>N</info>] (default) Cancel and re-enter the name.'
                 );
                 $io->writeln(
                     "[<comment>y</comment>] Force create with [<info>$ns</info>] without stage."

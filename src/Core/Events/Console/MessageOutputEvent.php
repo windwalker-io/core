@@ -20,9 +20,7 @@ class MessageOutputEvent
      * @param  bool          $newLine
      * @param  int           $options
      */
-    public function __construct(public string|array $messages, public bool $newLine = true, public int $options = 0)
-    {
-    }
+    public function __construct(public string|array $messages, public bool $newLine = true, public int $options = 0) {}
 
     /**
      * Instant write to std output.

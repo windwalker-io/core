@@ -49,7 +49,7 @@ class WsRootApplication implements WsRootApplicationInterface
     protected bool $booted = false;
 
     /**
-     * @var MiddlewareInterface[]|callable[]
+     * @var  MiddlewareInterface[]|callable[]
      */
     protected array $middlewares = [];
 
@@ -79,7 +79,7 @@ class WsRootApplication implements WsRootApplicationInterface
      * boot
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function boot(): void
     {
@@ -192,9 +192,9 @@ class WsRootApplication implements WsRootApplicationInterface
      *
      * @return  ResponseInterface
      *
-     * @throws \Throwable
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws  \Throwable
+     * @throws  \Psr\Container\ContainerExceptionInterface
+     * @throws  \Psr\Container\NotFoundExceptionInterface
      */
     public function runContext(WsAppContext $appContext, ?callable $handler = null): ResponseInterface
     {
@@ -276,9 +276,9 @@ class WsRootApplication implements WsRootApplicationInterface
      * @param  WebSocketRequestInterface  $request
      * @param  iterable                   $middlewares
      *
-     * @return ResponseInterface
-     * @throws \ReflectionException
-     * @throws DefinitionResolveException
+     * @return  ResponseInterface
+     * @throws  \ReflectionException
+     * @throws  DefinitionResolveException
      */
     protected function dispatch(
         WsAppContext $app,

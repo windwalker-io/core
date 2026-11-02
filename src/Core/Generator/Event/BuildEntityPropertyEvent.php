@@ -22,6 +22,5 @@ class BuildEntityPropertyEvent extends BaseEvent
         public Property $prop,
         public Column $column,
         public EntityMemberBuilder $entityMemberBuilder
-    ) {
-    }
+    ) {}
 }

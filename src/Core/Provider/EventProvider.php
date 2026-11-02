@@ -24,7 +24,7 @@ class EventProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function register(Container $container): void
     {

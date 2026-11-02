@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Profiler;
 
-use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Component\Stopwatch\StopwatchPeriod;
 
 /**
@@ -48,7 +47,7 @@ class ProfilerItem implements \JsonSerializable
     }
 
     /**
-     * @return StopwatchPeriod
+     * @return  StopwatchPeriod
      */
     public function getPeriod(): StopwatchPeriod
     {
@@ -56,7 +55,7 @@ class ProfilerItem implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getLabel(): string
     {
@@ -64,7 +63,7 @@ class ProfilerItem implements \JsonSerializable
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getTags(): array
     {

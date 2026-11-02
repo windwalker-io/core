@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class IO implements IOInterface
 {
-    protected SymfonyStyle|null $style = null;
+    protected ?SymfonyStyle $style = null;
 
     /**
      * IO constructor.
@@ -149,7 +149,7 @@ class IO implements IOInterface
     }
 
     /**
-     * @return InputInterface
+     * @return  InputInterface
      */
     public function getInput(): InputInterface
     {
@@ -171,7 +171,7 @@ class IO implements IOInterface
     }
 
     /**
-     * @return OutputInterface
+     * @return  OutputInterface
      */
     public function getOutput(): OutputInterface
     {
@@ -195,7 +195,7 @@ class IO implements IOInterface
     /**
      * Returns the first argument from the raw parameters (not parsed).
      *
-     * @return string|null The value of the first argument or null otherwise
+     * @return  string|null  The value of the first argument or null otherwise
      */
     public function getFirstArgument(): ?string
     {
@@ -213,7 +213,7 @@ class IO implements IOInterface
      * @param  string|array  $values      The values to look for in the raw parameters (can be an array)
      * @param  bool          $onlyParams  Only check real parameters, skip those following an end of options (--) signal
      *
-     * @return bool true if the value is contained in the raw parameters
+     * @return  bool  true if the value is contained in the raw parameters
      */
     public function hasParameterOption($values, bool $onlyParams = false): bool
     {
@@ -232,7 +232,7 @@ class IO implements IOInterface
      * @param  mixed         $default     The default value to return if no result is found
      * @param  bool          $onlyParams  Only check real parameters, skip those following an end of options (--) signal
      *
-     * @return mixed The option value
+     * @return  mixed  The option value
      */
     public function getParameterOption(
         string|array $values,
@@ -247,7 +247,7 @@ class IO implements IOInterface
      *
      * @param  InputDefinition  $definition
      *
-     * @return mixed
+     * @return  mixed
      */
     public function bind(InputDefinition $definition): void
     {
@@ -257,7 +257,7 @@ class IO implements IOInterface
     /**
      * Validates the input.
      *
-     * @throws RuntimeException When not enough arguments are given
+     * @throws  RuntimeException  When not enough arguments are given
      */
     public function validate(): void
     {
@@ -267,7 +267,7 @@ class IO implements IOInterface
     /**
      * Returns all the given arguments merged with the default values.
      *
-     * @return array
+     * @return  array
      */
     public function getArguments(): array
     {
@@ -277,9 +277,9 @@ class IO implements IOInterface
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return string|string[]|null The argument value
+     * @return  string|string[]|null  The argument value
      *
-     * @throws InvalidArgumentException When argument given doesn't exist
+     * @throws  InvalidArgumentException  When argument given doesn't exist
      */
     public function getArgument(string $name): string|array|null
     {
@@ -291,7 +291,7 @@ class IO implements IOInterface
      *
      * @param  string|string[]|null  $value  The argument value
      *
-     * @throws InvalidArgumentException When argument given doesn't exist
+     * @throws  InvalidArgumentException  When argument given doesn't exist
      */
     public function setArgument(string $name, $value): void
     {
@@ -303,7 +303,7 @@ class IO implements IOInterface
      *
      * @param  string|int  $name  The InputArgument name or position
      *
-     * @return bool true if the InputArgument object exists, false otherwise
+     * @return  bool  true if the InputArgument object exists, false otherwise
      */
     public function hasArgument($name): bool
     {
@@ -313,7 +313,7 @@ class IO implements IOInterface
     /**
      * Returns all the given options merged with the default values.
      *
-     * @return array
+     * @return  array
      */
     public function getOptions(): array
     {
@@ -323,9 +323,9 @@ class IO implements IOInterface
     /**
      * Returns the option value for a given option name.
      *
-     * @return string|string[]|bool|null The option value
+     * @return  string|string[]|bool|null  The option value
      *
-     * @throws InvalidArgumentException When option given doesn't exist
+     * @throws  InvalidArgumentException  When option given doesn't exist
      */
     public function getOption(string $name): mixed
     {
@@ -337,7 +337,7 @@ class IO implements IOInterface
      *
      * @param  string|string[]|bool|null  $value  The option value
      *
-     * @throws InvalidArgumentException When option given doesn't exist
+     * @throws  InvalidArgumentException  When option given doesn't exist
      */
     public function setOption(string $name, $value): void
     {
@@ -347,7 +347,7 @@ class IO implements IOInterface
     /**
      * Returns true if an InputOption object exists by name.
      *
-     * @return bool true if the InputOption object exists, false otherwise
+     * @return  bool  true if the InputOption object exists, false otherwise
      */
     public function hasOption(string $name): bool
     {
@@ -357,7 +357,7 @@ class IO implements IOInterface
     /**
      * Is this input means interactive?
      *
-     * @return bool
+     * @return  bool
      */
     public function isInteractive(): bool
     {
@@ -408,7 +408,7 @@ class IO implements IOInterface
     /**
      * Gets the current verbosity of the output.
      *
-     * @return int The current level of verbosity (one of the VERBOSITY constants)
+     * @return  int  The current level of verbosity (one of the VERBOSITY constants)
      */
     public function getVerbosity(): int
     {
@@ -418,7 +418,7 @@ class IO implements IOInterface
     /**
      * Returns whether verbosity is quiet (-q).
      *
-     * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
+     * @return  bool  true if verbosity is set to VERBOSITY_QUIET, false otherwise
      */
     public function isQuiet(): bool
     {
@@ -428,7 +428,7 @@ class IO implements IOInterface
     /**
      * Returns whether verbosity is verbose (-v).
      *
-     * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
+     * @return  bool  true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
      */
     public function isVerbose(): bool
     {
@@ -438,7 +438,7 @@ class IO implements IOInterface
     /**
      * Returns whether verbosity is very verbose (-vv).
      *
-     * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
+     * @return  bool  true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
      */
     public function isVeryVerbose(): bool
     {
@@ -448,7 +448,7 @@ class IO implements IOInterface
     /**
      * Returns whether verbosity is debug (-vvv).
      *
-     * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
+     * @return  bool  true if verbosity is set to VERBOSITY_DEBUG, false otherwise
      */
     public function isDebug(): bool
     {
@@ -466,7 +466,7 @@ class IO implements IOInterface
     /**
      * Gets the decorated flag.
      *
-     * @return bool true if the output will decorate messages, false otherwise
+     * @return  bool  true if the output will decorate messages, false otherwise
      */
     public function isDecorated(): bool
     {
@@ -481,7 +481,7 @@ class IO implements IOInterface
     /**
      * Returns current output formatter instance.
      *
-     * @return OutputFormatterInterface
+     * @return  OutputFormatterInterface
      */
     public function getFormatter(): OutputFormatterInterface
     {

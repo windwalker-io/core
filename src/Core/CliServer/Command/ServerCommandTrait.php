@@ -62,7 +62,7 @@ trait ServerCommandTrait
      * @param  string       $engine
      * @param  string       $name
      *
-     * @return string
+     * @return  string
      */
     protected function getMainFile(IOInterface $io, string $engine, string $name): string
     {

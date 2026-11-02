@@ -14,7 +14,7 @@ use Windwalker\Core\Router\SystemUri;
 class PaginationFactory
 {
     /**
-     * @var callable|string
+     * @var  callable|string
      */
     protected mixed $defaultTemplate = null;
 
@@ -31,8 +31,7 @@ class PaginationFactory
         protected Navigator $navigator,
         protected SystemUri $systemUri,
         protected RendererService $rendererService
-    ) {
-    }
+    ) {}
 
     public function create(int $current = 1, int $limit = 10, ?int $neighbours = null): Pagination
     {
@@ -44,7 +43,7 @@ class PaginationFactory
     }
 
     /**
-     * @return callable|string|null
+     * @return  callable|string|null
      */
     public function getDefaultTemplate(): callable|string|null
     {
@@ -64,7 +63,7 @@ class PaginationFactory
     }
 
     /**
-     * @return int
+     * @return  int
      */
     public function getDefaultNeighbours(): int
     {

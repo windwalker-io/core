@@ -37,9 +37,7 @@ class Runtime
     /**
      * Runtime constructor.
      */
-    protected function __construct()
-    {
-    }
+    protected function __construct() {}
 
     public static function boot(string $rootDir, string $workDir, ?bool $debug = null): void
     {
@@ -110,7 +108,7 @@ class Runtime
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public static function getRootDir(): string
     {
@@ -118,7 +116,7 @@ class Runtime
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public static function getWorkDir(): string
     {

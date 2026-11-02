@@ -45,7 +45,7 @@ abstract class AbstractPackage
      *
      * @return  array
      *
-     * @throws JsonException
+     * @throws  JsonException
      */
     public static function composerJson(): ?array
     {
@@ -57,7 +57,7 @@ abstract class AbstractPackage
      *
      * @return  array|null
      *
-     * @throws JsonException
+     * @throws  JsonException
      */
     protected static function loadComposerJson(): ?array
     {

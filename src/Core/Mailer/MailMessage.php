@@ -22,7 +22,7 @@ class MailMessage extends Email
 {
     use ChainingTrait;
 
-    protected AssetService|null $asset = null;
+    protected ?AssetService $asset = null;
 
     /**
      * MailMessage constructor.
@@ -107,7 +107,7 @@ class MailMessage extends Email
     }
 
     /**
-     * @return AssetService|null
+     * @return  AssetService|null
      */
     public function getAsset(): ?AssetService
     {

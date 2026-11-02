@@ -10,6 +10,4 @@ use Windwalker\Core\Attributes\Controller;
  * The IndexController class.
  */
 #[Controller]
-class IndexController
-{
-}
+class IndexController {}

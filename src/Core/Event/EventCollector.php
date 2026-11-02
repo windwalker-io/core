@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Event;
 
-use Psr\EventDispatcher\ListenerProviderInterface;
 use Windwalker\Utilities\Reflection\ReflectionCallable;
 
 /**
@@ -18,9 +17,7 @@ class EventCollector
 
     protected array $uninvokedListeners = [];
 
-    public function __construct(public bool $isEnabled = false)
-    {
-    }
+    public function __construct(public bool $isEnabled = false) {}
 
     public function collectTriggered(object $event): void
     {
@@ -67,7 +64,7 @@ class EventCollector
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getInvokedListeners(): array
     {
@@ -95,7 +92,7 @@ class EventCollector
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getUninvokedListeners(): array
     {

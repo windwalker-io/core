@@ -62,12 +62,12 @@ class DebuggerSubscriber
     protected Profiler $profiler;
 
     /**
-     * @var Collection|null
+     * @var  Collection|null
      */
     protected ?Collection $collector = null;
 
     /**
-     * @var Collection|null
+     * @var  Collection|null
      */
     protected ?Collection $queue = null;
 
@@ -76,7 +76,8 @@ class DebuggerSubscriber
      */
     public function __construct(
         protected Container $container,
-        #[Autowire] protected DashboardRepository $dashboardRepository
+        #[Autowire]
+        protected DashboardRepository $dashboardRepository
     ) {
         //
     }
@@ -348,11 +349,11 @@ class DebuggerSubscriber
             ];
         }
 
-        $collector->setDeep("db.connections", $dbConns);
+        $collector->setDeep('db.connections', $dbConns);
     }
 
     /**
-     * @param  Container  $container
+     * @param  Container   $container
      * @param  Collection  $queue
      * @param  Collection  $collector
      *

@@ -31,11 +31,11 @@ class CoreResponse extends Response
     /**
      * Create a new response.
      *
-     * @param  mixed  $body
-     * @param  int|null  $status  HTTP status code; defaults to 200
-     * @param  array  $headers
+     * @param  mixed     $body
+     * @param  int|null  $status   HTTP status code; defaults to 200
+     * @param  array     $headers
      *
-     * @return Response
+     * @return  Response
      */
     public function response(mixed $body = '', ?int $status = null, array $headers = []): Response
     {
@@ -78,7 +78,7 @@ class CoreResponse extends Response
     }
 
     public function redirect(
-        string|null|Stringable $uri,
+        string|Stringable|null $uri,
         int $status = 303,
         array $headers = []
     ): RedirectResponse {
@@ -88,7 +88,7 @@ class CoreResponse extends Response
     }
 
     public function redirectOutside(
-        string|null|Stringable $uri,
+        string|Stringable|null $uri,
         int $status = 303,
         array $headers = []
     ): RedirectResponse {

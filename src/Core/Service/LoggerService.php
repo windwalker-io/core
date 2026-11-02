@@ -17,7 +17,7 @@ use Windwalker\Core\Manager\LoggerManager;
 class LoggerService
 {
     /**
-     * @var LoggerManager
+     * @var  LoggerManager
      */
     protected LoggerManager $manager;
 
@@ -38,8 +38,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function emergency(string|array $channel, mixed $message, array $context = []): static
     {
@@ -58,8 +58,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function alert(string|array $channel, mixed $message, array $context = []): static
     {
@@ -77,8 +77,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function critical(string|array $channel, mixed $message, array $context = []): static
     {
@@ -95,8 +95,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function error(string|array $channel, mixed $message, array $context = []): static
     {
@@ -115,8 +115,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function warning(string|array $channel, mixed $message, array $context = []): static
     {
@@ -132,8 +132,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function notice(string|array $channel, mixed $message, array $context = []): static
     {
@@ -151,8 +151,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function info(string|array $channel, mixed $message, array $context = []): static
     {
@@ -168,8 +168,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function debug(string|array $channel, mixed $message, array $context = []): static
     {
@@ -186,8 +186,8 @@ class LoggerService
      * @param  mixed         $message
      * @param  array         $context
      *
-     * @return static
-     * @throws Exception
+     * @return  static
+     * @throws  Exception
      */
     public function log(string|array $channel, string|int $level, mixed $message, array $context = []): static
     {

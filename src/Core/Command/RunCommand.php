@@ -32,9 +32,7 @@ class RunCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  ConsoleApplication  $app
      */
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
@@ -73,7 +71,7 @@ class RunCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -194,9 +192,7 @@ class RunCommand implements CommandInterface, CompletionAwareInterface
     /**
      * @inheritDoc
      */
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     /**
      * @inheritDoc

@@ -24,9 +24,7 @@ class CreateCommand extends AbstractMigrationCommand implements InteractInterfac
     /**
      * CreateCommand constructor.
      */
-    public function __construct(#[Autowire] protected ClassFinder $classFinder)
-    {
-    }
+    public function __construct(#[Autowire] protected ClassFinder $classFinder) {}
 
     /**
      * configure

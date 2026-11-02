@@ -30,7 +30,7 @@ interface ProcessRunnerInterface
      * @param  string|null                    $input
      * @param  bool|callable|OutputInterface  $output
      *
-     * @return Process
+     * @return  Process
      *
      * @since  3.5.5
      */

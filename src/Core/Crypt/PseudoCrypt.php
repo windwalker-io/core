@@ -96,9 +96,7 @@ class PseudoCrypt
     /**
      * @param  int  $offset
      */
-    public function __construct(protected int $offset = 0)
-    {
-    }
+    public function __construct(protected int $offset = 0) {}
 
     public static function base62(int|string $int): string
     {
@@ -125,7 +123,7 @@ class PseudoCrypt
 
         $hash = static::base62(bcadd($dec, (string) $this->getOffset()));
 
-        return str_pad($hash, $len, "0", STR_PAD_LEFT);
+        return str_pad($hash, $len, '0', STR_PAD_LEFT);
     }
 
     public static function unbase62(string $key): int|string
@@ -153,7 +151,7 @@ class PseudoCrypt
     }
 
     /**
-     * @return int
+     * @return  int
      */
     public function getOffset(): int
     {

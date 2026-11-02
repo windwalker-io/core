@@ -10,7 +10,6 @@ use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\CliServer\CliServerClient;
-use Windwalker\Core\CliServer\CliServerStateManager;
 use Windwalker\Core\DI\TaggingFactory;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Package\PackageRegistry;
@@ -22,7 +21,6 @@ use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\ServiceProviderInterface;
-use Windwalker\Event\EventEmitter;
 use Windwalker\Filter\FilterFactory;
 
 /**
@@ -47,7 +45,7 @@ class AppProvider implements ServiceProviderInterface
 
     /**
      * @inheritDoc
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function register(Container $container): void
     {
@@ -93,13 +91,13 @@ class AppProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function prepareEvents(Container $container): void
     {
         $container->share(
             EventDispatcherRegistry::class,
-            fn () => new EventDispatcherRegistry($this->app),
+            fn() => new EventDispatcherRegistry($this->app),
             options: new DIOptions(providedIn: AppLayer::REQUEST)
         );
     }

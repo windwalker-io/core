@@ -7,7 +7,6 @@ namespace Windwalker\Core\View\Event;
 use Psr\Http\Message\ResponseInterface;
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
-use Windwalker\Core\View\ViewModelInterface;
 
 /**
  * The AfterRenderEvent class.

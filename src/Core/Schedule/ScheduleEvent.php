@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Schedule;
 
 use Cron\CronExpression;
-use DateTimeInterface;
 use DateTimeZone;
-
 use Windwalker\Core\DateTime\Clock;
 
 use function Windwalker\nope;
@@ -22,7 +20,7 @@ class ScheduleEvent extends ScheduleExpression
     /**
      * Property handler.
      *
-     * @var callable
+     * @var  callable
      */
     protected $handler;
 

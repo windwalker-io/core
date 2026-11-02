@@ -57,7 +57,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return Uri
+     * @return  Uri
      */
     public function getUri(): UriInterface
     {
@@ -94,7 +94,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return array
+     * @return  array
      */
     abstract public function getUrlVars(): array;
 
@@ -116,7 +116,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getInput(): array
     {
@@ -149,7 +149,7 @@ trait AppRequestTrait
         }
 
         return array_map(
-            static fn (array $values) => implode(',', $values),
+            static fn(array $values) => implode(',', $values),
             $this->request->getHeaders(),
         );
     }
@@ -222,7 +222,7 @@ trait AppRequestTrait
     abstract protected function compileInput(): mixed;
 
     /**
-     * @return SystemUri
+     * @return  SystemUri
      */
     public function getSystemUri(): SystemUri
     {
@@ -244,7 +244,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return Route|null
+     * @return  Route|null
      */
     public function getMatchedRoute(): ?Route
     {
@@ -269,8 +269,8 @@ trait AppRequestTrait
     /**
      * Specify data which should be serialized to JSON
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * @return  mixed  data which can be serialized by <b>json_encode</b>,
+     *                 which is a value of any type other than a resource.
      * @since 5.4
      */
     public function jsonSerialize(): mixed
@@ -287,7 +287,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return ProxyResolver
+     * @return  ProxyResolver
      */
     public function getProxyResolver(): ProxyResolver
     {
@@ -295,7 +295,7 @@ trait AppRequestTrait
     }
 
     /**
-     * @return ServerRequestInterface
+     * @return  ServerRequestInterface
      *
      * @deprecated  Use getServerRequest() instead.
      */

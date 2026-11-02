@@ -9,6 +9,4 @@ namespace Windwalker\Core\Security\Exception;
  *
  * @since  2.1.1
  */
-class InvalidTokenException extends UnauthorizedException
-{
-}
+class InvalidTokenException extends UnauthorizedException {}

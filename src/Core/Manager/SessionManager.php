@@ -22,8 +22,8 @@ use function Windwalker\chronos;
 /**
  * The SessionManager class.
  *
- * @method Session create(?string $name = null, ...$args)
- * @method Session get(?string $name = null, ...$args)
+ * @method  Session  create(?string $name = null, ...$args)
+ * @method  Session  get(?string $name = null, ...$args)
  *
  * @deprecated  Use container tags instead.
  */

@@ -10,7 +10,6 @@ use Windwalker\Core\Renderer\RendererService;
 use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Data\Collection;
 use Windwalker\Http\Output\OutputInterface;
-use Windwalker\Stream\Stream;
 
 /**
  * The DebugConsole class.
@@ -26,8 +25,7 @@ class DebugConsole
         protected RendererService $rendererService,
         protected CspNonceService $cspNonceService,
         protected AssetService $assetService
-    ) {
-    }
+    ) {}
 
     public static function disable(): void
     {

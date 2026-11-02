@@ -11,6 +11,4 @@ use LogicException;
  *
  * @since  4.0
  */
-class ControllerDispatchException extends LogicException
-{
-}
+class ControllerDispatchException extends LogicException {}

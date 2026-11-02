@@ -25,13 +25,13 @@ use Windwalker\Queue\RunnerOptions;
 trait EnqueuerCommandTrait
 {
     /**
-     * @param  ?string  $connection
+     * @param  ?string        $connection
      * @param  RunnerOptions  $options
      *
-     * @return Enqueuer
+     * @return  Enqueuer
      *
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     protected function createEnqueuer(?string $connection, RunnerOptions $options): Enqueuer
     {
@@ -61,7 +61,7 @@ trait EnqueuerCommandTrait
 
     public function createEnqueuerInvoker(): \Closure
     {
-        return fn (EnqueuerController $controller, callable $invokable) => $this->app->call(
+        return fn(EnqueuerController $controller, callable $invokable) => $this->app->call(
             $invokable,
             [
                 $controller,

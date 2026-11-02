@@ -6,15 +6,11 @@ namespace Windwalker\Core\Asset;
 
 use Windwalker\Utilities\Str;
 
-use function Windwalker\value;
-
 class PromiseScope
 {
     public protected(set) array $elements = [];
 
-    public function __construct(protected string $start, protected string $moduleVar = 'module')
-    {
-    }
+    public function __construct(protected string $start, protected string $moduleVar = 'module') {}
 
     public function add(string|\Stringable|\Closure $element): static
     {

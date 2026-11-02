@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator\Command;
 
-use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
-use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -23,8 +21,6 @@ use Windwalker\Core\Console\SubCommandAwareInterface;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\DI\Exception\DefinitionException;
 
-use function Windwalker\ds;
-
 /**
  * The GenerateCommand class.
  */
@@ -39,9 +35,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
     /**
      * GenerateCommand constructor.
      */
-    public function __construct(protected ConsoleApplication $app, protected PackageRegistry $packageRegistry)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app, protected PackageRegistry $packageRegistry) {}
 
     /**
      * configure
@@ -137,7 +131,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -215,7 +209,7 @@ class GenerateCommand implements CommandInterface, SubCommandAwareInterface, Com
      *
      * @return  Command
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function resolveSubCommand(string $name, string $command): object
     {

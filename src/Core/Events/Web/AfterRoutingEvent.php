@@ -22,6 +22,5 @@ class AfterRoutingEvent extends BaseEvent
         public ServerRequestInterface $request,
         public string $route,
         public Route $matched
-    ) {
-    }
+    ) {}
 }

@@ -7,11 +7,8 @@ namespace Windwalker\Console;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext as SymfonyCompletionContext;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
-
-use function Windwalker\ds;
 
 class CompletionContext
 {
@@ -40,12 +37,11 @@ class CompletionContext
     }
 
     public function __construct(
-        readonly public CompletionType $type,
-        readonly public string $name,
-        readonly public Command $currentCommand,
+        public readonly CompletionType $type,
+        public readonly string $name,
+        public readonly Command $currentCommand,
         public protected(set) SymfonyCompletionContext $originalContext,
-    ) {
-    }
+    ) {}
 
     public function isArgument(): bool
     {

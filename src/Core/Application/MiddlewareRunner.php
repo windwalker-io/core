@@ -22,9 +22,7 @@ class MiddlewareRunner
      *
      * @param  Container  $container
      */
-    public function __construct(protected Container $container)
-    {
-    }
+    public function __construct(protected Container $container) {}
 
     public function run(
         ServerRequestInterface $request,
@@ -41,7 +39,7 @@ class MiddlewareRunner
         }
 
         if ($last) {
-            yield static fn () => $last;
+            yield static fn() => $last;
         }
     }
 
@@ -51,7 +49,7 @@ class MiddlewareRunner
      * @param  iterable       $middlewares
      * @param  callable|null  $last
      *
-     * @return Generator
+     * @return  Generator
      */
     public function compileMiddlewares(iterable $middlewares, ?callable $last = null): Generator
     {

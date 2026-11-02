@@ -13,12 +13,12 @@ use Windwalker\Core\Application\ApplicationInterface;
 class PackageRegistry
 {
     /**
-     * @var AbstractPackage[]
+     * @var  AbstractPackage[]
      */
     protected array $packages = [];
 
     /**
-     * @var AbstractPackage[][]
+     * @var  AbstractPackage[][]
      */
     protected array $composerPackagesMap = [];
 
@@ -37,9 +37,7 @@ class PackageRegistry
      *
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     public function getInstaller(): PackageInstaller
     {
@@ -136,8 +134,8 @@ class PackageRegistry
     }
 
     /**
-     * @return AbstractPackage[]
-     * @throws JsonException
+     * @return  AbstractPackage[]
+     * @throws  JsonException
      */
     public function getPackages(): array
     {
@@ -149,7 +147,7 @@ class PackageRegistry
     /**
      * @return  AbstractPackage[]
      *
-     * @throws JsonException
+     * @throws  JsonException
      */
     public function getPackageNames(): array
     {
@@ -181,7 +179,7 @@ class PackageRegistry
     /**
      * @return  AbstractPackage[][]
      *
-     * @throws JsonException
+     * @throws  JsonException
      */
     public function getComposerPackagesMap(): array
     {

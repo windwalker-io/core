@@ -77,10 +77,10 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
      * @param  ServerRequestInterface   $request
      * @param  RequestHandlerInterface  $handler
      *
-     * @return ResponseInterface
-     * @throws ContainerExceptionInterface
-     * @throws \ReflectionException
-     * @throws DefinitionResolveException
+     * @return  ResponseInterface
+     * @throws  ContainerExceptionInterface
+     * @throws  \ReflectionException
+     * @throws  DefinitionResolveException
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

@@ -13,22 +13,9 @@ use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\IO;
 use Windwalker\Console\IOInterface;
-use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\DI\Exception\DefinitionNotFoundException;
-use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Queue\AbstractRunner;
-use Windwalker\Queue\Enqueuer;
-use Windwalker\Queue\Enqueuer\EnqueuerController;
-use Windwalker\Queue\Event\AfterEnqueueEvent;
-use Windwalker\Queue\Event\BeforeEnqueueEvent;
 use Windwalker\Queue\Event\DebugOutputEvent;
-use Windwalker\Queue\Event\EnqueueFailureEvent;
-use Windwalker\Queue\Event\LoopEndEvent;
-use Windwalker\Queue\Event\LoopFailureEvent;
-use Windwalker\Queue\Event\LoopStartEvent;
-use Windwalker\Queue\Event\StopEvent;
-use Windwalker\Queue\Queue;
 use Windwalker\Queue\RunnerOptions;
 
 trait QueueCommandTrait
@@ -67,12 +54,12 @@ trait QueueCommandTrait
     }
 
     /**
-     * @param  IOInterface  $io
+     * @param  IOInterface     $io
      * @param  AbstractRunner  $runner
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function prepareDebugServices(IOInterface $io, AbstractRunner $runner): void
     {

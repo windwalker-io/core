@@ -173,7 +173,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
      * getMessage
      *
      * @return  string
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function getMessage(): string
     {

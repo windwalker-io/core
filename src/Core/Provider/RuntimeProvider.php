@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Composer\Autoload\ClassLoader;
-use Windwalker\Core\Application\AppLayer;
 use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Core\Runtime\Config;

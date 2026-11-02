@@ -82,7 +82,7 @@ class FileGenData extends FileCloneResult
     }
 
     /**
-     * @return FileObject
+     * @return  FileObject
      */
     public function getSrc(): FileObject
     {
@@ -102,7 +102,7 @@ class FileGenData extends FileCloneResult
     }
 
     /**
-     * @return FileObject|null
+     * @return  FileObject|null
      */
     public function getDest(): ?FileObject
     {
@@ -127,7 +127,7 @@ class FileGenData extends FileCloneResult
     }
 
     /**
-     * @return StreamInterface|null
+     * @return  StreamInterface|null
      */
     public function getDestStream(): ?StreamInterface
     {

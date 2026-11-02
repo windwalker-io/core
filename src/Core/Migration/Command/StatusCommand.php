@@ -25,9 +25,7 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
     /**
      * StatusCommand constructor.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * configure

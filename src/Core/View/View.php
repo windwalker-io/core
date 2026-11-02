@@ -90,7 +90,7 @@ class View implements EventAwareInterface, \ArrayAccess
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getLayout(): string
     {
@@ -503,7 +503,7 @@ class View implements EventAwareInterface, \ArrayAccess
     }
 
     /**
-     * @return string|array|null
+     * @return  string|array|null
      */
     public function getLayoutMap(): string|array|null
     {
@@ -523,7 +523,7 @@ class View implements EventAwareInterface, \ArrayAccess
     }
 
     /**
-     * @return object
+     * @return  object
      */
     public function getViewModel(): object
     {
@@ -661,7 +661,7 @@ class View implements EventAwareInterface, \ArrayAccess
     }
 
     /**
-     * @return HtmlFrame
+     * @return  HtmlFrame
      */
     public function getHtmlFrame(): HtmlFrame
     {

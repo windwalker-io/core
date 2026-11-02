@@ -36,7 +36,7 @@ trait TranslatorTrait
     }
 
     /**
-     * @return LangService
+     * @return  LangService
      */
     public function getLang(): LangService
     {

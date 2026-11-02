@@ -22,11 +22,10 @@ class AfterRouteBuildEvent extends BaseEvent
         public array $query,
         public Navigator $navigator,
         public NavOptions $options
-    ) {
-    }
+    ) {}
 
     /**
-     * @return string
+     * @return  string
      *
      * @deprecated  Use property instead.
      */
@@ -36,7 +35,7 @@ class AfterRouteBuildEvent extends BaseEvent
     }
 
     /**
-     * @return array
+     * @return  array
      *
      * @deprecated  Use property instead.
      */
@@ -46,7 +45,7 @@ class AfterRouteBuildEvent extends BaseEvent
     }
 
     /**
-     * @return string
+     * @return  string
      *
      * @deprecated  Use property instead.
      */

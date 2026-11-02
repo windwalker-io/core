@@ -7,6 +7,4 @@ namespace Windwalker\Core\CliServer\Swoole;
 /**
  * The SwooleWorkerService class.
  */
-class SwooleWorkerService
-{
-}
+class SwooleWorkerService {}

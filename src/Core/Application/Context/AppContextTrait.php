@@ -10,7 +10,6 @@ use Windwalker\Core\Application\WebApplicationTrait;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\State\AppState;
 use Windwalker\Data\Collection;
-use Windwalker\DI\Parameters;
 
 /**
  * Trait RequestAppContextTrait
@@ -20,7 +19,7 @@ trait AppContextTrait
     use WebApplicationTrait;
 
     /**
-     * @var callable|array
+     * @var  callable|array
      */
     protected mixed $controller = null;
 
@@ -36,7 +35,7 @@ trait AppContextTrait
     }
 
     /**
-     * @return array|callable
+     * @return  array|callable
      */
     public function getController(): mixed
     {
@@ -58,7 +57,7 @@ trait AppContextTrait
     /**
      * @param  string|null  $prefix
      *
-     * @return AppState
+     * @return  AppState
      */
     public function getState(?string $prefix = null): AppState
     {
@@ -99,7 +98,7 @@ trait AppContextTrait
     }
 
     /**
-     * @return Route|null
+     * @return  Route|null
      */
     public function getMatchedRoute(): ?Route
     {
@@ -114,7 +113,7 @@ trait AppContextTrait
     public function setMatchedRoute(?Route $matchedRoute): static
     {
         return $this->modifyAppRequest(
-            fn (AppRequestInterface $request) => $request->withMatchedRoute($matchedRoute)
+            fn(AppRequestInterface $request) => $request->withMatchedRoute($matchedRoute)
         );
     }
 
@@ -129,7 +128,7 @@ trait AppContextTrait
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getUrlVars(): array
     {
@@ -144,7 +143,7 @@ trait AppContextTrait
     public function setUrlVars(array $vars): static
     {
         return $this->modifyAppRequest(
-            fn (AppRequestInterface $request) => $request->withUrlVars($vars)
+            fn(AppRequestInterface $request) => $request->withUrlVars($vars)
         );
     }
 

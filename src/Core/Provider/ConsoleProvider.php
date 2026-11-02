@@ -33,9 +33,7 @@ class ConsoleProvider implements ServiceProviderInterface
      *
      * @param  ConsoleApplication  $app
      */
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * @inheritDoc
@@ -68,7 +66,7 @@ class ConsoleProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function registerEmptyWebServices(Container $container): void
     {
@@ -90,7 +88,7 @@ class ConsoleProvider implements ServiceProviderInterface
 
         $container->share(
             AppRequest::class,
-            fn (Container $container) => $container->get(AppContext::class)->getAppRequest()
+            fn(Container $container) => $container->get(AppContext::class)->getAppRequest()
         )
             ->alias(AppRequestInterface::class, AppRequest::class);
 

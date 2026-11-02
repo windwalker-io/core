@@ -15,14 +15,14 @@ use Windwalker\Uri\UriNormalizer;
 use Windwalker\Utilities\Classes\ChainingTrait;
 
 /**
- * @method $this getHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this queryHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this postHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this putHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this patchHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this deleteHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this headHandler(callable|array|string|null $handler, ?string $task = null)
- * @method $this optionsHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  getHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  queryHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  postHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  putHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  patchHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  deleteHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  headHandler(callable|array|string|null $handler, ?string $task = null)
+ * @method  $this  optionsHandler(callable|array|string|null $handler, ?string $task = null)
  */
 class Route implements JsonSerializable
 {
@@ -331,8 +331,8 @@ class Route implements JsonSerializable
     /**
      * Specify data which should be serialized to JSON
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * @return  mixed  data which can be serialized by <b>json_encode</b>,
+     *                 which is a value of any type other than a resource.
      * @since 5.4
      */
     public function jsonSerialize(): array

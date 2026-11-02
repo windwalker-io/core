@@ -37,7 +37,7 @@ trait CommandScheduleTrait
         return $path;
     }
 
-    public function getScheduleExpression(string $tz = '', bool|null|string $phpBinary = false): string
+    public function getScheduleExpression(string $tz = '', bool|string|null $phpBinary = false): string
     {
         if ($phpBinary === true) {
             $php = (new PhpExecutableFinder())->find();
@@ -89,7 +89,7 @@ trait CommandScheduleTrait
         $regex = str_replace('__TZ__', '(--tz=[\w\/]+)?', $regex);
         $regex = str_replace('__PHP__', '(.*)', $regex);
 
-        return '/' . str_replace(' ', "\\s*", $regex) . '/';
+        return '/' . str_replace(' ', '\\s*', $regex) . '/';
     }
 
     protected function replaceCrontab(string $content): Process

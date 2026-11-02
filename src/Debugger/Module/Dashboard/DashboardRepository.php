@@ -4,16 +4,11 @@ declare(strict_types=1);
 
 namespace Windwalker\Debugger\Module\Dashboard;
 
-use FilesystemIterator;
 use Psr\Cache\InvalidArgumentException;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
-use SplFileInfo;
 use Throwable;
 use Windwalker\Data\Collection;
 use Windwalker\Filesystem\FileObject;
-use Windwalker\Filesystem\Filesystem;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 use function Windwalker\fs;
@@ -65,7 +60,7 @@ class DashboardRepository
      * @param  int   $limit
      * @param  bool  $includeData
      *
-     * @return array
+     * @return  array
      */
     public function getItems(int $limit = 100, bool $includeData = false): array
     {
@@ -115,7 +110,7 @@ class DashboardRepository
      * getLastItem
      *
      * @return  Collection
-     * @throws InvalidArgumentException
+     * @throws  InvalidArgumentException
      */
     public function getLastItem(): Collection
     {

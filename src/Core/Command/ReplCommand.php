@@ -22,9 +22,7 @@ class ReplCommand implements CommandInterface
 
     protected ?string $code = null;
 
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     public function configure(Command $command): void
     {

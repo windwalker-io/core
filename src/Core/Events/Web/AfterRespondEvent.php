@@ -18,7 +18,5 @@ class AfterRespondEvent extends BaseEvent
     /**
      * @param  Container  $container
      */
-    public function __construct(public Container $container)
-    {
-    }
+    public function __construct(public Container $container) {}
 }

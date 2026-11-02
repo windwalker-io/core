@@ -20,8 +20,7 @@ class CliServerClient
     public function __construct(
         protected ApplicationInterface $app,
         protected Terminal $terminal = new Terminal()
-    ) {
-    }
+    ) {}
 
     public function logRequestInfo(RequestInterface $request, int $statusCode, float $duration): void
     {
@@ -49,8 +48,8 @@ class CliServerClient
         $dots = str_repeat('.', max($terminalWidth - $length, 0));
 
         $log = sprintf(
-            '  [<fg=%s;options=bold>%s</>][%s] %s <fg=gray>%s</> [<fg=%s;options=bold>%s</>] ' .
-            'pid: <fg=yellow>%s</> - %s - %s',
+            '  [<fg=%s;options=bold>%s</>][%s] %s <fg=gray>%s</> [<fg=%s;options=bold>%s</>] '
+            . 'pid: <fg=yellow>%s</> - %s - %s',
             $color,
             $method,
             $name,

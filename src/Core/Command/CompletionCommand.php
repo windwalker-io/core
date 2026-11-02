@@ -134,14 +134,14 @@ class CompletionCommand implements CommandInterface
     /**
      * Determine the shell type for use with HookFactory
      *
-     * @return string
+     * @return  string
      */
     protected function getShellType(): string
     {
         if (!getenv('SHELL')) {
             throw new RuntimeException(
-                'Could not read SHELL environment variable. ' .
-                'Please specify your shell type using the --shell-type option.'
+                'Could not read SHELL environment variable. '
+                . 'Please specify your shell type using the --shell-type option.'
             );
         }
 

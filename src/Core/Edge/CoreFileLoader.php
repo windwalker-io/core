@@ -29,8 +29,7 @@ class CoreFileLoader implements EdgeLoaderInterface
         protected EdgeFileLoader $loader,
         protected LayoutPathResolver $pathResolver,
         protected array $extensions = []
-    ) {
-    }
+    ) {}
 
     /**
      * find
@@ -93,7 +92,7 @@ class CoreFileLoader implements EdgeLoaderInterface
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getExtensions(): array
     {

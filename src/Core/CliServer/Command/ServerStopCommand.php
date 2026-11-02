@@ -36,15 +36,14 @@ class ServerStopCommand implements CommandInterface, CompletionAwareInterface
         protected ConsoleApplication $app,
         #[Autowire]
         protected CliServerFactory $serverFactory
-    ) {
-    }
+    ) {}
 
     /**
      * configure
      *
      * @param  Command  $command
      *
-     * @return    void
+     * @return  void
      */
     public function configure(Command $command): void
     {
@@ -84,7 +83,7 @@ class ServerStopCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  IOInterface  $io
      *
-     * @return    int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -133,9 +132,7 @@ class ServerStopCommand implements CommandInterface, CompletionAwareInterface
     /**
      * @inheritDoc
      */
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     /**
      * @inheritDoc

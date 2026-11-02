@@ -27,7 +27,7 @@ abstract class AbstractModule implements ModuleInterface
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getName(): string
     {
@@ -57,7 +57,7 @@ abstract class AbstractModule implements ModuleInterface
     }
 
     /**
-     * @return AppContext
+     * @return  AppContext
      */
     public function getAppContext(): AppContext
     {

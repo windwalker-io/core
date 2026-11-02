@@ -10,8 +10,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Migration\MigrationService;
-use Windwalker\Core\Seed\SeedService;
-use Windwalker\Filesystem\FileObject;
 
 /**
  * The MigrateBackCommand class.

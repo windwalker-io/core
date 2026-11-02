@@ -17,7 +17,7 @@ use Windwalker\Authorization\AuthorizationInterface;
 class AuthService
 {
     /**
-     * @var callable
+     * @var  callable
      */
     protected $userRetrieveHandler;
 
@@ -63,7 +63,7 @@ class AuthService
     }
 
     /**
-     * @return Authentication
+     * @return  Authentication
      */
     public function getAuthentication(): AuthenticationInterface
     {
@@ -75,7 +75,7 @@ class AuthService
     }
 
     /**
-     * @return AuthorizationInterface
+     * @return  AuthorizationInterface
      */
     public function getAuthorization(): AuthorizationInterface
     {
@@ -116,7 +116,7 @@ class AuthService
     }
 
     /**
-     * @return callable
+     * @return  callable
      */
     public function getUserRetrieveHandler(): callable
     {

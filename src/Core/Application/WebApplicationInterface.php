@@ -5,12 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use Stringable;
-use Windwalker\Core\Router\Navigator;
-use Windwalker\Core\Router\RouteUri;
-use Windwalker\Http\Output\OutputInterface;
-use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 
 /**
@@ -25,7 +20,7 @@ interface WebApplicationInterface extends ApplicationInterface
      * @param  int                $code
      * @param  bool               $instant
      *
-     * @return ResponseInterface
+     * @return  ResponseInterface
      */
     public function redirect(string|Stringable $url, int $code = 303, bool $instant = false): ResponseInterface;
 
@@ -41,9 +36,9 @@ interface WebApplicationInterface extends ApplicationInterface
     /**
      * @param  mixed  $res
      *
-     * @return ResponseInterface
+     * @return  ResponseInterface
      *
-     * @throws \JsonException
+     * @throws  \JsonException
      * @since  4.0
      */
     public static function anyToResponse(mixed $res): ResponseInterface;

@@ -37,7 +37,7 @@ class EventDispatcherRegistry
     }
 
     /**
-     * @return EventEmitter
+     * @return  EventEmitter
      */
     public function getRootDispatcher(): EventEmitter
     {

@@ -20,21 +20,21 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * Property first.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $first = null;
 
     /**
      * Property less.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $less = null;
 
     /**
      * Property previous.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $previous = null;
 
@@ -48,7 +48,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * Property current.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $current = null;
 
@@ -62,21 +62,21 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * Property next.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $next = null;
 
     /**
      * Property more.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $more = null;
 
     /**
      * Property last.
      *
-     * @var ?PageItem
+     * @var  ?PageItem
      */
     protected ?PageItem $last = null;
 
@@ -161,7 +161,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getFirst(): ?PageItem
     {
@@ -169,7 +169,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getLess(): ?PageItem
     {
@@ -177,7 +177,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getPrevious(): ?PageItem
     {
@@ -185,7 +185,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem[]
+     * @return  PageItem[]
      */
     public function getLowers(): array
     {
@@ -193,7 +193,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getCurrent(): ?PageItem
     {
@@ -201,7 +201,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem[]
+     * @return  PageItem[]
      */
     public function getHighers(): array
     {
@@ -209,7 +209,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getNext(): ?PageItem
     {
@@ -217,7 +217,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getMore(): ?PageItem
     {
@@ -225,7 +225,7 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     }
 
     /**
-     * @return PageItem|null
+     * @return  PageItem|null
      */
     public function getLast(): ?PageItem
     {
@@ -350,8 +350,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * Specify data which should be serialized to JSON
      * @link  https://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * @return  mixed  data which can be serialized by <b>json_encode</b>,
+     *                 which is a value of any type other than a resource.
      * @since 5.4
      */
     public function jsonSerialize(): mixed
@@ -362,9 +362,9 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
     /**
      * Retrieve an external iterator
      * @link https://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
-     * <b>Traversable</b>
-     * @throws Exception on failure.
+     * @return  Traversable  An instance of an object implementing <b>Iterator</b> or
+     *                       <b>Traversable</b>
+     * @throws  Exception    on failure.
      */
     public function getIterator(): Traversable
     {

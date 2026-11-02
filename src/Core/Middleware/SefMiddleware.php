@@ -37,8 +37,7 @@ class SefMiddleware implements MiddlewareInterface
         protected ?string $baseHref = null,
         protected ?string $baseSrc = null,
         protected int $flags = self::REPLACE_ALL
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc
@@ -62,7 +61,7 @@ class SefMiddleware implements MiddlewareInterface
     /**
      * @see https://github.com/joomla/joomla-cms/blob/staging/plugins/system/sef/sef.php
      *
-     * @param string $buffer
+     * @param  string  $buffer
      *
      * @return  string
      *
@@ -189,8 +188,8 @@ class SefMiddleware implements MiddlewareInterface
             // Replace all unknown protocols in OBJECT param tag.
             if (str_contains($buffer, '<param')) {
                 // OBJECT <param name="xx", value="yy"> -- fix it only inside the <param> tag.
-                $regex  = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|' .
-                    $protocols . '|\#|\')([^"]*)"#m';
+                $regex  = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|'
+                    . $protocols . '|\#|\')([^"]*)"#m';
                 $buffer = preg_replace($regex, '$1name="$2" value="' . $baseSrc . '$3"', $buffer);
                 $this->checkBuffer($buffer);
 
@@ -213,7 +212,7 @@ class SefMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @param ?string $buffer
+     * @param  ?string  $buffer
      *
      * @return  void
      *

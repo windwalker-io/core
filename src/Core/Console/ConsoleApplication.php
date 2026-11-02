@@ -87,7 +87,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     /**
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     public function boot(): void
     {
@@ -210,7 +210,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
     }
 
     /**
-     * @return OutputInterface
+     * @return  OutputInterface
      */
     public function getOutput(): OutputInterface
     {
@@ -350,7 +350,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         return new ArgvInput($tokens);
     }
 
-    protected function logUserCommand(InputInterface|null $input, bool $error, array|\Throwable $context = []): void
+    protected function logUserCommand(?InputInterface $input, bool $error, array|\Throwable $context = []): void
     {
         if ($input instanceof ArgvInput && $input->getFirstArgument() !== '_completion') {
             $level = $error ? LogLevel::ERROR : LogLevel::INFO;
@@ -377,7 +377,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
      *
      * @return  int
      *
-     * @throws Exception|ExceptionInterface
+     * @throws  Exception|ExceptionInterface
      */
     public function runCommand(
         string|Command $command,

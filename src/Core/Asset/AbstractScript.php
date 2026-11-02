@@ -12,12 +12,12 @@ use Windwalker\Utilities\Classes\InstanceMarcoableTrait;
 /**
  * The AbstractScript class.
  *
- * @method AssetService css(string $url, array $options = [], array $attrs = [])
- * @method AssetService js(string $url, array $options = [], array $attrs = [])
- * @method AssetService internalCSS(string $content)
- * @method AssetService internalJS(string $content)
- * @method AssetService internalModule(string $content)
- * @method bool|string has(string $uri, bool $strict = false)
+ * @method  AssetService  css(string $url, array $options = [], array $attrs = [])
+ * @method  AssetService  js(string $url, array $options = [], array $attrs = [])
+ * @method  AssetService  internalCSS(string $content)
+ * @method  AssetService  internalJS(string $content)
+ * @method  AssetService  internalModule(string $content)
+ * @method  bool|string   has(string $uri, bool $strict = false)
  */
 abstract class AbstractScript
 {
@@ -37,7 +37,7 @@ abstract class AbstractScript
      * @param  string  $name
      * @param  mixed   ...$data
      *
-     * @return bool
+     * @return  bool
      */
     public function inited(string $name, ...$data): bool
     {

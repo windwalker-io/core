@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http\Exception;
 
-use JetBrains\PhpStorm\NoReturn;
-
 /**
  * Trait ApiErrorCodeTrait
  */

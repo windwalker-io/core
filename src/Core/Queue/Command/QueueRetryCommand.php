@@ -15,7 +15,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
-use Windwalker\Core\Queue\QueueManager;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Queue;
 
@@ -27,9 +26,7 @@ use Windwalker\Queue\Queue;
 )]
 class QueueRetryCommand implements CommandInterface
 {
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
@@ -71,10 +68,10 @@ class QueueRetryCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws JsonException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return  int                          Return 0 is success, 1-255 is failure.
+     * @throws  JsonException
+     * @throws  ContainerExceptionInterface
+     * @throws  NotFoundExceptionInterface
      */
     public function execute(IOInterface $io): int
     {
@@ -116,8 +113,8 @@ class QueueRetryCommand implements CommandInterface
             if (!$all) {
                 $io->writeln(
                     sprintf(
-                        'Resend failed-job: <info>%s</info> to connection: <info>%s</info> ' .
-                        'queue: <comment>%s</comment>',
+                        'Resend failed-job: <info>%s</info> to connection: <info>%s</info> '
+                        . 'queue: <comment>%s</comment>',
                         $id,
                         $connection,
                         $failed['channel']

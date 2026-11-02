@@ -5,17 +5,9 @@ declare(strict_types=1);
 namespace Windwalker\Core\Controller;
 
 use LogicException;
-use ReflectionException;
 use Throwable;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\Context\AppContextInterface;
-use Windwalker\Core\Form\Exception\ValidateFailException;
-use Windwalker\Core\Module\ModuleInterface;
-use Windwalker\Core\Router\Navigator;
-use Windwalker\Core\Service\LoggerService;
-use Windwalker\Core\State\AppState;
-use Windwalker\Core\View\View;
-use Windwalker\WebSocket\Application\WsApplicationInterface;
 
 /**
  * The DelegatingController class.
@@ -50,8 +42,8 @@ class DelegatingController implements ControllerInterface
      * @param  string  $task
      * @param  array   $args
      *
-     * @return mixed
-     * @throws Throwable
+     * @return  mixed
+     * @throws  Throwable
      */
     public function execute(string $task, array $args = []): mixed
     {
@@ -87,7 +79,7 @@ class DelegatingController implements ControllerInterface
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getViewMap(): array
     {

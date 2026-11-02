@@ -22,7 +22,7 @@ class RequestAssert extends RuntimeAssert
      * @param  mixed|null       $value
      * @param  callable|null    $exception
      *
-     * @return T
+     * @return  T
      */
     public static function assertBadRequest(
         mixed $assertion,
@@ -64,7 +64,7 @@ class RequestAssert extends RuntimeAssert
      * @param  mixed|null       $value
      * @param  callable|null    $exception
      *
-     * @return T
+     * @return  T
      */
     public static function assertForbidden(
         mixed $assertion,
@@ -85,7 +85,7 @@ class RequestAssert extends RuntimeAssert
      * @param  mixed|null       $value
      * @param  callable|null    $exception
      *
-     * @return T
+     * @return  T
      */
     public static function assertNotFound(
         mixed $assertion,

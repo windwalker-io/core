@@ -75,7 +75,7 @@ class ViewModel implements ContainerAttributeInterface
     }
 
     /**
-     * @return string|null
+     * @return  string|null
      */
     public function getModule(): ?string
     {

@@ -18,7 +18,7 @@ use Windwalker\Reactor\WebSocket\WebSocketFrameInterface;
 /**
  * The WsAppContext class.
  *
- * @method WebRootApplicationInterface getRootApp()
+ * @method  WebRootApplicationInterface  getRootApp()
  */
 class WsAppContext implements WsApplicationInterface, AppContextInterface, WebSocketFrameInterface
 {
@@ -60,9 +60,9 @@ class WsAppContext implements WsApplicationInterface, AppContextInterface, WebSo
     }
 
     /**
-     * @return WsAppRequest
-     * @throws DefinitionNotFoundException
-     * @throws DependencyResolutionException
+     * @return  WsAppRequest
+     * @throws  DefinitionNotFoundException
+     * @throws  DependencyResolutionException
      */
     public function getAppRequest(): WsAppRequest
     {
@@ -72,8 +72,8 @@ class WsAppContext implements WsApplicationInterface, AppContextInterface, WebSo
     /**
      * @param  WsAppRequest  $request
      *
-     * @return  static  Return self to support chaining.
-     * @throws DefinitionException
+     * @return  static               Return self to support chaining.
+     * @throws  DefinitionException
      *
      * @deprecated  Use modifyAppRequest() instead.
      */

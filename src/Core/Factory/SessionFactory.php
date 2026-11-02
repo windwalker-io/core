@@ -42,7 +42,8 @@ class SessionFactory implements ServiceFactoryInterface
         return #[Factory] static function (
             ServerRequestInterface $request,
             AppContextInterface $app,
-            #[Ref('session.cookie_params')] $params
+            #[Ref('session.cookie_params')]
+            $params
         ) {
             $cookies = new ArrayCookies($request->getCookieParams());
             $cookies->setOptions($params);
@@ -69,7 +70,8 @@ class SessionFactory implements ServiceFactoryInterface
         return #[Factory] static function (
             ServerRequestInterface $request,
             AppContextInterface $app,
-            #[Ref('session.cookie_params')] $params
+            #[Ref('session.cookie_params')]
+            $params
         ) {
             $cookies = new Cookies();
             $cookies->setOptions($params);

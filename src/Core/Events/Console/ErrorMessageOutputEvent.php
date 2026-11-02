@@ -7,6 +7,4 @@ namespace Windwalker\Core\Events\Console;
 /**
  * The ErrorConsoleOutputEvent class.
  */
-class ErrorMessageOutputEvent extends MessageOutputEvent
-{
-}
+class ErrorMessageOutputEvent extends MessageOutputEvent {}

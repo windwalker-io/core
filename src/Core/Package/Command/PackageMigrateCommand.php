@@ -27,9 +27,7 @@ use function Windwalker\fs;
 )]
 class PackageMigrateCommand implements CommandInterface
 {
-    public function __construct(protected PackageRegistry $registry)
-    {
-    }
+    public function __construct(protected PackageRegistry $registry) {}
 
     public function configure(Command $command): void
     {

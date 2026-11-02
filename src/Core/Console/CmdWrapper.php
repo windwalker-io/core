@@ -25,8 +25,7 @@ class CmdWrapper implements WrapperInterface
         public string|Closure $cmd,
         public ?string $input = null,
         public bool $ignoreError = false
-    ) {
-    }
+    ) {}
 
     public function toProcess(ApplicationInterface $app): Process
     {

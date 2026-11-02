@@ -15,8 +15,7 @@ class Input implements ContainerAttributeInterface
         public ?string $name = null,
         public mixed $default = null,
         public string $delimiter = '.',
-    ) {
-    }
+    ) {}
 
     public function __invoke(AttributeHandler $handler): callable
     {

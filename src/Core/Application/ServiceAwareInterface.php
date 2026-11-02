@@ -18,7 +18,7 @@ interface ServiceAwareInterface
      * @param  bool             $forceNew
      * @param  string|null      $tag
      *
-     * @return T
+     * @return  T
      */
     public function retrieve(string $id, bool $forceNew = false, ?string $tag = null): mixed;
 
@@ -93,7 +93,7 @@ interface ServiceAwareInterface
      * @param  int                    $options
      * @param  string|null            $tag
      *
-     * @return mixed|T
+     * @return  mixed|T
      */
     public function resolve(mixed $source, array $args = [], int $options = 0, ?string $tag = null): mixed;
 }

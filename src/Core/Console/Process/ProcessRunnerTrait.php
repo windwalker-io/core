@@ -23,13 +23,13 @@ trait ProcessRunnerTrait
      *
      * @return  Process
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      * @since  3.5.22
      */
     public function createProcess(string|array $script): Process
     {
-        $process = is_array($script) ?
-            new Process($script)
+        $process = is_array($script)
+            ? new Process($script)
             : Process::fromShellCommandline($script);
 
         $process->setTimeout(0);
@@ -64,18 +64,17 @@ trait ProcessRunnerTrait
 
     protected function getProcessOutputCallback(?OutputInterface $output = null): callable
     {
-        return static function () {
-        };
+        return static function () {};
     }
 
     /**
      * runProcess
      *
-     * @param  string|array|Process  $process
-     * @param  mixed  $input
+     * @param  string|array|Process           $process
+     * @param  mixed                          $input
      * @param  bool|callable|OutputInterface  $output
      *
-     * @return Process
+     * @return  Process
      *
      * @since  3.5.5
      */

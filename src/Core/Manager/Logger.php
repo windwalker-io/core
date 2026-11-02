@@ -10,19 +10,19 @@ use Windwalker\Core\Service\LoggerService;
 /**
  * The Logger class.
  *
- * @method static void log(string|array $channel, string|int $level, mixed $message, array $context = [])
- * @method static void emergency(string|array $channel, mixed $message, array $context = [])
- * @method static void alert(string|array $channel, mixed $message, array $context = [])
- * @method static void critical(string|array $channel, mixed $message, array $context = [])
- * @method static void error(string|array $channel, mixed $message, array $context = [])
- * @method static void warning(string|array $channel, mixed $message, array $context = [])
- * @method static void notice(string|array $channel, mixed $message, array $context = [])
- * @method static void info(string|array $channel, mixed $message, array $context = [])
- * @method static void debug(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  log(string|array $channel, string|int $level, mixed $message, array $context = [])
+ * @method  static  void  emergency(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  alert(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  critical(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  error(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  warning(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  notice(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  info(string|array $channel, mixed $message, array $context = [])
+ * @method  static  void  debug(string|array $channel, mixed $message, array $context = [])
  */
 class Logger
 {
-    public static \WeakReference|null $ref = null;
+    public static ?\WeakReference $ref = null;
 
     public static function getInstance(): ?LoggerService
     {

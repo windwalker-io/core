@@ -20,14 +20,12 @@ class XComponent extends DynamicComponent
     /**
      * XComponent constructor.
      */
-    public function __construct(protected LayoutPathResolver $pathResolver)
-    {
-    }
+    public function __construct(protected LayoutPathResolver $pathResolver) {}
 
     /**
      * Get the view / contents that represent the component.
      *
-     * @return Closure|string
+     * @return  Closure|string
      */
     public function render(): Closure|string
     {

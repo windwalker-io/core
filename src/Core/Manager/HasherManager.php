@@ -11,8 +11,8 @@ use Windwalker\DI\Attributes\Isolation;
 /**
  * The CryptoManager class.
  *
- * @method HasherInterface get(?string $name = null, ...$args)
- * @method HasherInterface create(?string $name = null, ...$args)
+ * @method  HasherInterface  get(?string $name = null, ...$args)
+ * @method  HasherInterface  create(?string $name = null, ...$args)
  *
  * @deprecated  Use container tags instead.
  */

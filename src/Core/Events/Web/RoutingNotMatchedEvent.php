@@ -22,6 +22,5 @@ class RoutingNotMatchedEvent extends BaseEvent
         public ServerRequestInterface $request,
         public string $route,
         public RouteNotFoundException $exception
-    ) {
-    }
+    ) {}
 }

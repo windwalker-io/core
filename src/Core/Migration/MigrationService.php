@@ -24,8 +24,6 @@ use Windwalker\Stream\Stream;
 
 use function Windwalker\chronos;
 
-use function Windwalker\depth;
-
 use const Windwalker\Stream\WRITE_ONLY_FROM_END;
 
 /**
@@ -51,12 +49,12 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * @param  string  $path
+     * @param  string       $path
      * @param  string|null  $targetVersion
      * @param  string|null  $logFile
      *
      * @return  int
-     * @throws Exception
+     * @throws  Exception
      */
     public function migrate(string $path, ?string $targetVersion, ?string $logFile = null): int
     {
@@ -351,8 +349,8 @@ class MigrationService implements EventAwareInterface
             if (strtolower($name) === strtolower($migration->name)) {
                 throw new MigrationExistsException(
                     $migration,
-                    'Migration: <info>' . $name . "</info> has exists. \nFile at: <info>" .
-                    $migration->file->getPathname() . '</info>'
+                    'Migration: <info>' . $name . "</info> has exists. \nFile at: <info>"
+                    . $migration->file->getPathname() . '</info>'
                 );
             }
 
@@ -474,8 +472,8 @@ class MigrationService implements EventAwareInterface
     }
 
     /**
-     * @param  string  $targetVersion
-     * @param  array<string, Migration>   $migrations
+     * @param  string                    $targetVersion
+     * @param  array<string, Migration>  $migrations
      *
      * @return  string
      */

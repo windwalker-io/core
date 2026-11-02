@@ -29,8 +29,7 @@ class RendererService
         protected Container $container,
         protected LayoutPathResolver $pathResolver,
         protected array $globals = []
-    ) {
-    }
+    ) {}
 
     public function render(string $layout, array $data, array $options = []): string
     {
@@ -91,7 +90,7 @@ class RendererService
     }
 
     /**
-     * @return array
+     * @return  array
      */
     public function getGlobals(): array
     {

@@ -52,7 +52,7 @@ class FileCloner
      * @param  string|FileObject                   $dest
      * @param  bool                                $force
      *
-     * @return array{ FileCloneResult[], FileCloneResult[], FileCloneResult[] }
+     * @return  array{ FileCloneResult[], FileCloneResult[], FileCloneResult[] }
      */
     public function copyList(iterable|string $files, FileObject|string $dest, bool $force = false): array
     {
@@ -77,7 +77,7 @@ class FileCloner
      * @param  string|FileObject  $dest
      * @param  bool               $force
      *
-     * @return FileCloneResult
+     * @return  FileCloneResult
      */
     public function copyFile(string|FileObject $src, string|FileObject $dest, bool $force = false): FileCloneResult
     {

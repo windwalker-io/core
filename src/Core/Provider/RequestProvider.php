@@ -27,7 +27,7 @@ class RequestProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws \Windwalker\DI\Exception\DefinitionException
+     * @throws  \Windwalker\DI\Exception\DefinitionException
      *
      * @level 3
      */

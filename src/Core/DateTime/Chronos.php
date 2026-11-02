@@ -42,7 +42,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     /**
      * The format string to be applied when using the __toString() magic method.
      *
-     * @var    string
+     * @var  string
      * @since  2.1
      */
     public static string $format = 'Y-m-d H:i:s';
@@ -53,7 +53,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  static
      *
-     * @throws Exception
+     * @throws  Exception
      * @since  3.5.19
      */
     public static function wrap(mixed $date = null, string|DateTimeZone|null $tz = null): static
@@ -98,7 +98,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @param  string|DateTimeZone|null  $tz    Time zone to be used for the date. Might be a string or
      *                                          a DateTimeZone object.
      *
-     * @throws Exception
+     * @throws  Exception
      * @since   2.1
      */
     public function __construct(mixed $date = null, string|DateTimeZone|null $tz = null)
@@ -140,9 +140,9 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @param  string|DateTimeInterface  $date
      * @param  string                    $format
      *
-     * @return string
+     * @return  string
      *
-     * @throws Exception
+     * @throws  Exception
      * @since  3.2
      */
     public static function toFormat(string|DateTimeInterface $date, string $format): string
@@ -161,7 +161,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @param  string|DateTimeZone|null  $tz
      *
      * @return  string
-     * @throws Exception
+     * @throws  Exception
      *
      * @deprecated  Use Clock::now()->format() instead.
      */
@@ -184,7 +184,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  static
      *
-     * @throws Exception
+     * @throws  Exception
      * @since   2.1
      */
     public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): static
@@ -199,8 +199,8 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @param  string  $time      String representing the time.
      * @param  mixed   $timezone  A DateTimeZone object representing the desired time zone.
      *
-     * @return static|bool
-     * @throws Exception
+     * @return  static|bool
+     * @throws  Exception
      */
     public static function createFromFormat($format, $time, $timezone = null): static|false
     {
@@ -234,7 +234,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  DateInterval
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public static function createInterval(\DateInterval|string|int $duration): DateInterval
     {
@@ -259,7 +259,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @param  DateInterval|string  $interval
      *
      * @return  int
-     * @throws Exception
+     * @throws  Exception
      */
     public static function intervalToSeconds(DateInterval|string $interval): int
     {
@@ -268,13 +268,13 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         }
 
         return (int) ($interval->format('%r') . (
-                ($interval->s) +
-                (60 * ($interval->i)) +
-                (60 * 60 * ($interval->h)) +
-                (24 * 60 * 60 * ($interval->d)) +
-                (30 * 24 * 60 * 60 * ($interval->m)) +
-                (365 * 24 * 60 * 60 * ($interval->y))
-            ));
+            ($interval->s)
+                + (60 * ($interval->i))
+                + (60 * 60 * ($interval->h))
+                + (24 * 60 * 60 * ($interval->d))
+                + (30 * 24 * 60 * 60 * ($interval->m))
+                + (365 * 24 * 60 * 60 * ($interval->y))
+        ));
     }
 
     public static function wrapDuration(
@@ -323,7 +323,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  \DatePeriod
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public static function createPeriodBetween(
         string|int|DateTimeInterface $start,
@@ -350,7 +350,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  \DatePeriod
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public static function createPeriodRecurrences(
         string|int|DateTimeInterface $start,
@@ -379,7 +379,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  \DatePeriod
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public function getPeriodTo(
         string|int|DateInterval $interval,
@@ -396,7 +396,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  \DatePeriod
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public function getPeriodRecurrences(
         string|int|DateInterval $interval,
@@ -473,7 +473,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @return  bool
      *
-     * @throws Exception
+     * @throws  Exception
      */
     public function isCurrent(string|int|DateInterval|null $range = null): bool
     {
@@ -500,7 +500,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @param  string  $name  The name of the property.
      *
-     * @return  mixed   A value if the property name is valid, null otherwise.
+     * @return  mixed  A value if the property name is valid, null otherwise.
      *
      * @since   2.1
      */
@@ -612,7 +612,7 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * Gets the date as an RFC 822 string.  IETF RFC 2822 supercedes RFC 822 and its definition
      * can be found at the IETF Web site.
      *
-     * @return  string   The date string in RFC 822 format.
+     * @return  string  The date string in RFC 822 format.
      *
      * @link    http://www.ietf.org/rfc/rfc2822.txt
      * @since   2.1

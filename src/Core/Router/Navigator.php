@@ -34,7 +34,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     use CoreEventAwareTrait;
 
     /**
-     * @var RouteBuilder
+     * @var  RouteBuilder
      */
     protected RouteBuilder $routeBuilder;
 
@@ -333,7 +333,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     }
 
     /**
-     * @return NavOptions
+     * @return  NavOptions
      */
     public function getOptions(): NavOptions
     {
@@ -357,7 +357,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     }
 
     /**
-     * @return Router
+     * @return  Router
      */
     public function getRouter(): Router
     {
@@ -365,7 +365,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     }
 
     /**
-     * @return AppContext
+     * @return  AppContext
      */
     public function getAppContext(): AppContext
     {
@@ -445,7 +445,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return false;
     }
 
-    public function inGroup(string|array $groups, array|null $query = null): bool
+    public function inGroup(string|array $groups, ?array $query = null): bool
     {
         $groups = TypeCast::toArray($groups);
 
@@ -462,7 +462,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $active && $this->matchVars($query);
     }
 
-    protected function matchVars(array|null $query = [], ?array $vars = null): bool
+    protected function matchVars(?array $query = [], ?array $vars = null): bool
     {
         if ($query === null) {
             return true;

@@ -18,7 +18,7 @@ abstract class AbstractMiddlewareAttribute implements ContainerAttributeInterfac
         return function (...$args) use ($handler) {
             $request = $handler->container->get(ServerRequestInterface::class);
             return $this->createMiddleware($handler->container)
-                ->run($request, fn () => $handler(...$args));
+                ->run($request, fn() => $handler(...$args));
         };
     }
 }

@@ -15,7 +15,7 @@ interface ModuleInterface
     public function getState(): AppState;
 
     /**
-     * @return string
+     * @return  string
      */
     public function getName(): string;
 
@@ -27,7 +27,7 @@ interface ModuleInterface
     public function setName(string $name): static;
 
     /**
-     * @return AppContext
+     * @return  AppContext
      */
     public function getAppContext(): AppContext;
 }

@@ -7,6 +7,7 @@ namespace Windwalker\Core\Attributes;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Attributes\AttributeHandler;
 use Windwalker\DI\Attributes\ContainerAttributeInterface;
+
 // use Windwalker\Filter\Rule\Alnum;
 // use Windwalker\Filter\Rule\CastTo;
 // use Windwalker\Filter\Rule\Clamp;

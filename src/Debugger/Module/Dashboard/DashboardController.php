@@ -10,6 +10,4 @@ use Windwalker\Core\Attributes\Controller;
  * The DashboardController class.
  */
 #[Controller]
-class DashboardController
-{
-}
+class DashboardController {}

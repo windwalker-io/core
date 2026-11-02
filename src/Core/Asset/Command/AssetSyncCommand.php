@@ -4,26 +4,15 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Asset\Command;
 
-use Composer\Semver\Constraint\MultiConstraint;
 use Composer\Semver\Intervals;
-use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
 use JsonException;
-use ReflectionAttribute;
-use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
-use Windwalker\Console\Input\InputOption;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Core\Attributes\ViewModel;
 use Windwalker\Core\Package\PackageRegistry;
-use Windwalker\Filesystem\FileObject;
-use Windwalker\Filesystem\Path;
-use Windwalker\Utilities\Str;
 
 use function Windwalker\fs;
 
@@ -42,8 +31,7 @@ class AssetSyncCommand implements CommandInterface
     public function __construct(
         protected ApplicationInterface $app,
         protected PackageRegistry $packageRegistry,
-    ) {
-    }
+    ) {}
 
     /**
      * configure
@@ -62,8 +50,8 @@ class AssetSyncCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws JsonException
+     * @return  int            Return 0 is success, 1-255 is failure.
+     * @throws  JsonException
      */
     public function execute(IOInterface $io): int
     {

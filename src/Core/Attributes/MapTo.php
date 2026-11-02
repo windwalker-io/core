@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Attributes;
 
-use Windwalker\Data\Collection;
 use Windwalker\Data\RecordInterface;
 use Windwalker\Database\Hydrator\SimpleHydrator;
 use Windwalker\DI\Attributes\AttributeHandler;
@@ -13,13 +12,11 @@ use Windwalker\ORM\Metadata\EntityMetadata;
 use Windwalker\ORM\ORM;
 use Windwalker\Utilities\Enum\EnumExtendedInterface;
 
-use function Windwalker\ds;
-
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class MapTo implements ContainerAttributeInterface
 {
     /**
-     * @var array<\Closure(mixed $value, MapTo $attribute, AttributeHandler $handler): mixed>
+     * @var  array<\Closure(mixed $value, MapTo $attribute, AttributeHandler $handler): mixed>
      */
     public static array $mapHandlers = [];
 
@@ -27,8 +24,7 @@ class MapTo implements ContainerAttributeInterface
         public string|object $className,
         public bool $try = false,
         public bool $nullable = true,
-    ) {
-    }
+    ) {}
 
     public function __invoke(AttributeHandler $handler): callable
     {

@@ -24,9 +24,7 @@ use function Windwalker\response;
  */
 class MaintenanceMiddleware implements MiddlewareInterface
 {
-    public function __construct(protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected ApplicationInterface $app) {}
 
     /**
      * @inheritDoc

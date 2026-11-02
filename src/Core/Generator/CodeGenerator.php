@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Generator;
 
-use Laminas\Code\Generator\DocBlockGenerator;
 use Laminas\Code\Generator\FileGenerator;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Filesystem\Filesystem;

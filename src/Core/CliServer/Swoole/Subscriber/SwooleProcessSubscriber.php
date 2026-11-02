@@ -19,9 +19,7 @@ use Windwalker\Reactor\Swoole\Event\WorkerStartEvent;
 #[EventSubscriber]
 class SwooleProcessSubscriber
 {
-    public function __construct(protected Container $container)
-    {
-    }
+    public function __construct(protected Container $container) {}
 
     #[ListenTo(ManagerStartEvent::class)]
     public function managerStart(ManagerStartEvent $event): void

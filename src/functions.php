@@ -129,7 +129,7 @@ namespace Windwalker {
          * @param  mixed|string              $date
          * @param  string|DateTimeZone|null  $tz
          *
-         * @return Chronos
+         * @return  Chronos
          */
         function chronos(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
         {
@@ -144,7 +144,7 @@ namespace Windwalker {
          * @param  mixed|string              $date
          * @param  string|DateTimeZone|null  $tz
          *
-         * @return Chronos|null
+         * @return  Chronos|null
          * @deprecated Use try_chronos()
          */
         function chronosOrNull(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?Chronos
@@ -160,7 +160,7 @@ namespace Windwalker {
          * @param  mixed|string              $date
          * @param  string|DateTimeZone|null  $tz
          *
-         * @return Chronos|null
+         * @return  Chronos|null
          */
         function try_chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?Chronos
         {
@@ -177,7 +177,7 @@ namespace Windwalker {
          *
          * @return  Chronos
          *
-         * @throws Exception
+         * @throws  Exception
          */
         function now(string $format, string|DateTimeZone|null $tz = null): string
         {
@@ -303,7 +303,7 @@ namespace Windwalker {
          *
          * @return  bool|int
          *
-         * @throws Exception
+         * @throws  Exception
          */
         function date_compare(
             string|DateTimeInterface $date1,

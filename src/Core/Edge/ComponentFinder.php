@@ -6,14 +6,11 @@ namespace Windwalker\Core\Edge;
 
 use Windwalker\Attributes\AttributesAccessor;
 use Windwalker\Cache\CachePool;
-use Windwalker\Cache\Serializer\JsonSerializer;
 use Windwalker\Cache\Serializer\PhpFileSerializer;
-use Windwalker\Cache\Storage\ForeverFileStorage;
 use Windwalker\Cache\Storage\PhpFileStorage;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Edge\Attribute\EdgeComponent;
-use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Utilities\ClassFinder;
 use Windwalker\DI\Attributes\Autowire;
 
@@ -23,7 +20,8 @@ class ComponentFinder
 
     public function __construct(
         protected ApplicationInterface $app,
-        #[Autowire] protected ClassFinder $classFinder,
+        #[Autowire]
+        protected ClassFinder $classFinder,
         protected PathResolver $pathResolver
     ) {
         //
@@ -38,7 +36,7 @@ class ComponentFinder
         $caches = $this->getCache()
             ->fetch(
                 'caches.json',
-                fn () => $this->scan()
+                fn() => $this->scan()
             );
 
         return (array) $caches;
@@ -58,7 +56,7 @@ class ComponentFinder
                 $this->getCachePath(),
                 [
                     'deny_access' => true,
-                    'deny_code' => "<" . "?php defined('WINDWALKER_ROOT') or die; ?>",
+                    'deny_code' => '<' . "?php defined('WINDWALKER_ROOT') or die; ?>",
                     'extension' => '.php',
                     'expiration_format' => null,
                 ]

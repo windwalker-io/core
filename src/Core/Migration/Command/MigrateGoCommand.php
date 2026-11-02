@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Migration\Command;
 
-use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,8 +15,6 @@ use Windwalker\Core\Migration\AbstractMigration;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Core\Seed\SeedService;
 use Windwalker\Filesystem\FileObject;
-
-use function Windwalker\ds;
 
 /**
  * The MigrationToCommand class.
@@ -158,7 +155,7 @@ class MigrateGoCommand extends AbstractMigrationCommand implements CompletionHan
 
                 $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));
                 $versions = array_map(
-                    fn (AbstractMigration $mig) => $mig->name,
+                    fn(AbstractMigration $mig) => $mig->name,
                     $migrations
                 );
 

@@ -7,6 +7,4 @@ namespace Windwalker\Debugger\Helper;
 /**
  * The DebuggerHelper class.
  */
-class DebuggerHelper
-{
-}
+class DebuggerHelper {}

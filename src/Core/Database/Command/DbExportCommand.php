@@ -16,7 +16,6 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Factory\DatabaseServiceFactory;
-use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Path;
@@ -35,8 +34,7 @@ class DbExportCommand implements CommandInterface
      */
     public function __construct(
         protected ApplicationInterface $app,
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc

@@ -21,7 +21,7 @@ class MetadataMiddleware implements MiddlewareInterface
     protected AppContext $app;
 
     /**
-     * @var callable|null
+     * @var  callable|null
      */
     protected $handler;
 

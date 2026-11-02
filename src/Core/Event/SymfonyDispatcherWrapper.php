@@ -17,9 +17,7 @@ class SymfonyDispatcherWrapper implements EventDispatcherInterface
      *
      * @param  PsrEventDispatcherInterface  $dispatcher
      */
-    public function __construct(protected PsrEventDispatcherInterface $dispatcher)
-    {
-    }
+    public function __construct(protected PsrEventDispatcherInterface $dispatcher) {}
 
     /**
      * @inheritDoc
@@ -30,7 +28,7 @@ class SymfonyDispatcherWrapper implements EventDispatcherInterface
     }
 
     /**
-     * @return PsrEventDispatcherInterface
+     * @return  PsrEventDispatcherInterface
      */
     public function getInnerDispatcher(): PsrEventDispatcherInterface
     {

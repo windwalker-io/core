@@ -13,7 +13,6 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Router\Exception\UnAllowedMethodException;
 use Windwalker\Event\EventAwareInterface;
-use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 use Windwalker\Utilities\Str;
 
 use function FastRoute\simpleDispatcher;
@@ -26,7 +25,7 @@ class Router implements EventAwareInterface
     use CoreEventAwareTrait;
 
     /**
-     * @var Route[]
+     * @var  Route[]
      */
     protected array $routes = [];
 
@@ -170,7 +169,7 @@ class Router implements EventAwareInterface
      * @param  array                   $hosts
      * @param  Route                   $route
      *
-     * @return bool
+     * @return  bool
      */
     protected function matchHost(ServerRequestInterface $request, array $hosts, Route $route): bool
     {
@@ -216,7 +215,7 @@ class Router implements EventAwareInterface
     }
 
     /**
-     * @return Route[]
+     * @return  Route[]
      */
     public function getRoutes(): array
     {
@@ -295,7 +294,7 @@ class Router implements EventAwareInterface
     /**
      * @param  string  $regex
      *
-     * @return bool
+     * @return  bool
      */
     private function regexHasCapturingGroups(string $regex): bool
     {

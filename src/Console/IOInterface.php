@@ -48,12 +48,12 @@ interface IOInterface extends InputInterface, OutputInterface
     public function getWrapperCommand(): Command;
 
     /**
-     * @return InputInterface
+     * @return  InputInterface
      */
     public function getInput(): InputInterface;
 
     /**
-     * @return OutputInterface
+     * @return  OutputInterface
      */
     public function getOutput(): OutputInterface;
 

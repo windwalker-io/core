@@ -47,9 +47,7 @@ class FilterService
      *
      * @param  FilterFactory  $filterFactory
      */
-    public function __construct(protected FilterFactory $filterFactory)
-    {
-    }
+    public function __construct(protected FilterFactory $filterFactory) {}
 
     public function filter(mixed $value, string|array $command): mixed
     {
@@ -68,7 +66,7 @@ class FilterService
      *
      * @return  bool
      *
-     * @throws ValidateException
+     * @throws  ValidateException
      */
     public function validate(mixed $value, string|array $command, bool $strict = false): bool
     {

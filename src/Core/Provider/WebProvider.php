@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Provider;
 
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
@@ -43,17 +42,15 @@ class WebProvider implements ServiceProviderInterface
      *
      * @param  WebApplicationInterface  $parentApp
      */
-    public function __construct(protected WebApplicationInterface $parentApp)
-    {
-    }
+    public function __construct(protected WebApplicationInterface $parentApp) {}
 
     public function canProvide(): \Closure
     {
         if ($this->parentApp->getType() === AppType::CONSOLE) {
-            return static fn (int $level) => $level > AppLayer::APP;
+            return static fn(int $level) => $level > AppLayer::APP;
         }
 
-        return static fn (int $level) => $level > AppLayer::REQUEST;
+        return static fn(int $level) => $level > AppLayer::REQUEST;
     }
 
     /**
@@ -62,7 +59,7 @@ class WebProvider implements ServiceProviderInterface
      * @param  Container  $container  The DI container.
      *
      * @return  void
-     * @throws DefinitionException
+     * @throws  DefinitionException
      *
      * @level 2
      */
@@ -91,8 +88,8 @@ class WebProvider implements ServiceProviderInterface
      * @param  Container  $container
      *
      * @return  AppRequest
-     * @throws ContainerExceptionInterface
-     * @throws \ReflectionException
+     * @throws  ContainerExceptionInterface
+     * @throws  \ReflectionException
      */
     public static function createAppRequest(Container $container): AppRequest
     {
@@ -108,7 +105,7 @@ class WebProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function registerAppContext(Container $container): void
     {
@@ -139,7 +136,7 @@ class WebProvider implements ServiceProviderInterface
      *
      * @return  void
      *
-     * @throws DefinitionException
+     * @throws  DefinitionException
      */
     protected function registerRequestObject(Container $container): void
     {

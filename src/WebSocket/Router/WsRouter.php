@@ -8,9 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
-use Windwalker\WebSocket\Application\WsAppContext;
 use Windwalker\WebSocket\Application\WsApplicationInterface;
-use Windwalker\WebSocket\Application\WsRootApplicationInterface;
 
 /**
  * The WsRouter class.

@@ -17,9 +17,7 @@ use Windwalker\WebSocket\Router\WsRouter;
  */
 class RouterProvider implements ServiceProviderInterface, BootableProviderInterface
 {
-    public function __construct(protected RootApplicationInterface $app)
-    {
-    }
+    public function __construct(protected RootApplicationInterface $app) {}
 
     /**
      * @inheritDoc

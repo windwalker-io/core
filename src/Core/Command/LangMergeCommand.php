@@ -16,10 +16,8 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Filesystem\Folder;
 use Windwalker\Filesystem\Path;
 
-use function Windwalker\ds;
 use function Windwalker\fs;
 
 /**
@@ -32,9 +30,7 @@ class LangMergeCommand implements CommandInterface, CompletionAwareInterface
 {
     use CommandPackageResolveTrait;
 
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
@@ -101,7 +97,7 @@ class LangMergeCommand implements CommandInterface, CompletionAwareInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
+     * @return  int  Return 0 is success, 1-255 is failure.
      */
     public function execute(IOInterface $io): int
     {
@@ -200,9 +196,7 @@ class LangMergeCommand implements CommandInterface, CompletionAwareInterface
         throw new RuntimeException('Too many locales given.');
     }
 
-    public function completeOptionValues($optionName, CompletionContext $context)
-    {
-    }
+    public function completeOptionValues($optionName, CompletionContext $context) {}
 
     public function completeArgumentValues($argumentName, CompletionContext $context)
     {

@@ -11,8 +11,6 @@ use Windwalker\Core\Attributes\JsonApi;
 use Windwalker\Debugger\Module\Dashboard\DashboardRepository;
 use Windwalker\DI\Attributes\Autowire;
 
-use function Windwalker\collect;
-
 /**
  * The AjaxController class.
  */

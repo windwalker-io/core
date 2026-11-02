@@ -11,7 +11,7 @@ use Windwalker\DI\Attributes\Isolation;
 /**
  * The DatabaseManager class.
  *
- * @method DatabaseAdapter get(?string $name = null, ...$args)
+ * @method  DatabaseAdapter  get(?string $name = null, ...$args)
  *
  * @deprecated  Use container tags instead.
  */

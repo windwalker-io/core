@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
-use Symfony\Component\Console\Command\Command;
-use Windwalker\Console\CommandWrapper;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
@@ -29,9 +27,7 @@ abstract class AbstractExporter implements ExporterInterface
      * @param  DatabaseAdapter       $db
      * @param  ApplicationInterface  $app
      */
-    public function __construct(protected DatabaseAdapter $db, protected ApplicationInterface $app)
-    {
-    }
+    public function __construct(protected DatabaseAdapter $db, protected ApplicationInterface $app) {}
 
     /**
      * Export to PSR7 stream.
@@ -87,7 +83,7 @@ abstract class AbstractExporter implements ExporterInterface
      * @param  StreamInterface  $stream
      * @param  array            $options
      *
-     * @return void
+     * @return  void
      */
     abstract protected function doExport(StreamInterface $stream, array $options = []): void;
 
@@ -96,7 +92,7 @@ abstract class AbstractExporter implements ExporterInterface
      *
      * @param  string  $table
      *
-     * @return array|mixed|string
+     * @return  array|mixed|string
      */
     abstract protected function getCreateTable(string $table): string;
 
@@ -105,7 +101,7 @@ abstract class AbstractExporter implements ExporterInterface
      *
      * @param  string  $table
      *
-     * @return mixed|null|string
+     * @return  mixed|null|string
      */
     abstract protected function getInserts(string $table): string;
 }

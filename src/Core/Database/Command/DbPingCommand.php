@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Database\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
 use Windwalker\Console\CommandInterface;
@@ -22,8 +21,7 @@ class DbPingCommand implements CommandInterface
 {
     public function __construct(
         protected ApplicationInterface $app,
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc

@@ -13,8 +13,7 @@ class ErrorInlineHandler implements ErrorHandlerInterface
         protected ApplicationInterface $app,
         public ?int $errorLevel = null,
         protected ?\Closure $callback = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc

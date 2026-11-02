@@ -21,24 +21,24 @@ use Windwalker\Utilities\Wrapper\RawWrapper;
 /**
  * The Lang class.
  *
- * @method $this load(string $file, ?string $format = 'ini', ?string $locale = null, array $options = [])
- * @method string resolveNamespace(string $key)
- * @method array find(string $id, ?string $locale = null, bool $fallback = true)
- * @method $this addString(string $key, string $string, ?string $locale = null)
- * @method $this addStrings(array $strings, ?string $locale = null)
- * @method $this setDebug(bool $debug)
- * @method array getOrphans()
- * @method array getUsed()
- * @method string getLocale()
- * @method $this setLocale(string $locale)
- * @method string getFallback()
- * @method $this setFallback(string $fallback)
- * @method mixed normalize(string $string)
- * @method array getStrings()
- * @method $this setStrings(array $strings)
- * @method string getNamespace()
- * @method $this setNamespace(string $namespace)
- * @method bool isDebug()
+ * @method  $this   load(string $file, ?string $format = 'ini', ?string $locale = null, array $options = [])
+ * @method  string  resolveNamespace(string $key)
+ * @method  array   find(string $id, ?string $locale = null, bool $fallback = true)
+ * @method  $this   addString(string $key, string $string, ?string $locale = null)
+ * @method  $this   addStrings(array $strings, ?string $locale = null)
+ * @method  $this   setDebug(bool $debug)
+ * @method  array   getOrphans()
+ * @method  array   getUsed()
+ * @method  string  getLocale()
+ * @method  $this   setLocale(string $locale)
+ * @method  string  getFallback()
+ * @method  $this   setFallback(string $fallback)
+ * @method  mixed   normalize(string $string)
+ * @method  array   getStrings()
+ * @method  $this   setStrings(array $strings)
+ * @method  string  getNamespace()
+ * @method  $this   setNamespace(string $namespace)
+ * @method  bool    isDebug()
  */
 class LangService implements LanguageInterface
 {
@@ -197,7 +197,7 @@ class LangService implements LanguageInterface
     }
 
     /**
-     * @return Language
+     * @return  Language
      */
     public function getLanguage(): Language
     {
@@ -267,7 +267,7 @@ class LangService implements LanguageInterface
     }
 
     /**
-     * @return self
+     * @return  self
      */
     public function getParent(): ?self
     {

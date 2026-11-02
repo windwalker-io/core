@@ -7,6 +7,4 @@ namespace Windwalker\Core\Application;
 /**
  * Interface RootApplicationInterface
  */
-interface RootApplicationInterface extends ApplicationInterface
-{
-}
+interface RootApplicationInterface extends ApplicationInterface {}

@@ -17,8 +17,8 @@ class JsonBuffer extends AbstractBuffer
     /**
      * Method for sending the response in JSON format
      *
-     * @return  string  The response in JSON format
-     * @throws JsonException
+     * @return  string         The response in JSON format
+     * @throws  JsonException
      */
     public function toString(): string
     {

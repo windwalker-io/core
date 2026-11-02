@@ -31,7 +31,7 @@ class RequestRegistry
     }
 
     /**
-     * @throws \JsonException
+     * @throws  \JsonException
      */
     public function store(WebSocketRequestInterface $request, ?int $fd = null): bool
     {
@@ -89,22 +89,22 @@ class RequestRegistry
     }
 
     /**
-     * @throws \JsonException
+     * @throws  \JsonException
      */
-//     public function store(int $fd, WebSocketRequestInterface $request): bool
-//     {
-//         $data = \Windwalker\serialize($request);
-// dump($data);
-//         return $this->table->set((string) $fd, compact('fd', 'data'));
-//     }
-//
-//     public function get(int $fd): WebSocketRequestInterface
-//     {
-//         $item = $this->table->get((string) $fd);
-//         $data = $item['data'];
-// dump($data);
-//         return \Windwalker\unserialize($data, ['allowed_classes' => true]);
-//     }
+    //     public function store(int $fd, WebSocketRequestInterface $request): bool
+    //     {
+    //         $data = \Windwalker\serialize($request);
+    // dump($data);
+    //         return $this->table->set((string) $fd, compact('fd', 'data'));
+    //     }
+    //
+    //     public function get(int $fd): WebSocketRequestInterface
+    //     {
+    //         $item = $this->table->get((string) $fd);
+    //         $data = $item['data'];
+    // dump($data);
+    //         return \Windwalker\unserialize($data, ['allowed_classes' => true]);
+    //     }
 
     public function exists(int $fd): bool
     {

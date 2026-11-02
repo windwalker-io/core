@@ -9,6 +9,4 @@ namespace Windwalker\Core\Provider;
  *
  * @deprecated
  */
-class EdgeProvider extends \Windwalker\Edge\Provider\EdgeProvider
-{
-}
+class EdgeProvider extends \Windwalker\Edge\Provider\EdgeProvider {}

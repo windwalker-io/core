@@ -6,7 +6,6 @@ namespace Windwalker\Core\View\Event;
 
 use Windwalker\Core\State\AppState;
 use Windwalker\Core\View\View;
-use Windwalker\Core\View\ViewModelInterface;
 use Windwalker\Event\BaseEvent;
 use Windwalker\Utilities\Accessible\AccessorBCTrait;
 
@@ -23,11 +22,10 @@ abstract class AbstractViewRenderEvent extends BaseEvent
         public AppState $state,
         public string $layout,
         public array $data,
-    ) {
-    }
+    ) {}
 
     /**
-     * @return array
+     * @return  array
      *
      * @deprecated  Use property instead.
      */
@@ -37,7 +35,7 @@ abstract class AbstractViewRenderEvent extends BaseEvent
     }
 
     /**
-     * @return string
+     * @return  string
      *
      * @deprecated  Use property instead.
      */

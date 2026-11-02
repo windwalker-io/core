@@ -15,7 +15,7 @@ class Profiler implements \JsonSerializable
     protected ?Stopwatch $stopwatch;
 
     /**
-     * @var array<ProfilerItem>
+     * @var  array<ProfilerItem>
      */
     protected array $items = [];
 
@@ -86,7 +86,7 @@ class Profiler implements \JsonSerializable
     }
 
     /**
-     * @return string
+     * @return  string
      */
     public function getName(): string
     {
@@ -94,7 +94,7 @@ class Profiler implements \JsonSerializable
     }
 
     /**
-     * @return StopwatchEvent|null
+     * @return  StopwatchEvent|null
      */
     public function getCurrentEvent(): ?StopwatchEvent
     {

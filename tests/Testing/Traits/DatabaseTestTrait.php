@@ -60,16 +60,12 @@ trait DatabaseTestTrait
      * Override in the test class to create tables (usually a no-op when
      * migrations handle the schema).
      */
-    protected static function prepareTables(): void
-    {
-    }
+    protected static function prepareTables(): void {}
 
     /**
      * Override in the test class to truncate the tables it owns.
      */
-    protected static function clearTables(): void
-    {
-    }
+    protected static function clearTables(): void {}
 
     public static function truncateTables(...$tables): void
     {

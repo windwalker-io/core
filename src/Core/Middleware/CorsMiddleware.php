@@ -9,10 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Windwalker\Core\Http\CorsHandler;
-use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Attributes\NoAutowire;
 use Windwalker\DI\Container;
 use Windwalker\Http\Response\Response;
@@ -193,7 +191,7 @@ class CorsMiddleware implements MiddlewareInterface
     {
         return Arr::mapWithKeys(
             $response->getHeaders(),
-            static fn ($v, $k) => yield $k => $response->getHeaderLine($k)
+            static fn($v, $k) => yield $k => $response->getHeaderLine($k)
         );
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Schedule\Command;
 
-use Lorisleiva\CronTranslator\CronTranslator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Windwalker\Console\CommandInterface;
@@ -23,8 +22,7 @@ class ScheduleInstallCommand implements CommandInterface
 
     public function __construct(
         protected ScheduleService $scheduleService
-    ) {
-    }
+    ) {}
 
     /**
      * @inheritDoc
@@ -97,7 +95,7 @@ class ScheduleInstallCommand implements CommandInterface
         }
 
         $io->writeln(">> $expr");
-        $io->writeln("Install schedule to crontab");
+        $io->writeln('Install schedule to crontab');
 
         return 0;
     }

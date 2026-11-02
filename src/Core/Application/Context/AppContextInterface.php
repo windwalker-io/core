@@ -19,7 +19,7 @@ interface AppContextInterface extends ApplicationInterface
     public function getRootApp(): RootApplicationInterface;
 
     /**
-     * @return array|callable
+     * @return  array|callable
      */
     public function getController(): mixed;
 
@@ -33,7 +33,7 @@ interface AppContextInterface extends ApplicationInterface
     /**
      * @param  string|null  $prefix
      *
-     * @return AppState
+     * @return  AppState
      */
     public function getState(?string $prefix = null): AppState;
 
@@ -51,7 +51,7 @@ interface AppContextInterface extends ApplicationInterface
     public function getServerRequest(): ServerRequestInterface;
 
     /**
-     * @return Route|null
+     * @return  Route|null
      */
     public function getMatchedRoute(): ?Route;
 

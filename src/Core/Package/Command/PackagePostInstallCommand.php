@@ -17,9 +17,7 @@ use Windwalker\Core\Console\ConsoleApplication;
 )]
 class PackagePostInstallCommand implements CommandInterface
 {
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     public function configure(Command $command): void
     {

@@ -75,7 +75,7 @@ class ResetCommand extends AbstractMigrationCommand
      * @param  IOInterface  $io
      *
      * @return  mixed
-     * @throws Exception
+     * @throws  Exception
      */
     public function execute(IOInterface $io): int
     {

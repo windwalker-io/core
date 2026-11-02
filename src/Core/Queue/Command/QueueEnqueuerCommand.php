@@ -31,9 +31,7 @@ class QueueEnqueuerCommand implements CommandInterface
 
     protected IOInterface $io;
 
-    public function __construct(protected ConsoleApplication $app)
-    {
-    }
+    public function __construct(protected ConsoleApplication $app) {}
 
     /**
      * configure
@@ -138,8 +136,8 @@ class QueueEnqueuerCommand implements CommandInterface
      *
      * @param  IOInterface  $io
      *
-     * @return  int Return 0 is success, 1-255 is failure.
-     * @throws DefinitionException
+     * @return  int                  Return 0 is success, 1-255 is failure.
+     * @throws  DefinitionException
      */
     public function execute(IOInterface $io): int
     {
@@ -178,7 +176,7 @@ class QueueEnqueuerCommand implements CommandInterface
         // Show enqueuer start information
         $io->writeln(
             sprintf(
-                "Enqueuer started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>",
+                'Enqueuer started. Press <info>Ctrl+C</info> to stop. PID: <comment>%s</comment>',
                 getmypid()
             )
         );

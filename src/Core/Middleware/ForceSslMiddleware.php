@@ -29,8 +29,7 @@ class ForceSslMiddleware implements MiddlewareInterface
         protected bool $enabled = true,
         protected int $redirectCode = 303,
         protected mixed $headers = null
-    ) {
-    }
+    ) {}
 
     /**
      * Process an incoming server request.
@@ -42,7 +41,7 @@ class ForceSslMiddleware implements MiddlewareInterface
      * @param  ServerRequestInterface   $request
      * @param  RequestHandlerInterface  $handler
      *
-     * @return ResponseInterface
+     * @return  ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

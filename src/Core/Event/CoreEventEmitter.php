@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Event;
 
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\EventDispatcher\StoppableEventInterface;
 use Windwalker\Event\EventEmitter;
 
 /**
@@ -30,7 +29,7 @@ class CoreEventEmitter extends EventEmitter
     }
 
     /**
-     * @return EventCollector
+     * @return  EventCollector
      */
     public function getCollector(): EventCollector
     {

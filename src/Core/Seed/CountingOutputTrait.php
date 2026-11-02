@@ -6,7 +6,6 @@ namespace Windwalker\Core\Seed;
 
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Core\Migration\AbstractMigration;
-use Windwalker\Core\Migration\Migration;
 use Windwalker\Environment\Environment;
 
 /**

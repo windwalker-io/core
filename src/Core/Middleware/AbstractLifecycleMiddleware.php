@@ -45,7 +45,7 @@ abstract class AbstractLifecycleMiddleware implements MiddlewareInterface
      * @param  ServerRequestInterface   $request
      * @param  RequestHandlerInterface  $handler
      *
-     * @return ResponseInterface
+     * @return  ResponseInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

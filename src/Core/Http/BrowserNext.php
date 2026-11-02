@@ -76,7 +76,7 @@ class BrowserNext extends Parser
 
         return tap(
             $this->os->toString(),
-            fn () => $this->os->hidden = $hidden
+            fn() => $this->os->hidden = $hidden
         );
     }
 
@@ -87,7 +87,7 @@ class BrowserNext extends Parser
 
         return tap(
             $this->device->toString(),
-            fn () => $this->device->hidden = $hidden
+            fn() => $this->device->hidden = $hidden
         );
     }
 
@@ -98,7 +98,7 @@ class BrowserNext extends Parser
 
         return tap(
             $this->browser->toString(),
-            fn () => $this->browser->hidden = $hidden
+            fn() => $this->browser->hidden = $hidden
         );
     }
 }

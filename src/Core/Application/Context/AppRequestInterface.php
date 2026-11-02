@@ -22,19 +22,19 @@ interface AppRequestInterface extends EventAwareInterface
     public function getClientIP(): string;
 
     /**
-     * @return UriInterface
+     * @return  UriInterface
      */
     public function getUri(): UriInterface;
 
     public function getQueryValues(): array;
 
     /**
-     * @return array
+     * @return  array
      */
     public function getUrlVars(): array;
 
     /**
-     * @return array
+     * @return  array
      */
     public function getInput(): array;
 
@@ -50,17 +50,17 @@ interface AppRequestInterface extends EventAwareInterface
     public function input(...$fields): mixed;
 
     /**
-     * @return SystemUri
+     * @return  SystemUri
      */
     public function getSystemUri(): SystemUri;
 
     /**
-     * @return Route|null
+     * @return  Route|null
      */
     public function getMatchedRoute(): ?Route;
 
     /**
-     * @return ProxyResolver
+     * @return  ProxyResolver
      */
     public function getProxyResolver(): ProxyResolver;
 

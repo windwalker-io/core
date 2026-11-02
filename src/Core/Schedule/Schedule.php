@@ -6,7 +6,6 @@ namespace Windwalker\Core\Schedule;
 
 use BadMethodCallException;
 use Cron\CronExpression;
-use DateTimeInterface;
 use DateTimeZone;
 use DomainException;
 use Generator;
@@ -17,14 +16,14 @@ use Windwalker\DI\Exception\DependencyResolutionException;
 /**
  * The Schedule class.
  *
- * @method ScheduleEvent yearly(string $name)
- * @method ScheduleEvent annually(string $name)
- * @method ScheduleEvent monthly(string $name)
- * @method ScheduleEvent weekly(string $name)
- * @method ScheduleEvent daily(string $name)
- * @method ScheduleEvent hourly(string $name)
- * @method ScheduleEvent minutely(string $name)
- * @method ScheduleEvent always(string $name)
+ * @method  ScheduleEvent  yearly(string $name)
+ * @method  ScheduleEvent  annually(string $name)
+ * @method  ScheduleEvent  monthly(string $name)
+ * @method  ScheduleEvent  weekly(string $name)
+ * @method  ScheduleEvent  daily(string $name)
+ * @method  ScheduleEvent  hourly(string $name)
+ * @method  ScheduleEvent  minutely(string $name)
+ * @method  ScheduleEvent  always(string $name)
  *
  * @since  3.5.3
  */
@@ -33,7 +32,7 @@ class Schedule
     /**
      * Property events.
      *
-     * @var ScheduleEvent[]
+     * @var  ScheduleEvent[]
      */
     protected array $events = [];
 
@@ -165,8 +164,8 @@ class Schedule
      *
      * @return  mixed
      *
-     * @throws ReflectionException
-     * @throws DependencyResolutionException
+     * @throws  ReflectionException
+     * @throws  DependencyResolutionException
      * @since  3.5.3
      */
     public function __call(string $name, array $args)
