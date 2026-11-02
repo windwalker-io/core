@@ -42,7 +42,9 @@
         "symfony/polyfill-time": "^1.42"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.95"
+        "windwalker/framework": "4.2.x-dev",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpunit/phpunit": "^13.4"
     },
     "scripts": {
         "test": "phpunit",
@@ -60,7 +62,7 @@
         "exclude": [
             ".github",
             "assets",
-            "test"
+            "tests"
         ]
     },
     "autoload" : {
