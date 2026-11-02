@@ -11,7 +11,9 @@ This directory stores the "instruction layer" of the shared toolkit. It contains
 
 ## Contents
 
-- `instruction.instructions.md`: explains how to route content between `instructions`, `skills`, `docs`, and `prompts`
+- [`instruction.instructions.md`](instruction.instructions.md): explains how to route content between `instructions`, `skills`, `docs`, and `prompts`
+- [`testing.instructions.md`](testing.instructions.md): test placement,
+  dependency-injection, database, and controller testing conventions
 - additional repo-level guidance files can be added here as new topics emerge
 
 ## Principles

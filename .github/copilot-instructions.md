@@ -17,18 +17,21 @@
   - [`skills/index.md`](skills/index.md) and
     [`skills/templates/`](skills/templates/): reusable skills and templates
   - [`workflows/`](workflows/): GitHub Actions workflows
-- Keep file roles distinct: this file and [`../AGENTS.md`](../AGENTS.md) define repository
+- Keep file roles distinct: this file and `../AGENTS.md` define repository
   rules; skill files define reusable skills; prompt files provide reusable
   prompts; `docs/` contains human-readable references and templates.
 
 ## Loading documentation
 
-- Do not read all of [`docs/`](docs/) up front unless the task requires it.
-- Start with [`docs/index.md`](docs/index.md) to identify relevant material, then read only the
+- Do not read all of `docs/` up front unless the task requires it.
+- Start with `docs/index.md` to identify relevant material, then read only the
   topic-specific documents needed.
-- When adding a documentation category, update [`docs/index.md`](docs/index.md) and this
+- When adding a documentation category, update `docs/index.md` and this
   guidance so contributors know when to load it.
 - Keep the documentation index and guidance concise and expandable.
+- When adding or updating tests, follow
+  [`instructions/testing.instructions.md`](instructions/testing.instructions.md)
+  for mirrored test paths and DI, database, and controller helpers.
 - Before writing Core integration tests, read
   [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md)
   to identify the host-app bootstrap,
@@ -44,8 +47,8 @@
 ## Package scope
 
 - This repository is `windwalker/core`, a reusable PHP framework package.
-- The `Windwalker\\` namespace maps to [`src/`](../src/); development tests use
-  `Windwalker\\Tests\\` from [`tests/`](../tests/).
+- The `Windwalker\\` namespace maps to `src/`; development tests use
+  `Windwalker\\Tests\\` from `tests/`.
 - Keep framework changes in this package. Do not apply Windwalker Starter
   application conventions such as `App\\`, front/admin modules, Vite assets,
   or application migrations here.
@@ -55,8 +58,7 @@
 ## PHP conventions
 
 - The package requires PHP `>=8.4.6`; preserve that compatibility floor.
-- Use `declare(strict_types=1);` and follow
-  [`.php-cs-fixer.dist.php`](../.php-cs-fixer.dist.php).
+- Use `declare(strict_types=1);` and follow `.php-cs-fixer.dist.php`.
 - Keep public API changes deliberate and compatible with existing consumers.
 - Add or update focused tests for behavior changes. Do not change unrelated
   framework behavior or tests.
@@ -71,15 +73,17 @@
 - Run `composer cs-check` for the configured PHP-CS-Fixer check.
 - `composer cs-fix` modifies files; use it only when formatting changes are
   intended.
-- Both style commands use [`bin/php-cs-fixer`](../bin/php-cs-fixer), which
+- Both style commands use `bin/php-cs-fixer`, which
   prefers Core's own `vendor/bin/php-cs-fixer`, then searches parent directories
   for a host app's fixer. They run from Core's root to use its configuration;
   if no fixer is available, they fail with an explicit installation message.
 - For changes limited to Markdown guidance or templates, confirm the content is
   Markdown and follows the intended file role; PHP checks are not needed.
-- When referring to another file or directory, prefer a Markdown link such as
-  `[label](relative/path)`. Use inline code for identifiers and example paths
-  that are merely mentioned rather than references readers should open.
+- Only when listing files or directories as an index, prefer starting each
+  item with a Markdown link, followed by its description:
+  `[label](relative/path): description`. In ordinary prose or other lists,
+  file mentions do not require links; use inline code for paths and identifiers,
+  and add links only when useful for navigation.
 
 ## Change boundaries
 
@@ -87,7 +91,7 @@
 - Keep documentation and templates concise, neutral, and reusable. Avoid
   customer-, product-, or team-specific details unless explicitly required.
 - Preserve clear folder responsibilities and keep shared guidance consistent.
-- Do not edit files under [`vendor/`](../vendor/) belonging to other packages
+- Do not edit files under `vendor/` belonging to other packages
   as part of a core change.
 - Avoid running database setup or destructive commands without explicit
   authorization and a confirmed safe target.
