@@ -42,7 +42,9 @@ class FormFactory
             $form->defineFormFields($definition);
         }
 
-        $form->setRenderer($this->renderer);
+        if ($this->renderer !== null) {
+            $form->setRenderer($this->renderer);
+        }
 
         return $form;
     }

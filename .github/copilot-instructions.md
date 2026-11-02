@@ -1,99 +1,76 @@
 # Copilot instructions
 
-## Purpose and project structure
+`windwalker/core` is a reusable PHP framework package. The `Windwalker\` namespace
+maps to `src/`; tests use `Windwalker\Tests\` from `tests/`.
 
-- This repository is the `windwalker/core` PHP framework package. Its `.github/`
-  directory also contains reusable agent guidance, documentation, prompts, and
-  skills.
-- Keep reusable guidance and templates generic; do not add product
-  implementation details, secrets, or environment-sensitive configuration to
-  those resources.
-- The main guidance and resource locations are:
-  - [`../AGENTS.md`](../AGENTS.md): general contributor and agent guidance
-  - [`docs/index.md`](docs/index.md): documentation overview and topic index
-  - [`docs/templates/`](docs/templates/): documentation templates and conventions
-  - [`instructions/`](instructions/): reusable repository instructions
-  - [`prompts/`](prompts/): AI workflow prompt templates
-  - [`skills/index.md`](skills/index.md) and
-    [`skills/templates/`](skills/templates/): reusable skills and templates
-  - [`workflows/`](workflows/): GitHub Actions workflows
-- Keep file roles distinct: this file and `../AGENTS.md` define repository
-  rules; skill files define reusable skills; prompt files provide reusable
-  prompts; `docs/` contains human-readable references and templates.
+## Where to find things
 
-## Loading documentation
+Load only what the task needs; do not read all of `docs/` up front.
 
-- Do not read all of `docs/` up front unless the task requires it.
-- Start with `docs/index.md` to identify relevant material, then read only the
-  topic-specific documents needed.
-- When adding a documentation category, update `docs/index.md` and this
-  guidance so contributors know when to load it.
-- Keep the documentation index and guidance concise and expandable.
-- When adding or updating tests, follow
-  [`instructions/testing.instructions.md`](instructions/testing.instructions.md)
-  for Core-specific test paths and helpers, and
-  [`instructions/testing-common.instructions.md`](instructions/testing-common.instructions.md)
-  for shared PHPUnit style and quality rules.
-- Before writing Core integration tests, read
-  [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md)
-  to identify the host-app bootstrap,
-  configuration, and external services the test needs.
-- A consuming app may have any name or location. If no host app is clearly
-  available in the workspace, treat Core as standalone and use its own test
-  setup; do not assume or depend on Earth.
-- If a host app is available, prefer its `phpunit.app.xml` when running tests;
-  pass it explicitly to PHPUnit with `-c`. If no host-specific config exists,
-  follow the fallback order in
-  [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md).
+- [`../AGENTS.md`](../AGENTS.md): general contributor and agent rules
+- [`docs/index.md`](docs/index.md): documentation index, start here for any topic
+- [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md): host-app bootstrap and test prerequisites (read before writing integration tests)
+- [`docs/templates/`](docs/templates/): documentation templates and conventions
+- [`instructions/test.instructions.md`](instructions/test.instructions.md): Core test paths and helpers
+- [`instructions/test-common.instructions.md`](instructions/test-common.instructions.md): shared PHPUnit style and quality rules
+- [`instructions/`](instructions/): other reusable instructions
+- [`prompts/`](prompts/): AI workflow prompt templates
+- [`skills/index.md`](skills/index.md): reusable skills; templates in [`skills/templates/`](skills/templates/)
+- [`workflows/`](workflows/): GitHub Actions workflows
 
-## Package scope
+File roles: this file and `../AGENTS.md` define rules; skills, prompts, and
+`docs/` hold reusable skills, prompts, and human-readable references.
+Keep reusable content generic: no product details, secrets, or
+environment-specific configuration.
 
-- This repository is `windwalker/core`, a reusable PHP framework package.
-- The `Windwalker\\` namespace maps to `src/`; development tests use
-  `Windwalker\\Tests\\` from `tests/`.
-- Keep framework changes in this package. Do not apply Windwalker Starter
-  application conventions such as `App\\`, front/admin modules, Vite assets,
-  or application migrations here.
-- Check the package's own code and tests for established APIs and patterns
-  before introducing new abstractions or dependencies.
+## Scope
+
+- Keep changes in this package. Do not apply Windwalker Starter conventions
+  (`App\`, front/admin modules, Vite assets, app migrations) here.
+- Check existing code and tests for established APIs before adding abstractions
+  or dependencies.
+- Do not edit other packages under `vendor/`.
 
 ## PHP conventions
 
-- The package requires PHP `>=8.4.6`; preserve that compatibility floor.
+- PHP `>=8.4.6`; keep that compatibility floor.
 - Use `declare(strict_types=1);` and follow `.php-cs-fixer.dist.php`.
-- Keep public API changes deliberate and compatible with existing consumers.
-- Add or update focused tests for behavior changes. Do not change unrelated
-  framework behavior or tests.
-- Keep unit tests independent of the consuming app when possible. For tests
-  requiring a booted app or real services, declare and configure those
-  integration prerequisites explicitly.
+- Keep public API changes deliberate and backward compatible.
+- Add or update focused tests for behavior changes; leave unrelated behavior
+  and tests alone.
+- Prefer unit tests independent of a host app; for tests needing a booted app
+  or real services, declare those prerequisites explicitly.
+
+## Testing with a host app
+
+- The host app may have any name or location. If none is clearly available,
+  treat Core as standalone and use its own test setup; do not assume Earth.
+- If a host app exists, pass its `phpunit.app.xml` to PHPUnit with `-c`.
+  Otherwise follow the fallback order in
+  [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md).
 
 ## Validation
 
-- Run `composer test` for the PHPUnit suite. Some database or service-backed
-  tests require their corresponding local DSN or service configuration.
-- Run `composer cs-check` for the configured PHP-CS-Fixer check.
-- `composer cs-fix` modifies files; use it only when formatting changes are
-  intended.
-- Both style commands use `bin/php-cs-fixer`, which
-  prefers Core's own `vendor/bin/php-cs-fixer`, then searches parent directories
-  for a host app's fixer. They run from Core's root to use its configuration;
-  if no fixer is available, they fail with an explicit installation message.
-- For changes limited to Markdown guidance or templates, confirm the content is
-  Markdown and follows the intended file role; PHP checks are not needed.
-- Only when listing files or directories as an index, prefer starting each
-  item with a Markdown link, followed by its description:
-  `[label](relative/path): description`. In ordinary prose or other lists,
-  file mentions do not require links; use inline code for paths and identifiers,
-  and add links only when useful for navigation.
+- `composer test`: PHPUnit suite (database/service tests need local DSN/config).
+- `composer cs-check`: PHP-CS-Fixer check.
+- `composer cs-fix`: modifies files; use only when formatting changes are intended.
+- Style commands run from Core's root via `bin/php-cs-fixer`, which prefers
+  Core's `vendor/bin/php-cs-fixer`, then a parent host app's fixer, and fails
+  with an install message if none exists.
+- Markdown-only changes: confirm the content is Markdown and fits the file's
+  role; PHP checks are not needed.
 
-## Change boundaries
+## Documentation
 
-- Update package documentation when changing user-facing behavior or APIs.
-- Keep documentation and templates concise, neutral, and reusable. Avoid
-  customer-, product-, or team-specific details unless explicitly required.
-- Preserve clear folder responsibilities and keep shared guidance consistent.
-- Do not edit files under `vendor/` belonging to other packages
-  as part of a core change.
-- Avoid running database setup or destructive commands without explicit
+- Update docs when changing user-facing behavior or APIs.
+- Keep docs and templates concise, neutral, and reusable.
+- When adding a documentation category, update `docs/index.md` and the
+  "Where to find things" list above.
+- When listing files or directories as an index, start each item with a
+  Markdown link followed by a description: `[label](relative/path): description`.
+  Elsewhere, use inline code for paths and identifiers; link only when useful.
+
+## Safety
+
+- Do not run database setup or destructive commands without explicit
   authorization and a confirmed safe target.

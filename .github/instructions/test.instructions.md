@@ -4,7 +4,7 @@ applyTo: "tests/**/*.php"
 
 # Core testing instructions
 
-Apply the [shared PHP testing rules](testing-common.instructions.md) together
+Apply the [shared PHP testing rules](test.instructions.md) together
 with the Core-specific conventions below.
 
 ## Test placement
