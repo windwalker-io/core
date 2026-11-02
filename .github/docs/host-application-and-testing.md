@@ -7,7 +7,8 @@ A consuming app may use any name and may live outside this repository; it
 installs Core and supplies application-specific bootstrap, configuration,
 routes, resources, and environment. The app's Composer autoloading maps its own
 namespace (for example, `App\`) to its source directory, while Core maps
-`Windwalker\` to Core's `src/`. Each package loads its own bootstrap file.
+`Windwalker\` to Core's [`src/`](../../src/). Each package loads its own
+bootstrap file.
 
 Core code should use framework contracts and package APIs; app-specific
 behavior and configuration belong in the consuming app. The Earth repository
@@ -24,13 +25,31 @@ use that app as the integration context. Do not assume the app is named Earth
 or is always located at a fixed relative path.
 
 If no host app can be identified, treat Core as an independently checked-out
-and independently tested package. Use Core's own `composer.json`,
-`phpunit.xml.dist`, source, and test support; do not search for or invent an
-application bootstrap, app config, routes, or migrations. Run isolated Core
-tests directly. Add only a minimal test bootstrap or fixture required by the
-specific behavior under test. If the behavior genuinely requires a host app or
-external service, make that prerequisite explicit and report it as unavailable
-rather than silently binding the test to an unrelated project.
+and independently tested package. Use Core's own [`composer.json`](../../composer.json),
+[`phpunit.dist.xml`](../../phpunit.dist.xml), source, and test support; do not
+search for or invent an application bootstrap, app config, routes, or
+migrations. Run isolated Core tests directly. Add only a minimal test bootstrap
+or fixture required by the specific behavior under test. If the behavior
+genuinely requires a host app or external service, make that prerequisite
+explicit and report it as unavailable rather than silently binding the test to
+an unrelated project.
+
+## Choose the PHPUnit configuration
+
+When a host app is available, prefer its `phpunit.app.xml` configuration for
+tests that need the app's Composer autoloader, bootstrap, environment, or
+service configuration. Invoke PHPUnit with that explicit configuration
+(for example, `phpunit -c /path/to/host-app/phpunit.app.xml`) rather than
+letting it discover a package-local default. This applies when testing Core
+from inside a host app; do not assume the host app is Earth or that it lives at
+a fixed path.
+
+If the host app has no `phpunit.app.xml`, use the package's
+[`phpunit.app.dist.xml`](../../phpunit.app.dist.xml) as the host-app test
+configuration when its bootstrap path and test setup fit the workspace. If
+neither app-aware configuration is available or suitable, use Core's
+[`phpunit.dist.xml`](../../phpunit.dist.xml) for standalone package tests, or
+report the missing app-specific setup when the test requires it.
 
 ## What the host app supplies at runtime
 
@@ -63,9 +82,11 @@ isolated container can cover the behavior.
 
 ## Testing Core with an application context
 
-Core's test support includes `tests/TestApp.php`. It extends
-`WebApplication` and creates request contexts; database-backed test support
-uses `tests/Testing/Traits/DatabaseTestTrait.php` to obtain the configured
+Core's test support includes [`tests/TestApp.php`](../../tests/TestApp.php). It
+extends `WebApplication` and creates request contexts; database-backed test
+support uses
+[`tests/Testing/Traits/DatabaseTestTrait.php`](../../tests/Testing/Traits/DatabaseTestTrait.php)
+to obtain the configured
 `DatabaseAdapter` and ORM. A database test bootstrap must create the app
 container, configure the database provider, initialize `TestApp::$instance`,
 and prepare `TestApp::$appContext` before database-backed traits are used.
@@ -76,8 +97,9 @@ own isolated test bootstrap when Core is tested independently.
 For database integration tests:
 
 - Configure a dedicated disposable test database using the DSN constants
-  documented in `phpunit.xml.dist` (`WINDWALKER_TEST_DB_DSN_*`) and provide
-  matching database configuration in the test app or standalone test fixture.
+  documented in [`phpunit.dist.xml`](../../phpunit.dist.xml)
+  (`WINDWALKER_TEST_DB_DSN_*`) and provide matching database configuration in
+  the test app or standalone test fixture.
 - Provide `WINDWALKER_MIGRATIONS` and `WINDWALKER_TEMP` when using
   `TestApp::initializeDatabase()`.
 - `TestApp::resetDatabase()` drops and recreates the selected database before
@@ -90,6 +112,6 @@ For database integration tests:
 
 Tests for optional external services should be opt-in and require their
 service-specific configuration, as indicated by the commented flags in
-`phpunit.xml.dist`. Prefer isolated unit or component tests unless app boot,
-routes, database migrations, or real external services are part of the behavior
-under test.
+[`phpunit.dist.xml`](../../phpunit.dist.xml). Prefer isolated unit or component
+tests unless app boot, routes, database migrations, or real external services
+are part of the behavior under test.
