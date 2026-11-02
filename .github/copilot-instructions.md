@@ -31,7 +31,9 @@
 - Keep the documentation index and guidance concise and expandable.
 - When adding or updating tests, follow
   [`instructions/testing.instructions.md`](instructions/testing.instructions.md)
-  for mirrored test paths and DI, database, and controller helpers.
+  for Core-specific test paths and helpers, and
+  [`instructions/testing-common.instructions.md`](instructions/testing-common.instructions.md)
+  for shared PHPUnit style and quality rules.
 - Before writing Core integration tests, read
   [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md)
   to identify the host-app bootstrap,

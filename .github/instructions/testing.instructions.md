@@ -4,6 +4,9 @@ applyTo: "tests/**/*.php"
 
 # Core testing instructions
 
+Apply the [shared PHP testing rules](testing-common.instructions.md) together
+with the Core-specific conventions below.
+
 ## Test placement
 
 - Mirror the object's path under `src/` in `tests/`, and name its test class
@@ -23,16 +26,16 @@ applyTo: "tests/**/*.php"
 - [`DatabaseTestTrait.php`](../../../framework/packages/test/src/Traits/DatabaseTestTrait.php):
   use `Windwalker\Test\Traits\DatabaseTestTrait` from `windwalker/test` for
   database tests. This link points to its source in this workspace.
-  In other installations, resolve that trait
-  from the installed package rather than assuming a sibling framework
-  checkout. Implement `setupDatabase()` and use `createDatabase()` with
-  explicit parameters or `WINDWALKER_TEST_DB_DSN_*` configuration. The trait
-  skips tests when no DSN is configured and disconnects after the test class.
+  In other installations, resolve that trait from the installed package
+  rather than assuming a sibling framework checkout. Implement
+  `setupDatabase()` and use `createDatabase()` with explicit parameters or
+  `WINDWALKER_TEST_DB_DSN_*` configuration. The trait skips tests when no DSN
+  is configured and disconnects after the test class.
 - [Core's DatabaseTestTrait.php](../../tests/Testing/Traits/DatabaseTestTrait.php):
   this is distinct from the framework trait above. It uses `TestApp`,
-  migrations, and the app's ORM and can drop and recreate
-  the configured database. Use it only for tests requiring that lifecycle and
-  a dedicated disposable database.
+  migrations, and the app's ORM and can drop and recreate the configured
+  database. Use it only for tests requiring that lifecycle and a dedicated
+  disposable database.
 - [`ControllerTestTrait.php`](../../tests/Testing/Traits/ControllerTestTrait.php):
   use this as a reference when executing controllers.
   Its `dispatchController()` delegates to `TestApp::$appContext` and accepts a
@@ -47,6 +50,3 @@ applyTo: "tests/**/*.php"
   with `-c`, following the documented configuration fallback order.
 - If no host app is available, treat Core as standalone. Use isolated tests
   or a minimal test fixture; do not assume an app name, location, or bootstrap.
-- Prefer existing helpers over duplicating DI, database, or controller setup.
-  Keep tests independent of real services unless those services are part of
-  the behavior under test.
