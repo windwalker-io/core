@@ -6,7 +6,7 @@ applyTo: "tests/**/*.php"
 
 Apply the [shared PHP testing rules](test-common.instructions.md) together
 with the Core-specific conventions below. To choose a test tier (unit, light
-integration with `WebApplicationFactory`, app-backed, database), see
+integration with `TestWebAppFactory`, app-backed, database), see
 [Testing Core by architecture layer](../docs/testing-architecture.md).
 
 ## Test placement

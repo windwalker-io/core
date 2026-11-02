@@ -13,7 +13,7 @@ use RuntimeException;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Http\Response\TextResponse;
-use Windwalker\Tests\Core\Application\Stub\WebApplicationFactory;
+use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 
 /**
  * Light integration tests: a real WebApplication boots and dispatches a controller.
@@ -23,7 +23,7 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function bootIsIdempotent(): void
     {
-        $app = WebApplicationFactory::create();
+        $app = TestWebAppFactory::create();
 
         $app->boot();
         $container = $app->getContainer();
@@ -35,8 +35,8 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function createContextBuildsAppContextFromRequest(): void
     {
-        $app = WebApplicationFactory::create();
-        $ctx = $app->createContext(WebApplicationFactory::request('http://example.com/a?x=1'));
+        $app = TestWebAppFactory::create();
+        $ctx = $app->createContext(TestWebAppFactory::request('http://example.com/a?x=1'));
 
         self::assertInstanceOf(AppContext::class, $ctx);
         self::assertSame('http://example.com/a?x=1', (string) $ctx->getUri());
@@ -47,8 +47,8 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function runContextDispatchesControllerToResponse(): void
     {
-        $app = WebApplicationFactory::create();
-        $ctx = $app->createContext(WebApplicationFactory::request());
+        $app = TestWebAppFactory::create();
+        $ctx = $app->createContext(TestWebAppFactory::request());
 
         $res = $app->runContext($ctx, fn() => 'hello');
 
@@ -59,8 +59,8 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function runContextInjectsContextIntoController(): void
     {
-        $app = WebApplicationFactory::create();
-        $ctx = $app->createContext(WebApplicationFactory::request('http://example.com/a?x=1'));
+        $app = TestWebAppFactory::create();
+        $ctx = $app->createContext(TestWebAppFactory::request('http://example.com/a?x=1'));
 
         $res = $app->runContext($ctx, static fn(AppContext $app) => $app->input('x'));
 
@@ -70,7 +70,7 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function middlewaresWrapControllerInRegistrationOrder(): void
     {
-        $app = WebApplicationFactory::create();
+        $app = TestWebAppFactory::create();
         $log = [];
 
         foreach (['A', 'B'] as $name) {
@@ -92,7 +92,7 @@ class WebApplicationTest extends TestCase
         }
 
         $app->runContext(
-            $app->createContext(WebApplicationFactory::request()),
+            $app->createContext(TestWebAppFactory::request()),
             function () use (&$log) {
                 $log[] = 'controller';
 
@@ -106,11 +106,11 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function middlewareCanShortCircuitWithoutReachingController(): void
     {
-        $app = WebApplicationFactory::create();
+        $app = TestWebAppFactory::create();
         $app->addMiddleware(fn() => fn() => new TextResponse('blocked', 403));
 
         $res = $app->runContext(
-            $app->createContext(WebApplicationFactory::request()),
+            $app->createContext(TestWebAppFactory::request()),
             fn() => self::fail('Controller must not run')
         );
 
@@ -121,8 +121,8 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function getRequestExceptionIsRethrown(): void
     {
-        $app = WebApplicationFactory::create();
-        $ctx = $app->createContext(WebApplicationFactory::request(method: 'GET'));
+        $app = TestWebAppFactory::create();
+        $ctx = $app->createContext(TestWebAppFactory::request(method: 'GET'));
 
         $this->expectException(RuntimeException::class);
 
@@ -134,8 +134,8 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function exceptionIsRethrownInDebugMode(): void
     {
-        $app = WebApplicationFactory::create(['debug' => true]);
-        $ctx = $app->createContext(WebApplicationFactory::request(method: 'POST'));
+        $app = TestWebAppFactory::create(['debug' => true]);
+        $ctx = $app->createContext(TestWebAppFactory::request(method: 'POST'));
 
         $this->expectException(RuntimeException::class);
 
@@ -147,9 +147,9 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function executeRunsGivenHandlerAsController(): void
     {
-        $app = WebApplicationFactory::create();
+        $app = TestWebAppFactory::create();
 
-        $res = $app->execute(WebApplicationFactory::request(), fn() => 'from handler');
+        $res = $app->execute(TestWebAppFactory::request(), fn() => 'from handler');
 
         self::assertSame('from handler', (string) $res->getBody());
     }
@@ -157,7 +157,7 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function configAccessorsReadAppConfig(): void
     {
-        $app = WebApplicationFactory::create(['name' => 'Foo', 'debug' => true]);
+        $app = TestWebAppFactory::create(['name' => 'Foo', 'debug' => true]);
 
         self::assertSame('Foo', $app->getAppName());
         self::assertTrue($app->isDebug());
@@ -174,7 +174,7 @@ class WebApplicationTest extends TestCase
         mixed $verbosity,
         AppVerbosity $expected
     ): void {
-        $app = WebApplicationFactory::create(['debug' => $debug, 'verbosity' => $verbosity]);
+        $app = TestWebAppFactory::create(['debug' => $debug, 'verbosity' => $verbosity]);
 
         self::assertSame($expected, $app->getVerbosity());
     }
@@ -194,7 +194,7 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function getSecretReturnsRawAndDerivedKeys(): void
     {
-        $app = WebApplicationFactory::create(['secret' => 'abc']);
+        $app = TestWebAppFactory::create(['secret' => 'abc']);
 
         $derived = $app->getSecret('cookie');
 
@@ -207,7 +207,7 @@ class WebApplicationTest extends TestCase
     #[Test]
     public function debugProfilerCanBeToggled(): void
     {
-        $app = WebApplicationFactory::create();
+        $app = TestWebAppFactory::create();
 
         self::assertFalse($app->isDebugProfilerDisabled());
 

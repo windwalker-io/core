@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Router\Route;
-use Windwalker\Tests\Core\Application\Stub\WebApplicationFactory;
+use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 
 /**
  * Light integration tests for AppContext (and AppContextTrait) created by a real WebApplication.
@@ -22,12 +22,12 @@ class AppContextTest extends TestCase
     #[Before]
     protected function setUpApp(): void
     {
-        $this->app = WebApplicationFactory::create();
+        $this->app = TestWebAppFactory::create();
     }
 
     private function createContext(string $uri = 'http://example.com/foo?a=1', string $method = 'GET'): AppContext
     {
-        return $this->app->createContext(WebApplicationFactory::request($uri, $method));
+        return $this->app->createContext(TestWebAppFactory::request($uri, $method));
     }
 
     #[Test]
@@ -51,7 +51,7 @@ class AppContextTest extends TestCase
     public function requestMethodUsesOverrideForWebCallsAndRawForApiCalls(): void
     {
         $web = $this->app->createContext(
-            WebApplicationFactory::request(method: 'POST')
+            TestWebAppFactory::request(method: 'POST')
                 ->withParsedBody(['_method' => 'PUT'])
         );
 
@@ -59,7 +59,7 @@ class AppContextTest extends TestCase
         self::assertSame('PUT', $web->getRequestMethod());
 
         $api = $this->app->createContext(
-            WebApplicationFactory::request(method: 'POST', headers: ['Content-Type' => ['application/json']])
+            TestWebAppFactory::request(method: 'POST', headers: ['Content-Type' => ['application/json']])
                 ->withParsedBody(['_method' => 'PUT'])
         );
 
@@ -71,7 +71,7 @@ class AppContextTest extends TestCase
     public function inputAndHeaderReadFromRequest(): void
     {
         $ctx = $this->app->createContext(
-            WebApplicationFactory::request('http://example.com/?a=1', headers: ['X-Foo' => ['bar']])
+            TestWebAppFactory::request('http://example.com/?a=1', headers: ['X-Foo' => ['bar']])
         );
 
         self::assertSame('1', $ctx->input('a'));

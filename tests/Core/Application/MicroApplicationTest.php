@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\MicroApplication;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\Container;
-use Windwalker\Tests\Core\Application\Stub\WebApplicationFactory;
+use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 
 class MicroApplicationTest extends TestCase
 {
@@ -41,7 +41,7 @@ class MicroApplicationTest extends TestCase
             }
         );
 
-        $res = $app->runContext($app->createContext(WebApplicationFactory::request('http://example.com/hello')));
+        $res = $app->runContext($app->createContext(TestWebAppFactory::request('http://example.com/hello')));
 
         self::assertSame('routed', (string) $res->getBody());
     }

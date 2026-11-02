@@ -16,7 +16,7 @@ Pick the lowest tier that covers the behavior.
 | Tier | Needs | Use for | Reference |
 |------|-------|---------|-----------|
 | 1. Unit with doubles | nothing | one class with mocked collaborators (factories, services, form, managers) | [`tests/Core/Form/FormFactoryTest.php`](../../tests/Core/Form/FormFactoryTest.php) |
-| 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application/) with [`WebApplicationFactory`](../../tests/Core/Application/Stub/WebApplicationFactory.php) |
+| 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application/) with [`TestWebAppFactory`](../../tests/Core/Application/Stub/WebApplicationFactory.php) |
 | 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`tests/TestApp.php`](../../tests/TestApp.php), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `StaticContainerTestTrait`, `ControllerTestTrait` |
 | 4. Database | disposable DB, DSN or host DB config | ORM, migrations, seeders, query behavior | `DatabaseTestTrait` (see [`../instructions/test.instructions.md`](../instructions/test.instructions.md)) |
 

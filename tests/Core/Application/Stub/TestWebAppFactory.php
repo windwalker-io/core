@@ -16,7 +16,7 @@ use Windwalker\Http\Request\ServerRequest;
  * Unlike tests/TestApp.php it needs no database or project config. Remove it if
  * the Application tests no longer boot a real application.
  */
-final class WebApplicationFactory
+final class TestWebAppFactory
 {
     public static function create(array $config = []): WebApplication
     {
