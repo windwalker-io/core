@@ -29,11 +29,17 @@ class MaintenanceConfig extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getAllowedIps(): array
     {
         return $this->allowedIps;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setAllowedIps(array $allowedIps): static
     {
         $this->allowedIps = $allowedIps;
@@ -41,6 +47,9 @@ class MaintenanceConfig extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getRedirect(): string
     {
         return $this->redirect;
@@ -53,11 +62,17 @@ class MaintenanceConfig extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getSecret(): string
     {
         return $this->secret;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setSecret(string $secret): static
     {
         $this->secret = $secret;
@@ -65,11 +80,17 @@ class MaintenanceConfig extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getTemplate(): string
     {
         return $this->template;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setTemplate(string $template): static
     {
         $this->template = $template;

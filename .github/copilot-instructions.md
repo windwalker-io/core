@@ -29,7 +29,8 @@ environment-specific configuration.
   (`App\`, front/admin modules, Vite assets, app migrations) here.
 - Check existing code and tests for established APIs before adding abstractions
   or dependencies.
-- Do not edit other packages under `vendor/`.
+- Ask the user before editing any other package under `vendor/` (cross-package
+  edits). Editing the host application is allowed when the task requires it.
 
 ## PHP conventions
 

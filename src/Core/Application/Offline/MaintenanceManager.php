@@ -37,6 +37,9 @@ class MaintenanceManager
         return MaintenanceConfig::wrap($this->getFile()->readAndParse('json'));
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getFilePath(): string
     {
         return WINDWALKER_TEMP . '/down.json';

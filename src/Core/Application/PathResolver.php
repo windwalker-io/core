@@ -64,8 +64,8 @@ class PathResolver
             throw new LogicException(
                 sprintf(
                     'The system path: %s not exists in config.',
-                    $base
-                )
+                    $base,
+                ),
             );
         }
 

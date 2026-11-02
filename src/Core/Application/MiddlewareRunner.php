@@ -27,7 +27,7 @@ class MiddlewareRunner
     public function run(
         ServerRequestInterface $request,
         iterable $middlewares,
-        ?callable $last = null
+        ?callable $last = null,
     ): ResponseInterface {
         return $this->createRequestHandler(static::chainMiddlewares($middlewares, $last))->handle($request);
     }
