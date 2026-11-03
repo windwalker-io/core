@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Seed;
 
+use Closure;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -37,16 +38,12 @@ class AbstractSeederTest extends TestCase
 
     private function createSeeder(): AbstractSeeder
     {
-        return new class extends AbstractSeeder {
+        return new class () extends AbstractSeeder {
             #[SeedImport]
-            public function import(): void
-            {
-            }
+            public function import(): void {}
 
             #[SeedClear]
-            public function clear(): void
-            {
-            }
+            public function clear(): void {}
         };
     }
 
@@ -71,11 +68,11 @@ class AbstractSeederTest extends TestCase
         $seeder = $this->createSeeder();
         $seeder->init(new SplFileInfo('main.php'), $this->db, new FakerService());
 
-        self::assertSame(2, (int) $this->db->prepare('SELECT COUNT(*) FROM foo')->loadResult());
+        self::assertSame(2, (int) $this->db->prepare('SELECT COUNT(*) FROM foo')->result());
 
         $seeder->truncate('foo');
 
-        self::assertSame(0, (int) $this->db->prepare('SELECT COUNT(*) FROM foo')->loadResult());
+        self::assertSame(0, (int) $this->db->prepare('SELECT COUNT(*) FROM foo')->result());
     }
 
     #[Test]
@@ -86,7 +83,7 @@ class AbstractSeederTest extends TestCase
 
         $handler = $seeder->getImportHandler();
 
-        self::assertInstanceOf(\Closure::class, $handler);
+        self::assertInstanceOf(Closure::class, $handler);
     }
 
     #[Test]
@@ -97,13 +94,13 @@ class AbstractSeederTest extends TestCase
 
         $handler = $seeder->getClearHandler();
 
-        self::assertInstanceOf(\Closure::class, $handler);
+        self::assertInstanceOf(Closure::class, $handler);
     }
 
     #[Test]
     public function getImportHandlerReturnsNullWhenNoMethodHasTheAttribute(): void
     {
-        $seeder = new class extends AbstractSeeder {};
+        $seeder = new class () extends AbstractSeeder {};
         $seeder->init(new SplFileInfo('main.php'), $this->db, new FakerService());
 
         self::assertNull($seeder->getImportHandler());
@@ -112,7 +109,7 @@ class AbstractSeederTest extends TestCase
     #[Test]
     public function getClearHandlerReturnsNullWhenNoMethodHasTheAttribute(): void
     {
-        $seeder = new class extends AbstractSeeder {};
+        $seeder = new class () extends AbstractSeeder {};
         $seeder->init(new SplFileInfo('main.php'), $this->db, new FakerService());
 
         self::assertNull($seeder->getClearHandler());

@@ -101,12 +101,59 @@ Optional-package branches cut both ways:
     real production engine. Needs a tier 4 test that introspects an actual
     MySQL/PostgreSQL table and asserts the generated migration code and
     version are correct.
+- Core/Seed
+  - `Windwalker\Core\Seed\SeedService::copySeedFile()` — delegates to
+    `CodeGenerator::from()`, which globs real `.tpl` template files from disk
+    and writes generated output through a real `ApplicationInterface`-backed
+    `FileCollection`/event dealer. `CodeGenerator` is now constructor-injected
+    (`#[Autowire]`), and `tests/Core/Seed/SeedServiceTest.php` covers the
+    shallow, fully-mocked shape (a fake `CodeGenerator`/`FileCollection`
+    verifies `from()`/`replaceTo()` are called with the right arguments, and
+    `buildReplacementData()` is unit-tested in isolation as a pure method).
+    That only proves wiring, not that a real `.tpl` template actually globs
+    and renders correctly end to end — a stub `ApplicationInterface` can't
+    fake real template lookup/rendering, so a tier 4 test still needs the
+    same real-app setup as `MigrationService::copyMigrationFile()` (also
+    untested for the same reason, and not yet backlogged there either).
+    Follow-up: decide on a test strategy for this real-rendering gap — e.g.
+    a tier 4 test using a real `ApplicationTraitStub`-compatible app plus
+    actual seed `.tpl` fixtures under `tmp/`, or extracting template
+    discovery/rendering out of `CodeGenerator` into something fakeable at a
+    lower level — before closing this entry.
+    `SeedService::import()`/`clear()`/`processIncluded()` are not listed
+    here: they follow the exact same include-a-PHP-file-and-call-a-handler
+    shape as `MigrationService::migrate()`/`getMigrations()`, which
+    `tests/Core/Migration/MigrationServiceTest.php` already covers with real
+    temp fixture files, `ApplicationTraitStub`, and an in-memory SQLite
+    `DatabaseAdapter` (tier 1) — the same recipe applies directly to
+    `SeedService` without any source change.
 - Core/Runtime
   - `Windwalker\Core\Runtime\Runtime::forbidden()` / the blocking branch of
     `ipBlock()` — calls `header()` followed by `exit()`, a process-terminating
     side effect a unit test can't observe or recover from.
     `tests/Core/Runtime/RuntimeTest.php` covers every `shouldBlock()` branch
     that decides whether to block, plus the non-blocking path of `ipBlock()`.
+- Core/Service
+  - `Windwalker\Core\Service\ErrorService::exception()` — the catch branch
+    that detects "infinity loop in exception & error handler" ends every
+    path with `exit()`/`exit($msg)`, a process-terminating side effect a
+    unit test can't observe or recover from.
+    `tests/Core/Service/ErrorServiceTest.php` covers `handle()` (the
+    delegate `exception()` calls before the unreachable-in-tests `exit()`)
+    directly instead.
+  - `Windwalker\Core\Service\ErrorService::down()` — the `true` branch
+    (last error's type is `E_ERROR`) calls `$this->error(...)`, which throws
+    an `ErrorException`; reaching it deterministically requires a real fatal
+    error to populate `error_get_last()`, which can't be triggered safely
+    inside a unit test process. `tests/Core/Service/ErrorServiceTest.php`
+    covers the "no last error" and "last error present but not fatal"
+    branches.
+  - `Windwalker\Core\Service\ErrorService::registerShutdown()` — registers
+    `down()` via `register_shutdown_function()`; the registration call
+    itself is covered via `registerAlsoRegistersShutdownHandlerWhenRequested`,
+    but whether the callback actually fires on script shutdown is a PHP
+    engine guarantee with no synchronous, in-process way to observe it from
+    a unit test.
 - Core/Queue
   - `Windwalker\Core\Queue\QueueFactory::createSyncHandler()` — the `sync`
     driver's returned closure runs the job inline via a real `Invoker`/

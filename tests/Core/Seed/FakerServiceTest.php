@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Tests\Core\Seed;
 
 use Faker\Generator as FakerGenerator;
+use Faker\Provider\fr_FR\Address;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@ class FakerServiceTest extends TestCase
 
         $faker = $instance->create();
 
-        self::assertInstanceOf(FakerGenerator::class, $faker);
+        self::assertIsString($faker->name());
     }
 
     #[Test]
@@ -35,7 +36,7 @@ class FakerServiceTest extends TestCase
         $underscoreProviders = array_map(get_class(...), $underscoreLocale->getProviders());
 
         self::assertSame($underscoreProviders, $dashProviders);
-        self::assertContains('Faker\\Provider\\fr_FR\\Address', $dashProviders);
+        self::assertContains(Address::class, $dashProviders);
     }
 
     #[Test]

@@ -31,12 +31,15 @@ class SeedService implements EventAwareInterface
      *
      * @param  ApplicationInterface  $app
      * @param  FakerService          $fakerService
+     * @param  CodeGenerator         $codeGenerator
      * @param  DatabaseAdapter|null  $db
      */
     public function __construct(
         protected ApplicationInterface $app,
         #[Autowire]
         protected FakerService $fakerService,
+        #[Autowire]
+        protected CodeGenerator $codeGenerator,
         protected ?DatabaseAdapter $db = null,
     ) {}
 
@@ -148,17 +151,31 @@ class SeedService implements EventAwareInterface
      */
     public function copySeedFile(string $dir, string $name, string $source): FileCollection
     {
-        $codeGenerator = $this->app->make(CodeGenerator::class);
+        return $this->codeGenerator->from($source)
+            ->replaceTo(
+                $dir,
+                $this->buildReplacementData($name),
+            );
+    }
 
-        $date = new DateTimeImmutable('now');
+    /**
+     * Build the placeholder replacement data used when rendering a seed file template.
+     *
+     * Extracted as a pure method so the replacement data can be asserted in isolation
+     * from the template file-copying side effect.
+     *
+     * @param  string                  $name  The seed class name.
+     * @param  DateTimeImmutable|null  $date  Defaults to now; injectable for deterministic tests.
+     *
+     * @return  array{name: string, year: string}
+     */
+    public function buildReplacementData(string $name, ?DateTimeImmutable $date = null): array
+    {
+        $date ??= new DateTimeImmutable('now');
 
         $year = $date->format('Y');
 
-        return $codeGenerator->from($source)
-            ->replaceTo(
-                $dir,
-                compact('name', 'year'),
-            );
+        return compact('name', 'year');
     }
 
     protected function runImport(AbstractSeeder $seeder): void

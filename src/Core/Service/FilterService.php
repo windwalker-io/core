@@ -108,8 +108,10 @@ class FilterService
         return $this;
     }
 
+    // @codeCoverageIgnoreStart
     public static function getInstance(): static
     {
         return Runtime::getContainer()->get(static::class);
     }
+    // @codeCoverageIgnoreEnd
 }

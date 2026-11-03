@@ -285,9 +285,12 @@ class ErrorService
      */
     public function setErrorTemplate(string $errorTemplate, ?string $engine = null): void
     {
+        // @codeCoverageIgnoreStart
+        // $errorTemplate is typed as string, so this is unreachable at the language level.
         if (!is_string($errorTemplate)) {
             throw new InvalidArgumentException('Please use string as template name (Example: "folder.file").');
         }
+        // @codeCoverageIgnoreEnd
 
         $this->errorTemplate = $errorTemplate;
 

@@ -17,7 +17,7 @@ class CountingOutputTraitTest extends TestCase
     #[Test]
     public function printCountingIncrementsCountAndEmitsFormattedMessage(): void
     {
-        $instance = new class {
+        $instance = new class () {
             use CountingOutputTrait;
         };
 
@@ -40,7 +40,7 @@ class CountingOutputTraitTest extends TestCase
     #[Test]
     public function printCountingAccumulatesCountAcrossCalls(): void
     {
-        $instance = new class {
+        $instance = new class () {
             use CountingOutputTrait;
         };
 
@@ -53,7 +53,7 @@ class CountingOutputTraitTest extends TestCase
     #[Test]
     public function printCountingEmitsLeadingBlankLineOnlyOnFirstCallForMigrations(): void
     {
-        $instance = new class extends AbstractMigration {};
+        $instance = new class () extends AbstractMigration {};
 
         $events = [];
         $instance->onMessages(static function (MessageOutputEvent $event) use (&$events) {
@@ -72,7 +72,7 @@ class CountingOutputTraitTest extends TestCase
     #[Test]
     public function printCountingDoesNotEmitLeadingBlankLineForNonMigrationClasses(): void
     {
-        $instance = new class {
+        $instance = new class () {
             use CountingOutputTrait;
         };
 
