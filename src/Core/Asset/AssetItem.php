@@ -17,11 +17,17 @@ class AssetItem implements \Stringable
         $this->options = $options;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getContent(): string|\Stringable|\Closure
     {
         return $this->content;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setContent(string|\Stringable|\Closure $content): static
     {
         $this->content = $content;

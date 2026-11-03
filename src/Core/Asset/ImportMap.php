@@ -26,6 +26,9 @@ class ImportMap
      */
     public function __construct(protected bool $isDebug = false) {}
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addImport(string $name, string $uri): static
     {
         $this->data['imports'][$name] = $uri;
@@ -33,6 +36,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function removeImport(string $name): static
     {
         unset($this->data['imports'][$name]);
@@ -45,11 +51,17 @@ class ImportMap
         return $this->data['imports'][$name] ?? null;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getAllImports(): array
     {
         return $this->data['imports'];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setImports(array $imports): static
     {
         $this->data['imports'] = $imports;
@@ -67,6 +79,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetImports(): static
     {
         $this->data['imports'] = [];
@@ -84,6 +99,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setScope(string $scope, array $items): static
     {
         $this->data['scopes'][$scope] = $items;
@@ -91,6 +109,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addScopeItem(string $scope, string $name, string $uri): static
     {
         $this->data['scopes'][$scope][$name] = $uri;
@@ -98,6 +119,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function removeScopeItem(string $scope, string $name): static
     {
         unset($this->data['scopes'][$scope][$name]);
@@ -105,6 +129,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function removeScope(string $scope): static
     {
         unset($this->data['scopes'][$scope]);
@@ -117,16 +144,25 @@ class ImportMap
         return $this->data['scopes'][$scope] ?? null;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getScopeItem(string $scope, string $name): array
     {
         return $this->data['imports'][$scope][$name];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getAllScopes(): array
     {
         return $this->data['scopes'];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setScopes(array $scopes): static
     {
         $this->data['scopes'] = $scopes;
@@ -134,6 +170,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setScopeItems(array $scopes, array $items): static
     {
         $this->data['scopes'][$scopes] = $items;
@@ -141,6 +180,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetScopes(): static
     {
         $this->data['scopes'] = [];
@@ -148,6 +190,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetScope(string $scope): static
     {
         $this->data['scopes'][$scope] = [];
@@ -155,6 +200,9 @@ class ImportMap
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function reset(): static
     {
         $this->resetImports();
@@ -203,6 +251,8 @@ class ImportMap
 
     /**
      * @return  bool
+     *
+     * @codeCoverageIgnore
      */
     public function isDebug(): bool
     {
@@ -213,6 +263,8 @@ class ImportMap
      * @param  bool  $isDebug
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setIsDebug(bool $isDebug): static
     {
@@ -223,6 +275,8 @@ class ImportMap
 
     /**
      * @return  string
+     *
+     * @codeCoverageIgnore
      */
     public function getCspNonce(): string
     {
@@ -233,6 +287,8 @@ class ImportMap
      * @param  string  $cspNonce
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setCspNonce(string $cspNonce): static
     {

@@ -12,6 +12,9 @@ class PromiseScope
 
     public function __construct(protected string $start, protected string $moduleVar = 'module') {}
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function add(string|\Stringable|\Closure $element): static
     {
         $this->elements[] = $element;
@@ -44,6 +47,9 @@ class PromiseScope
         return $output;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __toString(): string
     {
         return $this->render();

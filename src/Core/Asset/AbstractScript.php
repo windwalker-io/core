@@ -146,6 +146,8 @@ abstract class AbstractScript
      * @param  array   $args    The arguments of method call.
      *
      * @return  mixed
+     *
+     * @codeCoverageIgnore
      */
     public function __call(string $method, array $args)
     {

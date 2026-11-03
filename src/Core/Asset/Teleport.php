@@ -47,6 +47,8 @@ class Teleport
      * @param  string  $string
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function add(string $name, string $string): static
     {
@@ -75,6 +77,8 @@ class Teleport
      * resetTemplates
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function reset(): static
     {

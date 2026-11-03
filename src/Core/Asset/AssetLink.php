@@ -57,6 +57,9 @@ class AssetLink extends Link
         return $new;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function sri(string $hash): static
     {
         $this->options['sri'] = $hash;
@@ -64,6 +67,9 @@ class AssetLink extends Link
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function option(string $name, mixed $value): static
     {
         $this->options[$name] = $value;

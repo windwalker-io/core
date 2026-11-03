@@ -738,6 +738,9 @@ class AssetService implements EventAwareInterface
      *
      * @return  static  Return self to support chaining.
      */
+    /**
+     * @codeCoverageIgnore
+     */
     public function setVersion(string $version): static
     {
         $this->version = $version;
@@ -749,6 +752,8 @@ class AssetService implements EventAwareInterface
      * Method to get property Styles
      *
      * @return  AssetLink[]
+     *
+     * @codeCoverageIgnore
      */
     public function getStyles(): array
     {
@@ -761,6 +766,8 @@ class AssetService implements EventAwareInterface
      * @param  array  $styles
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setStyles(array $styles): static
     {
@@ -773,6 +780,8 @@ class AssetService implements EventAwareInterface
      * Method to get property Scripts
      *
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function &getScripts(): array
     {
@@ -785,6 +794,8 @@ class AssetService implements EventAwareInterface
      * @param  array  $scripts
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setScripts(array $scripts): static
     {
@@ -797,6 +808,8 @@ class AssetService implements EventAwareInterface
      * Method to get property InternalStyles
      *
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function &getInternalStyles(): array
     {
@@ -809,6 +822,8 @@ class AssetService implements EventAwareInterface
      * @param  array  $internalStyles
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setInternalStyles(array $internalStyles): static
     {
@@ -821,6 +836,8 @@ class AssetService implements EventAwareInterface
      * Method to get property InternalScripts
      *
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function &getInternalScripts(): array
     {
@@ -833,6 +850,8 @@ class AssetService implements EventAwareInterface
      * @param  array  $internalScripts
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setInternalScripts(array $internalScripts): static
     {
@@ -954,6 +973,8 @@ class AssetService implements EventAwareInterface
      * @param  string  $indents
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setIndents(string $indents): static
     {
@@ -966,6 +987,8 @@ class AssetService implements EventAwareInterface
      * Method to get property Indents
      *
      * @return  string
+     *
+     * @codeCoverageIgnore
      */
     public function getIndents(): string
     {
@@ -1338,6 +1361,8 @@ class AssetService implements EventAwareInterface
      * @param  Teleport  $teleport
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setTeleport(string $name, Teleport $teleport): static
     {
@@ -1358,6 +1383,8 @@ class AssetService implements EventAwareInterface
      * @param  ImportMap|null  $importMap
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setImportMap(?ImportMap $importMap): static
     {
@@ -1368,6 +1395,8 @@ class AssetService implements EventAwareInterface
 
     /**
      * @return  Teleport[]
+     *
+     * @codeCoverageIgnore
      */
     public function getTeleports(): array
     {
@@ -1378,6 +1407,8 @@ class AssetService implements EventAwareInterface
      * @param  Teleport[]  $teleports
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setTeleports(array $teleports): static
     {

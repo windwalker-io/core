@@ -58,6 +58,13 @@ Windwalker framework application, rather than package behavior that needs standa
 for these files or include them in a package's coverage target by default. Test them only when they contain
 meaningful, independently testable logic or the requested change specifically requires validating their behavior.
 
+### Console command classes are not unit-tested
+
+Classes named `*Command` (console commands, typically implementing `CommandInterface` under a `Command/` directory)
+are CLI wiring, not package behavior. Do not write unit tests for them, and do not add `@codeCoverageIgnore` to their
+methods either — simply leave them out of a package's test and coverage scope by default. Test them only when the
+requested change specifically requires validating their behavior (for example, a regression tied to that command).
+
 Tests touching a real database: see [Database Testing](../docs/database-testing.md) (never run DB suites in parallel).
 
 See [Testing and Coverage](../docs/testing.md) for test selectors, driver setup, report commands, and scope caveats.

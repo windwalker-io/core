@@ -11,8 +11,6 @@ removed easily later.
 3. Find source code that has no need for tests and add `@codeCoverageIgnore` in its docblock:
    - Logic-free getters/setters (only return/assign a property, optionally `return $this`) without meaningful coverage
      from other behavior tests.
-   - Wiring/tooling files that the instructions say need no standalone tests (e.g. `src/*Package.php`,
-     `etc/*.config.php`, `src/Command/*` or some DI service providers), unless they contain meaningful, independently testable logic.
    - Do not ignore code with real logic (validation, normalization, lazy init, side effects, branching). Cover it with
      tests instead of ignoring it.
 4. Find test classes that exist only for integration testing or coverage purposes (e.g. classes added just to exercise

@@ -33,6 +33,8 @@ class AssetBeforeRender extends BaseEvent
      * @return  array
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getInternalAttrs(): array
     {
@@ -43,6 +45,8 @@ class AssetBeforeRender extends BaseEvent
      * @return  array<AssetLink>
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getLinks(): array
     {
