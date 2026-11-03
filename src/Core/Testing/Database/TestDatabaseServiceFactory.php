@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Database;
+namespace Windwalker\Core\Testing\Database;
 
 use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Database\DatabaseFactory;

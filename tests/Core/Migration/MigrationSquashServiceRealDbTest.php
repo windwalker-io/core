@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Migration;
 
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -25,6 +26,13 @@ use Windwalker\Database\DatabaseAdapter;
  * `Windwalker\Core\Migration\MigrationSquashBuilder`/`MigrationSquashService`
  * entry in `.github/docs/integration-test-backlog.md`.
  *
+ * `MigrationSquashService::generateMigrationCodes()` squashes every table
+ * present in the database, not just ones this test created. `DatabaseTestTrait`
+ * points every real-DB test class at the same shared, never-dropped database
+ * (e.g. `RealUserDbTest` leaves a `users` table behind), so this test must
+ * drop all pre-existing tables itself before migrating; otherwise it becomes
+ * order-dependent and fails only when run alongside other real-DB tests.
+ *
  * Requires `WINDWALKER_TEST_DB_DSN` to point at a disposable MySQL database
  * (see `DatabaseTestTrait`); skipped otherwise.
  */
@@ -33,6 +41,13 @@ use Windwalker\Database\DatabaseAdapter;
 class MigrationSquashServiceRealDbTest extends TestCase
 {
     use DatabaseTestTrait;
+
+    protected function clearTables(): void
+    {
+        foreach (static::$db->getSchemaManager()->getTables(refresh: true) as $table) {
+            static::$db->getTableManager($table->tableName)->drop();
+        }
+    }
 
     #[Test]
     public function generateMigrationCodesReproducesRealTableAsSchemaCode(): void

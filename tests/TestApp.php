@@ -7,7 +7,7 @@ namespace Windwalker\Tests;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Testing\AbstractTestApp;
-use Windwalker\Tests\Testing\Database\TestDatabasesProvider;
+use Windwalker\Core\Testing\Database\TestDatabasesProvider;
 
 /**
  * Reference example of a host app's app-backed test app.

@@ -7,15 +7,11 @@ namespace Windwalker\Core\Testing;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
-use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
-use Windwalker\Core\Factory\DatabaseServiceFactory;
-use Windwalker\Core\Migration\MigrationService;
-use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\Http\Event\RequestEvent;
 use Windwalker\Http\Factory\ServerRequestFactory;
+use Windwalker\Http\Request\ServerRequest;
 
 /**
  * Base class for a host application's tier-3/4 app-backed test app.
@@ -65,27 +61,50 @@ abstract class AbstractTestApp extends WebApplication
         return $this->runContext($appContext);
     }
 
-    public static function createTestContext(?ServerRequestInterface $request = null): AppContext
-    {
+    public static function createTestContext(
+        ?ServerRequestInterface $request = null,
+        iterable $providers = [],
+    ): AppContext {
         $app = static::$instance ?? throw new \RuntimeException('TestApp instance not set.');
 
         $request ??= ServerRequestFactory::createFromGlobals();
 
-        $appContext = $app->createContext($request);
+        $app->boot();
+
+        // Level 2
+        $container = $app->getContainer();
+
+        // Level 3
+        $container = $container->createChild();
+
+        if ($request !== null) {
+            $container->share(ServerRequest::class, $request);
+        }
+
+        foreach ($providers as $provider) {
+            $container->registerServiceProvider($provider);
+        }
+
+        $app->registerListeners($container);
+
+        $app->bootProvidersBeforeRequest($container);
+
+        $appContext = $container->get(AppContext::class);
 
         $appContext->disableDebugProfiler(true);
 
+        // Before Run Context
         $container = $appContext->getContainer();
         $request = $container->get(ServerRequestInterface::class);
 
         // @event
         $event = $app->emit(
-            new BeforeRequestEvent(container: $container, request: $request)
+            new BeforeRequestEvent(container: $container, request: $request),
         );
 
         // @event
         $appContext->emit(
-            new BeforeRequestEvent(container: $container, request: $event->request)
+            new BeforeRequestEvent(container: $container, request: $event->request),
         );
 
         return $appContext;
@@ -96,9 +115,11 @@ abstract class AbstractTestApp extends WebApplication
      * build its own, storing it in {@see $sharedCtx}. Call this once from
      * the host app's PHPUnit bootstrap.
      */
-    public function prepareSharedContext(?ServerRequestInterface $request = null): AppContext
-    {
-        $appContext = $this->createContext($request);
+    public function prepareSharedContext(
+        ?ServerRequestInterface $request = null,
+        iterable $providers = [],
+    ): AppContext {
+        $appContext = $this->createContext($request, $providers);
 
         static::$sharedCtx = $appContext;
         static::$ctx = $appContext;
@@ -106,9 +127,11 @@ abstract class AbstractTestApp extends WebApplication
         return $appContext;
     }
 
-    public static function prepareTestContext(?ServerRequestInterface $request = null): AppContext
-    {
-        $appContext = static::$instance->createContext($request);
+    public static function prepareTestContext(
+        ?ServerRequestInterface $request = null,
+        iterable $providers = [],
+    ): AppContext {
+        $appContext = static::$instance->createContext($request, $providers);
 
         static::$ctx = $appContext;
 
