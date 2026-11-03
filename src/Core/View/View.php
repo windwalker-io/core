@@ -114,11 +114,13 @@ class View implements EventAwareInterface, \ArrayAccess
         if ($vm instanceof ViewModelInterface || method_exists($vm, 'prepare')) {
             $prepare = $vm->prepare(...);
         } else {
-            $prepare = AttributesAccessor::getFirstMemberWithAttribute(
+            $member = AttributesAccessor::getFirstMemberWithAttribute(
                 $vm,
                 ViewPrepare::class,
                 \ReflectionAttribute::IS_INSTANCEOF
             );
+
+            $prepare = $member !== null ? $member[0]->getClosure($vm) : null;
         }
 
         return $prepare ?? throw new LogicException(
@@ -180,9 +182,9 @@ class View implements EventAwareInterface, \ArrayAccess
 
     public function renderLayout(string $layout, array $data = []): mixed
     {
-        $options['layout'] = $layout;
+        $this->layout = $layout;
 
-        return $this->render($data, $options);
+        return $this->render($data);
     }
 
     public function render(array $data = []): ResponseInterface
@@ -577,7 +579,7 @@ class View implements EventAwareInterface, \ArrayAccess
                 $this->addPath($langDir, PriorityQueue::BELOW_NORMAL, $ns);
             }
 
-            $fallbackDir = $dir . '/' . $langService->getLocale();
+            $fallbackDir = $dir . '/' . $langService->getFallback();
 
             if ($langDir !== $fallbackDir && is_dir($dir)) {
                 $this->addPath($fallbackDir, PriorityQueue::BELOW_NORMAL, $ns);
@@ -609,6 +611,9 @@ class View implements EventAwareInterface, \ArrayAccess
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore  Logic-free getter, currently unused internally.
+     */
     protected function getPageAttribute(): ?ViewModel
     {
         return $this->options['vmAttr'];
