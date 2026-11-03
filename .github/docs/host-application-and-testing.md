@@ -113,6 +113,15 @@ For database integration tests:
   running its migrations. The configured database account therefore needs
   permission to drop and create the test schema. Never point it at a developer,
   shared, staging, or production database.
+- `resetDatabase()` only issues the MySQL-specific `USE <dbname>` statement
+  when the resolved platform is MySQL, so pointing the test DSN at a
+  different platform will not fail on that statement. This is a defensive
+  guard only: tier 4 is still intended to run against the same real DBMS the
+  host app targets in production (migrations may contain dialect-specific
+  DDL), not as a generic real-DB/SQLite switch. For lightweight tests that
+  need a real SQLite-backed `DatabaseAdapter` without a host app, use
+  `InMemoryDatabaseTestTrait` instead (see
+  [`test.instructions.md`](../instructions/test.instructions.md)).
 - If the test depends on app-provided migrations, providers, or services,
   install and configure those in the identified host app. Without a host app,
   provide only the explicit fixtures needed by the test.

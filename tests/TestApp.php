@@ -7,10 +7,12 @@ namespace Windwalker\Tests;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\Http\Event\RequestEvent;
 use Windwalker\Http\Factory\ServerRequestFactory;
 
@@ -73,6 +75,7 @@ class TestApp extends WebApplication
     public function resetDatabase(): void
     {
         $db = self::$appContext->retrieve(DatabaseAdapter::class);
+        $pathResolver = self::$appContext->retrieve(PathResolver::class);
 
         $dbname = $db->driver->options->dbname;
 
@@ -84,7 +87,14 @@ class TestApp extends WebApplication
         $schemaManager->create();
 
         $db->driver->options->dbname = $dbname;
-        $db->execute('USE ' . $dbname);
+
+        // `USE <dbname>` is MySQL-specific raw SQL and is not supported by
+        // other drivers (e.g. SQLite has no server-side schema switching).
+        // Skip it for non-MySQL platforms so this reset logic does not break
+        // if the test DSN ever points to a different driver.
+        if ($db->getPlatform()->getName() === AbstractPlatform::MYSQL) {
+            $db->execute('USE ' . $dbname);
+        }
 
         $migrationService = TestApp::$instance->make(
             MigrationService::class,
@@ -94,9 +104,9 @@ class TestApp extends WebApplication
         );
 
         $migrationService->migrate(
-            WINDWALKER_MIGRATIONS,
+            $pathResolver->resolve('@migrations'),
             null,
-            WINDWALKER_TEMP . '/db/test-mig.sql'
+            $pathResolver->resolve('@temp') . '/db/test-mig.sql'
         );
     }
 

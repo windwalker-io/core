@@ -11,7 +11,5 @@ namespace Windwalker\Tests\Core\DI\Stub;
  */
 class StubCreatedService
 {
-    public function __construct(public string $instanceName = '', public string $tag = '')
-    {
-    }
+    public function __construct(public string $instanceName = '', public string $tag = '') {}
 }
