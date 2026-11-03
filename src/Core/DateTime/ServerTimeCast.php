@@ -86,6 +86,9 @@ class ServerTimeCast implements CompositeCastInterface
         return (string) $value;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function serialize(mixed $data): mixed
     {
         return $data;

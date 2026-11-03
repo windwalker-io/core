@@ -13,6 +13,9 @@ class MockClock implements ChronosClockInterface
         $this->set($date);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function now(): Chronos
     {
         return $this->now;

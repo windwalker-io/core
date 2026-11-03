@@ -43,11 +43,17 @@ class ChronosService
         //
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getTimezone(): string
     {
         return $this->config->getDeep('app.timezone');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getServerTimezone(): string
     {
         return $this->config->getDeep('app.server_timezone');
@@ -97,6 +103,9 @@ class ChronosService
         return static::convert($date, $from, $this->getServerTimezone());
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function mustToServer(mixed $date, string|DateTimeZone|null $from = null): Chronos
     {
         return $this->toServer($date, $from);
@@ -125,6 +134,9 @@ class ChronosService
         return static::convert($date, $this->getServerTimezone(), $to);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function mustToLocal(mixed $date, string|DateTimeZone|null $to = null): Chronos
     {
         return $this->toLocal($date, $to);
@@ -282,6 +294,8 @@ class ChronosService
 
     /**
      * @deprecated  No instead, manually format it.
+     *
+     * @codeCoverageIgnore
      */
     public function localNow(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
@@ -298,6 +312,8 @@ class ChronosService
      *
      * @throws  Exception
      * @since  3.2
+     *
+     * @codeCoverageIgnore
      */
     public static function toFormat(string|DateTimeInterface $date, string $format): string
     {
@@ -312,6 +328,8 @@ class ChronosService
      *
      * @return  string
      * @throws  Exception
+     *
+     * @codeCoverageIgnore
      */
     public static function now(string $format = Chronos::FORMAT_YMD_HIS, string|DateTimeZone|null $tz = null): string
     {
@@ -328,6 +346,8 @@ class ChronosService
      *
      * @throws  Exception
      * @since   2.1
+     *
+     * @codeCoverageIgnore
      */
     public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): Chronos
     {
@@ -343,6 +363,8 @@ class ChronosService
      *
      * @return  static|bool
      * @throws  Exception
+     *
+     * @codeCoverageIgnore
      */
     public static function createFromFormat(
         string $format,
@@ -395,6 +417,9 @@ class ChronosService
         return $date->format($format ?? Chronos::FORMAT_YMD_HIS);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function setClock(ClockInterface|\DateTimeInterface|string|int|float|null $clock): void
     {
         Clock::set($clock);

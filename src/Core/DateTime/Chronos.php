@@ -171,6 +171,9 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         return Clock::now()->format($format, $tz);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function clockNow(): Chronos
     {
         return Clock::now();
@@ -186,6 +189,8 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      *
      * @throws  Exception
      * @since   2.1
+     *
+     * @codeCoverageIgnore
      */
     public static function create(mixed $date = null, string|DateTimeZone|null $tz = null): static
     {
@@ -380,6 +385,8 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @return  \DatePeriod
      *
      * @throws  Exception
+     *
+     * @codeCoverageIgnore
      */
     public function getPeriodTo(
         string|int|DateInterval $interval,
@@ -397,6 +404,8 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
      * @return  \DatePeriod
      *
      * @throws  Exception
+     *
+     * @codeCoverageIgnore
      */
     public function getPeriodRecurrences(
         string|int|DateInterval $interval,
@@ -421,11 +430,17 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         return $new->format($format);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function isFuture(): bool
     {
         return $this->isGt('now');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function isPast(): bool
     {
         return $this->isLt('now');

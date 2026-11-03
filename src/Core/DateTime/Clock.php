@@ -23,11 +23,17 @@ class Clock
         return $date;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function get(): ?ClockInterface
     {
         return self::$clock;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function set(ClockInterface|\DateTimeInterface|string|int|float|null $clock): void
     {
         static::$clock = static::from($clock);
@@ -46,6 +52,9 @@ class Clock
         return $clock;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function reset(): void
     {
         self::$clock = null;

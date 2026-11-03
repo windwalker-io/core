@@ -65,6 +65,12 @@ integration with `TestWebAppFactory`, app-backed, database), see
   migrations, and the app's ORM and can drop and recreate the configured
   database. Use it only for tests requiring that lifecycle and a dedicated
   disposable database.
+- [`InMemoryDatabaseTestTrait.php`](../../tests/Testing/Traits/InMemoryDatabaseTestTrait.php):
+  use this for tier 1 unit tests that need a real `DatabaseAdapter` (actual
+  query/statement behavior) without a host app, migrations, or a configured
+  DSN. It opens a fresh SQLite `:memory:` connection before every test and
+  disconnects after. Override `prepareInMemoryDatabaseSchema(DatabaseAdapter $db)`
+  in the test class to create tables and seed rows.
 - [`ControllerTestTrait.php`](../../tests/Testing/Traits/ControllerTestTrait.php):
   use this as a reference when executing controllers.
   Its `dispatchController()` delegates to `TestApp::$appContext` and accepts a

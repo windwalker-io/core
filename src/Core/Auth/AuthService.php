@@ -70,9 +70,14 @@ class AuthService
      */
     public function getAuthentication(): AuthenticationInterface
     {
+        // @codeCoverageIgnoreStart
+        // windwalker/authentication is not a required dependency of this package; this guard
+        // only triggers when it is not installed, which cannot happen in this monorepo's test
+        // environment where the package is always present.
         if (!interface_exists(AuthenticationInterface::class)) {
             throw new DomainException('Please install windwalker/authentication ^4.0 first.');
         }
+        // @codeCoverageIgnoreEnd
 
         return $this->authentication;
     }
@@ -82,9 +87,14 @@ class AuthService
      */
     public function getAuthorization(): AuthorizationInterface
     {
+        // @codeCoverageIgnoreStart
+        // windwalker/authorization is not a required dependency of this package; this guard
+        // only triggers when it is not installed, which cannot happen in this monorepo's test
+        // environment where the package is always present.
         if (!interface_exists(AuthorizationInterface::class)) {
             throw new DomainException('Please install windwalker/authorization ^4.0 first.');
         }
+        // @codeCoverageIgnoreEnd
 
         return $this->authorization;
     }

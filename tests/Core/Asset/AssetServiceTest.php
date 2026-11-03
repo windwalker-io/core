@@ -307,6 +307,24 @@ class AssetServiceTest extends TestCase
     }
 
     #[Test]
+    public function renderCssSkipsLinksNotMatchingFooterFilter(): void
+    {
+        $service = $this->createService(debug: true);
+
+        $service->css('head.css');
+        $service->css('footer.css', ['footer' => true]);
+
+        $headHtml = $service->renderCSS(false, [], false);
+        $footerHtml = $service->renderCSS(false, [], true);
+
+        self::assertStringContainsString('head.css', $headHtml);
+        self::assertStringNotContainsString('footer.css', $headHtml);
+
+        self::assertStringContainsString('footer.css', $footerHtml);
+        self::assertStringNotContainsString('head.css', $footerHtml);
+    }
+
+    #[Test]
     public function renderJsOutputsScriptTagsAndInternalScripts(): void
     {
         $service = $this->createService(debug: true);
@@ -513,6 +531,186 @@ class AssetServiceTest extends TestCase
     }
 
     #[Test]
+    public function moduleAsyncSetsModuleTypeAndAsyncAttribute(): void
+    {
+        $service = $this->createService();
+
+        $link = $service->moduleAsync('m.js');
+
+        self::assertSame('module', $link->getAttributes()['type'] ?? null);
+        self::assertTrue((bool) ($link->getAttributes()['async'] ?? false));
+    }
+
+    #[Test]
+    public function importModuleAppendsCommentAfterBody(): void
+    {
+        $service = $this->createService(debug: true);
+        $service->setVersion('v1');
+
+        $service->importModule('@main', 'doSomething()', ['comment' => '//note']);
+
+        $html = $service->renderJS(true);
+
+        self::assertStringContainsString('doSomething();//note', $html);
+    }
+
+    #[Test]
+    public function importSyncByAppUsesConfiguredClosureHandler(): void
+    {
+        $service = $this->createService(
+            configData: [
+                'asset' => [
+                    'modules' => [
+                        'importSyncCode' => static fn(string $module, string $props, array $options)
+                            => "customSync($module, $props);",
+                    ],
+                ],
+            ],
+            debug: true,
+        );
+        $service->setVersion('v1');
+
+        $service->importSyncByApp('my-module', ['a' => 1]);
+
+        $html = $service->renderJS(true);
+
+        self::assertStringContainsString('customSync(my-module, {a:1});', $html);
+    }
+
+    #[Test]
+    public function viteDevServerForcesNoVersionAndInjectsClientScript(): void
+    {
+        mkdir($this->tmpDir . '/tmp', 0777, true);
+        file_put_contents($this->tmpDir . '/tmp/vite-server', 'http://localhost:5173');
+
+        $service = $this->createService(debug: true);
+        $service->setVersion('v1');
+
+        $link = $service->js('@vite/app.js');
+
+        self::assertFalse($link->getOption('version'));
+
+        $html = $service->renderJS();
+
+        self::assertStringContainsString('@vite/client', $html);
+        self::assertStringNotContainsString('v1', $html);
+    }
+
+    #[Test]
+    public function renderJsOutputsSriAndInlineBody(): void
+    {
+        $service = $this->createService(debug: true);
+        $service->setVersion('v1');
+
+        $service->js('app.js', ['sri' => 'sha384-xyz', 'body' => 'console.log(1)']);
+
+        $html = $service->renderJS();
+
+        self::assertStringContainsString('integrity="sha384-xyz"', $html);
+        self::assertStringContainsString('crossorigin="anonymous"', $html);
+        self::assertStringContainsString('console.log(1)', $html);
+        self::assertStringNotContainsString('src=', $html);
+    }
+
+    #[Test]
+    public function hasFallsBackToPlainOrMinifiedFileWhenRequestedVariantMissing(): void
+    {
+        $this->writeAssetFile('only-plain.js', '// plain');
+        $this->writeAssetFile('only-min.min.js', '// min');
+
+        $service = $this->createService();
+
+        self::assertSame('/assets/only-plain.js', $service->has('only-plain.min.js'));
+        self::assertSame('/assets/only-min.min.js', $service->has('only-min.js'));
+    }
+
+    #[Test]
+    public function resolveAliasResolvesPlainImportMapNameWithoutSlash(): void
+    {
+        $service = $this->createService();
+
+        $service->importMap('@app', 'https://cdn.example.com/app.js');
+
+        self::assertSame('https://cdn.example.com/app.js', $service->resolveAlias('@app'));
+    }
+
+    #[Test]
+    public function setImportMapsResolvesPlainStringImportsThroughPath(): void
+    {
+        $service = $this->createService();
+
+        $service->setImportMaps(
+            [
+                'imports' => [
+                    'local' => 'local-lib.js',
+                ],
+            ]
+        );
+
+        self::assertSame('/assets/local-lib.js', $service->getImportMap()->getImport('local'));
+    }
+
+    #[Test]
+    public function appendVersionReturnsUriUnchangedWhenVersionIsFalsy(): void
+    {
+        file_put_contents($this->tmpDir . '/version.txt', '   ');
+
+        $service = $this->createService(debug: false);
+
+        self::assertSame('a.js', $service->appendVersion('a.js'));
+    }
+
+    #[Test]
+    public function detectVersionCachesResultAcrossInstancesViaStaticVariable(): void
+    {
+        // detectVersion() uses a function-level static variable, so once computed in this
+        // process it returns the cached hash for any later AssetService instance too.
+        $service1 = $this->createService(debug: false);
+        $version1 = $service1->getVersion();
+
+        $service2 = $this->createService(debug: false);
+        $version2 = $service2->getVersion();
+
+        self::assertSame($version1, $version2);
+    }
+
+    #[Test]
+    public function pathRootAndFolderPathAppendVersionQueryString(): void
+    {
+        $service = $this->createService();
+        $service->setVersion('v1');
+
+        self::assertSame('/assets/a.js?v1', $service->path('a.js', true));
+        self::assertSame('/assets/a.js?x=1&v1', $service->path('a.js?x=1', true));
+        self::assertSame('http://example.com/assets/a.js?v1', $service->root('a.js', true));
+    }
+
+    #[Test]
+    public function addSysPathReturnsFullUrlUnchanged(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('https://cdn.example.com/a.js', $service->addSysPath('https://cdn.example.com/a.js'));
+    }
+
+    #[Test]
+    public function resolveViteUriDelegatesToViteResolver(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('@vite/app.js', $service->resolveViteUri('@vite/app.js'));
+    }
+
+    #[Test]
+    public function getPropertyPathAndRootDelegateToMethods(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame($service->path(), $service->__get('path'));
+        self::assertSame($service->root(), $service->__get('root'));
+    }
+
+    #[Test]
     public function viteEntryAddsJsAndCssFromManifestEntries(): void
     {
         $manifest = [
@@ -535,5 +733,69 @@ class AssetServiceTest extends TestCase
         self::assertCount(2, $links);
         self::assertSame('/assets/app.hash.js', $links[0]->getHref());
         self::assertSame('/assets/app.hash.css', $links[1]->getHref());
+    }
+
+    #[Test]
+    public function handleUriFallsBackWhenPreferredVariantMissing(): void
+    {
+        $this->writeAssetFile('only-min.min.css', '/* min */');
+        $debugService = $this->createService(debug: true);
+
+        self::assertSame('/assets/only-min.min.css', $debugService->handleUri('only-min.css'));
+
+        $this->writeAssetFile('only-plain.css', '/* plain */');
+        $prodService = $this->createService(debug: false);
+
+        self::assertSame('/assets/only-plain.css', $prodService->handleUri('only-plain.css'));
+    }
+
+    #[Test]
+    public function rootAppendsVersionAfterExistingQueryString(): void
+    {
+        $service = $this->createService();
+        $service->setVersion('v1');
+
+        self::assertSame('http://example.com/assets/a.js?x=1&v1', $service->root('a.js?x=1', true));
+    }
+
+    #[Test]
+    public function folderPathWithUriAppendsVersionQueryString(): void
+    {
+        $service = $this->createService();
+        $service->setVersion('v1');
+
+        self::assertSame('assets/a.js?v1/', $service->folderPath('a.js', true));
+        self::assertSame('assets/a.js?x=1&v1/', $service->folderPath('a.js?x=1', true));
+    }
+
+    #[Test]
+    public function addUriBaseResolvesRelativeUriAndSkipsAbsoluteUrl(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('https://cdn.example.com/a.js', $service->addUriBase('https://cdn.example.com/a.js'));
+        self::assertSame('a.js/', $service->addUriBase('a.js'));
+        self::assertSame('http://example.com/a.js', $service->addUriBase('a.js', 'root'));
+        self::assertSame('example.com/a.js', $service->addUriBase('/a.js', 'root'));
+    }
+
+    #[Test]
+    public function addAssetBaseStripsFolderPathPrefixAndAppliesHostForRoot(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame(
+            'https://cdn.example.com/a.js',
+            $service->addAssetBase('https://cdn.example.com/a.js')
+        );
+        self::assertSame('/assets/a.js', $service->addAssetBase('assets/a.js'));
+        self::assertSame(
+            'http://example.com/assets/a.js',
+            $service->addAssetBase('assets/a.js', 'root')
+        );
+        self::assertSame(
+            'http://example.com/a.js',
+            $service->addAssetBase('/a.js', 'root')
+        );
     }
 }
