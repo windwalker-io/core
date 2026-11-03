@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -49,6 +50,74 @@ class ErrorServiceTest extends TestCase
         }
 
         error_reporting($this->originalErrorReporting);
+    }
+
+    /**
+     * Non-destructively snapshots the currently installed error/exception handler
+     * stack by repeatedly pushing a throwaway handler and immediately popping it
+     * (the same technique PHPUnit's own leak detector uses), then reinstalls every
+     * discovered handler so the stack is left exactly as found.
+     *
+     * @return  list<callable>
+     */
+    private static function captureHandlers(string $setFn, string $restoreFn): array
+    {
+        $handlers = [];
+
+        while (true) {
+            $previous = $setFn(static fn() => null);
+            $restoreFn();
+
+            if ($previous === null) {
+                break;
+            }
+
+            $handlers[] = $previous;
+            $restoreFn();
+        }
+
+        $handlers = array_reverse($handlers);
+
+        foreach ($handlers as $handler) {
+            $setFn($handler);
+        }
+
+        return $handlers;
+    }
+
+    /**
+     * Drains the entire handler stack (down to the PHP engine default) without
+     * reinstalling anything.
+     */
+    private static function drainHandlers(string $setFn, string $restoreFn): void
+    {
+        while (true) {
+            $previous = $setFn(static fn() => null);
+            $restoreFn();
+
+            if ($previous === null) {
+                break;
+            }
+
+            $restoreFn();
+        }
+    }
+
+    /**
+     * Restores the handler stack to exactly the given snapshot, regardless of how
+     * many handlers the test installed/removed in between. This keeps the real
+     * stack identical to what PHPUnit captured before the test ran, so its leak
+     * detector has nothing to report.
+     *
+     * @param  list<callable>  $handlers
+     */
+    private static function resetHandlersTo(string $setFn, string $restoreFn, array $handlers): void
+    {
+        self::drainHandlers($setFn, $restoreFn);
+
+        foreach ($handlers as $handler) {
+            $setFn($handler);
+        }
     }
 
     private function createApp(bool $verbose = false): ApplicationInterface
@@ -451,95 +520,137 @@ class ErrorServiceTest extends TestCase
 
     // The five tests below install real PHP error/exception handlers via
     // registerErrors()/registerExceptions()/register()/restore(). Those methods call
-    // restore_error_handler()/restore_exception_handler(), which permanently discards
-    // whatever handler PHPUnit itself had installed for the running test (there is no
-    // API to peek below the top of the handler stack without popping it). PHPUnit's
-    // leak detector therefore always reports these tests as "risky" ("removed error/
-    // exception handlers other than its own"), even though PHPUnit transparently
-    // restores its own handler for the next test afterwards. This is expected and
-    // does not fail the run (no failOnRisky is configured).
+    // restore_error_handler()/restore_exception_handler(), which pop whatever handler
+    // is currently on top of the real handler stack (the host app's bootstrap installs
+    // its own `ErrorService` globally, and PHPUnit layers its own handler on top of that
+    // per test). `#[WithoutErrorHandler]` stops PHPUnit from adding its own layer for
+    // these tests, and each test below snapshots the handler stack before touching it
+    // and restores that exact snapshot afterwards (via captureHandlers()/
+    // resetHandlersTo()), so the stack always ends up identical to how PHPUnit found it
+    // and its leak detector has nothing to flag.
 
     #[Test]
+    #[WithoutErrorHandler]
     public function registerErrorsInstallsServiceAsPhpErrorHandler(): void
     {
         error_reporting(E_ALL);
 
-        $service = $this->createService();
-        $service->registerErrors();
+        $originalErrorHandlers = self::captureHandlers('set_error_handler', 'restore_error_handler');
 
-        $this->expectException(ErrorException::class);
+        try {
+            $service = $this->createService();
+            $service->registerErrors();
 
-        trigger_error('Boom', E_USER_WARNING);
+            $this->expectException(ErrorException::class);
+
+            trigger_error('Boom', E_USER_WARNING);
+        } finally {
+            self::resetHandlersTo('set_error_handler', 'restore_error_handler', $originalErrorHandlers);
+        }
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function registerExceptionsInstallsServiceAsPhpExceptionHandler(): void
     {
-        $service = $this->createService();
-        $service->registerExceptions();
+        $originalExceptionHandlers = self::captureHandlers('set_exception_handler', 'restore_exception_handler');
 
-        // Peek at the currently active handler without disturbing the stack: pushing
-        // `null` returns whatever was active, and `restore_exception_handler()`
-        // immediately pops that `null` frame back off again.
-        $previousHandler = set_exception_handler(null);
-        restore_exception_handler();
+        try {
+            $service = $this->createService();
+            $service->registerExceptions();
 
-        self::assertSame([$service, 'exception'], $previousHandler);
+            // Peek at the currently active handler without disturbing the stack: pushing
+            // `null` returns whatever was active, and `restore_exception_handler()`
+            // immediately pops that `null` frame back off again.
+            $previousHandler = set_exception_handler(null);
+            restore_exception_handler();
+
+            self::assertSame([$service, 'exception'], $previousHandler);
+        } finally {
+            self::resetHandlersTo('set_exception_handler', 'restore_exception_handler', $originalExceptionHandlers);
+        }
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function restoreResetsBothHandlersToDefault(): void
     {
-        $service = $this->createService();
-        $service->registerErrors();
-        $service->registerExceptions();
+        $originalErrorHandlers     = self::captureHandlers('set_error_handler', 'restore_error_handler');
+        $originalExceptionHandlers = self::captureHandlers('set_exception_handler', 'restore_exception_handler');
 
-        $service->restore();
+        try {
+            $service = $this->createService();
+            $service->registerErrors();
+            $service->registerExceptions();
 
-        // `restore()` only pops the handler frames this service pushed; what remains
-        // underneath isn't observable without destructively unwinding the whole stack,
-        // so we only assert that the service's own handlers are no longer active.
-        $errorHandler = set_error_handler(null);
-        restore_error_handler();
-        $exceptionHandler = set_exception_handler(null);
-        restore_exception_handler();
+            $service->restore();
 
-        self::assertNotSame([$service, 'error'], $errorHandler);
-        self::assertNotSame([$service, 'exception'], $exceptionHandler);
+            // `restore()` only pops the handler frames this service pushed; what remains
+            // underneath isn't observable without destructively unwinding the whole stack,
+            // so we only assert that the service's own handlers are no longer active.
+            $errorHandler = set_error_handler(null);
+            restore_error_handler();
+            $exceptionHandler = set_exception_handler(null);
+            restore_exception_handler();
+
+            self::assertNotSame([$service, 'error'], $errorHandler);
+            self::assertNotSame([$service, 'exception'], $exceptionHandler);
+        } finally {
+            self::resetHandlersTo('set_error_handler', 'restore_error_handler', $originalErrorHandlers);
+            self::resetHandlersTo('set_exception_handler', 'restore_exception_handler', $originalExceptionHandlers);
+        }
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function registerInstallsErrorAndExceptionHandlersByDefault(): void
     {
-        $service = $this->createService();
-        $service->register();
+        $originalErrorHandlers     = self::captureHandlers('set_error_handler', 'restore_error_handler');
+        $originalExceptionHandlers = self::captureHandlers('set_exception_handler', 'restore_exception_handler');
 
-        $errorHandler = set_error_handler(null);
-        restore_error_handler();
-        $exceptionHandler = set_exception_handler(null);
-        restore_exception_handler();
+        try {
+            $service = $this->createService();
+            $service->register();
 
-        self::assertSame([$service, 'error'], $errorHandler);
-        self::assertSame([$service, 'exception'], $exceptionHandler);
+            $errorHandler = set_error_handler(null);
+            restore_error_handler();
+            $exceptionHandler = set_exception_handler(null);
+            restore_exception_handler();
+
+            self::assertSame([$service, 'error'], $errorHandler);
+            self::assertSame([$service, 'exception'], $exceptionHandler);
+        } finally {
+            self::resetHandlersTo('set_error_handler', 'restore_error_handler', $originalErrorHandlers);
+            self::resetHandlersTo('set_exception_handler', 'restore_exception_handler', $originalExceptionHandlers);
+        }
     }
 
     #[Test]
+    #[WithoutErrorHandler]
     public function registerAlsoRegistersShutdownHandlerWhenRequested(): void
     {
-        // `registerShutdown()` only registers `down()` via `register_shutdown_function()`,
-        // which cannot be observed or verified from within the current process; the
-        // assertions below only prove that requesting it does not break the rest of
-        // `register()`'s observable behaviour.
-        $service = $this->createService();
-        $service->register(shutdown: true);
+        $originalErrorHandlers     = self::captureHandlers('set_error_handler', 'restore_error_handler');
+        $originalExceptionHandlers = self::captureHandlers('set_exception_handler', 'restore_exception_handler');
 
-        $errorHandler = set_error_handler(null);
-        restore_error_handler();
-        $exceptionHandler = set_exception_handler(null);
-        restore_exception_handler();
+        try {
+            // `registerShutdown()` only registers `down()` via `register_shutdown_function()`,
+            // which cannot be observed or verified from within the current process; the
+            // assertions below only prove that requesting it does not break the rest of
+            // `register()`'s observable behaviour.
+            $service = $this->createService();
+            $service->register(shutdown: true);
 
-        self::assertSame([$service, 'error'], $errorHandler);
-        self::assertSame([$service, 'exception'], $exceptionHandler);
+            $errorHandler = set_error_handler(null);
+            restore_error_handler();
+            $exceptionHandler = set_exception_handler(null);
+            restore_exception_handler();
+
+            self::assertSame([$service, 'error'], $errorHandler);
+            self::assertSame([$service, 'exception'], $exceptionHandler);
+        } finally {
+            self::resetHandlersTo('set_error_handler', 'restore_error_handler', $originalErrorHandlers);
+            self::resetHandlersTo('set_exception_handler', 'restore_exception_handler', $originalExceptionHandlers);
+        }
     }
 
     #[Test]

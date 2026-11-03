@@ -21,7 +21,7 @@ trait ControllerTestTrait
         ServerRequestInterface|array|null $data = null,
         array $args = [],
     ): mixed {
-        return TestApp::$appContext->dispatchWithInput(
+        return TestApp::$ctx->dispatchWithInput(
             $controller,
             $data,
             $args

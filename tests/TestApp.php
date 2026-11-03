@@ -10,6 +10,7 @@ use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
+use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Platform\AbstractPlatform;
@@ -20,7 +21,7 @@ class TestApp extends WebApplication
 {
     public static self $instance;
 
-    public static AppContext $appContext;
+    public static AppContext $ctx;
 
     protected bool $dbInitialized = false;
 
@@ -39,7 +40,7 @@ class TestApp extends WebApplication
 
         $appContext = $this->createContext($request);
         $appContext->disableDebugProfiler(true);
-        static::$appContext = $appContext;
+        static::$ctx = $appContext;
 
         $container = $appContext->getContainer();
         $request = $container->get(ServerRequestInterface::class);
@@ -69,13 +70,12 @@ class TestApp extends WebApplication
 
         $this->dbInitialized = true;
 
-        $this->resetDatabase();
+        static::resetDatabase();
     }
 
-    public function resetDatabase(): void
+    public static function resetDatabase(?string $connection = null, string|bool $log = false): void
     {
-        $db = self::$appContext->retrieve(DatabaseAdapter::class);
-        $pathResolver = self::$appContext->retrieve(PathResolver::class);
+        $db = self::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
 
         $dbname = $db->driver->options->dbname;
 
@@ -95,26 +95,55 @@ class TestApp extends WebApplication
         if ($db->getPlatform()->getName() === AbstractPlatform::MYSQL) {
             $db->execute('USE ' . $dbname);
         }
+    }
 
-        $migrationService = TestApp::$instance->make(
+    public static function migrate(?string $connection = null, string|bool $log = false): int
+    {
+        $factory = self::$ctx->retrieve(DatabaseServiceFactory::class);
+        $db = self::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+        $pathResolver = self::$ctx->retrieve(PathResolver::class);
+
+        // Logging
+        $logName = $connection ?? $factory->getDefaultName();
+
+        $logFile = null;
+
+        if ($log) {
+            if ($log === true) {
+                $logFile = $pathResolver->resolve('@temp') . "/db/test-mig-{$logName}.sql";
+            } else {
+                $logFile = $log;
+            }
+        }
+
+        $migrationService = static::$instance->make(
             MigrationService::class,
             [
                 'db' => $db,
             ]
         );
 
-        $migrationService->migrate(
+        // Do migrate
+        return $migrationService->migrate(
             $pathResolver->resolve('@migrations'),
             null,
-            $pathResolver->resolve('@temp') . '/db/test-mig.sql'
+            $logFile
         );
+    }
+
+
+
+    public static function resetDatabaseAndMigrate(?string $connection = null, string|bool $log = false): void
+    {
+        static::resetDatabase($connection);
+        static::migrate($connection, $log);
     }
 
     // protected function terminating(Container $container): void
     // {
     //     parent::terminating($container);
     //
-    //     $db = self::$appContext->retrieve(DatabaseAdapter::class);
+    //     $db = self::$appContext->retrieve(DatabaseAdapter::class, tag: $connection);
     //     $db->driver->releaseKeptConnection();
     //     $db->disconnect();
     // }

@@ -30,7 +30,7 @@ trait StaticContainerTestTrait
     #[BeforeClass(priority: 100)]
     public static function prepareChildContainer(): void
     {
-        $parentContainer = TestApp::$appContext->container;
+        $parentContainer = TestApp::$ctx->container;
 
         static::$container = $parentContainer->createChild();
 
