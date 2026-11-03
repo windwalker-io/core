@@ -9,15 +9,31 @@ integration test should I write next".
 
 ## Scope
 
-Any production code path discovered while writing or reviewing tests that:
+List a code path only when a unit test genuinely can't exercise it, e.g.:
 
-- needs a real host application, database, or optional dependency not
-  installed in this package's dev environment, or
-- needs infrastructure (real view rendering pipeline, real HTTP server,
-  external service) that a unit test cannot reasonably fake.
+- needs a real host app, database, or optional package not installed in this
+  package's dev dependencies;
+- needs infrastructure (real view pipeline, real HTTP server, external
+  service) a unit test can't reasonably fake;
+- calls an internal (non-optional) service whose downstream behavior is
+  heavy/complex enough that a stub would only prove "it was called", not
+  that the real result is correct (`AppContext::renderView()`); or
+- needs to obtain complex info from outside (e.g. the real request shape a
+  CLI/HTTP server sends) where a hand-built double risks diverging from
+  reality.
 
-Do not list plain missing unit tests here; only list cases where a full
-integration test is the appropriate next step.
+Do not list plain missing unit tests; only cases where integration-level
+setup is genuinely required.
+
+Optional-package branches cut both ways:
+
+- A "package missing" guard unreachable only because the package *is*
+  installed here doesn't need an entry — you can't deliberately uninstall it
+  for one test, so skip it.
+- A "package present" path doesn't need an entry either if an existing stub
+  already faithfully implements the interface and the logic is a thin
+  wrapper. Only list it when the real collaborators are too complex for a
+  stub to stand in (`SimpleCspMiddleware`, `renderView()`).
 
 ## How to use this list
 
@@ -28,17 +44,36 @@ integration test is the appropriate next step.
   list in the same change.
 - Keep entries short: class, path/branch, and why it needs integration-level
   setup.
+- Group entries as a two-level list: the top-level bullet is the
+  `src/Core` subdirectory (e.g. `Core/Application`, `Core/Middleware`)
+  matching where the production file lives, with each entry nested
+  underneath. Do not use headings for grouping.
 
 ## Pending items
 
-- `Windwalker\Core\Middleware\MaintenanceMiddleware::process()` — the
-  maintenance-view-rendering branch (no allowed IP, no valid secret, no
-  redirect configured) calls `AppContext::make(BaseVM::class)` and
-  `AppContext::renderView()`, which need a real view-rendering pipeline.
-  Covered by `tests/Core/Middleware/MaintenanceMiddlewareTest.php` for every
-  other branch.
-- `Windwalker\Core\Middleware\SimpleCspMiddleware::process()` — the CSP
-  enabled/disabled building logic requires the optional
-  `paragonie/csp-builder` package, which is not installed in this package's
-  dev dependencies. Only the missing-package guard clause is currently
-  covered by `tests/Core/Middleware/SimpleCspMiddlewareTest.php`.
+- Core/Application
+  - `Windwalker\Core\Application\AppContext::renderView()` — the
+    `@codeCoverageIgnoreStart`/`End` branch that builds a real `View::class`
+    graph (`RendererService`, `HtmlFrame`, `AssetService`, ...) can't be
+    reasonably faked with stubs; needs a real host app rendering pipeline,
+    e.g. via `TestWebAppFactory`. The same code path is also what blocks the
+    `MaintenanceMiddleware` entry below.
+- Core/Middleware
+  - `Windwalker\Core\Middleware\MaintenanceMiddleware::process()` — the
+    maintenance-view-rendering branch (no allowed IP, no valid secret, no
+    redirect configured) calls `AppContext::make(BaseVM::class)` and
+    `AppContext::renderView()`, which need a real view-rendering pipeline.
+    Covered by `tests/Core/Middleware/MaintenanceMiddlewareTest.php` for
+    every other branch.
+  - `Windwalker\Core\Middleware\SimpleCspMiddleware::process()` — the CSP
+    enabled/disabled building logic requires the optional
+    `paragonie/csp-builder` package, which is not installed in this
+    package's dev dependencies. Only the missing-package guard clause is
+    currently covered by `tests/Core/Middleware/SimpleCspMiddlewareTest.php`.
+- Core/Mailer
+  - `Windwalker\Core\Mailer\MailBuilder::tryRenderMarkdown()` /
+    `getMarkdownRenderer()` — the markdown-rendering branch requires the
+    optional `erusev/parsedown` package, which is not installed in this
+    package's dev dependencies. `tests/Core/Mailer/MailBuilderTest.php`
+    covers every other branch; the "package present" path (actual
+    `\Parsedown` rendering) needs `erusev/parsedown` installed to test.

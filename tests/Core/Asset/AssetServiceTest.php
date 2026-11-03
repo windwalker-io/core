@@ -105,6 +105,15 @@ class AssetServiceTest extends TestCase
     }
 
     #[Test]
+    public function constructorUsesConfiguredUriOverrideForPathAndRoot(): void
+    {
+        $service = $this->createService(['asset' => ['uri' => '/custom-base']]);
+
+        self::assertSame('/custom-base/', $service->path());
+        self::assertSame('/custom-base/', $service->root());
+    }
+
+    #[Test]
     public function getUndefinedPropertyThrows(): void
     {
         $service = $this->createService();
