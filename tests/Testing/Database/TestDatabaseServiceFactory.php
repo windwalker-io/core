@@ -11,30 +11,22 @@ use Windwalker\Database\Driver\Pdo\DsnHelper;
 
 class TestDatabaseServiceFactory extends DatabaseServiceFactory
 {
+    protected \Closure $defaultFactory;
+
     public function getDefaultName(): ?string
     {
         return 'test';
     }
 
+    public function setDefaultFactory(\Closure $defaultFactory): static
+    {
+        $this->defaultFactory = $defaultFactory;
+
+        return $this;
+    }
+
     protected function getDefaultFactory(string $name, ...$args): mixed
     {
-        return static function () {
-            $dsn = env('WINDWALKER_TEST_DB_DSN');
-
-            if (!$dsn) {
-                throw new \RuntimeException('Please set WINDWALKER_TEST_DB_DSN in phpunit.xml');
-            }
-
-            $optionsArray = DsnHelper::extract($dsn, $type);
-            $options = DriverOptions::wrap($optionsArray);
-
-            if ($type === 'sqlsrv' || $type === 'pdo_sqlsrv') {
-                $options->tls = [
-                    'verify' => false,
-                ];
-            }
-
-            return new DatabaseFactory()->create($type, $options);
-        };
+        return $this->defaultFactory;
     }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Windwalker\Tests\Core\Seed;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -13,17 +15,33 @@ use Windwalker\Core\Generator\FileCollection;
 use Windwalker\Core\Seed\FakerService;
 use Windwalker\Core\Seed\SeedService;
 use Windwalker\Core\Testing\Stub\ApplicationTraitStub;
+use Windwalker\Filesystem\Filesystem;
 
 /**
  * Covers the parts of SeedService that do not require a real host app /
  * database / Migration-style fixture files. `import()`/`clear()` are
  * exercised through the same recipe as `MigrationServiceTest` and are not
- * duplicated here; see `.github/docs/integration-test-backlog.md` for the
- * remaining `copySeedFile()` integration gap (real `.tpl` rendering).
+ * duplicated here.
  */
 #[CoversClass(SeedService::class)]
 class SeedServiceTest extends TestCase
 {
+    private string $destDir;
+
+    #[Before]
+    protected function setUpDestDir(): void
+    {
+        $this->destDir = sys_get_temp_dir() . '/ww-seed-test-' . uniqid();
+    }
+
+    #[After]
+    protected function removeDestDir(): void
+    {
+        if (is_dir($this->destDir)) {
+            Filesystem::deleteIfExists($this->destDir);
+        }
+    }
+
     #[Test]
     public function buildReplacementDataReturnsNameAndYearFromGivenDate(): void
     {
@@ -93,6 +111,29 @@ class SeedServiceTest extends TestCase
         $service = $this->createSeedService($codeGenerator);
 
         $service->copySeedFile('/dest', 'CreateUserData', '/templates/seeder.tpl');
+    }
+
+    #[Test]
+    public function copySeedFileRendersRealTemplateAndWritesDestFile(): void
+    {
+        $app = new ApplicationTraitStub();
+        $codeGenerator = new CodeGenerator($app);
+        $service = new SeedService($app, new FakerService(), $codeGenerator);
+
+        $source = __DIR__ . '/../../../resources/templates/seed/*';
+
+        $result = $service->copySeedFile($this->destDir, 'CreateUserSeeder', $source);
+
+        $destFile = $this->destDir . '/create-user-seeder.seeder.php';
+
+        self::assertFileExists($destFile);
+        self::assertCount(1, $result->getResults());
+
+        $content = file_get_contents($destFile);
+
+        self::assertStringContainsString('namespace App\Seeder;', $content);
+        self::assertStringContainsString('/** CreateUserSeeder Seeder */', $content);
+        self::assertStringContainsString('#[SeedImport]', $content);
     }
 
     private function createSeedService(?CodeGenerator $codeGenerator = null): SeedService

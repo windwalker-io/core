@@ -12,6 +12,7 @@ use Windwalker\Core\Application\WebApplication;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\State\AppState;
+use Windwalker\Core\View\BaseVM;
 use Windwalker\Session\Session;
 use Windwalker\Tests\Core\Application\Stub\SessionStub;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
@@ -202,6 +203,20 @@ class AppContextTest extends TestCase
 
         self::assertSame(['default' => true], $body['options']);
         self::assertSame(['x' => '1'], $body['data']);
+    }
+
+    #[Test]
+    public function renderViewRendersRealViewModelThroughRealViewAndRenderer(): void
+    {
+        $app = TestWebAppFactory::createWithRendering();
+        $ctx = $app->createContext(TestWebAppFactory::request());
+
+        $vm = $ctx->make(BaseVM::class);
+
+        $response = $ctx->renderView($vm, ['name' => 'Bob'], ['layout' => 'test-layout']);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('Hello, Bob!', (string) $response->getBody());
     }
 
     #[Test]

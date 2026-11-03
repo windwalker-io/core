@@ -196,4 +196,43 @@ class MaintenanceMiddlewareTest extends TestCase
         self::assertSame(303, $result->getStatusCode());
         self::assertSame('/offline', $result->getHeaderLine('Location'));
     }
+
+    #[Test]
+    public function rendersRealMaintenanceViewWhenNoRedirectOrAccessOverrideConfigured(): void
+    {
+        $config = new MaintenanceConfig()->setSecret('mysecret');
+        $app = TestWebAppFactory::createWithRendering();
+
+        $app->getContainer()->share(MaintenanceManager::class, $this->createManager($config));
+
+        $serverRequest = new ServerRequest(
+            serverParams: ['REMOTE_ADDR' => '127.0.0.1'],
+            uri: 'http://example.com/foo',
+            method: 'GET',
+        );
+
+        $ctx = $app->createContext($serverRequest);
+        $ctx->getContainer()->share(
+            AppRequestInterface::class,
+            new AppRequest(
+                $serverRequest,
+                new SystemUri('http://example.com/foo'),
+                $this->createStub(ProxyResolver::class),
+                new RequestInspector(),
+            )
+        );
+        $ctx->getContainer()->share(
+            Session::class,
+            new Session([], new PhpBridge(handler: new ArrayHandler()))
+        );
+
+        $middleware = new MaintenanceMiddleware($ctx);
+        $marker = new Response();
+
+        $result = $middleware->process(TestWebAppFactory::request(), $this->passthroughHandler($marker));
+
+        self::assertNotSame($marker, $result);
+        self::assertSame(503, $result->getStatusCode());
+        self::assertStringContainsString('Maintenance: mysecret', (string) $result->getBody());
+    }
 }

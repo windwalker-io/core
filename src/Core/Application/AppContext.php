@@ -118,10 +118,6 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         }
 
         if ($view instanceof ViewModelInterface) {
-            // @codeCoverageIgnoreStart
-            // Exercising this branch would require a real View::class graph
-            // (RendererService, HtmlFrame, AssetService, ...), which is far
-            // beyond the scope of AppContext unit tests.
             $view = $this->make(
                 View::class,
                 [
@@ -129,7 +125,6 @@ class AppContext implements WebApplicationInterface, AppContextInterface
                     'options' => $options
                 ]
             );
-            // @codeCoverageIgnoreEnd
         }
 
         $options = [

@@ -17,7 +17,7 @@ List a code path only when a unit test genuinely can't exercise it, e.g.:
   service) a unit test can't reasonably fake;
 - calls an internal (non-optional) service whose downstream behavior is
   heavy/complex enough that a stub would only prove "it was called", not
-  that the real result is correct (`AppContext::renderView()`); or
+  that the real result is correct (`SimpleCspMiddleware::process()`); or
 - needs to obtain complex info from outside (e.g. the real request shape a
   CLI/HTTP server sends) where a hand-built double risks diverging from
   reality.
@@ -51,20 +51,7 @@ Optional-package branches cut both ways:
 
 ## Pending items
 
-- Core/Application
-  - `Windwalker\Core\Application\AppContext::renderView()` — the
-    `@codeCoverageIgnoreStart`/`End` branch that builds a real `View::class`
-    graph (`RendererService`, `HtmlFrame`, `AssetService`, ...) can't be
-    reasonably faked with stubs; needs a real host app rendering pipeline,
-    e.g. via `TestWebAppFactory`. The same code path is also what blocks the
-    `MaintenanceMiddleware` entry below.
 - Core/Middleware
-  - `Windwalker\Core\Middleware\MaintenanceMiddleware::process()` — the
-    maintenance-view-rendering branch (no allowed IP, no valid secret, no
-    redirect configured) calls `AppContext::make(BaseVM::class)` and
-    `AppContext::renderView()`, which need a real view-rendering pipeline.
-    Covered by `tests/Core/Middleware/MaintenanceMiddlewareTest.php` for
-    every other branch.
   - `Windwalker\Core\Middleware\SimpleCspMiddleware::process()` — the CSP
     enabled/disabled building logic requires the optional
     `paragonie/csp-builder` package, which is not installed in this
@@ -77,46 +64,6 @@ Optional-package branches cut both ways:
     package's dev dependencies. `tests/Core/Mailer/MailBuilderTest.php`
     covers every other branch; the "package present" path (actual
     `\Parsedown` rendering) needs `erusev/parsedown` installed to test.
-- Core/Migration
-  - `Windwalker\Core\Migration\MigrationSquashBuilder::build()` /
-    `Windwalker\Core\Migration\MigrationSquashService::generateMigrationCodes()`
-    — these introspect a real table's columns/indexes/constraints
-    (`TableManager::getColumns()/getIndexes()/getConstraints()`) and rebuild
-    Schema-API code from the platform-specific metadata (column type names,
-    auto-increment/primary detection, length/JSON "erratas"). That metadata
-    shape comes from each driver's own `listColumns()`/`listIndexes()`
-    implementation and differs meaningfully between MySQL, PostgreSQL, and
-    SQLite, so a SQLite-backed test cannot validate `typeToMethod()` mapping
-    or the auto-increment/JSON/length branches the way they behave against a
-    real production engine. Needs a tier 4 test that introspects an actual
-    MySQL/PostgreSQL table and asserts the generated migration code and
-    version are correct.
-- Core/Seed
-  - `Windwalker\Core\Seed\SeedService::copySeedFile()` — delegates to
-    `CodeGenerator::from()`, which globs real `.tpl` template files from disk
-    and writes generated output through a real `ApplicationInterface`-backed
-    `FileCollection`/event dealer. `CodeGenerator` is now constructor-injected
-    (`#[Autowire]`), and `tests/Core/Seed/SeedServiceTest.php` covers the
-    shallow, fully-mocked shape (a fake `CodeGenerator`/`FileCollection`
-    verifies `from()`/`replaceTo()` are called with the right arguments, and
-    `buildReplacementData()` is unit-tested in isolation as a pure method).
-    That only proves wiring, not that a real `.tpl` template actually globs
-    and renders correctly end to end — a stub `ApplicationInterface` can't
-    fake real template lookup/rendering, so a tier 4 test still needs the
-    same real-app setup as `MigrationService::copyMigrationFile()` (also
-    untested for the same reason, and not yet backlogged there either).
-    Follow-up: decide on a test strategy for this real-rendering gap — e.g.
-    a tier 4 test using a real `ApplicationTraitStub`-compatible app plus
-    actual seed `.tpl` fixtures under `tmp/`, or extracting template
-    discovery/rendering out of `CodeGenerator` into something fakeable at a
-    lower level — before closing this entry.
-    `SeedService::import()`/`clear()`/`processIncluded()` are not listed
-    here: they follow the exact same include-a-PHP-file-and-call-a-handler
-    shape as `MigrationService::migrate()`/`getMigrations()`, which
-    `tests/Core/Migration/MigrationServiceTest.php` already covers with real
-    temp fixture files, `ApplicationTraitStub`, and an in-memory SQLite
-    `DatabaseAdapter` (tier 1) — the same recipe applies directly to
-    `SeedService` without any source change.
 - Core/Runtime
   - `Windwalker\Core\Runtime\Runtime::forbidden()` / the blocking branch of
     `ipBlock()` — calls `header()` followed by `exit()`, a process-terminating

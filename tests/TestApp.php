@@ -25,7 +25,9 @@ class TestApp extends AbstractTestApp
     {
         $context = parent::createContext($request);
 
-        $context->container->registerServiceProvider(new TestDatabasesProvider());
+        $context->container->registerServiceProvider(
+            new TestDatabasesProvider(env('WINDWALKER_TEST_DB_DSN'))
+        );
 
         return $context;
     }
