@@ -19,6 +19,8 @@ testing requirements, and Markdown templates.
 - [`host-application-and-testing.md`](host-application-and-testing.md): how a
   consuming app boots Core and what app context and services Core integration
   tests require
+- [`integration-test-backlog.md`](integration-test-backlog.md): running list
+  of code paths that need a future integration test instead of a unit test
 
 ## Maintenance
 

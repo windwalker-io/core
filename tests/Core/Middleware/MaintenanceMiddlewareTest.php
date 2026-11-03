@@ -196,20 +196,4 @@ class MaintenanceMiddlewareTest extends TestCase
         self::assertSame(303, $result->getStatusCode());
         self::assertSame('/offline', $result->getHeaderLine('Location'));
     }
-
-    /**
-     * @todo Add an integration test for the maintenance view-rendering branch
-     *       (no allowed IP, no valid secret, no redirect configured) once a
-     *       lightweight way to stub `AppContext::make(BaseVM::class)` /
-     *       `AppContext::renderView()` is available, asserting a 503 response
-     *       built from the `maintenance` template.
-     */
-    #[Test]
-    public function viewIsRenderedWithStatus503WhenNoRedirectConfigured(): void
-    {
-        self::markTestSkipped(
-            'Rendering the maintenance view requires a real AppContext/BaseVM view pipeline; '
-                . 'needs a host-app-backed integration test.',
-        );
-    }
 }

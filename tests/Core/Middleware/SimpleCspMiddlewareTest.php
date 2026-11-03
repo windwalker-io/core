@@ -37,17 +37,4 @@ class SimpleCspMiddlewareTest extends TestCase
 
         $middleware->process($this->createStub(ServerRequestInterface::class), $handler);
     }
-
-    /**
-     * @todo Add an integration test for the enabled/disabled CSP-building logic
-     *       once `paragonie/csp-builder` is installed as a dev dependency, covering
-     *       both the CSP-enabled (header/nonce generation) and CSP-disabled passthrough paths.
-     */
-    #[Test]
-    public function processBuildsCspWhenPackageIsAvailable(): void
-    {
-        self::markTestSkipped(
-            '`paragonie/csp-builder` is not installed; CSP-building logic is untestable in this environment.',
-        );
-    }
 }

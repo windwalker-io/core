@@ -86,6 +86,17 @@ integration with `TestWebAppFactory`, app-backed, database), see
   event listener timing, coverage branch semantics) before debugging from
   scratch.
 
+## Code paths that need a future integration test
+
+- If a branch cannot be unit-tested because it needs a real host app,
+  database, optional dependency, or other infrastructure a unit test cannot
+  fake, do not add a skipped test or `@codeCoverageIgnore` for it. Instead,
+  add an entry to
+  [`integration-test-backlog.md`](../docs/integration-test-backlog.md)
+  describing the class, branch, and why it needs integration-level setup.
+- When you later add the integration test for a listed entry, remove that
+  entry from the backlog in the same change.
+
 ## Execution context
 
 - Read [host application and testing guidance](../docs/host-application-and-testing.md)
