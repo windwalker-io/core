@@ -311,7 +311,7 @@ class MigrationService implements EventAwareInterface
             if (!$table->hasColumn('name')) {
                 $table->update(
                     function (Schema $schema) {
-                        $schema->varchar('name');
+                        $schema->varchar('name')->length(191);
                     }
                 );
             }
@@ -321,8 +321,11 @@ class MigrationService implements EventAwareInterface
 
         $table->create(
             function (Schema $schema) {
-                $schema->varchar('version');
-                $schema->varchar('name');
+                // Explicit length keeps the composite primary key below SQL Server's
+                // 900-byte index key limit (unbounded varchar() defaults to a wide
+                // platform-specific type, e.g. NVARCHAR(255) on SQL Server).
+                $schema->varchar('version')->length(191);
+                $schema->varchar('name')->length(191);
 
                 // Use exists time as timestamp before framework supports CURRENT_TIMESTAMP
                 $schema->timestamp('start_time')->defaultCurrent();

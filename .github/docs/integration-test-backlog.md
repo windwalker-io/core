@@ -78,16 +78,6 @@ Optional-package branches cut both ways:
     covers every other branch; the "package present" path (actual
     `\Parsedown` rendering) needs `erusev/parsedown` installed to test.
 - Core/Migration
-  - `Windwalker\Core\Migration\MigrationService` — `tests/Core/Migration/MigrationServiceTest.php`
-    covers `migrate()`/version-tracking orchestration against a SQLite
-    `:memory:` `DatabaseAdapter` (tier 1), which is enough to prove the
-    up/down ordering, ignore, and squash-coordination logic. It cannot prove
-    that the DDL produced by the Schema API in real migration files actually
-    succeeds on the dialects the host app targets in production (MySQL,
-    PostgreSQL, SQL Server), since SQLite's lenient type affinity accepts
-    column/index definitions a strict engine would reject. Needs a tier 4
-    test with `DatabaseTestTrait` against `WINDWALKER_TEST_DB_DSN_*` running
-    representative migrations end to end.
   - `Windwalker\Core\Migration\MigrationSquashBuilder::build()` /
     `Windwalker\Core\Migration\MigrationSquashService::generateMigrationCodes()`
     — these introspect a real table's columns/indexes/constraints

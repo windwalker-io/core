@@ -28,6 +28,12 @@ class TestDatabaseServiceFactory extends DatabaseServiceFactory
             $optionsArray = DsnHelper::extract($dsn, $type);
             $options = DriverOptions::wrap($optionsArray);
 
+            if ($type === 'sqlsrv' || $type === 'pdo_sqlsrv') {
+                $options->tls = [
+                    'verify' => false,
+                ];
+            }
+
             return new DatabaseFactory()->create($type, $options);
         };
     }
