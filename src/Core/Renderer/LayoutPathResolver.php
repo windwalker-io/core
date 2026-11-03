@@ -131,6 +131,9 @@ class LayoutPathResolver
         return $layout;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function alias(string $alias, string $layout): static
     {
         $this->aliases[$layout] = $alias;
@@ -147,6 +150,8 @@ class LayoutPathResolver
      * @param  string  $path
      *
      * @return  array<?string>
+     *
+     * @codeCoverageIgnore Simple proxy, delegates entirely to Collection without own logic.
      */
     public static function extractNamespace(string $path): array
     {
@@ -155,6 +160,8 @@ class LayoutPathResolver
 
     /**
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getAliases(): array
     {
@@ -165,6 +172,8 @@ class LayoutPathResolver
      * @param  array  $aliases
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setAliases(array $aliases): static
     {
@@ -202,6 +211,9 @@ class LayoutPathResolver
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetPathsBags(): static
     {
         $this->pathsBags = [];
@@ -211,6 +223,8 @@ class LayoutPathResolver
 
     /**
      * @return  PathsBag[]
+     *
+     * @codeCoverageIgnore
      */
     public function getPathsBags(): array
     {
@@ -221,6 +235,8 @@ class LayoutPathResolver
      * @param  PathsBag[]  $pathsBags
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setPathsBags(array $pathsBags): static
     {

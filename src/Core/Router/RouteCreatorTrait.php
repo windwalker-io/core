@@ -189,6 +189,8 @@ trait RouteCreatorTrait
      * @return  $this
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function prefix(string $prefix): static
     {
@@ -203,6 +205,8 @@ trait RouteCreatorTrait
      * @param  string  $namespace
      *
      * @return  $this
+     *
+     * @codeCoverageIgnore
      */
     public function namespace(string $namespace): static
     {
@@ -284,6 +288,8 @@ trait RouteCreatorTrait
      * @return  Route[]
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function getRoutes(): array
     {
@@ -308,6 +314,8 @@ trait RouteCreatorTrait
      * @return  array
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function getGroups(): array
     {
@@ -322,6 +330,8 @@ trait RouteCreatorTrait
      * @return  static  Return self to support chaining.
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function setGroups(array $groups): static
     {

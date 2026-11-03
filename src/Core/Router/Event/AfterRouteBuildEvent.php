@@ -28,6 +28,8 @@ class AfterRouteBuildEvent extends BaseEvent
      * @return  string
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getRoute(): string
     {
@@ -38,6 +40,8 @@ class AfterRouteBuildEvent extends BaseEvent
      * @return  array
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getQuery(): array
     {
@@ -48,6 +52,8 @@ class AfterRouteBuildEvent extends BaseEvent
      * @return  string
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getUrl(): string
     {

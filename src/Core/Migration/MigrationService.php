@@ -426,6 +426,9 @@ class MigrationService implements EventAwareInterface
         return $version;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function ignores(array $ignoreVersions): void
     {
         $this->ignoreVersions = $ignoreVersions;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Core\Application\Stub;
+namespace Windwalker\Tests\Testing\Stub;
 
 use Psr\Log\LogLevel;
 use Stringable;

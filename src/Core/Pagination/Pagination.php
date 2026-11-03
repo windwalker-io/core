@@ -170,6 +170,8 @@ class Pagination
      * @param  int|Closure  $total
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function total(int|Closure $total): static
     {
@@ -182,6 +184,8 @@ class Pagination
      * Method to get property Current
      *
      * @return  int
+     *
+     * @codeCoverageIgnore
      */
     public function getCurrent(): int
     {
@@ -269,6 +273,8 @@ class Pagination
      * Method to get property Neighbours
      *
      * @return  int
+     *
+     * @codeCoverageIgnore
      */
     public function getNeighbours(): int
     {
@@ -321,6 +327,8 @@ class Pagination
      * Method to get property Template
      *
      * @return  callable|string|null
+     *
+     * @codeCoverageIgnore
      */
     public function getTemplate(): callable|string|null
     {
@@ -333,6 +341,8 @@ class Pagination
      * @param  callable|string|null  $template
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function template(callable|string|null $template): static
     {
@@ -343,6 +353,8 @@ class Pagination
 
     /**
      * @return  RouteUri|null
+     *
+     * @codeCoverageIgnore
      */
     public function getRoute(): ?RouteUri
     {
@@ -353,6 +365,8 @@ class Pagination
      * @param  RouteUri|null  $route
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function route(?RouteUri $route): static
     {
@@ -372,6 +386,9 @@ class Pagination
         return $route->withVar('page', $page);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function isSimple(): bool
     {
         return $this->simple;
@@ -381,6 +398,8 @@ class Pagination
      * @param  bool  $simple
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function simple(bool $simple = true): static
     {

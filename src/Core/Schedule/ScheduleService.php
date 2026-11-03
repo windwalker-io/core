@@ -16,6 +16,9 @@ class ScheduleService
 
     public function __construct(protected ApplicationInterface $app) {}
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getScheduleRoutes(): array
     {
         return (array) $this->app->config('schedules');

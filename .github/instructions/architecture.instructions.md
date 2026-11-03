@@ -26,6 +26,27 @@ changing applications, providers, routing, controllers, views, or packages.
   `Runtime::getContainer()` inside request-scoped code when `AppContext` or
   injection is available.
 
+## Paths and debug mode
+
+- `WINDWALKER_*` constants (`WINDWALKER_ROOT`, `WINDWALKER_CACHE`,
+  `WINDWALKER_TEMP`, `WINDWALKER_RESOURCES`, `WINDWALKER_DEBUG`, ...) are
+  defined by and scoped to the host app's bootstrap; they are not part of
+  Core's internal API.
+- Inside `src/`, resolve filesystem paths through `PathResolver`
+  (`$app->path('@root/...')` or inject `PathResolver`) instead of referencing
+  `WINDWALKER_*` path constants directly.
+- Inside `src/`, read debug mode via `ApplicationInterface::isDebug()`
+  (`$app->isDebug()`) instead of reading `WINDWALKER_DEBUG` directly.
+- Existing `WINDWALKER_*` usages in `src/` predate this rule; do not copy them
+  as a pattern for new code, and prefer `PathResolver`/`isDebug()` when
+  touching that code.
+- When fixing an existing `WINDWALKER_*` usage: if `PathResolver` /
+  `ApplicationInterface` can be injected or otherwise obtained correctly at
+  that location, replace it directly. If the code runs in an isolated context
+  where injection isn't possible (e.g. before the container/app exists, a
+  static/global context, or a class outside the DI graph), do not guess a
+  workaround — ask the user how to proceed.
+
 ## Extension points
 
 - Add lifecycle hooks as typed events in `src/Core/Events/` (or a feature's

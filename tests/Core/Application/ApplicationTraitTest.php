@@ -13,12 +13,12 @@ use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Tests\Core\Application\Stub\AnotherEventAwareStub;
-use Windwalker\Tests\Core\Application\Stub\ApplicationTraitStub;
 use Windwalker\Tests\Core\Application\Stub\DeferredBootProviderStub;
 use Windwalker\Tests\Core\Application\Stub\EventAwareStub;
 use Windwalker\Tests\Core\Application\Stub\InvokableListenerStub;
 use Windwalker\Tests\Core\Application\Stub\SubscriberStub;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
+use Windwalker\Tests\Testing\Stub\ApplicationTraitStub;
 
 /**
  * Unit tests for the uncovered ApplicationTrait branches that are not already

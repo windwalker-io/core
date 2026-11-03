@@ -12,11 +12,17 @@ class PackageDbMigrate
 
     public function __construct(public string $version = '') {}
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getMigrationFiles(): array
     {
         return $this->migrationFiles;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function migrationFiles(string ...$migrationFiles): static
     {
         $this->migrationFiles = $migrationFiles;
@@ -24,11 +30,17 @@ class PackageDbMigrate
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getEntitiesShouldChecks(): array
     {
         return $this->entities;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function checkEntitiesNotOverrides(string ...$entities): static
     {
         $this->entities = $entities;
@@ -36,6 +48,9 @@ class PackageDbMigrate
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getVersion(): string
     {
         return $this->version;

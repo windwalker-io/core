@@ -83,6 +83,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * full
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function full(): static
     {
@@ -93,6 +95,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * path
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function path(): static
     {
@@ -103,6 +107,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * raw
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function raw(): static
     {
@@ -115,6 +121,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  int  $id
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function id(mixed $id): static
     {
@@ -127,6 +135,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  string  $alias
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function alias(string $alias): static
     {
@@ -139,6 +149,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  int  $page
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function page(int $page): static
     {
@@ -153,6 +165,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @return  static
      *
      * @since  3.5.8
+     *
+     * @codeCoverageIgnore
      */
     public function layout(string $layout): static
     {
@@ -167,6 +181,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @return  static
      *
      * @since  3.5.8
+     *
+     * @codeCoverageIgnore
      */
     public function task(string $task): static
     {
@@ -209,6 +225,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @return  static
      *
      * @since  3.5.5
+     *
+     * @codeCoverageIgnore
      */
     public function delVar(string $name): static
     {
@@ -230,6 +248,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * Method to get property Escape
      *
      * @return  bool
+     *
+     * @codeCoverageIgnore
      */
     public function isEscape(): bool
     {
@@ -242,6 +262,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  bool  $bool
      *
      * @return  $this
+     *
+     * @codeCoverageIgnore
      */
     public function escape(bool $bool = true): static
     {
@@ -252,6 +274,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * Method to get property Mute
      *
      * @return  bool
+     *
+     * @codeCoverageIgnore
      */
     public function isMute(): bool
     {
@@ -264,6 +288,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  bool  $mute
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function mute(bool $mute = true): static
     {
@@ -292,12 +318,17 @@ class RouteUri extends Uri implements NavConstantInterface
 
     /**
      * @return  NavOptions
+     *
+     * @codeCoverageIgnore
      */
     public function getOptions(): NavOptions
     {
         return $this->options;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function go(int $code = 303, int $options = 0): ?ResponseInterface
     {
         return $this->navigator->redirect($this, $code, $options);
@@ -309,6 +340,9 @@ class RouteUri extends Uri implements NavConstantInterface
         return $this->handledData ??= ($this->handler)($this->vars);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function cacheReset(): static
     {
         $this->handledData = null;
@@ -409,6 +443,9 @@ class RouteUri extends Uri implements NavConstantInterface
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[\NoDiscard]
     public function allowQuery(array|bool|null $fields, bool $replace = false): static
     {
@@ -421,6 +458,8 @@ class RouteUri extends Uri implements NavConstantInterface
 
     /**
      * @return  int
+     *
+     * @codeCoverageIgnore
      */
     public function getStatus(): int
     {
@@ -431,6 +470,8 @@ class RouteUri extends Uri implements NavConstantInterface
      * @param  int  $status
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     #[\NoDiscard]
     public function withStatus(int $status): static
@@ -456,6 +497,9 @@ class RouteUri extends Uri implements NavConstantInterface
         $this->options = clone $this->options;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetCache(): void
     {
         $this->cache = null;

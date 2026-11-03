@@ -27,6 +27,8 @@ class PrepareRouteBuildEvent extends BaseEvent
      * @return  string
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getRoute(): string
     {
@@ -37,6 +39,8 @@ class PrepareRouteBuildEvent extends BaseEvent
      * @return  array
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getQuery(): array
     {

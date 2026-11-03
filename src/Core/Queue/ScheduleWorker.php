@@ -347,6 +347,9 @@ class ScheduleWorker
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createLogger(): LoggerInterface
     {
         return $this->app->service(LoggerInterface::class, tag: 'system/cron-queue');

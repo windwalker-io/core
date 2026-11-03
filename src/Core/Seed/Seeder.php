@@ -23,6 +23,8 @@ class Seeder extends AbstractSeeder
      * @param  callable  $import
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function import(callable $import): static
     {
@@ -35,6 +37,8 @@ class Seeder extends AbstractSeeder
      * @param  callable  $clear
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function clear(callable $clear): static
     {
@@ -43,11 +47,17 @@ class Seeder extends AbstractSeeder
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getImportHandler(): ?\Closure
     {
         return $this->importHandler;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getClearHandler(): ?\Closure
     {
         return $this->clearHandler;

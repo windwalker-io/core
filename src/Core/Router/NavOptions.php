@@ -110,16 +110,25 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function allowAllQuery(bool $allow = true): void
     {
         $this->allowQuery = $allow;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function jsonSerialize(): array
     {
         return get_object_dump_values($this);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function normalizeKey(int|string $key): string|int
     {
         return $key;

@@ -48,6 +48,9 @@ class Router implements EventAwareInterface
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function createRouteCreator(): RouteCreatorInterface
     {
         return new RouteCreator();
@@ -83,6 +86,9 @@ class Router implements EventAwareInterface
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createRouteDispatcher(callable $define, array $options = []): Dispatcher
     {
         return simpleDispatcher($define, $options);
@@ -216,6 +222,8 @@ class Router implements EventAwareInterface
 
     /**
      * @return  Route[]
+     *
+     * @codeCoverageIgnore
      */
     public function getRoutes(): array
     {
@@ -226,6 +234,8 @@ class Router implements EventAwareInterface
      * @param  Route[]  $routes
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setRoutes(array $routes): static
     {

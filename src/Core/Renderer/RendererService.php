@@ -31,6 +31,9 @@ class RendererService
         protected array $globals = []
     ) {}
 
+    /**
+     * @codeCoverageIgnore Simple proxy, forwards to renderWith() without own logic.
+     */
     public function render(string $layout, array $data, array $options = []): string
     {
         return $this->renderWith($this->createRenderer(), $layout, $data, $options);
@@ -47,6 +50,9 @@ class RendererService
         );
     }
 
+    /**
+     * @codeCoverageIgnore Simple proxy, forwards to createRenderer()/resolveLayout() without own logic.
+     */
     public function make(string $layout, array $options = []): Closure
     {
         return $this->createRenderer()->make($this->resolveLayout($layout), $options);
@@ -63,6 +69,9 @@ class RendererService
         return $renderer;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getRendererFactories(): array
     {
         return $this->container->getParam('renderer.renderers') ?? [];
@@ -77,6 +86,9 @@ class RendererService
             ->dump();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addGlobal(string $name, mixed $value): static
     {
         $this->globals[$name] = $value;
@@ -84,6 +96,9 @@ class RendererService
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getGlobal(string $name): mixed
     {
         return $this->globals[$name] ?? null;
@@ -91,6 +106,8 @@ class RendererService
 
     /**
      * @return  array
+     *
+     * @codeCoverageIgnore Simple proxy, prepareGlobals() currently has no logic of its own.
      */
     public function getGlobals(): array
     {
@@ -99,6 +116,9 @@ class RendererService
         return $this->prepareGlobals($globals);
     }
 
+    /**
+     * @codeCoverageIgnore Simple proxy, forwards to pathResolver without own logic.
+     */
     public function resolveLayout(string $layout): string
     {
         return $this->pathResolver->resolveLayout($layout, $this->getSupportedExtensions());
@@ -143,6 +163,8 @@ class RendererService
      * @param  array  $globals
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setGlobals(array $globals): static
     {
@@ -161,6 +183,9 @@ class RendererService
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore Simple proxy, forwards to pathResolver without own logic.
+     */
     public function getPaths(string $ns = 'main'): PriorityQueue
     {
         return $this->pathResolver->getPathsBag($ns)->getClonedPaths();

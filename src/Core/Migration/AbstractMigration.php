@@ -80,6 +80,8 @@ abstract class AbstractMigration
 
     /**
      * @return  array{ \ReflectionMethod, \ReflectionAttribute<object> }|null
+     *
+     * @codeCoverageIgnore
      */
     protected function getReflectionMethod(string $attr): ?array
     {
@@ -97,6 +99,8 @@ abstract class AbstractMigration
      * @param  string  $name
      *
      * @return  TableManager
+     *
+     * @codeCoverageIgnore
      */
     public function getTable(string $name): TableManager
     {
@@ -111,6 +115,8 @@ abstract class AbstractMigration
      * @param  array     $options
      *
      * @return  TableManager
+     *
+     * @codeCoverageIgnore
      */
     public function createTable(string $name, callable $callback, array $options = []): TableManager
     {
@@ -124,6 +130,8 @@ abstract class AbstractMigration
      * @param  callable  $callback
      *
      * @return  TableManager
+     *
+     * @codeCoverageIgnore
      */
     public function updateTable(string $name, callable $callback): TableManager
     {
@@ -138,6 +146,8 @@ abstract class AbstractMigration
      * @param  array     $options
      *
      * @return  TableManager
+     *
+     * @codeCoverageIgnore
      */
     public function saveTable(string $name, callable $callback, $options = []): TableManager
     {

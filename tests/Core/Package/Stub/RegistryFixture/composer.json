@@ -1,0 +1,10 @@
+{
+    "name": "acme/root",
+    "extra": {
+        "windwalker": {
+            "packages": [
+                "Windwalker\\Tests\\Core\\Package\\Stub\\NamedPackage"
+            ]
+        }
+    }
+}

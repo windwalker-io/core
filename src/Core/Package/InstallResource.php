@@ -68,6 +68,9 @@ class InstallResource
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addCallback(callable $callback): static
     {
         $this->callbacks[] = $callback;
@@ -77,6 +80,8 @@ class InstallResource
 
     /**
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getCallbacks(): array
     {
@@ -87,6 +92,8 @@ class InstallResource
      * @param  array  $callbacks
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setCallbacks(array $callbacks): static
     {

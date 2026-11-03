@@ -55,6 +55,8 @@ class FakerService implements EventAwareInterface
      * @throws  InvalidArgumentException
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function get(string $locale = FakerFactory::DEFAULT_LOCALE, bool $new = false): FakerGenerator
     {

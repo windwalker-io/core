@@ -33,6 +33,8 @@ class MigrationExistsException extends RuntimeException
 
     /**
      * @return  Migration
+     *
+     * @codeCoverageIgnore
      */
     public function getMigration(): AbstractMigration
     {

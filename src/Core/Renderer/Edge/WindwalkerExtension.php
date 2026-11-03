@@ -44,6 +44,8 @@ class WindwalkerExtension implements
      * getName
      *
      * @return  string
+     *
+     * @codeCoverageIgnore
      */
     public function getName(): string
     {
@@ -54,6 +56,8 @@ class WindwalkerExtension implements
      * getDirectives
      *
      * @return  callable[]
+     *
+     * @codeCoverageIgnore Simple declarative wiring, no own logic.
      */
     public function getDirectives(): array
     {
@@ -350,6 +354,8 @@ class WindwalkerExtension implements
 
     /**
      * @inheritDoc
+     *
+     * @codeCoverageIgnore Simple declarative wiring, no own logic.
      */
     public function getParsers(): array
     {

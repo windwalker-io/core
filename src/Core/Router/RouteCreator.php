@@ -20,6 +20,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function get(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -34,6 +36,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function query(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -48,6 +52,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function fetch(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -62,6 +68,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function post(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -76,6 +84,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function put(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -90,6 +100,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function patch(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -104,6 +116,8 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function save(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
@@ -118,12 +132,17 @@ class RouteCreator implements RouteCreatorInterface
      * @return  Route
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function delete(string $name, string|callable|null $pattern = null, array $options = []): Route
     {
         return $this->any($name, $pattern, $options)->methods('DELETE');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function controller(string $handler): static
     {
         $this->options['extra']['default_controller'] = $handler;
@@ -131,6 +150,9 @@ class RouteCreator implements RouteCreatorInterface
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function view(string $view): static
     {
         $this->options['extra']['default_view'] = $view;

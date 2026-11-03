@@ -124,6 +124,7 @@ class ScheduleEvent extends ScheduleExpression
      *
      * @return  static  Return self to support chaining.
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function handler(callable $handler): static
@@ -138,6 +139,7 @@ class ScheduleEvent extends ScheduleExpression
      *
      * @return  array
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function getTags(): array
@@ -152,6 +154,7 @@ class ScheduleEvent extends ScheduleExpression
      *
      * @return  static  Return self to support chaining.
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function setTags(array $tags): static
@@ -166,6 +169,7 @@ class ScheduleEvent extends ScheduleExpression
      *
      * @return  string
      *
+     * @codeCoverageIgnore
      * @since  3.5.6
      */
     public function getName(): string
@@ -180,6 +184,7 @@ class ScheduleEvent extends ScheduleExpression
      *
      * @return  static  Return self to support chaining.
      *
+     * @codeCoverageIgnore
      * @since  3.5.6
      */
     public function name(string $name): static
@@ -189,11 +194,17 @@ class ScheduleEvent extends ScheduleExpression
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getCatch(): ?\Closure
     {
         return $this->catch ?? null;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function catch(\Closure $catch): static
     {
         $this->catch = $catch;

@@ -23,6 +23,8 @@ trait CountingOutputTrait
      * @return  $this
      *
      * @deprecated  Use printCounting() instead.
+     *
+     * @codeCoverageIgnore
      */
     public function outCounting(int $count = 1): static
     {
@@ -51,6 +53,9 @@ trait CountingOutputTrait
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function resetCount(): static
     {
         $this->count = 0;

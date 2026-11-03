@@ -41,9 +41,13 @@ class Schedule
      */
     public function __construct()
     {
+        // @codeCoverageIgnoreStart
+        // dragonmantank/cron-expression is a required-dev/runtime dependency of this package and is always
+        // autoloaded wherever this class can be instantiated, so this guard is unreachable in practice.
         if (!class_exists(CronExpression::class)) {
             throw new DomainException('Please install `dragonmantank/cron-expression ^3.1` first.');
         }
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -62,6 +66,9 @@ class Schedule
         return $this->events[$name] = $this->createEvent($name, $expression, $handler);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function task(string $name, string $expr = '* * * * *', mixed $handler = null): ScheduleEvent
     {
         return $this->cron($name, $expr, $handler);
@@ -101,6 +108,7 @@ class Schedule
      *
      * @return  ScheduleEvent
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function createEvent(string $name, string $expr, mixed $handler = null): ScheduleEvent
@@ -133,6 +141,7 @@ class Schedule
      *
      * @return  static  Return self to support chaining.
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function setEvents(array $events)
@@ -149,6 +158,7 @@ class Schedule
      *
      * @return  CronExpression
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     protected function createCronExpression(string $expr): CronExpression

@@ -44,6 +44,8 @@ class PaginationFactory
 
     /**
      * @return  callable|string|null
+     *
+     * @codeCoverageIgnore
      */
     public function getDefaultTemplate(): callable|string|null
     {
@@ -54,6 +56,8 @@ class PaginationFactory
      * @param  callable|string|null  $defaultTemplate
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setDefaultTemplate(callable|string|null $defaultTemplate): static
     {
@@ -64,6 +68,8 @@ class PaginationFactory
 
     /**
      * @return  int
+     *
+     * @codeCoverageIgnore
      */
     public function getDefaultNeighbours(): int
     {
@@ -74,6 +80,8 @@ class PaginationFactory
      * @param  int  $defaultNeighbours
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setDefaultNeighbours(int $defaultNeighbours): static
     {

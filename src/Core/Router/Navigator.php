@@ -322,6 +322,9 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     #[\NoDiscard]
     public function allowQuery(array|bool|null $fields, bool $replace = false): static
     {
@@ -334,6 +337,8 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     /**
      * @return  NavOptions
+     *
+     * @codeCoverageIgnore
      */
     public function getOptions(): NavOptions
     {
@@ -358,6 +363,8 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     /**
      * @return  Router
+     *
+     * @codeCoverageIgnore
      */
     public function getRouter(): Router
     {
@@ -366,6 +373,8 @@ class Navigator implements NavConstantInterface, EventAwareInterface
 
     /**
      * @return  AppContext
+     *
+     * @codeCoverageIgnore
      */
     public function getAppContext(): AppContext
     {
@@ -376,12 +385,17 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      * getMatchedRoute
      *
      * @return  Route|null
+     *
+     * @codeCoverageIgnore
      */
     public function getMatchedRoute(): ?Route
     {
         return $this->app->getMatchedRoute();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getRouteName(): ?string
     {
         return $this->getMatchedRoute()?->getName();

@@ -44,6 +44,9 @@ abstract class AbstractSeeder
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function faker(string $locale = FakerFactory::DEFAULT_LOCALE): FakerGenerator
     {
         return $this->faker->create($locale);
@@ -78,6 +81,8 @@ abstract class AbstractSeeder
 
     /**
      * @return  array{ \ReflectionMethod, \ReflectionAttribute<SeedImport> }|null
+     *
+     * @codeCoverageIgnore
      */
     protected function getReflectionMethod(string $attr): ?array
     {

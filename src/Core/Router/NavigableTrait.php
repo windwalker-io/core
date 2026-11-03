@@ -11,6 +11,9 @@ trait NavigableTrait
     #[Inject]
     protected Navigator $nav;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getNav(): Navigator
     {
         return $this->nav;

@@ -162,6 +162,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getFirst(): ?PageItem
     {
@@ -170,6 +172,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getLess(): ?PageItem
     {
@@ -178,6 +182,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getPrevious(): ?PageItem
     {
@@ -186,6 +192,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem[]
+     *
+     * @codeCoverageIgnore
      */
     public function getLowers(): array
     {
@@ -194,6 +202,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getCurrent(): ?PageItem
     {
@@ -202,6 +212,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem[]
+     *
+     * @codeCoverageIgnore
      */
     public function getHighers(): array
     {
@@ -210,6 +222,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getNext(): ?PageItem
     {
@@ -218,6 +232,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getMore(): ?PageItem
     {
@@ -226,6 +242,8 @@ class PaginationResult implements JsonSerializable, IteratorAggregate
 
     /**
      * @return  PageItem|null
+     *
+     * @codeCoverageIgnore
      */
     public function getLast(): ?PageItem
     {

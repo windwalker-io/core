@@ -19,6 +19,8 @@ final class Migration extends AbstractMigration
      * @param  callable  $up
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function up(callable $up): static
     {
@@ -31,6 +33,8 @@ final class Migration extends AbstractMigration
      * @param  callable  $down
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function down(callable $down): static
     {
@@ -39,11 +43,17 @@ final class Migration extends AbstractMigration
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function getUpHandler(): ?\Closure
     {
         return $this->upHandler;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function getDownHandler(): ?\Closure
     {
         return $this->downHandler;

@@ -1,0 +1,17 @@
+{
+    "packages": [
+        {
+            "name": "acme/with-composer-json",
+            "extra": {
+                "windwalker": {
+                    "packages": [
+                        "Windwalker\\Tests\\Core\\Package\\Stub\\WithComposerJson\\Src\\WithComposerJsonPackage"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "acme/no-windwalker-extra"
+        }
+    ]
+}

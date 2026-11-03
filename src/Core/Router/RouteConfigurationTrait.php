@@ -210,6 +210,8 @@ trait RouteConfigurationTrait
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function var(string $name, mixed $value): static
     {
@@ -242,13 +244,15 @@ trait RouteConfigurationTrait
     }
 
     /**
-     * matchHook
+     * hooks
      *
      * @param  callable[]  $hooks
      *
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function hooks(array $hooks): static
     {
@@ -265,6 +269,8 @@ trait RouteConfigurationTrait
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function matchHook(callable $callable): static
     {
@@ -281,6 +287,8 @@ trait RouteConfigurationTrait
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function buildHook(callable $callable): static
     {
@@ -403,6 +411,8 @@ trait RouteConfigurationTrait
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function scheme(string $value): static
     {
@@ -416,6 +426,9 @@ trait RouteConfigurationTrait
         return $this->options['scheme'] ?? null;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function host(string $value): static
     {
         $this->options['hosts'][] = $value;
@@ -499,6 +512,8 @@ trait RouteConfigurationTrait
      * @return  self
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function clear(string $name): self
     {

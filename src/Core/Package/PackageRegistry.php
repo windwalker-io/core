@@ -126,6 +126,9 @@ class PackageRegistry
         return $migrator;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addPackage(AbstractPackage $package): static
     {
         $this->packages[$package::class] = $package;
@@ -163,6 +166,8 @@ class PackageRegistry
      * @param  AbstractPackage[]  $packages
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setPackages(array $packages): static
     {

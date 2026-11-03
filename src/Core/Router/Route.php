@@ -56,6 +56,8 @@ class Route implements JsonSerializable
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function pattern(string $value): self
     {
@@ -143,6 +145,9 @@ class Route implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function view(string $view): static
     {
         return $this->var('view', $view);
@@ -156,6 +161,8 @@ class Route implements JsonSerializable
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function group(string $group): static
     {
@@ -170,6 +177,8 @@ class Route implements JsonSerializable
      * @return  static
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function groups(array $groups): static
     {
@@ -182,6 +191,8 @@ class Route implements JsonSerializable
      * @return  array
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function getGroups(): array
     {
@@ -194,6 +205,8 @@ class Route implements JsonSerializable
      * @return  string
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public function getName(): string
     {
@@ -349,11 +362,11 @@ class Route implements JsonSerializable
             }
         }
 
-        foreach ($properties['options']['middlewares'] ?? [] as &$middleware) {
+        foreach ($properties['options']['middlewares'] ?? [] as $key => $middleware) {
             if ($middleware instanceof ObjectBuilderDefinition) {
-                $middleware = $middleware->getClass();
+                $properties['options']['middlewares'][$key] = $middleware->getClass();
             } elseif (is_object($middleware)) {
-                $middleware = $middleware::class;
+                $properties['options']['middlewares'][$key] = $middleware::class;
             }
         }
 

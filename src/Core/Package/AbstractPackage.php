@@ -35,6 +35,9 @@ abstract class AbstractPackage
         return $name ?? StrNormalize::toKebabCase(Str::removeRight(static::class, 'Package'));
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function version(): string
     {
         return InstalledVersions::getPrettyVersion(static::getName());
@@ -109,6 +112,8 @@ abstract class AbstractPackage
      * @return  string
      *
      * @since  3.5
+     *
+     * @codeCoverageIgnore
      */
     public static function fileName(): string
     {
@@ -121,6 +126,8 @@ abstract class AbstractPackage
      * @return  string
      *
      * @since  3.1
+     *
+     * @codeCoverageIgnore
      */
     public static function namespace(): string
     {

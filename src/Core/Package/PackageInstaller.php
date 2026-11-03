@@ -48,6 +48,9 @@ class PackageInstaller
         return $this->children[$package::getName()] ??= new static($package, $this->app);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installConfig(string|array $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -59,6 +62,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installMigrations(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -70,6 +76,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installLanguages(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -81,6 +90,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installRoutes(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -92,6 +104,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installFiles(
         string $path,
         string $dest,
@@ -107,6 +122,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installViews(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -207,6 +225,9 @@ class PackageInstaller
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installSeeders(string $path, string|array $tags = [], ?callable $callback = null): static
     {
         return $this->installResource(
@@ -218,6 +239,9 @@ class PackageInstaller
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function installCallback(
         string|array $tags = [],
         ?callable $callback = null

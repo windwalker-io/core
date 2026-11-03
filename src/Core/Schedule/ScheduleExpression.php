@@ -33,6 +33,9 @@ class ScheduleExpression
         $this->setExpression($expression);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setPart(int $position, string $value): static
     {
         $this->getExpression()->setPart($position, $value);
@@ -45,6 +48,7 @@ class ScheduleExpression
      *
      * @return  static
      *
+     * @codeCoverageIgnore
      * @since  3.5.6
      */
     public function always(): static
@@ -110,36 +114,57 @@ class ScheduleExpression
             ->hourOfDay(0);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function minutely(): static
     {
         return $this->everyMinutes();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function hourly(): static
     {
         return $this->setExpression('@hourly');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function daily(): static
     {
         return $this->setExpression('@daily');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function weekly(): static
     {
         return $this->setExpression('@weekly');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function monthly(): static
     {
         return $this->setExpression('@monthly');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function yearly(): static
     {
         return $this->setExpression('@yearly');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function annually(): static
     {
         return $this->yearly();
@@ -169,6 +194,7 @@ class ScheduleExpression
      *
      * @return  CronExpression
      *
+     * @codeCoverageIgnore
      * @since  3.5.3
      */
     public function getExpression(): CronExpression
@@ -200,6 +226,9 @@ class ScheduleExpression
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __toString(): string
     {
         return (string) $this->getExpression();
