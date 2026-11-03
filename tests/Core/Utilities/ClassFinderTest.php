@@ -25,7 +25,7 @@ class ClassFinderTest extends TestCase
     #[Before]
     protected function prepareFixtures(): void
     {
-        $this->tmpDir = WINDWALKER_TEMP . '/ww-class-finder-test-' . uniqid('', true);
+        $this->tmpDir = sys_get_temp_dir() . '/ww-class-finder-test-' . uniqid('', true);
 
         mkdir($this->tmpDir . '/Sub', 0777, true);
 

@@ -14,8 +14,8 @@ use RuntimeException;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Tests\Testing\Stub\ApplicationTraitStub;
-use Windwalker\Tests\Testing\Traits\InMemoryDatabaseTestTrait;
+use Windwalker\Core\Testing\Stub\ApplicationTraitStub;
+use Windwalker\Core\Testing\Traits\InMemoryDatabaseTestTrait;
 
 /**
  * Unit tests for MigrationService's public migrate/version-tracking API,

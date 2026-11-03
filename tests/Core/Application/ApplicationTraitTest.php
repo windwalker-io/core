@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Application;
 
+use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,8 @@ use Windwalker\Core\Application\AppClient;
 use Windwalker\Core\Application\AppType;
 use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\Offline\MaintenanceManager;
+use Windwalker\Core\Application\PathResolver;
+use Windwalker\Core\Testing\Traits\ServiceAwareTestTrait;
 use Windwalker\Event\Attributes\ListenTo;
 use Windwalker\Tests\Core\Application\Stub\AnotherEventAwareStub;
 use Windwalker\Tests\Core\Application\Stub\DeferredBootProviderStub;
@@ -18,7 +21,8 @@ use Windwalker\Tests\Core\Application\Stub\EventAwareStub;
 use Windwalker\Tests\Core\Application\Stub\InvokableListenerStub;
 use Windwalker\Tests\Core\Application\Stub\SubscriberStub;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
-use Windwalker\Tests\Testing\Stub\ApplicationTraitStub;
+use Windwalker\Core\Testing\Stub\ApplicationTraitStub;
+use Windwalker\Tests\TestApp;
 
 /**
  * Unit tests for the uncovered ApplicationTrait branches that are not already
@@ -26,6 +30,14 @@ use Windwalker\Tests\Testing\Stub\ApplicationTraitStub;
  */
 class ApplicationTraitTest extends TestCase
 {
+    use ServiceAwareTestTrait;
+
+    #[Before]
+    public function prepareDependencies()
+    {
+        self::$container->prepareSharedObject(PathResolver::class);
+    }
+
     #[Test]
     #[DataProvider('typeProvider')]
     public function getTypeResolvesFromClientAndRuntime(
@@ -77,10 +89,9 @@ class ApplicationTraitTest extends TestCase
     #[Test]
     public function isMaintenanceResolvesMaintenanceManager(): void
     {
-        $app = TestWebAppFactory::create();
-        $app->getContainer()->prepareSharedObject(MaintenanceManager::class);
+        self::$container->prepareSharedObject(MaintenanceManager::class);
 
-        self::assertFalse($app->isMaintenance());
+        self::assertFalse(static::$appContext->isMaintenance());
     }
 
     #[Test]

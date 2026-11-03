@@ -12,7 +12,7 @@ use Windwalker\Authentication\AuthResult;
 use Windwalker\Core\Auth\Method\DatabaseMethod;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Tests\Testing\Traits\InMemoryDatabaseTestTrait;
+use Windwalker\Core\Testing\Traits\InMemoryDatabaseTestTrait;
 
 #[CoversClass(DatabaseMethod::class)]
 class DatabaseMethodTest extends TestCase

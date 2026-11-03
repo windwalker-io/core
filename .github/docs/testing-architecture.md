@@ -17,7 +17,7 @@ Pick the lowest tier that covers the behavior.
 |------|-------|---------|-----------|
 | 1. Unit with doubles | nothing | one class with mocked collaborators (factories, services, form, managers) | [`tests/Core/Form/FormFactoryTest.php`](../../tests/Core/Form/FormFactoryTest.php) |
 | 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application/) with [`TestWebAppFactory`](../../tests/Core/Application/Stub/TestWebAppFactory.php) |
-| 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`tests/TestApp.php`](../../tests/TestApp.php), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `DITestTrait`, `ControllerTestTrait` |
+| 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`src/Core/Testing/AbstractTestApp.php`](../../src/Core/Testing/AbstractTestApp.php), [`tests/TestApp.php`](../../tests/TestApp.php) (reference example), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `ServiceAwareTestTrait`, `ControllerTestTrait` |
 | 4. Database | disposable DB, DSN or host DB config | ORM, migrations, seeders, query behavior | `DatabaseTestTrait` (see [`../instructions/test.instructions.md`](../instructions/test.instructions.md)) |
 
 Tiers 3 and 4 depend on a host app; never make tier 1 or 2 tests depend on one.
@@ -77,18 +77,20 @@ needs the request pipeline in tier 2, and only ORM/DB behavior in tier 4.
   instances differ; app-scoped services must be the same.
 - Inject the request through `createContext($request)` rather than touching
   globals.
-- In tier 3, `TestApp::prepareSharedContext()` sets the static
-  `TestApp::$sharedCtx` and `TestApp::$ctx`; `dispatchWithInput()` swaps the request and
-  controller and restores them afterwards. Do not rely on state left by a
-  previous test.
+- In tier 3, `AbstractTestApp::prepareSharedContext()` sets the static
+  `AbstractTestApp::$sharedCtx` and `::$ctx` (shared storage with any
+  subclass, such as `TestApp`, that does not redeclare them);
+  `dispatchWithInput()` swaps the request and controller and restores them
+  afterwards. Do not rely on state left by a previous test.
 - Debug output: the test context disables the debug profiler
   (`disableDebugProfiler(true)`); tier 2 apps use `'debug' => false`. Set
   `'debug' => true` only to test debug-mode error propagation.
 
 ## Composing request-layer providers and bindings per test
 
-Tier 3's `TestApp` boots the host app once and keeps a single
-process-wide `AppContext` (`TestApp::$instance`/`$ctx`); tests that need
+Tier 3's `TestApp` (an `AbstractTestApp` subclass) boots the host app once
+and keeps a single process-wide `AppContext`
+(`AbstractTestApp::$instance`/`$ctx`); tests that need
 their own request-level providers or bindings do not have to reboot the
 application to get them. `WebApplication::boot()` is one-shot (levels 1-2,
 RUNTIME → APP), but `createContext()` creates a fresh level 3 child
@@ -104,7 +106,7 @@ creation:
 
 - **Per test class**: build the custom context once in a `#[BeforeClass]`
   hook and store it in a static property, the same pattern
-  `DITestTrait` already uses for its child container. Cheaper,
+  `ServiceAwareTestTrait` already uses for its child container. Cheaper,
   but every test method in the class shares the same providers/bindings.
 - **Per test method**: rebuild the context in a `#[Before]` hook (runs
   before every test method) and store it in an *instance* property instead
@@ -145,7 +147,7 @@ A view model is a plain class with `#[ViewModel]` and a `prepare()` method (or
 ## Fixtures
 
 - Mandatory rules for where to put a new Stub/Mock class (check
-  `tests/Testing/Stub/` first, when to promote a scoped one) are in
+  `src/Core/Testing/Stub/` first, when to promote a scoped one) are in
   [test.instructions.md's "Stubs and mocks" section](../instructions/test.instructions.md#stubs-and-mocks);
   read it before adding a new double.
 - Keep tests free of host-specific names, routes, and config; the stub app

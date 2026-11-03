@@ -14,7 +14,7 @@ use Windwalker\Core\Application\MiddlewareRunner;
 use Windwalker\DI\Container;
 use Windwalker\Http\Request\ServerRequest;
 use Windwalker\Http\Response\Response;
-use Windwalker\Tests\Testing\Stub\PassThroughMiddleware;
+use Windwalker\Core\Testing\Stub\PassThroughMiddleware;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
 class MiddlewareRunnerTest extends TestCase

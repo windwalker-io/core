@@ -2,23 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Traits;
+namespace Windwalker\Core\Testing\Traits;
 
 use PHPUnit\Framework\Attributes\BeforeClass;
 use ReflectionException;
-use Windwalker\Tests\TestApp;
 use UnitEnum;
-use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Testing\AbstractTestApp;
 use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\DI\Exception\DependencyResolutionException;
-use Windwalker\ORM\ORM;
+use Windwalker\Tests\TestApp;
 
-trait DITestTrait
+/**
+ * Creates a per-test-class child container from the shared app-backed test
+ * context and exposes `make()`, `retrieve()`, and `call()` against it.
+ *
+ * Requires the consuming test suite to have a {@see AbstractTestApp}
+ * subclass bootstrapped and `AbstractTestApp::$ctx` prepared before this
+ * trait's `#[BeforeClass]` hook runs; it does not bootstrap the application
+ * itself.
+ */
+trait ServiceAwareTestTrait
 {
     protected static Container $container;
+
+    protected static AppContext $appContext;
 
     /**
      * Create a new child container from every test class and store it in a static property.
@@ -28,22 +39,12 @@ trait DITestTrait
      * @throws  \Windwalker\DI\Exception\DefinitionException
      */
     #[BeforeClass(priority: 100)]
-    public static function prepareChildContainer(): void
+    public static function prepareAppContext(): void
     {
-        $parentContainer = TestApp::$ctx->container;
+        $ctx = TestApp::prepareTestContext();
 
-        static::$container = $parentContainer->createChild();
-
-        // Keep the ORM and DatabaseAdapter always one instance in the child container.
-        static::$container->share(
-            ORM::class,
-            fn() => $parentContainer->get(ORM::class)
-        );
-
-        static::$container->share(
-            DatabaseAdapter::class,
-            fn() => $parentContainer->get(DatabaseAdapter::class)
-        );
+        static::$container = $ctx->container;
+        static::$appContext = $ctx;
     }
 
     /**
@@ -79,13 +80,13 @@ trait DITestTrait
         mixed $callable,
         array $args = [],
         ?object $context = null,
-        DIOptions $options = new DIOptions()
+        DIOptions $options = new DIOptions(),
     ) {
         return static::$container->call(
             $callable,
             $args,
             $context,
-            $options
+            $options,
         );
     }
 }

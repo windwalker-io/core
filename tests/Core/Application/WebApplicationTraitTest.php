@@ -29,7 +29,7 @@ use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Http\Response\Response;
 use Windwalker\Http\Response\TextResponse;
 use Windwalker\Stream\Stream;
-use Windwalker\Tests\Testing\Stub\SpyLogger;
+use Windwalker\Core\Testing\Stub\SpyLogger;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 use Windwalker\Uri\Uri;
 

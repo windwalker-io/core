@@ -51,6 +51,10 @@ class ComponentFinder
 
     public function getCache(): CachePool
     {
+        if (!defined('WINDWALKER_ROOT')) {
+            define('WINDWALKER_ROOT', $this->pathResolver->resolve('@root'));
+        }
+
         return $this->cache ??= new CachePool(
             new PhpFileStorage(
                 $this->getCachePath(),

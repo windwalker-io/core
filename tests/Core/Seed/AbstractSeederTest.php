@@ -14,7 +14,7 @@ use Windwalker\Core\Seed\FakerService;
 use Windwalker\Core\Seed\SeedClear;
 use Windwalker\Core\Seed\SeedImport;
 use Windwalker\Database\DatabaseAdapter;
-use Windwalker\Tests\Testing\Traits\InMemoryDatabaseTestTrait;
+use Windwalker\Core\Testing\Traits\InMemoryDatabaseTestTrait;
 
 #[CoversClass(AbstractSeeder::class)]
 class AbstractSeederTest extends TestCase

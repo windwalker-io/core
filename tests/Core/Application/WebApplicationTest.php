@@ -29,7 +29,7 @@ use Windwalker\Http\Server\ServerInterface;
 use Windwalker\Session\Bridge\PhpBridge;
 use Windwalker\Session\Handler\ArrayHandler;
 use Windwalker\Session\Session;
-use Windwalker\Tests\Testing\Stub\FakeHttpServer;
+use Windwalker\Core\Testing\Stub\FakeHttpServer;
 use Windwalker\Tests\Core\Application\Stub\RecordingLoggerService;
 use Windwalker\Tests\Core\Application\Stub\RequestLifecycleProviderStub;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;

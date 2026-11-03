@@ -22,7 +22,7 @@ class ScheduleServiceTest extends TestCase
     #[Before]
     protected function prepareTmpDir(): void
     {
-        $this->tmpDir = WINDWALKER_TEMP . '/ww-schedule-service-test-' . uniqid('', true);
+        $this->tmpDir = sys_get_temp_dir() . '/ww-schedule-service-test-' . uniqid('', true);
 
         Filesystem::mkdir($this->tmpDir);
     }

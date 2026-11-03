@@ -12,7 +12,7 @@ use Windwalker\Core\Generator\CodeGenerator;
 use Windwalker\Core\Generator\FileCollection;
 use Windwalker\Core\Seed\FakerService;
 use Windwalker\Core\Seed\SeedService;
-use Windwalker\Tests\Testing\Stub\ApplicationTraitStub;
+use Windwalker\Core\Testing\Stub\ApplicationTraitStub;
 
 /**
  * Covers the parts of SeedService that do not require a real host app /

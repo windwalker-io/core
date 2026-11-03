@@ -22,7 +22,7 @@ class PackageInstallerTest extends TestCase
     #[Before]
     protected function prepareTmpDir(): void
     {
-        $this->tmpDir = WINDWALKER_TEMP . '/ww-package-installer-test-' . uniqid('', true);
+        $this->tmpDir = sys_get_temp_dir() . '/ww-package-installer-test-' . uniqid('', true);
 
         Filesystem::mkdir($this->tmpDir);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Application\Offline;
 
+use Windwalker\Core\Application\PathResolver;
 use Windwalker\Filesystem\FileObject;
 
 use function Windwalker\fs;
@@ -13,6 +14,8 @@ use function Windwalker\fs;
  */
 class MaintenanceManager
 {
+    public function __construct(protected PathResolver $pathResolver) {}
+
     public function down(MaintenanceConfig|array $config): void
     {
         $config = MaintenanceConfig::wrap($config);
@@ -42,7 +45,7 @@ class MaintenanceManager
      */
     public function getFilePath(): string
     {
-        return WINDWALKER_TEMP . '/down.json';
+        return $this->pathResolver->resolve('@temp') . '/down.json';
     }
 
     public function getFile(): FileObject

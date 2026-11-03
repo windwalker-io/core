@@ -2,11 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Traits;
+namespace Windwalker\Core\Testing\Traits;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Tests\TestApp;
+use Windwalker\Core\Testing\AbstractTestApp;
 
+/**
+ * Dispatches a controller through the shared app-backed test context.
+ *
+ * Requires the consuming test suite to have a {@see AbstractTestApp}
+ * subclass bootstrapped and `AbstractTestApp::$ctx` prepared (see that
+ * class's docblock and `tests/TestApp.php` / `tests/bootstrap.app.php` in
+ * this package for the reference setup).
+ */
 trait ControllerTestTrait
 {
     /**
@@ -21,7 +29,7 @@ trait ControllerTestTrait
         ServerRequestInterface|array|null $data = null,
         array $args = [],
     ): mixed {
-        return TestApp::$ctx->dispatchWithInput(
+        return AbstractTestApp::$ctx->dispatchWithInput(
             $controller,
             $data,
             $args

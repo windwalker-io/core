@@ -23,7 +23,7 @@ class LayoutPathResolverTest extends TestCase
     #[Before]
     protected function prepareTmpDir(): void
     {
-        $this->tmpDir = WINDWALKER_TEMP . '/ww-layout-path-resolver-test-' . uniqid('', true);
+        $this->tmpDir = sys_get_temp_dir() . '/ww-layout-path-resolver-test-' . uniqid('', true);
 
         Filesystem::mkdir($this->tmpDir . '/layouts');
         Filesystem::mkdir($this->tmpDir . '/widgets');

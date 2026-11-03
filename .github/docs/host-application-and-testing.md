@@ -54,9 +54,10 @@ report the missing app-specific setup when the test requires it.
 `phpunit.app.dist.xml` uses [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php),
 which loads the host autoloader (root from `WINDWALKER_TEST_APP_ROOT`, default
 `dirname(__DIR__, 4)`), boots the runtime, and sets
-`Windwalker\Tests\TestApp::$instance`. `TestApp::resetDatabase()` DROPS the
-configured database, so point `DATABASE_NAME` (via an `APP_ENV` `.env.*` file)
-at a disposable database before running DB tests.
+`Windwalker\Tests\TestApp::$instance` (an `AbstractTestApp` subclass).
+`AbstractTestApp::resetDatabase()` DROPS the configured database, so point
+`DATABASE_NAME` (via an `APP_ENV` `.env.*` file) at a disposable database
+before running DB tests.
 
 ## What the host app supplies at runtime
 
@@ -89,17 +90,21 @@ isolated container can cover the behavior.
 
 ## Testing Core with an application context
 
-Core's test support includes [`tests/TestApp.php`](../../tests/TestApp.php). It
-extends `WebApplication` and creates request contexts; database-backed test
-support uses
-[`tests/Testing/Traits/DatabaseTestTrait.php`](../../tests/Testing/Traits/DatabaseTestTrait.php)
-to obtain the configured
-`DatabaseAdapter` and ORM. A database test bootstrap must create the app
-container, configure the database provider, initialize `TestApp::$instance`,
-and prepare `TestApp::$ctx` (via `prepareSharedContext()`) before database-backed traits are used.
-Composer autoloading alone does not provide this application state. This test
-app can be configured by a consuming app when one is available, or by Core's
-own isolated test bootstrap when Core is tested independently.
+Core's test support includes
+[`src/Core/Testing/AbstractTestApp.php`](../../src/Core/Testing/AbstractTestApp.php).
+Shipped under Core's production autoload (`Windwalker\` → `src/`), it is
+reusable by any host app, not just Core's own test suite. It extends
+`WebApplication` and creates request contexts; database-backed test support
+uses
+[`src/Core/Testing/Traits/DatabaseTestTrait.php`](../../src/Core/Testing/Traits/DatabaseTestTrait.php)
+to obtain the configured `DatabaseAdapter` and ORM. A host app extends
+`AbstractTestApp` with its own concrete class — see
+[`tests/TestApp.php`](../../tests/TestApp.php) for the reference example
+Core uses for its own tests — and its database test bootstrap must create
+the app container, configure the database provider, assign that subclass to
+`AbstractTestApp::$instance`, and prepare `AbstractTestApp::$ctx` (via
+`prepareSharedContext()`) before database-backed traits are used. Composer
+autoloading alone does not provide this application state.
 
 For database integration tests:
 
@@ -108,9 +113,10 @@ For database integration tests:
   (`WINDWALKER_TEST_DB_DSN_*`) and provide matching database configuration in
   the test app or standalone test fixture.
 - Provide `WINDWALKER_MIGRATIONS` and `WINDWALKER_TEMP` when using
-  `TestApp::initializeDatabase()`.
+  `AbstractTestApp::initializeDatabase()` (inherited by `TestApp`).
 - `TestApp::resetDatabase()` drops and recreates the selected database before
-  running its migrations. The configured database account therefore needs
+  running its migrations (inherited from `AbstractTestApp`). The configured
+  database account therefore needs
   permission to drop and create the test schema. Never point it at a developer,
   shared, staging, or production database.
 - `resetDatabase()` only issues the MySQL-specific `USE <dbname>` statement

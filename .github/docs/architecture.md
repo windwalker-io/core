@@ -273,10 +273,12 @@ come from config `listeners` (global and per section) and attributes
 
 ## Tests layout
 
-[`tests/Core/`](../../tests/Core/) mirrors `src/Core/`; support classes are in
-[`tests/Testing/`](../../tests/Testing/) and the app-aware bootstrap in
-[`tests/bootstrap.app.php`](../../tests/bootstrap.app.php) with
-[`tests/TestApp.php`](../../tests/TestApp.php). See
-[`testing-architecture.md`](testing-architecture.md) for per-layer test
+[`tests/Core/`](../../tests/Core/) mirrors `src/Core/`. Reusable test support
+(stubs, traits, the app-backed `AbstractTestApp`) ships under
+[`src/Core/Testing/`](../../src/Core/Testing/) — Core's production autoload —
+so any host app can reuse it from its own tests; `tests/` only keeps
+`tests/TestApp.php` as the reference example extending `AbstractTestApp`, and
+the app-aware bootstrap in [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php).
+See [`testing-architecture.md`](testing-architecture.md) for per-layer test
 strategy and
 [`../instructions/test.instructions.md`](../instructions/test.instructions.md).

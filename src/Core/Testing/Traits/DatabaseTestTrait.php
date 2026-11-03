@@ -2,26 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Traits;
+namespace Windwalker\Core\Testing\Traits;
 
 use PHPUnit\Framework\Attributes\AfterClass;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\BeforeClass;
-use Windwalker\Tests\TestApp;
+use Windwalker\Core\Testing\AbstractTestApp;
+use Windwalker\Core\Testing\Database\TestDatabaseFixtures;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\ORM\ORM;
 
 /**
  * Provides a real-DB ORM instance and common helpers for test cases.
  *
- * Lifecycle hooks use PHPUnit attributes so they compose safely with any
- * setUpBeforeClass / setUp the consuming test class defines:
+ * Requires the consuming test suite to have a {@see AbstractTestApp}
+ * subclass bootstrapped as `AbstractTestApp::$instance` (see that class's
+ * docblock and `tests/TestApp.php` / `tests/bootstrap.app.php` in this
+ * package for the reference setup). Lifecycle hooks use PHPUnit attributes
+ * so they compose safely with any setUpBeforeClass / setUp the consuming
+ * test class defines:
  *   - #[BeforeClass] bootOrm()        — runs before setUpBeforeClass()
  *   - #[Before]      truncateBeforeTest() — runs before setUp()
  */
 trait DatabaseTestTrait
 {
+    use ServiceAwareTestTrait;
+
     protected static DatabaseAdapter $db;
+
     protected static ORM $orm;
 
     /**
@@ -31,9 +39,13 @@ trait DatabaseTestTrait
     #[BeforeClass]
     public static function bootDb(): void
     {
-        TestApp::$instance->initializeDatabase();
+        if (!env('WINDWALKER_TEST_DB_DSN')) {
+            self::markTestSkipped('WINDWALKER_TEST_DB_DSN is not set.');
+        }
 
-        $db = TestApp::$instance->retrieve(DatabaseAdapter::class);
+        self::retrieve(TestDatabaseFixtures::class)->initialize();
+
+        $db = static::retrieve(DatabaseAdapter::class);
 
         static::$db = $db;
         static::$orm = $db->orm();

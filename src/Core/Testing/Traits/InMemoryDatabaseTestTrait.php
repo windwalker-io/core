@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Traits;
+namespace Windwalker\Core\Testing\Traits;
 
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
@@ -15,8 +15,8 @@ use Windwalker\Database\DatabaseFactory;
  * host application, migrations, or a configured DSN.
  *
  * This is distinct from the app-backed `DatabaseTestTrait` (tier 4), which
- * boots `TestApp`'s ORM and migrations against a real, configured database.
- * Use this trait when the class under test only needs a working
+ * boots the host app's ORM and migrations against a real, configured
+ * database. Use this trait when the class under test only needs a working
  * `DatabaseAdapter` and owns its own minimal schema.
  *
  * Lifecycle hooks use PHPUnit attributes so they compose safely with any

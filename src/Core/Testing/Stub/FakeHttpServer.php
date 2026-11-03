@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Testing\Stub;
+namespace Windwalker\Core\Testing\Stub;
 
 use Windwalker\Http\Server\ServerInterface;
 

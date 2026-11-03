@@ -8,12 +8,12 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Windwalker\Database\Schema\Schema;
-use Windwalker\Tests\Testing\Traits\DatabaseTestTrait;
-use Windwalker\Tests\Testing\Traits\DITestTrait;
+use Windwalker\Core\Testing\Traits\DatabaseTestTrait;
+use Windwalker\Core\Testing\Traits\ServiceAwareTestTrait;
 
 class RealUserDbTest extends TestCase
 {
-    use DITestTrait;
+    use ServiceAwareTestTrait;
     use DatabaseTestTrait;
 
     protected static function prepareTablesBeforeClass(): void

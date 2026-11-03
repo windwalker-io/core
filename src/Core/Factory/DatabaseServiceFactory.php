@@ -86,7 +86,7 @@ class DatabaseServiceFactory implements ServiceFactoryInterface
         /** @var DatabaseAdapter $db */
         $db = $this->parentCreate($name, ...$args);
 
-        $db->getDriver()->options->debug = WINDWALKER_DEBUG;
+        $db->getDriver()->options->debug = (bool) $this->container->getParam('app.debug');
 
         $orm = $db->orm();
 
