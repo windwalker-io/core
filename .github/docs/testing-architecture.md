@@ -85,6 +85,46 @@ needs the request pipeline in tier 2, and only ORM/DB behavior in tier 4.
   (`disableDebugProfiler(true)`); tier 2 apps use `'debug' => false`. Set
   `'debug' => true` only to test debug-mode error propagation.
 
+## Composing request-layer providers and bindings per test
+
+Tier 3's `TestApp` boots the host app once and keeps a single
+process-wide `AppContext` (`TestApp::$instance`/`$ctx`); tests that need
+their own request-level providers or bindings do not have to reboot the
+application to get them. `WebApplication::boot()` is one-shot (levels 1-2,
+RUNTIME → APP), but `createContext()` creates a fresh level 3 child
+container on every call — see
+[`architecture.md`](architecture.md#request-scoped-service-isolation). A
+test-only `WebApplication` subclass (or an added method on `TestApp`) can
+expose that same per-call container creation with extra injection points:
+extra providers to register and extra bindings to share, before
+`bootProvidersBeforeRequest()` runs, just like a real request.
+
+Two granularities are useful, both built on the same per-call context
+creation:
+
+- **Per test class**: build the custom context once in a `#[BeforeClass]`
+  hook and store it in a static property, the same pattern
+  `StaticContainerTestTrait` already uses for its child container. Cheaper,
+  but every test method in the class shares the same providers/bindings.
+- **Per test method**: rebuild the context in a `#[Before]` hook (runs
+  before every test method) and store it in an *instance* property instead
+  of a static one. Since PHPUnit constructs a new test case instance per
+  test method, this isolates providers/bindings between methods with no
+  manual reset, and a method can still override its own providers/bindings
+  on top of the class's defaults before the context is built, or rebuild
+  mid-test with extras of its own without affecting any other method. This
+  trades some setup cost per method for stronger isolation.
+
+A service marked `#[Isolation]` is rebuilt fresh for each such context
+(not shared across them), which is what makes it possible to assert two
+contexts have distinct instances of app-level services like
+`DatabaseManager` or `PathResolver` without rebooting the application
+between them.
+
+This does not replace `TestApp`/`bootstrap.app.php` — it is the pattern to
+extend them with if a test needs more than the single shared context they
+provide today.
+
 ## Testing view models and controllers
 
 A view model is a plain class with `#[ViewModel]` and a `prepare()` method (or

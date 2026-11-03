@@ -60,6 +60,35 @@ server). Providers can implement `RequestBootableProviderInterface` /
 `RequestReleasableProviderInterface` (see
 [`src/Core/DI/`](../../src/Core/DI/)) to hook request start and cleanup.
 
+### Request-scoped service isolation
+
+`WebApplication::boot()` only boots levels 1-2 (RUNTIME → APP) once; it never
+reruns. Each request gets its own level 3 container from
+`createContext()`/`createChild()`, which is discarded when the request ends.
+A level 3 container that looks up a service it has no local definition for
+falls back to its parent's (level 2) definition, cloning it; by default that
+clone shares the parent's already-resolved instance, so services registered
+once at the app level are effectively singletons shared across requests.
+
+Some services must not be shared this way — for example anything that holds
+a live connection or per-request mutable state (`DatabaseManager`,
+`SessionManager`, `PathResolver`, `CacheManager`, `MailerManager`, and other
+`Manager`/`Factory` classes). These are marked with the `#[Isolation]`
+attribute (or registered with `DIOptions(isolation: true)`). When a child
+container clones a definition marked isolated, it resets the clone's cache
+before use, so the next resolution rebuilds a fresh instance instead of
+reusing the parent's cached one — giving each request its own instance while
+the definition itself is still declared once, at the app level.
+
+This rebuild only works for definitions registered as a rebuildable factory
+(`$container->prepareSharedObject()` / `prepareObject()`, used internally by
+`AppProvider`); a literal pre-built value shared via
+`$container->share($id, $value)` has nothing to rebuild from and stays
+shared regardless of the attribute. See
+[`testing-architecture.md`](testing-architecture.md#composing-request-layer-providers-and-bindings-per-test)
+for how tests can use this to compose request-layer state without rebooting
+the application.
+
 ## Applications
 
 Applications live in [`src/Core/Application/`](../../src/Core/Application/).
