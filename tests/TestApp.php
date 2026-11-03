@@ -21,14 +21,10 @@ use Windwalker\Core\Testing\Database\TestDatabasesProvider;
  */
 class TestApp extends AbstractTestApp
 {
-    public function createContext(?ServerRequestInterface $request = null): AppContext
+    protected static function getContextProviders(): array
     {
-        $context = parent::createContext($request);
-
-        $context->container->registerServiceProvider(
-            new TestDatabasesProvider(env('WINDWALKER_TEST_DB_DSN'))
-        );
-
-        return $context;
+        return [
+            fn() => new TestDatabasesProvider(env('WINDWALKER_TEST_DB_DSN')),
+        ];
     }
 }

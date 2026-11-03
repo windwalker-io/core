@@ -8,7 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Events\Web\BeforeRequestEvent;
+use Windwalker\DI\Container;
 use Windwalker\Http\Event\RequestEvent;
 use Windwalker\Http\Factory\ServerRequestFactory;
 use Windwalker\Http\Request\ServerRequest;
@@ -52,6 +54,19 @@ abstract class AbstractTestApp extends WebApplication
      */
     public static AppContext $sharedCtx;
 
+    public static function createInstance(Container $container, array $config = []): static
+    {
+        static::$instance = new static($container);
+
+        if ($config) {
+            static::$instance->loadConfig($config);
+        }
+
+        static::$instance->prepareSharedContext();
+
+        return static::$instance;
+    }
+
     public function executeServerEvent(RequestEvent $event): ResponseInterface
     {
         $appContext = $this->createContextFromServerEvent($event);
@@ -60,6 +75,8 @@ abstract class AbstractTestApp extends WebApplication
 
         return $this->runContext($appContext);
     }
+
+    abstract protected static function getContextProviders(): array;
 
     public static function createTestContext(
         ?ServerRequestInterface $request = null,
@@ -81,6 +98,8 @@ abstract class AbstractTestApp extends WebApplication
             $container->share(ServerRequest::class, $request);
         }
 
+        $providers = array_map($container->resolve(...), array_merge(static::getContextProviders(), $providers));
+
         foreach ($providers as $provider) {
             $container->registerServiceProvider($provider);
         }
@@ -88,6 +107,12 @@ abstract class AbstractTestApp extends WebApplication
         $app->registerListeners($container);
 
         $app->bootProvidersBeforeRequest($container);
+
+        foreach ($providers as $provider) {
+            if ($provider instanceof RequestBootableProviderInterface) {
+                $provider->bootBeforeRequest($container);
+            }
+        }
 
         $appContext = $container->get(AppContext::class);
 
@@ -119,7 +144,7 @@ abstract class AbstractTestApp extends WebApplication
         ?ServerRequestInterface $request = null,
         iterable $providers = [],
     ): AppContext {
-        $appContext = $this->createContext($request, $providers);
+        $appContext = static::createTestContext($request, $providers);
 
         static::$sharedCtx = $appContext;
         static::$ctx = $appContext;
@@ -131,7 +156,7 @@ abstract class AbstractTestApp extends WebApplication
         ?ServerRequestInterface $request = null,
         iterable $providers = [],
     ): AppContext {
-        $appContext = static::$instance->createContext($request, $providers);
+        $appContext = static::createTestContext($request, $providers);
 
         static::$ctx = $appContext;
 

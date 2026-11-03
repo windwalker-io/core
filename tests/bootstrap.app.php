@@ -14,11 +14,17 @@
 
 declare(strict_types=1);
 
+use Windwalker\Tests\TestApp;
+
 $init = include __DIR__ . '/../src/Core/Testing/test.init.php';
 
-$init(
-    root: $root = env('WINDWALKER_TEST_ROOT') ?: dirname(__DIR__),
-    workDir: $root,
+$container = $init(
+    root: $root = env('WINDWALKER_TEST_APP_ROOT') ?: dirname(__DIR__),
+    workDir: $root
+);
+
+TestApp::createInstance(
+    container: $container,
     config: [
         '@root' => $root,
         '@temp' => $root . '/tmp',

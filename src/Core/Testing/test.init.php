@@ -6,7 +6,7 @@ use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Runtime\Runtime;
 use Windwalker\Tests\TestApp;
 
-return static function (string $root, string $workDir, array|string|null $config = null) {
+return static function (string $root, string $workDir) {
     require $root . '/vendor/autoload.php';
 
     // Some legacy code (predating PathResolver/ApplicationInterface) still
@@ -17,18 +17,9 @@ return static function (string $root, string $workDir, array|string|null $config
     }
 
     Runtime::boot($root, $workDir);
-    Runtime::loadConfig($root . '/etc/runtime.config.php');
 
     // Under the CLI, the app type is CLI_WEB, and database boot asks for the CLI server inspector.
     CliServerRuntime::boot('test', []);
 
-    TestApp::$instance = new TestApp(Runtime::getContainer());
-
-    if ($config) {
-        TestApp::$instance->loadConfig($config);
-    }
-
-    TestApp::$instance->prepareSharedContext();
-
-    return TestApp::$instance;
+    return Runtime::getContainer();
 };
