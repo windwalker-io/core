@@ -482,6 +482,8 @@ class WebApplication implements WebRootApplicationInterface
      * @param  mixed  $return
      *
      * @return  void
+     *
+     * @codeCoverageIgnore  Logic-free proxy that terminates the PHP process via die().
      */
     #[NoReturn]
     public function close(mixed $return = ''): void

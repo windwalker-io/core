@@ -15,6 +15,7 @@ use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Data\Collection;
 use Windwalker\Http\Request\ServerRequest;
+use Windwalker\Tests\Core\Application\Stub\AppRequestTraitStub;
 use Windwalker\Uri\Uri;
 
 /**
@@ -201,5 +202,27 @@ class AppRequestTraitTest extends TestCase
 
         self::assertArrayHasKey('systemUri', $data);
         self::assertNull($data['stream']);
+    }
+
+    /**
+     * AppRequest::compileInput() always merges to an array, so the non-array
+     * fallbacks in input() are otherwise only reachable through WsAppRequest,
+     * which requires the uninstalled windwalker/reactor package. Exercise them
+     * directly via a minimal AppRequestTrait host instead.
+     */
+    #[Test]
+    public function inputWithoutFieldsReturnsScalarInputAsIsWhenNotArray(): void
+    {
+        $request = new AppRequestTraitStub('raw-scalar-payload');
+
+        self::assertSame('raw-scalar-payload', $request->input());
+    }
+
+    #[Test]
+    public function inputWithFieldsReturnsScalarInputAsIsWhenNotArray(): void
+    {
+        $request = new AppRequestTraitStub('raw-scalar-payload');
+
+        self::assertSame('raw-scalar-payload', $request->input('foo', 'bar'));
     }
 }

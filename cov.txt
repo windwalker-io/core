@@ -1,0 +1,855 @@
+﻿PHPUnit 13.4.6 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.5.6 with Xdebug 3.5.1
+Configuration: D:\www\earth\vendor\windwalker\core\phpunit.xml
+
+................................................................. 65 / 92 ( 70%)
+...........................                                       92 / 92 (100%)
+
+Time: 00:01.164, Memory: 38.00 MB
+
+OK (92 tests, 196 assertions)
+
+
+Code Coverage Report:
+  2026-11-02 18:12:01
+
+ Summary:
+  Classes:    4.02% (15/373)
+  Methods:    6.36% (155/2436)
+  Lines:      5.19% (790/15197)
+
+Windwalker\Console\CommandWrapper
+  Methods:   0.00% ( 0/16)   Lines:   0.00% (  0/ 90)
+Windwalker\Console\CommendRegistrarTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 28)
+Windwalker\Console\CompletionContext
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 13)
+Windwalker\Console\CompletionType
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Console\IO
+  Methods:   0.00% ( 0/46)   Lines:   0.00% (  0/ 87)
+Windwalker\Console\Input\InputArgument
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Console\Input\InputOption
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Console\QuestionFactory
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Application\AppClient
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+Windwalker\Core\Application\AppContext
+  Methods:  52.17% (12/23)   Lines:  54.11% ( 46/ 85)
+Windwalker\Core\Application\AppLayer
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Application\AppType
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  3/  3)
+Windwalker\Core\Application\AppVerbosity
+  Methods:  90.00% ( 9/10)   Lines:  95.65% ( 22/ 23)
+Windwalker\Core\Application\ApplicationTrait
+  Methods:  55.00% (11/20)   Lines:  48.27% ( 42/ 87)
+Windwalker\Core\Application\Context\AppContextTrait
+  Methods:  66.66% ( 4/ 6)   Lines:  64.28% (  9/ 14)
+Windwalker\Core\Application\Context\AppRequestTrait
+  Methods:  92.30% (12/13)   Lines:  97.18% ( 69/ 71)
+Windwalker\Core\Application\MicroApplication
+  Methods:  75.00% ( 3/ 4)   Lines:  66.66% (  8/ 12)
+Windwalker\Core\Application\MiddlewareRunner
+  Methods: 100.00% ( 6/ 6)   Lines: 100.00% ( 20/ 20)
+Windwalker\Core\Application\Offline\MaintenanceConfig
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  7/  7)
+Windwalker\Core\Application\Offline\MaintenanceManager
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% (  8/  8)
+Windwalker\Core\Application\PathResolver
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 28/ 28)
+Windwalker\Core\Application\ServiceAwareTrait
+  Methods: 100.00% ( 7/ 7)   Lines: 100.00% ( 10/ 10)
+Windwalker\Core\Application\WebApplication
+  Methods:  27.27% ( 6/22)   Lines:  46.51% ( 80/172)
+Windwalker\Core\Application\WebApplicationTrait
+  Methods:  22.22% ( 2/ 9)   Lines:  26.92% (  7/ 26)
+Windwalker\Core\Asset\AbstractScript
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 29)
+Windwalker\Core\Asset\AssetItem
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/  7)
+Windwalker\Core\Asset\AssetLink
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 17)
+Windwalker\Core\Asset\AssetProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Asset\AssetService
+  Methods:   0.00% ( 0/68)   Lines:   0.00% (  0/440)
+Windwalker\Core\Asset\Command\AssetSyncCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 60)
+Windwalker\Core\Asset\Command\AssetVersionCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Asset\Event\AssetBeforeRender
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Asset\ImportMap
+  Methods:   0.00% ( 0/26)   Lines:   0.00% (  0/ 62)
+Windwalker\Core\Asset\PromiseScope
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Asset\Teleport
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 29)
+Windwalker\Core\Asset\ViteResolver
+  Methods:   0.00% ( 0/15)   Lines:   0.00% (  0/ 52)
+Windwalker\Core\Attributes\Assert
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Attributes\ConfigModule
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Attributes\Controller
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Attributes\Csrf
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Attributes\Filter
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Attributes\Json
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Attributes\JsonApi
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Attributes\MapTo
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 39)
+Windwalker\Core\Attributes\Method
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Attributes\Module
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Attributes\Ref
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Attributes\Request\BodyValue
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 10)
+Windwalker\Core\Attributes\Request\File
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 10)
+Windwalker\Core\Attributes\Request\Header
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Attributes\Request\Input
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 21)
+Windwalker\Core\Attributes\Request\InputCompact
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Attributes\Request\QueryParam
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Attributes\Request\RouteParam
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Attributes\Request\UrlVar
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Attributes\Required
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Attributes\TaskMapping
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Attributes\Transaction
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Attributes\ViewMetadata
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Attributes\ViewModel
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 24)
+Windwalker\Core\Attributes\ViewPrepare
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Auth\AuthService
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 23)
+Windwalker\Core\Auth\Method\DatabaseMethod
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 49)
+Windwalker\Core\CliServer\CliServerClient
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 88)
+Windwalker\Core\CliServer\CliServerFactory
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\CliServer\CliServerRuntime
+  Methods:   0.00% ( 0/18)   Lines:   0.00% (  0/141)
+Windwalker\Core\CliServer\CliServerState
+  Methods:   0.00% ( 0/22)   Lines:   0.00% (  0/ 33)
+Windwalker\Core\CliServer\CliServerStateManager
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 21)
+Windwalker\Core\CliServer\CliServerTrait
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  6)
+Windwalker\Core\CliServer\Command\ServerCommandTrait
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 31)
+Windwalker\Core\CliServer\Command\ServerStartCommand
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/149)
+Windwalker\Core\CliServer\Command\ServerStopCommand
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 55)
+Windwalker\Core\CliServer\PhpNative\PhpNativeEngine
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 47)
+Windwalker\Core\CliServer\PhpNative\TestInspector
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\CliServer\Swoole\Subscriber\ServerStartedListener
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  9)
+Windwalker\Core\CliServer\Swoole\Subscriber\SwooleProcessSubscriber
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 18)
+Windwalker\Core\CliServer\Swoole\SwooleEngine
+  Methods:   0.00% ( 0/14)   Lines:   0.00% (  0/119)
+Windwalker\Core\CliServer\Swoole\SwooleInspector
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\CliServer\Swoole\SwooleWorkerService
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\CliServer\Swoole\TableRegistry
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Command\CacheClearCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\Command\CachePurgeCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 65)
+Windwalker\Core\Command\CommandPackageResolveTrait
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 24)
+Windwalker\Core\Command\CompletionCommand
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 63)
+Windwalker\Core\Command\DumpServerCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 33)
+Windwalker\Core\Command\LangMergeCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 91)
+Windwalker\Core\Command\MailTestCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 60)
+Windwalker\Core\Command\ReplCommand
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 66)
+Windwalker\Core\Command\RunCommand
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 73)
+Windwalker\Core\Command\SiteDownCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 37)
+Windwalker\Core\Command\SiteUpCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Composer\PackageUpgrader
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 35)
+Windwalker\Core\Composer\StarterInstaller
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 99)
+Windwalker\Core\Console\CmdWrapper
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Console\Color
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 69)
+Windwalker\Core\Console\ConsoleApplication
+  Methods:   0.00% ( 0/24)   Lines:   0.00% (  0/191)
+Windwalker\Core\Console\Process\ProcessRunnerTrait
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 43)
+Windwalker\Core\Console\WebAppSimulator
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Controller\Controller
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Controller\ControllerDecorator
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Controller\ControllerDispatcher
+  Methods:  16.66% ( 1/ 6)   Lines:  37.17% ( 29/ 78)
+Windwalker\Core\Controller\DefaultController
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Controller\DelegatingController
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 24)
+Windwalker\Core\Controller\Exception\ControllerDispatchException
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\CorePackage
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Crypt\Command\CryptSecretCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 66)
+Windwalker\Core\Crypt\PseudoCrypt
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\DI\ServiceFactoryTrait
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 47)
+Windwalker\Core\DI\TaggingFactory
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 18)
+Windwalker\Core\Database\Command\CommandDatabaseTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Database\Command\DbDropAllCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 29)
+Windwalker\Core\Database\Command\DbExportCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 63)
+Windwalker\Core\Database\Command\DbPingCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\Database\DatabaseExportService
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 42)
+Windwalker\Core\Database\Exporter\AbstractExporter
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Database\Exporter\ExporterFactory
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 10)
+Windwalker\Core\Database\Exporter\MySQLExporter
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/101)
+Windwalker\Core\Database\Exporter\PostgresqlExporter
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Database\Exporter\SqlsrvExporter
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Database\ORMAwareTrait
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Database\QueryProxyTrait
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 17)
+Windwalker\Core\DateTime\Chronos
+  Methods:   0.00% ( 0/36)   Lines:   0.00% (  0/152)
+Windwalker\Core\DateTime\ChronosAwareTrait
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\DateTime\ChronosService
+  Methods:   0.00% ( 0/28)   Lines:   0.00% (  0/ 97)
+Windwalker\Core\DateTime\Clock
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\DateTime\MockClock
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 26)
+Windwalker\Core\DateTime\OffsetClock
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  7)
+Windwalker\Core\DateTime\ServerTimeCast
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 33)
+Windwalker\Core\DateTime\SystemClock
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\DateTime\TimeZoneSerializer
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Edge\Attribute\EdgeComponent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Edge\ComponentFinder
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 37)
+Windwalker\Core\Edge\Component\XComponent
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Edge\CoreFileLoader
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 25)
+Windwalker\Core\Error\ErrorInlineHandler
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 10)
+Windwalker\Core\Error\ErrorLogHandler
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 38)
+Windwalker\Core\Error\SimpleErrorPageHandler
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 25)
+Windwalker\Core\Event\CoreCompositeProvider
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Event\CoreEventAwareTrait
+  Methods:  60.00% ( 3/ 5)   Lines:  60.00% (  6/ 10)
+Windwalker\Core\Event\CoreEventEmitter
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Event\EventCollector
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 27)
+Windwalker\Core\Event\EventDispatcherRegistry
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Event\SymfonyDispatcherWrapper
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Events\Console\ConsoleLogEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Events\Console\ConsoleLogTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Events\Console\ErrorMessageOutputEvent
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Events\Console\MessageOutputEvent
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\Events\Console\MessageOutputTrait
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Events\Web\AfterControllerDispatchEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\AfterRequestEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\AfterRespondEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Events\Web\AfterRoutingEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\BeforeAppDispatchEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\BeforeControllerDispatchEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\BeforeRequestEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\BeforeRoutingEvent
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+Windwalker\Core\Events\Web\RoutingNotMatchedEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Events\Web\TerminatingEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Factory\CacheFactory
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 78)
+Windwalker\Core\Factory\CryptoFactory
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Factory\DatabaseServiceFactory
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 51)
+Windwalker\Core\Factory\HasherFactory
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Factory\LoggerFactory
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 39)
+Windwalker\Core\Factory\MailerFactory
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 23)
+Windwalker\Core\Factory\SessionFactory
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 61)
+Windwalker\Core\Filesystem\FileWatcher
+  Methods:   0.00% ( 0/16)   Lines:   0.00% (  0/ 37)
+Windwalker\Core\Form\Exception\ValidateFailException
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Form\FormFactory
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 19)
+Windwalker\Core\Form\FormProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Form\FormRenderer
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Generator\Builder\AbstractAstBuilder
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 48)
+Windwalker\Core\Generator\Builder\CallbackAstBuilder
+  Methods:   0.00% ( 0/13)   Lines:   0.00% (  0/ 36)
+Windwalker\Core\Generator\Builder\EntityAccessorConcernTrait
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/178)
+Windwalker\Core\Generator\Builder\EntityHooksConcernTrait
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/224)
+Windwalker\Core\Generator\Builder\EntityMemberBuilder
+  Methods:   0.00% ( 0/18)   Lines:   0.00% (  0/334)
+Windwalker\Core\Generator\CodeGenerator
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 17)
+Windwalker\Core\Generator\Command\BuildEntityCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/171)
+Windwalker\Core\Generator\Command\BuildEnumCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 61)
+Windwalker\Core\Generator\Command\GenReviseCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 69)
+Windwalker\Core\Generator\Command\GenerateCommand
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/111)
+Windwalker\Core\Generator\Event\BuildEntityHookEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Generator\Event\BuildEntityMethodEvent
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 12)
+Windwalker\Core\Generator\Event\BuildEntityPropertyEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Generator\FileCloneResult
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Generator\FileCloner
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 86)
+Windwalker\Core\Generator\FileCollection
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 41)
+Windwalker\Core\Generator\FileGenData
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\Generator\GeneratorEdgeExtension
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Generator\SubCommand\AbstractGeneratorSubCommand
+  Methods:   0.00% ( 0/18)   Lines:   0.00% (  0/121)
+Windwalker\Core\Generator\SubCommand\CommandSubCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 60)
+Windwalker\Core\Generator\SubCommand\ComponentSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 44)
+Windwalker\Core\Generator\SubCommand\ControllerSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 18)
+Windwalker\Core\Generator\SubCommand\DataSubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Generator\SubCommand\EntitySubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Generator\SubCommand\EnumSubCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 45)
+Windwalker\Core\Generator\SubCommand\FieldSubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Generator\SubCommand\FormSubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Generator\SubCommand\MiddlewareSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 17)
+Windwalker\Core\Generator\SubCommand\ModelSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 27)
+Windwalker\Core\Generator\SubCommand\PolicySubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Generator\SubCommand\QueueJobSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 17)
+Windwalker\Core\Generator\SubCommand\RouteSubCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 35)
+Windwalker\Core\Generator\SubCommand\SubscriberSubCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Generator\SubCommand\ViewSubCommand
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 18)
+Windwalker\Core\Html\HtmlFrame
+  Methods:   0.00% ( 0/40)   Lines:   0.00% (  0/127)
+Windwalker\Core\Html\Metadata
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 35)
+Windwalker\Core\Html\PreloadLink
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Http\AppRequest
+  Methods:  69.23% ( 9/13)   Lines:  68.85% ( 42/ 61)
+Windwalker\Core\Http\Browser
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Http\BrowserNext
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 36)
+Windwalker\Core\Http\CoreResponse
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Http\CorsHandler
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 32)
+Windwalker\Core\Http\Event\RequestGetValueEvent
+  Methods:  50.00% ( 1/ 2)   Lines:  50.00% (  1/  2)
+Windwalker\Core\Http\Exception\ApiErrorCodeTrait
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Http\Exception\ApiException
+  Methods:   0.00% ( 0/16)   Lines:   0.00% (  0/ 48)
+Windwalker\Core\Http\Exception\HttpStatus
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Http\OutsideRedirectResponse
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Http\ProxyAuthorizer
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Http\ProxyResolver
+  Methods:  15.78% ( 3/19)   Lines:  14.06% (  9/ 64)
+Windwalker\Core\Http\RequestAssert
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Http\RequestInspector
+  Methods:  40.00% ( 2/ 5)   Lines:  57.14% ( 12/ 21)
+Windwalker\Core\IO\IOSocketTrait
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Language\LangService
+  Methods:   0.00% ( 0/24)   Lines:   0.00% (  0/ 86)
+Windwalker\Core\Language\TranslatorTrait
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Link\Link
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Mailer\Event\BeforeSendEvent
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Mailer\MailBuilder
+  Methods:   0.00% ( 0/19)   Lines:   0.00% (  0/ 89)
+Windwalker\Core\Mailer\MailMessage
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 45)
+Windwalker\Core\Mailer\Mailer
+  Methods:   0.00% ( 0/15)   Lines:   0.00% (  0/ 88)
+Windwalker\Core\Mailer\MailerOptions
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 26)
+Windwalker\Core\Mailer\Subscriber\MailInlinerSubscriber
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 24)
+Windwalker\Core\Manager\AbstractManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\CacheManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\CryptoManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\DatabaseManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\Event\InstanceCreatedEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Manager\HasherManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\Logger
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Manager\LoggerManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\MailerManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Manager\SessionManager
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 35)
+Windwalker\Core\Middleware\AbstractLifecycleMiddleware
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Middleware\AbstractMiddlewareAttribute
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  5)
+Windwalker\Core\Middleware\AttributeMiddlewareTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Middleware\CanonicalizeMiddleware
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 73)
+Windwalker\Core\Middleware\CorsMiddleware
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 95)
+Windwalker\Core\Middleware\CsrfMiddleware
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 36)
+Windwalker\Core\Middleware\Enum\WwwRedirect
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Middleware\ForceSslMiddleware
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 26)
+Windwalker\Core\Middleware\JsonApiMiddleware
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 81)
+Windwalker\Core\Middleware\JsonResponseMiddleware
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\Middleware\MaintenanceMiddleware
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 40)
+Windwalker\Core\Middleware\MetadataMiddleware
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Middleware\RoutingExcludesTrait
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 29)
+Windwalker\Core\Middleware\RoutingMiddleware
+  Methods:  25.00% ( 1/ 4)   Lines:  54.20% ( 58/107)
+Windwalker\Core\Middleware\SefMiddleware
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 89)
+Windwalker\Core\Middleware\SimpleCspMiddleware
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 73)
+Windwalker\Core\Migration\AbstractMigration
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 33)
+Windwalker\Core\Migration\Command\AbstractMigrationCommand
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 90)
+Windwalker\Core\Migration\Command\CreateCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 54)
+Windwalker\Core\Migration\Command\MigSquashCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 41)
+Windwalker\Core\Migration\Command\MigrateBackCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 52)
+Windwalker\Core\Migration\Command\MigrateGoCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 85)
+Windwalker\Core\Migration\Command\ResetCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 72)
+Windwalker\Core\Migration\Command\StatusCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 84)
+Windwalker\Core\Migration\Exception\MigrationExistsException
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Migration\MigrateDown
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Migration\MigrateUp
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Migration\Migration
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Migration\MigrationDirection
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Migration\MigrationService
+  Methods:   0.00% ( 0/18)   Lines:   0.00% (  0/211)
+Windwalker\Core\Migration\MigrationSquashBuilder
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/150)
+Windwalker\Core\Migration\MigrationSquashService
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 73)
+Windwalker\Core\Module\AbstractModule
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  9)
+Windwalker\Core\Package\AbstractPackage
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 31)
+Windwalker\Core\Package\Command\PackageInstallCommand
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/171)
+Windwalker\Core\Package\Command\PackageMigrateCommand
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/114)
+Windwalker\Core\Package\Command\PackagePostInstallCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 20)
+Windwalker\Core\Package\InstallResource
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 24)
+Windwalker\Core\Package\PackageInstaller
+  Methods:   0.00% ( 0/15)   Lines:   0.00% (  0/119)
+Windwalker\Core\Package\PackageMigrator
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Package\PackageRegistry
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 56)
+Windwalker\Core\Package\Record\PackageDbMigrate
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Pagination\PageItem
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Pagination\Pagination
+  Methods:   0.00% ( 0/23)   Lines:   0.00% (  0/ 58)
+Windwalker\Core\Pagination\PaginationFactory
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 12)
+Windwalker\Core\Pagination\PaginationResult
+  Methods:   0.00% ( 0/18)   Lines:   0.00% (  0/ 91)
+Windwalker\Core\Profiler\Profiler
+  Methods:   0.00% ( 0/13)   Lines:   0.00% (  0/ 36)
+Windwalker\Core\Profiler\ProfilerFactory
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  7)
+Windwalker\Core\Profiler\ProfilerItem
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Provider\AppProvider
+  Methods:  80.00% ( 4/ 5)   Lines:  96.96% ( 32/ 33)
+Windwalker\Core\Provider\AuthProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Provider\ConsoleProvider
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 32)
+Windwalker\Core\Provider\DateTimeProvider
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Provider\EdgeProvider
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Provider\ErrorHandlingProvider
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 54)
+Windwalker\Core\Provider\EventProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Provider\IniSetterTrait
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  7)
+Windwalker\Core\Provider\LoggerProvider
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Provider\MailerProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 13)
+Windwalker\Core\Provider\MonologProvider
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 28)
+Windwalker\Core\Provider\RequestProvider
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 18/ 18)
+Windwalker\Core\Provider\RouterProvider
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Provider\RuntimeProvider
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 13)
+Windwalker\Core\Provider\SecurityProvider
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 23)
+Windwalker\Core\Provider\SessionProvider
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Provider\WebProvider
+  Methods:  71.42% ( 5/ 7)   Lines:  87.32% ( 62/ 71)
+Windwalker\Core\Provider\WhoopsProvider
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 66)
+Windwalker\Core\Queue\Command\EnqueuerCommandTrait
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/117)
+Windwalker\Core\Queue\Command\QueueCommandTrait
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 58)
+Windwalker\Core\Queue\Command\QueueEnqueuerCommand
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/129)
+Windwalker\Core\Queue\Command\QueueFailedTableCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\Queue\Command\QueueRestartCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Queue\Command\QueueRetryCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 61)
+Windwalker\Core\Queue\Command\QueueTableCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\Queue\Command\QueueWorkerCommand
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/354)
+Windwalker\Core\Queue\QueueFactory
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 66)
+Windwalker\Core\Queue\QueueFailerFactory
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Queue\QueueFailerManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Queue\QueueManager
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Queue\ScheduleWorker
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/234)
+Windwalker\Core\Queue\ScheduleWorkerOptions
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Renderer\Edge\EdgeHelper
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Renderer\Edge\WindwalkerExtension
+  Methods:   0.00% ( 0/26)   Lines:   0.00% (  0/105)
+Windwalker\Core\Renderer\LayoutNotFoundException
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Renderer\LayoutPathResolver
+  Methods:   0.00% ( 0/14)   Lines:   0.00% (  0/ 55)
+Windwalker\Core\Renderer\PathsBag
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Renderer\RendererService
+  Methods:   0.00% ( 0/19)   Lines:   0.00% (  0/ 40)
+Windwalker\Core\Response\Buffer\AbstractBuffer
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Response\Buffer\JsonBuffer
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Router\Event\AfterRouteBuildEvent
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  4)
+Windwalker\Core\Router\Event\BeforeRouteBuildEvent
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Router\Event\PrepareRouteBuildEvent
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\Router\Exception\RouteNotFoundException
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Router\Exception\UnAllowedMethodException
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Router\NavMode
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Router\NavOptions
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 47)
+Windwalker\Core\Router\NavigableTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Router\Navigator
+  Methods:   0.00% ( 0/31)   Lines:   0.00% (  0/202)
+Windwalker\Core\Router\Route
+  Methods:  43.75% ( 7/16)   Lines:  45.68% ( 53/116)
+Windwalker\Core\Router\RouteBuilder
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\Router\RouteConfigurationTrait
+  Methods:  33.33% (12/36)   Lines:  21.84% ( 26/119)
+Windwalker\Core\Router\RouteCreator
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 12)
+Windwalker\Core\Router\RouteCreatorTrait
+  Methods:  23.07% ( 3/13)   Lines:  35.16% ( 32/ 91)
+Windwalker\Core\Router\RouteUri
+  Methods:   0.00% ( 0/33)   Lines:   0.00% (  0/103)
+Windwalker\Core\Router\Router
+  Methods:  26.66% ( 4/15)   Lines:  31.09% ( 37/119)
+Windwalker\Core\Router\SystemUri
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Runtime\Config
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Runtime\ConfigLoader
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 31)
+Windwalker\Core\Runtime\Runtime
+  Methods:  11.11% ( 2/18)   Lines:   3.12% (  2/ 64)
+Windwalker\Core\Schedule\Command\CommandScheduleTrait
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 41)
+Windwalker\Core\Schedule\Command\ScheduleInstallCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 44)
+Windwalker\Core\Schedule\Command\ScheduleRunCommand
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 83)
+Windwalker\Core\Schedule\Command\ScheduleShowCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 85)
+Windwalker\Core\Schedule\Command\ScheduleUninstallCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 14)
+Windwalker\Core\Schedule\Schedule
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 34)
+Windwalker\Core\Schedule\ScheduleEvent
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 23)
+Windwalker\Core\Schedule\ScheduleExpression
+  Methods:   0.00% ( 0/24)   Lines:   0.00% (  0/ 45)
+Windwalker\Core\Schedule\ScheduleService
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\Security\CspNonceService
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 55)
+Windwalker\Core\Security\CsrfService
+  Methods:   0.00% ( 0/11)   Lines:   0.00% (  0/ 43)
+Windwalker\Core\Security\Exception\InvalidTokenException
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Security\Exception\UnauthorizedException
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Seed\AbstractSeeder
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Seed\Command\AbstractSeedCommand
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 21)
+Windwalker\Core\Seed\Command\SeedClearCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Seed\Command\SeedCreateCommand
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 15)
+Windwalker\Core\Seed\Command\SeedImportCommand
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 22)
+Windwalker\Core\Seed\CountingOutputTrait
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 12)
+Windwalker\Core\Seed\FakerService
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  8)
+Windwalker\Core\Seed\SeedClear
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Seed\SeedImport
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\Seed\SeedService
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 76)
+Windwalker\Core\Seed\Seeder
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Service\ErrorService
+  Methods:   0.00% ( 0/34)   Lines:   1.69% (  2/118)
+Windwalker\Core\Service\FilterService
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 16)
+Windwalker\Core\Service\LoggerService
+  Methods:   0.00% ( 0/12)   Lines:   0.00% (  0/ 32)
+Windwalker\Core\Session\CookiesAutoSecureSubscriber
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 20)
+Windwalker\Core\Session\SessionRobotSubscriber
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  5)
+Windwalker\Core\State\AppState
+  Methods:   5.26% ( 1/19)   Lines:   1.26% (  1/ 79)
+Windwalker\Core\State\Persistence\CookiesPersistence
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  6)
+Windwalker\Core\State\Persistence\NullPersistence
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/  4)
+Windwalker\Core\State\Persistence\SessionPersistence
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/  6)
+Windwalker\Core\Theme\AbstractTheme
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Theme\BootstrapTheme
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\Utilities\Base64Url
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\Utilities\ClassFinder
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 26)
+Windwalker\Core\Utilities\Dumper
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 30)
+Windwalker\Core\View\AbstractViewModel
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\View\BaseVM
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Core\View\CollapseWrapper
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/  2)
+Windwalker\Core\View\Event\AbstractViewRenderEvent
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  3)
+Windwalker\Core\View\Event\AfterRenderEvent
+  Methods:   0.00% ( 0/ 2)   Lines:   0.00% (  0/ 10)
+Windwalker\Core\View\Event\BeforeRenderEvent
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  7)
+Windwalker\Core\View\Event\PrepareDataEvent
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Core\View\Traits\FilterAwareViewModelTrait
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/ 11)
+Windwalker\Core\View\View
+  Methods:   0.00% ( 0/45)   Lines:   0.00% (  0/313)
+Windwalker\Debugger\DebuggerPackage
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 13)
+Windwalker\Debugger\Helper\DebuggerHelper
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Debugger\Module\Ajax\AjaxController
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 12)
+Windwalker\Debugger\Module\Dashboard\DashboardController
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Debugger\Module\Dashboard\DashboardRepository
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 63)
+Windwalker\Debugger\Module\Index\IndexController
+  Methods:  ( 0/ 0)   Lines:  (  0/  0)
+Windwalker\Debugger\Module\Index\IndexView
+  Methods:   0.00% ( 0/ 1)   Lines:   0.00% (  0/  1)
+Windwalker\Debugger\Services\DebugConsole
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 36)
+Windwalker\Debugger\Subscriber\DebuggerSubscriber
+  Methods:   0.00% ( 0/13)   Lines:   0.00% (  0/262)
+Windwalker\WebSocket\Application\WsAppContext
+  Methods:   0.00% ( 0/10)   Lines:   0.00% (  0/ 16)
+Windwalker\WebSocket\Application\WsAppRequest
+  Methods:   0.00% ( 0/ 8)   Lines:   0.00% (  0/ 14)
+Windwalker\WebSocket\Application\WsApplicationTrait
+  Methods:   0.00% ( 0/ 6)   Lines:   0.00% (  0/ 11)
+Windwalker\WebSocket\Application\WsRootApplication
+  Methods:   0.00% ( 0/26)   Lines:   0.00% (  0/134)
+Windwalker\WebSocket\Middleware\WebSocketRoutingMiddleware
+  Methods:   0.00% ( 0/ 4)   Lines:   0.00% (  0/ 45)
+Windwalker\WebSocket\Parser\ChainingArgumentsParer
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 16)
+Windwalker\WebSocket\Parser\SimpleMessageParser
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/ 11)
+Windwalker\WebSocket\Provider\WebSocketProvider
+  Methods:   0.00% ( 0/ 7)   Lines:   0.00% (  0/ 84)
+Windwalker\WebSocket\Router\WsRouter
+  Methods:   0.00% ( 0/ 5)   Lines:   0.00% (  0/ 13)
+Windwalker\WebSocket\Router\WsRouterCreator
+  Methods:   0.00% ( 0/ 3)   Lines:   0.00% (  0/  6)
+Windwalker\WebSocket\Swoole\RequestRegistry
+  Methods:   0.00% ( 0/ 9)   Lines:   0.00% (  0/ 41)

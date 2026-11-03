@@ -38,14 +38,14 @@
 
 	<testsuites>
 		<testsuite name="Unit">
-			<directory>test</directory>
+			<directory>tests</directory>
 		</testsuite>
 	</testsuites>
 
     <!-- Code Coverage -->
     <source ignoreIndirectDeprecations="true">
         <include>
-            <directory suffix=".php">test</directory>
+            <directory suffix=".php">src</directory>
         </include>
     </source>
 </phpunit>

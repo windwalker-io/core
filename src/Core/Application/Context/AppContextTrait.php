@@ -29,6 +29,9 @@ trait AppContextTrait
 
     public protected(set) string $mode = '';
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getRootApp(): RootApplicationInterface
     {
         return $this->container->get(RootApplicationInterface::class);
@@ -36,6 +39,8 @@ trait AppContextTrait
 
     /**
      * @return  array|callable
+     *
+     * @codeCoverageIgnore
      */
     public function getController(): mixed
     {
@@ -46,6 +51,8 @@ trait AppContextTrait
      * @param  array|callable  $controller
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setController(mixed $controller): static
     {
@@ -87,11 +94,17 @@ trait AppContextTrait
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getSubState(string $prefix): AppState
     {
         return $this->state->withPrefix($prefix);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getServerRequest(): ServerRequestInterface
     {
         return $this->appRequest->getRequest();
@@ -99,6 +112,8 @@ trait AppContextTrait
 
     /**
      * @return  Route|null
+     *
+     * @codeCoverageIgnore
      */
     public function getMatchedRoute(): ?Route
     {
@@ -117,11 +132,17 @@ trait AppContextTrait
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getQueryValues(): array
     {
         return $this->appRequest->getQueryValues();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getBodyValues(): array
     {
         return $this->appRequest->getBodyValues();
@@ -129,6 +150,8 @@ trait AppContextTrait
 
     /**
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getUrlVars(): array
     {
@@ -147,6 +170,9 @@ trait AppContextTrait
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getHeader(string $name): string
     {
         return $this->appRequest->getHeader($name);

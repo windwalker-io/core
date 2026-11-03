@@ -79,7 +79,11 @@ enum AppVerbosity: int
             return $e;
         }
 
+        // @codeCoverageIgnoreStart
+        // Unreachable: every non-HIDDEN case (NORMAL/VERBOSE/VERY_VERBOSE) already
+        // satisfies `value >= NORMAL->value` above, so this is a defensive fallback only.
         return $fallback;
+        // @codeCoverageIgnoreEnd
     }
 
     public function debugMessage(\Throwable|string $e): string

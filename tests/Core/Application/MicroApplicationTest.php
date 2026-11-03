@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\MicroApplication;
 use Windwalker\Core\Router\Router;
 use Windwalker\DI\Container;
+use Windwalker\Http\Output\Output;
+use Windwalker\Stream\Stream;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 
 class MicroApplicationTest extends TestCase
@@ -44,5 +46,24 @@ class MicroApplicationTest extends TestCase
         $res = $app->runContext($app->createContext(TestWebAppFactory::request('http://example.com/hello')));
 
         self::assertSame('routed', (string) $res->getBody());
+    }
+
+    #[Test]
+    public function executeRunsRequestAndRespondsThroughOutput(): void
+    {
+        $app = new MicroApplication();
+        $app->routing(
+            static function (\Windwalker\Core\Router\RouteCreator $router) {
+                $router->any('hello', '/hello')->handler(fn() => 'executed');
+            }
+        );
+
+        // Bind Output to a memory stream so respond() does not write to real stdout.
+        $outputStream = Stream::wrap('php://memory', \Windwalker\Stream\WRITE_ONLY_RESET);
+        $app->getContainer()->share(Output::class, new Output($outputStream));
+
+        $res = $app->execute(TestWebAppFactory::request('http://example.com/hello'));
+
+        self::assertSame('executed', (string) $res->getBody());
     }
 }

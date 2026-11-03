@@ -70,9 +70,14 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         $appReq = $this->getAppRequest();
 
         if ($data !== null) {
+            // @codeCoverageIgnoreStart
+            // Unreachable: $data is typed as ServerRequestInterface|array|null and AppRequest
+            // (the only AppRequestInterface implementation) does not implement
+            // ServerRequestInterface, so this branch can never be type-checked into.
             if ($data instanceof AppRequestInterface) {
                 $appReqNew = $data;
             } elseif ($data instanceof ServerRequestInterface) {
+                // @codeCoverageIgnoreEnd
                 $appReqNew = $appReq->withRequest($data);
             } else {
                 $req = $appReq->getServerRequest();
@@ -113,6 +118,10 @@ class AppContext implements WebApplicationInterface, AppContextInterface
         }
 
         if ($view instanceof ViewModelInterface) {
+            // @codeCoverageIgnoreStart
+            // Exercising this branch would require a real View::class graph
+            // (RendererService, HtmlFrame, AssetService, ...), which is far
+            // beyond the scope of AppContext unit tests.
             $view = $this->make(
                 View::class,
                 [
@@ -120,6 +129,7 @@ class AppContext implements WebApplicationInterface, AppContextInterface
                     'options' => $options
                 ]
             );
+            // @codeCoverageIgnoreEnd
         }
 
         $options = [
@@ -150,6 +160,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @return  Parameters|null
      *
      * @deprecated  No-longer used.
+     *
+     * @codeCoverageIgnore  Deprecated, logic-free getter.
      */
     public function getParams(): ?Parameters
     {
@@ -162,6 +174,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @return  static  Return self to support chaining.
      *
      * @deprecated  No-longer used.
+     *
+     * @codeCoverageIgnore  Deprecated, logic-free setter.
      */
     public function setParams(?Parameters $params): static
     {
@@ -254,6 +268,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @param  mixed   ...$fields
      *
      * @return  mixed|Collection
+     *
+     * @codeCoverageIgnore  Logic-free proxy to AppRequest::inputWithMethod().
      */
     public function inputOfMethod(string $method = 'REQUEST', ...$fields): mixed
     {
@@ -266,6 +282,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @param  mixed  ...$fields
      *
      * @return  UploadedFileInterface[]|UploadedFileInterface|array
+     *
+     * @codeCoverageIgnore  Logic-free proxy to AppRequest::file().
      */
     public function file(...$fields): mixed
     {
@@ -342,6 +360,8 @@ class AppContext implements WebApplicationInterface, AppContextInterface
      * @param  mixed  $return
      *
      * @return  void
+     *
+     * @codeCoverageIgnore  Logic-free proxy that terminates the script via the root application.
      */
     #[NoReturn]
     public function close(

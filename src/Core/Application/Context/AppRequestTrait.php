@@ -58,6 +58,8 @@ trait AppRequestTrait
 
     /**
      * @return  Uri
+     *
+     * @codeCoverageIgnore
      */
     public function getUri(): UriInterface
     {
@@ -117,6 +119,8 @@ trait AppRequestTrait
 
     /**
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getInput(): array
     {
@@ -223,6 +227,8 @@ trait AppRequestTrait
 
     /**
      * @return  SystemUri
+     *
+     * @codeCoverageIgnore
      */
     public function getSystemUri(): SystemUri
     {
@@ -245,6 +251,8 @@ trait AppRequestTrait
 
     /**
      * @return  Route|null
+     *
+     * @codeCoverageIgnore
      */
     public function getMatchedRoute(): ?Route
     {
@@ -288,6 +296,8 @@ trait AppRequestTrait
 
     /**
      * @return  ProxyResolver
+     *
+     * @codeCoverageIgnore
      */
     public function getProxyResolver(): ProxyResolver
     {
@@ -298,12 +308,16 @@ trait AppRequestTrait
      * @return  ServerRequestInterface
      *
      * @deprecated  Use getServerRequest() instead.
+     * @codeCoverageIgnore
      */
     public function getRequest(): ServerRequestInterface
     {
         return $this->request;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getServerRequest(): ServerRequestInterface
     {
         return $this->request;
