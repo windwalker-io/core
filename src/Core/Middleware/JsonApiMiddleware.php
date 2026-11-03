@@ -7,14 +7,12 @@ namespace Windwalker\Core\Middleware;
 use Closure;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Windwalker\Core\Http\Exception\ApiException;
 use Windwalker\Core\Response\Buffer\JsonBuffer;
 use Windwalker\Core\Service\ErrorService;
 use Windwalker\DI\DICreateTrait;
 use Windwalker\DI\Exception\DefinitionException;
-use Windwalker\Http\Helper\ResponseHelper;
 use Windwalker\Http\Response\JsonResponse;
 use Windwalker\Http\Response\RedirectResponse;
 use Windwalker\Session\Session;
@@ -28,11 +26,11 @@ class JsonApiMiddleware extends JsonResponseMiddleware
 {
     use DICreateTrait;
 
-    public function run(ServerRequestInterface $request, Closure $next): mixed
+    public function run(Closure $callback): ResponseInterface
     {
         try {
             /** @var ResponseInterface|mixed $response */
-            $response = $next($request);
+            $response = $callback();
 
             if ($response instanceof ResponseInterface) {
                 // Allow redirect
@@ -93,35 +91,17 @@ class JsonApiMiddleware extends JsonResponseMiddleware
         $apiException = ApiException::wrap($e);
         $e = $apiException->getPrevious() ?? $apiException;
 
-        $this->logError($e);
-
         $data = [];
-        $backtraces = null;
 
         if ($this->app->isDebug()) {
             $data['exception'] = $e::class;
-            $backtraces = BacktraceHelper::normalizeBacktraces($e->getTrace(), $this->app->path('@root'));
+            $data['backtraces'] = BacktraceHelper::normalizeBacktraces($e->getTrace());
 
-            // Add last caller
-            array_unshift(
-                $backtraces,
-                [
-                    'file' => BacktraceHelper::replaceRoot($e->getFile(), $this->app->path('@root'))
-                        . ':' . $e->getLine(),
-                    'function' => $e->getMessage(),
-                ]
-            );
+            foreach ($data['backtraces'] as &$datum) {
+                unset($datum['pathname']);
+            }
 
-            $data['backtraces'] = $backtraces = Arr::mapWithKeys(
-                $backtraces,
-                static fn($v, $k) => yield "#{$k} {$v['file']}" => $v['function']
-            );
-
-            // foreach ($data['backtraces'] as &$datum) {
-            //     unset($datum['pathname']);
-            // }
-
-            // unset($datum);
+            unset($datum);
 
             // if (class_exists(DebuggerHelper::class)) {
             //     try {
@@ -130,37 +110,17 @@ class JsonApiMiddleware extends JsonResponseMiddleware
             //         // None
             //     }
             // }
-
-            $data = array_merge($data, $apiException->debugData);
         }
 
-        $data = array_merge($data, $apiException->data);
+        $message = !$this->app->isDebug() ? $e->getMessage() : sprintf(
+            '#%d %s - File: %s (%d)',
+            $apiException->getErrCode() ?: $e->getCode(),
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        );
 
-        $verbosity = $this->app->getVerbosity();
-
-        $erroCode = $apiException->getErrCode();
-
-        if (ResponseHelper::isClientError($apiException->getStatusCode())) {
-            $message = $apiException->getMessage();
-        } elseif ($verbosity->isVerbose()) {
-            $message = sprintf(
-                '#%d %s - File: %s (%d)',
-                $erroCode,
-                $verbosity->displayMessage($e),
-                $e->getFile(),
-                $e->getLine()
-            );
-        } else {
-            $message = $verbosity->displayMessage($e);
-
-            $erroCode = $apiException->getRawErrCode() ?: '500';
-
-            if ($verbosity->isHidden()) {
-                $erroCode = '500';
-            }
-        }
-
-        $buffer = new JsonBuffer($message, $data, false, $erroCode);
+        $buffer = new JsonBuffer($message, $data, false, $apiException->getErrCode());
         $buffer->status = ErrorService::normalizeCode($apiException->getStatusCode());
 
         return new JsonResponse($buffer)
@@ -173,7 +133,7 @@ class JsonApiMiddleware extends JsonResponseMiddleware
      * getMessage
      *
      * @return  string
-     * @throws  DefinitionException
+     * @throws DefinitionException
      */
     protected function getMessage(): string
     {

@@ -103,6 +103,8 @@ class HtmlFrame
      * getTitle
      *
      * @return  string|null
+     *
+     * @codeCoverageIgnore
      */
     public function getTitle(): ?string
     {
@@ -115,6 +117,8 @@ class HtmlFrame
      * @param  string|null  $title
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setTitle(?string $title): static
     {
@@ -127,6 +131,8 @@ class HtmlFrame
      * Method to get property Favicon
      *
      * @return  string
+     *
+     * @codeCoverageIgnore
      */
     public function getFavicon(): ?string
     {
@@ -208,6 +214,9 @@ class HtmlFrame
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setNoindex($name = 'robots'): static
     {
         return $this->setRobotsMeta('noindex', $name);
@@ -294,6 +303,8 @@ class HtmlFrame
      * Method to get property CustomTags
      *
      * @return  array<HTMLElement>
+     *
+     * @codeCoverageIgnore
      */
     public function getCustomTags(): array
     {
@@ -306,6 +317,8 @@ class HtmlFrame
      * @param  array<HTMLElement>  $customTags
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setCustomTags(array $customTags): static
     {
@@ -322,6 +335,8 @@ class HtmlFrame
      * @param  bool               $replace
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function addMetadata(string $name, string|Stringable $content, bool $replace = false): static
     {
@@ -338,6 +353,8 @@ class HtmlFrame
      * @param  bool               $replace
      *
      * @return  static
+     *
+     * @codeCoverageIgnore
      */
     public function addOpenGraph(string $type, string|Stringable $content, bool $replace = false): static
     {
@@ -423,6 +440,8 @@ class HtmlFrame
      * Method to get property SiteName
      *
      * @return  string|null
+     *
+     * @codeCoverageIgnore
      */
     public function getSiteName(): ?string
     {
@@ -435,6 +454,8 @@ class HtmlFrame
      * @param  string|null  $siteName
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setSiteName(?string $siteName): static
     {
@@ -447,6 +468,8 @@ class HtmlFrame
      * Method to get property Indents
      *
      * @return  string
+     *
+     * @codeCoverageIgnore
      */
     public function getIndents(): string
     {
@@ -459,6 +482,8 @@ class HtmlFrame
      * @param  string  $indents
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setIndents(string $indents): static
     {
@@ -471,6 +496,8 @@ class HtmlFrame
      * Method to get property Metadata
      *
      * @return  Metadata
+     *
+     * @codeCoverageIgnore
      */
     public function getMetadata(): Metadata
     {
@@ -483,6 +510,8 @@ class HtmlFrame
      * @param  Metadata  $metadata
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setMetadata(Metadata $metadata): static
     {
@@ -542,6 +571,8 @@ class HtmlFrame
      * getBody
      *
      * @return  HTMLElement
+     *
+     * @codeCoverageIgnore
      */
     public function getBodyElement(): HTMLElement
     {
@@ -552,6 +583,8 @@ class HtmlFrame
      * @param  HTMLElement  $body
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setBodyElement(HTMLElement $body): static
     {
@@ -560,11 +593,17 @@ class HtmlFrame
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addBodyClass(string $class): HTMLElement
     {
         return $this->bodyElement->addClass($class);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function bodyAttributes(): string
     {
         return HTMLElement::buildAttributes($this->bodyElement);
@@ -572,6 +611,8 @@ class HtmlFrame
 
     /**
      * @return  HTMLElement
+     *
+     * @codeCoverageIgnore
      */
     public function getHtmlElement(): HTMLElement
     {
@@ -582,6 +623,8 @@ class HtmlFrame
      * @param  HTMLElement  $html
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setHtmlElement(HTMLElement $html): static
     {
@@ -590,11 +633,17 @@ class HtmlFrame
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addHtmlClass(string $class): HTMLElement
     {
         return $this->htmlElement->addClass($class);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function htmlAttributes(): string
     {
         return HTMLElement::buildAttributes($this->htmlElement);

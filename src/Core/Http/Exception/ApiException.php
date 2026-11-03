@@ -16,10 +16,6 @@ class ApiException extends \RuntimeException
 
     protected string $errCode = '';
 
-    public array $data = [];
-
-    public array $debugData = [];
-
     public function __construct(
         string $message = '',
         int|string $code = 0,
@@ -46,11 +42,13 @@ class ApiException extends \RuntimeException
 
     public static function fromEnum(\UnitEnum $enum, ?string $message = null, ?\Throwable $previous = null): static
     {
+        static::checkBackedEnumType($enum);
+
         $message = $message ?: static::getAttrFromEnum($enum, Title::class)?->string;
 
         [$code, $statusCode] = static::getStatusCodeFromEnum($enum);
 
-        return new static($message, $code, $statusCode, $previous);
+        return new static($message, (int) $code, $statusCode, $previous);
     }
 
     public static function wrap(\Throwable $e): static
@@ -70,8 +68,8 @@ class ApiException extends \RuntimeException
     /**
      * @param  int|\UnitEnum  $statusCode
      *
-     * @return  static                Return self to support chaining.
-     * @throws  \ReflectionException
+     * @return  static  Return self to support chaining.
+     * @throws \ReflectionException
      */
     public function setStatusCode(int|\UnitEnum $statusCode): static
     {
@@ -105,7 +103,7 @@ class ApiException extends \RuntimeException
      *
      * @return  T|object|null
      *
-     * @throws  \ReflectionException
+     * @throws \ReflectionException
      */
     protected static function getAttrFromEnum(\UnitEnum $enum, string $attr): ?object
     {
@@ -135,9 +133,9 @@ class ApiException extends \RuntimeException
     /**
      * @param  \UnitEnum  $enum
      *
-     * @return  array{ 0: int|string, 1: int }
+     * @return  array{ 0: int, 1: int }
      *
-     * @throws  \ReflectionException
+     * @throws \ReflectionException
      */
     protected static function getStatusCodeFromEnum(\UnitEnum $enum): array
     {
@@ -150,48 +148,32 @@ class ApiException extends \RuntimeException
         } else {
             static::checkEnumBacked($enum);
 
-            $code = $enum->value;
-            $statusCode = 500;
+            $code = $statusCode = $enum->value;
         }
 
         return [$code, $statusCode];
     }
 
+    /**
+     * @param  \UnitEnum  $enum
+     *
+     * @return  void
+     *
+     * @throws \ReflectionException
+     */
+    protected static function checkBackedEnumType(\UnitEnum $enum): void
+    {
+        if ($enum instanceof \BackedEnum) {
+            $ref = new \ReflectionEnum($enum);
+
+            if ($ref->getBackingType()?->getName() !== 'int') {
+                throw new \LogicException('The BackedEnum used as error code must be int type.');
+            }
+        }
+    }
+
     public function getErrCode(): string|int
     {
         return $this->errCode ?: $this->code;
-    }
-
-    public function getRawErrCode(): string
-    {
-        return $this->errCode;
-    }
-
-    public function setData(array $data): static
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    public function details(...$args): static
-    {
-        $this->data = [...$this->data, ...$args];
-
-        return $this;
-    }
-
-    public function setDebugData(array $debugData): static
-    {
-        $this->debugData = $debugData;
-
-        return $this;
-    }
-
-    public function debugDetails(...$args): static
-    {
-        $this->debugData = [...$this->debugData, ...$args];
-
-        return $this;
     }
 }

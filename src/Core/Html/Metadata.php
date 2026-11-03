@@ -141,6 +141,8 @@ class Metadata
      * Method to get property Metadata
      *
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getMetadata(): array
     {
@@ -153,6 +155,8 @@ class Metadata
      * @param  array  $metadata
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setMetadata(array $metadata): static
     {
@@ -165,6 +169,8 @@ class Metadata
      * Method to get property OpenGraphs
      *
      * @return  array
+     *
+     * @codeCoverageIgnore
      */
     public function getOpenGraphs(): array
     {
@@ -177,6 +183,8 @@ class Metadata
      * @param  array  $openGraphs
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setOpenGraphs(array $openGraphs): static
     {
