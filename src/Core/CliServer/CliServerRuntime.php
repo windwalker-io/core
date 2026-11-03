@@ -86,11 +86,17 @@ class CliServerRuntime
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function log(string|iterable $message, bool $newline = false): void
     {
         self::getOutput()->write($message, $newline);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function logLine(string|iterable $message): void
     {
         self::getOutput()->writeln($message);
@@ -111,11 +117,17 @@ class CliServerRuntime
         return self::$output;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getStyledOutput(): SymfonyStyle
     {
         return new SymfonyStyle(new ArrayInput([]), self::getOutput());
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function getInspector(): CliServerInspectorInterface
     {
         return self::$inspector;

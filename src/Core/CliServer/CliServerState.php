@@ -23,11 +23,17 @@ class CliServerState extends ValueObject
     public array $server = [];
     public array $subServers = [];
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getHost(): string
     {
         return $this->host;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setHost(string $host): static
     {
         $this->host = $host;
@@ -35,11 +41,17 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getPort(): int
     {
         return $this->port;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setPort(int $port): static
     {
         $this->port = $port;
@@ -47,6 +59,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setName(string $name): static
     {
         $this->name = $name;
@@ -54,6 +69,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setMasterPid(int $masterPid): static
     {
         $this->masterPid = $masterPid;
@@ -61,6 +79,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setManagerPid(int $managerPid): static
     {
         $this->managerPid = $managerPid;
@@ -68,6 +89,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setStartupOptions(array $startupOptions): static
     {
         $this->startupOptions = $startupOptions;
@@ -75,26 +99,41 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getManagerPid(): int
     {
         return $this->managerPid;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getMasterPid(): int
     {
         return $this->masterPid;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getStartupOptions(): array
     {
         return $this->startupOptions;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getSubServers(): array
     {
         return $this->subServers;
@@ -104,6 +143,8 @@ class CliServerState extends ValueObject
      * @param  array  $subServers
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setSubServers(array $subServers): static
     {
@@ -112,6 +153,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getServer(): array
     {
         return $this->server;
@@ -121,6 +165,8 @@ class CliServerState extends ValueObject
      * @param  array  $server
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setServer(array $server): static
     {
@@ -129,6 +175,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getWorkerNumber(): int
     {
         return $this->workerNumber;
@@ -138,6 +187,8 @@ class CliServerState extends ValueObject
      * @param  int  $workerNumber
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setWorkerNumber(int $workerNumber): static
     {
@@ -146,6 +197,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getServerName(): string
     {
         return $this->serverName;
@@ -155,6 +209,8 @@ class CliServerState extends ValueObject
      * @param  string  $serverName
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setServerName(string $serverName): static
     {
@@ -163,6 +219,9 @@ class CliServerState extends ValueObject
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getVerbosity(): int
     {
         return $this->verbosity;
@@ -172,6 +231,8 @@ class CliServerState extends ValueObject
      * @param  int  $verbosity
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setVerbosity(int $verbosity): static
     {

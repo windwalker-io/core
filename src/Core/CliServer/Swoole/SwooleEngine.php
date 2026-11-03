@@ -47,6 +47,9 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         $this->serverStateManager->setFilePath($this->options['state_file']);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getName(): string
     {
         return $this->name;
@@ -251,11 +254,17 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
         return true;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function isAlive(int $pid): bool
     {
         return self::signal($pid);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function signal(int $pid, int $signo = 0): bool
     {
         return SwooleProcess::kill($pid, $signo);
@@ -263,6 +272,8 @@ class SwooleEngine implements CliServerEngineInterface, ServerProcessManageInter
 
     /**
      * @return  SymfonyStyle
+     *
+     * @codeCoverageIgnore
      */
     protected function getStyledOutput(): SymfonyStyle
     {

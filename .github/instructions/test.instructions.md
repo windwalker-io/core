@@ -18,6 +18,33 @@ integration with `TestWebAppFactory`, app-backed, database), see
 - Use the `Windwalker\Tests\` namespace followed by the mirrored directory
   path, consistent with the development autoload mapping in `composer.json`.
 
+## Stubs and mocks
+
+- Before writing a new Stub or Mock class, check
+  [`tests/Testing/Stub/`](../../tests/Testing/Stub/) for an existing double
+  that already does the job. Do not duplicate one that already exists there.
+- If the double you are about to write has no dependency on the specific
+  feature/class under test (e.g. a generic PSR-3 logger spy, a PSR-15
+  passthrough middleware, a PSR-7/HTTP server no-op), add it to
+  `tests/Testing/Stub/` instead of a feature-local `Stub/` directory, so
+  other test suites can reuse it. This repo uses a single `Stub/` naming
+  convention for both stubs and mocks; there is no separate `Mock/`
+  directory.
+- If the double is tied to one feature/class (constructor shape, specific
+  behavior only that code exercises), keep it in that area's own `Stub/`
+  directory next to the tests that use it (see "Fixtures" in
+  [testing-architecture.md](../docs/testing-architecture.md)), with a
+  docblock stating what depends on it and when it can be removed. Promote it
+  to `tests/Testing/Stub/` once a second, unrelated test needs the same
+  double.
+- Current reusable entries in `tests/Testing/Stub/` (update this list when
+  adding or removing one):
+  - `SpyLogger`: PSR-3 logger that records every `log()` call for assertions.
+  - `PassThroughMiddleware`: PSR-15 middleware that tags the request with a
+    `passed` attribute and delegates; for middleware pipeline tests.
+  - `FakeHttpServer`: no-op `Windwalker\Http\Server\ServerInterface`
+    implementation; for tests that need to boot against a fake server.
+
 ## Test helpers
 
 - [`StaticContainerTestTrait.php`](../../tests/Testing/Traits/StaticContainerTestTrait.php):
@@ -43,6 +70,15 @@ integration with `TestWebAppFactory`, app-backed, database), see
   Its `dispatchController()` delegates to `TestApp::$appContext` and accepts a
   controller, input data or request, and explicit method arguments. Prepare
   the app context before dispatching.
+
+## Known pitfalls
+
+- Before writing a tier 2 (`TestWebAppFactory`) test for `WebApplication`/
+  `AppContext`/event or DI wiring, check
+  [testing-architecture.md's pitfalls list](../docs/testing-architecture.md#pitfalls-found-while-closing-coverage-gaps-in-coreapplication)
+  for known gotchas (request-container overrides, `config()` path resolution,
+  event listener timing, coverage branch semantics) before debugging from
+  scratch.
 
 ## Execution context
 

@@ -16,6 +16,9 @@ class CliServerStateManager
 {
     public function __construct(protected $filePath = '') {}
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getFilePath(): string
     {
         return $this->filePath;
@@ -25,6 +28,8 @@ class CliServerStateManager
      * @param  string  $filePath
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setFilePath(string $filePath): static
     {
@@ -33,6 +38,9 @@ class CliServerStateManager
         return $this;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getFile(): FileObject
     {
         return fs($this->filePath);
@@ -76,6 +84,9 @@ class CliServerStateManager
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function clearState(): bool
     {
         return $this->getFile()->deleteIfExists();

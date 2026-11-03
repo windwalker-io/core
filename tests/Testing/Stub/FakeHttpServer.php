@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Core\Application\Stub;
+namespace Windwalker\Tests\Testing\Stub;
 
 use Windwalker\Http\Server\ServerInterface;
 
 /**
- * Minimal no-op ServerInterface implementation for WebApplication::bootForServer() tests.
+ * Minimal no-op ServerInterface implementation.
+ *
+ * Shared, general-purpose double; safe to reuse from any test suite that
+ * needs a fake HTTP server without a real listen loop.
  */
 class FakeHttpServer implements ServerInterface
 {

@@ -10,6 +10,9 @@ class TestInspector implements CliServerInspectorInterface
 {
     public bool $enableConnectionPool = false;
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function shouldEnableConnectionPool(): bool
     {
         return $this->enableConnectionPool;

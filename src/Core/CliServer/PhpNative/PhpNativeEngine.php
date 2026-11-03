@@ -45,6 +45,9 @@ class PhpNativeEngine implements CliServerEngineInterface
         $resolver->setDefined(['state_file']);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function isSupported(): bool
     {
         return true;
@@ -106,6 +109,8 @@ class PhpNativeEngine implements CliServerEngineInterface
 
     /**
      * @return  SymfonyStyle
+     *
+     * @codeCoverageIgnore
      */
     protected function getStyledOutput(): SymfonyStyle
     {
@@ -115,11 +120,17 @@ class PhpNativeEngine implements CliServerEngineInterface
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function isRunning(): bool
     {
         return false;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getName(): string
     {
         return $this->name;

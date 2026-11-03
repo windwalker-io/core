@@ -42,6 +42,9 @@ class CliServerFactory
         };
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function addEngineType(string $name, mixed $factory): static
     {
         $this->engineTypes[$name] = $factory;

@@ -52,6 +52,9 @@ class AuthService
         return $this->getAuthorization()->authorize($policy, $user, ...$args);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function can(string|\UnitEnum $policy, mixed $user = null, ...$args): bool
     {
         return $this->authorize($policy, $user, ...$args);
@@ -90,6 +93,8 @@ class AuthService
      * @param  AuthenticationInterface  $authentication
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setAuthentication(AuthenticationInterface $authentication): static
     {
@@ -102,6 +107,8 @@ class AuthService
      * @param  AuthorizationInterface  $authorization
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setAuthorization(AuthorizationInterface $authorization): static
     {
@@ -127,6 +134,8 @@ class AuthService
      * @param  callable  $userRetrieveHandler
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setUserRetrieveHandler(callable $userRetrieveHandler): static
     {

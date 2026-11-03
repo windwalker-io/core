@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Core\Application\Stub;
+namespace Windwalker\Tests\Testing\Stub;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,8 +12,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Test-only PSR-15 middleware that marks the request with a `passed` attribute and delegates.
  *
- * Used by MiddlewareRunnerTest to verify class-name middleware resolution through the container.
- * Remove it together with those tests if MiddlewareRunner stops resolving class-name middleware.
+ * Shared, general-purpose PSR-15 double; safe to reuse from any test suite
+ * exercising a middleware pipeline.
  */
 class PassThroughMiddleware implements MiddlewareInterface
 {
