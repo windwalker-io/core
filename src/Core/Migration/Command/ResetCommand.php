@@ -55,16 +55,14 @@ class ResetCommand extends AbstractMigrationCommand
         $command->addOption(
             'no-backup',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Do not backup database.',
-            false
         );
         $command->addOption(
             'no-create-db',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Do not auto create database or schema.',
-            false
         );
         $this->configureRunningOptions($command);
     }

@@ -41,7 +41,7 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
         $command->addOption(
             'no-create-db',
             null,
-            InputOption::VALUE_REQUIRED,
+            InputOption::VALUE_NONE,
             'Do not auto create database or schema.'
         );
 

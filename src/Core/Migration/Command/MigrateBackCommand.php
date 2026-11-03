@@ -50,9 +50,8 @@ class MigrateBackCommand extends AbstractMigrationCommand
         $command->addOption(
             'no-backup',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Do not backup database.',
-            false
         );
 
         $this->configureRunningOptions($command);
