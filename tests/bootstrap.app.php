@@ -24,5 +24,6 @@ $init(
         '@temp' => $root . '/tmp',
         '@public' => $root . '/tests/public',
         '@migrations' => $root . '/tests/resources/migrations',
+        '@seeders' => $root . '/tests/resources/seeders',
     ]
 );

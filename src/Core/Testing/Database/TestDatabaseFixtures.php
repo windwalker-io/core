@@ -7,6 +7,7 @@ namespace Windwalker\Core\Testing\Database;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Core\Migration\MigrationService;
+use Windwalker\Core\Seed\SeedService;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\DI\Attributes\Service;
@@ -52,10 +53,21 @@ class TestDatabaseFixtures
         }
     }
 
+    public static function createMigrationRunner(?string $connection = null): MigrationService
+    {
+        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+
+        return TestApp::$ctx->make(
+            MigrationService::class,
+            [
+                'db' => $db,
+            ],
+        );
+    }
+
     public static function migrate(?string $connection = null, string|bool $log = false): int
     {
         $factory = TestApp::$ctx->retrieve(DatabaseServiceFactory::class);
-        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
         $pathResolver = TestApp::$ctx->retrieve(PathResolver::class);
 
         // Logging
@@ -71,19 +83,33 @@ class TestDatabaseFixtures
             }
         }
 
-        $migrationService = TestApp::$ctx->make(
-            MigrationService::class,
+        // Do migrate
+        return static::createMigrationRunner($connection)
+            ->migrate(
+                $pathResolver->resolve('@migrations'),
+                null,
+                $logFile,
+            );
+    }
+
+    public static function createSeedRunner(?string $connection = null): SeedService
+    {
+        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+
+        return TestApp::$ctx->make(
+            SeedService::class,
             [
                 'db' => $db,
             ],
         );
+    }
 
-        // Do migrate
-        return $migrationService->migrate(
-            $pathResolver->resolve('@migrations'),
-            null,
-            $logFile,
-        );
+    public static function seeding(?string $connection = null): int
+    {
+        return static::createSeedRunner($connection)
+            ->import(
+                TestApp::$ctx->retrieve(PathResolver::class)->resolve('@seeders'),
+            );
     }
 
     public static function resetAndMigrate(?string $connection = null, string|bool $log = false): void
