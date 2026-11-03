@@ -42,9 +42,12 @@
         "symfony/polyfill-time": "^1.42"
     },
     "require-dev": {
-        "windwalker/framework": "4.2.x-dev",
+        "windwalker/framework": "4.x-dev",
         "friendsofphp/php-cs-fixer": "^3.95",
-        "phpunit/phpunit": "^13.4"
+        "phpunit/phpunit": "^13.4",
+        "symfony/mailer": "^8.1",
+        "dragonmantank/cron-expression": "^3.6",
+        "tijsverkoyen/css-to-inline-styles": "^2.4"
     },
     "scripts": {
         "test": "phpunit",

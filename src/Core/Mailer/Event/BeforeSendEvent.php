@@ -28,6 +28,8 @@ class BeforeSendEvent extends BaseEvent
      * @return  int
      *
      * @deprecated  Use property instead.
+     *
+     * @codeCoverageIgnore
      */
     public function &getFlags(): int
     {

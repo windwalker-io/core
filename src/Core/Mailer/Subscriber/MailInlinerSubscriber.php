@@ -60,7 +60,11 @@ class MailInlinerSubscriber
         // Loop internal styles
         foreach ($matches as $match) {
             if (!isset($match[1])) {
+                // @codeCoverageIgnoreStart
+                // Defensive: the regex above always captures group 1 (possibly empty) for every
+                // full `<style>...</style>` match, so this branch is unreachable in practice.
                 continue;
+                // @codeCoverageIgnoreEnd
             }
 
             $css .= $match[1] . "\n";

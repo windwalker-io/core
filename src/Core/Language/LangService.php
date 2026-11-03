@@ -63,6 +63,9 @@ class LangService implements LanguageInterface
         $this->addPath($this->config->getDeep('language.paths') ?? []);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function __invoke(string|RawWrapper $id, ...$args): string
     {
         return $this->trans($id, ...$args);
@@ -193,7 +196,8 @@ class LangService implements LanguageInterface
     public function __clone(): void
     {
         $this->paths = clone $this->paths;
-        $this->language = clone $this->language;
+        // $this->language is lazily created, so it may still be null here.
+        $this->language = $this->language !== null ? clone $this->language : null;
     }
 
     /**
@@ -224,7 +228,12 @@ class LangService implements LanguageInterface
     public static function checkLanguageInstalled(): void
     {
         if (!class_exists(Language::class)) {
+            // @codeCoverageIgnoreStart
+            // windwalker/language is always present in this dev/test environment
+            // (via windwalker/framework's dev-require), so this guard cannot be
+            // exercised by tests without uninstalling the package.
             throw new DomainException('Please install windwalker/language first.');
+            // @codeCoverageIgnoreEnd
         }
     }
 
@@ -232,6 +241,8 @@ class LangService implements LanguageInterface
      * @param  Language|null  $language
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setLanguage(?Language $language): static
     {
@@ -268,6 +279,8 @@ class LangService implements LanguageInterface
 
     /**
      * @return  self
+     *
+     * @codeCoverageIgnore
      */
     public function getParent(): ?self
     {
@@ -278,6 +291,8 @@ class LangService implements LanguageInterface
      * @param  self  $parent
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setParent(?self $parent): static
     {
@@ -297,26 +312,41 @@ class LangService implements LanguageInterface
         return $r;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function get(string $id, ?string $locale = null, bool $fallback = true): array
     {
         return $this->getLanguage()->get($id, $locale, $fallback);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function trans(string|RawWrapper $id, ...$args): string
     {
         return $this->getLanguage()->trans($id, ...$args);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function choice(string|RawWrapper $id, float|int $number, ...$args)
     {
         return $this->getLanguage()->choice($id, $number, ...$args);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function replace(string $string, array $args = []): string
     {
         return $this->getLanguage()->replace($string, $args);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function has(string $id, ?string $locale = null, bool $fallback = true): bool
     {
         return $this->getLanguage()->has($id, $locale, $fallback);

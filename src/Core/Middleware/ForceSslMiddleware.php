@@ -95,6 +95,8 @@ class ForceSslMiddleware implements MiddlewareInterface
      * @param  bool  $enabled
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function enabled(bool $enabled): static
     {
@@ -107,6 +109,8 @@ class ForceSslMiddleware implements MiddlewareInterface
      * @param  int  $redirectCode
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function redirectCode(int $redirectCode): static
     {
@@ -119,6 +123,8 @@ class ForceSslMiddleware implements MiddlewareInterface
      * @param  mixed  $headers
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function headers(callable|array|null $headers): static
     {

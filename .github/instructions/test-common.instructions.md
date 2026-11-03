@@ -69,6 +69,25 @@ Tests touching a real database: see [Database Testing](../docs/database-testing.
 
 See [Testing and Coverage](../docs/testing.md) for test selectors, driver setup, report commands, and scope caveats.
 
+## Reading or setting ENV values in tests
+
+Use `Windwalker\Utilities\Env::get()` instead of reading `$_SERVER`/`$_ENV` directly to fetch an env value; it
+already checks `$_SERVER` then `$_ENV`, matching what the framework's own `env()` helper reads. If the installed
+`windwalker/utilities` version also provides `Env::set()`, prefer it for writes too, since it keeps `$_SERVER`,
+`$_ENV`, and `putenv()` in sync in one call; otherwise set `$_SERVER` (and `$_ENV` if relevant) manually. This
+matters because a host app's local `.env` may set a variable (for example `MAIL_ENABLED=1`) that leaks into
+`$_SERVER`/`$_ENV` during bootstrap and pollutes tests expecting a different default. When a test depends on an env
+value, read and save the original value with `Env::get()` in a `#[Before]` hook before overwriting it, then restore
+that saved value in `#[After]`.
+
+## Prefer the project's own `tmp/` directory for temporary files
+
+When a test needs a scratch file or directory, prefer the project's own `tmp/` directory (`WINDWALKER_TEMP`, which
+resolves to `WINDWALKER_ROOT . '/tmp'` by default, gitignored except for `.gitkeep`) over `sys_get_temp_dir()` /
+`tempnam()` on the OS temp dir, and never create loose scratch files directly under the project root. Build the path
+with something like `WINDWALKER_TEMP . '/ww-test-' . uniqid()`, create it in a `#[Before]`/setup step, and always
+remove it in `#[After]` (or register a shutdown function) so leftover test artifacts do not accumulate in `tmp/`.
+
 ## Filesystem tests: cross-platform paths and virtual storage
 
 - When testing the real filesystem, use

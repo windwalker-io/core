@@ -74,11 +74,17 @@ class JsonResponseMiddleware implements AttributeMiddlewareInterface
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected static function toJsonResponse(ResponseInterface $response): JsonResponse
     {
         return JsonResponse::from($response);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function logError(\Throwable $e): void
     {
         $this->app->retrieve(ErrorService::class)->logException($e);

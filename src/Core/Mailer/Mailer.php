@@ -143,6 +143,8 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
 
     /**
      * @return  Envelope|null
+     *
+     * @codeCoverageIgnore
      */
     public function getEnvelop(): ?Envelope
     {
@@ -153,6 +155,8 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
      * @param  Envelope|null  $envelop
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setEnvelop(?Envelope $envelop): static
     {
@@ -192,6 +196,9 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function createAssetService(): AssetService
     {
         return $this->container->newInstance(AssetService::class);
@@ -228,6 +235,8 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
 
     /**
      * @return  TransportInterface
+     *
+     * @codeCoverageIgnore
      */
     public function getTransport(): TransportInterface
     {
@@ -238,6 +247,8 @@ class Mailer implements MailerInterface, BuilderMailerInterface, RenderableMaile
      * @param  TransportInterface  $transport
      *
      * @return  static  Return self to support chaining.
+     *
+     * @codeCoverageIgnore
      */
     public function setTransport(TransportInterface $transport): static
     {

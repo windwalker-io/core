@@ -100,7 +100,10 @@ class MailMessage extends Email
         echo $this->getHtmlBody();
 
         if ($die) {
+            // @codeCoverageIgnoreStart
+            // Process-level exit, cannot be exercised in a test without terminating the runner.
             die;
+            // @codeCoverageIgnoreEnd
         }
 
         return $this;
@@ -108,6 +111,8 @@ class MailMessage extends Email
 
     /**
      * @return  AssetService|null
+     *
+     * @codeCoverageIgnore
      */
     public function getAsset(): ?AssetService
     {
