@@ -21,6 +21,7 @@ use Windwalker\ORM\ORM;
  */
 trait DatabaseTestTrait
 {
+    protected static DatabaseAdapter $db;
     protected static ORM $orm;
 
     /**
@@ -28,15 +29,16 @@ trait DatabaseTestTrait
      * Runs before the test class's own setUpBeforeClass().
      */
     #[BeforeClass]
-    public static function bootOrm(): void
+    public static function bootDb(): void
     {
         TestApp::$instance->initializeDatabase();
 
         $db = TestApp::$instance->retrieve(DatabaseAdapter::class);
 
+        static::$db = $db;
         static::$orm = $db->orm();
 
-        static::prepareTables();
+        static::prepareTablesBeforeClass();
     }
 
     /**
@@ -44,9 +46,10 @@ trait DatabaseTestTrait
      * Runs before the test class's own setUp().
      */
     #[Before]
-    public function truncateBeforeTest(): void
+    public function prepareDatabaseBeforeTest(): void
     {
-        static::clearTables();
+        $this->clearTables();
+        $this->prepareFixtures();
     }
 
     #[AfterClass]
@@ -60,12 +63,17 @@ trait DatabaseTestTrait
      * Override in the test class to create tables (usually a no-op when
      * migrations handle the schema).
      */
-    protected static function prepareTables(): void {}
+    protected static function prepareTablesBeforeClass(): void {}
 
     /**
      * Override in the test class to truncate the tables it owns.
      */
-    protected static function clearTables(): void {}
+    protected function clearTables(): void {}
+
+    /**
+     * Override in the test class to prepare fixtures.
+     */
+    protected function prepareFixtures(): void {}
 
     public static function truncateTables(...$tables): void
     {

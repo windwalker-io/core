@@ -17,7 +17,7 @@ Pick the lowest tier that covers the behavior.
 |------|-------|---------|-----------|
 | 1. Unit with doubles | nothing | one class with mocked collaborators (factories, services, form, managers) | [`tests/Core/Form/FormFactoryTest.php`](../../tests/Core/Form/FormFactoryTest.php) |
 | 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application/) with [`TestWebAppFactory`](../../tests/Core/Application/Stub/TestWebAppFactory.php) |
-| 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`tests/TestApp.php`](../../tests/TestApp.php), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `StaticContainerTestTrait`, `ControllerTestTrait` |
+| 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`tests/TestApp.php`](../../tests/TestApp.php), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `DITestTrait`, `ControllerTestTrait` |
 | 4. Database | disposable DB, DSN or host DB config | ORM, migrations, seeders, query behavior | `DatabaseTestTrait` (see [`../instructions/test.instructions.md`](../instructions/test.instructions.md)) |
 
 Tiers 3 and 4 depend on a host app; never make tier 1 or 2 tests depend on one.
@@ -77,8 +77,8 @@ needs the request pipeline in tier 2, and only ORM/DB behavior in tier 4.
   instances differ; app-scoped services must be the same.
 - Inject the request through `createContext($request)` rather than touching
   globals.
-- In tier 3, `TestApp::prepareTestContext()` sets the static
-  `TestApp::$appContext`; `dispatchWithInput()` swaps the request and
+- In tier 3, `TestApp::prepareSharedContext()` sets the static
+  `TestApp::$sharedCtx` and `TestApp::$ctx`; `dispatchWithInput()` swaps the request and
   controller and restores them afterwards. Do not rely on state left by a
   previous test.
 - Debug output: the test context disables the debug profiler
@@ -104,7 +104,7 @@ creation:
 
 - **Per test class**: build the custom context once in a `#[BeforeClass]`
   hook and store it in a static property, the same pattern
-  `StaticContainerTestTrait` already uses for its child container. Cheaper,
+  `DITestTrait` already uses for its child container. Cheaper,
   but every test method in the class shares the same providers/bindings.
 - **Per test method**: rebuild the context in a `#[Before]` hook (runs
   before every test method) and store it in an *instance* property instead

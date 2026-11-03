@@ -47,10 +47,10 @@ integration with `TestWebAppFactory`, app-backed, database), see
 
 ## Test helpers
 
-- [`StaticContainerTestTrait.php`](../../tests/Testing/Traits/StaticContainerTestTrait.php):
+- [`DITestTrait.php`](../../tests/Testing/Traits/DITestTrait.php):
   use this as a reference when dependency injection is needed.
   It creates a child container for each test class and exposes `make()`,
-  `retrieve()`, and `call()`. Prepare `TestApp::$appContext` first; this trait
+  `retrieve()`, and `call()`. Prepare `TestApp::$ctx` (or `$sharedCtx`) first; this trait
   does not bootstrap the application.
 - [`DatabaseTestTrait.php`](../../../framework/packages/test/src/Traits/DatabaseTestTrait.php):
   use `Windwalker\Test\Traits\DatabaseTestTrait` from `windwalker/test` for
@@ -73,7 +73,7 @@ integration with `TestWebAppFactory`, app-backed, database), see
   in the test class to create tables and seed rows.
 - [`ControllerTestTrait.php`](../../tests/Testing/Traits/ControllerTestTrait.php):
   use this as a reference when executing controllers.
-  Its `dispatchController()` delegates to `TestApp::$appContext` and accepts a
+  Its `dispatchController()` delegates to `TestApp::$ctx` and accepts a
   controller, input data or request, and explicit method arguments. Prepare
   the app context before dispatching.
 

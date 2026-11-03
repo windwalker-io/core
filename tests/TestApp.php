@@ -21,7 +21,21 @@ class TestApp extends WebApplication
 {
     public static self $instance;
 
+    /**
+     * Context a test class assigned to itself, usually in its own
+     * `#[BeforeClass]` hook, when it needs to customize the request layer
+     * (providers, bindings) instead of using {@see $sharedCtx}. Shared by
+     * every test method in that class, the same way the static container in
+     * `StaticContainerTestTrait` is.
+     */
     public static AppContext $ctx;
+
+    /**
+     * Context created once at bootstrap by {@see prepareSharedContext()},
+     * for tests that do not need to build their own and just want a ready
+     * request-level context to retrieve services from.
+     */
+    public static AppContext $sharedCtx;
 
     protected bool $dbInitialized = false;
 
@@ -34,30 +48,52 @@ class TestApp extends WebApplication
         return $this->runContext($appContext);
     }
 
-    public function prepareTestContext(?ServerRequestInterface $request = null): AppContext
+    public static function createTestContext(?ServerRequestInterface $request = null): AppContext
     {
+        $app = static::$instance ?? throw new \RuntimeException('TestApp instance not set.');
+
         $request ??= ServerRequestFactory::createFromGlobals();
 
-        $appContext = $this->createContext($request);
+        $appContext = $app->createContext($request);
+
         $appContext->disableDebugProfiler(true);
-        static::$ctx = $appContext;
 
         $container = $appContext->getContainer();
         $request = $container->get(ServerRequestInterface::class);
 
         // @event
-        $event = $this->emit(
+        $event = $app->emit(
             new BeforeRequestEvent(container: $container, request: $request)
         );
 
-        // if ($handler) {
-        //     $appContext->setController($handler);
-        // }
-
         // @event
-        $event = $appContext->emit(
+        $appContext->emit(
             new BeforeRequestEvent(container: $container, request: $event->request)
         );
+
+        return $appContext;
+    }
+
+    /**
+     * Create and prepare the context shared by every test that does not
+     * build its own, storing it in {@see $sharedCtx}. Called once from
+     * `bootstrap.app.php`.
+     */
+    public function prepareSharedContext(?ServerRequestInterface $request = null): AppContext
+    {
+        $appContext = $this->createContext($request);
+
+        static::$sharedCtx = $appContext;
+        static::$ctx = $appContext;
+
+        return $appContext;
+    }
+
+    public static function prepareTestContext(?ServerRequestInterface $request = null): AppContext
+    {
+        $appContext = static::$instance->createContext($request);
+
+        static::$ctx = $appContext;
 
         return $appContext;
     }

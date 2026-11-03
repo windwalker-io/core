@@ -16,7 +16,7 @@ use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\ORM\ORM;
 
-trait StaticContainerTestTrait
+trait DITestTrait
 {
     protected static Container $container;
 

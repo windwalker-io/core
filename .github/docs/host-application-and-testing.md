@@ -96,7 +96,7 @@ support uses
 to obtain the configured
 `DatabaseAdapter` and ORM. A database test bootstrap must create the app
 container, configure the database provider, initialize `TestApp::$instance`,
-and prepare `TestApp::$appContext` before database-backed traits are used.
+and prepare `TestApp::$ctx` (via `prepareSharedContext()`) before database-backed traits are used.
 Composer autoloading alone does not provide this application state. This test
 app can be configured by a consuming app when one is available, or by Core's
 own isolated test bootstrap when Core is tested independently.

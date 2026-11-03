@@ -5,7 +5,8 @@
  *
  * Referenced by phpunit.app.dist.xml. It loads the host's autoloader and
  * etc/define.php, boots Runtime, and prepares TestApp::$instance and
- * TestApp::$appContext, which the traits in tests/Testing rely on.
+ * TestApp::$sharedCtx (also assigned to TestApp::$ctx), which the traits in
+ * tests/Testing rely on by default.
  *
  * The host root is taken from the WINDWALKER_TEST_APP_ROOT environment
  * variable, otherwise from the conventional vendor/windwalker/core location.
@@ -49,4 +50,4 @@ CliServerRuntime::boot('test', []);
 $main = Runtime::getContainer()->resolve('factories.apps.main');
 
 TestApp::$instance = new TestApp($main->getContainer()->createChild());
-TestApp::$instance->prepareTestContext();
+TestApp::$instance->prepareSharedContext();
