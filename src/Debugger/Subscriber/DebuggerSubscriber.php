@@ -444,7 +444,7 @@ class DebuggerSubscriber
                                             && $query->getType() === Query::TYPE_SELECT
                                         ) {
                                             $query = clone $query;
-                                            $query->prefix('EXPLAIN');
+                                            $query->prefix('EXPLAIN FORMAT=TRADITIONAL ');
                                             $data['explain'] = $db->prepare($query)->all();
                                         }
 
