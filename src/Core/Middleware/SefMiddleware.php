@@ -20,13 +20,21 @@ use const Windwalker\Stream\READ_WRITE_FROM_BEGIN;
 class SefMiddleware implements MiddlewareInterface
 {
     public const int REPLACE_LINK_HREF = 1 << 0;
+
     public const int REPLACE_LINK_HASH = 1 << 1;
+
     public const int REPLACE_SRC = 1 << 2;
+
     public const int REPLACE_SRCSET = 1 << 3;
+
     public const int REPLACE_POSTER = 1 << 4;
+
     public const int REPLACE_WINDOW_OPEN = 1 << 5;
+
     public const int REPLACE_STYLES = 1 << 6;
+
     public const int REPLACE_OBJECTS = 1 << 7;
+
     public const int REPLACE_ALL = self::REPLACE_LINK_HREF | self::REPLACE_LINK_HASH | self::REPLACE_SRC
         | self::REPLACE_SRCSET | self::REPLACE_POSTER | self::REPLACE_WINDOW_OPEN | self::REPLACE_STYLES
         | self::REPLACE_OBJECTS;
@@ -36,7 +44,7 @@ class SefMiddleware implements MiddlewareInterface
         protected bool $enabled = true,
         protected ?string $baseHref = null,
         protected ?string $baseSrc = null,
-        protected int $flags = self::REPLACE_ALL
+        protected int $flags = self::REPLACE_ALL,
     ) {}
 
     /**
@@ -59,7 +67,7 @@ class SefMiddleware implements MiddlewareInterface
     }
 
     /**
-     * @see https://github.com/joomla/joomla-cms/blob/staging/plugins/system/sef/sef.php
+     * @see    https://github.com/joomla/joomla-cms/blob/staging/plugins/system/sef/sef.php
      *
      * @param  string  $buffer
      *
@@ -83,14 +91,14 @@ class SefMiddleware implements MiddlewareInterface
         if (($this->flags & static::REPLACE_LINK_HASH) && str_contains($buffer, '#')) {
             $fullPath = new Uri($uri->full())->toString(Uri::PATH | Uri::QUERY);
 
-            $regex  = '#\shref="\#(?!/|\')([^"]*)"#m';
+            $regex = '#\shref="\#(?!/|\')([^"]*)"#m';
             $buffer = preg_replace($regex, ' href="' . $fullPath . '#$1"', $buffer);
             $this->checkBuffer($buffer);
         }
 
         // Check for all unknown protocals
         // (a protocol must contain at least one alpahnumeric character followed by a ":").
-        $protocols  = '[a-zA-Z0-9\-]+:';
+        $protocols = '[a-zA-Z0-9\-]+:';
         $attributes = [];
 
         if ($this->flags & static::REPLACE_LINK_HREF) {
@@ -108,15 +116,15 @@ class SefMiddleware implements MiddlewareInterface
         if ($attributes !== []) {
             foreach ($attributes as $attribute => $base) {
                 if (str_contains($buffer, $attribute)) {
-                    $regex  = '#\s' . $attribute . '(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
-                    $buffer = preg_replace($regex, ' ' . $attribute . '"' . $base . '$1$2"', $buffer);
+                    $regex = '#\s' . $attribute . '(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
+                    $buffer = preg_replace($regex, ' ' . $attribute . $base . '$1$2"', $buffer);
                     $this->checkBuffer($buffer);
                 }
             }
         }
 
         if ($this->flags & static::REPLACE_SRCSET && str_contains($buffer, 'srcset=')) {
-            $regex  = '#\s+srcset="([^"]+)"#m';
+            $regex = '#\s+srcset="([^"]+)"#m';
             $buffer = (string) preg_replace_callback(
                 $regex,
                 static function ($match) use ($baseSrc, $protocols) {
@@ -128,7 +136,7 @@ class SefMiddleware implements MiddlewareInterface
 
                     return ' srcset="' . implode($matches[0]) . '"';
                 },
-                $buffer
+                $buffer,
             );
 
             $this->checkBuffer($buffer);
@@ -136,7 +144,7 @@ class SefMiddleware implements MiddlewareInterface
 
         // Replace all unknown protocals in javascript window open events.
         if (($this->flags & static::REPLACE_WINDOW_OPEN) && str_contains($buffer, 'window.open(')) {
-            $regex  = '#onclick="window.open\(\'(?!/|' . $protocols . '|\#)([^/]+[^\']*?\')#m';
+            $regex = '#onclick="window.open\(\'(?!/|' . $protocols . '|\#)([^/]+[^\']*?\')#m';
             $buffer = preg_replace($regex, 'onclick="window.open(\'' . $baseHref . '$1', $buffer);
             $this->checkBuffer($buffer);
         }
@@ -158,14 +166,14 @@ class SefMiddleware implements MiddlewareInterface
 
             // Replace all unknown protocols in CSS background image.
             if (str_contains($buffer, 'style=')) {
-                $regex     = '#style=\s*([\'\"])(.*):' . $regexUrl . '#m';
-                $buffer    = preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
+                $regex = '#style=\s*([\'\"])(.*):' . $regexUrl . '#m';
+                $buffer = preg_replace($regex, 'style=$1$2: url($3' . $baseSrc . '$4$5)', $buffer);
                 $this->checkBuffer($buffer);
             }
 
             // Replace style tags
             if (str_contains($buffer, '<style')) {
-                /** @var null|string $buffer */
+                /** @var string|null $buffer */
                 $buffer = preg_replace_callback(
                     "'<style(.*?)>(.*?)</style>'is",
                     static function ($matches) use ($baseSrc, $regexUrl) {
@@ -177,7 +185,7 @@ class SefMiddleware implements MiddlewareInterface
 
                         return '<style' . $matches[1] . '>' . $css . '</style>';
                     },
-                    $buffer
+                    $buffer,
                 );
 
                 $this->checkBuffer($buffer);
@@ -188,13 +196,13 @@ class SefMiddleware implements MiddlewareInterface
             // Replace all unknown protocols in OBJECT param tag.
             if (str_contains($buffer, '<param')) {
                 // OBJECT <param name="xx", value="yy"> -- fix it only inside the <param> tag.
-                $regex  = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|'
+                $regex = '#(<param\s+)name\s*=\s*"(movie|src|url)"[^>]\s*value\s*=\s*"(?!/|'
                     . $protocols . '|\#|\')([^"]*)"#m';
                 $buffer = preg_replace($regex, '$1name="$2" value="' . $baseSrc . '$3"', $buffer);
                 $this->checkBuffer($buffer);
 
                 // OBJECT <param value="xx", name="yy"> -- fix it only inside the <param> tag.
-                $regex  = '#(<param\s+[^>]*)value\s*=\s*"(?!/|' . $protocols
+                $regex = '#(<param\s+[^>]*)value\s*=\s*"(?!/|' . $protocols
                     . '|\#|\')([^"]*)"\s*name\s*=\s*"(movie|src|url)"#m';
                 $buffer = preg_replace($regex, '<param value="' . $baseSrc . '$2" name="$3"', $buffer);
                 $this->checkBuffer($buffer);
@@ -202,7 +210,7 @@ class SefMiddleware implements MiddlewareInterface
 
             // Replace all unknown protocols in OBJECT tag.
             if (str_contains($buffer, '<object')) {
-                $regex  = '#(<object\s+[^>]*)data\s*=\s*"(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
+                $regex = '#(<object\s+[^>]*)data\s*=\s*"(?!/|' . $protocols . '|\#|\')([^"]*)"#m';
                 $buffer = preg_replace($regex, '$1data="' . $baseSrc . '$2"', $buffer);
                 $this->checkBuffer($buffer);
             }
