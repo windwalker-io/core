@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Http;
 
+use Closure;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Http\ProxyResolver;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Runtime\Config;
+use Windwalker\DI\Container;
 use Windwalker\Http\Request\ServerRequest;
+use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 
 class ProxyResolverTest extends TestCase
 {
@@ -17,15 +21,19 @@ class ProxyResolverTest extends TestCase
         array $httpConfig = [],
         array $serverParams = [],
         array $headers = [],
+        ?Closure $trustedProxyCallback = null,
     ): ProxyResolver {
-        $config = new Config(['http' => $httpConfig]);
-
         $request = new ServerRequest(
             serverParams: $serverParams,
             headers: $headers,
         );
 
-        return new ProxyResolver($config, $request);
+        return new ProxyResolver(
+            $request,
+            (array) ($httpConfig['trusted_headers'] ?? []),
+            $httpConfig['trusted_proxies'] ?? [],
+            $trustedProxyCallback,
+        );
     }
 
     #[Test]
@@ -214,6 +222,129 @@ class ProxyResolverTest extends TestCase
     }
 
     #[Test]
+    public function getTrustedProxiesAddsRemoteAddrWhenCallbackTrustsRequest(): void
+    {
+        $resolver = $this->createResolver(
+            httpConfig: [
+                'trusted_proxies' => ['10.0.0.0/8'],
+            ],
+            serverParams: ['REMOTE_ADDR' => '9.9.9.9'],
+            headers: ['Cf-Access-Jwt-Assertion' => ['valid-token']],
+            trustedProxyCallback: static fn(ServerRequestInterface $request): bool
+                => $request->getHeaderLine('Cf-Access-Jwt-Assertion') === 'valid-token',
+        );
+
+        self::assertSame(['10.0.0.0/8', '9.9.9.9'], $resolver->getTrustedProxies());
+    }
+
+    #[Test]
+    public function webProviderResolvesTrustedProxyCallbackFactoryFromConfig(): void
+    {
+        $app = TestWebAppFactory::create();
+        $app->getContainer()->share(
+            ProxyResolverTestTokenVerifier::class,
+            new ProxyResolverTestTokenVerifier(),
+        );
+        $app->loadConfig([
+            'http' => [
+                'trusted_proxies' => ['10.0.0.0/8'],
+                'trusted_proxy_callback' => static function (Container $container): Closure {
+                    $tokenVerifier = $container->get(ProxyResolverTestTokenVerifier::class);
+
+                    return static fn(ServerRequestInterface $request): bool
+                        => $tokenVerifier->isValid($request->getHeaderLine('Cf-Access-Jwt-Assertion'));
+                },
+            ],
+        ]);
+
+        $context = $app->createContext(
+            TestWebAppFactory::request(
+                headers: ['Cf-Access-Jwt-Assertion' => ['valid-token']],
+            ),
+        );
+        $resolver = $context->getContainer()->get(ProxyResolver::class);
+
+        self::assertSame(['10.0.0.0/8', '127.0.0.1'], $resolver->getTrustedProxies());
+    }
+
+    #[Test]
+    public function webProviderCreatesProxyResolverWithoutConfiguredCallback(): void
+    {
+        $app = TestWebAppFactory::create();
+        $context = $app->createContext(TestWebAppFactory::request());
+        $resolver = $context->getContainer()->get(ProxyResolver::class);
+
+        self::assertSame([], $resolver->getTrustedProxies());
+    }
+
+    #[Test]
+    public function webProviderRejectsCallbackFactoryThatDoesNotReturnClosure(): void
+    {
+        $app = TestWebAppFactory::create();
+        $app->loadConfig([
+            'http' => [
+                'trusted_proxy_callback' => static fn(): \stdClass => new \stdClass(),
+            ],
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $context = $app->createContext(TestWebAppFactory::request());
+        $context->getContainer()->get(ProxyResolver::class);
+    }
+
+    #[Test]
+    public function getTrustedProxiesDoesNotAddRemoteAddrWhenCallbackRejectsRequest(): void
+    {
+        $resolver = $this->createResolver(
+            httpConfig: [
+                'trusted_proxies' => ['10.0.0.0/8'],
+            ],
+            serverParams: ['REMOTE_ADDR' => '9.9.9.9'],
+            headers: ['Cf-Access-Jwt-Assertion' => ['invalid-token']],
+            trustedProxyCallback: static fn(ServerRequestInterface $request): bool
+                => $request->getHeaderLine('Cf-Access-Jwt-Assertion') === 'valid-token',
+        );
+
+        self::assertSame(['10.0.0.0/8'], $resolver->getTrustedProxies());
+    }
+
+    #[Test]
+    public function constructorResolvesCallbackAndItsServicesFromContainer(): void
+    {
+        $container = new Container();
+        $request = new ServerRequest(
+            serverParams: ['REMOTE_ADDR' => '9.9.9.9'],
+            headers: ['Cf-Access-Jwt-Assertion' => ['valid-token']],
+        );
+        $container->share(ServerRequestInterface::class, $request);
+        $container->share(
+            'http.trusted_proxy_callback',
+            static function (Container $container): Closure {
+                return static fn(ServerRequestInterface $request): bool
+                    => $container->get(ProxyResolverTestTokenVerifier::class)
+                        ->isValid($request->getHeaderLine('Cf-Access-Jwt-Assertion'));
+            },
+        );
+        $container->share(
+            ProxyResolverTestTokenVerifier::class,
+            new ProxyResolverTestTokenVerifier(),
+        );
+
+        $trustedProxyCallback = $container->resolve('http.trusted_proxy_callback');
+        $resolver = $container->newInstance(
+            ProxyResolver::class,
+            [
+                'trustedHeaders' => [],
+                'trustedProxies' => [],
+                'trustedProxyCallback' => $trustedProxyCallback,
+            ],
+        );
+
+        self::assertSame(['9.9.9.9'], $resolver->getTrustedProxies());
+    }
+
+    #[Test]
     public function handleProxyHostRewritesSystemUriWhenTrustedProxyForwards(): void
     {
         $resolver = $this->createResolver(
@@ -301,5 +432,13 @@ class ProxyResolverTest extends TestCase
         $result = ProxyResolver::splitIps('1.2.3.4, not-an-ip , ::1');
 
         self::assertSame([0 => '1.2.3.4', 2 => '::1'], $result);
+    }
+}
+
+final class ProxyResolverTestTokenVerifier
+{
+    public function isValid(string $token): bool
+    {
+        return $token === 'valid-token';
     }
 }

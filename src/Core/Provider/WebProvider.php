@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Closure;
+use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +18,7 @@ use Windwalker\Core\Application\WebApplicationInterface;
 use Windwalker\Core\Controller\ControllerDispatcher;
 use Windwalker\Core\Http\BrowserNext;
 use Windwalker\Core\Http\RequestInspector;
+use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Security\CspNonceService;
 use Windwalker\Core\Http\AppRequest;
 use Windwalker\Core\Http\Browser;
@@ -174,7 +177,33 @@ class WebProvider implements ServiceProviderInterface
         $container->prepareSharedObject(RequestInspector::class);
 
         // Proxy
-        $container->prepareSharedObject(ProxyResolver::class, null, new DIOptions(isolation: true));
+        $container->share(
+            ProxyResolver::class,
+            static function (Container $container): ProxyResolver {
+                $config = $container->get(Config::class);
+                // This config entry is a factory that returns the request callback.
+                $callbackFactory = $config->getDeep('http.trusted_proxy_callback');
+                $callback = $callbackFactory === null
+                    ? null
+                    : $container->resolve($callbackFactory);
+
+                if ($callback !== null && !$callback instanceof Closure) {
+                    throw new InvalidArgumentException(
+                        'The http.trusted_proxy_callback factory must resolve to a Closure.'
+                    );
+                }
+
+                return $container->newInstance(
+                    ProxyResolver::class,
+                    [
+                        'trustedHeaders' => (array) $config->getDeep('http.trusted_headers'),
+                        'trustedProxies' => $config->getDeep('http.trusted_proxies') ?? [],
+                        'trustedProxyCallback' => $callback,
+                    ],
+                );
+            },
+            new DIOptions(isolation: true),
+        );
 
         // App Request
         $container->set(

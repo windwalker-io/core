@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Http;
 
+use Closure;
 use Psr\Http\Message\ServerRequestInterface;
 use Windwalker\Core\Router\SystemUri;
-use Windwalker\Core\Runtime\Config;
 use Windwalker\Http\Helper\IpHelper;
 use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
@@ -24,21 +24,21 @@ class ProxyResolver
     protected string $headerPrefix = 'x-';
 
     /**
-     * @var  array
+     * @param  (Closure(ServerRequestInterface): bool)|null  $trustedProxyCallback
      */
-    protected array $config;
-
-    public function __construct(Config $config, protected ServerRequestInterface $request)
-    {
-        $this->config = (array) $config->getDeep('http');
-    }
+    public function __construct(
+        protected ServerRequestInterface $request,
+        protected array $trustedHeaders = [],
+        protected string|array $trustedProxies = [],
+        protected ?Closure $trustedProxyCallback = null,
+    ) {}
 
     public function getHeader(string $name): ?string
     {
         $name = $this->getHeaderPrefix() . $name;
         $name = strtolower($name);
 
-        if (!in_array($name, $this->config['trusted_headers'] ?? [], true)) {
+        if (!in_array($name, $this->trustedHeaders, true)) {
             return null;
         }
 
@@ -146,9 +146,19 @@ class ProxyResolver
         return $this->once(
             'trusted.proxies',
             function () {
-                $trustedProxies = $this->config['trusted_proxies'] ?? '';
+                $remoteAddr = $this->getRemoteAddr();
+                $trustedProxies = static::handleTrustedProxies($this->trustedProxies, $remoteAddr ?? '');
 
-                return static::handleTrustedProxies($trustedProxies, $this->getRemoteAddr());
+                if (
+                    $remoteAddr
+                    && $this->trustedProxyCallback !== null
+                    && ($this->trustedProxyCallback)($this->request) === true
+                    && !IpHelper::checkIp($remoteAddr, $trustedProxies)
+                ) {
+                    $trustedProxies[] = $remoteAddr;
+                }
+
+                return $trustedProxies;
             }
         );
     }
