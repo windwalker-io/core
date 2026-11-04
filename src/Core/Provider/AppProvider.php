@@ -16,6 +16,8 @@ use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Schedule\ScheduleService;
+use Windwalker\Core\Schedule\SchedulerLock;
+use Windwalker\Core\Schedule\SchedulerLockInterface;
 use Windwalker\Core\Service\FilterService;
 use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
@@ -109,6 +111,8 @@ class AppProvider implements ServiceProviderInterface
         $container->prepareSharedObject(FilterFactory::class, options: $options);
         $container->prepareSharedObject(FilterService::class, options: $options);
         $container->prepareSharedObject(ScheduleService::class, options: $options);
+        $container->prepareSharedObject(SchedulerLock::class, options: $options);
+        $container->alias(SchedulerLockInterface::class, SchedulerLock::class);
     }
 
     protected function prepareCliWeb(Container $container): void

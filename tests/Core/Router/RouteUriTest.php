@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Router;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Windwalker\Core\Http\OutsideRedirectResponse;
 use Windwalker\Core\Router\NavMode;
 use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\Navigator;
@@ -89,6 +91,40 @@ class RouteUriTest extends TestCase
 
         self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame(301, $response->getStatusCode());
+    }
+
+    public static function outsideOptionsProvider(): array
+    {
+        return [
+            'explicitly allowed' => [true, null, true],
+            'explicitly disallowed' => [false, null, false],
+            'default restriction' => [null, null, false],
+            'inherited permission' => [null, true, true],
+            'overridden permission' => [false, true, false],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('outsideOptionsProvider')]
+    public function toResponse_preservesOutsidePermissionAndResponseMetadata(
+        ?bool $allowOutside,
+        ?bool $defaultAllowOutside,
+        bool $expectedOutside,
+    ): void {
+        $url = 'https://outside.example/target';
+        $nav = $this->createStub(Navigator::class);
+        $nav->method('getOptions')->willReturn(new NavOptions(allowOutside: $defaultAllowOutside));
+        $nav->method('absolute')->willReturn($url);
+        $routeUri = new RouteUri($url, null, $nav, new NavOptions(allowOutside: $allowOutside));
+        $routeUri = $routeUri->withStatus(307);
+
+        $response = $routeUri->toResponse(headers: ['X-Redirect-Test' => 'preserved']);
+
+        self::assertSame($expectedOutside, $response instanceof OutsideRedirectResponse);
+        self::assertSame($url, $response->getHeaderLine('Location'));
+        self::assertSame(307, $response->getStatusCode());
+        self::assertSame('preserved', $response->getHeaderLine('X-Redirect-Test'));
+        self::assertSame(302, $routeUri->toResponse(302)->getStatusCode());
     }
 
     #[Test]

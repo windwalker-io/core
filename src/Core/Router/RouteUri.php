@@ -9,6 +9,7 @@ use JetBrains\PhpStorm\ArrayShape;
 use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\UuidInterface;
 use Stringable;
+use Windwalker\Core\Http\OutsideRedirectResponse;
 use Windwalker\Core\Router\Exception\RouteNotFoundException;
 use Windwalker\Core\Utilities\Base64Url;
 use Windwalker\Http\Response\RedirectResponse;
@@ -482,8 +483,15 @@ class RouteUri extends Uri implements NavConstantInterface
         return $new;
     }
 
+    /**
+     * Preserve allowOutside when converting the route to a redirect response.
+     */
     public function toResponse(?int $status = null, array $headers = []): RedirectResponse
     {
+        if ($this->computedOptions()->allowOutside) {
+            return new OutsideRedirectResponse($this, $status ?? $this->status, $headers);
+        }
+
         return new RedirectResponse($this, $status ?? $this->status, $headers);
     }
 
