@@ -59,8 +59,11 @@ class PhpNativeEngine implements CliServerEngineInterface
 
         $args = [];
 
+        $resolver = $this->getOptionsResolver();
+        $this->configureOptions($resolver);
+
         /** @var ServerOptions $options */
-        $options = $this->getOptionsResolver()->resolve(
+        $options = $resolver->resolve(
             array_merge(
                 $this->options,
                 $options
