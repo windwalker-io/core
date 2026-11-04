@@ -47,7 +47,8 @@ in the background and restart it after failures or deployments. The command
 does not daemonize itself. Schedule definitions are loaded once; restart the
 process after changing routes or code. Avoid running multiple workers (or
 system CRON's `schedule:run`) for the same schedules unless duplicate execution
-is acceptable. There is no cross-process lock.
+is acceptable. Task locks prevent concurrent execution, not repeated execution
+of the same scheduled minute.
 
 If a task spans multiple minutes, intervening minutes are skipped rather than
 replayed. The worker is not a durable job queue and does not guarantee delivery
@@ -55,6 +56,43 @@ of events missed while stopped.
 
 If the wall clock moves backwards, dispatch waits until it passes the last
 processed minute, so previously processed minutes are not repeated.
+
+## Task locks
+
+`ScheduleService::runEvent()` creates a fresh Symfony lock for each invocation
+through `SchedulerLockInterface`, calls `acquire(blocking: true)`, and releases
+it in `finally`. This protects both `schedule:worker` and `schedule:run`.
+Handler return values are preserved; acquisition and release errors propagate.
+The lock covers the handler, not the subsequent lifecycle listeners or `catch()`.
+
+The default `SchedulerLock` uses Symfony `FlockStore` under
+`@temp/scheduler-locks`, with an application-root namespace and the schedule name
+as resource identity. All processes must use the same root and lock directory.
+Files must remain in place while workers are running; do not purge this directory.
+Flock locks do not expire and are released by the OS when the process exits.
+This is a local-host default, not a distributed lock.
+
+Blocking waits serialize competing invocations: a second worker waits and
+then runs its own invocation. It does not skip or deduplicate a scheduled minute.
+Waiting is not interrupted by Runner lifetime limits or graceful stop checks.
+As with other synchronous handlers, background work dispatched by the handler
+requires its own job-level protection.
+
+To choose another driver or customize each lock, implement
+`SchedulerLockInterface::createLock(ScheduleEvent $event): LockInterface` and
+override its binding in the host application's `di.config.php`:
+
+```php
+'bindings' => [
+    \Windwalker\Core\Schedule\SchedulerLockInterface::class => \App\Schedule\CustomSchedulerLock::class,
+],
+```
+
+The implementation owns its Symfony `LockFactory`, store, resource namespace,
+TTL and logger. Return a new, unacquired lock per call; Core manages blocking
+acquisition and release. For expiring distributed stores, choose a TTL longer
+than the handler runtime; the synchronous runner does not automatically renew it.
+Direct PHP construction of `ScheduleService` now requires this dependency.
 
 ## PHP runner options
 

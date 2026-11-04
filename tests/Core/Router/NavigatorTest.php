@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\Router;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\AppContext;
+use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
+use Windwalker\DI\Container;
 use Windwalker\Event\EventEmitter;
 
 class NavigatorTest extends TestCase
@@ -57,6 +61,45 @@ class NavigatorTest extends TestCase
 
         self::assertSame('/foo', $nav->validateRedirectUrl('/foo'));
         self::assertSame($systemUri->root, $nav->validateRedirectUrl('http://other.com/foo'));
+    }
+
+    public static function sharedOutsideRouteProvider(): array
+    {
+        return [
+            'allowed' => [true],
+            'disallowed' => [false],
+            'default restriction' => [null],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('sharedOutsideRouteProvider')]
+    public function to_sharedCallbackPreservesOutsidePermissionThroughResponseHandling(?bool $allowOutside): void
+    {
+        $url = 'https://outside.example/target';
+        $systemUri = new SystemUri('http://example.com/base');
+        $app = $this->createAppStub($systemUri);
+        $nav = $this->createNavigator(new Router(['outside' => new Route('outside', $url)]), $app);
+        $app->method('retrieve')->willReturn($nav);
+        $container = new Container();
+        $container->share(Navigator::class, $nav);
+        $container->share(
+            'outside.route',
+            static fn(Container $container) => $container->get(Navigator::class)->to(
+                'outside',
+                options: new NavOptions(allowOutside: $allowOutside),
+            ),
+        );
+
+        $routeUri = $container->get('outside.route');
+        $response = AppContext::anyToResponse($routeUri);
+        $dispatcher = new ControllerDispatcher($container);
+        $response = $dispatcher->handleResponse($response, $app);
+
+        self::assertSame($allowOutside, $routeUri->getOptions()->allowOutside);
+        self::assertSame($routeUri, $container->get('outside.route'));
+        self::assertSame($allowOutside ? $url : $systemUri->root, $response->getHeaderLine('Location'));
+        self::assertSame(303, $response->getStatusCode());
     }
 
     #[Test]

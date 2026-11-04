@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Schedule;
 
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
@@ -14,7 +15,10 @@ class ScheduleService
 {
     use InstanceCacheTrait;
 
-    public function __construct(protected ApplicationInterface $app) {}
+    public function __construct(
+        protected ApplicationInterface $app,
+        protected SchedulerLockInterface $schedulerLock
+    ) {}
 
     /**
      * @codeCoverageIgnore
@@ -45,13 +49,23 @@ class ScheduleService
 
     public function runEvent(ScheduleEvent $event): mixed
     {
-        $handler = $event->getHandler();
+        $lock = $this->schedulerLock->createLock($event);
 
-        if (is_string($handler) && class_exists($handler)) {
-            $handler = $this->app->make($handler);
+        if (!$lock->acquire(blocking: true)) {
+            throw new LockConflictedException(sprintf('Unable to acquire schedule lock: %s', $event->getName()));
         }
 
-        return $this->app->call($handler);
+        try {
+            $handler = $event->getHandler();
+
+            if (is_string($handler) && class_exists($handler)) {
+                $handler = $this->app->make($handler);
+            }
+
+            return $this->app->call($handler);
+        } finally {
+            $lock->release();
+        }
     }
 
     protected function loadScheduleTasks(Schedule $schedule, string $route): void

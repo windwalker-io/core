@@ -17,6 +17,7 @@
         "nikic/php-parser": "^4.10||^5.0",
         "stecman/symfony-console-completion": "^0.13.0||^0.14.0||^0.15.0||^v0.16.0",
         "symfony/console": "^6.0||^7.0||^8.0",
+        "symfony/lock": "^6.0||^7.0||^8.0",
         "symfony/dotenv": "^6.0||^7.0||^8.0",
         "symfony/event-dispatcher-contracts": "^2.0||^3.0",
         "symfony/options-resolver": "^6.0||^7.0||^8.0",
