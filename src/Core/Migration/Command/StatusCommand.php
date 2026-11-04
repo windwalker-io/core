@@ -7,6 +7,7 @@ namespace Windwalker\Core\Migration\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputOption;
+use Throwable;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\CompletionContext;
 use Windwalker\Console\CompletionHandlerInterface;
@@ -68,11 +69,16 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
      */
     public function execute(IOInterface $io): int
     {
-        $this->preprocess(
-            $io,
-            static::TOGGLE_CONNECTION
-            | static::CREATE_DATABASE
-        );
+        $databaseAvailable = true;
+
+        $this->preprocess($io, static::TOGGLE_CONNECTION);
+
+        try {
+            $this->preprocess($io, static::CREATE_DATABASE);
+        } catch (Throwable $e) {
+            $databaseAvailable = false;
+            $io->errorStyle()->warning($e->getMessage());
+        }
 
         $task = $io->getArgument('task');
         $showName = $io->getOption('show-name');
@@ -84,7 +90,8 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
         $migrations = $migrationService->getMigrations($this->getMigrationFolder($io));
 
         if ($task === 'current') {
-            $currentVersion = $migrationService->getCurrentVersion();
+            $versions = $this->getVersions($io, $migrationService, $databaseAvailable);
+            $currentVersion = $versions === [] ? '0' : $versions[array_key_last($versions)];
 
             if ($currentVersion) {
                 if ($showName) {
@@ -118,7 +125,7 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
 
         if ($task === 'is-done') {
             ksort($migrations);
-            $versions = $migrationService->getVersions();
+            $versions = $this->getVersions($io, $migrationService, $databaseAvailable);
 
             foreach ($migrations as $migration) {
                 if (!in_array($migration->version, $versions, true)) {
@@ -133,12 +140,12 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
 
         if ($migrations === []) {
             $io->writeln('No migrations found.');
-
-            return 0;
         }
 
         ksort($migrations);
-        $versions = $migrationService->getVersions();
+        $versions = $migrations === []
+            ? []
+            : $this->getVersions($io, $migrationService, $databaseAvailable);
 
         $table = new Table($io);
         $table->setHeaders(['Status', 'Version', 'Migration Name']);
@@ -163,6 +170,24 @@ class StatusCommand extends AbstractMigrationCommand implements CompletionHandle
         $io->newLine();
 
         return 0;
+    }
+
+    /**
+     * @return  array<int, string>
+     */
+    private function getVersions(IOInterface $io, MigrationService $migrationService, bool $databaseAvailable): array
+    {
+        if (!$databaseAvailable) {
+            return [];
+        }
+
+        try {
+            return $migrationService->getVersions();
+        } catch (Throwable $e) {
+            $io->errorStyle()->warning($e->getMessage());
+
+            return [];
+        }
     }
 
     #[\Override]
