@@ -7,6 +7,7 @@ namespace Windwalker\Core\Database\Command;
 use DateTimeImmutable;
 use DomainException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Throwable;
@@ -130,7 +131,11 @@ class DbExportCommand implements CommandInterface
 
         $dest = $databaseExportService->exportTo($file, $io, $options);
 
-        $io->writeln("Exported to <info>{$dest->getPathname()}</info>");
+        $io->writeln(
+            "Exported to <info>{$dest->getPathname()}</info> ("
+            . Helper::formatMemory($dest->getSize())
+            . ')'
+        );
 
         return 0;
     }

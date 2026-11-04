@@ -51,6 +51,18 @@ Optional-package branches cut both ways:
 
 ## Pending items
 
+- Core/Database
+  - `SqlsrvExporter` SQL/native CLI paths — real round trips still need
+    mssql-scripter and SQLPackage installed. `LiveExporterIntegration.php`
+    covers PHP fallback against SQL Server, including identity state,
+    computed/rowversion columns, defaults, indexes, binary data and foreign keys.
+  - `OracleExporter` SQLcl, Data Pump and PHP paths — require SQLcl, an Oracle
+    directory-object/local-path mapping, and a PHP OCI driver respectively.
+    `LiveExporterIntegration.php` covers legacy exp/imp round trips; its
+    PostgreSQL cases cover plain/custom pg_dump and PHP. Advanced user-defined
+    types, large LOBs and vendor-specific schema features need additional
+    server fixtures.
+
 - Core/Middleware
   - `Windwalker\Core\Middleware\SimpleCspMiddleware::process()` — the CSP
     enabled/disabled building logic requires the optional

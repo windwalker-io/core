@@ -20,6 +20,10 @@ class ExporterFactory
 
         $class = match ($platform->getName()) {
             AbstractPlatform::MYSQL => MySQLExporter::class,
+            AbstractPlatform::POSTGRESQL => PostgresqlExporter::class,
+            AbstractPlatform::SQLSERVER => SqlsrvExporter::class,
+            AbstractPlatform::SQLITE => SQLiteExporter::class,
+            AbstractPlatform::ORACLE => OracleExporter::class,
             default => throw new DomainException(
                 sprintf(
                     '%s exporter not yet prepared.',

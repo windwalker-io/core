@@ -6,7 +6,7 @@ namespace Windwalker\Core\Database;
 
 use Exception;
 use SplFileInfo;
-use Symfony\Component\Console\Command\Command;
+use Throwable;
 use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\Exporter\ExporterFactory;
@@ -16,8 +16,6 @@ use Windwalker\DI\Attributes\Autowire;
 use Windwalker\Filesystem\FileObject;
 use Windwalker\Filesystem\Filesystem;
 use Windwalker\Filesystem\Path;
-use Windwalker\Stream\GzStream;
-use Windwalker\Stream\Stream;
 use Windwalker\Utilities\StrNormalize;
 
 use function Windwalker\tid;
@@ -82,25 +80,37 @@ class DatabaseExportService
 
         $exporter = $this->exporterFactory->createExporter($this->db, $this->app);
 
-        $exporter->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output));
-
-        $streamClass = Stream::class;
+        $exporter->on(MessageOutputEvent::class, fn(MessageOutputEvent $event) => $event->writeWith($output ?? $this->app));
 
         if ($compress) {
-            $gzipCliExists = $this->checkGzipExists();
             $dest = $dest->appendPath('.gz');
-
-            $options['gz'] = $gzipCliExists ? 'cli' : 'php';
-
-            if ($options['gz'] === 'php') {
-                $streamClass = GzStream::class;
-            }
         }
 
-        $exporter->exportToPsrStream(
-            $dest->getStream(WRITE_ONLY_RESET, $streamClass),
-            $options
-        );
+        $stream = $dest->getStream(WRITE_ONLY_RESET);
+
+        try {
+            $exporter->exportToPsrStream($stream, $options);
+            $stream->close();
+
+            if ($exporter->getFileExtension() !== 'sql') {
+                $extension = $exporter->getFileExtension() . ($compress ? '.gz' : '');
+                $path = $dest->getPathname();
+                $suffix = $compress ? '.sql.gz' : '.sql';
+                $path = str_ends_with($path, $suffix)
+                    ? substr($path, 0, -strlen($suffix)) . '.' . $extension
+                    : $path . '.' . $extension;
+                $dest = $dest->moveTo($path);
+            }
+        } catch (Throwable $e) {
+            $stream->close();
+            Filesystem::delete($dest->getPathname());
+
+            throw $e;
+        } finally {
+            $stream->close();
+        }
+
+        clearstatcache(true, $dest->getPathname());
 
         return $dest;
     }
@@ -143,12 +153,5 @@ class DatabaseExportService
         }
 
         return $table;
-    }
-
-    protected function checkGzipExists(): bool
-    {
-        $process = $this->app->runProcess('which gzip');
-
-        return $process->getExitCode() === Command::SUCCESS;
     }
 }

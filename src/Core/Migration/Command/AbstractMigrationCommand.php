@@ -7,6 +7,7 @@ namespace Windwalker\Core\Migration\Command;
 use DomainException;
 use Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Windwalker\Console\CommandInterface;
@@ -224,7 +225,11 @@ abstract class AbstractMigrationCommand implements CommandInterface
             try {
                 $dest = $dbExportService->export($io, $options);
 
-                $io->writeln('SQL backup to: <info>' . $dest->getRealPath() . '</info>');
+                $io->writeln(
+                    'SQL backup to: <info>'
+                    . $dest->getRealPath()
+                    . '</info> (' . Helper::formatMemory($dest->getSize()) . ')'
+                );
                 $io->style()->newLine();
             } catch (DomainException $e) {
                 $io->errorStyle()->warning($e->getMessage());

@@ -181,6 +181,79 @@ it. `ConsoleApplication::boot()` registers providers and commands from the
 are lazily built by the container. Console events are in
 [`src/Core/Events/Console/`](../../src/Core/Events/Console/).
 
+`db:export --compress` and compressed migration backups share
+`DatabaseExportService`. Successful `mysqldump` exports use the system
+`gzip` when available; otherwise compression uses PHP zlib. A failed
+dump or gzip process is reported before falling back to PHP SQL export
+and compression, replacing any incomplete compressed output. Export and
+backup messages show the finalized file size in B, KiB, MiB, or GiB.
+`MySQLExporter` selects the compression engine only after locating
+`mysqldump`; the PHP fallback always uses PHP zlib without probing CLI gzip.
+Exporters can reuse `AbstractExporter::createGzipStream()` to close the
+previous destination stream and open a fresh PHP gzip stream. Pass the
+original destination URI when replacing an already-compressed stream,
+and close the returned stream in `finally` to finalize the gzip file.
+
+PostgreSQL, SQL Server, SQLite and Oracle use `AbstractCliExporter`: try a
+SQL-producing CLI, then a native-backup CLI, then PHP SQL export. Each CLI
+attempt writes an isolated temporary file; failed or empty output is discarded,
+and stderr never becomes backup content. Successful CLI artifacts use system
+gzip when available (`GZIP_BINARY` overrides discovery), otherwise PHP zlib.
+PHP export always uses PHP zlib and does not probe system gzip.
+
+| Database | Preferred SQL CLI | Native fallback | Native extension / restore tool |
+|----------|-------------------|-----------------|---------------------------------|
+| PostgreSQL | `pg_dump --format=plain` | `pg_dump --format=custom` | `.dump` / `pg_restore` |
+| SQL Server | `mssql-scripter --schema-and-data` | `sqlpackage /Action:Export` | `.bacpac` / SQLPackage Import |
+| SQLite | `sqlite3 .dump` | `sqlite3 .backup` | `.sqlite` / SQLite database file |
+| Oracle | SQLcl (`sql`) with DBMS_METADATA and INSERT output | configured `expdp`, then client-side `exp` | `.dmp` / matching `impdp` or `imp` |
+
+Executables are discovered on PATH. Overrides are `PG_DUMP_BINARY`,
+`MSSQL_SCRIPTER_BINARY`, `SQLPACKAGE_BINARY`, `SQLITE3_BINARY`, `SQLCL_BINARY`,
+`ORACLE_EXPDP_BINARY` and `ORACLE_EXP_BINARY`. SQLcl must be Oracle SQLcl,
+not another program named `sql`. Native exports must produce a locally readable,
+nonempty file. `DatabaseExportService` returns the actual extension, adding
+`.gz` when compressed; native binary formats are never reported as `.sql`.
+Uncompressed SQL restores with the database's SQL client; decompress `.gz`
+before using its SQL/native restore tool.
+
+Oracle Data Pump is attempted only with both
+`database.export.oracle.directory` (an Oracle directory-object name) and
+`database.export.oracle.local_directory` (its existing, locally accessible
+filesystem mapping). It uses a unique dump filename and removes the mapped
+scratch file after copying it locally. Without this mapping, use client-side
+`exp`; a remote-only Data Pump artifact is not a successful local backup.
+
+PHP fallback is a limited logical export, not a replacement for full native
+backups or a transactionally consistent snapshot during concurrent writes.
+PostgreSQL and SQL Server export tables, rows and metadata-supported indexes
+and constraints; PostgreSQL also handles enums and sequence state, while
+SQL Server handles computed/identity/rowversion columns. Routines, grants,
+database settings and advanced schema features require native tooling.
+PostgreSQL domains are explicitly rejected. SQLite preserves table/index/view/
+trigger DDL, generated columns and AUTOINCREMENT state; in-memory databases
+bypass CLI discovery, and PHP rejects virtual tables. Oracle exports tables,
+rows, sequences, nonconstraint indexes, views, triggers and deferred foreign
+keys using DBMS_METADATA, excluding routines and grants. Oracle SQL output
+rejects GENERATED ALWAYS identities; PHP additionally rejects time-zone
+timestamps, binary values over 2000 bytes and text values over 4000 bytes.
+Use Oracle native backups for those cases. Plain SQL/PHP exports do not promise
+full-fidelity restoration of vendor-specific or user-defined types.
+
+Opt-in live round trips are in
+`tests/Core/Database/Exporter/LiveExporterIntegration.php` (not collected by
+the default `*Test.php` suffix). Run that file explicitly through PHPUnit with
+`EXPORT_TEST_PG_PASSWORD`, `EXPORT_TEST_SQL_PASSWORD` and
+`EXPORT_TEST_ORACLE_CONTAINER`, or select a platform using `--filter`.
+The fixtures use PostgreSQL/SQL Server on localhost's standard ports and Docker
+containers `windwalker_postgresql` (override `EXPORT_TEST_PG_CONTAINER`) and
+the explicit Oracle container. They create unique disposable databases/users,
+restore into separate targets, then remove only their own artifacts. Container
+CLI bridges are test fixtures, not production executable discovery.
+Oracle `exp` can report `ORA-`/`EXP-` errors while exiting with status zero;
+native Oracle exports reject these diagnostics rather than publishing an
+incomplete dump.
+
 ## Modules, controllers, and view models
 
 Core supplies the contracts; the host supplies the concrete modules.

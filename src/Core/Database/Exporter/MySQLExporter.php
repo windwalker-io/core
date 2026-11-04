@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Windwalker\Core\Database\DatabaseExportService;
 use Windwalker\Core\Manager\DatabaseManager;
 use Windwalker\Database\Driver\DriverOptions;
@@ -32,6 +33,13 @@ class MySQLExporter extends AbstractExporter
      */
     protected function doExport(StreamInterface $stream, array $options = []): void
     {
+        $compress = (bool) ($options['compress'] ?? isset($options['gz']));
+        $uri = $compress ? $stream->getMetadata('uri') : null;
+
+        if ($compress && (!is_string($uri) || $uri === '')) {
+            throw new RuntimeException('Unable to open the gzip backup destination.');
+        }
+
         try {
             $md = trim((string) $this->findMysqldump());
 
@@ -39,7 +47,11 @@ class MySQLExporter extends AbstractExporter
                 throw new \DomainException('Mysqldump executable not found.');
             }
 
-            $gzMode = $options['gz'] ?? null;
+            $gzipCli = $compress && $this->checkGzipExists();
+
+            if ($compress && !$gzipCli) {
+                $stream = $this->createGzipStream($stream, $uri);
+            }
 
             $dbOptions = DatabaseManager::mergeDsnToOptions($this->db->getDriver()->getOptions());
             $cmd = sprintf(
@@ -50,17 +62,32 @@ class MySQLExporter extends AbstractExporter
                 env('MYSQLDUMP_EXTRA_OPTIONS') ?? '',
             );
 
-            if ($gzMode === 'cli') {
-                $cmd .= ' | gzip';
-            }
-
             $process = $this->app->createProcess($cmd);
-
-            $process->mustRun(
-                function ($type, $buffer) use ($stream) {
+            $writeOutput = static function ($type, $buffer) use ($stream): void {
+                if ($type === Process::OUT) {
                     $stream->write($buffer);
                 }
-            );
+            };
+
+            if ($gzipCli) {
+                $process->start();
+
+                try {
+                    $gzip = $this->app->createProcess('gzip');
+                    $gzip->setInput($process->getIterator(Process::ITER_SKIP_ERR));
+                    $gzip->mustRun($writeOutput);
+
+                    if ($process->wait() !== 0) {
+                        throw new ProcessFailedException($process);
+                    }
+                } finally {
+                    if ($process->isRunning()) {
+                        $process->stop();
+                    }
+                }
+            } else {
+                $process->mustRun($writeOutput);
+            }
         } catch (ProcessFailedException|\DomainException $e) {
             $this->emitMessage(
                 [
@@ -68,6 +95,10 @@ class MySQLExporter extends AbstractExporter
                     'Fallback to php backup script.',
                 ]
             );
+
+            if ($compress) {
+                $stream = $this->createGzipStream($stream, $uri);
+            }
 
             $tableInfos = $this->db->getSchemaManager()->getTables(true);
 
@@ -87,9 +118,14 @@ class MySQLExporter extends AbstractExporter
                     $stream->write((string) $inserts);
                 }
             }
+        } finally {
+            $stream->close();
         }
+    }
 
-        $stream->close();
+    protected function checkGzipExists(): bool
+    {
+        return $this->app->runProcess('gzip --version')->isSuccessful();
     }
 
     protected function createPasswordCnfFile(DriverOptions $options): string

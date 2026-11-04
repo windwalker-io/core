@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Windwalker\Core\Database\Exporter;
 
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Stream\GzStream;
 use Windwalker\Stream\Stream;
 
 use const Windwalker\Stream\READ_WRITE_FROM_BEGIN;
+use const Windwalker\Stream\WRITE_ONLY_RESET;
 
 /**
  * The AbstractExporter class.
@@ -52,7 +55,7 @@ abstract class AbstractExporter implements ExporterInterface
      */
     public function exportToStream($resource, array $options = []): void
     {
-        $this->export(new Stream($resource));
+        $this->export(new Stream($resource), $options);
     }
 
     /**
@@ -75,6 +78,24 @@ abstract class AbstractExporter implements ExporterInterface
     protected function export(StreamInterface $stream, array $options = []): void
     {
         $this->doExport($stream, $options);
+    }
+
+    public function getFileExtension(): string
+    {
+        return 'sql';
+    }
+
+    protected function createGzipStream(StreamInterface $stream, ?string $uri = null): StreamInterface
+    {
+        $uri ??= $stream->getMetadata('uri');
+
+        if (!is_string($uri) || $uri === '') {
+            throw new RuntimeException('Unable to open the gzip backup destination.');
+        }
+
+        $stream->close();
+
+        return GzStream::fromFilePath($uri, WRITE_ONLY_RESET);
     }
 
     /**
