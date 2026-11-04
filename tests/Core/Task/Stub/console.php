@@ -18,7 +18,19 @@ use Windwalker\Core\Task\TaskPayload;
 require dirname(__DIR__, 4) . '/vendor/autoload.php';
 
 $app = require __DIR__ . '/application.php';
-$handler = new TaskRunCommand(new TaskPayload($app), $app);
+$transport = \Windwalker\Utilities\Env::get('TASK_TEST_CACHE')
+    ? require __DIR__ . '/transport.php'
+    : new \Windwalker\Core\Task\CallbackTaskResultTransport(
+        static function (): never {
+            throw new \LogicException('Test transport is not configured.');
+        },
+        static fn(): ?array => null,
+        static function (): void {}
+    );
+$app->getContainer()->share(\Windwalker\Core\Task\TaskResultTransportInterface::class, $transport);
+$app->getContainer()->prepareSharedObject(TaskPayload::class);
+$app->getContainer()->prepareSharedObject(TaskRunCommand::class);
+$handler = $app->getContainer()->get(TaskRunCommand::class);
 $command = new Command('task:run');
 $handler->configure($command);
 $command->setCode(

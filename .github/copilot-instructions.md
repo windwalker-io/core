@@ -11,7 +11,7 @@ Load only what the task needs; do not read all of `docs/` up front.
 - [`docs/index.md`](docs/index.md): documentation index, start here for any topic
 - [`docs/architecture.md`](docs/architecture.md): Core package layout, container layers, web/console lifecycle, packages (read before structural changes)
 - [`docs/schedule-worker.md`](docs/schedule-worker.md): resident CRON worker, CLI options and lifecycle
-- [`docs/task-run.md`](docs/task-run.md): serialized task command and result protocol
+- [`docs/task-run.md`](docs/task-run.md): serialized task command, subprocess runner and result protocol
 - [`docs/testing-architecture.md`](docs/testing-architecture.md): which test tier to use per architecture layer, with the standard `TestWebAppFactory` recipe (read before writing tests)
 - [`docs/host-application-and-testing.md`](docs/host-application-and-testing.md): host-app bootstrap and test prerequisites (read before writing integration tests)
 - [`docs/templates/`](docs/templates/): documentation templates and conventions

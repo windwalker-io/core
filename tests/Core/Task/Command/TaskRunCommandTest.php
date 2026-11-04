@@ -284,7 +284,11 @@ class TaskRunCommandTest extends TestCase
         mixed $stream = null,
         int $verbosity = BufferedOutput::VERBOSITY_NORMAL
     ): array {
-        $handler = new TaskRunCommand($this->payload, $this->app);
+        $handler = new TaskRunCommand(
+            $this->payload,
+            $this->app,
+            $this->createStub(\Windwalker\Core\Task\TaskResultTransportInterface::class)
+        );
         $command = new Command('task:run');
         $handler->configure($command);
         $input = new ArrayInput($options, $command->getDefinition());
@@ -294,5 +298,46 @@ class TaskRunCommandTest extends TestCase
         $text = $output->fetch();
 
         return [$exitCode, $text === '' ? null : json_decode($text, true, flags: JSON_THROW_ON_ERROR), $text];
+    }
+
+    #[Test]
+    public function ipcPublishesSignedIdentityAndTtlWithoutStdoutProtocol(): void
+    {
+        $id = str_repeat('a', 32);
+        $transport = $this->createMock(\Windwalker\Core\Task\TaskResultTransportInterface::class);
+        $transport->expects($this->once())->method('publish')->with(
+            $id,
+            ['version' => 1, 'status' => 'fulfilled', 'value' => ['ok' => true], 'taskId' => $id],
+            123
+        );
+        $handler = new TaskRunCommand($this->payload, $this->app, $transport);
+        $command = new Command('task:run');
+        $handler->configure($command);
+        $input = new ArrayInput([
+            '--ipc' => true,
+            '--code' => $this->payload->encodeRequest(new SerializedTask(['ok' => true]), $id, 123),
+        ], $command->getDefinition());
+        $output = new BufferedOutput();
+
+        self::assertSame(Command::SUCCESS, $handler->execute(new IO($input, $output, $command)));
+        self::assertSame('', $output->fetch());
+    }
+
+    #[Test]
+    public function ipcPublishFailuresAreNotReportedAsSuccess(): void
+    {
+        $transport = $this->createMock(\Windwalker\Core\Task\TaskResultTransportInterface::class);
+        $transport->expects($this->once())->method('publish')
+            ->willThrowException(new \RuntimeException('Transport write failed.'));
+        $handler = new TaskRunCommand($this->payload, $this->app, $transport);
+        $command = new Command('task:run');
+        $handler->configure($command);
+        $input = new ArrayInput([
+            '--ipc' => true,
+            '--code' => $this->payload->encodeRequest(new SerializedTask('done'), str_repeat('a', 32)),
+        ], $command->getDefinition());
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Transport write failed.');
+        $handler->execute(new IO($input, new BufferedOutput(), $command));
     }
 }

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Provider;
 
+use Windwalker\Cache\CachePool;
+use Windwalker\Cache\Serializer\PhpSerializer;
+use Windwalker\Cache\Storage\FileStorage;
 use Windwalker\Core\Application\AppLayer;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\AppType;
@@ -16,12 +19,15 @@ use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Core\Profiler\ProfilerFactory;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Schedule\ScheduleService;
-use Windwalker\Core\Schedule\SchedulerLock;
-use Windwalker\Core\Schedule\SchedulerLockInterface;
 use Windwalker\Core\Schedule\SchedulerClaim;
 use Windwalker\Core\Schedule\SchedulerClaimInterface;
+use Windwalker\Core\Schedule\SchedulerLock;
+use Windwalker\Core\Schedule\SchedulerLockInterface;
 use Windwalker\Core\Service\FilterService;
+use Windwalker\Core\Task\CacheTaskResultTransport;
 use Windwalker\Core\Task\TaskPayload;
+use Windwalker\Core\Task\TaskResultTransportInterface;
+use Windwalker\Core\Task\TaskRunner;
 use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
@@ -114,6 +120,17 @@ class AppProvider implements ServiceProviderInterface
         $container->prepareSharedObject(FilterFactory::class, options: $options);
         $container->prepareSharedObject(FilterService::class, options: $options);
         $container->prepareSharedObject(TaskPayload::class, options: $options);
+        $container->bindShared(
+            TaskResultTransportInterface::class,
+            fn() => new CacheTaskResultTransport(
+                new CachePool(
+                    new FileStorage($this->app->path('@cache/' . env('TASK_RUNNER_CACHE_DIR', 'task-results'))),
+                    new PhpSerializer()
+                )
+            ),
+            options: $options
+        );
+        $container->prepareSharedObject(TaskRunner::class, options: $options);
         $container->prepareSharedObject(ScheduleService::class, options: $options);
         $container->prepareSharedObject(SchedulerLock::class, options: $options);
         $container->alias(SchedulerLockInterface::class, SchedulerLock::class);

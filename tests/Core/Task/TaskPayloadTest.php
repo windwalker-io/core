@@ -80,6 +80,46 @@ class TaskPayloadTest extends TestCase
     }
 
     #[Test]
+    public function signsRequestIdentityAndTtlIncludingClosures(): void
+    {
+        $codec = new TaskPayload(require __DIR__ . '/Stub/application.php');
+        $id = str_repeat('a', 32);
+        $payload = $codec->encodeRequest(require __DIR__ . '/Stub/closure.php', $id, 123);
+        $request = $codec->decodeRequest($payload);
+
+        self::assertSame($id, $request['taskId']);
+        self::assertSame(123, $request['ttl']);
+        self::assertSame(['ok' => true], $request['task']());
+    }
+
+    #[Test]
+    public function rejectsTamperedRequestBeforeObjectHooks(): void
+    {
+        $codec = new TaskPayload(require __DIR__ . '/Stub/application.php');
+        $parts = explode('.', $codec->encodeRequest(new DeserializationProbe(), str_repeat('a', 32), 300));
+        $parts[1] = base64_encode(str_replace(str_repeat('a', 32), str_repeat('b', 32), base64_decode($parts[1])));
+        DeserializationProbe::$restored = false;
+
+        try {
+            $codec->decodeRequest(implode('.', $parts));
+            self::fail('Modified request must be rejected.');
+        } catch (InvalidArgumentException $e) {
+            self::assertSame('Task payload signature is invalid.', $e->getMessage());
+            self::assertFalse(DeserializationProbe::$restored);
+        }
+    }
+
+    #[Test]
+    #[TestWith(['bad', 300])]
+    #[TestWith(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0])]
+    #[TestWith(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', -1])]
+    public function rejectsInvalidRequestDestination(string $id, int $ttl): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new TaskPayload(require __DIR__ . '/Stub/application.php')->encodeRequest(new SerializedTask(), $id, $ttl);
+    }
+
+    #[Test]
     public function rejectsAnotherApplicationSecret(): void
     {
         $sender = require __DIR__ . '/Stub/application.php';

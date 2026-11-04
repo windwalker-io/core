@@ -36,6 +36,7 @@
         "windwalker/filesystem": "^4.0",
         "windwalker/filter": "^4.0",
         "windwalker/http": "^4.0",
+        "windwalker/promise": "^4.0",
         "windwalker/test": "^4.0",
         "composer/semver": "^3.4",
         "whichbrowser/parser": "^2.1",

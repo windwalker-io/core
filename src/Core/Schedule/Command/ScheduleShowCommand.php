@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Schedule\Command;
 
+use DateTime;
+use DateTimeZone;
 use Lorisleiva\CronTranslator\CronTranslator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -94,12 +96,25 @@ class ScheduleShowCommand implements CommandInterface
 
         $table = new Table($io);
         $table->setHeaderTitle('Schedule Events');
-        $table->setHeaders(['Event', 'Expression', 'Describe', 'Due', 'Next Due', 'Tags']);
 
         $events = $schedule->getEvents($tags);
 
         $count = 0;
         $tz = $io->getOption('tz');
+        $timezone = $tz ?? date_default_timezone_get();
+        $showUtc = $timezone !== 'UTC';
+        $table->setHeaders(
+            [
+                'Event',
+                'Expression',
+                'Describe',
+                'Due',
+                'Next Due (' . $timezone . ')',
+                ...($showUtc ? ['Next Due (UTC)'] : []),
+                'Tags',
+            ]
+        );
+
         $time = $io->getOption('time') ?: 'now';
         $canDescribe = class_exists(CronTranslator::class);
 
@@ -121,17 +136,36 @@ class ScheduleShowCommand implements CommandInterface
                 $table->addRow(new TableSeparator());
             }
 
+            $nextDues = [$nextDue0, $nextDue1, $nextDue2];
+            $nextDuesLocal = implode(
+                "\n",
+                array_map(static fn (DateTime $date): string => $date->format('Y-m-d H:i:s'), $nextDues)
+            );
+            $row = [
+                '<fg=cyan>' . $event->getName() . '</>',
+                (string) $event,
+                $canDescribe ? CronTranslator::translate($expr->getExpression()) : '-',
+                $expr->isDue($time, $tz) ? '<info>v</info>' : '',
+                $nextDuesLocal,
+            ];
+
+            if ($showUtc) {
+                $nextDuesUtc = array_map(
+                    static function (DateTime $date): string {
+                        $utcDate = clone $date;
+                        $utcDate->setTimezone(new DateTimeZone('UTC'));
+
+                        return $utcDate->format('Y-m-d H:i:s');
+                    },
+                    $nextDues
+                );
+                $row[] = implode("\n", $nextDuesUtc);
+            }
+
+            $row[] = '<fg=gray>' . implode(' ', $tags) . '</>';
+
             $table->addRow(
-                [
-                    '<fg=cyan>' . $event->getName() . '</>',
-                    (string) $event,
-                    $canDescribe ? CronTranslator::translate($expr->getExpression()) : '-',
-                    $expr->isDue($time, $tz) ? '<info>v</info>' : '',
-                    $nextDue0->format('Y-m-d H:i:s e')
-                    . "\n" . $nextDue1->format('Y-m-d H:i:s e')
-                    . "\n" . $nextDue2->format('Y-m-d H:i:s e'),
-                    '<fg=gray>' . implode(' ', $tags) . '</>',
-                ]
+                $row
             );
         }
 

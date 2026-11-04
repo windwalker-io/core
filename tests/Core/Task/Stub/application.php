@@ -13,5 +13,6 @@ use Windwalker\Core\Application\ApplicationInterface;
 $app = new ApplicationTraitStub();
 $app->getContainer()->getParameters()->set('app', ['secret' => 'task-protocol-test-key-not-for-production']);
 $app->getContainer()->share(ApplicationInterface::class, $app);
+$app->getContainer()->prepareSharedObject(\Windwalker\Tests\Core\Task\Stub\RuntimeTaskService::class);
 
 return $app;

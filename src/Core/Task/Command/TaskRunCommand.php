@@ -17,27 +17,35 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Task\TaskPayload;
+use Windwalker\Core\Task\TaskResultTransportInterface;
 
 #[CommandWrapper(description: 'Execute a trusted serialized task and return a JSON result.')]
 class TaskRunCommand implements CommandInterface
 {
-    public function __construct(private TaskPayload $payload, private ApplicationInterface $app) {}
+    public function __construct(
+        private TaskPayload $payload,
+        private ApplicationInterface $app,
+        private TaskResultTransportInterface $transport
+    ) {}
 
     public function configure(Command $command): void
     {
         $command->addOption('code', 'c', InputOption::VALUE_REQUIRED, 'Signed serialized task payload.');
         $command->addOption('file', 'f', InputOption::VALUE_REQUIRED, 'File containing the same encoded payload.');
         $command->addOption('stdin', null, InputOption::VALUE_NONE, 'Read the encoded payload from standard input.');
+        $command->addOption('ipc', null, InputOption::VALUE_NONE, 'Publish results through the configured task transport.');
         $command->addOption('result-file', null, InputOption::VALUE_REQUIRED, 'Write JSON to this file instead of stdout.');
     }
 
     public function execute(IOInterface $io): int
     {
         $resultFile = $io->getOption('result-file');
+        $ipc = $io->getOption('ipc');
+        $request = null;
         $level = ob_get_level();
 
         // Keep ordinary PHP output out of the stdout result protocol.
-        if ($resultFile === null) {
+        if ($resultFile === null && !$ipc) {
             ob_start(
                 static function (string $output): string {
                     if ($output !== '') {
@@ -58,7 +66,18 @@ class TaskRunCommand implements CommandInterface
                     throw new InvalidArgumentException('--result-file must not be empty.');
                 }
 
-                $task = $this->payload->decode($this->readPayload($io));
+                if ($ipc && $resultFile !== null) {
+                    throw new InvalidArgumentException('--ipc and --result-file cannot be combined.');
+                }
+
+                $input = $this->readPayload($io);
+
+                if ($ipc) {
+                    $request = $this->payload->decodeRequest($input);
+                    $task = $request['task'];
+                } else {
+                    $task = $this->payload->decode($input);
+                }
                 $exitCode = Command::FAILURE;
                 $value = $this->app->call($task);
                 $json = json_encode(
@@ -84,6 +103,20 @@ class TaskRunCommand implements CommandInterface
             while (ob_get_level() > $level) {
                 ob_end_flush();
             }
+        }
+
+        if ($ipc) {
+            if ($request === null) {
+                fwrite(STDERR, $json . "\n");
+
+                return $exitCode;
+            }
+
+            $result = json_decode($json, true, flags: JSON_THROW_ON_ERROR);
+            $result['taskId'] = $request['taskId'];
+            $this->transport->publish($request['taskId'], $result, $request['ttl']);
+
+            return $exitCode;
         }
 
         if ($resultFile !== null && $resultFile !== '') {
