@@ -33,6 +33,7 @@ use Windwalker\Core\Application\ApplicationTrait;
 use Windwalker\Core\Application\AppVerbosity;
 use Windwalker\Core\Application\RootApplicationInterface;
 use Windwalker\Core\Application\WebApplication;
+use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Command\RunCommand;
 use Windwalker\Core\DI\RequestBootableProviderInterface;
 use Windwalker\Core\Event\SymfonyDispatcherWrapper;
@@ -472,6 +473,12 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         }
 
         $container->share(SystemUri::class, $systemUri);
+
+        $assetService = $container->getDefinition(AssetService::class)?->getCache();
+
+        if ($assetService instanceof AssetService) {
+            $assetService->setSystemUri($systemUri);
+        }
 
         return $this->webSimulator = $app;
     }

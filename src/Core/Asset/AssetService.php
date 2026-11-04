@@ -135,13 +135,21 @@ class AssetService implements EventAwareInterface
         $this->config = $this->config->proxy('asset');
 
         $folder = $this->config->get('folder') ?? 'assets';
-        $uri = $this->config->get('uri');
-
-        $this->path = $uri ?? $this->systemUri->path($folder);
-        $this->root = $uri ?? $this->systemUri->root($folder);
         $this->folder = $folder;
+        $this->setSystemUri($systemUri);
 
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setSystemUri(SystemUri $systemUri): static
+    {
+        $this->systemUri = $systemUri;
+
+        $uri = $this->config->get('uri');
+        $this->path = $uri ?? $systemUri->path($this->folder);
+        $this->root = $uri ?? $systemUri->root($this->folder);
+
+        return $this;
     }
 
     /**

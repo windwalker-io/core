@@ -13,10 +13,13 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Asset\ViteResolver;
+use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\Core\Runtime\Config;
+use Windwalker\DI\Container;
 use Windwalker\Event\EventEmitter;
 use Windwalker\Filesystem\Filesystem;
+use Windwalker\Http\Factory\ServerRequestFactory;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
 class AssetServiceTest extends TestCase
@@ -111,6 +114,23 @@ class AssetServiceTest extends TestCase
 
         self::assertSame('/custom-base/', $service->path());
         self::assertSame('/custom-base/', $service->root());
+    }
+
+    #[Test]
+    public function prepareWebSimulatorUpdatesExistingAssetServiceUri(): void
+    {
+        $service = $this->createService();
+        $container = new Container();
+        $container->share(AssetService::class, $service);
+        $app = new ConsoleApplication($container);
+
+        $app->prepareWebSimulatorByRequest(
+            ServerRequestFactory::createFromUri('https://simulator.example/base/'),
+            'https://simulator.example/base/'
+        );
+
+        self::assertSame('/base/assets/', $service->path());
+        self::assertSame('https://simulator.example/base/assets/', $service->root());
     }
 
     #[Test]
