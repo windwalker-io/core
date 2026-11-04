@@ -626,6 +626,39 @@ class AssetServiceTest extends TestCase
     }
 
     #[Test]
+    public function pathResolvesTildeAliasToViteDevServerUri(): void
+    {
+        mkdir($this->tmpDir . '/tmp', 0777, true);
+        file_put_contents($this->tmpDir . '/tmp/vite-server', 'http://localhost:5173');
+
+        $service = $this->createService();
+
+        self::assertSame(
+            'http://localhost:5173/resources/assets/foo/bar/yoo.jpg',
+            $service->path('~/foo/bar/yoo.jpg')
+        );
+    }
+
+    #[Test]
+    public function pathResolvesTildeAliasFromViteManifest(): void
+    {
+        $manifest = [
+            'resources/assets/foo/bar/yoo.jpg' => [
+                'file' => 'images/yoo-ABC123.jpg',
+            ],
+        ];
+
+        file_put_contents(
+            $this->tmpDir . '/public/assets/manifest.json',
+            json_encode($manifest, JSON_THROW_ON_ERROR)
+        );
+
+        $service = $this->createService();
+
+        self::assertSame('/assets/images/yoo-ABC123.jpg', $service->path('~/foo/bar/yoo.jpg'));
+    }
+
+    #[Test]
     public function renderJsOutputsSriAndInlineBody(): void
     {
         $service = $this->createService(debug: true);

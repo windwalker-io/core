@@ -44,6 +44,8 @@ class ViteResolver
 
     public function resolve(string $uri): string
     {
+        $originalUri = $uri;
+        $uri = $this->resolveAlias($uri);
         $path = str_replace($this->alias, $this->base, $uri);
 
         if ($this->serverIsRunning()) {
@@ -51,7 +53,7 @@ class ViteResolver
         }
 
         if (null === $manifest = $this->getManifest()) {
-            return $uri;
+            return $originalUri;
         }
 
         $uri = $manifest[$path]['file'] ?? $uri;
@@ -78,6 +80,7 @@ class ViteResolver
             return null;
         }
 
+        $uri = $this->resolveAlias($uri);
         $path = str_replace($this->alias, $this->base, $uri);
 
         $manifest = $this->getManifest();
@@ -107,7 +110,10 @@ class ViteResolver
 
     public function shouldResolve(string $uri): bool
     {
-        return str_starts_with($uri, $this->alias) && $this->hasViteEnvironment();
+        return (
+            str_starts_with($uri, $this->alias)
+            || str_starts_with($uri, '~/')
+        ) && $this->hasViteEnvironment();
     }
 
     public function hasViteEnvironment(): bool
@@ -118,6 +124,15 @@ class ViteResolver
     protected function getBase(): string
     {
         return $this->config->getDeep('base') ?? 'resources/assets';
+    }
+
+    protected function resolveAlias(string $uri): string
+    {
+        if (str_starts_with($uri, '~/')) {
+            return $this->alias . substr($uri, 1);
+        }
+
+        return $uri;
     }
 
     public function getManifest(bool $refresh = false): ?array
