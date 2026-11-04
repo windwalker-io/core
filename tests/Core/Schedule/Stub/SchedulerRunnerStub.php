@@ -7,13 +7,13 @@ namespace Windwalker\Tests\Core\Schedule\Stub;
 use DateTimeImmutable;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Schedule\ScheduleService;
-use Windwalker\Core\Schedule\ScheduleRunner;
+use Windwalker\Core\Schedule\SchedulerRunner;
 
 /**
- * Virtual wall and monotonic clocks for SccheduleRunner lifecycle tests.
+ * Virtual wall and monotonic clocks for SchedulerRunner lifecycle tests.
  * Remove when those tests no longer need deterministic polling and slow tasks.
  */
-class ScheduleRunnerStub extends ScheduleRunner
+class SchedulerRunnerStub extends SchedulerRunner
 {
     public DateTimeImmutable $date;
 

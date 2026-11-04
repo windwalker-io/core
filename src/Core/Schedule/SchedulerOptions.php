@@ -6,7 +6,7 @@ namespace Windwalker\Core\Schedule;
 
 use DateTimeZone;
 
-class ScheduleRunnerOptions
+class SchedulerOptions
 {
     public function __construct(
         public int $lifetime = 0,

@@ -23,7 +23,7 @@ use Windwalker\Core\Schedule\Event\StopEvent;
 use Windwalker\DI\Attributes\Service;
 
 #[Service]
-class ScheduleRunner
+class SchedulerRunner
 {
     use MessageOutputTrait;
 
@@ -38,7 +38,7 @@ class ScheduleRunner
         protected ScheduleService $scheduleService
     ) {}
 
-    public function run(ScheduleRunnerOptions $options = new ScheduleRunnerOptions()): void
+    public function run(SchedulerOptions $options = new SchedulerOptions()): void
     {
         $lifetime = $options->lifetime;
         $names = $options->names;

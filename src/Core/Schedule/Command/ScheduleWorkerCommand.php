@@ -22,14 +22,14 @@ use Windwalker\Core\Schedule\Event\AfterScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\LoopStartEvent;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
-use Windwalker\Core\Schedule\ScheduleRunner;
-use Windwalker\Core\Schedule\ScheduleRunnerOptions;
+use Windwalker\Core\Schedule\SchedulerRunner;
+use Windwalker\Core\Schedule\SchedulerOptions;
 use Windwalker\Utilities\Arr;
 
 #[CommandWrapper(description: 'Run a resident CRON schedule worker.')]
 class ScheduleWorkerCommand implements CommandInterface, SignalableCommandInterface
 {
-    public function __construct(protected ScheduleRunner $runner, protected ApplicationInterface $app) {}
+    public function __construct(protected SchedulerRunner $runner, protected ApplicationInterface $app) {}
 
     public function configure(Command $command): void
     {
@@ -121,9 +121,9 @@ class ScheduleWorkerCommand implements CommandInterface, SignalableCommandInterf
         return 0;
     }
 
-    protected function getRunnerOptions(IOInterface $io): ScheduleRunnerOptions
+    protected function getRunnerOptions(IOInterface $io): SchedulerOptions
     {
-        return new ScheduleRunnerOptions(
+        return new SchedulerOptions(
             lifetime: $this->getNonNegativeInteger($io, 'lifetime'),
             names: $io->getArgument('names'),
             tags: Arr::explodeAndClear(',', $io->getOption('tags') ?? ''),
@@ -133,7 +133,7 @@ class ScheduleWorkerCommand implements CommandInterface, SignalableCommandInterf
         );
     }
 
-    protected function displayInfo(IOInterface $io, ScheduleRunnerOptions $options): void
+    protected function displayInfo(IOInterface $io, SchedulerOptions $options): void
     {
         $names = $options->names;
         $tags = $options->tags;

@@ -16,8 +16,8 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleService;
-use Windwalker\Core\Schedule\ScheduleRunner;
-use Windwalker\Core\Schedule\ScheduleRunnerOptions;
+use Windwalker\Core\Schedule\SchedulerRunner;
+use Windwalker\Core\Schedule\SchedulerOptions;
 use Windwalker\Core\Schedule\Event\AfterScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\BeforeScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\LoopEndEvent;
@@ -26,12 +26,12 @@ use Windwalker\Core\Schedule\Event\ScheduleFailureEvent;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
 use Windwalker\Event\EventEmitter;
-use Windwalker\Tests\Core\Schedule\Stub\ScheduleRunnerStub;
+use Windwalker\Tests\Core\Schedule\Stub\SchedulerRunnerStub;
 
-#[CoversClass(ScheduleRunner::class)]
-class SccheduleRunnerTest extends TestCase
+#[CoversClass(SchedulerRunner::class)]
+class SchedulerRunnerTest extends TestCase
 {
-    private function observeEvents(ScheduleRunner $runner, array &$events): void
+    private function observeEvents(SchedulerRunner $runner, array &$events): void
     {
         foreach ([
             StartEvent::class,
@@ -62,7 +62,7 @@ class SccheduleRunnerTest extends TestCase
         $this->observeEvents($runner, $events);
         $time = $runner->date;
 
-        $runner->run(new ScheduleRunnerOptions(once: true));
+        $runner->run(new SchedulerOptions(once: true));
 
         self::assertSame(
             [StartEvent::class, LoopStartEvent::class, BeforeScheduleRunEvent::class,
@@ -102,7 +102,7 @@ class SccheduleRunnerTest extends TestCase
             $order[] = 'failure';
         });
 
-        $runner->run(new ScheduleRunnerOptions(once: true));
+        $runner->run(new SchedulerOptions(once: true));
 
         self::assertSame(['failure', 'catch'], $order);
         self::assertInstanceOf(ScheduleFailureEvent::class, $events[3]);
@@ -120,7 +120,7 @@ class SccheduleRunnerTest extends TestCase
         $events = [];
         $this->observeEvents($runner, $events);
 
-        $runner->run(new ScheduleRunnerOptions(maxRuns: 2));
+        $runner->run(new SchedulerOptions(maxRuns: 2));
 
         self::assertSame(
             [StartEvent::class, LoopStartEvent::class, LoopEndEvent::class,
@@ -144,7 +144,7 @@ class SccheduleRunnerTest extends TestCase
         $runner->on(AfterScheduleRunEvent::class, static fn() => throw $failure);
 
         try {
-            $runner->run(new ScheduleRunnerOptions(once: true));
+            $runner->run(new SchedulerOptions(once: true));
             self::fail('Listener failures must propagate.');
         } catch (RuntimeException $e) {
             self::assertSame($failure, $e);
@@ -175,14 +175,14 @@ class SccheduleRunnerTest extends TestCase
         });
         $runner->addEventDealer($dealer);
 
-        $runner->run(new ScheduleRunnerOptions(once: true));
+        $runner->run(new SchedulerOptions(once: true));
 
         self::assertSame(0, $calls);
         self::assertSame('External shutdown.', $stop->reason);
         self::assertNull($stop->exception);
     }
 
-    private function createWorker(Schedule $schedule, ?ApplicationInterface $app = null): ScheduleRunnerStub
+    private function createWorker(Schedule $schedule, ?ApplicationInterface $app = null): SchedulerRunnerStub
     {
         if ($app === null) {
             $app = $this->createStub(ApplicationInterface::class);
@@ -193,7 +193,7 @@ class SccheduleRunnerTest extends TestCase
         $service->method('getSchedule')->willReturn($schedule);
         $service->method('runEvent')->willReturnCallback(static fn($event) => $event->execute());
 
-        return new ScheduleRunnerStub($app, $service);
+        return new SchedulerRunnerStub($app, $service);
     }
 
     #[Test]
@@ -201,7 +201,7 @@ class SccheduleRunnerTest extends TestCase
     {
         $schedule = new Schedule();
         $runner = $this->createWorker($schedule);
-        $options = new ScheduleRunnerOptions(timezone: 'UTC', maxRuns: 2);
+        $options = new SchedulerOptions(timezone: 'UTC', maxRuns: 2);
         $calls = 0;
         $schedule->cron('task', '* * * * *', static function () use ($options, &$calls) {
             $calls++;
@@ -231,7 +231,7 @@ class SccheduleRunnerTest extends TestCase
         });
         $worker = $this->createWorker($schedule);
 
-        $worker->run(new ScheduleRunnerOptions(maxRuns: 3));
+        $worker->run(new SchedulerOptions(maxRuns: 3));
 
         self::assertSame(3, $calls);
         self::assertSame(90, $worker->sleeps);
@@ -253,7 +253,7 @@ class SccheduleRunnerTest extends TestCase
 
         $worker = $this->createWorker($schedule);
         $worker->date = new DateTimeImmutable('2026-01-01 00:00:00 UTC');
-        $worker->run(new ScheduleRunnerOptions(
+        $worker->run(new SchedulerOptions(
             names: ['match', 'wrong-tag', 'not-due'],
             tags: ['selected'],
             timezone: 'Asia/Taipei',
@@ -269,7 +269,7 @@ class SccheduleRunnerTest extends TestCase
     {
         $worker = $this->createWorker(new Schedule());
 
-        $worker->run(new ScheduleRunnerOptions(lifetime: 3));
+        $worker->run(new SchedulerOptions(lifetime: 3));
 
         self::assertSame(3, $worker->sleeps);
         self::assertSame(3.0, $worker->elapsed);
@@ -280,7 +280,7 @@ class SccheduleRunnerTest extends TestCase
     {
         $worker = $this->createWorker(new Schedule());
 
-        $worker->run(new ScheduleRunnerOptions(maxRuns: 2));
+        $worker->run(new SchedulerOptions(maxRuns: 2));
 
         self::assertSame(30, $worker->sleeps);
     }
@@ -296,7 +296,7 @@ class SccheduleRunnerTest extends TestCase
             $worker->advance(125);
         });
 
-        $worker->run(new ScheduleRunnerOptions(lifetime: 2));
+        $worker->run(new SchedulerOptions(lifetime: 2));
 
         self::assertSame(1, $calls);
         self::assertSame(126.0, $worker->elapsed);
@@ -316,7 +316,7 @@ class SccheduleRunnerTest extends TestCase
             }
         });
 
-        $worker->run(new ScheduleRunnerOptions(maxRuns: 2));
+        $worker->run(new SchedulerOptions(maxRuns: 2));
 
         self::assertSame(2, $calls);
         self::assertSame(90, $worker->sleeps);
@@ -334,7 +334,7 @@ class SccheduleRunnerTest extends TestCase
             $worker->advance(125);
         });
 
-        $worker->run(new ScheduleRunnerOptions(maxRuns: 2));
+        $worker->run(new SchedulerOptions(maxRuns: 2));
 
         self::assertSame(['00:00:30', '00:02:36'], $times);
         self::assertSame(1, $worker->sleeps);
@@ -390,7 +390,7 @@ class SccheduleRunnerTest extends TestCase
             $errors[] = $event->messages;
         });
 
-        $worker->run(new ScheduleRunnerOptions(once: true));
+        $worker->run(new SchedulerOptions(once: true));
 
         self::assertSame($failure, $caught);
         self::assertTrue($continued);
@@ -406,14 +406,14 @@ class SccheduleRunnerTest extends TestCase
         $worker = $this->createWorker($schedule);
 
         try {
-            $worker->run(new ScheduleRunnerOptions(once: true));
+            $worker->run(new SchedulerOptions(once: true));
             self::fail('The callback exception must propagate.');
         } catch (RuntimeException $e) {
             self::assertSame('callback failed', $e->getMessage());
         }
 
         $schedule->setEvents([]);
-        $worker->run(new ScheduleRunnerOptions(once: true));
+        $worker->run(new SchedulerOptions(once: true));
 
         self::assertSame(0, $worker->sleeps);
     }
@@ -443,13 +443,13 @@ class SccheduleRunnerTest extends TestCase
         $exception = null;
         $schedule->cron('nested', '* * * * *', static function () use ($worker, &$exception) {
             try {
-                $worker->run(new ScheduleRunnerOptions(once: true));
+                $worker->run(new SchedulerOptions(once: true));
             } catch (LogicException $e) {
                 $exception = $e;
             }
         });
 
-        $worker->run(new ScheduleRunnerOptions(once: true));
+        $worker->run(new SchedulerOptions(once: true));
 
         self::assertInstanceOf(LogicException::class, $exception);
     }
@@ -460,7 +460,7 @@ class SccheduleRunnerTest extends TestCase
         $worker = $this->createWorker(new Schedule());
         $this->expectException(InvalidArgumentException::class);
 
-        $worker->run(new ScheduleRunnerOptions(lifetime: -1));
+        $worker->run(new SchedulerOptions(lifetime: -1));
     }
 
     #[Test]
@@ -469,7 +469,7 @@ class SccheduleRunnerTest extends TestCase
         $worker = $this->createWorker(new Schedule());
         $this->expectException(InvalidArgumentException::class);
 
-        $worker->run(new ScheduleRunnerOptions(maxRuns: -1));
+        $worker->run(new SchedulerOptions(maxRuns: -1));
     }
 
     #[Test]
@@ -478,6 +478,6 @@ class SccheduleRunnerTest extends TestCase
         $worker = $this->createWorker(new Schedule());
         $this->expectException(\DateInvalidTimeZoneException::class);
 
-        $worker->run(new ScheduleRunnerOptions(timezone: 'invalid/timezone', once: true));
+        $worker->run(new SchedulerOptions(timezone: 'invalid/timezone', once: true));
     }
 }

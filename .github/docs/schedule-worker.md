@@ -1,6 +1,6 @@
 # Schedule worker
 
-`Windwalker\Core\Schedule\ScheduleRunner` runs the configured `schedules` routes
+`Windwalker\Core\Schedule\SchedulerRunner` runs the configured `schedules` routes
 in a resident process without requiring system CRON or `windwalker/queue`.
 The host application must install `dragonmantank/cron-expression ^3.1`, as
 required by `schedule:run`.
@@ -58,14 +58,14 @@ processed minute, so previously processed minutes are not repeated.
 
 ## PHP runner options
 
-`ScheduleRunner::run()` accepts a `ScheduleRunnerOptions` object instead of
+`SchedulerRunner::run()` accepts a `SchedulerOptions` object instead of
 individual arguments. Like queue options, its typed public properties can be
 set through named constructor arguments or assigned before calling the runner.
 
 ```php
-use Windwalker\Core\Schedule\ScheduleRunnerOptions;
+use Windwalker\Core\Schedule\SchedulerOptions;
 
-$options = new ScheduleRunnerOptions(
+$options = new SchedulerOptions(
     lifetime: 3600,
     names: ['cleanup'],
     tags: ['maintenance'],
