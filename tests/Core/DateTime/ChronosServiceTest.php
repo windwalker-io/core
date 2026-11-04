@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\DateTime;
 
-use DomainException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;

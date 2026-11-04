@@ -13,7 +13,7 @@ use Windwalker\Queue\Failer\QueueFailerInterface;
 class StubQueueFailer implements QueueFailerInterface
 {
     /**
-     * @var array<array{string, string, string, string}>
+     * @var  array<array{string, string, string, string}>
      */
     public array $added = [];
 

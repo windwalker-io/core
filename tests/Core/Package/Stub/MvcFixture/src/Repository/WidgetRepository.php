@@ -9,6 +9,4 @@ namespace Windwalker\Tests\Core\Package\Stub\MvcFixture\Repository;
  * Its namespace is rewritten to `App\Repository` during install, which lets
  * {@see \Windwalker\Tests\Core\Package\PackageInstallerTest} assert on the written content.
  */
-class WidgetRepository
-{
-}
+class WidgetRepository {}

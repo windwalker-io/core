@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Asset\AssetService;
 use Windwalker\Core\Html\HtmlFrame;
-use Windwalker\Core\Html\Metadata;
 use Windwalker\Core\Html\PreloadLink;
 use Windwalker\Core\Link\Link;
 
@@ -245,7 +244,7 @@ class HtmlFrameTest extends TestCase
     #[Test]
     public function linkToElementBuildsAnchorAttributesFromLink(): void
     {
-        $link = (new PreloadLink('preload', '/foo.js'))->withAs('script');
+        $link = new PreloadLink('preload', '/foo.js')->withAs('script');
 
         $html = (string) HtmlFrame::linkToElement($link);
 

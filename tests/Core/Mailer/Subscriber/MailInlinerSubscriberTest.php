@@ -19,7 +19,7 @@ use Windwalker\Core\Mailer\Subscriber\MailInlinerSubscriber;
 class MailInlinerSubscriberTest extends TestCase
 {
     /**
-     * @var string[]
+     * @var  string[]
      */
     private array $tempFiles = [];
 

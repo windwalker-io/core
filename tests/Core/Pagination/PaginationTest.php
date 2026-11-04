@@ -141,7 +141,7 @@ class PaginationTest extends TestCase
 
         $output = $this->instance->render(
             $result,
-            fn (array $data) => 'rendered:' . ($data['result'] === $result ? 'ok' : 'fail')
+            fn(array $data) => 'rendered:' . ($data['result'] === $result ? 'ok' : 'fail')
         );
 
         self::assertSame('rendered:ok', $output);
@@ -155,7 +155,7 @@ class PaginationTest extends TestCase
         $rendererService->expects($this->once())
             ->method('make')
             ->with('pagination::default', ['foo' => 'bar'])
-            ->willReturn(fn (array $data) => 'string-template-output');
+            ->willReturn(fn(array $data) => 'string-template-output');
 
         $instance = new Pagination($this->nav, $this->systemUri, $rendererService);
         $instance->template('pagination::default');
@@ -181,7 +181,7 @@ class PaginationTest extends TestCase
     {
         $this->instance->total(0);
 
-        $output = $this->instance->render(template: fn (array $data) => get_class($data['result']));
+        $output = $this->instance->render(template: fn(array $data) => get_class($data['result']));
 
         self::assertSame(PaginationResult::class, $output);
     }
@@ -224,7 +224,7 @@ class PaginationTest extends TestCase
     {
         $newNav = $this->createStub(Navigator::class);
 
-        $this->instance->configureNavigator(fn (Navigator $nav) => $newNav);
+        $this->instance->configureNavigator(fn(Navigator $nav) => $newNav);
 
         self::assertSame($newNav, $this->instance->nav);
     }
@@ -232,7 +232,7 @@ class PaginationTest extends TestCase
     #[Test]
     public function configureNavigator_keepsOriginalNavigatorWhenCallbackReturnsNull(): void
     {
-        $this->instance->configureNavigator(fn (Navigator $nav) => null);
+        $this->instance->configureNavigator(fn(Navigator $nav) => null);
 
         self::assertSame($this->nav, $this->instance->nav);
     }

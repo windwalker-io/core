@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Testing\AbstractTestApp;
 use Windwalker\Core\Testing\Database\TestDatabasesProvider;
 

@@ -13,7 +13,7 @@ use Windwalker\Core\Service\LoggerService;
 class RecordingLoggerService extends LoggerService
 {
     /**
-     * @var array<int, array{channel: string|array, message: mixed, context: array}>
+     * @var  array<int, array{channel: string|array, message: mixed, context: array}>
      */
     public array $errors = [];
 

@@ -11,6 +11,4 @@ namespace Windwalker\Tests\Core\Edge\Stub;
  * are excluded from scan results. Remove once that behavior is no longer
  * covered by a test.
  */
-class PlainClassStub
-{
-}
+class PlainClassStub {}

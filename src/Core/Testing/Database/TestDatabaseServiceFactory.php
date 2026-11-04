@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Testing\Database;
 
 use Windwalker\Core\Factory\DatabaseServiceFactory;
-use Windwalker\Database\DatabaseFactory;
-use Windwalker\Database\Driver\DriverOptions;
-use Windwalker\Database\Driver\Pdo\DsnHelper;
 
 class TestDatabaseServiceFactory extends DatabaseServiceFactory
 {

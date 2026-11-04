@@ -9,8 +9,7 @@ use Asika\SimpleConsole\ExecResult;
 
 require __DIR__ . '/Console.php';
 
-$app = new class () extends Console
-{
+$app = new class () extends Console {
     protected array $scripts = [];
 
     protected bool $isDryRun {
@@ -163,7 +162,7 @@ $app = new class () extends Console
         return [$major, $minor, $patch, $prereleaseType, $prereleaseVersion];
     }
 
-    public function exec(string $cmd, \Closure|null|false $output = null, bool $showCmd = true): ExecResult
+    public function exec(string $cmd, \Closure|false|null $output = null, bool $showCmd = true): ExecResult
     {
         $this->writeln('>> ' . ($this->isDryRun ? '(Dry Run) ' : '') . $cmd);
 

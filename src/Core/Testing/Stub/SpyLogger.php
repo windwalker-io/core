@@ -15,7 +15,7 @@ use Psr\Log\AbstractLogger;
 class SpyLogger extends AbstractLogger
 {
     /**
-     * @var array<int, array{level: mixed, message: string, context: array}>
+     * @var  array<int, array{level: mixed, message: string, context: array}>
      */
     public array $records = [];
 

@@ -128,7 +128,7 @@ class CryptSecretCommand implements CommandInterface
 
                     $content = preg_replace_callback(
                         $secretPattern,
-                        static fn (array $matches): string => $matches[1] . $secret . $matches[2],
+                        static fn(array $matches): string => $matches[1] . $secret . $matches[2],
                         $content
                     );
                 }

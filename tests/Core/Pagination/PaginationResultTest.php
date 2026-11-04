@@ -67,7 +67,7 @@ class PaginationResultTest extends TestCase
         self::assertNull($result->getPrevious());
         self::assertSame([], $result->getLowers());
         self::assertSame(1, $result->getCurrent()?->page);
-        self::assertSame([2, 3, 4, 5], array_map(static fn ($item) => $item->page, $result->getHighers()));
+        self::assertSame([2, 3, 4, 5], array_map(static fn($item) => $item->page, $result->getHighers()));
         self::assertSame(2, $result->getNext()?->page);
         self::assertNull($result->getMore());
         self::assertNull($result->getLast());
@@ -81,7 +81,7 @@ class PaginationResultTest extends TestCase
         self::assertSame(1, $result->getFirst()?->page);
         self::assertNull($result->getLess());
         self::assertSame(4, $result->getPrevious()?->page);
-        self::assertSame([4, 3, 2, 1], array_map(static fn ($item) => $item->page, $result->getLowers()));
+        self::assertSame([4, 3, 2, 1], array_map(static fn($item) => $item->page, $result->getLowers()));
         self::assertSame(5, $result->getCurrent()?->page);
         self::assertSame([], $result->getHighers());
         self::assertNull($result->getNext());
@@ -96,10 +96,10 @@ class PaginationResultTest extends TestCase
 
         self::assertSame(1, $result->getFirst()?->page);
         self::assertSame(7, $result->getLess()?->page);
-        self::assertSame([9, 8], array_map(static fn ($item) => $item->page, $result->getLowers()));
+        self::assertSame([9, 8], array_map(static fn($item) => $item->page, $result->getLowers()));
         self::assertSame(9, $result->getPrevious()?->page);
         self::assertSame(10, $result->getCurrent()?->page);
-        self::assertSame([11, 12], array_map(static fn ($item) => $item->page, $result->getHighers()));
+        self::assertSame([11, 12], array_map(static fn($item) => $item->page, $result->getHighers()));
         self::assertSame(11, $result->getNext()?->page);
         self::assertSame(13, $result->getMore()?->page);
         self::assertSame(20, $result->getLast()?->page);
@@ -154,7 +154,7 @@ class PaginationResultTest extends TestCase
 
         self::assertSame(
             [1, 7, 8, 9, 10, 11, 12, 13, 20],
-            array_map(static fn ($item) => $item->page, $result->getAll())
+            array_map(static fn($item) => $item->page, $result->getAll())
         );
     }
 

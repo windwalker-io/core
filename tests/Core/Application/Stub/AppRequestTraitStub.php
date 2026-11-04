@@ -15,9 +15,7 @@ class AppRequestTraitStub
 {
     use AppRequestTrait;
 
-    public function __construct(private mixed $compiledInput)
-    {
-    }
+    public function __construct(private mixed $compiledInput) {}
 
     protected function getUriQueryValues(): mixed
     {

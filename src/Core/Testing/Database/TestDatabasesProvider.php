@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Testing\Database;
 
 use Windwalker\Core\Factory\DatabaseServiceFactory;
-use Windwalker\Core\Testing\Database\TestDatabaseFixtures;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\DriverOptions;

@@ -8,9 +8,12 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()
     ->in(
         [
+            __DIR__ . '/bin',
+            __DIR__ . '/etc',
+            __DIR__ . '/routes',
             __DIR__ . '/src',
             __DIR__ . '/tests',
-            __DIR__ . '/resources/registry',
+            __DIR__ . '/resources',
         ]
     )
     ->exclude(

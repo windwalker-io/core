@@ -18,8 +18,6 @@ use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
 use Windwalker\Queue\Event\StopEvent;
-use Windwalker\Queue\Exception\AbandonedException;
-use Windwalker\Queue\Exception\DeferredException;
 use Windwalker\Queue\Failer\QueueFailerInterface;
 use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;

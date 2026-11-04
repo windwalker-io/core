@@ -68,8 +68,8 @@ class ApiException extends \RuntimeException
     /**
      * @param  int|\UnitEnum  $statusCode
      *
-     * @return  static  Return self to support chaining.
-     * @throws \ReflectionException
+     * @return  static                Return self to support chaining.
+     * @throws  \ReflectionException
      */
     public function setStatusCode(int|\UnitEnum $statusCode): static
     {
@@ -103,7 +103,7 @@ class ApiException extends \RuntimeException
      *
      * @return  T|object|null
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     protected static function getAttrFromEnum(\UnitEnum $enum, string $attr): ?object
     {
@@ -135,7 +135,7 @@ class ApiException extends \RuntimeException
      *
      * @return  array{ 0: int, 1: int }
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     protected static function getStatusCodeFromEnum(\UnitEnum $enum): array
     {
@@ -159,7 +159,7 @@ class ApiException extends \RuntimeException
      *
      * @return  void
      *
-     * @throws \ReflectionException
+     * @throws  \ReflectionException
      */
     protected static function checkBackedEnumType(\UnitEnum $enum): void
     {

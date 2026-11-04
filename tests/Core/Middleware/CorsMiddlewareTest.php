@@ -21,9 +21,7 @@ class CorsMiddlewareTest extends TestCase
     private function handler(?ResponseInterface $response = null): RequestHandlerInterface
     {
         return new class ($response) implements RequestHandlerInterface {
-            public function __construct(private readonly ?ResponseInterface $response)
-            {
-            }
+            public function __construct(private readonly ?ResponseInterface $response) {}
 
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
@@ -100,7 +98,7 @@ class CorsMiddlewareTest extends TestCase
     {
         $middleware = new CorsMiddleware(new Container());
 
-        $handler = new class implements RequestHandlerInterface {
+        $handler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 throw new \RuntimeException('boom');

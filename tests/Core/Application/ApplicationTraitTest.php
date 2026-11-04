@@ -22,7 +22,6 @@ use Windwalker\Tests\Core\Application\Stub\InvokableListenerStub;
 use Windwalker\Tests\Core\Application\Stub\SubscriberStub;
 use Windwalker\Tests\Core\Application\Stub\TestWebAppFactory;
 use Windwalker\Core\Testing\Stub\ApplicationTraitStub;
-use Windwalker\Tests\TestApp;
 
 /**
  * Unit tests for the uncovered ApplicationTrait branches that are not already

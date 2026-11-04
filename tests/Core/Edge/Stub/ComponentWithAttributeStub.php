@@ -14,6 +14,4 @@ use Windwalker\Core\Edge\Attribute\EdgeComponent;
  * longer covered by a test.
  */
 #[EdgeComponent('stub-component')]
-class ComponentWithAttributeStub
-{
-}
+class ComponentWithAttributeStub {}

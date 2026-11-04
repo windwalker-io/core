@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Windwalker\Core\CliServer\CliServerRuntime;
 use Windwalker\Core\Runtime\Runtime;
-use Windwalker\Tests\TestApp;
 
 return static function (string $root, string $workDir) {
     require $root . '/vendor/autoload.php';

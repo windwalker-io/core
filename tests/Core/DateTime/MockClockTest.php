@@ -8,7 +8,6 @@ use DateTimeImmutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Windwalker\Core\DateTime\Chronos;
 use Windwalker\Core\DateTime\MockClock;
 
 #[CoversClass(MockClock::class)]

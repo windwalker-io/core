@@ -16,7 +16,7 @@ namespace Asika\SimpleConsole {
 
         public const ParameterType BOOLEAN = ParameterType::BOOLEAN;
 
-        public const ParameterType ARRAY = ParameterType::ARRAY;
+        public const ParameterType array = ParameterType::ARRAY;
 
         public const ParameterType LEVEL = ParameterType::LEVEL;
 
@@ -35,7 +35,7 @@ namespace Asika\SimpleConsole {
 
         public bool $disableDefaultParameters = false;
 
-        public static function createArgvParser(\Closure|null $configure = null): ArgvParser
+        public static function createArgvParser(?\Closure $configure = null): ArgvParser
         {
             ($parser = new ArgvParser()) && (!$configure || $configure($parser));
 
@@ -43,7 +43,7 @@ namespace Asika\SimpleConsole {
         }
 
         public static function parseArgv(
-            \Closure|null $configure = null,
+            ?\Closure $configure = null,
             ?array $argv = null,
             bool $validate = true
         ): array {
@@ -58,8 +58,7 @@ namespace Asika\SimpleConsole {
             public string $epilog = '',
             public ?string $commandName = null,
             public ArgvParser $parser = new ArgvParser(),
-        ) {
-        }
+        ) {}
 
         public function addParameter(
             string|array $name,
@@ -87,13 +86,9 @@ namespace Asika\SimpleConsole {
             return $this->params[$name] ?? $default;
         }
 
-        protected function configure(): void
-        {
-        }
+        protected function configure(): void {}
 
-        protected function preprocess(): void
-        {
-        }
+        protected function preprocess(): void {}
 
         protected function doExecute(): int|bool
         {
@@ -172,7 +167,7 @@ namespace Asika\SimpleConsole {
             return (bool) $this->mapBoolean($this->ask($question, $default));
         }
 
-        public function mapBoolean($in): bool|null
+        public function mapBoolean($in): ?bool
         {
             $in = strtolower((string) $in);
             if (in_array($in, $this->boolMapping[0], true)) {
@@ -185,11 +180,11 @@ namespace Asika\SimpleConsole {
             return null;
         }
 
-        public function exec(string $cmd, \Closure|null|false $output = null, bool $showCmd = true): ExecResult
+        public function exec(string $cmd, \Closure|false|null $output = null, bool $showCmd = true): ExecResult
         {
             !$showCmd || $this->writeln('>> ' . $cmd);
             [$outFull, $errFull, $code] = ['', '', 255];
-            if ($process = proc_open($cmd, [["pipe", "r"], ["pipe", "w"], ["pipe", "w"]], $pipes)) {
+            if ($process = proc_open($cmd, [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $pipes)) {
                 $callback = $output ?: fn($data, $err) => ($output === false) || $this->write($data, $err);
                 while (($out = fgets($pipes[1])) || $err = fgets($pipes[2])) {
                     if (isset($out[0])) {
@@ -262,9 +257,7 @@ namespace Asika\SimpleConsole {
             get => $this->code === 0;
         }
 
-        public function __construct(public int $code = 0, public string $output = '', public string $errOutput = '')
-        {
-        }
+        public function __construct(public int $code = 0, public string $output = '', public string $errOutput = '') {}
     }
 
     class ArgvParser
@@ -503,10 +496,10 @@ namespace Asika\SimpleConsole {
     }
 
     /**
-     * @method  self description(string $value)
-     * @method  self required(bool $value)
-     * @method  self negatable(bool $value)
-     * @method  self default(mixed $value)
+     * @method  self  description(string $value)
+     * @method  self  required(bool $value)
+     * @method  self  negatable(bool $value)
+     * @method  self  default(mixed $value)
      */
     class Parameter
     {
@@ -573,20 +566,20 @@ namespace Asika\SimpleConsole {
         {
             $this->assertArg(
                 $this->type !== ParameterType::ARRAY || is_array($this->defaultValue),
-                "Default value of \"%s\" must be an array."
+                'Default value of "%s" must be an array.'
             );
             if ($this->isArg) {
-                $this->assertArg(!$this->negatable, "Argument \"%s\" cannot be negatable.");
+                $this->assertArg(!$this->negatable, 'Argument "%s" cannot be negatable.');
                 $this->assertArg(
                     $this->type !== ParameterType::BOOLEAN && $this->type !== ParameterType::LEVEL,
                     "Argument \"%s\" cannot be type: {$this->type->name}."
                 );
             } else {
-                $this->assertArg(!$this->negatable || !$this->required, "Negatable option \"%s\" cannot be required.");
+                $this->assertArg(!$this->negatable || !$this->required, 'Negatable option "%s" cannot be required.');
             }
             $this->assertArg(
                 !$this->required || $this->default === null,
-                "Default value of \"%s\" cannot be set when required is true."
+                'Default value of "%s" cannot be set when required is true.'
             );
         }
 
@@ -611,7 +604,7 @@ namespace Asika\SimpleConsole {
         public function validate(mixed $value): void
         {
             if ($value === null) {
-                $this->assertInput(!$this->required, "Required value for \"%s\" is missing.");
+                $this->assertInput(!$this->required, 'Required value for "%s" is missing.');
 
                 return;
             }
@@ -623,7 +616,7 @@ namespace Asika\SimpleConsole {
                 ParameterType::ARRAY => is_array($value),
                 default => true,
             };
-            $this->assertInput($passed, "Invalid value type for \"%s\". Expected %s.");
+            $this->assertInput($passed, 'Invalid value type for "%s". Expected %s.');
         }
 
         public function assertArg(mixed $value, ?string $message = ''): void
@@ -753,7 +746,5 @@ namespace Asika\SimpleConsole {
         case ARRAY;
     }
 
-    class InvalidParameterException extends \RuntimeException
-    {
-    }
+    class InvalidParameterException extends \RuntimeException {}
 }

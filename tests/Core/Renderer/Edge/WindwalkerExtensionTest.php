@@ -114,7 +114,7 @@ class WindwalkerExtensionTest extends TestCase
         $extension = new WindwalkerExtension($this->createStub(ApplicationInterface::class));
 
         self::assertSame(
-            "<?php show(\$foo) ?>",
+            '<?php show($foo) ?>',
             $extension->shown('($foo)')
         );
     }
@@ -125,7 +125,7 @@ class WindwalkerExtensionTest extends TestCase
         $extension = new WindwalkerExtension($this->createStub(ApplicationInterface::class));
 
         self::assertSame(
-            "<?php dump(\$foo) ?>",
+            '<?php dump($foo) ?>',
             $extension->dump('($foo)')
         );
     }
@@ -136,7 +136,7 @@ class WindwalkerExtensionTest extends TestCase
         $extension = new WindwalkerExtension($this->createStub(ApplicationInterface::class));
 
         self::assertSame(
-            "<?php show(\$foo); die; ?>",
+            '<?php show($foo); die; ?>',
             $extension->dd('($foo)')
         );
     }

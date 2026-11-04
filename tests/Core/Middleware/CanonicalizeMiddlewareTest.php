@@ -18,7 +18,7 @@ class CanonicalizeMiddlewareTest extends TestCase
 {
     private function handler(): RequestHandlerInterface
     {
-        return new class implements RequestHandlerInterface {
+        return new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 return new Response()->withHeader('X-Handled', '1');

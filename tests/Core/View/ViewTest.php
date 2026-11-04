@@ -80,9 +80,7 @@ class ViewTest extends TestCase
     private function createLangServiceStub(string $locale = 'en', string $fallback = 'en'): object
     {
         return new class ($locale, $fallback) {
-            public function __construct(private string $locale, private string $fallback)
-            {
-            }
+            public function __construct(private string $locale, private string $fallback) {}
 
             public function getLocale(): string
             {

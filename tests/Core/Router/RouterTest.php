@@ -27,7 +27,7 @@ class RouterTest extends TestCase
     #[Test]
     public function getRoute_findsRouteByAlias(): void
     {
-        $route = (new Route('post.show', '/post/{id}'))->alias('post.view');
+        $route = new Route('post.show', '/post/{id}')->alias('post.view');
         $router = new Router(['post.show' => $route]);
 
         self::assertSame($route, $router->getRoute('post.view'));
@@ -74,7 +74,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsFalseWhenMethodMismatch(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->methods('POST');
+        $route = new Route('home', '/')->methods('POST');
 
         self::assertFalse(
             $router->filterRoute(new ServerRequest(method: 'GET'), $route)
@@ -85,7 +85,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsTrueWhenMethodMatches(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->methods('GET');
+        $route = new Route('home', '/')->methods('GET');
 
         self::assertTrue(
             $router->filterRoute(new ServerRequest(method: 'get'), $route)
@@ -96,7 +96,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsFalseWhenHostMismatch(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->hosts('example.com');
+        $route = new Route('home', '/')->hosts('example.com');
 
         self::assertFalse(
             $router->filterRoute(new ServerRequest(uri: 'http://other.com/'), $route)
@@ -107,7 +107,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsTrueWhenHostMatchesWithVariable(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->hosts('{sub:\w+}.example.com');
+        $route = new Route('home', '/')->hosts('{sub:\w+}.example.com');
 
         self::assertTrue(
             $router->filterRoute(new ServerRequest(uri: 'http://foo.example.com/'), $route)
@@ -119,7 +119,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsFalseWhenSchemeMismatch(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->scheme('https');
+        $route = new Route('home', '/')->scheme('https');
 
         self::assertFalse(
             $router->filterRoute(new ServerRequest(uri: 'http://example.com/'), $route)
@@ -130,7 +130,7 @@ class RouterTest extends TestCase
     public function filterRoute_returnsTrueWhenSchemeMatches(): void
     {
         $router = new Router();
-        $route = (new Route('home', '/'))->scheme('https');
+        $route = new Route('home', '/')->scheme('https');
 
         self::assertTrue(
             $router->filterRoute(new ServerRequest(uri: 'https://example.com/'), $route)

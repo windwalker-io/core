@@ -117,7 +117,7 @@ class MailMessageTest extends TestCase
             ->with(
                 'mail.welcome',
                 $this->callback(
-                    static fn (array $data) => isset($data['message'], $data['asset']) && $data['asset'] === $asset
+                    static fn(array $data) => isset($data['message'], $data['asset']) && $data['asset'] === $asset
                 )
             )
             ->willReturn('<p>Rendered</p>');
@@ -157,7 +157,7 @@ class MailMessageTest extends TestCase
 
         $message = new MailMessage($mailer);
 
-        $result = $message->buildBody(static fn () => null);
+        $result = $message->buildBody(static fn() => null);
 
         self::assertSame($message, $result);
         self::assertSame('<p>Built</p>', $message->getHtmlBody());
@@ -170,7 +170,7 @@ class MailMessageTest extends TestCase
 
         $message = new MailMessage($mailer);
 
-        $result = $message->buildBody(static fn () => null);
+        $result = $message->buildBody(static fn() => null);
 
         self::assertSame($message, $result);
         self::assertNull($message->getHtmlBody());

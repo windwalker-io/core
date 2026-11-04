@@ -9,6 +9,4 @@ namespace Windwalker\Tests\Core\Package\Stub\MvcFixture\Module\Front\Widget;
  * Its namespace is rewritten to `App\Module\Front` during install, which lets
  * {@see \Windwalker\Tests\Core\Package\PackageInstallerTest} assert on the written content.
  */
-class WidgetController
-{
-}
+class WidgetController {}

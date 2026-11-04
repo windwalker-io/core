@@ -77,7 +77,7 @@ class RouteTest extends TestCase
     #[Test]
     public function alias_withNullClearsAliases(): void
     {
-        $route = (new Route('show', '/show'))->alias('a');
+        $route = new Route('show', '/show')->alias('a');
 
         $route->alias(null);
 
@@ -87,7 +87,7 @@ class RouteTest extends TestCase
     #[Test]
     public function isGroup_matchesGroupKeys(): void
     {
-        $route = (new Route('show', '/show'))->groups(['admin' => [], 'api' => []]);
+        $route = new Route('show', '/show')->groups(['admin' => [], 'api' => []]);
 
         self::assertTrue($route->isGroup('admin'));
         self::assertTrue($route->isGroup('other', 'api'));
@@ -104,7 +104,7 @@ class RouteTest extends TestCase
     #[Test]
     public function compile_appliesGroupPrefixNamespaceAndMethods(): void
     {
-        $route = (new Route('show', '/show/{id}'))
+        $route = new Route('show', '/show/{id}')
             ->alias('legacy')
             ->groups(
                 [
@@ -215,8 +215,7 @@ class RouteTest extends TestCase
     {
         $route = new Route('show', '/show');
         $route->middleware(new ObjectBuilderDefinition(\stdClass::class));
-        $route->middleware(new class {
-        });
+        $route->middleware(new class () {});
 
         $data = $route->jsonSerialize();
 

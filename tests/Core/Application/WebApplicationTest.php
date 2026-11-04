@@ -242,7 +242,7 @@ class WebApplicationTest extends TestCase
     {
         // isCliRuntime() = false makes getType() resolve to AppType::WEB instead of CLI_WEB.
         $app = $this->createStubApp(cliRuntime: false);
-        $app->loadConfig(['middlewares' => [fn () => null]]);
+        $app->loadConfig(['middlewares' => [fn() => null]]);
 
         $app->boot();
 
@@ -473,7 +473,7 @@ class WebApplicationTest extends TestCase
         $app->boot();
         $app->on(
             \Windwalker\Core\Events\Web\BeforeRequestEvent::class,
-            fn ($event) => $event->container->get(AppContext::class)->setController(fn () => 'ok')
+            fn($event) => $event->container->get(AppContext::class)->setController(fn() => 'ok')
         );
         $event = new RequestEvent(request: TestWebAppFactory::request(), output: new Output('php://memory'));
 
@@ -490,7 +490,7 @@ class WebApplicationTest extends TestCase
         $app->boot();
         $app->on(
             \Windwalker\Core\Events\Web\BeforeRequestEvent::class,
-            fn ($event) => $event->container->get(AppContext::class)->setController(fn () => 'ok')
+            fn($event) => $event->container->get(AppContext::class)->setController(fn() => 'ok')
         );
         $event = new RequestEvent(request: TestWebAppFactory::request(), output: new Output('php://memory'));
 

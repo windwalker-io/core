@@ -9,6 +9,4 @@ namespace Windwalker\Tests\Core\Application\Stub;
  * numeric-key "plain class name" branch and the scalar-subscriber else branch.
  * No listener methods are required for dispatcher->subscribe()/->resolve() to succeed.
  */
-class SubscriberStub
-{
-}
+class SubscriberStub {}

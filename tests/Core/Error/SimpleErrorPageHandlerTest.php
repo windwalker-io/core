@@ -30,7 +30,7 @@ class SimpleErrorPageHandlerTest extends TestCase
             ->with(
                 'windwalker.error.simple',
                 self::callback(
-                    static fn (array $data) => $data['exception'] === $exception
+                    static fn(array $data) => $data['exception'] === $exception
                 )
             )
             ->willReturn('<html>Boom</html>');

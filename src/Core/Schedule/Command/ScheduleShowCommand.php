@@ -139,7 +139,7 @@ class ScheduleShowCommand implements CommandInterface
             $nextDues = [$nextDue0, $nextDue1, $nextDue2];
             $nextDuesLocal = implode(
                 "\n",
-                array_map(static fn (DateTime $date): string => $date->format('Y-m-d H:i:s'), $nextDues)
+                array_map(static fn(DateTime $date): string => $date->format('Y-m-d H:i:s'), $nextDues)
             );
             $row = [
                 '<fg=cyan>' . $event->getName() . '</>',
