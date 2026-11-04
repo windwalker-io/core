@@ -209,7 +209,10 @@ class MailBuilder implements \Stringable
             return $this->line($text);
         }
 
-        $this->blocks[] = $this->tryRenderMarkdown((string) $text);
+        $text = (string) $text;
+        $this->blocks[] = $this->markdown
+            ? $this->tryRenderMarkdown($text)
+            : htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return $this;
     }

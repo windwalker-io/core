@@ -260,6 +260,17 @@ class MailBuilderTest extends TestCase
     }
 
     #[Test]
+    public function textEscapesHtmlWhenInline(): void
+    {
+        $builder = new MailBuilder(inline: true);
+
+        $builder->text('<script>alert("x")</script>');
+
+        self::assertSame(['&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;'], $builder->blocks);
+        self::assertSame('&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;', (string) $builder);
+    }
+
+    #[Test]
     public function rawAddsRawContentDirectly(): void
     {
         $builder = new MailBuilder();
