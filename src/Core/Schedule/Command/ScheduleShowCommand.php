@@ -127,9 +127,9 @@ class ScheduleShowCommand implements CommandInterface
                     (string) $event,
                     $canDescribe ? CronTranslator::translate($expr->getExpression()) : '-',
                     $expr->isDue($time, $tz) ? '<info>v</info>' : '',
-                    $nextDue0->format('Y-m-d H:i:s')
-                    . "\n" . $nextDue1->format('Y-m-d H:i:s')
-                    . "\n" . $nextDue2->format('Y-m-d H:i:s'),
+                    $nextDue0->format('Y-m-d H:i:s e')
+                    . "\n" . $nextDue1->format('Y-m-d H:i:s e')
+                    . "\n" . $nextDue2->format('Y-m-d H:i:s e'),
                     '<fg=gray>' . implode(' ', $tags) . '</>',
                 ]
             );
