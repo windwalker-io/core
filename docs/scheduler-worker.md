@@ -238,6 +238,18 @@ The runner does not automatically refresh locks. Protection covers the handler,
 not later lifecycle listeners, `catch()` callbacks or background jobs dispatched
 by the handler.
 
+### Queue worker configuration
+
+`ScheduleWorker` and `queue:worker` share `WorkerConfigurator` for job DI
+invocation, configuration scripts and maintenance state handling. Output,
+failure reporting and command-specific database recovery remain in their
+respective entry points. Initialization scripts receive `event: null`; command
+scripts additionally receive the command's IO.
+
+`ScheduleWorkerOptions::enqueuer` only affects `ScheduleWorker::runByCommand()`,
+which forwards it to `queue:worker --enqueuer`. In-process `run()` and
+`runOnce()` do not attach an Enqueuer.
+
 ### Starting an Enqueuer subprocess
 
 `Windwalker\Core\Queue\ScheduleEnqueuer::runByCommand()` starts
@@ -297,7 +309,49 @@ Run long-lived producers in a dedicated scheduler process, for example
 `php windwalker schedule:worker enqueuer`, to avoid delaying unrelated tasks.
 The outer minute claim prevents duplicate launches of that scheduled minute,
 not duplicate job production across the Enqueuer's polling iterations.
-There is no in-process `run()` or `runOnce()` adapter.
+### In-process Enqueuer
+
+Use `ScheduleEnqueuer::run()` to execute the configured producers in the current
+process instead of launching `queue:enqueuer`:
+
+```php
+$schedule->task('enqueuer')
+    ->everyMinutes(5)
+    ->handler(function (ConsoleApplication $app, ScheduleEnqueuer $enqueuer) {
+        $enqueuer->setMessageOutput($app->getOutput());
+        $enqueuer->run(
+            5 * 60 - 3,
+            options: new ScheduleEnqueuerOptions(sleep: 2)
+        );
+    });
+```
+
+The signature is `run(int $lifetime, ?string $connection = null,
+array|string $channels = 'default', ScheduleEnqueuerOptions $options = new
+ScheduleEnqueuerOptions()): void`. It resolves the default connection from
+`queue.default`, supports `'*'` for all registered handlers, and copies options
+into a fresh runner without mutating the supplied options.
+
+Handler files, name-based DI invocation, `init_scripts`, `loop_end_scripts`,
+maintenance handling, and the restart signal share the command's integration.
+Scripts receive a dedicated `IOInterface` whose output is forwarded to
+`MessageOutputEvent`; it is not bound over the enclosing command's IO.
+Enqueuer events are forwarded to the application dispatcher. Debug messages,
+stop reasons, and failures use the adapter's message events.
+
+With `once: true`, only `next()` runs: initialization still runs, but there is
+no loop or loop-end script. Otherwise the standard Enqueuer loop honors lifetime,
+memory, timeout, sleep, max-runs, force, shuffle and stop-when-empty options.
+On systems with PCNTL, shutdown also notifies the enclosing scheduler, and the
+previous signal handlers/alarm are restored when the adapter returns.
+
+Unlike the continuous CLI command, producer or loop failure stops this adapter
+and throws the original exception to the scheduler. Remaining producers do not
+run after a failure. Initialization and script errors also propagate.
+Execution is synchronous; lifetime is checked between iterations, not a hard
+execution deadline. Returned jobs are not automatically queued or executed:
+producer handlers must use `$controller->enqueue()` to push jobs.
+There is no separate `runOnce()` adapter; pass `once: true`.
 
 ### Direct execution and delivery limits
 

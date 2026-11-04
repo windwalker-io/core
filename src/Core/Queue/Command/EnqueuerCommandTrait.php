@@ -7,11 +7,11 @@ namespace Windwalker\Core\Queue\Command;
 use Psr\Log\LogLevel;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Manager\Logger;
+use Windwalker\Core\Queue\EnqueuerConfigurator;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DependencyResolutionException;
 use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Enqueuer;
-use Windwalker\Queue\Enqueuer\EnqueuerController;
 use Windwalker\Queue\Event\AfterEnqueueEvent;
 use Windwalker\Queue\Event\BeforeEnqueueEvent;
 use Windwalker\Queue\Event\EnqueueFailureEvent;
@@ -49,26 +49,12 @@ trait EnqueuerCommandTrait
      */
     public function prepareEnqueuer(Enqueuer $enqueuer): void
     {
-        $enqueuer->setInvoker($this->createEnqueuerInvoker());
-
-        $handlerFiles = $this->app->config('queue.enqueuer.handlers') ?? [];
-        $app = $this->app;
-
-        foreach ($handlerFiles as $handlerFile) {
-            include $handlerFile;
-        }
+        new EnqueuerConfigurator($this->app)->prepare($enqueuer, $this->createEnqueuerInvoker());
     }
 
     public function createEnqueuerInvoker(): \Closure
     {
-        return fn(EnqueuerController $controller, callable $invokable) => $this->app->call(
-            $invokable,
-            [
-                $controller,
-                'enqueuerController' => $controller,
-                'controller' => $controller,
-            ]
-        );
+        return new EnqueuerConfigurator($this->app)->createInvoker();
     }
 
     protected function listenToEnqueuer(Enqueuer $enqueuer, IOInterface $io, string $connection): void
@@ -132,19 +118,7 @@ trait EnqueuerCommandTrait
                         );
                     }
 
-                    switch ($enqueuer->getState()) {
-                        case $enqueuer::STATE_ACTIVE:
-                            if ($this->app->isMaintenance()) {
-                                $enqueuer->setState($enqueuer::STATE_PAUSE);
-                            }
-                            break;
-
-                        case $enqueuer::STATE_PAUSE:
-                            if (!$this->app->isMaintenance()) {
-                                $enqueuer->setState($enqueuer::STATE_ACTIVE);
-                            }
-                            break;
-                    }
+                    new EnqueuerConfigurator($this->app)->updateMaintenanceState($enqueuer);
                 }
             )
             ->on(
@@ -187,25 +161,6 @@ trait EnqueuerCommandTrait
         IOInterface $io,
         string $connection
     ): void {
-        $scripts = $this->app->config('queue.enqueuer.' . $configName) ?? [];
-
-        if (is_callable($scripts)) {
-            $scripts = [$scripts];
-        }
-
-        foreach ($scripts as $script) {
-            $this->app->call(
-                $script,
-                [
-                    'enqueuer' => $enqueuer,
-                    Enqueuer::class => $enqueuer,
-                    'event' => $event,
-                    ...($event !== null ? [$event::class => $event] : []),
-                    'io' => $io,
-                    IOInterface::class => $io,
-                    'connection' => $connection,
-                ]
-            );
-        }
+        new EnqueuerConfigurator($this->app)->runScripts($configName, $enqueuer, $event, $io, $connection);
     }
 }

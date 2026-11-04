@@ -45,6 +45,10 @@ class ScheduleEnqueuerTest extends TestCase
         $enqueuer = new ScheduleEnqueuer($app);
         $enqueuer->runByCommand(297, 'redis', ['default', 'high priority'], $options);
 
+        if (!is_string($command) || !is_callable($output)) {
+            throw new \LogicException('Process command and output callback were not captured.');
+        }
+
         self::assertStringStartsWith('php windwalker queue:enqueuer ', $command);
         foreach ([
             '--lifetime' => '297',
@@ -145,6 +149,30 @@ class ScheduleEnqueuerTest extends TestCase
             try {
                 $enqueuer->runByCommand(...$arguments);
                 self::fail('Invalid input must throw.');
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
+
+    }
+
+    #[Test]
+    public function invalidRunInputIsRejectedBeforeResolvingQueueServices(): void
+    {
+        $app = $this->createMock(ApplicationInterface::class);
+        $app->expects($this->never())->method('retrieve');
+        $runner = new ScheduleEnqueuer($app);
+
+        foreach ([
+            [-1, null, 'default', new ScheduleEnqueuerOptions()],
+            [0, '', 'default', new ScheduleEnqueuerOptions()],
+            [0, null, [123], new ScheduleEnqueuerOptions()],
+            [0, null, '', new ScheduleEnqueuerOptions()],
+            [0, null, 'default', new ScheduleEnqueuerOptions(sleep: NAN)],
+        ] as $arguments) {
+            try {
+                $runner->run(...$arguments);
+                self::fail('Invalid run input must throw.');
             } catch (InvalidArgumentException) {
                 self::assertTrue(true);
             }

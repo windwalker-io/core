@@ -19,7 +19,6 @@ use Windwalker\Queue\Event\LoopFailureEvent;
 use Windwalker\Queue\Event\LoopStartEvent;
 use Windwalker\Queue\Event\StopEvent;
 use Windwalker\Queue\Failer\QueueFailerInterface;
-use Windwalker\Queue\Job\JobController;
 use Windwalker\Queue\Queue;
 use Windwalker\Queue\RunnerOptions;
 use Windwalker\Queue\Worker;
@@ -281,19 +280,7 @@ class ScheduleWorker
                 function (LoopStartEvent $event) {
                     $worker = $event->runner;
 
-                    switch ($worker->getState()) {
-                        case $worker::STATE_ACTIVE:
-                            if ($this->app->isMaintenance()) {
-                                $worker->setState($worker::STATE_PAUSE);
-                            }
-                            break;
-
-                        case $worker::STATE_PAUSE:
-                            if (!$this->app->isMaintenance()) {
-                                $worker->setState($worker::STATE_ACTIVE);
-                            }
-                            break;
-                    }
+                    new WorkerConfigurator($this->app)->updateMaintenanceState($worker);
                 }
             )
             ->on(
@@ -328,14 +315,7 @@ class ScheduleWorker
 
     public function createInvoker(): \Closure
     {
-        return fn(JobController $controller, callable $invokable) => $this->app->call(
-            $invokable,
-            [
-                'jobController' => $controller,
-                'controller' => $controller,
-                JobController::class => $controller,
-            ]
-        );
+        return new WorkerConfigurator($this->app)->createInvoker();
     }
 
     protected function createWorker(?string $connection, RunnerOptions $options): Worker
@@ -361,23 +341,6 @@ class ScheduleWorker
         ?EventInterface $event,
         string $connection
     ): void {
-        $scripts = $this->app->config('queue.' . $configName) ?? [];
-
-        if (is_callable($scripts)) {
-            $scripts = [$scripts];
-        }
-
-        foreach ($scripts as $script) {
-            $this->app->call(
-                $script,
-                [
-                    'worker' => $worker,
-                    Worker::class => $worker,
-                    'event' => $event,
-                    $event::class => $event,
-                    'connection' => $connection,
-                ]
-            );
-        }
+        new WorkerConfigurator($this->app)->runScripts($configName, $worker, $event, $connection);
     }
 }

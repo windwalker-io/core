@@ -34,9 +34,249 @@ use Windwalker\Queue\Event\EnqueueFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Queue;
 use Windwalker\Tests\Core\Queue\Stub\EnqueuerCommandStub;
+use Windwalker\Tests\Core\Queue\Stub\ScheduleEnqueuerStub;
+use Windwalker\Core\Queue\ScheduleEnqueuer;
+use Windwalker\Core\Queue\ScheduleEnqueuerOptions;
+use Windwalker\Core\Queue\ScheduleWorker;
+use Windwalker\Queue\Worker;
+use Windwalker\Queue\Enqueuer;
 
 class QueueEnqueuerCommandTest extends TestCase
 {
+    #[Test]
+    public function workerEntrypointsShareScriptsAndPreserveCommandOnlyIoArguments(): void
+    {
+        $worker = new Worker(new Queue(new NullQueueDriver()));
+        $io = $this->createIO(new QueueWorkerCommand($this->app), ['--once' => true]);
+        $calls = [];
+        $this->config->setDeep('queue.init_scripts', [
+            static function ($worker, $event, $connection) use (&$calls) {
+                $calls[] = [$worker, $event, $connection];
+            },
+            static function (Worker $runner) use (&$calls) {
+                $calls[] = $runner;
+            },
+        ]);
+        $command = new QueueWorkerCommand($this->app);
+        new \ReflectionMethod($command, 'runConfigScripts')->invoke(
+            $command,
+            'init_scripts',
+            $worker,
+            null,
+            $io,
+            'primary'
+        );
+        $adapter = new ScheduleWorker($this->app);
+        new \ReflectionMethod($adapter, 'runConfigScripts')->invoke(
+            $adapter,
+            'init_scripts',
+            $worker,
+            null,
+            'primary'
+        );
+        self::assertSame([[$worker, null, 'primary'], $worker, [$worker, null, 'primary'], $worker], $calls);
+
+        $this->config->setDeep('queue.job_end_scripts', static function (
+            Worker $runner,
+            AfterJobRunEvent $event,
+            IOInterface $io
+        ) use ($worker) {
+            self::assertSame($worker, $runner);
+            self::assertSame($worker, $event->runner);
+            self::assertTrue($io->getOption('once'));
+        });
+        $controller = new \Windwalker\Queue\QueueMessage(new \Windwalker\Tests\Core\Queue\Stub\StubInvokableJob())->makeJobController();
+        $event = new AfterJobRunEvent($controller, $worker, $worker->getQueue());
+        new \ReflectionMethod($command, 'runConfigScripts')->invoke(
+            $command,
+            'job_end_scripts',
+            $worker,
+            $event,
+            $io,
+            'primary'
+        );
+    }
+
+    #[Test]
+    public function schedulerRunSharesHandlerAndScriptWiringWithoutChangingApplicationIo(): void
+    {
+        $this->handlers('$enqueuer->channel("default", static fn($controller) => $controller->channel);');
+        $order = [];
+        $this->config->setDeep('queue.enqueuer.init_scripts', static function ($event, $connection, IOInterface $io) use (&$order) {
+            $order[] = ['init', $event, $connection, $io->getOption('once')];
+            $io->writeln('init output');
+        });
+        $this->config->setDeep('queue.enqueuer.loop_end_scripts', static function ($enqueuer) use (&$order) {
+            $order[] = ['end', $enqueuer];
+        });
+        $this->app->on(AfterEnqueueEvent::class, static function ($event) use (&$order) {
+            $order[] = ['handler', $event->result];
+        });
+        $output = new BufferedOutput();
+        $outerIO = new IO(new ArrayInput([]), new NullOutput(), new Command());
+        $this->app->container->share(IOInterface::class, $outerIO);
+        $runner = new ScheduleEnqueuerStub($this->app);
+        $runner->setMessageOutput($output);
+        $options = new ScheduleEnqueuerOptions(sleep: 0, timeout: 0, maxRuns: 2);
+        $runner->run(297, options: $options);
+
+        self::assertSame(['init', 'handler', 'end', 'handler', 'end'], array_column($order, 0));
+        self::assertSame(['init', null, 'primary', false], $order[0]);
+        self::assertSame('default', $order[1][1]);
+        self::assertSame(297, $runner->enqueuer->options->lifetime);
+        self::assertSame(2, $options->maxRuns);
+        self::assertSame($outerIO, $this->app->retrieve(IOInterface::class));
+        self::assertStringContainsString('init output', $output->fetch());
+    }
+
+    #[Test]
+    public function schedulerOnceRunsEachChannelWithoutEnteringLoop(): void
+    {
+        $this->handlers('$enqueuer->channel("alpha", static fn() => "a"); $enqueuer->channel("beta", static fn() => "b");');
+        $results = [];
+        $this->app->on(AfterEnqueueEvent::class, static function ($event) use (&$results) {
+            $results[] = $event->result;
+        });
+        $runner = new ScheduleEnqueuerStub($this->app);
+        $runner->run(0, channels: '*', options: new ScheduleEnqueuerOptions(once: true));
+        self::assertSame(['a', 'b'], $results);
+        self::assertNull($runner->enqueuer->pid);
+    }
+
+    #[Test]
+    public function schedulerFailureStopsAndPropagatesRatherThanReturningSuccess(): void
+    {
+        foreach ([true, false] as $once) {
+            $this->handlers(<<<'PHP'
+                $enqueuer->channel("default", static fn() => throw new \Windwalker\Queue\Exception\UnrecoverableException("producer failed"));
+                $enqueuer->channel("later", static fn() => throw new \LogicException("Later producer must not run"));
+                PHP);
+            $runner = new ScheduleEnqueuerStub($this->app);
+            $output = new BufferedOutput();
+            $runner->setMessageOutput($output);
+            try {
+                $runner->run(0, channels: ['default', 'later'], options: new ScheduleEnqueuerOptions(once: $once, sleep: 0, timeout: 0));
+                self::fail('Scheduler must receive the producer exception.');
+            } catch (\RuntimeException $e) {
+                self::assertSame('producer failed', $e->getMessage());
+            }
+            self::assertTrue($runner->enqueuer->isStop());
+            self::assertStringContainsString('producer failed', $output->fetch());
+        }
+    }
+
+    #[Test]
+    public function schedulerMaintenanceResumesAndForceRunsWhilePaused(): void
+    {
+        foreach ([false, true] as $force) {
+            $this->maintenance = true;
+            $runs = 0;
+            $this->handlers('$enqueuer->channel("default", static fn() => "produced");');
+            $this->config->setDeep('queue.enqueuer.init_scripts', static function (Enqueuer $enqueuer) use (&$runs) {
+                $enqueuer->on(AfterEnqueueEvent::class, static function () use (&$runs) {
+                    $runs++;
+                });
+            });
+            $states = [];
+            $this->config->setDeep('queue.enqueuer.loop_end_scripts', function (Enqueuer $enqueuer) use (&$states, &$runs, $force) {
+                $states[] = [$enqueuer->getState(), $runs];
+                $this->maintenance = false;
+                if (count($states) >= ($force ? 1 : 2)) {
+                    $enqueuer->stop('test complete');
+                }
+            });
+            new ScheduleEnqueuerStub($this->app)->run(
+                0,
+                options: new ScheduleEnqueuerOptions(force: $force, sleep: 0, timeout: 0)
+            );
+            self::assertSame([Enqueuer::STATE_PAUSE, $force ? 1 : 0], $states[0]);
+            self::assertSame(1, $runs);
+        }
+    }
+
+    #[Test]
+    public function schedulerLoopFailurePropagatesAndOptionsAreSnapshotted(): void
+    {
+        $options = new ScheduleEnqueuerOptions(sleep: 0, timeout: 0);
+        $failure = new \RuntimeException('loop listener failed');
+        $this->handlers('$enqueuer->channel("default", static fn() => "produced");');
+        $this->config->setDeep('queue.enqueuer.init_scripts', static function (Enqueuer $enqueuer) use ($failure, $options) {
+            $options->once = true;
+            $enqueuer->on(BeforeEnqueueEvent::class, static fn() => throw $failure);
+        });
+        $runner = new ScheduleEnqueuerStub($this->app);
+        try {
+            $runner->run(0, options: $options);
+            self::fail('Loop failure must propagate.');
+        } catch (\RuntimeException $e) {
+            self::assertSame($failure, $e);
+        }
+        self::assertNotNull($runner->enqueuer->pid);
+        self::assertFalse($runner->enqueuer->options->once);
+    }
+
+    #[Test]
+    public function realSchedulerEnqueuerRunsOnceAndInjectsNamedAndTypedDependencies(): void
+    {
+        $this->app->container->share(LoggerInterface::class, $this->logger);
+        $this->handlers(<<<'PHP'
+            $enqueuer->channel('default', static function ($controller, \Psr\Log\LoggerInterface $logger) use ($app) {
+                $logger->info('scheduler:' . $controller->channel . ':' . $app->config('queue.default'));
+                return 'created';
+            });
+            PHP);
+        new ScheduleEnqueuer($this->app)->run(0, options: new ScheduleEnqueuerOptions(once: true));
+        self::assertSame('scheduler:default:primary', $this->logger->records[0]['message']);
+    }
+
+    #[Test]
+    public function schedulerRestoresEnclosingSignalHandlersAfterLoopAndFailure(): void
+    {
+        if (!extension_loaded('pcntl')) {
+            self::markTestSkipped('Signal restoration requires PCNTL.');
+        }
+
+        $original = [];
+        foreach ([SIGINT, SIGTERM, SIGALRM] as $signal) {
+            $original[$signal] = pcntl_signal_get_handler($signal);
+        }
+        $alarm = pcntl_alarm(0);
+        $handler = static function () {};
+
+        try {
+            foreach (array_keys($original) as $signal) {
+                pcntl_signal($signal, $handler);
+            }
+            foreach ([false, true] as $fail) {
+                $this->handlers($fail
+                    ? '$enqueuer->channel("default", static fn() => throw new \TypeError("producer error"));'
+                    : '$enqueuer->channel("default", static fn() => "produced");');
+                try {
+                    new ScheduleEnqueuer($this->app)->run(
+                        0,
+                        options: new ScheduleEnqueuerOptions(sleep: 0, timeout: 1, maxRuns: 1)
+                    );
+                    self::assertFalse($fail);
+                } catch (\TypeError $e) {
+                    self::assertTrue($fail);
+                    self::assertSame('producer error', $e->getMessage());
+                }
+                foreach (array_keys($original) as $signal) {
+                    self::assertSame($handler, pcntl_signal_get_handler($signal));
+                }
+                self::assertSame(0, pcntl_alarm(0));
+            }
+        } finally {
+            pcntl_alarm(0);
+            foreach ($original as $signal => $previous) {
+                pcntl_signal($signal, $previous);
+            }
+            if ($alarm > 0) {
+                pcntl_alarm($alarm);
+            }
+        }
+    }
+
     private string $directory;
 
     private Config $config;

@@ -22,6 +22,7 @@ class ScheduleWorkerOptions extends RunnerOptions
         bool $stopWhenEmpty = false,
         ?string $restartSignal = null,
         ?\Closure $controllerFactory = null,
+        // Only used by ScheduleWorker::runByCommand(); run() and runOnce() do not attach an Enqueuer.
         public bool $enqueuer = false
     ) {
         parent::__construct(

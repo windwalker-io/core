@@ -16,6 +16,7 @@ use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Database\DatabaseConnectionRecovery;
 use Windwalker\Core\Manager\Logger;
+use Windwalker\Core\Queue\WorkerConfigurator;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DependencyResolutionException;
@@ -330,16 +331,11 @@ class QueueWorkerCommand implements CommandInterface
 
     public function createInvoker(): \Closure
     {
-        return function (JobController $controller, callable $invokable) {
+        $invoker = new WorkerConfigurator($this->app)->createInvoker();
+
+        return function (JobController $controller, callable $invokable) use ($invoker) {
             try {
-                return $this->app->call(
-                    $invokable,
-                    [
-                        'jobController' => $controller,
-                        'controller' => $controller,
-                        JobController::class => $controller,
-                    ]
-                );
+                return $invoker($controller, $invokable);
             } catch (\Throwable $e) {
                 // Exit before the queue tries to settle a job using a failed connection.
                 $this->shutdownOnDatabaseFailure($e);
@@ -473,19 +469,7 @@ class QueueWorkerCommand implements CommandInterface
                 function (LoopStartEvent $event) {
                     $worker = $event->runner;
 
-                    switch ($worker->getState()) {
-                        case $worker::STATE_ACTIVE:
-                            if ($this->app->isMaintenance()) {
-                                $worker->setState($worker::STATE_PAUSE);
-                            }
-                            break;
-
-                        case $worker::STATE_PAUSE:
-                            if (!$this->app->isMaintenance()) {
-                                $worker->setState($worker::STATE_ACTIVE);
-                            }
-                            break;
-                    }
+                    new WorkerConfigurator($this->app)->updateMaintenanceState($worker);
                 }
             )
             ->on(
@@ -553,26 +537,7 @@ class QueueWorkerCommand implements CommandInterface
         IOInterface $io,
         string $connection
     ): void {
-        $scripts = $this->app->config('queue.' . $configName) ?? [];
-
-        if (is_callable($scripts)) {
-            $scripts = [$scripts];
-        }
-
-        foreach ($scripts as $script) {
-            $this->app->call(
-                $script,
-                [
-                    'worker' => $worker,
-                    Worker::class => $worker,
-                    'event' => $event,
-                    $event::class => $event,
-                    'io' => $io,
-                    IOInterface::class => $io,
-                    'connection' => $connection,
-                ]
-            );
-        }
+        new WorkerConfigurator($this->app)->runScripts($configName, $worker, $event, $connection, $io);
     }
 
     protected function createLogger(): LoggerInterface
