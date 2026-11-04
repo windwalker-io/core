@@ -51,7 +51,8 @@
         "symfony/mailer": "^8.1",
         "dragonmantank/cron-expression": "^3.6",
         "tijsverkoyen/css-to-inline-styles": "^2.4",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6",
+        "league/commonmark": "^2.10"
     },
     "scripts": {
         "test": "phpunit",

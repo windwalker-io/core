@@ -14,14 +14,18 @@
 
 declare(strict_types=1);
 
+use Windwalker\DI\Container;
 use Windwalker\Tests\TestApp;
 
 $init = include __DIR__ . '/../src/Core/Testing/test.init.php';
 
+/** @var Container $container */
 $container = $init(
     root: $root = env('WINDWALKER_TEST_APP_ROOT') ?: dirname(__DIR__),
     workDir: $root
 );
+
+$container->options->lazy = true;
 
 TestApp::createInstance(
     container: $container,

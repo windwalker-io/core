@@ -146,8 +146,8 @@ class AssetService implements EventAwareInterface
         $this->systemUri = $systemUri;
 
         $uri = $this->config->get('uri');
-        $this->path = $uri ?? $systemUri->path($this->folder);
-        $this->root = $uri ?? $systemUri->root($this->folder);
+        $this->path = $uri ?: $systemUri->path($this->folder);
+        $this->root = $uri ?: $systemUri->root($this->folder);
 
         return $this;
     }
