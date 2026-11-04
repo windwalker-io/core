@@ -47,6 +47,7 @@ return [
     'pkg:postinstall' => \Windwalker\Core\Package\Command\PackagePostInstallCommand::class,
 
     'run' => \Windwalker\Core\Command\RunCommand::class,
+    'task:run' => \Windwalker\Core\Task\Command\TaskRunCommand::class,
 
     'build:entity' => \Windwalker\Core\Generator\Command\BuildEntityCommand::class,
     'build:enum' => \Windwalker\Core\Generator\Command\BuildEnumCommand::class,

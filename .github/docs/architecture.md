@@ -328,7 +328,8 @@ Directories in [`src/Core/`](../../src/Core/), grouped by concern:
 - Data: `Database`, `Migration`, `Seed`, `Queue`, `Schedule`, `Mailer`,
   `Crypt`, `DateTime`
 - Tooling: `Console`, `Command`, `Generator`, `CliServer`, `Composer`,
-  `Profiler`, `Filesystem`, `Utilities`
+  `Profiler`, `Filesystem`, `Utilities`, `Task` (trusted serialized task command;
+  see [task execution](task-run.md))
 - Events: `Event` (emitter, collectors), `Events` (typed web/console event
   objects)
 

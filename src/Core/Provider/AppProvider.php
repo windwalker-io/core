@@ -21,6 +21,7 @@ use Windwalker\Core\Schedule\SchedulerLockInterface;
 use Windwalker\Core\Schedule\SchedulerClaim;
 use Windwalker\Core\Schedule\SchedulerClaimInterface;
 use Windwalker\Core\Service\FilterService;
+use Windwalker\Core\Task\TaskPayload;
 use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionException;
@@ -112,6 +113,7 @@ class AppProvider implements ServiceProviderInterface
 
         $container->prepareSharedObject(FilterFactory::class, options: $options);
         $container->prepareSharedObject(FilterService::class, options: $options);
+        $container->prepareSharedObject(TaskPayload::class, options: $options);
         $container->prepareSharedObject(ScheduleService::class, options: $options);
         $container->prepareSharedObject(SchedulerLock::class, options: $options);
         $container->alias(SchedulerLockInterface::class, SchedulerLock::class);

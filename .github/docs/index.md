@@ -23,6 +23,8 @@ testing requirements, and Markdown templates.
   of code paths that need a future integration test instead of a unit test
 - [`schedule-worker.md`](schedule-worker.md): resident CRON scheduling, CLI options,
   lifecycle and deployment behavior
+- [`task-run.md`](task-run.md): trusted serialized task input, execution and
+  structured result protocol
 
 ## Maintenance
 
