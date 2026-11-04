@@ -12,6 +12,8 @@ use Windwalker\Uri\Uri;
 use Windwalker\Utilities\Arr;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
+use function Windwalker\collect;
+
 /**
  * The ProxyHandler class.
  */
@@ -193,16 +195,19 @@ class ProxyResolver
     }
 
     /**
-     * @param  mixed   $trustedProxies
-     * @param  string  $remoteAddr
+     * @param  string|array  $trustedProxies
+     * @param  string        $remoteAddr
      *
      * @return  array
      */
     public static function handleTrustedProxies(string|array $trustedProxies, string $remoteAddr = ''): array
     {
-        if (is_string($trustedProxies)) {
-            $trustedProxies = Arr::explodeAndClear(',', $trustedProxies);
-        }
+        $trustedProxies = collect((array) $trustedProxies)
+            ->map(fn($v) => preg_split('/[\r\n,]+/', $v))
+            ->collapse(false)
+            ->map('trim')
+            ->filter()
+            ->dump();
 
         foreach ($trustedProxies as &$trustedProxy) {
             if ($trustedProxy === 'REMOTE_ADDR' && $remoteAddr) {
