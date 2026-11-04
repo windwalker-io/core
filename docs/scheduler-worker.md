@@ -238,6 +238,67 @@ The runner does not automatically refresh locks. Protection covers the handler,
 not later lifecycle listeners, `catch()` callbacks or background jobs dispatched
 by the handler.
 
+### Starting an Enqueuer subprocess
+
+`Windwalker\Core\Queue\ScheduleEnqueuer::runByCommand()` starts
+`queue:enqueuer` in a subprocess and waits for it to finish. This reuses the
+command's configured queue connection, `queue.enqueuer.handlers`, DI invoker,
+maintenance handling and lifecycle scripts.
+
+```php
+use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Queue\ScheduleEnqueuer;
+use Windwalker\Core\Queue\ScheduleEnqueuerOptions;
+
+$schedule->task('enqueuer')
+    ->everyMinutes(5)
+    ->handler(
+        function (ConsoleApplication $app, ScheduleEnqueuer $enqueuer): void {
+            $enqueuer->setMessageOutput($app->getOutput());
+            $enqueuer->runByCommand(
+                5 * 60 - 3,
+                options: new ScheduleEnqueuerOptions(sleep: 2)
+            );
+        }
+    );
+```
+
+The method accepts `lifetime` in seconds, optional `connection`, optional
+`channels` (`string|array|null`), and `ScheduleEnqueuerOptions`. With no connection
+or channels supplied, the command uses `queue.default` and the `default` channel.
+Use `channels: '*'` to execute all registered channel handlers.
+Channel names must be non-empty strings without a leading hyphen.
+
+| Option | Default |
+|--------|---------|
+| `once` | `false`; execute each selected channel once and exit |
+| `force` | `false` |
+| `memoryLimit` | `128` MB |
+| `sleep` | `1.0` seconds; fractional intervals are supported |
+| `timeout` | `60` seconds |
+| `maxRuns` | `0` (unlimited) |
+| `shuffleChannels` | `false` |
+| `stopWhenEmpty` | `false`; the underlying Enqueuer uses handler return values to determine emptiness |
+
+Limits and sleep must be non-negative, and sleep must be finite. Numeric values,
+including zero, are forwarded explicitly to the command. A zero lifetime means
+unlimited; the lifetime parameter is not a hard subprocess deadline.
+The underlying runner checks lifetime between iterations, so slow handlers and
+sleep can extend execution beyond the requested interval.
+
+Both output streams are forwarded through `MessageOutputTrait` without adding
+newlines. Non-zero subprocess exits propagate through `mustRunProcess()` to the
+scheduler failure flow. Individual Enqueuer handler failures may be reported by
+the command while it continues running; a successful subprocess exit does not
+mean every handler succeeded.
+
+The subprocess is synchronous and holds the outer task lock until it exits.
+Run long-lived producers in a dedicated scheduler process, for example
+`php windwalker schedule:worker enqueuer`, to avoid delaying unrelated tasks.
+The outer minute claim prevents duplicate launches of that scheduled minute,
+not duplicate job production across the Enqueuer's polling iterations.
+There is no in-process `run()` or `runOnce()` adapter.
+
 ### Direct execution and delivery limits
 
 `ScheduleService::runEvent(ScheduleEvent $event, ?DateTimeImmutable $scheduledAt = null): mixed`

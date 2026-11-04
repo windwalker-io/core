@@ -200,7 +200,7 @@ trait EnqueuerCommandTrait
                     'enqueuer' => $enqueuer,
                     Enqueuer::class => $enqueuer,
                     'event' => $event,
-                    $event::class => $event,
+                    ...($event !== null ? [$event::class => $event] : []),
                     'io' => $io,
                     IOInterface::class => $io,
                     'connection' => $connection,
