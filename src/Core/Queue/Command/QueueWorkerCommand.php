@@ -14,6 +14,7 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Console\ConsoleApplication;
+use Windwalker\Core\Database\DatabaseConnectionRecovery;
 use Windwalker\Core\Manager\Logger;
 use Windwalker\DI\Exception\DefinitionException;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
@@ -22,6 +23,7 @@ use Windwalker\Event\EventInterface;
 use Windwalker\Queue\Enqueuer;
 use Windwalker\Queue\Event\AfterJobRunEvent;
 use Windwalker\Queue\Event\BeforeJobRunEvent;
+use Windwalker\Queue\Event\EnqueueFailureEvent;
 use Windwalker\Queue\Event\JobFailureEvent;
 use Windwalker\Queue\Event\LoopEndEvent;
 use Windwalker\Queue\Event\LoopFailureEvent;
@@ -201,6 +203,17 @@ class QueueWorkerCommand implements CommandInterface
 
         $this->io = $io;
 
+        try {
+            return $this->executeWorker($io);
+        } catch (\Throwable $e) {
+            $this->shutdownOnDatabaseFailure($e);
+
+            throw $e;
+        }
+    }
+
+    protected function executeWorker(IOInterface $io): int
+    {
         $channels = $io->getArgument('channels') ?: 'default';
         $all = $io->getOption('all-channels');
         $options = $this->getWorkOptions($io);
@@ -244,6 +257,10 @@ class QueueWorkerCommand implements CommandInterface
             $this->prepareEnqueuer($enqueuer);
             $enqueuer->addEventDealer($this->app);
             $this->listenToEnqueuer($enqueuer, $io, $connection);
+            $enqueuer->on(
+                EnqueueFailureEvent::class,
+                fn(EnqueueFailureEvent $event) => $this->shutdownOnDatabaseFailure($event->exception)
+            );
 
             $this->prepareDebugServices($io, $enqueuer);
 
@@ -313,14 +330,34 @@ class QueueWorkerCommand implements CommandInterface
 
     public function createInvoker(): \Closure
     {
-        return fn(JobController $controller, callable $invokable) => $this->app->call(
-            $invokable,
-            [
-                'jobController' => $controller,
-                'controller' => $controller,
-                JobController::class => $controller,
-            ]
-        );
+        return function (JobController $controller, callable $invokable) {
+            try {
+                return $this->app->call(
+                    $invokable,
+                    [
+                        'jobController' => $controller,
+                        'controller' => $controller,
+                        JobController::class => $controller,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                // Exit before the queue tries to settle a job using a failed connection.
+                $this->shutdownOnDatabaseFailure($e);
+
+                throw $e;
+            }
+        };
+    }
+
+    protected function shutdownOnDatabaseFailure(\Throwable $exception): void
+    {
+        if ($this->io->getOption('once') || !DatabaseConnectionRecovery::isConnectionFailure($exception)) {
+            return;
+        }
+
+        $this->io->writeln('<comment>' . DatabaseConnectionRecovery::MESSAGE . '</comment>');
+
+        $this->app->service(DatabaseConnectionRecovery::class)->shutdown($exception);
     }
 
     protected function listenToWorker(Worker $worker, IOInterface $io, string $connection): void
@@ -385,6 +422,8 @@ class QueueWorkerCommand implements CommandInterface
                     $backoff = $event->backoff;
 
                     Logger::error('system/queue-error', $e);
+
+                    $this->shutdownOnDatabaseFailure($e);
 
                     if ($controller->shouldDelete) {
                         $this->logMessage(
@@ -453,6 +492,8 @@ class QueueWorkerCommand implements CommandInterface
                 LoopFailureEvent::class,
                 function (LoopFailureEvent $event) use ($io) {
                     $e = $event->exception;
+
+                    $this->shutdownOnDatabaseFailure($e);
 
                     $this->logMessage(
                         sprintf(

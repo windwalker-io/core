@@ -32,6 +32,28 @@ logged and reported, and the event's `catch()` callback receives the exception.
 An unhandled event failure does not prevent subsequent events from running;
 an exception thrown by the error callback stops the worker.
 
+Resident `schedule:worker` and `queue:worker` terminate with exit code **1**
+after connection timeouts, lost connections, server shutdowns, or
+communication failures (including MySQL 2002/2006/2013 and SQLSTATE connection
+errors) escape the database driver's existing single reconnect/retry.
+The error is logged and a warning is displayed before immediate process shutdown.
+The workers do not call `disconnectAll()`, reset adapters, sleep, or retry in-process.
+Syntax errors, constraint failures, deadlocks and authentication errors are not
+shutdown triggers. `--once` retains its existing failure behavior.
+
+Shutdown does not settle the current queue job through the failed connection;
+its reservation timeout and existing retry/attempt rules determine redelivery.
+Schedule tasks are not replayed: existing minute claims remain, and subsequent
+tasks in that process do not run. Immediate `exit(1)` does not unwind PHP `finally`
+blocks or emit remaining lifecycle events; OS-owned locks are released on exit.
+Database connection failures in polling, task handlers, initialization and
+tick/error callbacks also trigger shutdown. Other errors retain their original handling.
+
+Supervisor or another external process manager must restart the process.
+For Supervisor, use `autorestart=unexpected` with `exitcodes=0`, or `autorestart=true`.
+Configure `startsecs` and `startretries` for database outages during startup;
+repeated startup failures can enter `FATAL` rather than retry forever.
+
 `--max-runs` counts minute ticks, including ticks with no matching events.
 `--lifetime` uses elapsed monotonic time. Both limits default to unlimited and
 must be non-negative integers. They are checked between ticks, not during a
@@ -197,6 +219,7 @@ $runner->on(AfterScheduleRunEvent::class, static function (AfterScheduleRunEvent
 Payload properties are read-only observations, not handler replacement hooks.
 Listeners may request shutdown with `$event->runner->stop('Custom reason.')`.
 A before-run listener that requests shutdown prevents the handler from starting.
-Listener exceptions propagate and stop the runner; they are not reported as
+Listener exceptions normally propagate and stop the runner; they are not reported as
 schedule-handler failures. Error-callback exceptions likewise propagate, with
-the fatal exception available on `LoopEndEvent` and `StopEvent`.
+the fatal exception available on `LoopEndEvent` and `StopEvent`. The resident
+CLI command terminates on database connection failures as described above.

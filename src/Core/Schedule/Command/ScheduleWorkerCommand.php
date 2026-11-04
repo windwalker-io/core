@@ -16,10 +16,12 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\Database\DatabaseConnectionRecovery;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Core\Schedule\Event\AfterScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\ScheduleSkippedEvent;
+use Windwalker\Core\Schedule\Event\ScheduleFailureEvent;
 use Windwalker\Core\Schedule\Event\LoopStartEvent;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
@@ -130,9 +132,30 @@ class ScheduleWorkerCommand implements CommandInterface, SignalableCommandInterf
                 );
             }
         );
-        $this->runner->run($options);
+        $this->runner->on(
+            ScheduleFailureEvent::class,
+            fn(ScheduleFailureEvent $event) => $this->shutdownOnDatabaseFailure($event->exception, $io)
+        );
+
+        try {
+            $this->runner->run($options);
+        } catch (\Throwable $e) {
+            $this->shutdownOnDatabaseFailure($e, $io);
+
+            throw $e;
+        }
 
         return 0;
+    }
+
+    protected function shutdownOnDatabaseFailure(\Throwable $exception, IOInterface $io): void
+    {
+        if ($io->getOption('once') || !DatabaseConnectionRecovery::isConnectionFailure($exception)) {
+            return;
+        }
+
+        $io->writeln('<comment>' . DatabaseConnectionRecovery::MESSAGE . '</comment>');
+        $this->app->service(DatabaseConnectionRecovery::class)->shutdown($exception);
     }
 
     protected function getRunnerOptions(IOInterface $io): SchedulerOptions
