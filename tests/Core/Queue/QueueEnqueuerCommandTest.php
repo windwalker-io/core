@@ -22,6 +22,7 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Console\ConsoleApplication;
 use Windwalker\Core\Queue\Command\QueueEnqueuerCommand;
 use Windwalker\Core\Queue\Command\QueueWorkerCommand;
+use Windwalker\Core\Events\Console\ConsoleLogEvent;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Testing\Stub\SpyLogger;
 use Windwalker\DI\Container;
@@ -602,12 +603,44 @@ class QueueEnqueuerCommandTest extends TestCase
             } else {
                 self::assertStringNotContainsString('handler debug', $text);
             }
+
             if ($verbosity === OutputInterface::VERBOSITY_NORMAL) {
                 self::assertInstanceOf(NullOutput::class, $this->app->retrieve(IOInterface::class)->getOutput());
             } else {
                 self::assertSame($io, $this->app->retrieve(IOInterface::class));
                 self::assertSame($io->getOutput(), $this->app->retrieve(Output::class));
             }
+        }
+    }
+
+    #[Test]
+    public function enqueuerLoopHeartbeatIsPrintedOnlyAtVeryVerbose(): void
+    {
+        $this->handlers('$enqueuer->channel("default", static fn() => "done");');
+        $loopLogs = [];
+        $capture = false;
+        $this->app->on(ConsoleLogEvent::class, static function (ConsoleLogEvent $event) use (&$loopLogs, &$capture) {
+            if ($capture && str_contains(implode("\n", $event->messages), 'Enqueuer loop step')) {
+                $loopLogs[] = $event;
+            }
+        });
+
+        foreach ([
+            OutputInterface::VERBOSITY_VERBOSE => 0,
+            OutputInterface::VERBOSITY_VERY_VERBOSE => 2,
+        ] as $verbosity => $expected) {
+            $loopLogs = [];
+            $capture = true;
+            $command = new EnqueuerCommandStub($this->app);
+            $io = $this->createIO(
+                $command,
+                ['--max-runs' => '2', '--timeout' => '0', '--sleep' => '0'],
+                (int) $verbosity
+            );
+
+            self::assertSame(0, $command->execute($io));
+            $capture = false;
+            self::assertCount($expected, $loopLogs);
         }
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Queue\Command;
 
 use Psr\Log\LogLevel;
+use Symfony\Component\Console\Output\OutputInterface;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Manager\Logger;
 use Windwalker\Core\Queue\EnqueuerConfigurator;
@@ -64,7 +65,7 @@ trait EnqueuerCommandTrait
             function (BeforeEnqueueEvent $event) use ($io) {
                 $controller = $event->controller;
 
-                if ($this->canShowLog(LogLevel::DEBUG)) {
+                if ($io->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
                     $io->writeln("Enqueuing Start - Channel: <info>{$controller->channel}</info>.");
                 }
             }
