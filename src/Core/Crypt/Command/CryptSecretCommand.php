@@ -116,8 +116,9 @@ class CryptSecretCommand implements CommandInterface
 
             if (is_file($replace)) {
                 $content = file_get_contents($replace);
+                $secretPattern = '/^(APP_SECRET=)[^\r\n]*(\r?)$/m';
 
-                if (!preg_match('/^APP_SECRET=.*$/m', $content)) {
+                if (!preg_match($secretPattern, $content)) {
                     $content .= "\nAPP_SECRET=" . $secret . "\n";
                 } else {
                     if (!$force && !$io->askConfirmation("APP_SECRET already exists in file: <info>$replace</info>, do you want to replace it? [N/y] ", false)) {
@@ -125,7 +126,11 @@ class CryptSecretCommand implements CommandInterface
                         return 0;
                     }
 
-                    $content = preg_replace('/^APP_SECRET=.*$/m', 'APP_SECRET=' . $secret, $content);
+                    $content = preg_replace_callback(
+                        $secretPattern,
+                        static fn (array $matches): string => $matches[1] . $secret . $matches[2],
+                        $content
+                    );
                 }
 
                 file_put_contents($replace, $content);
