@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Mailer;
 
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+use League\CommonMark\Util\HtmlFilter;
 use Windwalker\DOM\HTMLElement;
 use Windwalker\Html\Grid\Grid;
 use Windwalker\Utilities\Classes\ChainingTrait;
@@ -15,6 +17,8 @@ class MailBuilder implements \Stringable
     use ChainingTrait;
 
     public array $blocks = [];
+
+    protected ?GithubFlavoredMarkdownConverter $markdownRenderer = null;
 
     public function __construct(public bool $markdown = false, public bool $inline = false)
     {
@@ -217,6 +221,17 @@ class MailBuilder implements \Stringable
         return $this;
     }
 
+    public function block(string|\Stringable $text): static
+    {
+        if ($this->inline) {
+            throw new \LogicException('You cannot add block in a line.');
+        }
+
+        $this->blocks[] = $this->getMarkdownRenderer()->convert((string) $text);
+
+        return $this;
+    }
+
     public function raw(string|\Stringable $raw): static
     {
         $this->blocks[] = $raw;
@@ -230,14 +245,27 @@ class MailBuilder implements \Stringable
             return $text;
         }
 
-        return $this->getMarkdownRenderer()->line($text);
+        $html = (string) $this->getMarkdownRenderer()->convert((string) $text);
+
+        if (preg_match('/^<p>(.*)<\/p>\n?$/sD', $html, $matches)) {
+            return $matches[1];
+        }
+
+        return $html;
     }
 
-    protected function getMarkdownRenderer(): \Parsedown
+    protected function getMarkdownRenderer(): GithubFlavoredMarkdownConverter
     {
-        return $this->markdownRenderer ??= new \Parsedown()
-            ->setSafeMode(false)
-            ->setMarkupEscaped(false);
+        if (!class_exists(GithubFlavoredMarkdownConverter::class)) {
+            throw new \LogicException('Please install league/commonmark ^2.10 first to use Markdown rendering.');
+        }
+
+        return $this->markdownRenderer ??= new GithubFlavoredMarkdownConverter(
+            [
+                'html_input' => HtmlFilter::ESCAPE,
+                'allow_unsafe_links' => false,
+            ]
+        );
     }
 
     public function __toString(): string

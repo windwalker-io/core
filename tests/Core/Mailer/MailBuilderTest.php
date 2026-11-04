@@ -238,6 +238,35 @@ class MailBuilderTest extends TestCase
     }
 
     #[Test]
+    public function blockRendersMultilineGitHubFlavoredMarkdownSafely(): void
+    {
+        $builder = new MailBuilder();
+
+        $builder->block(
+            "~~removed~~\n\n| Name |\n| --- |\n| Earth |\n\n[unsafe](javascript:alert(1))\n\n<script>alert(1)</script>"
+        );
+
+        $html = (string) $builder;
+
+        self::assertStringContainsString('<del>removed</del>', $html);
+        self::assertStringContainsString('<table>', $html);
+        self::assertStringNotContainsString('href="javascript:', $html);
+        self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
+        self::assertStringNotContainsString('<script>', $html);
+    }
+
+    #[Test]
+    public function blockThrowsExceptionWhenInline(): void
+    {
+        $builder = new MailBuilder(inline: true);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageIsOrContains('You cannot add block in a line.');
+
+        $builder->block("one\n\ntwo");
+    }
+
+    #[Test]
     public function textAddsLineWhenNotInline(): void
     {
         $builder = new MailBuilder();
@@ -289,6 +318,19 @@ class MailBuilderTest extends TestCase
         $builder->text('**bold**');
 
         self::assertSame(['**bold**'], $builder->blocks);
+    }
+
+    #[Test]
+    public function textRendersGitHubFlavoredMarkdownInlineSafely(): void
+    {
+        $builder = new MailBuilder(markdown: true, inline: true);
+
+        $builder->text('~~removed~~ <script>alert(1)</script>');
+
+        self::assertSame(
+            ['<del>removed</del> &lt;script&gt;alert(1)&lt;/script&gt;'],
+            $builder->blocks
+        );
     }
 
     #[Test]
