@@ -23,6 +23,9 @@ use Windwalker\Core\Schedule\Event\BeforeScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\LoopEndEvent;
 use Windwalker\Core\Schedule\Event\LoopStartEvent;
 use Windwalker\Core\Schedule\Event\ScheduleFailureEvent;
+use Windwalker\Core\Schedule\Event\ScheduleSkippedEvent;
+use Windwalker\Core\Schedule\Exception\ScheduleSkippedException;
+use Windwalker\Core\Schedule\ScheduleSkipReason;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
 use Windwalker\Event\EventEmitter;
@@ -31,6 +34,48 @@ use Windwalker\Tests\Core\Schedule\Stub\SchedulerRunnerStub;
 #[CoversClass(SchedulerRunner::class)]
 class SchedulerRunnerTest extends TestCase
 {
+    #[Test]
+    public function skippedTaskEmitsItsReasonWithoutFailureOrSuccessAndContinues(): void
+    {
+        $schedule = new Schedule();
+        $schedule->cron('duplicate', '* * * * *', static fn() => null)
+            ->catch(static fn() => self::fail('A skip must not invoke catch.'));
+        $schedule->cron('next', '* * * * *', static fn() => 'done');
+        $app = $this->createStub(ApplicationInterface::class);
+        $app->method('getEventDispatcher')->willReturn(new EventEmitter());
+        $service = $this->createStub(ScheduleService::class);
+        $service->method('getSchedule')->willReturn($schedule);
+        $runner = new SchedulerRunnerStub($app, $service);
+        $time = $runner->date;
+        $service->method('runEvent')->willReturnCallback(
+            static function ($event, $scheduledAt) use ($time) {
+                self::assertSame($time, $scheduledAt);
+
+                if ($event->getName() === 'duplicate') {
+                    throw new ScheduleSkippedException(ScheduleSkipReason::CLAIMED);
+                }
+
+                return $event->execute();
+            }
+        );
+        $skips = [];
+        $successes = [];
+        $runner->on(ScheduleSkippedEvent::class, static function ($event) use (&$skips) {
+            $skips[] = $event;
+        });
+        $runner->on(AfterScheduleRunEvent::class, static function ($event) use (&$successes) {
+            $successes[] = $event;
+        });
+        $runner->on(ScheduleFailureEvent::class, static fn() => self::fail('A skip is not a failure.'));
+        $runner->run(new SchedulerOptions(once: true));
+
+        self::assertCount(1, $skips);
+        self::assertSame(ScheduleSkipReason::CLAIMED, $skips[0]->reason);
+        self::assertSame($time, $skips[0]->time);
+        self::assertCount(1, $successes);
+        self::assertSame('done', $successes[0]->result);
+    }
+
     private function observeEvents(SchedulerRunner $runner, array &$events): void
     {
         foreach ([

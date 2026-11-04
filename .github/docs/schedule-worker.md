@@ -45,10 +45,9 @@ PHP callers can use `$worker->stop()` and forward output with
 Use a process manager such as Supervisor or systemd to keep the command running
 in the background and restart it after failures or deployments. The command
 does not daemonize itself. Schedule definitions are loaded once; restart the
-process after changing routes or code. Avoid running multiple workers (or
-system CRON's `schedule:run`) for the same schedules unless duplicate execution
-is acceptable. Task locks prevent concurrent execution, not repeated execution
-of the same scheduled minute.
+process after changing routes or code. Multiple workers and system CRON's
+`schedule:run` share task locks and minute claims when configured with the
+same application namespace and storage.
 
 If a task spans multiple minutes, intervening minutes are skipped rather than
 replayed. The worker is not a durable job queue and does not guarantee delivery
@@ -60,10 +59,11 @@ processed minute, so previously processed minutes are not repeated.
 ## Task locks
 
 `ScheduleService::runEvent()` creates a fresh Symfony lock for each invocation
-through `SchedulerLockInterface`, calls `acquire(blocking: true)`, and releases
+through `SchedulerLockInterface`, calls `acquire(blocking: false)`, and releases
 it in `finally`. This protects both `schedule:worker` and `schedule:run`.
 Handler return values are preserved; acquisition and release errors propagate.
 The lock covers the handler, not the subsequent lifecycle listeners or `catch()`.
+Lock contention skips the task instead of waiting or invoking its `catch()`.
 
 The default `SchedulerLock` uses Symfony `FlockStore` under
 `@temp/scheduler-locks`, with an application-root namespace and the schedule name
@@ -72,9 +72,6 @@ Files must remain in place while workers are running; do not purge this director
 Flock locks do not expire and are released by the OS when the process exits.
 This is a local-host default, not a distributed lock.
 
-Blocking waits serialize competing invocations: a second worker waits and
-then runs its own invocation. It does not skip or deduplicate a scheduled minute.
-Waiting is not interrupted by Runner lifetime limits or graceful stop checks.
 As with other synchronous handlers, background work dispatched by the handler
 requires its own job-level protection.
 
@@ -89,10 +86,62 @@ override its binding in the host application's `di.config.php`:
 ```
 
 The implementation owns its Symfony `LockFactory`, store, resource namespace,
-TTL and logger. Return a new, unacquired lock per call; Core manages blocking
+TTL and logger. Return a new, unacquired lock per call; Core manages non-blocking
 acquisition and release. For expiring distributed stores, choose a TTL longer
 than the handler runtime; the synchronous runner does not automatically renew it.
-Direct PHP construction of `ScheduleService` now requires this dependency.
+The default constructor accepts an optional `namespace` to replace its root-path
+namespace.
+
+## Scheduled-minute claims
+
+After acquiring the task lock, `ScheduleService` calls
+`SchedulerClaimInterface::claim(ScheduleEvent $event, DateTimeImmutable $scheduledAt): bool`.
+Only the winner executes the handler. An existing claim skips this invocation;
+backend exceptions are failures, not skips. Claims remain after success or failure.
+The task lock is released even when the claim is already taken or its store fails.
+
+The identity is application namespace, unique schedule name and the scheduled
+UTC minute (`floor(timestamp / 60)`). The worker passes its tick time to every
+task, so long handlers cannot change later tasks' claim identity.
+`schedule:run` likewise snapshots one time for both filtering and claiming;
+`--clock` (or deprecated `--time`) supplies an explicit time.
+`--test` bypasses CRON matching, not locks or claims.
+Direct `runEvent()` calls may supply the scheduled time as their second argument;
+otherwise the current Core clock is captured before acquisition.
+
+The default `SchedulerClaim` stores a per-task JSON ledger under
+`@temp/scheduler-claims`, protected by a short blocking Flock guard and updated
+via atomic file replacement. Expired entries are pruned on the next successful
+claim. Retention defaults to 24 hours from acquisition, measured independently
+of the scheduled time. Its constructor accepts `retention` (seconds) and
+`namespace`; by default the namespace is derived from the application root.
+Do not purge claim or guard files while workers are running. Removing claim
+data permits previously claimed minutes to run again.
+
+Both defaults are single-host. Replacing **only** `SchedulerLockInterface`
+with Redis/database locks does not provide cross-host minute deduplication:
+replace `SchedulerClaimInterface` with a shared atomic store too.
+
+```php
+'bindings' => [
+    \Windwalker\Core\Schedule\SchedulerLockInterface::class => \App\Schedule\CustomSchedulerLock::class,
+    \Windwalker\Core\Schedule\SchedulerClaimInterface::class => \App\Schedule\CustomSchedulerClaim::class,
+],
+```
+
+A Redis implementation can use `SET key value NX EX retention`; a database
+implementation can INSERT a row with a unique constraint on namespace, task
+and minute. Return `false` only for a duplicate claim, and throw on backend
+errors. All hosts must use identical application/task identities and a common
+store, regardless of deployment paths. Keep host clocks synchronized.
+Retention must cover the supported delay/retry window; after expiration,
+an old minute can be claimed again.
+
+This guarantees at most one execution attempt per minute **within retention**,
+not exactly-once delivery. A process crash after claiming can lose that attempt.
+Use durable dispatch, retries and idempotent handlers when delivery matters.
+Direct PHP construction of `ScheduleService` requires both lock and claim
+dependencies.
 
 ## PHP runner options
 
@@ -133,6 +182,7 @@ Existing message-output events remain available.
 | `BeforeScheduleRunEvent` | `runner`, `scheduleEvent`, `time`; only for selected due events |
 | `AfterScheduleRunEvent` | Same context plus handler `result` and `duration` in seconds; success only |
 | `ScheduleFailureEvent` | Same context plus `exception` and `duration`; after logging, before `catch()` |
+| `ScheduleSkippedEvent` | `runner`, `scheduleEvent`, `time`, `reason` (`ScheduleSkipReason::LOCKED` or `CLAIMED`); no success/failure event or `catch()` |
 | `LoopEndEvent` | `runner`, `time`, `run`, nullable `exception`; emitted even if the tick throws |
 | `StopEvent` | `runner`, `reason`, attempted tick count `runs`, nullable `exception`; after cleanup |
 

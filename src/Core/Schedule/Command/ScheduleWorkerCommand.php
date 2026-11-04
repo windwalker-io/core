@@ -19,6 +19,7 @@ use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Events\Console\ErrorMessageOutputEvent;
 use Windwalker\Core\Events\Console\MessageOutputEvent;
 use Windwalker\Core\Schedule\Event\AfterScheduleRunEvent;
+use Windwalker\Core\Schedule\Event\ScheduleSkippedEvent;
 use Windwalker\Core\Schedule\Event\LoopStartEvent;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
@@ -78,22 +79,35 @@ class ScheduleWorkerCommand implements CommandInterface, SignalableCommandInterf
                 $event->writeWith($io->getOutput());
             }
         );
-        $this->runner->addEventDealer(
-            new class ($this->app->getEventDispatcher()) implements EventDispatcherInterface {
-                public function __construct(private EventDispatcherInterface $dispatcher) {}
+        // Dealers are weakly referenced; keep this adapter alive throughout run().
+        $eventDealer = new class ($this->app->getEventDispatcher()) implements EventDispatcherInterface {
+            public function __construct(private EventDispatcherInterface $dispatcher) {}
 
-                public function dispatch(object $event): object
-                {
-                    // ConsoleApplication's message output may differ from this command's output.
-                    return $event instanceof MessageOutputEvent ? $event : $this->dispatcher->dispatch($event);
-                }
+            public function dispatch(object $event): object
+            {
+                // ConsoleApplication's message output may differ from this command's output.
+                return $event instanceof MessageOutputEvent ? $event : $this->dispatcher->dispatch($event);
             }
-        );
+        };
+        $this->runner->addEventDealer($eventDealer);
         $this->runner->on(
             AfterScheduleRunEvent::class,
             static function (AfterScheduleRunEvent $event) use ($io) {
                 $io->writeln(
                     sprintf('Schedule completed: %s (%.3fs)', $event->scheduleEvent->getName(), $event->duration),
+                    OutputInterface::VERBOSITY_VERBOSE
+                );
+            }
+        );
+        $this->runner->on(
+            ScheduleSkippedEvent::class,
+            static function (ScheduleSkippedEvent $event) use ($io) {
+                $io->writeln(
+                    sprintf(
+                        'Schedule skipped: %s (%s)',
+                        OutputFormatter::escape($event->scheduleEvent->getName()),
+                        $event->reason->value
+                    ),
                     OutputInterface::VERBOSITY_VERBOSE
                 );
             }

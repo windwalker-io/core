@@ -10,6 +10,10 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\LockInterface;
+use DateTimeImmutable;
+use Windwalker\Core\Schedule\SchedulerClaimInterface;
+use Windwalker\Core\Schedule\Exception\ScheduleSkippedException;
+use Windwalker\Core\Schedule\ScheduleSkipReason;
 use Windwalker\Core\Schedule\SchedulerLockInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Schedule\Schedule;
@@ -49,6 +53,14 @@ class ScheduleServiceTest extends TestCase
         return $app;
     }
 
+    private function createClaim(): SchedulerClaimInterface
+    {
+        $claim = $this->createStub(SchedulerClaimInterface::class);
+        $claim->method('claim')->willReturn(true);
+
+        return $claim;
+    }
+
     #[Test]
     public function createScheduleLoadsTasksFromGivenRouteFile(): void
     {
@@ -63,7 +75,7 @@ class ScheduleServiceTest extends TestCase
             PHP
         );
 
-        $service = new ScheduleService($this->createApp(), $this->createStub(SchedulerLockInterface::class));
+        $service = new ScheduleService($this->createApp(), $this->createStub(SchedulerLockInterface::class), $this->createClaim());
 
         $schedule = $service->createSchedule($route);
 
@@ -79,7 +91,7 @@ class ScheduleServiceTest extends TestCase
         file_put_contents($route1, '<?php $schedule->cron("a", "* * * * *", fn () => null);');
         file_put_contents($route2, '<?php $schedule->cron("b", "* * * * *", fn () => null);');
 
-        $service = new ScheduleService($this->createApp(), $this->createStub(SchedulerLockInterface::class));
+        $service = new ScheduleService($this->createApp(), $this->createStub(SchedulerLockInterface::class), $this->createClaim());
 
         $schedule = $service->createSchedule([$route1, $route2]);
 
@@ -102,7 +114,7 @@ class ScheduleServiceTest extends TestCase
                 ['schedules', [$route]],
             ]);
 
-        $service = new ScheduleService($app, $this->createStub(SchedulerLockInterface::class));
+        $service = new ScheduleService($app, $this->createStub(SchedulerLockInterface::class), $this->createClaim());
 
         $schedule = $service->createSchedule();
 
@@ -118,7 +130,7 @@ class ScheduleServiceTest extends TestCase
             ->with(Schedule::class)
             ->willReturn(new Schedule());
 
-        $service = new ScheduleService($app, $this->createStub(SchedulerLockInterface::class));
+        $service = new ScheduleService($app, $this->createStub(SchedulerLockInterface::class), $this->createClaim());
 
         $first = $service->getSchedule([]);
         $second = $service->getSchedule([]);
@@ -134,11 +146,11 @@ class ScheduleServiceTest extends TestCase
         $app = $this->createMock(ApplicationInterface::class);
         $app->expects($this->once())->method('call')->with($handler)->willReturn('resolved');
         $lock = $this->createMock(LockInterface::class);
-        $lock->expects($this->once())->method('acquire')->with(true)->willReturn(true);
+        $lock->expects($this->once())->method('acquire')->with(false)->willReturn(true);
         $lock->expects($this->once())->method('release');
         $factory = $this->createMock(SchedulerLockInterface::class);
         $factory->expects($this->once())->method('createLock')->with($event)->willReturn($lock);
-        $service = new ScheduleService($app, $factory);
+        $service = new ScheduleService($app, $factory, $this->createClaim());
 
         self::assertSame('resolved', $service->runEvent($event));
     }
@@ -151,11 +163,11 @@ class ScheduleServiceTest extends TestCase
         $app = $this->createMock(ApplicationInterface::class);
         $app->expects($this->once())->method('call')->willThrowException($failure);
         $lock = $this->createMock(LockInterface::class);
-        $lock->expects($this->once())->method('acquire')->with(true)->willReturn(true);
+        $lock->expects($this->once())->method('acquire')->with(false)->willReturn(true);
         $lock->expects($this->once())->method('release');
         $factory = $this->createStub(SchedulerLockInterface::class);
         $factory->method('createLock')->willReturn($lock);
-        $service = new ScheduleService($app, $factory);
+        $service = new ScheduleService($app, $factory, $this->createClaim());
 
         $this->expectExceptionObject($failure);
         $service->runEvent($event);
@@ -167,13 +179,15 @@ class ScheduleServiceTest extends TestCase
         $app = $this->createMock(ApplicationInterface::class);
         $app->expects($this->never())->method('call');
         $lock = $this->createMock(LockInterface::class);
-        $lock->expects($this->once())->method('acquire')->with(true)->willReturn(false);
+        $lock->expects($this->once())->method('acquire')->with(false)->willReturn(false);
         $lock->expects($this->never())->method('release');
         $factory = $this->createStub(SchedulerLockInterface::class);
         $factory->method('createLock')->willReturn($lock);
-        $service = new ScheduleService($app, $factory);
+        $claim = $this->createMock(SchedulerClaimInterface::class);
+        $claim->expects($this->never())->method('claim');
+        $service = new ScheduleService($app, $factory, $claim);
 
-        $this->expectException(\Symfony\Component\Lock\Exception\LockConflictedException::class);
+        $this->expectException(ScheduleSkippedException::class);
         $service->runEvent(new ScheduleEvent('conflict'));
     }
 
@@ -188,9 +202,52 @@ class ScheduleServiceTest extends TestCase
         $lock->expects($this->never())->method('release');
         $factory = $this->createStub(SchedulerLockInterface::class);
         $factory->method('createLock')->willReturn($lock);
-        $service = new ScheduleService($app, $factory);
+        $service = new ScheduleService($app, $factory, $this->createClaim());
 
         $this->expectException(\RuntimeException::class);
+        $service->runEvent(new ScheduleEvent('error'));
+    }
+
+    #[Test]
+    public function duplicateClaimReleasesTheTaskLockWithoutInvokingTheHandler(): void
+    {
+        $app = $this->createMock(ApplicationInterface::class);
+        $app->expects($this->never())->method('call');
+        $event = new ScheduleEvent('duplicate');
+        $time = new DateTimeImmutable('2026-11-04T14:08:00+08:00');
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())->method('acquire')->with(false)->willReturn(true);
+        $lock->expects($this->once())->method('release');
+        $factory = $this->createStub(SchedulerLockInterface::class);
+        $factory->method('createLock')->willReturn($lock);
+        $claim = $this->createMock(SchedulerClaimInterface::class);
+        $claim->expects($this->once())->method('claim')->with($event, $time)->willReturn(false);
+        $service = new ScheduleService($app, $factory, $claim);
+
+        try {
+            $service->runEvent($event, $time);
+            self::fail('Expected a skipped invocation.');
+        } catch (ScheduleSkippedException $e) {
+            self::assertSame(ScheduleSkipReason::CLAIMED, $e->reason);
+        }
+    }
+
+    #[Test]
+    public function claimBackendFailureReleasesTheTaskLockAndPropagates(): void
+    {
+        $app = $this->createMock(ApplicationInterface::class);
+        $app->expects($this->never())->method('call');
+        $lock = $this->createMock(LockInterface::class);
+        $lock->expects($this->once())->method('acquire')->with(false)->willReturn(true);
+        $lock->expects($this->once())->method('release');
+        $factory = $this->createStub(SchedulerLockInterface::class);
+        $factory->method('createLock')->willReturn($lock);
+        $failure = new \RuntimeException('claim store unavailable');
+        $claim = $this->createStub(SchedulerClaimInterface::class);
+        $claim->method('claim')->willThrowException($failure);
+        $service = new ScheduleService($app, $factory, $claim);
+
+        $this->expectExceptionObject($failure);
         $service->runEvent(new ScheduleEvent('error'));
     }
 }

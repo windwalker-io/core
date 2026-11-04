@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\Schedule;
 
-use Symfony\Component\Lock\Exception\LockConflictedException;
+use DateTimeImmutable;
 use Windwalker\Core\Application\ApplicationInterface;
+use Windwalker\Core\DateTime\Clock;
+use Windwalker\Core\Schedule\Exception\ScheduleSkippedException;
 use Windwalker\Utilities\Cache\InstanceCacheTrait;
 
 /**
@@ -17,7 +19,8 @@ class ScheduleService
 
     public function __construct(
         protected ApplicationInterface $app,
-        protected SchedulerLockInterface $schedulerLock
+        protected SchedulerLockInterface $schedulerLock,
+        protected SchedulerClaimInterface $schedulerClaim
     ) {}
 
     /**
@@ -47,15 +50,20 @@ class ScheduleService
         return $schedule;
     }
 
-    public function runEvent(ScheduleEvent $event): mixed
+    public function runEvent(ScheduleEvent $event, ?DateTimeImmutable $scheduledAt = null): mixed
     {
+        $scheduledAt ??= Clock::now();
         $lock = $this->schedulerLock->createLock($event);
 
-        if (!$lock->acquire(blocking: true)) {
-            throw new LockConflictedException(sprintf('Unable to acquire schedule lock: %s', $event->getName()));
+        if (!$lock->acquire(blocking: false)) {
+            throw new ScheduleSkippedException(ScheduleSkipReason::LOCKED);
         }
 
         try {
+            if (!$this->schedulerClaim->claim($event, $scheduledAt)) {
+                throw new ScheduleSkippedException(ScheduleSkipReason::CLAIMED);
+            }
+
             $handler = $event->getHandler();
 
             if (is_string($handler) && class_exists($handler)) {

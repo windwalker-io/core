@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Windwalker\Core\Schedule\Command;
 
 use Generator;
+use DateTimeImmutable;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Stecman\Component\Symfony\Console\BashCompletion\Completion\CompletionAwareInterface;
 use Stecman\Component\Symfony\Console\BashCompletion\CompletionContext;
 use Symfony\Component\Console\Command\Command;
@@ -15,6 +18,8 @@ use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Manager\Logger;
+use Windwalker\Core\DateTime\Clock;
+use Windwalker\Core\Schedule\Exception\ScheduleSkippedException;
 use Windwalker\Core\Schedule\Schedule;
 use Windwalker\Core\Schedule\ScheduleEvent;
 use Windwalker\Core\Schedule\ScheduleService;
@@ -99,12 +104,17 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
         $schedule = $this->scheduleService->getSchedule();
 
         Logger::info('system/schedule', 'Run schedule');
+        $scheduledAt = $this->getScheduledTime($io);
 
-        foreach ($this->getAvailableEvents($schedule, $io) as $event) {
+        foreach ($this->getAvailableEvents($schedule, $io, $scheduledAt) as $event) {
             Logger::info('system/schedule', '  [Event] ' . $event->getName());
 
             try {
-                $this->runEvent($event);
+                $this->runEvent($event, $scheduledAt);
+            } catch (ScheduleSkippedException $e) {
+                $message = sprintf('Schedule skipped: %s (%s)', $event->getName(), $e->getMessage());
+                Logger::info('system/schedule', '  [Skipped] ' . $message);
+                $io->writeln(OutputFormatter::escape($message), OutputInterface::VERBOSITY_VERBOSE);
             } catch (\Throwable $e) {
                 Logger::error(
                     'system/schedule',
@@ -129,13 +139,23 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
         return 0;
     }
 
-    protected function runEvent(ScheduleEvent $event): mixed
+    protected function runEvent(ScheduleEvent $event, ?DateTimeImmutable $scheduledAt = null): mixed
     {
-        return $this->scheduleService->runEvent($event);
+        return $this->scheduleService->runEvent($event, $scheduledAt);
     }
 
-    protected function getAvailableEvents(Schedule $schedule, IOInterface $io): Generator
+    protected function getScheduledTime(IOInterface $io): DateTimeImmutable
     {
+        $time = $io->getOption('clock') ?? $io->getOption('time');
+
+        return $time === null ? Clock::now() : new DateTimeImmutable($time);
+    }
+
+    protected function getAvailableEvents(
+        Schedule $schedule,
+        IOInterface $io,
+        ?DateTimeImmutable $scheduledAt = null
+    ): Generator {
         $tags = $io->getOption('tags') ?? '';
         $tags = Arr::explodeAndClear(',', $tags);
 
@@ -143,9 +163,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
             $events = $schedule->getEvents($tags);
         } else {
             $tz = $io->getOption('tz');
-            $time = $io->getOption('time') ? $io->getOption('clock') : 'now';
-
-            $events = $schedule->getDueEvents($tags, $time, $tz);
+            $events = $schedule->getDueEvents($tags, $scheduledAt ?? $this->getScheduledTime($io), $tz);
         }
 
         $names = $io->getArgument('names');

@@ -18,6 +18,8 @@ use Windwalker\Core\Schedule\Event\BeforeScheduleRunEvent;
 use Windwalker\Core\Schedule\Event\LoopEndEvent;
 use Windwalker\Core\Schedule\Event\LoopStartEvent;
 use Windwalker\Core\Schedule\Event\ScheduleFailureEvent;
+use Windwalker\Core\Schedule\Event\ScheduleSkippedEvent;
+use Windwalker\Core\Schedule\Exception\ScheduleSkippedException;
 use Windwalker\Core\Schedule\Event\StartEvent;
 use Windwalker\Core\Schedule\Event\StopEvent;
 use Windwalker\DI\Attributes\Service;
@@ -160,7 +162,12 @@ class SchedulerRunner
             $startedAt = $this->monotonicTime();
 
             try {
-                $result = $this->scheduleService->runEvent($event);
+                $result = $this->scheduleService->runEvent($event, $now);
+            } catch (ScheduleSkippedException $e) {
+                Logger::info('system/schedule', '  [Skipped] ' . $event->getName() . ': ' . $e->getMessage());
+                $this->emit(new ScheduleSkippedEvent($this, $event, $now, $e->reason));
+
+                continue;
             } catch (Throwable $e) {
                 Logger::error(
                     'system/schedule',

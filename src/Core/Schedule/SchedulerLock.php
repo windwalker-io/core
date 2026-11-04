@@ -15,9 +15,9 @@ class SchedulerLock implements SchedulerLockInterface
 
     private string $namespace;
 
-    public function __construct(PathResolver $paths)
+    public function __construct(PathResolver $paths, ?string $namespace = null)
     {
-        $this->namespace = hash('sha256', $paths->resolve('@root'));
+        $this->namespace = $namespace ?? hash('sha256', $paths->resolve('@root'));
         $this->factory = new LockFactory(
             new FlockStore($paths->resolve('@temp') . DIRECTORY_SEPARATOR . 'scheduler-locks')
         );
