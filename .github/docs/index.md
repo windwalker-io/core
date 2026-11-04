@@ -21,6 +21,8 @@ testing requirements, and Markdown templates.
   tests require
 - [`integration-test-backlog.md`](integration-test-backlog.md): running list
   of code paths that need a future integration test instead of a unit test
+- [`schedule-worker.md`](schedule-worker.md): resident CRON scheduling, CLI options,
+  lifecycle and deployment behavior
 
 ## Maintenance
 

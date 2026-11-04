@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Windwalker\Core\Schedule\Event;
+
+use DateTimeImmutable;
+use Throwable;
+use Windwalker\Core\Schedule\ScheduleEvent;
+use Windwalker\Core\Schedule\ScheduleRunner;
+use Windwalker\Event\BaseEvent;
+
+class ScheduleFailureEvent extends BaseEvent
+{
+    public function __construct(
+        public readonly ScheduleRunner $runner,
+        public readonly ScheduleEvent $scheduleEvent,
+        public readonly DateTimeImmutable $time,
+        public readonly Throwable $exception,
+        public readonly float $duration
+    ) {}
+}

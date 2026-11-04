@@ -131,13 +131,7 @@ class ScheduleRunCommand implements CommandInterface, CompletionAwareInterface
 
     protected function runEvent(ScheduleEvent $event): mixed
     {
-        $handler = $event->getHandler();
-
-        if (is_string($handler) && class_exists($handler)) {
-            $handler = $this->app->make($handler);
-        }
-
-        return $this->app->call($handler);
+        return $this->scheduleService->runEvent($event);
     }
 
     protected function getAvailableEvents(Schedule $schedule, IOInterface $io): Generator

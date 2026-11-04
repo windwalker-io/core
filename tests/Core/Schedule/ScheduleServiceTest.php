@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Schedule\Schedule;
+use Windwalker\Core\Schedule\ScheduleEvent;
 use Windwalker\Core\Schedule\ScheduleService;
 use Windwalker\Filesystem\Filesystem;
 
@@ -121,5 +122,17 @@ class ScheduleServiceTest extends TestCase
         $second = $service->getSchedule([]);
 
         self::assertSame($first, $second);
+    }
+
+    #[Test]
+    public function runEventInvokesTheHandlerThroughTheApplicationContainer(): void
+    {
+        $handler = static fn(string $injected) => $injected;
+        $event = new ScheduleEvent('injected', '* * * * *', $handler);
+        $app = $this->createMock(ApplicationInterface::class);
+        $app->expects($this->once())->method('call')->with($handler)->willReturn('resolved');
+        $service = new ScheduleService($app);
+
+        self::assertSame('resolved', $service->runEvent($event));
     }
 }

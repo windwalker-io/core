@@ -274,9 +274,25 @@ class ProxyResolverTest extends TestCase
     #[Test]
     public function handleTrustedProxiesAcceptsArrayInput(): void
     {
-        $result = ProxyResolver::handleTrustedProxies(['REMOTE_ADDR', '10.0.0.1'], '1.1.1.1');
+        $result = ProxyResolver::handleTrustedProxies(
+            [
+                'REMOTE_ADDR',
+                '10.0.0.0/8, 192.168.0.0/16',
+                "172.16.0.0/12\n 192.0.2.0/24",
+            ],
+            '1.1.1.1',
+        );
 
-        self::assertSame(['1.1.1.1', '10.0.0.1'], $result);
+        self::assertSame(
+            [
+                '1.1.1.1',
+                '10.0.0.0/8',
+                '192.168.0.0/16',
+                '172.16.0.0/12',
+                '192.0.2.0/24',
+            ],
+            $result,
+        );
     }
 
     #[Test]

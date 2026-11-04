@@ -34,6 +34,7 @@ return [
     'seed:create' => \Windwalker\Core\Seed\Command\SeedCreateCommand::class,
 
     'schedule:run' => \Windwalker\Core\Schedule\Command\ScheduleRunCommand::class,
+    'schedule:worker' => \Windwalker\Core\Schedule\Command\ScheduleWorkerCommand::class,
     'schedule:show' => \Windwalker\Core\Schedule\Command\ScheduleShowCommand::class,
     'schedule:install' => \Windwalker\Core\Schedule\Command\ScheduleInstallCommand::class,
     'schedule:uninstall' => \Windwalker\Core\Schedule\Command\ScheduleUninstallCommand::class,

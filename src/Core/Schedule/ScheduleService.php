@@ -43,6 +43,17 @@ class ScheduleService
         return $schedule;
     }
 
+    public function runEvent(ScheduleEvent $event): mixed
+    {
+        $handler = $event->getHandler();
+
+        if (is_string($handler) && class_exists($handler)) {
+            $handler = $this->app->make($handler);
+        }
+
+        return $this->app->call($handler);
+    }
+
     protected function loadScheduleTasks(Schedule $schedule, string $route): void
     {
         $app = $this->app;
