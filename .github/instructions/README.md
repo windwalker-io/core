@@ -14,6 +14,7 @@ This directory stores the "instruction layer" of the shared toolkit. It contains
 - [`instruction.instructions.md`](instruction.instructions.md): explains how to route content between `instructions`, `skills`, `docs`, and `prompts`
 - [`architecture.instructions.md`](architecture.instructions.md): placement,
   container-layer, and extension-point rules for Core structure
+- [`cs.instructions.md`](cs.instructions.md): coding style, formatting, and linting rules.
 - [`test.instructions.md`](test.instructions.md): test placement,
   dependency-injection, database, and controller conventions specific to Core
 - [`test-common.instructions.md`](test-common.instructions.md):
