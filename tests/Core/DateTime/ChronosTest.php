@@ -47,6 +47,39 @@ class ChronosTest extends TestCase
     }
 
     #[Test]
+    public function withTimezoneKeepsInstantAndWithTimezoneKeepingLocalKeepsWallClock(): void
+    {
+        $taipei = Chronos::create('2026-03-05 10:00:00.123456', 'Asia/Taipei');
+
+        $converted = $taipei->withTimezone('UTC');
+        self::assertSame('2026-03-05 02:00:00.123456', $converted->format('Y-m-d H:i:s.u'));
+        self::assertSame($taipei->getTimestamp(), $converted->getTimestamp());
+
+        $moved = $taipei->withTimezoneKeepingLocal('UTC');
+        self::assertSame('2026-03-05 10:00:00.123456', $moved->format('Y-m-d H:i:s.u'));
+        self::assertSame('UTC', $moved->getTimezone()->getName());
+        self::assertSame($taipei->getTimestamp() + 8 * 3600, $moved->getTimestamp());
+        self::assertSame('2026-03-05 10:00:00', $taipei->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
+    public function wrapConvertsModernObjectsInUtcByDefault(): void
+    {
+        self::assertSame(
+            '2026-03-05 00:00:00 +00:00',
+            Chronos::wrap(\Windwalker\Core\DateTime\PlainDate::of(2026, 3, 5))->format('Y-m-d H:i:s P')
+        );
+        self::assertSame(
+            '2026-03-05 00:00:00 +08:00',
+            Chronos::wrap(\Windwalker\Core\DateTime\PlainDate::of(2026, 3, 5), 'Asia/Taipei')->format('Y-m-d H:i:s P')
+        );
+        self::assertSame(
+            '2026-01-01 00:00:00 +00:00',
+            Chronos::tryWrap(\Windwalker\Core\DateTime\Instant::parse('2026-01-01T00:00:00Z'))->format('Y-m-d H:i:s P')
+        );
+    }
+
+    #[Test]
     public function wrapCreatesFromStringWhenNotDateTime(): void
     {
         $result = Chronos::wrap('2020-01-02 03:04:05');
@@ -399,10 +432,10 @@ class ChronosTest extends TestCase
     {
         $chronos = new Chronos('2020-02-03 04:05:06', 'UTC');
 
-        self::assertSame('29', $chronos->daysinmonth);
-        self::assertSame('1', $chronos->dayofweek);
-        self::assertSame('33', $chronos->dayofyear);
-        self::assertTrue($chronos->isleapyear);
+        self::assertSame('29', $chronos->daysInMonth);
+        self::assertSame('1', $chronos->dayOfWeek);
+        self::assertSame('33', $chronos->dayOfYear);
+        self::assertTrue($chronos->isLeapYear);
         self::assertSame('03', $chronos->day);
         self::assertSame('04', $chronos->hour);
         self::assertSame('05', $chronos->minute);
@@ -411,17 +444,6 @@ class ChronosTest extends TestCase
         self::assertSame('rd', $chronos->ordinal);
         self::assertSame('2020', $chronos->year);
         self::assertIsString($chronos->week);
-    }
-
-    #[Test]
-    public function getUnknownPropertyThrows(): void
-    {
-        $chronos = new Chronos('2020-01-01');
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Property nothing not exists\./');
-
-        $chronos->nothing;
     }
 
     #[Test]

@@ -58,6 +58,19 @@ class ClockTest extends TestCase
     }
 
     #[Test]
+    public function modernEntryPointsFollowTheConfiguredClock(): void
+    {
+        Clock::set(new Chronos('2020-06-15 23:30:45.123456', 'UTC'));
+
+        self::assertSame('2020-06-15T23:30:45.123456Z', Clock::instant()->toIso());
+        self::assertSame('2020-06-15', Clock::plainDate('UTC')->toIso());
+        self::assertSame('2020-06-16', Clock::plainDate('Asia/Taipei')->toIso());
+        self::assertSame('23:30:45.123456', Clock::plainTime('UTC')->toIso());
+        self::assertSame('07:30:45.123456', Clock::plainTime('Asia/Taipei')->toIso());
+        self::assertSame('2020-06-16T07:30:45.123456', Clock::plainDateTime('Asia/Taipei')->toIso());
+    }
+
+    #[Test]
     public function fromReturnsSystemClockForNull(): void
     {
         self::assertInstanceOf(SystemClock::class, Clock::from(null));

@@ -1,0 +1,145 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Windwalker\Core\DateTime;
+
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
+use InvalidArgumentException;
+use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\HasChronosInterface;
+use Windwalker\Core\DateTime\Contract\HasInstantInterface;
+
+/**
+ * An exact point on the timeline, precision up to microsecond (the limit of PHP DateTime).
+ *
+ * It has no time zone and no calendar: only time-based intervals (hours, minutes, seconds)
+ * can be added, years/months/days are rejected because their length depends on a time zone.
+ */
+final class Instant implements ChronosInterface, HasInstantInterface, HasChronosInterface
+{
+    use ChronosValueTrait;
+
+    public string $epochSecond {
+        get => (string) $this->dt->getTimestamp();
+    }
+
+    public string $microsecond {
+        get => $this->dt->format('u');
+    }
+
+    public function getEpochSecond(): int
+    {
+        return $this->dt->getTimestamp();
+    }
+
+    public function getMicrosecond(): int
+    {
+        return (int) $this->dt->format('u');
+    }
+
+    private function __construct(private readonly DateTimeImmutable $dt)
+    {
+    }
+
+    public static function from(DateTimeInterface $date): self
+    {
+        return new self(
+            DateTimeImmutable::createFromInterface($date)->setTimezone(new DateTimeZone('UTC'))
+        );
+    }
+
+    public static function now(): self
+    {
+        return self::from(Clock::now());
+    }
+
+    public static function fromEpochSecond(int $seconds, int $microsecond = 0): self
+    {
+        $seconds += (int) floor($microsecond / 1_000_000);
+        $microsecond = $microsecond % 1_000_000;
+
+        if ($microsecond < 0) {
+            $microsecond += 1_000_000;
+        }
+
+        $dt = DateTimeImmutable::createFromFormat('U u', $seconds . ' ' . $microsecond);
+
+        return new self($dt->setTimezone(new DateTimeZone('UTC')));
+    }
+
+    public static function fromEpochMilli(int $milliseconds): self
+    {
+        return self::fromEpochSecond(
+            (int) floor($milliseconds / 1000),
+            ($milliseconds % 1000 + 1000) % 1000 * 1000
+        );
+    }
+
+    /**
+     * @param  string  $instant  Strict ISO 8601 with a time zone designator, e.g. `2026-01-01T00:00:00Z`
+     *                           or `2026-01-01T08:00:00.123456+08:00`.
+     */
+    public static function parse(string $instant): self
+    {
+        foreach (['Y-m-d\TH:i:s.uP', 'Y-m-d\TH:i:sP'] as $format) {
+            $dt = DateTimeImmutable::createFromFormat($format, $instant);
+
+            if ($dt !== false && DateTimeImmutable::getLastErrors() === false) {
+                return self::from($dt);
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf('Invalid instant "%s", expect ISO 8601 with time zone.', $instant));
+    }
+
+    public function toInstant(): self
+    {
+        return $this;
+    }
+
+    public function toEpochMilli(): int
+    {
+        return $this->getEpochSecond() * 1000 + intdiv($this->getMicrosecond(), 1000);
+    }
+
+    public function toDateTime(DateTimeZone|string $tz = 'UTC'): DateTimeImmutable
+    {
+        return $this->dt->setTimezone(is_string($tz) ? new DateTimeZone($tz) : $tz);
+    }
+
+    public function toChronos(DateTimeZone|string|null $tz = null): Chronos
+    {
+        return Chronos::createFromInterface($this->toDateTime($tz ?? 'UTC'));
+    }
+
+    /**
+     * @throws \TypeError When $other is not an exact point on the timeline.
+     */
+    public function compareTo(ChronosInterface|DateTimeInterface $other): int
+    {
+        $other = match (true) {
+            $other instanceof DateTimeInterface => self::from($other),
+            $other instanceof HasInstantInterface => $other->toInstant(),
+            default => throw new \TypeError(
+                sprintf('Cannot compare %s with %s.', self::class, get_debug_type($other))
+            ),
+        };
+
+        return $this->dt <=> $other->dt;
+    }
+
+    public function toIso(): string
+    {
+        return $this->dt->format($this->getMicrosecond() === 0 ? 'Y-m-d\TH:i:s\Z' : 'Y-m-d\TH:i:s.u\Z');
+    }
+
+    protected function applyFields(array $fields, DateOverflow $overflow): static
+    {
+        ChronosMath::assertOnly($fields, ['h', 'i', 's', 'us'], self::class);
+
+        return new self(ChronosMath::addTo($this->dt, $fields, $overflow));
+    }
+}

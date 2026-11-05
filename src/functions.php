@@ -11,11 +11,11 @@ namespace {
          * @param  string  $name
          * @param  mixed   $default
          *
-         * @return  string
+         * @return  ?string
          *
          * @since  3.3
          */
-        function env(string $name, $default = null): ?string
+        function env(string $name, mixed $default = null): ?string
         {
             return $_SERVER[$name] ?? $_ENV[$name] ?? $default;
         }
@@ -57,6 +57,13 @@ namespace Windwalker {
     use Windwalker\Core\Console\CmdWrapper;
     use Windwalker\Core\DateTime\Chronos;
     use Windwalker\Core\DateTime\ChronosService;
+    use Windwalker\Core\DateTime\Contract\HasDateInterface;
+    use Windwalker\Core\DateTime\Contract\HasInstantInterface;
+    use Windwalker\Core\DateTime\Contract\HasTimeInterface;
+    use Windwalker\Core\DateTime\Instant;
+    use Windwalker\Core\DateTime\PlainDate;
+    use Windwalker\Core\DateTime\PlainDateTime;
+    use Windwalker\Core\DateTime\PlainTime;
     use Windwalker\Core\Http\CoreResponse;
     use Windwalker\Core\Manager\Logger;
     use Windwalker\Core\Runtime\ConfigLoader;
@@ -165,6 +172,124 @@ namespace Windwalker {
         function try_chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?Chronos
         {
             return Chronos::tryWrap($date, $tz);
+        }
+    }
+
+    if (!function_exists('\Windwalker\to_instant')) {
+        /**
+         * Strictly convert a value to Instant.
+         *
+         * Accepts: Instant (returned as is), any HasInstantInterface (Chronos), \DateTimeInterface,
+         * and strict ISO 8601 string with time zone. PlainDate/PlainTime/PlainDateTime are rejected
+         * because they have no time zone.
+         *
+         * @throws \TypeError|\InvalidArgumentException
+         */
+        function to_instant(mixed $value): Instant
+        {
+            return match (true) {
+                $value instanceof Instant => $value,
+                $value instanceof HasInstantInterface => $value->toInstant(),
+                $value instanceof DateTimeInterface => Instant::from($value),
+                is_string($value) => Instant::parse($value),
+                default => throw new \TypeError(sprintf('Cannot convert %s to Instant.', get_debug_type($value))),
+            };
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_instant')) {
+        /**
+         * Same as to_instant() but returns NULL for null or empty string.
+         */
+        function try_instant(mixed $value): ?Instant
+        {
+            return $value === null || $value === '' ? null : to_instant($value);
+        }
+    }
+
+    if (!function_exists('\Windwalker\to_plain_date')) {
+        /**
+         * Strictly convert a value to PlainDate, using the wall-clock date without any time zone conversion.
+         *
+         * Accepts: PlainDate (returned as is), any HasDateInterface (PlainDateTime, Chronos),
+         * \DateTimeInterface, and strict `Y-m-d` string. Instant is rejected.
+         *
+         * @throws \TypeError|\InvalidArgumentException
+         */
+        function to_plain_date(mixed $value): PlainDate
+        {
+            return match (true) {
+                $value instanceof PlainDate => $value,
+                $value instanceof HasDateInterface => $value->toPlainDate(),
+                $value instanceof DateTimeInterface => PlainDate::from($value),
+                is_string($value) => PlainDate::parse($value),
+                default => throw new \TypeError(sprintf('Cannot convert %s to PlainDate.', get_debug_type($value))),
+            };
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_plain_date')) {
+        function try_plain_date(mixed $value): ?PlainDate
+        {
+            return $value === null || $value === '' ? null : to_plain_date($value);
+        }
+    }
+
+    if (!function_exists('\Windwalker\to_plain_time')) {
+        /**
+         * Strictly convert a value to PlainTime, using the wall-clock time without any time zone conversion.
+         *
+         * Accepts: PlainTime (returned as is), any HasTimeInterface (PlainDateTime, Chronos),
+         * \DateTimeInterface, and strict time string. Instant is rejected.
+         *
+         * @throws \TypeError|\InvalidArgumentException
+         */
+        function to_plain_time(mixed $value): PlainTime
+        {
+            return match (true) {
+                $value instanceof PlainTime => $value,
+                $value instanceof HasTimeInterface => $value->toPlainTime(),
+                $value instanceof DateTimeInterface => PlainTime::from($value),
+                is_string($value) => PlainTime::parse($value),
+                default => throw new \TypeError(sprintf('Cannot convert %s to PlainTime.', get_debug_type($value))),
+            };
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_plain_time')) {
+        function try_plain_time(mixed $value): ?PlainTime
+        {
+            return $value === null || $value === '' ? null : to_plain_time($value);
+        }
+    }
+
+    if (!function_exists('\Windwalker\to_plain_datetime')) {
+        /**
+         * Strictly convert a value to PlainDateTime, using the wall-clock fields without any time zone conversion.
+         *
+         * Accepts: PlainDateTime (returned as is), Chronos, \DateTimeInterface, and strict ISO string
+         * without time zone. PlainDate/PlainTime/Instant are rejected, combine or convert explicitly.
+         *
+         * @throws \TypeError|\InvalidArgumentException
+         */
+        function to_plain_datetime(mixed $value): PlainDateTime
+        {
+            return match (true) {
+                $value instanceof PlainDateTime => $value,
+                $value instanceof Chronos => $value->toPlainDateTime(),
+                $value instanceof DateTimeInterface => PlainDateTime::from($value),
+                is_string($value) => PlainDateTime::parse($value),
+                default => throw new \TypeError(
+                    sprintf('Cannot convert %s to PlainDateTime.', get_debug_type($value))
+                ),
+            };
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_plain_datetime')) {
+        function try_plain_datetime(mixed $value): ?PlainDateTime
+        {
+            return $value === null || $value === '' ? null : to_plain_datetime($value);
         }
     }
 

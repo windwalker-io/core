@@ -23,6 +23,26 @@ class Clock
         return $date;
     }
 
+    public static function instant(): Instant
+    {
+        return Instant::from(static::now());
+    }
+
+    public static function plainDate(string|\DateTimeZone|null $tz = null): PlainDate
+    {
+        return PlainDate::from(static::now($tz));
+    }
+
+    public static function plainTime(string|\DateTimeZone|null $tz = null): PlainTime
+    {
+        return PlainTime::from(static::now($tz));
+    }
+
+    public static function plainDateTime(string|\DateTimeZone|null $tz = null): PlainDateTime
+    {
+        return PlainDateTime::from(static::now($tz));
+    }
+
     /**
      * @codeCoverageIgnore
      */

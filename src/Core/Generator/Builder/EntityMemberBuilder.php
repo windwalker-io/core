@@ -11,6 +11,10 @@ use Ramsey\Uuid\UuidInterface;
 use ReflectionProperty;
 use Unicorn\Enum\BasicState;
 use Windwalker\Core\DateTime\Chronos;
+use Windwalker\Core\DateTime\PlainDate;
+use Windwalker\Core\DateTime\PlainDateCast;
+use Windwalker\Core\DateTime\PlainTime;
+use Windwalker\Core\DateTime\PlainTimeCast;
 use Windwalker\Core\DateTime\ServerTimeCast;
 use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Events\Console\MessageOutputTrait;
@@ -289,6 +293,16 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $default = null;
 
             $this->addUse(Chronos::class);
+        } elseif ($dataType === 'date') {
+            $type = '?PlainDate';
+            $default = null;
+
+            $this->addUse(PlainDate::class);
+        } elseif ($dataType === 'time') {
+            $type = '?PlainTime';
+            $default = null;
+
+            $this->addUse(PlainTime::class);
         } elseif ($dbColumn->columnName === 'state' && $dataType === 'tinyint' && enum_exists(BasicState::class)) {
             // Todo: This should move to unicorn package
             $type = 'BasicState';
@@ -561,6 +575,30 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 $this->attribute(
                     'CastNullable',
                     new Node\Expr\ClassConstFetch(new Node\Name('ServerTimeCast'), 'class')
+                ),
+            );
+        }
+
+        if ($type === '?PlainTime') {
+            $this->addUse(CastNullable::class);
+            $this->addUse(PlainTimeCast::class);
+            $prop->setAttribute('fullType', PlainTime::class);
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'CastNullable',
+                    new Node\Expr\ClassConstFetch(new Node\Name('PlainTimeCast'), 'class')
+                ),
+            );
+        }
+
+        if ($type === '?PlainDate') {
+            $this->addUse(CastNullable::class);
+            $this->addUse(PlainDateCast::class);
+            $prop->setAttribute('fullType', PlainDate::class);
+            $prop->attrGroups[] = $this->attributeGroup(
+                $this->attribute(
+                    'CastNullable',
+                    new Node\Expr\ClassConstFetch(new Node\Name('PlainDateCast'), 'class')
                 ),
             );
         }

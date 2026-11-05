@@ -14,25 +14,54 @@ use JsonSerializable;
 use Psr\Clock\ClockInterface;
 use SebastianBergmann\Invoker\TimeoutException;
 use Time\Duration;
+use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\HasChronosInterface;
+use Windwalker\Core\DateTime\Contract\HasDateInterface;
+use Windwalker\Core\DateTime\Contract\HasInstantInterface;
+use Windwalker\Core\DateTime\Contract\HasTimeInterface;
 
 /**
  * The Chronos class.
- *
- * @property-read string $daysinmonth
- * @property-read string $dayofweek
- * @property-read string $dayofyear
- * @property-read bool   $isleapyear
- * @property-read string $day
- * @property-read string $hour
- * @property-read string $minute
- * @property-read string $second
- * @property-read string $month
- * @property-read string $ordinal
- * @property-read string $week
- * @property-read string $year
  */
-class Chronos extends DateTimeImmutable implements JsonSerializable
+class Chronos extends DateTimeImmutable implements
+    ChronosInterface,
+    HasDateInterface,
+    HasTimeInterface,
+    HasInstantInterface,
+    HasChronosInterface
 {
+    use DateFieldsTrait;
+    use TimeFieldsTrait;
+
+    /**
+     * Day of the year, starting from 0.
+     */
+    public string $dayOfYear {
+        get => $this->format('z');
+    }
+
+    public bool $isLeapYear {
+        get => (bool) $this->format('L');
+    }
+
+    /**
+     * English ordinal suffix of the day, e.g. "st".
+     */
+    public string $ordinal {
+        get => $this->format('S');
+    }
+
+    /**
+     * ISO-8601 week number.
+     */
+    public string $week {
+        get => $this->format('W');
+    }
+
+    public string $epochSecond {
+        get => (string) $this->getTimestamp();
+    }
+
     public const string FORMAT_YMD = 'Y-m-d';
 
     public const string FORMAT_YMD_HI = 'Y-m-d H:i';
@@ -64,6 +93,10 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
 
         if ($date instanceof DateTimeInterface) {
             return static::createFromInterface($date);
+        }
+
+        if ($date instanceof HasChronosInterface) {
+            return static::createFromInterface($date->toChronos($tz));
         }
 
         return static::create($date, $tz);
@@ -511,58 +544,6 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     }
 
     /**
-     * Magic method to access properties of the date given by class to the format method.
-     *
-     * @param  string  $name  The name of the property.
-     *
-     * @return  mixed  A value if the property name is valid, null otherwise.
-     *
-     * @since   2.1
-     */
-    public function __get(string $name)
-    {
-        switch ($name) {
-            case 'daysinmonth':
-                return $this->format('t');
-
-            case 'dayofweek':
-                return $this->format('N');
-
-            case 'dayofyear':
-                return $this->format('z');
-
-            case 'isleapyear':
-                return (bool) $this->format('L');
-
-            case 'day':
-                return $this->format('d');
-
-            case 'hour':
-                return $this->format('H');
-
-            case 'minute':
-                return $this->format('i');
-
-            case 'second':
-                return $this->format('s');
-
-            case 'month':
-                return $this->format('m');
-
-            case 'ordinal':
-                return $this->format('S');
-
-            case 'week':
-                return $this->format('W');
-
-            case 'year':
-                return $this->format('Y');
-        }
-
-        throw new InvalidArgumentException('Property ' . $name . ' not exists.');
-    }
-
-    /**
      * Magic method to render the date object in the format specified in the public
      * static member JDate::$format.
      *
@@ -607,6 +588,23 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
         }
 
         return parent::setTimezone($timezone);
+    }
+
+    /**
+     * Same instant, shown in another time zone. The wall-clock fields change.
+     */
+    public function withTimezone(DateTimeZone|string $timezone): static
+    {
+        return $this->setTimezone($timezone);
+    }
+
+    /**
+     * Same wall-clock fields, placed in another time zone. The instant changes.
+     * A wall-clock time that does not exist in the target zone (DST gap) is shifted forward by PHP.
+     */
+    public function withTimezoneKeepingLocal(DateTimeZone|string $timezone): static
+    {
+        return new static($this->format('Y-m-d H:i:s.u'), static::wrapTimezoneObject($timezone));
     }
 
     /**
@@ -668,5 +666,93 @@ class Chronos extends DateTimeImmutable implements JsonSerializable
     public function jsonSerialize(): string
     {
         return $this->toISO8601(true);
+    }
+
+    public function getEpochSecond(): int
+    {
+        return $this->getTimestamp();
+    }
+
+    public function toChronos(DateTimeZone|string|null $tz = null): static
+    {
+        if ($tz === null) {
+            return $this;
+        }
+
+        return $this->setTimezone(is_string($tz) ? new DateTimeZone($tz) : $tz);
+    }
+
+    public function toInstant(): Instant
+    {
+        return Instant::from($this);
+    }
+
+    public function toPlainDate(): PlainDate
+    {
+        return PlainDate::from($this);
+    }
+
+    public function toPlainTime(): PlainTime
+    {
+        return PlainTime::from($this);
+    }
+
+    public function toPlainDateTime(): PlainDateTime
+    {
+        return PlainDateTime::from($this);
+    }
+
+    /**
+     * Compare the exact instants, the time zone is ignored.
+     *
+     * @throws  \TypeError  When $other has no instant, e.g. PlainDate.
+     */
+    public function compareTo(ChronosInterface|DateTimeInterface $other): int
+    {
+        $other = match (true) {
+            $other instanceof DateTimeInterface => $other,
+            $other instanceof HasInstantInterface => $other->toInstant()->toDateTime(),
+            default => throw new \TypeError(
+                sprintf('Cannot compare %s with %s.', static::class, get_debug_type($other))
+            ),
+        };
+
+        return $this <=> $other;
+    }
+
+    public function equals(ChronosInterface|DateTimeInterface $other): bool
+    {
+        return $this->compareTo($other) === 0;
+    }
+
+    public function isBefore(ChronosInterface|DateTimeInterface $other): bool
+    {
+        return $this->compareTo($other) < 0;
+    }
+
+    public function isAfter(ChronosInterface|DateTimeInterface $other): bool
+    {
+        return $this->compareTo($other) > 0;
+    }
+
+    /**
+     * Calendar units (years, months, days) move the wall clock in the current time zone,
+     * time units move the exact time. See {@see ChronosInterface} for $overflow.
+     */
+    public function plus(Duration|DateInterval|string $interval, DateOverflow $overflow = DateOverflow::Constrain): static
+    {
+        return static::createFromInterface(ChronosMath::addTo($this, ChronosMath::fields($interval), $overflow));
+    }
+
+    public function minus(Duration|DateInterval|string $interval, DateOverflow $overflow = DateOverflow::Constrain): static
+    {
+        return static::createFromInterface(
+            ChronosMath::addTo($this, ChronosMath::negate(ChronosMath::fields($interval)), $overflow)
+        );
+    }
+
+    public function toIso(): string
+    {
+        return $this->toISO8601($this->getMicrosecond() !== 0);
     }
 }
