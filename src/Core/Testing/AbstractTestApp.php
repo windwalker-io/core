@@ -62,6 +62,8 @@ abstract class AbstractTestApp extends WebApplication
             static::$instance->loadConfig($config);
         }
 
+        // Register TestAppProvider
+
         static::$instance->prepareSharedContext();
 
         return static::$instance;

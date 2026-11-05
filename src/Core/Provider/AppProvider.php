@@ -73,6 +73,7 @@ class AppProvider implements ServiceProviderInterface
         }
 
         $container->prepareSharedObject(PathResolver::class);
+        $container->registerServiceProvider(new AppEnvironmentProvider());
         $container->prepareSharedObject(PackageRegistry::class);
 
         if ($this->profilerFactory) {

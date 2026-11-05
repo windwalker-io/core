@@ -14,7 +14,6 @@ use Windwalker\Core\Event\CoreEventAwareTrait;
 use Windwalker\Core\Event\EventDispatcherRegistry;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Core\Runtime\Runtime;
-use Windwalker\Crypt\SecretToolkit;
 use Windwalker\DI\BootableDeferredProviderInterface;
 use Windwalker\DI\Container;
 use Windwalker\DI\Parameters;
@@ -68,6 +67,21 @@ trait ApplicationTrait
         return AppType::CONSOLE;
     }
 
+    // Prefer a registered implementation (user may override); fall back so apps work without providers.
+    protected function appEnvironment(): AppEnvironmentInterface
+    {
+        return $this->container->has(AppEnvironmentInterface::class)
+            ? $this->container->get(AppEnvironmentInterface::class)
+            : new AppEnvironment($this->config);
+    }
+
+    protected function secretKeeper(): SecretKeeperInterface
+    {
+        return $this->container->has(SecretKeeperInterface::class)
+            ? $this->container->get(SecretKeeperInterface::class)
+            : new SecretKeeper($this->config);
+    }
+
     public function isCliRuntime(): bool
     {
         return Runtime::isCli();
@@ -75,7 +89,7 @@ trait ApplicationTrait
 
     public function getAppName(): string
     {
-        return (string) ($this->config('app.name') ?? 'Windwalker');
+        return $this->appEnvironment()->getName();
     }
 
     /**
@@ -115,7 +129,7 @@ trait ApplicationTrait
      */
     public function isDebug(): bool
     {
-        return $this->config('app.debug');
+        return $this->appEnvironment()->isDebug();
     }
 
     /**
@@ -125,24 +139,12 @@ trait ApplicationTrait
      */
     public function getMode(): string
     {
-        return (string) $this->config('app.mode');
+        return $this->appEnvironment()->getMode();
     }
 
     public function getVerbosity(): AppVerbosity
     {
-        $verbosity = $this->config('app.verbosity');
-
-        if ($verbosity === null || $verbosity === '') {
-            return $this->isDebug() ? AppVerbosity::VERBOSE : AppVerbosity::NORMAL;
-        }
-
-        $verbosity = AppVerbosity::tryFrom((int) $verbosity) ?? AppVerbosity::NORMAL;
-
-        if ($verbosity->value < AppVerbosity::VERBOSE->value && $this->isDebug()) {
-            $verbosity = AppVerbosity::VERBOSE;
-        }
-
-        return $verbosity;
+        return $this->appEnvironment()->getVerbosity();
     }
 
     public function isVerbose(): bool
@@ -152,18 +154,7 @@ trait ApplicationTrait
 
     public function getSecret(?string $deriveFor = null): string
     {
-        $secret = (string) SecretToolkit::decodeIfHasPrefix((string) $this->config('app.secret'));
-
-        if ($deriveFor) {
-            $secret = hash_hkdf(
-                'sha256',
-                $secret,
-                32,
-                $deriveFor,
-            );
-        }
-
-        return $secret;
+        return $this->secretKeeper()->getSecret($deriveFor);
     }
 
     public function isMaintenance(): bool
