@@ -174,6 +174,9 @@ PlainDate::compare($a, $b);       // 靜態比較，可用於 usort($dates, Plai
 `PlainTime`、`PlainDateTime`、`Instant` 有 `round($smallestUnit, $roundingIncrement = 1, $roundingMode = HalfAwayFromZero)`。
 `PlainDate` 沒有比日更小的單位，所以沒有 `round()`。`PlainTime` 取整後會繞過午夜。
 
+與 Temporal 相同，時間單位的 `roundingIncrement` 必須小於且能整除上一層單位（小時對 24、分與秒對 60、毫秒與微秒對 1000），
+`round('day')` 的 increment 只能是 1，否則丟 `InvalidArgumentException`（`until()` / `since()` 對時間單位同樣適用）。
+
 ```php
 PlainTime::parse('23:59:59.6')->round('second');          // 00:00:00
 PlainTime::parse('10:07:30')->round('minute', 15);        // 10:15:00

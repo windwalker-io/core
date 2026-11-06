@@ -140,6 +140,8 @@ final class PlainTime implements ChronosInterface, DifferenceInterface, Roundabl
     ): static {
         $unit = ChronosMath::assertUnit($smallestUnit, DateTimeUnit::Hour, DateTimeUnit::Microsecond);
 
+        ChronosMath::assertUnitIncrement($unit, $roundingIncrement, true);
+
         $us = ChronosMath::roundMicros(ChronosMath::toMicros($this->dt), $unit, $roundingIncrement, $roundingMode);
 
         return new self(ChronosMath::fromMicros($us % 86_400_000_000));

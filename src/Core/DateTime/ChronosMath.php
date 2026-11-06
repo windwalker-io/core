@@ -156,7 +156,7 @@ final class ChronosMath
     {
         $pattern = '/^(?<y>-?\d{4,6})-(?<mo>\d{2})-(?<d>\d{2})'
             . '(?:[Tt ](?<h>\d{2}):(?<i>\d{2})(?::(?<s>\d{2})(?:[.,](?<f>\d{1,9}))?)?'
-            . '(?:[+-]\d{2}(?::?\d{2})?)?)?$/';
+            . '(?:[+-]\d{2}(?::?\d{2})?)?)?\z/';
 
         if (!preg_match($pattern, $value, $m)) {
             return null;
@@ -200,7 +200,7 @@ final class ChronosMath
      */
     public static function parseIsoTime(string $value): ?array
     {
-        if (preg_match('/^[Tt]?(\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d{1,9}))?)?$/', $value, $m)) {
+        if (preg_match('/^[Tt]?(\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d{1,9}))?)?\z/', $value, $m)) {
             $parts = [(int) $m[1], (int) $m[2], (int) ($m[3] ?? 0), self::fractionToMicros($m[4] ?? '')];
 
             try {
@@ -309,6 +309,33 @@ final class ChronosMath
         return self::roundDiv($us, $step, $mode) * $step;
     }
 
+    /**
+     * Like Temporal, a time unit increment must be less than and divide the next larger unit
+     * (hours of 24, minutes and seconds of 60, milliseconds and microseconds of 1000), otherwise the
+     * rounded values would not repeat each day. round() cannot take a day increment other than 1.
+     */
+    public static function assertUnitIncrement(DateTimeUnit $unit, int $increment, bool $rounding): void
+    {
+        self::assertIncrement($increment);
+
+        $max = match ($unit) {
+            DateTimeUnit::Hour => 24,
+            DateTimeUnit::Minute, DateTimeUnit::Second => 60,
+            DateTimeUnit::Millisecond, DateTimeUnit::Microsecond => 1000,
+            default => null,
+        };
+
+        if ($unit === DateTimeUnit::Day && $rounding && $increment !== 1) {
+            throw new InvalidArgumentException('Rounding increment of "day" must be 1.');
+        }
+
+        if ($max !== null && ($increment >= $max || $max % $increment !== 0)) {
+            throw new InvalidArgumentException(
+                sprintf('Rounding increment %d must be less than and divide %d for unit "%s".', $increment, $max, $unit->value)
+            );
+        }
+    }
+
     public static function assertIncrement(int $increment): void
     {
         if ($increment < 1) {
@@ -377,7 +404,7 @@ final class ChronosMath
     ): DateInterval {
         [$largest, $smallest] = self::resolveUnits($largest, $smallest, $defaultLargest, $defaultSmallest, $max, $min);
 
-        self::assertIncrement($increment);
+        self::assertUnitIncrement($smallest, $increment, false);
 
         if ($largest->rank() <= DateTimeUnit::Month->rank()) {
             return self::calendarDifference($from, $to, $largest, $smallest, $increment, $mode);

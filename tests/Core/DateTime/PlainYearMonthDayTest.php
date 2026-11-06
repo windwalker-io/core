@@ -164,4 +164,48 @@ class PlainYearMonthDayTest extends TestCase
         $this->expectException(\RangeException::class);
         PlainMonthDay::of(2, 30);
     }
+
+    #[Test]
+    public function parseRejectsTrailingNewlineAndSpaces(): void
+    {
+        $bads = [
+            [PlainYearMonth::class, "2024-03\n"],
+            [PlainMonthDay::class, "03-01\n"],
+            [PlainDate::class, "2024-03-01\n"],
+            [PlainDateTime::class, "2024-03-01T10:00\n"],
+            [\Windwalker\Core\DateTime\PlainTime::class, "10:00\n"],
+            [\Windwalker\Core\DateTime\Instant::class, "2024-03-01T10:00:00Z\n"],
+            [\Windwalker\Core\DateTime\Instant::class, ' 2024-03-01T10:00:00Z'],
+        ];
+
+        foreach ($bads as [$class, $value]) {
+            try {
+                $class::parse($value);
+                self::fail($class . ' ' . json_encode($value));
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
+    }
+
+    #[Test]
+    public function roundIncrementMustDivideNextUnit(): void
+    {
+        $dt = PlainDateTime::parse('2024-01-01T10:20');
+
+        self::assertSame('2024-01-01T10:15:00', $dt->round('minutes', 15)->toIso());
+        self::assertSame('2024-01-01T12:00:00', $dt->round('hours', 12)->toIso());
+
+        foreach ([['hours', 7], ['hours', 24], ['minutes', 90], ['minutes', 7], ['days', 2], ['milliseconds', 3]] as [$unit, $inc]) {
+            try {
+                $dt->round($unit, $inc);
+                self::fail("$unit $inc");
+            } catch (InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        $dt->until(PlainDateTime::parse('2024-01-02'), 'hours', 'hours', 7);
+    }
 }

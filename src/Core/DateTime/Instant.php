@@ -92,7 +92,7 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
         $normalized = preg_replace_callback(
             '/[.,](\d+)(?=[zZ+-])/',
             static fn(array $m) => '.' . substr(str_pad($m[1], 6, '0'), 0, 6),
-            strtoupper(trim($instant))
+            strtoupper($instant)
         ) ?? $instant;
 
         foreach (['Y-m-d\TH:i:s.uP', 'Y-m-d\TH:i:sP'] as $format) {
@@ -177,6 +177,8 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
         RoundingMode $roundingMode = RoundingMode::HalfAwayFromZero,
     ): static {
         $unit = ChronosMath::assertUnit($smallestUnit, DateTimeUnit::Hour, DateTimeUnit::Microsecond);
+
+        ChronosMath::assertUnitIncrement($unit, $roundingIncrement, true);
 
         $us = ChronosMath::roundMicros(ChronosMath::toMicros($this->dt), $unit, $roundingIncrement, $roundingMode);
 

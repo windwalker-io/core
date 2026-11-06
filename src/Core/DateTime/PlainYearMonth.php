@@ -76,7 +76,7 @@ final class PlainYearMonth implements ChronosInterface, DifferenceInterface
      */
     public static function parse(string $value): self
     {
-        if (preg_match('/^(-?\d{4,6})-(\d{2})$/', $value, $m)) {
+        if (preg_match('/^(-?\d{4,6})-(\d{2})\z/', $value, $m)) {
             try {
                 return self::of((int) $m[1], (int) $m[2]);
             } catch (\RangeException) {

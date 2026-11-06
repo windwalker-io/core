@@ -227,6 +227,8 @@ final class PlainDateTime implements ChronosInterface, DifferenceInterface, Roun
     ): static {
         $unit = ChronosMath::assertUnit($smallestUnit, DateTimeUnit::Day, DateTimeUnit::Microsecond);
 
+        ChronosMath::assertUnitIncrement($unit, $roundingIncrement, true);
+
         $us = ChronosMath::roundMicros(ChronosMath::toMicros($this->dt), $unit, $roundingIncrement, $roundingMode);
 
         return new self(ChronosMath::fromMicros($us));
