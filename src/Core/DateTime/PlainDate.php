@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use InvalidArgumentException;
+use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\DifferenceInterface;
+use Windwalker\Core\DateTime\Contract\HasCalendarFieldsInterface;
 use Windwalker\Core\DateTime\Contract\HasChronosInterface;
 use Windwalker\Core\DateTime\Contract\HasDateInterface;
 
 /**
  * A calendar date without time and time zone.
  */
-final class PlainDate implements ChronosInterface, HasDateInterface, HasChronosInterface
+final class PlainDate implements ChronosInterface, DifferenceInterface, HasDateInterface, HasCalendarFieldsInterface, HasChronosInterface
 {
     use ChronosValueTrait;
+    use CalendarFieldsTrait;
     use DateFieldsTrait;
 
     /**
@@ -109,6 +114,31 @@ final class PlainDate implements ChronosInterface, HasDateInterface, HasChronosI
         }
 
         return $this->dt <=> $other->dt;
+    }
+
+    protected function differenceTo(
+        ChronosInterface $other,
+        DateTimeUnit|string|null $largestUnit,
+        DateTimeUnit|string|null $smallestUnit,
+        int $roundingIncrement,
+        RoundingMode $roundingMode,
+    ): DateInterval {
+        if (!$other instanceof self) {
+            throw new \TypeError(sprintf('Cannot compare %s with %s.', self::class, get_debug_type($other)));
+        }
+
+        return ChronosMath::difference(
+            $this->dt,
+            $other->dt,
+            $largestUnit,
+            $smallestUnit,
+            $roundingIncrement,
+            $roundingMode,
+            DateTimeUnit::Day,
+            DateTimeUnit::Day,
+            DateTimeUnit::Year,
+            DateTimeUnit::Day,
+        );
     }
 
     public function toIso(): string

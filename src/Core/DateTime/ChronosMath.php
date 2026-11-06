@@ -6,7 +6,9 @@ namespace Windwalker\Core\DateTime;
 
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeZone;
 use InvalidArgumentException;
+use RoundingMode;
 use Time\Duration;
 
 /**
@@ -160,6 +162,300 @@ final class ChronosMath
         ];
     }
 
+    public static function toMicros(DateTimeImmutable $dt): int
+    {
+        return $dt->getTimestamp() * 1_000_000 + (int) $dt->format('u');
+    }
+
+    public static function fromMicros(int $us): DateTimeImmutable
+    {
+        $seconds = intdiv($us, 1_000_000);
+        $micro = $us - $seconds * 1_000_000;
+
+        if ($micro < 0) {
+            $seconds--;
+            $micro += 1_000_000;
+        }
+
+        // The "u" format reads digits as a fraction, so it must be zero-padded to six digits.
+        return DateTimeImmutable::createFromFormat('U u', sprintf('%d %06d', $seconds, $micro))
+            ->setTimezone(new DateTimeZone('UTC'));
+    }
+
+    /**
+     * Divide and round to an integer. $d must be positive.
+     */
+    public static function roundDiv(int $n, int $d, RoundingMode $mode): int
+    {
+        $q = intdiv($n, $d);
+        $r = $n - $q * $d;
+
+        if ($r < 0) {
+            $q--;
+            $r += $d;
+        }
+
+        if ($r === 0) {
+            return $q;
+        }
+
+        $negative = $n < 0;
+        $half = $r * 2 <=> $d;
+
+        return match ($mode) {
+            RoundingMode::NegativeInfinity => $q,
+            RoundingMode::PositiveInfinity => $q + 1,
+            RoundingMode::TowardsZero => $negative ? $q + 1 : $q,
+            RoundingMode::AwayFromZero => $negative ? $q : $q + 1,
+            default => match (true) {
+                $half < 0 => $q,
+                $half > 0 => $q + 1,
+                $mode === RoundingMode::HalfAwayFromZero => $negative ? $q : $q + 1,
+                $mode === RoundingMode::HalfTowardsZero => $negative ? $q + 1 : $q,
+                $mode === RoundingMode::HalfEven => ($q & 1) === 0 ? $q : $q + 1,
+                default => ($q & 1) === 1 ? $q : $q + 1,
+            },
+        };
+    }
+
+    /**
+     * Round a microsecond count to a multiple of $unit * $increment. $unit must be Day or smaller.
+     */
+    public static function roundMicros(int $us, DateTimeUnit $unit, int $increment, RoundingMode $mode): int
+    {
+        self::assertIncrement($increment);
+
+        $step = $unit->microseconds() * $increment;
+
+        return self::roundDiv($us, $step, $mode) * $step;
+    }
+
+    public static function assertIncrement(int $increment): void
+    {
+        if ($increment < 1) {
+            throw new InvalidArgumentException('Rounding increment must be a positive integer.');
+        }
+    }
+
+    /**
+     * Validate a unit against the range the type supports. Returns the resolved unit.
+     */
+    public static function assertUnit(DateTimeUnit|string $unit, DateTimeUnit $max, DateTimeUnit $min): DateTimeUnit
+    {
+        $unit = DateTimeUnit::resolve($unit);
+
+        if ($unit->isLargerThan($max) || $min->isLargerThan($unit)) {
+            throw new InvalidArgumentException(
+                sprintf('Unit "%s" is not supported, expect "%s" to "%s".', $unit->value, $max->value, $min->value)
+            );
+        }
+
+        return $unit;
+    }
+
+    /**
+     * Like Temporal, the default largest unit is raised to the smallest unit if it is smaller.
+     *
+     * @return  array{DateTimeUnit, DateTimeUnit}  Largest and smallest.
+     */
+    public static function resolveUnits(
+        DateTimeUnit|string|null $largest,
+        DateTimeUnit|string|null $smallest,
+        DateTimeUnit $defaultLargest,
+        DateTimeUnit $defaultSmallest,
+        DateTimeUnit $max,
+        DateTimeUnit $min,
+    ): array {
+        $smallest = $smallest === null ? $defaultSmallest : self::assertUnit($smallest, $max, $min);
+
+        $largest = $largest === null
+            ? ($defaultLargest->isLargerThan($smallest) ? $defaultLargest : $smallest)
+            : self::assertUnit($largest, $max, $min);
+
+        if ($smallest->isLargerThan($largest)) {
+            throw new InvalidArgumentException(
+                sprintf('Largest unit "%s" must not be smaller than smallest unit "%s".', $largest->value, $smallest->value)
+            );
+        }
+
+        return [$largest, $smallest];
+    }
+
+    /**
+     * The difference from $from to $to. Both must be naive wall-clock values in UTC.
+     */
+    public static function difference(
+        DateTimeImmutable $from,
+        DateTimeImmutable $to,
+        DateTimeUnit|string|null $largest,
+        DateTimeUnit|string|null $smallest,
+        int $increment,
+        RoundingMode $mode,
+        DateTimeUnit $defaultLargest,
+        DateTimeUnit $defaultSmallest,
+        DateTimeUnit $max,
+        DateTimeUnit $min,
+    ): DateInterval {
+        [$largest, $smallest] = self::resolveUnits($largest, $smallest, $defaultLargest, $defaultSmallest, $max, $min);
+
+        self::assertIncrement($increment);
+
+        if ($largest->rank() <= DateTimeUnit::Month->rank()) {
+            return self::calendarDifference($from, $to, $largest, $smallest, $increment, $mode);
+        }
+
+        $us = self::roundMicros(self::toMicros($to) - self::toMicros($from), $smallest, $increment, $mode);
+
+        return self::buildInterval(0, $us, $us < 0, $largest);
+    }
+
+    /**
+     * The sign flips and Ceil/Floor swap, so that since() is the mirror image of until().
+     */
+    public static function mirrorMode(RoundingMode $mode): RoundingMode
+    {
+        return match ($mode) {
+            RoundingMode::PositiveInfinity => RoundingMode::NegativeInfinity,
+            RoundingMode::NegativeInfinity => RoundingMode::PositiveInfinity,
+            default => $mode,
+        };
+    }
+
+    public static function negateInterval(DateInterval $interval): DateInterval
+    {
+        $interval->invert = $interval->invert === 1 ? 0 : (int) self::isNonZero($interval);
+
+        return $interval;
+    }
+
+    private static function isNonZero(DateInterval $interval): bool
+    {
+        return $interval->y || $interval->m || $interval->d || $interval->h || $interval->i || $interval->s
+            || $interval->f;
+    }
+
+    /**
+     * Years and months are counted by month-index like Temporal: 2026-01-31 until 2026-03-01 is
+     * 1 month 1 day, and until 2026-02-28 is 28 days since February 28th is before the 31st.
+     */
+    private static function calendarDifference(
+        DateTimeImmutable $from,
+        DateTimeImmutable $to,
+        DateTimeUnit $largest,
+        DateTimeUnit $smallest,
+        int $increment,
+        RoundingMode $mode,
+    ): DateInterval {
+        $fromUs = self::toMicros($from);
+        $toUs = self::toMicros($to);
+
+        if ($fromUs === $toUs) {
+            return self::buildInterval(0, 0, false, $largest);
+        }
+
+        $sign = $toUs > $fromUs ? 1 : -1;
+
+        $months = ((int) $to->format('Y') - (int) $from->format('Y')) * 12
+            + ((int) $to->format('n') - (int) $from->format('n'));
+
+        $fromTail = self::monthTail($from);
+        $toTail = self::monthTail($to);
+
+        if ($sign > 0 && $toTail < $fromTail) {
+            $months--;
+        } elseif ($sign < 0 && $toTail > $fromTail) {
+            $months++;
+        }
+
+        if ($smallest === DateTimeUnit::Year || $smallest === DateTimeUnit::Month) {
+            $unit = ($smallest === DateTimeUnit::Year ? 12 : 1) * $increment;
+            $whole = intdiv($months, $unit);
+            $startUs = self::toMicros(self::addMonths($from, $whole * $unit));
+            $endUs = self::toMicros(self::addMonths($from, ($whole + $sign) * $unit));
+            $den = abs($endUs - $startUs);
+            $num = abs($toUs - $startUs);
+
+            $rounded = self::roundDiv($sign * (abs($whole) * $den + $num), $den, $mode) * $unit;
+
+            return self::buildInterval($rounded, 0, $rounded < 0, $largest);
+        }
+
+        $inter = self::addMonths($from, $months);
+        $rest = $toUs - self::toMicros($inter);
+        $rounded = self::roundMicros($rest, $smallest, $increment, $mode);
+
+        if ($rounded !== $rest) {
+            // Re-measure to the rounded end point so that a carry is rebalanced into larger units.
+            return self::calendarDifference(
+                $from,
+                self::fromMicros(self::toMicros($inter) + $rounded),
+                $largest,
+                DateTimeUnit::Microsecond,
+                1,
+                $mode
+            );
+        }
+
+        return self::buildInterval($months, $rest, $sign < 0, $largest);
+    }
+
+    private static function monthTail(DateTimeImmutable $dt): int
+    {
+        [$day, $hour, $minute, $second, $us] = array_map('intval', explode(' ', $dt->format('j G i s u')));
+
+        return $day * 86_400_000_000 + $hour * 3_600_000_000 + $minute * 60_000_000 + $second * 1_000_000 + $us;
+    }
+
+    private static function addMonths(DateTimeImmutable $dt, int $months): DateTimeImmutable
+    {
+        return self::addTo(
+            $dt,
+            ['y' => 0, 'm' => $months, 'd' => 0, 'h' => 0, 'i' => 0, 's' => 0, 'us' => 0],
+            DateOverflow::Constrain
+        );
+    }
+
+    /**
+     * @param  int           $months   Only its absolute value is used.
+     * @param  int           $us       Only its absolute value is used.
+     * @param  DateTimeUnit  $largest  The unit that absorbs everything above it: with Hour, 30 hours stay 30 hours.
+     */
+    private static function buildInterval(
+        int $months,
+        int $us,
+        bool $invert,
+        DateTimeUnit $largest,
+    ): DateInterval {
+        $months = abs($months);
+        $us = abs($us);
+        $rank = $largest->rank();
+
+        $interval = new DateInterval('PT0S');
+        $interval->y = $rank === 0 ? intdiv($months, 12) : 0;
+        $interval->m = $rank === 0 ? $months % 12 : $months;
+
+        if ($rank <= DateTimeUnit::Day->rank()) {
+            $interval->d = intdiv($us, 86_400_000_000);
+            $us %= 86_400_000_000;
+        }
+
+        if ($rank <= DateTimeUnit::Hour->rank()) {
+            $interval->h = intdiv($us, 3_600_000_000);
+            $us %= 3_600_000_000;
+        }
+
+        if ($rank <= DateTimeUnit::Minute->rank()) {
+            $interval->i = intdiv($us, 60_000_000);
+            $us %= 60_000_000;
+        }
+
+        $interval->s = intdiv($us, 1_000_000);
+        $interval->f = self::microsToFraction($us % 1_000_000);
+        $interval->invert = $invert && self::isNonZero($interval) ? 1 : 0;
+
+        return $interval;
+    }
+
     private static function bound(int $value, int $min, int $max, DateOverflow $overflow, string $name): int
     {
         if ($value >= $min && $value <= $max) {
@@ -176,6 +472,21 @@ final class ChronosMath
     /**
      * @param  array{y: int, m: int, d: int, h: int, i: int, s: int, us: int}  $fields
      */
+    /**
+     * PHP truncates `f * 1e6` when adding an interval, so nudge values like 0.515392 (515391.99999...)
+     * up to the nearest double that truncates back to the exact microsecond count.
+     */
+    private static function microsToFraction(int $us): float
+    {
+        $f = $us / 1_000_000;
+
+        while (abs((int) ($f * 1_000_000)) < abs($us)) {
+            $f += $f * 2.0e-16;
+        }
+
+        return $f;
+    }
+
     private static function toInterval(array $fields): DateInterval
     {
         $interval = new DateInterval('PT0S');
@@ -185,7 +496,7 @@ final class ChronosMath
         $interval->h = $fields['h'];
         $interval->i = $fields['i'];
         $interval->s = $fields['s'];
-        $interval->f = $fields['us'] / 1_000_000;
+        $interval->f = self::microsToFraction($fields['us']);
 
         return $interval;
     }

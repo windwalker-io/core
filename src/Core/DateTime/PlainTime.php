@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use InvalidArgumentException;
+use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\DifferenceInterface;
+use Windwalker\Core\DateTime\Contract\RoundableInterface;
 use Windwalker\Core\DateTime\Contract\HasTimeInterface;
 
 /**
  * A wall-clock time without date and time zone, precision up to microsecond.
  */
-final class PlainTime implements ChronosInterface, HasTimeInterface
+final class PlainTime implements ChronosInterface, DifferenceInterface, RoundableInterface, HasTimeInterface
 {
     use ChronosValueTrait;
     use TimeFieldsTrait;
@@ -109,6 +113,39 @@ final class PlainTime implements ChronosInterface, HasTimeInterface
         return $this->dt <=> $other->dt;
     }
 
+    protected function differenceTo(
+        ChronosInterface $other,
+        DateTimeUnit|string|null $largestUnit,
+        DateTimeUnit|string|null $smallestUnit,
+        int $roundingIncrement,
+        RoundingMode $roundingMode,
+    ): DateInterval {
+        return ChronosMath::difference(
+            $this->dt,
+            self::assertSame($other)->dt,
+            $largestUnit,
+            $smallestUnit,
+            $roundingIncrement,
+            $roundingMode,
+            DateTimeUnit::Hour,
+            DateTimeUnit::Microsecond,
+            DateTimeUnit::Hour,
+            DateTimeUnit::Microsecond,
+        );
+    }
+
+    public function round(
+        DateTimeUnit|string $smallestUnit,
+        int $roundingIncrement = 1,
+        RoundingMode $roundingMode = RoundingMode::HalfAwayFromZero,
+    ): static {
+        $unit = ChronosMath::assertUnit($smallestUnit, DateTimeUnit::Hour, DateTimeUnit::Microsecond);
+
+        $us = ChronosMath::roundMicros(ChronosMath::toMicros($this->dt), $unit, $roundingIncrement, $roundingMode);
+
+        return new self(ChronosMath::fromMicros($us % 86_400_000_000));
+    }
+
     public function toIso(): string
     {
         return $this->dt->format($this->getMicrosecond() === 0 ? 'H:i:s' : 'H:i:s.u');
@@ -124,6 +161,15 @@ final class PlainTime implements ChronosInterface, HasTimeInterface
         $dt = ChronosMath::addTo($this->dt, $fields, $overflow);
 
         return new self($dt->setDate(1970, 1, 1));
+    }
+
+    private static function assertSame(ChronosInterface $other): self
+    {
+        if (!$other instanceof self) {
+            throw new \TypeError(sprintf('Cannot compare %s with %s.', self::class, get_debug_type($other)));
+        }
+
+        return $other;
     }
 
     private function format(string $format): string

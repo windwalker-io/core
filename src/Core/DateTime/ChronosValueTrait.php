@@ -6,12 +6,13 @@ namespace Windwalker\Core\DateTime;
 
 use DateInterval;
 use DateTimeInterface;
+use RoundingMode;
 use Time\Duration;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 
 /**
  * Shared behavior of the value objects. The using class must implement
- * compareTo(), toIso() and applyFields().
+ * compareTo(), toIso(), applyFields() and differenceTo().
  *
  * @mixin ChronosInterface
  */
@@ -21,6 +22,17 @@ trait ChronosValueTrait
      * @param  array{y: int, m: int, d: int, h: int, i: int, s: int, us: int}  $fields
      */
     abstract protected function applyFields(array $fields, DateOverflow $overflow): static;
+
+    /**
+     * The measure from this to $other, with the unit range of the using class.
+     */
+    abstract protected function differenceTo(
+        ChronosInterface $other,
+        DateTimeUnit|string|null $largestUnit,
+        DateTimeUnit|string|null $smallestUnit,
+        int $roundingIncrement,
+        RoundingMode $roundingMode,
+    ): DateInterval;
 
     public function equals(ChronosInterface|DateTimeInterface $other): bool
     {
@@ -45,6 +57,48 @@ trait ChronosValueTrait
     public function minus(Duration|DateInterval|string $interval, DateOverflow $overflow = DateOverflow::Constrain): static
     {
         return $this->applyFields(ChronosMath::negate(ChronosMath::fields($interval)), $overflow);
+    }
+
+    public function until(
+        ChronosInterface|DateTimeInterface $other,
+        DateTimeUnit|string|null $largestUnit = null,
+        DateTimeUnit|string|null $smallestUnit = null,
+        int $roundingIncrement = 1,
+        RoundingMode $roundingMode = RoundingMode::TowardsZero,
+    ): DateInterval {
+        return $this->differenceTo($other, $largestUnit, $smallestUnit, $roundingIncrement, $roundingMode);
+    }
+
+    public function since(
+        ChronosInterface|DateTimeInterface $other,
+        DateTimeUnit|string|null $largestUnit = null,
+        DateTimeUnit|string|null $smallestUnit = null,
+        int $roundingIncrement = 1,
+        RoundingMode $roundingMode = RoundingMode::TowardsZero,
+    ): DateInterval {
+        return ChronosMath::negateInterval(
+            $this->differenceTo(
+                $other,
+                $largestUnit,
+                $smallestUnit,
+                $roundingIncrement,
+                ChronosMath::mirrorMode($roundingMode)
+            )
+        );
+    }
+
+    /**
+     * PHP style alias of until() with the default units. $absolute drops the sign.
+     */
+    public function diff(ChronosInterface|DateTimeInterface $other, bool $absolute = false): DateInterval
+    {
+        $interval = $this->until($other);
+
+        if ($absolute) {
+            $interval->invert = 0;
+        }
+
+        return $interval;
     }
 
     public function jsonSerialize(): string

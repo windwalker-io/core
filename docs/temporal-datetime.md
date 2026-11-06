@@ -30,8 +30,8 @@ $time = PlainTime::of(10, 30);
 $dateTime = PlainDateTime::of(2026, 3, 5, 10, 30);
 $combined = PlainDateTime::combine($date, $time);
 
-$instant = Instant::fromEpochSecond(1772676000);
-$instant = Instant::fromEpochMilli(1772676000123);
+$instant = Instant::fromEpochSeconds(1772676000);
+$instant = Instant::fromEpochMilliseconds(1772676000123);
 ```
 
 字串解析是嚴格的，不使用 `strtotime()`，格式不符會丟出 `InvalidArgumentException`：
@@ -91,7 +91,11 @@ $dateTime->getDaysInMonth();
 
 `PlainDate` 與 `PlainDateTime` 有 `year`、`month`、`day`、`dayOfWeek`、`daysInMonth`；
 `PlainTime` 與 `PlainDateTime` 有 `hour`、`minute`、`second`、`microsecond`；
-`Instant` 有 `epochSecond`、`microsecond`。
+`Instant` 有 `epochSeconds`、`microsecond`。
+
+`PlainDate` 與 `PlainDateTime` 另有 `dayOfTheYear`（從 1 開始，即 Temporal 的 `dayOfYear`）、`dayOfYear`（從 0 開始，與 `Chronos` 一致，已 deprecated）、`weekOfYear`、`yearOfWeek`、`daysInYear`、`inLeapYear`，
+對應的方法為 `getDayOfTheYear()`、`getDayOfYear()`、`getWeekOfYear()`、`getYearOfWeek()`、`getDaysInYear()`、`isInLeapYear()`。
+下個 major release 將以 Temporal 版本為主：`dayOfYear` 會改為從 1 開始。
 
 ### 加減與修改欄位
 
@@ -132,6 +136,44 @@ PlainDate::of(2026, 1, 31)->plus('P1M', DateOverflow::Native)->toIso(); // 2026-
 `compareTo()`、`equals()`、`isBefore()`、`isAfter()` 只能在相同種類之間比較，
 跨種類（例如 `PlainDate` 與 `PlainTime`）會丟出 `TypeError`。
 `Instant` 另外可以與任何 `DateTimeInterface` 比較時間點。
+
+### 時間差：`until`、`since`、`diff`
+
+四種物件都有 `until()` / `since()`，回傳 `DateInterval`（各欄位皆為非負，正負號放在 `invert`，與 PHP `diff()` 相同）。
+
+```php
+$a = PlainDate::of(2026, 1, 31);
+$b = PlainDate::of(2026, 3, 1);
+
+$a->until($b);                    // +29 天（預設 largestUnit 為 day）
+$a->until($b, 'month');           // +1 月 1 天
+$b->since($a);                    // $b - $a
+$a->diff($b, absolute: true);     // PHP 風格，等同 until() 預設單位
+```
+
+參數：`$largestUnit`、`$smallestUnit`（`DateTimeUnit` 或 `'day'`、`'days'` 等字串）、
+`$roundingIncrement`、`$roundingMode`（PHP 原生 `RoundingMode`，`TowardsZero` 即 Temporal 的 trunc，預設值）。
+
+| 型別 | 預設 largestUnit | 可用單位 |
+|---|---|---|
+| `PlainDate` | day | year ~ day |
+| `PlainDateTime` | day | year ~ microsecond |
+| `PlainTime` | hour | hour ~ microsecond |
+| `Instant` | second | hour ~ microsecond |
+
+不支援 week，因為 `DateInterval` 沒有對應欄位。`PlainDate` / `PlainDateTime` 的月份以月份索引計算，
+`2026-01-31` 到 `2026-03-01` 是 1 月 1 天。
+
+### 取整：`round`
+
+`PlainTime`、`PlainDateTime`、`Instant` 有 `round($smallestUnit, $roundingIncrement = 1, $roundingMode = HalfAwayFromZero)`。
+`PlainDate` 沒有比日更小的單位，所以沒有 `round()`。`PlainTime` 取整後會繞過午夜。
+
+```php
+PlainTime::parse('23:59:59.6')->round('second');          // 00:00:00
+PlainTime::parse('10:07:30')->round('minute', 15);        // 10:15:00
+PlainDateTime::parse('2026-01-31T13:00')->round('day');   // 2026-02-01T00:00:00
+```
 
 ### 轉換
 

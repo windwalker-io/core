@@ -56,7 +56,7 @@ class Chronos extends DateTimeImmutable implements
         get => $this->format('W');
     }
 
-    public string $epochSecond {
+    public string $epochSeconds {
         get => (string) $this->getTimestamp();
     }
 
@@ -666,7 +666,7 @@ class Chronos extends DateTimeImmutable implements
         return $this->toISO8601(true);
     }
 
-    public function getEpochSecond(): int
+    public function getEpochSeconds(): int
     {
         return $this->getTimestamp();
     }

@@ -194,17 +194,17 @@ class ChronoValueObjectsTest extends TestCase
     #[Test]
     public function instantFromEpochAndIso(): void
     {
-        $i = Instant::fromEpochSecond(1_767_225_600, 123456);
+        $i = Instant::fromEpochSeconds(1_767_225_600, 123456);
 
         self::assertSame('2026-01-01T00:00:00.123456Z', $i->toIso());
-        self::assertSame(1_767_225_600, $i->getEpochSecond());
-        self::assertSame('1767225600', $i->epochSecond);
+        self::assertSame(1_767_225_600, $i->getEpochSeconds());
+        self::assertSame('1767225600', $i->epochSeconds);
         self::assertSame(123456, $i->getMicrosecond());
-        self::assertSame(1_767_225_600_123, $i->toEpochMilli());
-        self::assertSame('2026-01-01T00:00:00Z', Instant::fromEpochMilli(1_767_225_600_000)->toIso());
+        self::assertSame(1_767_225_600_123, $i->toEpochMilliseconds());
+        self::assertSame('2026-01-01T00:00:00Z', Instant::fromEpochMilliseconds(1_767_225_600_000)->toIso());
         self::assertSame(
             '1969-12-31T23:59:59.500000Z',
-            Instant::fromEpochMilli(-500)->toIso()
+            Instant::fromEpochMilliseconds(-500)->toIso()
         );
     }
 
@@ -302,5 +302,31 @@ class ChronoValueObjectsTest extends TestCase
         $c = \Windwalker\Core\DateTime\Chronos::create('2026-01-01 00:00:00', 'Asia/Tokyo');
         self::assertSame($c, $c->toChronos());
         self::assertSame('UTC', $c->toChronos('UTC')->getTimezone()->getName());
+    }
+
+    #[Test]
+    public function calendarFields(): void
+    {
+        $d = PlainDate::of(2024, 12, 30);
+
+        self::assertSame([364, 1, 2025, 366, true], [
+            $d->getDayOfYear(),
+            $d->getWeekOfYear(),
+            $d->getYearOfWeek(),
+            $d->getDaysInYear(),
+            $d->isInLeapYear(),
+        ]);
+        self::assertSame(['364', '1', '2025', '366', true], [
+            $d->dayOfYear,
+            $d->weekOfYear,
+            $d->yearOfWeek,
+            $d->daysInYear,
+            $d->inLeapYear,
+        ]);
+        self::assertSame(1, PlainDate::of(2026, 1, 1)->getDayOfTheYear());
+        self::assertSame(0, PlainDate::of(2026, 1, 1)->getDayOfYear());
+        self::assertSame('59', PlainDateTime::of(2026, 3, 1, 12)->dayOfYear);
+        self::assertSame('60', PlainDateTime::of(2026, 3, 1, 12)->dayOfTheYear);
+        self::assertSame(365, PlainDate::of(2026, 6, 1)->getDaysInYear());
     }
 }

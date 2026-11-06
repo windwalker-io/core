@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Windwalker\Core\DateTime;
 
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use InvalidArgumentException;
+use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\DifferenceInterface;
+use Windwalker\Core\DateTime\Contract\RoundableInterface;
 use Windwalker\Core\DateTime\Contract\HasChronosInterface;
 use Windwalker\Core\DateTime\Contract\HasInstantInterface;
 
@@ -18,11 +22,11 @@ use Windwalker\Core\DateTime\Contract\HasInstantInterface;
  * It has no time zone and no calendar: only time-based intervals (hours, minutes, seconds)
  * can be added, years/months/days are rejected because their length depends on a time zone.
  */
-final class Instant implements ChronosInterface, HasInstantInterface, HasChronosInterface
+final class Instant implements ChronosInterface, DifferenceInterface, RoundableInterface, HasInstantInterface, HasChronosInterface
 {
     use ChronosValueTrait;
 
-    public string $epochSecond {
+    public string $epochSeconds {
         get => (string) $this->dt->getTimestamp();
     }
 
@@ -30,7 +34,7 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
         get => $this->dt->format('u');
     }
 
-    public function getEpochSecond(): int
+    public function getEpochSeconds(): int
     {
         return $this->dt->getTimestamp();
     }
@@ -54,7 +58,7 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
         return self::from(Clock::now());
     }
 
-    public static function fromEpochSecond(int $seconds, int $microsecond = 0): self
+    public static function fromEpochSeconds(int $seconds, int $microsecond = 0): self
     {
         $seconds += (int) floor($microsecond / 1_000_000);
         $microsecond = $microsecond % 1_000_000;
@@ -63,14 +67,12 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
             $microsecond += 1_000_000;
         }
 
-        $dt = DateTimeImmutable::createFromFormat('U u', $seconds . ' ' . $microsecond);
-
-        return new self($dt->setTimezone(new DateTimeZone('UTC')));
+        return new self(ChronosMath::fromMicros($seconds * 1_000_000 + $microsecond));
     }
 
-    public static function fromEpochMilli(int $milliseconds): self
+    public static function fromEpochMilliseconds(int $milliseconds): self
     {
-        return self::fromEpochSecond(
+        return self::fromEpochSeconds(
             (int) floor($milliseconds / 1000),
             ($milliseconds % 1000 + 1000) % 1000 * 1000
         );
@@ -98,9 +100,9 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
         return $this;
     }
 
-    public function toEpochMilli(): int
+    public function toEpochMilliseconds(): int
     {
-        return $this->getEpochSecond() * 1000 + intdiv($this->getMicrosecond(), 1000);
+        return $this->getEpochSeconds() * 1000 + intdiv($this->getMicrosecond(), 1000);
     }
 
     public function toDateTime(DateTimeZone|string $tz = 'UTC'): DateTimeImmutable
@@ -118,15 +120,51 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
      */
     public function compareTo(ChronosInterface|DateTimeInterface $other): int
     {
-        $other = match (true) {
+        return $this->dt <=> $this->coerce($other)->dt;
+    }
+
+    private function coerce(ChronosInterface|DateTimeInterface $other): self
+    {
+        return match (true) {
             $other instanceof DateTimeInterface => self::from($other),
             $other instanceof HasInstantInterface => $other->toInstant(),
             default => throw new \TypeError(
                 sprintf('Cannot compare %s with %s.', self::class, get_debug_type($other))
             ),
         };
+    }
 
-        return $this->dt <=> $other->dt;
+    protected function differenceTo(
+        ChronosInterface|DateTimeInterface $other,
+        DateTimeUnit|string|null $largestUnit,
+        DateTimeUnit|string|null $smallestUnit,
+        int $roundingIncrement,
+        RoundingMode $roundingMode,
+    ): DateInterval {
+        return ChronosMath::difference(
+            $this->dt,
+            $this->coerce($other)->dt,
+            $largestUnit,
+            $smallestUnit,
+            $roundingIncrement,
+            $roundingMode,
+            DateTimeUnit::Second,
+            DateTimeUnit::Microsecond,
+            DateTimeUnit::Hour,
+            DateTimeUnit::Microsecond,
+        );
+    }
+
+    public function round(
+        DateTimeUnit|string $smallestUnit,
+        int $roundingIncrement = 1,
+        RoundingMode $roundingMode = RoundingMode::HalfAwayFromZero,
+    ): static {
+        $unit = ChronosMath::assertUnit($smallestUnit, DateTimeUnit::Hour, DateTimeUnit::Microsecond);
+
+        $us = ChronosMath::roundMicros(ChronosMath::toMicros($this->dt), $unit, $roundingIncrement, $roundingMode);
+
+        return new self(ChronosMath::fromMicros($us));
     }
 
     public function toIso(): string
