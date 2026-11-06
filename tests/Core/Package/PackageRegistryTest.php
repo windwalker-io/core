@@ -11,7 +11,7 @@ use Windwalker\Core\Package\PackageInstaller;
 use Windwalker\Core\Package\PackageMigrator;
 use Windwalker\Core\Package\PackageRegistry;
 use Windwalker\Tests\Core\Package\Stub\NamedPackage;
-use Windwalker\Tests\Core\Package\Stub\WithComposerJson\Src\WithComposerJsonPackage;
+use Windwalker\Tests\Core\Package\Stub\WithComposerJson\src\WithComposerJsonPackage;
 
 class PackageRegistryTest extends TestCase
 {

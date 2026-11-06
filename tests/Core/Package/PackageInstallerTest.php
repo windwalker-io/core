@@ -12,7 +12,7 @@ use ReflectionClass;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Package\PackageInstaller;
 use Windwalker\Filesystem\Filesystem;
-use Windwalker\Tests\Core\Package\Stub\MvcFixture\Src\MvcFixturePackage;
+use Windwalker\Tests\Core\Package\Stub\MvcFixture\src\MvcFixturePackage;
 use Windwalker\Tests\Core\Package\Stub\NamedPackage;
 
 class PackageInstallerTest extends TestCase

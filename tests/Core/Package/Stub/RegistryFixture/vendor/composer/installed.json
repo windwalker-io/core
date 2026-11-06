@@ -5,7 +5,7 @@
             "extra": {
                 "windwalker": {
                     "packages": [
-                        "Windwalker\\Tests\\Core\\Package\\Stub\\WithComposerJson\\Src\\WithComposerJsonPackage"
+                        "Windwalker\\Tests\\Core\\Package\\Stub\\WithComposerJson\\src\\WithComposerJsonPackage"
                     ]
                 }
             }

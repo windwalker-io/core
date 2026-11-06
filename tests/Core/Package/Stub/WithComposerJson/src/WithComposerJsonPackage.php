@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Windwalker\Tests\Core\Package\Stub\WithComposerJson\Src;
+namespace Windwalker\Tests\Core\Package\Stub\WithComposerJson\src;
 
 use Windwalker\Core\Package\AbstractPackage;
 use Windwalker\Core\Package\PackageInstaller;

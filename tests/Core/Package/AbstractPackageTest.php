@@ -10,7 +10,7 @@ use ReflectionMethod;
 use Windwalker\DI\Container;
 use Windwalker\Tests\Core\Package\Stub\FallbackNamePackage;
 use Windwalker\Tests\Core\Package\Stub\NamedPackage;
-use Windwalker\Tests\Core\Package\Stub\WithComposerJson\Src\WithComposerJsonPackage;
+use Windwalker\Tests\Core\Package\Stub\WithComposerJson\src\WithComposerJsonPackage;
 use Windwalker\Utilities\Str;
 use Windwalker\Utilities\StrNormalize;
 
