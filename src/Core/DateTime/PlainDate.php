@@ -51,17 +51,17 @@ final class PlainDate implements ChronosInterface, DifferenceInterface, HasDateI
     }
 
     /**
-     * @param  string  $date  Strict `Y-m-d`.
+     * @param  string  $date  `Y-m-d`. A date time string is accepted too, its time and offset are ignored.
      */
     public static function parse(string $date): self
     {
-        $dt = DateTimeImmutable::createFromFormat('!Y-m-d', $date, new DateTimeZone('UTC'));
+        $parsed = ChronosMath::parseIso($date);
 
-        if ($dt === false || DateTimeImmutable::getLastErrors() !== false) {
+        if ($parsed === null) {
             throw new InvalidArgumentException(sprintf('Invalid date "%s", expect Y-m-d.', $date));
         }
 
-        return new self($dt);
+        return self::of($parsed['year'], $parsed['month'], $parsed['day']);
     }
 
     public static function today(DateTimeZone|string|null $tz = null): self
@@ -85,6 +85,16 @@ final class PlainDate implements ChronosInterface, DifferenceInterface, HasDateI
     public function toPlainDate(): self
     {
         return $this;
+    }
+
+    public function toPlainYearMonth(): PlainYearMonth
+    {
+        return PlainYearMonth::of($this->getYear(), $this->getMonth());
+    }
+
+    public function toPlainMonthDay(): PlainMonthDay
+    {
+        return PlainMonthDay::of($this->getMonth(), $this->getDay());
     }
 
     public function toPlainDateTime(?PlainTime $time = null): PlainDateTime

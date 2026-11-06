@@ -329,4 +329,59 @@ class ChronoValueObjectsTest extends TestCase
         self::assertSame('60', PlainDateTime::of(2026, 3, 1, 12)->dayOfTheYear);
         self::assertSame(365, PlainDate::of(2026, 6, 1)->getDaysInYear());
     }
+
+    #[Test]
+    public function lenientParseAndDefaults(): void
+    {
+        self::assertSame('10:00:00', PlainTime::of(10)->toIso());
+        self::assertSame('00:00:00', PlainTime::of()->toIso());
+        self::assertSame('2024-02-03', PlainDate::parse('2024-02-03T10:00:00+08:00')->toIso());
+        self::assertSame('2024-02-03T10:00:00.123456', PlainDateTime::parse('2024-02-03t10:00:00,123456789+08:00')->toIso());
+        self::assertSame('2024-02-03T00:00:00', PlainDateTime::parse('2024-02-03')->toIso());
+        self::assertSame('10:30:15.123456', PlainTime::parse('10:30:15.123456789')->toIso());
+        self::assertSame('10:30:00', PlainTime::parse('2024-02-03T10:30')->toIso());
+        self::assertSame('2024-02-03T10:00:00.123456Z', Instant::parse('2024-02-03t10:00:00.123456789z')->toIso());
+
+        foreach (['2024-02-30', '2024-02-03T25:00', '2024-02-03T10:00Z', 'foo'] as $bad) {
+            try {
+                PlainDateTime::parse($bad);
+                self::fail($bad);
+            } catch (\InvalidArgumentException) {
+                self::assertTrue(true);
+            }
+        }
+    }
+
+    #[Test]
+    public function extraApis(): void
+    {
+        $dates = [PlainDate::of(2024, 3, 1), PlainDate::of(2024, 1, 1), PlainDate::of(2024, 2, 1)];
+        usort($dates, PlainDate::compare(...));
+        self::assertSame('2024-01-01', $dates[0]->toIso());
+        self::assertSame(-1, Instant::compare(Instant::fromEpochSeconds(1), Instant::fromEpochSeconds(2)));
+
+        $dt = PlainDateTime::of(2024, 1, 2, 3, 4, 5);
+        self::assertSame('2024-01-02T09:00:00', $dt->withPlainTime(PlainTime::of(9))->toIso());
+        self::assertSame('2025-05-06T03:04:05', $dt->withPlainDate(PlainDate::of(2025, 5, 6))->toIso());
+        self::assertSame('2024-01-02T00:00:00', $dt->startOfDay()->toIso());
+
+        $i = Instant::fromEpochMicroseconds(-1);
+        self::assertSame(-1, $i->toEpochMicroseconds());
+        self::assertSame('1969-12-31T23:59:59.999999Z', $i->toIso());
+
+        self::assertSame([12, 7, '12', '7'], [
+            $dt->getMonthsInYear(),
+            $dt->getDaysInWeek(),
+            $dt->monthsInYear,
+            $dt->daysInWeek,
+        ]);
+
+        self::assertSame(60, PlainDate::of(2024, 1, 1)->diff(PlainDate::of(2024, 3, 1))->days);
+        self::assertSame(1, PlainDateTime::of(2024, 1, 1, 12)->diff(PlainDateTime::of(2024, 1, 2, 13))->days);
+        self::assertSame(2, Instant::fromEpochSeconds(0)->diff(Instant::fromEpochSeconds(2 * 86400 + 5))->days);
+        self::assertSame(0, PlainTime::of(1)->diff(PlainTime::of(5))->days);
+        $back = PlainDate::of(2024, 3, 1)->diff(PlainDate::of(2024, 1, 1));
+        self::assertSame([60, 1], [$back->days, $back->invert]);
+        self::assertSame(0, PlainDate::of(2024, 3, 1)->diff(PlainDate::of(2024, 1, 1), true)->invert);
+    }
 }

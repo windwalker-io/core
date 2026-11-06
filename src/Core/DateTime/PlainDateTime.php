@@ -86,19 +86,28 @@ final class PlainDateTime implements ChronosInterface, DifferenceInterface, Roun
     }
 
     /**
-     * @param  string  $dateTime  Strict `Y-m-d\TH:i:s` or `Y-m-d\TH:i:s.u`, without time zone.
+     * @param  string  $dateTime  `Y-m-d\TH:i[:s[.f]]`, the `T` may be lowercase or a space, the time part
+     *                            may be omitted (midnight) and a UTC offset is accepted but ignored.
      */
     public static function parse(string $dateTime): self
     {
-        foreach (['!Y-m-d\TH:i:s.u', '!Y-m-d\TH:i:s', '!Y-m-d\TH:i'] as $format) {
-            $dt = DateTimeImmutable::createFromFormat($format, $dateTime, new DateTimeZone('UTC'));
+        $p = ChronosMath::parseIso($dateTime);
 
-            if ($dt !== false && DateTimeImmutable::getLastErrors() === false) {
-                return new self($dt);
-            }
+        if ($p === null) {
+            throw new InvalidArgumentException(
+                sprintf('Invalid date time "%s", expect Y-m-d\TH:i[:s[.f]].', $dateTime)
+            );
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid date time "%s", expect Y-m-d\TH:i[:s[.u]].', $dateTime));
+        return self::of(
+            $p['year'],
+            $p['month'],
+            $p['day'],
+            $p['hour'],
+            $p['minute'],
+            $p['second'],
+            $p['microsecond']
+        );
     }
 
     public static function now(DateTimeZone|string|null $tz = null): self
@@ -128,9 +137,37 @@ final class PlainDateTime implements ChronosInterface, DifferenceInterface, Roun
         );
     }
 
+    /**
+     * Replace the time part, midnight when $time is null.
+     */
+    public function withPlainTime(?PlainTime $time = null): self
+    {
+        return self::combine($this->toPlainDate(), $time ?? PlainTime::of());
+    }
+
+    public function withPlainDate(PlainDate $date): self
+    {
+        return self::combine($date, $this->toPlainTime());
+    }
+
+    public function startOfDay(): self
+    {
+        return $this->withPlainTime();
+    }
+
     public function toPlainDate(): PlainDate
     {
         return PlainDate::of($this->getYear(), $this->getMonth(), $this->getDay());
+    }
+
+    public function toPlainYearMonth(): PlainYearMonth
+    {
+        return PlainYearMonth::of($this->getYear(), $this->getMonth());
+    }
+
+    public function toPlainMonthDay(): PlainMonthDay
+    {
+        return PlainMonthDay::of($this->getMonth(), $this->getDay());
     }
 
     public function toPlainTime(): PlainTime

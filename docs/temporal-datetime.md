@@ -3,7 +3,7 @@
 ## Temporal 風格的日期時間物件
 
 `Chronos` 繼承自 `DateTimeImmutable`，同時代表「時間點」與「顯示時區」。當你只需要其中一種概念時，
-可以使用下列四個值物件，它們各自只表達一件事，並且沒有隱性的時區轉換：
+可以使用下列值物件，它們各自只表達一件事，並且沒有隱性的時區轉換：
 
 | 類別 | 代表 | 有時區 | 範例 |
 |---|---|---|---|
@@ -11,6 +11,8 @@
 | `PlainDate` | 日曆上的日期 | 否 | `2026-03-05` |
 | `PlainTime` | 牆上時間（時鐘讀數） | 否 | `10:30:00` |
 | `PlainDateTime` | 日期加牆上時間 | 否 | `2026-03-05T10:30:00` |
+| `PlainYearMonth` | 年月（無日） | 否 | `2026-03` |
+| `PlainMonthDay` | 月日（無年） | 否 | `03-05` |
 
 這些類別位於 `Windwalker\Core\DateTime`，皆為 `final`、不可變，精度為微秒（不支援奈秒）。
 PHP 不允許自訂類別實作 `DateTimeInterface`，因此它們不能傳給要求 `DateTimeInterface` 的 API，
@@ -34,12 +36,12 @@ $instant = Instant::fromEpochSeconds(1772676000);
 $instant = Instant::fromEpochMilliseconds(1772676000123);
 ```
 
-字串解析是嚴格的，不使用 `strtotime()`，格式不符會丟出 `InvalidArgumentException`：
+字串解析不使用 `strtotime()`，格式不符會丟出 `InvalidArgumentException`。解析方式與 Temporal 相同：`Plain*` 可接受帶時間或偏移的 ISO 字串（多餘部分忽略，`Z` 除外），小數最多 9 位（截斷到微秒），`T` 可小寫或以空白代替：
 
 ```php
-PlainDate::parse('2026-03-05');                   // Y-m-d
-PlainTime::parse('10:30:15.123456');              // H:i、H:i:s 或 H:i:s.u
-PlainDateTime::parse('2026-03-05T10:30:00');
+PlainDate::parse('2026-03-05');                   // 也接受 2026-03-05T10:30+08:00，只取日期
+PlainTime::parse('10:30:15.123456');              // H:i、H:i:s 或 H:i:s.f，也可取自完整日期時間字串
+PlainDateTime::parse('2026-03-05T10:30:00');      // 省略時間則為 00:00
 Instant::parse('2026-03-05T10:30:00+08:00');      // 必須帶時區
 ```
 
@@ -95,6 +97,7 @@ $dateTime->getDaysInMonth();
 
 `PlainDate` 與 `PlainDateTime` 另有 `dayOfTheYear`（從 1 開始，即 Temporal 的 `dayOfYear`）、`dayOfYear`（從 0 開始，與 `Chronos` 一致，已 deprecated）、`weekOfYear`、`yearOfWeek`、`daysInYear`、`inLeapYear`，
 對應的方法為 `getDayOfTheYear()`、`getDayOfYear()`、`getWeekOfYear()`、`getYearOfWeek()`、`getDaysInYear()`、`isInLeapYear()`。
+另有固定值 `monthsInYear`（12）與 `daysInWeek`（7），方法為 `getMonthsInYear()`、`getDaysInWeek()`。
 下個 major release 將以 Temporal 版本為主：`dayOfYear` 會改為從 1 開始。
 
 ### 加減與修改欄位
@@ -148,7 +151,9 @@ $b = PlainDate::of(2026, 3, 1);
 $a->until($b);                    // +29 天（預設 largestUnit 為 day）
 $a->until($b, 'month');           // +1 月 1 天
 $b->since($a);                    // $b - $a
-$a->diff($b, absolute: true);     // PHP 風格，等同 until() 預設單位
+$a->diff($b, absolute: true);     // PHP 風格，等同 until() 預設單位，且填入 days（總天數）
+
+PlainDate::compare($a, $b);       // 靜態比較，可用於 usort($dates, PlainDate::compare(...))
 ```
 
 參數：`$largestUnit`、`$smallestUnit`（`DateTimeUnit` 或 `'day'`、`'days'` 等字串）、
@@ -174,6 +179,36 @@ PlainTime::parse('23:59:59.6')->round('second');          // 00:00:00
 PlainTime::parse('10:07:30')->round('minute', 15);        // 10:15:00
 PlainDateTime::parse('2026-01-31T13:00')->round('day');   // 2026-02-01T00:00:00
 ```
+
+### 其他輔助
+
+```php
+PlainTime::of();                                   // 00:00:00，所有參數預設為 0
+$dt->withPlainTime(PlainTime::of(9));              // 只換時間，傳 null 為午夜
+$dt->withPlainDate(PlainDate::of(2026, 1, 1));     // 只換日期
+$dt->startOfDay();                                 // 同 withPlainTime()
+Instant::fromEpochMicroseconds(1_700_000_000_000_000);
+$instant->toEpochMicroseconds();
+```
+
+### `PlainYearMonth` 與 `PlainMonthDay`
+
+```php
+$ym = PlainYearMonth::of(2024, 2);        // 或 parse('2024-02')、from($date)、$date->toPlainYearMonth()
+$ym->daysInMonth;                         // '29'，另有 daysInYear、monthsInYear、inLeapYear
+$ym->plus('P1Y2M');                       // 只支援年與月，含日會丟 InvalidArgumentException
+$ym->until(PlainYearMonth::of(2025, 4));  // P1Y2M，largestUnit 可用 years / months
+$ym->toPlainDate(31);                     // 2024-02-29，預設 Constrain；endOfMonth() 取月底
+PlainYearMonth::compare($a, $b);          // 可用於 usort，也可用 ChronosService::compare()
+
+$md = PlainMonthDay::of(2, 29);           // 或 parse('02-29')、parse('--02-29')、$date->toPlainMonthDay()
+$md->toPlainDate(2025);                   // 2025-02-28（Constrain），Reject 則丟 RangeException
+$md->equals(PlainMonthDay::of(2, 29));
+```
+
+`PlainYearMonth` 實作 `ChronosInterface` 與 `DifferenceInterface`，不支援 `round()`。
+`PlainMonthDay` 與 Temporal 一致，沒有排序與加減（順序取決於年份），因此不實作 `ChronosInterface`，只有 `equals()`；
+字串輸出為 `MM-DD`，`parse()` 也接受 `--MM-DD`。兩者的 `toIso()` / `__toString()` / JSON 皆為上述字串。
 
 ### 轉換
 

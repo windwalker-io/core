@@ -146,6 +146,85 @@ final class ChronosMath
     }
 
     /**
+     * Lenient ISO 8601 reader shared by the Plain types, like Temporal: the date part is required,
+     * `T`/`t`/space separators, up to 9 fraction digits (truncated to microseconds) and a UTC offset
+     * are accepted, and the offset is ignored. A `Z` designator is rejected because it means an instant.
+     *
+     * @return  array{year: int, month: int, day: int, hour: int, minute: int, second: int, microsecond: int, hasTime: bool}|null
+     */
+    public static function parseIso(string $value): ?array
+    {
+        $pattern = '/^(?<y>-?\d{4,6})-(?<mo>\d{2})-(?<d>\d{2})'
+            . '(?:[Tt ](?<h>\d{2}):(?<i>\d{2})(?::(?<s>\d{2})(?:[.,](?<f>\d{1,9}))?)?'
+            . '(?:[+-]\d{2}(?::?\d{2})?)?)?$/';
+
+        if (!preg_match($pattern, $value, $m)) {
+            return null;
+        }
+
+        $hasTime = ($m['h'] ?? '') !== '';
+
+        try {
+            self::resolveDate((int) $m['y'], (int) $m['mo'], (int) $m['d'], DateOverflow::Reject);
+
+            if ($hasTime) {
+                self::resolveTime(
+                    (int) $m['h'],
+                    (int) $m['i'],
+                    (int) ($m['s'] ?? 0),
+                    self::fractionToMicros($m['f'] ?? ''),
+                    DateOverflow::Reject
+                );
+            }
+        } catch (\RangeException) {
+            return null;
+        }
+
+        return [
+            'year' => (int) $m['y'],
+            'month' => (int) $m['mo'],
+            'day' => (int) $m['d'],
+            'hour' => (int) ($m['h'] ?? 0),
+            'minute' => (int) ($m['i'] ?? 0),
+            'second' => (int) ($m['s'] ?? 0),
+            'microsecond' => self::fractionToMicros($m['f'] ?? ''),
+            'hasTime' => $hasTime,
+        ];
+    }
+
+    /**
+     * Time-of-day reader: `H:i`, `H:i:s`, `H:i:s.f` (up to 9 digits), optional leading `T`,
+     * or any string accepted by parseIso() that has a time part.
+     *
+     * @return  array{int, int, int, int}|null  hour, minute, second, microsecond
+     */
+    public static function parseIsoTime(string $value): ?array
+    {
+        if (preg_match('/^[Tt]?(\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d{1,9}))?)?$/', $value, $m)) {
+            $parts = [(int) $m[1], (int) $m[2], (int) ($m[3] ?? 0), self::fractionToMicros($m[4] ?? '')];
+
+            try {
+                self::resolveTime(...[...$parts, DateOverflow::Reject]);
+            } catch (\RangeException) {
+                return null;
+            }
+
+            return $parts;
+        }
+
+        $parsed = self::parseIso($value);
+
+        return $parsed !== null && $parsed['hasTime']
+            ? [$parsed['hour'], $parsed['minute'], $parsed['second'], $parsed['microsecond']]
+            : null;
+    }
+
+    private static function fractionToMicros(string $fraction): int
+    {
+        return (int) substr(str_pad($fraction, 6, '0'), 0, 6);
+    }
+
+    /**
      * @return  array{int, int, int, int}
      */
     public static function resolveTime(int $hour, int $minute, int $second, int $us, DateOverflow $overflow): array

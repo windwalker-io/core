@@ -32,8 +32,8 @@ final class PlainTime implements ChronosInterface, DifferenceInterface, Roundabl
      * @throws  \RangeException  When $overflow is Reject and a field is out of range.
      */
     public static function of(
-        int $hour,
-        int $minute,
+        int $hour = 0,
+        int $minute = 0,
         int $second = 0,
         int $microsecond = 0,
         DateOverflow $overflow = DateOverflow::Reject
@@ -63,19 +63,18 @@ final class PlainTime implements ChronosInterface, DifferenceInterface, Roundabl
     }
 
     /**
-     * @param  string  $time  Strict `H:i`, `H:i:s` or `H:i:s.u`.
+     * @param  string  $time  `H:i`, `H:i:s` or `H:i:s.f` (up to 9 fraction digits, truncated to microseconds).
+     *                        A date time string is accepted too, its date and offset are ignored.
      */
     public static function parse(string $time): self
     {
-        foreach (['!H:i:s.u', '!H:i:s', '!H:i'] as $format) {
-            $dt = DateTimeImmutable::createFromFormat($format, $time, new DateTimeZone('UTC'));
+        $parts = ChronosMath::parseIsoTime($time);
 
-            if ($dt !== false && DateTimeImmutable::getLastErrors() === false) {
-                return new self($dt);
-            }
+        if ($parts === null) {
+            throw new InvalidArgumentException(sprintf('Invalid time "%s", expect H:i[:s[.f]].', $time));
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid time "%s", expect H:i[:s[.u]].', $time));
+        return self::of(...$parts);
     }
 
     public static function now(DateTimeZone|string|null $tz = null): self

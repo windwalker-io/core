@@ -88,17 +88,44 @@ trait ChronosValueTrait
     }
 
     /**
-     * PHP style alias of until() with the default units. $absolute drops the sign.
+     * @return  int  Negative if $a is before $b, 0 if equal, positive if after. Usable as `usort` callback.
+     */
+    public static function compare(ChronosInterface $a, ChronosInterface|DateTimeInterface $b): int
+    {
+        return $a->compareTo($b);
+    }
+
+    /**
+     * PHP style alias of until() with the default units, and `days` is filled with the total
+     * number of whole days like DateTime::diff(). $absolute drops the sign.
      */
     public function diff(ChronosInterface|DateTimeInterface $other, bool $absolute = false): DateInterval
     {
         $interval = $this->until($other);
 
-        if ($absolute) {
-            $interval->invert = 0;
-        }
+        return DateInterval::__set_state([
+            'y' => $interval->y,
+            'm' => $interval->m,
+            'd' => $interval->d,
+            'h' => $interval->h,
+            'i' => $interval->i,
+            's' => $interval->s,
+            'f' => $interval->f,
+            'invert' => $absolute ? 0 : $interval->invert,
+            'days' => $this->wholeDaysTo($other),
+        ]);
+    }
 
-        return $interval;
+    private function wholeDaysTo(ChronosInterface|DateTimeInterface $other): int
+    {
+        try {
+            $span = $this->until($other, DateTimeUnit::Day);
+
+            return $span->d;
+        } catch (\InvalidArgumentException) {
+            // Types without a day unit (PlainTime, Instant) measure in hours.
+            return intdiv($this->until($other, DateTimeUnit::Hour)->h, 24);
+        }
     }
 
     public function jsonSerialize(): string

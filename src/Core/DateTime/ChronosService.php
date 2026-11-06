@@ -11,6 +11,7 @@ use DomainException;
 use Exception;
 use InvalidArgumentException;
 use Psr\Clock\ClockInterface;
+use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
@@ -196,45 +197,73 @@ class ChronosService
      * );
      * ```
      *
-     * @param  string|DateTimeInterface  $date1
-     * @param  string|DateTimeInterface  $date2
-     * @param  string|null               $operator
+     * Strings and DateTimeInterface are compared as exact times. The value objects (Instant, PlainDate,
+     * PlainTime, PlainDateTime) use their own compareTo(): Plain types only against the same type, while
+     * Instant and Chronos may be mixed with DateTimeInterface. A string next to a value object is parsed
+     * by that value object's parse().
+     *
+     * @param  string|DateTimeInterface|ChronosInterface  $date1
+     * @param  string|DateTimeInterface|ChronosInterface  $date2
+     * @param  string|null                                $operator
      *
      * @return  bool|int
      * @throws  Exception
+     * @throws  \TypeError  When the value objects are not comparable, e.g. PlainDate with PlainTime.
      */
     public static function compare(
-        string|DateTimeInterface $date1,
-        string|DateTimeInterface $date2,
+        string|DateTimeInterface|ChronosInterface $date1,
+        string|DateTimeInterface|ChronosInterface $date2,
         ?string $operator = null
     ): bool|int {
-        $date1 = $date1 instanceof DateTimeInterface ? $date1 : new DateTime($date1);
-        $date2 = $date2 instanceof DateTimeInterface ? $date2 : new DateTime($date2);
+        $result = self::compareValues(
+            self::normalizeComparable($date1, $date2),
+            self::normalizeComparable($date2, $date1)
+        );
 
         if ($operator === null) {
-            return $date1 <=> $date2;
+            return $result;
         }
 
-        switch ($operator) {
-            case '=':
-                return $date1 == $date2;
-            case '!=':
-                return $date1 != $date2;
-            case '>':
-            case 'gt':
-                return $date1 > $date2;
-            case '>=':
-            case 'gte':
-                return $date1 >= $date2;
-            case '<':
-            case 'lt':
-                return $date1 < $date2;
-            case '<=':
-            case 'lte':
-                return $date1 <= $date2;
+        return match ($operator) {
+            '=' => $result === 0,
+            '!=' => $result !== 0,
+            '>', 'gt' => $result > 0,
+            '>=', 'gte' => $result >= 0,
+            '<', 'lt' => $result < 0,
+            '<=', 'lte' => $result <= 0,
+            default => throw new InvalidArgumentException('Invalid operator: ' . $operator),
+        };
+    }
+
+    private static function normalizeComparable(
+        string|DateTimeInterface|ChronosInterface $value,
+        string|DateTimeInterface|ChronosInterface $other
+    ): DateTimeInterface|ChronosInterface {
+        if (!is_string($value)) {
+            return $value;
         }
 
-        throw new InvalidArgumentException('Invalid operator: ' . $operator);
+        if ($other instanceof ChronosInterface && !$other instanceof DateTimeInterface) {
+            return $other::parse($value);
+        }
+
+        return new DateTime($value);
+    }
+
+    private static function compareValues(
+        DateTimeInterface|ChronosInterface $a,
+        DateTimeInterface|ChronosInterface $b
+    ): int {
+        // Chronos is both, plain DateTime is only a DateTimeInterface.
+        if ($a instanceof ChronosInterface) {
+            return $a->compareTo($b);
+        }
+
+        if ($b instanceof ChronosInterface) {
+            return -$b->compareTo($a);
+        }
+
+        return $a <=> $b;
     }
 
     public function createLocal(

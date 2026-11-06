@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\DateTime;
 
+use Windwalker\Core\DateTime\Instant;
+use Windwalker\Core\DateTime\PlainDate;
+use Windwalker\Core\DateTime\PlainTime;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
@@ -418,5 +421,19 @@ class ChronosServiceTest extends TestCase
         ChronosService::setClock('2021-09-10 11:12:13');
 
         self::assertSame('2021-09-10 11:12:13', Clock::now()->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
+    public function compareSupportsValueObjects(): void
+    {
+        self::assertSame(-1, ChronosService::compare(PlainDate::of(2020, 1, 1), PlainDate::of(2020, 1, 2)));
+        self::assertTrue(ChronosService::compare(PlainDate::of(2020, 1, 2), '2020-01-01', '>'));
+        self::assertTrue(ChronosService::compare('10:00', PlainTime::of(10), '='));
+        self::assertSame(1, ChronosService::compare(Instant::fromEpochSeconds(10), new \DateTimeImmutable('@5')));
+        self::assertSame(-1, ChronosService::compare(new \DateTimeImmutable('@5'), Instant::fromEpochSeconds(10)));
+        self::assertTrue(ChronosService::compare(Instant::fromEpochSeconds(0), '1970-01-01T00:00:00Z', '='));
+
+        $this->expectException(\TypeError::class);
+        ChronosService::compare(PlainDate::of(2020, 1, 1), PlainTime::of(1));
     }
 }

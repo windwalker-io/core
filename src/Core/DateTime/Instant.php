@@ -70,6 +70,11 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
         return new self(ChronosMath::fromMicros($seconds * 1_000_000 + $microsecond));
     }
 
+    public static function fromEpochMicroseconds(int $microseconds): self
+    {
+        return new self(ChronosMath::fromMicros($microseconds));
+    }
+
     public static function fromEpochMilliseconds(int $milliseconds): self
     {
         return self::fromEpochSeconds(
@@ -84,8 +89,14 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
      */
     public static function parse(string $instant): self
     {
+        $normalized = preg_replace_callback(
+            '/[.,](\d+)(?=[zZ+-])/',
+            static fn(array $m) => '.' . substr(str_pad($m[1], 6, '0'), 0, 6),
+            strtoupper(trim($instant))
+        ) ?? $instant;
+
         foreach (['Y-m-d\TH:i:s.uP', 'Y-m-d\TH:i:sP'] as $format) {
-            $dt = DateTimeImmutable::createFromFormat($format, $instant);
+            $dt = DateTimeImmutable::createFromFormat($format, $normalized);
 
             if ($dt !== false && DateTimeImmutable::getLastErrors() === false) {
                 return self::from($dt);
@@ -103,6 +114,11 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
     public function toEpochMilliseconds(): int
     {
         return $this->getEpochSeconds() * 1000 + intdiv($this->getMicrosecond(), 1000);
+    }
+
+    public function toEpochMicroseconds(): int
+    {
+        return ChronosMath::toMicros($this->dt);
     }
 
     public function toDateTime(DateTimeZone|string $tz = 'UTC'): DateTimeImmutable

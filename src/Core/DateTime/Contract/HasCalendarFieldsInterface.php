@@ -40,6 +40,16 @@ interface HasCalendarFieldsInterface
      */
     public string $daysInYear { get; }
 
+    /**
+     * Always 12 (ISO calendar).
+     */
+    public string $monthsInYear { get; }
+
+    /**
+     * Always 7 (ISO calendar).
+     */
+    public string $daysInWeek { get; }
+
     public bool $inLeapYear { get; }
 
     /**
@@ -54,6 +64,10 @@ interface HasCalendarFieldsInterface
     public function getYearOfWeek(): int;
 
     public function getDaysInYear(): int;
+
+    public function getMonthsInYear(): int;
+
+    public function getDaysInWeek(): int;
 
     public function isInLeapYear(): bool;
 }

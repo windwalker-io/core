@@ -34,6 +34,14 @@ trait CalendarFieldsTrait
         get => (string) $this->getDaysInYear();
     }
 
+    public string $monthsInYear {
+        get => '12';
+    }
+
+    public string $daysInWeek {
+        get => '7';
+    }
+
     public bool $inLeapYear {
         get => $this->isInLeapYear();
     }
@@ -65,6 +73,16 @@ trait CalendarFieldsTrait
     public function getDaysInYear(): int
     {
         return $this->isInLeapYear() ? 366 : 365;
+    }
+
+    public function getMonthsInYear(): int
+    {
+        return 12;
+    }
+
+    public function getDaysInWeek(): int
+    {
+        return 7;
     }
 
     public function isInLeapYear(): bool
