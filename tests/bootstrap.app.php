@@ -14,17 +14,23 @@
 
 declare(strict_types=1);
 
+use Composer\Autoload\ClassLoader;
 use Windwalker\DI\Container;
 use Windwalker\Tests\TestApp;
 
 $init = include __DIR__ . '/../src/Core/Testing/test.init.php';
 
 /** @var Container $container */
-$container = $init(
+/** @var ClassLoader $classLoader */
+[$container, $classLoader] = $init(
     root: $root = env('WINDWALKER_TEST_APP_ROOT') ?: dirname(__DIR__),
     workDir: $root
 );
 
+// Load local tests
+$classLoader->addPsr4('Windwalker\Tests\\', __DIR__ . '/');
+
+// Init global lazy
 $container->options->lazy = true;
 
 TestApp::createInstance(
