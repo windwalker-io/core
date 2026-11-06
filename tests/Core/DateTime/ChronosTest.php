@@ -8,7 +8,6 @@ use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;

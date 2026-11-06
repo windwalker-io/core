@@ -137,7 +137,7 @@ final class ChronosMath
 
         $month = self::bound($month, 1, 12, $overflow, 'month');
 
-        $max = (int) (new DateTimeImmutable('2000-01-01'))->setDate($year, $month, 1)->format('t');
+        $max = (int) new DateTimeImmutable('2000-01-01')->setDate($year, $month, 1)->format('t');
         $day = self::bound($day, 1, $max, $overflow, 'day');
 
         return [$year, $month, $day];

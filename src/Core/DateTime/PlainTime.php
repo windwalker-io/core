@@ -22,12 +22,10 @@ final class PlainTime implements ChronosInterface, HasTimeInterface
     /**
      * Always on 1970-01-01 in UTC, so that no DST rule can ever affect the calculation.
      */
-    private function __construct(private readonly DateTimeImmutable $dt)
-    {
-    }
+    private function __construct(private readonly DateTimeImmutable $dt) {}
 
     /**
-     * @throws \RangeException When $overflow is Reject and a field is out of range.
+     * @throws  \RangeException  When $overflow is Reject and a field is out of range.
      */
     public static function of(
         int $hour,

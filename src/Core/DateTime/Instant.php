@@ -40,9 +40,7 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
         return (int) $this->dt->format('u');
     }
 
-    private function __construct(private readonly DateTimeImmutable $dt)
-    {
-    }
+    private function __construct(private readonly DateTimeImmutable $dt) {}
 
     public static function from(DateTimeInterface $date): self
     {
@@ -116,7 +114,7 @@ final class Instant implements ChronosInterface, HasInstantInterface, HasChronos
     }
 
     /**
-     * @throws \TypeError When $other is not an exact point on the timeline.
+     * @throws  \TypeError  When $other is not an exact point on the timeline.
      */
     public function compareTo(ChronosInterface|DateTimeInterface $other): int
     {

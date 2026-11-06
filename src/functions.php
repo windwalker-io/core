@@ -183,7 +183,7 @@ namespace Windwalker {
          * and strict ISO 8601 string with time zone. PlainDate/PlainTime/PlainDateTime are rejected
          * because they have no time zone.
          *
-         * @throws \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|\InvalidArgumentException
          */
         function to_instant(mixed $value): Instant
         {
@@ -214,7 +214,7 @@ namespace Windwalker {
          * Accepts: PlainDate (returned as is), any HasDateInterface (PlainDateTime, Chronos),
          * \DateTimeInterface, and strict `Y-m-d` string. Instant is rejected.
          *
-         * @throws \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|\InvalidArgumentException
          */
         function to_plain_date(mixed $value): PlainDate
         {
@@ -242,7 +242,7 @@ namespace Windwalker {
          * Accepts: PlainTime (returned as is), any HasTimeInterface (PlainDateTime, Chronos),
          * \DateTimeInterface, and strict time string. Instant is rejected.
          *
-         * @throws \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|\InvalidArgumentException
          */
         function to_plain_time(mixed $value): PlainTime
         {
@@ -270,7 +270,7 @@ namespace Windwalker {
          * Accepts: PlainDateTime (returned as is), Chronos, \DateTimeInterface, and strict ISO string
          * without time zone. PlainDate/PlainTime/Instant are rejected, combine or convert explicitly.
          *
-         * @throws \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|\InvalidArgumentException
          */
         function to_plain_datetime(mixed $value): PlainDateTime
         {

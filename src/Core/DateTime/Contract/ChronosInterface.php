@@ -28,8 +28,8 @@ use Windwalker\Core\DateTime\DateOverflow;
 interface ChronosInterface extends Stringable, JsonSerializable
 {
     /**
-     * @return  int  Negative if less than $other, 0 if equal, positive if greater.
-     * @throws \TypeError
+     * @return  int         Negative if less than $other, 0 if equal, positive if greater.
+     * @throws  \TypeError
      */
     public function compareTo(ChronosInterface $other): int;
 

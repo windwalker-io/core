@@ -23,19 +23,17 @@ final class PlainDate implements ChronosInterface, HasDateInterface, HasChronosI
     /**
      * Always midnight in UTC, so that no DST rule can ever affect the calculation.
      */
-    private function __construct(private readonly DateTimeImmutable $dt)
-    {
-    }
+    private function __construct(private readonly DateTimeImmutable $dt) {}
 
     /**
-     * @throws \RangeException When $overflow is Reject and the date does not exist.
+     * @throws  \RangeException  When $overflow is Reject and the date does not exist.
      */
     public static function of(int $year, int $month, int $day, DateOverflow $overflow = DateOverflow::Reject): self
     {
         [$year, $month, $day] = ChronosMath::resolveDate($year, $month, $day, $overflow);
 
         return new self(
-            (new DateTimeImmutable('1970-01-01', new DateTimeZone('UTC')))->setDate($year, $month, $day)
+            new DateTimeImmutable('1970-01-01', new DateTimeZone('UTC'))->setDate($year, $month, $day)
         );
     }
 
