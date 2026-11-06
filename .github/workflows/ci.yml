@@ -103,7 +103,10 @@ jobs:
                   extensions: mbstring, intl, json, pdo, pdo_pgsql, pgsql
 
             - name: Install PostgreSQL client tools
-              run: sudo apt-get update && sudo apt-get install -y postgresql-client
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y postgresql-client-16
+                  echo "/usr/lib/postgresql/16/bin" >> "$GITHUB_PATH"
 
             - name: Get Composer cache directory
               id: composer-cache
@@ -200,7 +203,7 @@ jobs:
               run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php
 
     oracle:
-        # Experimental: setup-php does not provide pdo_oci, so the PDO connection needs Oracle Instant Client on the runner.
+        # Experimental: setup-php provides pdo_oci (with Oracle Instant Client) as an extension, as the framework CI does.
         name: Oracle (PHP ${{ matrix.php-versions }})
         runs-on: ubuntu-latest
         continue-on-error: true
@@ -232,7 +235,7 @@ jobs:
                   php-version: ${{ matrix.php-versions }}
                   coverage: none
                   tools: composer
-                  extensions: mbstring, intl, json, pdo
+                  extensions: mbstring, intl, json, pdo, pdo_oci
 
             - name: Get Composer cache directory
               id: composer-cache
