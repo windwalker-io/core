@@ -95,7 +95,7 @@ class TaskRunnerTest extends TestCase
             PHP_BINARY,
             '-r',
             $code,
-            dirname(__DIR__, 3) . '/vendor/autoload.php',
+            realpath(env('WINDWALKER_TEST_APP_ROOT')) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php',
             __DIR__ . '/Stub/application.php',
         ]);
         $process->mustRun();

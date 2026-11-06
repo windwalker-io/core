@@ -139,18 +139,16 @@ class SchedulerClaimTest extends TestCase
     #[Test]
     public function concurrentProcessesHaveExactlyOneClaimWinner(): void
     {
-        $coreAutoload = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'vendor'
-            . DIRECTORY_SEPARATOR . 'autoload.php';
-        $lockAutoload = dirname(new \ReflectionClass(LockFactory::class)->getFileName(), 3)
+        // The host app autoloader covers Core and the lock package alike.
+        $hostAutoload = realpath(env('WINDWALKER_TEST_APP_ROOT')) . DIRECTORY_SEPARATOR . 'vendor'
             . DIRECTORY_SEPARATOR . 'autoload.php';
         $code = sprintf(
-            'require %s; require_once %s;'
+            'require_once %s;'
             . '$paths = new \Windwalker\Core\Application\PathResolver(new \Windwalker\Core\Runtime\Config(%s));'
             . '$claim = new \Windwalker\Core\Schedule\SchedulerClaim($paths);'
             . 'echo $claim->claim(new \Windwalker\Core\Schedule\ScheduleEvent("task"),'
             . 'new \DateTimeImmutable("2026-11-04T06:08:00Z")) ? "won" : "lost";',
-            var_export($lockAutoload, true),
-            var_export($coreAutoload, true),
+            var_export($hostAutoload, true),
             var_export(['@root' => 'app', '@temp' => $this->directory], true)
         );
         $processes = [];

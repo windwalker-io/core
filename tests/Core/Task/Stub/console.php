@@ -15,7 +15,9 @@ use Windwalker\Console\IO;
 use Windwalker\Core\Task\Command\TaskRunCommand;
 use Windwalker\Core\Task\TaskPayload;
 
-require dirname(__DIR__, 4) . '/vendor/autoload.php';
+$loader = require realpath(getenv('WINDWALKER_TEST_APP_ROOT') ?: dirname(__DIR__, 4)) . '/vendor/autoload.php';
+// Test classes (closures, services) are serialized into this child process, so it needs the same test namespace as bootstrap.app.php.
+$loader->addPsr4('Windwalker\Tests\\', dirname(__DIR__, 3) . '/');
 
 $app = require __DIR__ . '/application.php';
 $transport = \Windwalker\Utilities\Env::get('TASK_TEST_CACHE')

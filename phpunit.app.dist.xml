@@ -7,6 +7,7 @@
 >
 	<php>
 		<ini name="error_reporting" value="-1" />
+        <env name="WINDWALKER_TEST_APP_ROOT" value="../../.." />
 
         <!--
             Default database DSN, used by general tests. The prefix before ':' selects the
@@ -14,7 +15,7 @@
             An environment variable with the same name takes precedence over this value.
             Start database servers in the background first (for example `docker compose up -d`).
         -->
-        <env name="WINDWALKER_TEST_DB_DSN" value="pdo_mysql:host=127.0.0.1;port=3306;dbname=windwalker_test_core;user=root;password=;prefix=ww_" />
+        <!--<env name="WINDWALKER_TEST_DB_DSN" value="pdo_mysql:host=127.0.0.1;port=3306;dbname=windwalker_test_core;user=root;password=ut1234;prefix=ww_" />-->
 
         <!--
             Per-database DSNs. Uncomment one and copy its value into WINDWALKER_TEST_DB_DSN
