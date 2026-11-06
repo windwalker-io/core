@@ -65,7 +65,8 @@ jobs:
 
     postgresql:
         name: PostgreSQL (PHP ${{ matrix.php-versions }})
-        runs-on: ubuntu-latest
+        # Pinned: ubuntu-latest (26.04) no longer ships postgresql-client-16, which must match the postgres:16 service.
+        runs-on: ubuntu-24.04
         continue-on-error: ${{ matrix.allow_failure || false }}
         strategy:
             fail-fast: false
