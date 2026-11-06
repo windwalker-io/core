@@ -5,18 +5,19 @@ on:
     pull_request:
 
 jobs:
-    ubuntu:
-        name: PHPUnit (PHP ${{ matrix.php-versions }})
+    mysql:
+        name: MySQL (PHP ${{ matrix.php-versions }})
         runs-on: ubuntu-latest
         continue-on-error: ${{ matrix.allow_failure || false }}
         strategy:
             fail-fast: false
             matrix:
                 php-versions: [ '8.4', '8.5', '8.6' ]
-                experimental: [ false ]
                 include:
                     - php-versions: '8.6'
                       allow_failure: true
+        env:
+            WINDWALKER_TEST_DB_DSN: 'pdo_mysql:host=127.0.0.1;port=3306;dbname=windwalker_test_core;user=root;password=;prefix=ww_'
         services:
             mysql:
                 image: mysql:8.4
@@ -58,3 +59,242 @@ jobs:
 
             - name: Run tests
               run: vendor/bin/phpunit -c phpunit.ci.xml
+
+            - name: Run live exporter integration
+              run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php
+
+    postgresql:
+        name: PostgreSQL (PHP ${{ matrix.php-versions }})
+        runs-on: ubuntu-latest
+        continue-on-error: ${{ matrix.allow_failure || false }}
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions: [ '8.4', '8.5', '8.6' ]
+                include:
+                    - php-versions: '8.6'
+                      allow_failure: true
+        env:
+            WINDWALKER_TEST_DB_DSN: 'pdo_pgsql:host=127.0.0.1;port=5432;dbname=windwalker_test_core;user=postgres;password=ut1234;prefix=ww_'
+        services:
+            postgres:
+                # Major version must match the runner's postgresql-client (pg_dump/pg_restore/psql) for native exports.
+                image: postgres:16
+                env:
+                    POSTGRES_PASSWORD: ut1234
+                    POSTGRES_DB: windwalker_test_core
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=10
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  coverage: none
+                  tools: composer
+                  extensions: mbstring, intl, json, pdo, pdo_pgsql, pgsql
+
+            - name: Install PostgreSQL client tools
+              run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Setup cache
+              uses: actions/cache@v6
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-progress --ignore-platform-req=php
+
+            - name: Run tests
+              run: vendor/bin/phpunit -c phpunit.ci.xml
+
+            - name: Run live exporter integration
+              run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php
+
+    sqlserver:
+        name: SQL Server (PHP ${{ matrix.php-versions }})
+        runs-on: ubuntu-latest
+        continue-on-error: ${{ matrix.allow_failure || false }}
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions: [ '8.4', '8.5', '8.6' ]
+                include:
+                    - php-versions: '8.6'
+                      allow_failure: true
+        env:
+            WINDWALKER_TEST_DB_DSN: 'pdo_sqlsrv:host=127.0.0.1;port=1433;dbname=windwalker_test_core;user=sa;password=Ut1234!pass;prefix=ww_'
+        services:
+            mssql:
+                image: mcr.microsoft.com/mssql/server:2022-latest
+                env:
+                    ACCEPT_EULA: 'Y'
+                    MSSQL_SA_PASSWORD: 'Ut1234!pass'
+                ports:
+                    - 1433:1433
+                options: >-
+                    --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'Ut1234!pass' -Q 'SELECT 1'"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=20
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  coverage: none
+                  tools: composer
+                  extensions: mbstring, intl, json, pdo, pdo_sqlsrv, sqlsrv
+
+            - name: Create test database
+              run: |
+                  php <<'PHP'
+                  <?php
+                  $pdo = new PDO('sqlsrv:Server=127.0.0.1,1433;Database=master;TrustServerCertificate=1', 'sa', 'Ut1234!pass');
+                  $pdo->exec("IF DB_ID(N'windwalker_test_core') IS NULL CREATE DATABASE windwalker_test_core");
+                  PHP
+
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Setup cache
+              uses: actions/cache@v6
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-progress --ignore-platform-req=php
+
+            - name: Run tests
+              run: vendor/bin/phpunit -c phpunit.ci.xml
+
+            - name: Run live exporter integration
+              run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php
+
+    oracle:
+        # Experimental: setup-php does not provide pdo_oci, so the PDO connection needs Oracle Instant Client on the runner.
+        name: Oracle (PHP ${{ matrix.php-versions }})
+        runs-on: ubuntu-latest
+        continue-on-error: true
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions: [ '8.4', '8.5', '8.6' ]
+        env:
+            WINDWALKER_TEST_DB_DSN: 'pdo_oracle:host=127.0.0.1;port=1521;dbname=FREEPDB1;user=system;password=ut1234;prefix=ww_'
+        services:
+            oracle:
+                image: gvenzl/oracle-free:23-slim
+                env:
+                    ORACLE_PASSWORD: ut1234
+                ports:
+                    - 1521:1521
+                options: >-
+                    --health-cmd="healthcheck.sh"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=60
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  coverage: none
+                  tools: composer
+                  extensions: mbstring, intl, json, pdo
+
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Setup cache
+              uses: actions/cache@v6
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-progress --ignore-platform-req=php
+
+            - name: Run tests
+              run: vendor/bin/phpunit -c phpunit.ci.xml
+
+            - name: Run live exporter integration
+              env:
+                  # Legacy exp/imp run inside the service container through these wrappers.
+                  ORACLE_EXP_BINARY: bin/oracle-docker-exp
+                  ORACLE_IMP_BINARY: bin/oracle-docker-imp
+                  ORACLE_DOCKER_CONTAINER: ${{ job.services.oracle.id }}
+              run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php
+
+    sqlite:
+        name: SQLite (PHP ${{ matrix.php-versions }})
+        runs-on: ubuntu-latest
+        continue-on-error: ${{ matrix.allow_failure || false }}
+        strategy:
+            fail-fast: false
+            matrix:
+                php-versions: [ '8.4', '8.5', '8.6' ]
+                include:
+                    - php-versions: '8.6'
+                      allow_failure: true
+        env:
+            WINDWALKER_TEST_DB_DSN: 'pdo_sqlite:dbname=tmp/test.db;prefix=ww_'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  coverage: none
+                  tools: composer
+                  extensions: mbstring, intl, json, pdo, pdo_sqlite
+
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Setup cache
+              uses: actions/cache@v6
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.json') }}
+                  restore-keys: ${{ runner.os }}-php${{ matrix.php-versions }}-composer-
+
+            - name: Install dependencies
+              run: composer update --prefer-dist --no-progress --ignore-platform-req=php
+
+            - name: Prepare SQLite directory
+              run: mkdir -p tmp
+
+            - name: Run tests
+              run: vendor/bin/phpunit -c phpunit.ci.xml
+
+            - name: Run live exporter integration
+              run: vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php

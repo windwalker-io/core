@@ -7,7 +7,12 @@ namespace Windwalker\Tests\Core\Database\Exporter\Stub;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Isolates CLI discovery and PHP row queries for exporter orchestration tests.
+ * Test double for exporter tests that exercise CLI selection without real tools.
+ *
+ * - cliAvailable / gzipAvailable: simulate missing exporter or gzip executables.
+ * - phpFails: makes the PHP exporter throw, so error handling can be checked.
+ * - schemaObjects() returns no extra objects; exportPhp() writes a fixed marker payload.
+ *
  * Remove with the multi-platform CLI priority regression tests.
  */
 trait CliExporterHarness

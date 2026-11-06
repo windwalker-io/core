@@ -1,0 +1,33 @@
+#!/bin/sh
+# Oracle legacy exp wrapper for ORACLE_EXP_BINARY (used by LiveExporterIntegration).
+#
+# What: runs `exp` inside the Oracle container so host tests can export without a local Oracle client.
+# How: set ORACLE_EXP_BINARY to this file (for example `ORACLE_EXP_BINARY=$PWD/bin/oracle-docker-exp`).
+# The container name comes from ORACLE_DOCKER_CONTAINER (default: windwalker_oracle). The host FILE=
+# path is replaced by a container scratch file, copied back on success, and the scratch files are removed.
+# Requires the docker CLI on the host and a running container.
+set -eu
+
+container=${ORACLE_DOCKER_CONTAINER:-windwalker_oracle}
+remote="/tmp/ww-exp-$$"
+host_file=""
+
+n=$#
+while [ "$n" -gt 0 ]; do
+    arg=$1
+    shift
+    case $arg in
+        FILE=*) host_file=${arg#FILE=}; arg="FILE=$remote.dmp" ;;
+        LOG=*) arg="LOG=$remote.log" ;;
+    esac
+    set -- "$@" "$arg"
+    n=$((n - 1))
+done
+
+status=0
+docker exec -i "$container" exp "$@" || status=$?
+if [ "$status" -eq 0 ] && [ -n "$host_file" ]; then
+    docker cp "$container:$remote.dmp" "$host_file" || status=$?
+fi
+docker exec -u root "$container" rm -f "$remote.dmp" "$remote.log" >/dev/null 2>&1 || true
+exit "$status"

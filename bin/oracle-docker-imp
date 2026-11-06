@@ -1,0 +1,36 @@
+#!/bin/sh
+# Oracle legacy imp wrapper for ORACLE_IMP_BINARY (used by LiveExporterIntegration).
+#
+# What: runs `imp` inside the Oracle container to restore a dump exported by oracle-docker-exp.
+# How: set ORACLE_IMP_BINARY to this file (for example `ORACLE_IMP_BINARY=$PWD/bin/oracle-docker-imp`).
+# The container name comes from ORACLE_DOCKER_CONTAINER (default: windwalker_oracle). The host FILE= is
+# copied into the container, FILE= and LOG= are rewritten to container scratch paths, and the scratch files
+# are removed afterward. Requires FILE=, the docker CLI on the host, and a running container.
+set -eu
+
+container=${ORACLE_DOCKER_CONTAINER:-windwalker_oracle}
+remote="/tmp/ww-imp-$$"
+host_file=""
+
+n=$#
+while [ "$n" -gt 0 ]; do
+    arg=$1
+    shift
+    case $arg in
+        FILE=*) host_file=${arg#FILE=}; arg="FILE=$remote.dmp" ;;
+        LOG=*) arg="LOG=$remote.log" ;;
+    esac
+    set -- "$@" "$arg"
+    n=$((n - 1))
+done
+
+if [ -z "$host_file" ]; then
+    echo "oracle-docker-imp: FILE= is required" >&2
+    exit 1
+fi
+
+docker cp "$host_file" "$container:$remote.dmp"
+status=0
+docker exec -i "$container" imp "$@" || status=$?
+docker exec -u root "$container" rm -f "$remote.dmp" "$remote.log" >/dev/null 2>&1 || true
+exit "$status"

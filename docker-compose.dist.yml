@@ -1,0 +1,120 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: windwalker_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ut1234
+      MYSQL_DATABASE: windwalker_test
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/windwalker.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  postgresql:
+    image: postgres:17-alpine
+    container_name: windwalker_postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ut1234
+      POSTGRES_DB: windwalker_test
+    ports:
+      - "${PGSQL_PORT:-5432}:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: windwalker_sqlserver
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Ut1234!pass"
+    ports:
+      - "${SQLSERVER_PORT:-1433}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"IF DB_ID('windwalker_test') IS NULL CREATE DATABASE windwalker_test\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: windwalker_oracle
+    environment:
+      ORACLE_PASSWORD: ut1234
+      APP_USER: windwalker
+      APP_USER_PASSWORD: ut1234
+    ports:
+      - "${ORACLE_PORT:-1521}:1521"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  redis:
+    image: redis:7-alpine
+    container_name: windwalker_redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  memcached:
+    image: memcached:1-alpine
+    container_name: windwalker_memcached
+    ports:
+      - "${MEMCACHED_PORT:-11211}:11211"
+
+  sqs:
+    image: softwaremill/elasticmq-native:1.6.11
+    container_name: windwalker_sqs
+    ports:
+      - "${SQS_PORT:-9324}:9324"
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: windwalker_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
+  postgresql_data:
+  redis_data:
+  sqlserver_data:
+  oracle_data:

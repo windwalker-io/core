@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use Windwalker\Core\Application\ApplicationInterface;
 use Windwalker\Core\Database\DatabaseExportService;
@@ -17,183 +18,192 @@ use Windwalker\Core\Database\Exporter\ExporterFactory;
 use Windwalker\Core\Database\Exporter\OracleExporter;
 use Windwalker\Core\Database\Exporter\PostgresqlExporter;
 use Windwalker\Core\Database\Exporter\SqlsrvExporter;
-use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\DatabaseAdapter;
+use Windwalker\Database\DatabaseFactory;
 use Windwalker\Database\Driver\DriverOptions;
-use Windwalker\Utilities\Env;
+use Windwalker\Database\Driver\Pdo\DsnHelper;
 
 /**
- * Opt-in round trips against explicitly configured disposable server databases.
- * Run explicitly with EXPORT_TEST_PG_PASSWORD, EXPORT_TEST_SQL_PASSWORD and
- * EXPORT_TEST_ORACLE_CONTAINER. All schemas/databases use unique disposable names.
- * Remove when equivalent server round trips replace these Docker integration cases.
+ * Live round trips against the server of the active WINDWALKER_TEST_DB_DSN.
+ *
+ * What: exports a disposable database (or Oracle schema), restores it into a second one,
+ * and checks the restored data, constraints and indexes. Only the platform of the active DSN runs:
+ * - PostgreSQL: php, sql (psql restore) and native (pg_dump/pg_restore) modes, each compressed or not.
+ * - SQL Server: php mode only.
+ * - Oracle: legacy exp/imp round trip (needs exp and imp via ORACLE_EXP_BINARY/ORACLE_IMP_BINARY or PATH).
+ * - Other platforms: skipped; they are covered by CliExporterTest and SQLiteExporterTest.
+ *
+ * How: connects with the DSN's own credentials. Native and SQL modes need pg_dump, pg_restore and psql
+ * on PATH; missing tools skip those modes. This class never calls docker directly; the optional
+ * bin/oracle-docker-* wrappers reach a container only when ORACLE_EXP_BINARY/ORACLE_IMP_BINARY point to them.
+ * Start database servers beforehand (for example `docker compose up -d` in the background).
+ *
+ * Note: the file name does not end in Test, so run it explicitly:
+ * `vendor/bin/phpunit -c phpunit.ci.xml tests/Core/Database/Exporter/LiveExporterIntegration.php`.
  */
 class LiveExporterIntegration extends TestCase
 {
-    protected function oracleSql(string $container, string $sql): string
+    /**
+     * @return  array{platform: string, options: array<string, string>}|null
+     */
+    protected static function activeTarget(): ?array
     {
-        return new Process(
-            ['docker', 'exec', '-i', $container, 'sqlplus', '-s', '/ as sysdba'],
-            input: "WHENEVER SQLERROR EXIT FAILURE\nWHENEVER OSERROR EXIT FAILURE\n"
-                . "SET HEADING OFF\nSET FEEDBACK OFF\nSET PAGESIZE 0\nALTER SESSION SET CONTAINER=FREEPDB1;\n"
-                . $sql . "\nEXIT SUCCESS\n"
-        )->mustRun()->getOutput();
+        $dsn = env('WINDWALKER_TEST_DB_DSN');
+
+        if (!$dsn) {
+            return null;
+        }
+
+        $options = DsnHelper::extract($dsn, $type);
+        $platform = match (strtolower((string) $type)) {
+            'pgsql', 'pdo_pgsql' => 'pgsql',
+            'sqlsrv', 'pdo_sqlsrv' => 'sqlserver',
+            'oci', 'pdo_oci', 'oracle', 'pdo_oracle' => 'oracle',
+            default => null,
+        };
+
+        return $platform === null ? null : ['platform' => $platform, 'options' => $options];
     }
 
-    #[Test]
-    #[TestWith([false])]
-    #[TestWith([true])]
-    public function oracleLegacyNativeRestoresDisposableSchemas(bool $compress): void
+    protected static function activePlatform(): ?string
     {
-        $container = Env::get('EXPORT_TEST_ORACLE_CONTAINER');
-        if (!$container) {
-            throw new \RuntimeException('Explicit EXPORT_TEST_ORACLE_CONTAINER is required for Oracle tests.');
-        }
-        $prefix = 'WW_EXP_' . strtoupper(bin2hex(random_bytes(5)));
-        $source = $prefix . '_SRC';
-        $target = $prefix . '_DST';
-        $password = 'Ww' . bin2hex(random_bytes(12));
-        $dir = dirname(__DIR__, 4) . '/tmp/' . $prefix;
-        mkdir($dir, 0777, true);
-        $created = [];
-        $artifact = null;
-        $native = $dir . '/restore.dmp';
-        $remote = '/tmp/' . $prefix . '.dmp';
-        try {
-            foreach ([$source, $target] as $user) {
-                $this->oracleSql($container, "CREATE USER {$user} IDENTIFIED BY {$password} "
-                    . 'DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;');
-                $created[] = $user;
-                $this->oracleSql($container, "GRANT CREATE SESSION, CREATE TABLE TO {$user};");
-            }
-            $this->oracleSql($container, "CREATE TABLE {$source}.parent (id NUMBER PRIMARY KEY, label VARCHAR2(200));\n"
-                . "CREATE TABLE {$source}.child (id NUMBER PRIMARY KEY, parent_id NUMBER REFERENCES {$source}.parent(id), "
-                . "payload RAW(20));\nINSERT INTO {$source}.parent VALUES (1,'fixture');\n"
-                . "INSERT INTO {$source}.child VALUES (2,1,HEXTORAW('0001FF'));\nCOMMIT;");
-            self::assertSame('1', trim($this->oracleSql(
-                $container,
-                "SELECT COUNT(*) FROM {$source}.child WHERE RAWTOHEX(payload)='0001FF';"
-            )));
-            // Legacy CONSISTENT snapshots can predate DDL within the same timestamp granule.
-            sleep(2);
-            $db = $this->createStub(DatabaseAdapter::class);
-            $db->method('getOptions')->willReturn(new DriverOptions(
-                host: 'localhost',
-                dbname: 'FREEPDB1',
-                user: $source,
-                password: $password
-            ));
-            $app = $this->createStub(ApplicationInterface::class);
-            $app->method('path')->willReturn($dir);
-            $exportProcesses = [];
-            $app->method('createProcess')->willReturnCallback(static function (array $command) use (
-                $container,
-                &$exportProcesses
-            ): Process {
-                return $exportProcesses[] = new Process([
-                    PHP_BINARY, __DIR__ . '/Stub/docker-oracle-export.php',
-                    $container, json_encode($command, JSON_THROW_ON_ERROR),
-                ]);
-            });
-            /**
-             * Selects actual legacy exp inside Docker without a host OCI dependency.
-             * Remove together with this explicit live integration test.
-             */
-            $exporter = new class ($db, $app) extends OracleExporter {
-                protected function findExecutable(string $name, string $environment): ?string
-                {
-                    return $name === 'exp' ? 'exp' : null;
-                }
+        return self::activeTarget()['platform'] ?? null;
+    }
 
-                protected function exportPhp(\Psr\Http\Message\StreamInterface $stream): void
-                {
-                    throw new \RuntimeException('Oracle native export failed; host PHP OCI is unavailable.');
-                }
-            };
-            $factory = $this->createStub(ExporterFactory::class);
-            $factory->method('createExporter')->willReturn($exporter);
-            $output = new BufferedOutput();
-            $file = new DatabaseExportService($factory, $app, $db)->exportTo(
-                $dir . '/backup.sql',
-                $output,
-                ['compress' => $compress]
-            );
-            $artifact = $file->getPathname();
-            self::assertStringEndsWith('.dmp' . ($compress ? '.gz' : ''), $artifact, $output->fetch());
-            $content = file_get_contents($artifact);
-            if ($compress) {
-                self::assertSame("\x1f\x8b", substr($content, 0, 2));
-                $content = gzdecode($content);
-            }
-            self::assertNotEmpty($content);
-            file_put_contents($native, $content);
-            new Process(['docker', 'cp', $native, $container . ':' . $remote])->mustRun();
-            $import = new Process([
-                'docker', 'exec', '-i', '-w', '/tmp', $container, 'imp', 'system@//localhost:1521/FREEPDB1',
-                'FILE=' . $remote, 'FROMUSER=' . $source, 'TOUSER=' . $target, 'LOG=' . $remote . '.log',
-            ]);
-            $inspect = json_decode(new Process(['docker', 'inspect', $container])->mustRun()->getOutput(), true);
-            foreach ($inspect[0]['Config']['Env'] as $entry) {
-                if (str_starts_with($entry, 'ORACLE_PASSWORD=')) {
-                    $import->setInput(substr($entry, strlen('ORACLE_PASSWORD=')) . "\n");
-                }
-            }
-            $import->setTimeout(120)->mustRun();
-            $result = $this->oracleSql(
-                $container,
-                "SELECT COUNT(*) FROM {$target}.child WHERE id=2 AND parent_id=1 AND RAWTOHEX(payload)='0001FF';"
-            );
-            self::assertSame('1', trim($result), $import->getOutput() . $import->getErrorOutput()
-                . $this->oracleSql($container, "SELECT id,parent_id,RAWTOHEX(payload) FROM {$target}.child;")
-                . $exportProcesses[0]->getOutput() . $exportProcesses[0]->getErrorOutput());
-            self::assertSame('1', trim($this->oracleSql(
-                $container,
-                "SELECT COUNT(*) FROM DBA_CONSTRAINTS WHERE OWNER='{$target}' AND TABLE_NAME='CHILD' "
-                    . "AND CONSTRAINT_TYPE='R' AND R_OWNER='{$target}' AND STATUS='ENABLED';"
-            )));
-            self::assertSame(filesize($artifact), $file->getSize());
-        } finally {
-            new Process([
-                'docker', 'exec', '--user', 'root', $container, 'rm', '-f',
-                $remote, $remote . '.log', $remote . '.log_sys.sql', substr($remote, 0, -4) . '_sys.sql',
-            ])->mustRun();
-            foreach (array_reverse($created) as $user) {
-                $this->oracleSql($container, "DROP USER {$user} CASCADE;");
-            }
-            foreach ([$artifact, $native] as $file) {
-                if ($file !== null && is_file($file)) {
-                    unlink($file);
-                }
-            }
-            rmdir($dir);
+    protected static function port(string $platform, array $options): int
+    {
+        return (int) ($options['port'] ?? match ($platform) {
+            'pgsql' => 5432,
+            'sqlserver' => 1433,
+            default => 1521,
+        });
+    }
+
+    protected static function serverDsn(string $platform, array $options, string $dbname): string
+    {
+        $host = $options['host'] ?? '127.0.0.1';
+        $port = self::port($platform, $options);
+
+        return match ($platform) {
+            'pgsql' => sprintf('pgsql:host=%s;port=%d;dbname=%s', $host, $port, $dbname),
+            'sqlserver' => sprintf('sqlsrv:Server=%s,%d;Database=%s;TrustServerCertificate=1', $host, $port, $dbname),
+            'oracle' => sprintf('oci:dbname=//%s:%d/%s', $host, $port, $dbname),
+        };
+    }
+
+    /**
+     * Options for creating a DatabaseAdapter on a given database of the active server.
+     */
+    protected static function databaseOptions(string $platform, array $options, string $dbname): array
+    {
+        return [
+            'host' => $options['host'] ?? '127.0.0.1',
+            'port' => self::port($platform, $options),
+            'dbname' => $dbname,
+            'user' => $options['user'] ?? '',
+            'password' => $options['password'] ?? '',
+            'dsn' => self::serverDsn($platform, $options, $dbname),
+        ];
+    }
+
+    /**
+     * Admin connection on the server's maintenance database, used to create and drop disposable databases.
+     */
+    protected static function connectAdmin(string $platform, array $options): PDO
+    {
+        $dbname = match ($platform) {
+            'pgsql' => 'postgres',
+            'sqlserver' => 'master',
+            default => $options['dbname'] ?? 'FREEPDB1',
+        };
+
+        return new PDO(
+            self::serverDsn($platform, $options, $dbname),
+            $options['user'] ?? '',
+            $options['password'] ?? '',
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+    }
+
+    /**
+     * Runs a host PostgreSQL client tool against the active server.
+     */
+    protected static function pgTool(
+        string $tool,
+        array $options,
+        string $dbname,
+        array $args,
+        ?string $input = null
+    ): Process {
+        return new Process(
+            [
+                $tool,
+                '-h', $options['host'] ?? '127.0.0.1',
+                '-p', (string) self::port('pgsql', $options),
+                '-U', $options['user'] ?? '',
+                '-d', $dbname,
+                ...$args,
+            ],
+            env: ['PGPASSWORD' => $options['password'] ?? ''],
+            input: $input,
+            timeout: 120,
+        );
+    }
+
+    /**
+     * Resolves a legacy Oracle tool from its env override first, then from PATH.
+     */
+    protected static function oracleTool(string $name, string $environment): ?string
+    {
+        return env($environment) ?: new ExecutableFinder()->find($name);
+    }
+
+    protected static function removeDirectory(string $dir): void
+    {
+        foreach (glob($dir . '/*') ?: [] as $file) {
+            unlink($file);
         }
+
+        rmdir($dir);
     }
 
     public static function modes(): iterable
     {
-        foreach (['pgsql' => ['php', 'sql', 'native'], 'sqlserver' => ['php']] as $platform => $modes) {
-            foreach ($modes as $mode) {
-                foreach ([false, true] as $compress) {
-                    yield "{$platform}-{$mode}-" . (int) $compress => [$platform, $mode, $compress];
-                }
+        $finder = new ExecutableFinder();
+        $platform = self::activePlatform();
+        $pgTools = $finder->find('pg_dump') && $finder->find('pg_restore') && $finder->find('psql');
+        $modes = match ($platform) {
+            'pgsql' => ['php', ...($pgTools ? ['sql', 'native'] : [])],
+            'sqlserver' => ['php'],
+            default => [],
+        };
+
+        if ($modes === []) {
+            yield 'inactive-platform' => ['', false];
+
+            return;
+        }
+
+        foreach ($modes as $mode) {
+            foreach ([false, true] as $compress) {
+                yield "{$platform}-{$mode}-" . (int) $compress => [$mode, $compress];
             }
         }
     }
 
     #[Test]
     #[DataProvider('modes')]
-    public function restoresDisposableServerDatabase(string $platform, string $mode, bool $compress): void
+    public function restoresDisposableServerDatabase(string $mode, bool $compress): void
     {
-        $pgsql = $platform === 'pgsql';
-        $password = Env::get($pgsql ? 'EXPORT_TEST_PG_PASSWORD' : 'EXPORT_TEST_SQL_PASSWORD');
-        if (!$password) {
-            throw new \RuntimeException('Explicit integration-test credentials are required.');
+        $platform = self::activePlatform();
+
+        if (!in_array($platform, ['pgsql', 'sqlserver'], true)) {
+            self::markTestSkipped('Active WINDWALKER_TEST_DB_DSN is not PostgreSQL or SQL Server.');
         }
-        $user = $pgsql ? 'postgres' : 'sa';
-        $adminDsn = $pgsql
-            ? 'pgsql:host=127.0.0.1;port=5432;dbname=postgres'
-            : 'sqlsrv:Server=127.0.0.1,1433;Database=master;TrustServerCertificate=1';
-        $admin = new PDO($adminDsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+        $pgsql = $platform === 'pgsql';
+        $options = self::activeTarget()['options'];
+        $admin = self::connectAdmin($platform, $options);
         $prefix = 'ww_export_' . bin2hex(random_bytes(6));
         $source = $prefix . '_src';
         $target = $prefix . '_dst';
@@ -209,14 +219,11 @@ class LiveExporterIntegration extends TestCase
                 $admin->exec('CREATE DATABASE ' . $name);
                 $created[] = $name;
             }
-            $options = [
-                'host' => '127.0.0.1', 'port' => $pgsql ? 5432 : 1433,
-                'dbname' => $source, 'user' => $user, 'password' => $password,
-            ];
-            if (!$pgsql) {
-                $options['dsn'] = str_replace('Database=master', 'Database=' . $source, $adminDsn);
-            }
-            $db = new DatabaseFactory()->create($pgsql ? 'pdo_pgsql' : 'pdo_sqlsrv', $options);
+
+            $db = new DatabaseFactory()->create(
+                $pgsql ? 'pdo_pgsql' : 'pdo_sqlsrv',
+                self::databaseOptions($platform, $options, $source)
+            );
             $db->execute($pgsql
                 ? 'CREATE TABLE z_parent (id bigint GENERATED ALWAYS AS IDENTITY (START WITH 10 INCREMENT BY 2) PRIMARY KEY, '
                     . 'label text NOT NULL UNIQUE, enabled boolean DEFAULT true, created_at timestamp DEFAULT CURRENT_TIMESTAMP)'
@@ -232,19 +239,11 @@ class LiveExporterIntegration extends TestCase
             $db->execute("DELETE FROM z_parent WHERE label='deleted'");
             $payload = $pgsql ? "decode('0001ff', 'hex')" : '0x0001FF';
             $db->execute("INSERT INTO a_child(id,parent_id,payload,note) VALUES (1,10,{$payload},'quote''and text')");
-            $app = $this->createStub(ApplicationInterface::class);
-            $app->method('path')->willReturn($dir);
-            $app->method('createProcess')->willReturnCallback(static function (array $command): Process {
-                return new Process([
-                    PHP_BINARY, __DIR__ . '/Stub/docker-pg-dump.php',
-                    Env::get('EXPORT_TEST_PG_CONTAINER') ?: 'windwalker_postgresql',
-                    json_encode($command, JSON_THROW_ON_ERROR),
-                ]);
-            });
+
+            $app = $this->stubApplication($dir);
             if ($pgsql) {
                 /**
-                 * Selects actual Docker pg_dump or forces PHP without changing export generation.
-                 * Remove together with this explicit live integration test.
+                 * Forces the requested pg_dump mode on the host without changing export generation.
                  */
                 $exporter = new class ($db, $app) extends PostgresqlExporter {
                     public string $mode = 'php';
@@ -263,7 +262,6 @@ class LiveExporterIntegration extends TestCase
             } else {
                 /**
                  * Forces PHP to exercise SQL Server catalogs against the live server.
-                 * Remove together with this explicit live integration test.
                  */
                 $exporter = new class ($db, $app) extends SqlsrvExporter {
                     protected function findExecutable(string $name, string $environment): ?string
@@ -272,8 +270,8 @@ class LiveExporterIntegration extends TestCase
                     }
                 };
             }
-            $factory = $this->createStub(ExporterFactory::class);
-            $factory->method('createExporter')->willReturn($exporter);
+
+            $factory = $this->stubExporterFactory($exporter);
             $output = new BufferedOutput();
             $file = new DatabaseExportService($factory, $app, $db)->exportTo(
                 $dir . '/backup.sql',
@@ -287,32 +285,26 @@ class LiveExporterIntegration extends TestCase
                 self::assertSame("\x1f\x8b", substr($content, 0, 2));
                 $content = gzdecode($content);
             }
+
             $restore = new PDO(
-                str_replace($pgsql ? 'dbname=postgres' : 'Database=master', ($pgsql ? 'dbname=' : 'Database=') . $target, $adminDsn),
-                $user,
-                $password,
+                self::serverDsn($platform, $options, $target),
+                $options['user'] ?? '',
+                $options['password'] ?? '',
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
             );
+
             if ($mode === 'native') {
                 $native = $dir . '/restore.dump';
                 file_put_contents($native, $content);
-                $container = Env::get('EXPORT_TEST_PG_CONTAINER') ?: 'windwalker_postgresql';
-                $remote = '/tmp/' . $prefix . '.dump';
-                try {
-                    new Process(['docker', 'cp', $native, $container . ':' . $remote])->mustRun();
-                    new Process([
-                        'docker', 'exec', $container, 'pg_restore', '-U', $user, '-d', $target, '--exit-on-error', $remote,
-                    ])->mustRun();
-                } finally {
-                    new Process(['docker', 'exec', $container, 'rm', '-f', $remote])->mustRun();
-                    unlink($native);
-                }
-            } elseif ($pgsql && $mode === 'sql') {
-                new Process([
-                    'docker', 'exec', '-i',
-                    Env::get('EXPORT_TEST_PG_CONTAINER') ?: 'windwalker_postgresql',
-                    'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', $user, '-d', $target,
-                ], input: $content)->mustRun();
+                self::pgTool('pg_restore', $options, $target, ['--exit-on-error', $native])->mustRun();
+            } elseif ($mode === 'sql') {
+                self::pgTool(
+                    'psql',
+                    $options,
+                    $target,
+                    ['-X', '-v', 'ON_ERROR_STOP=1'],
+                    $content
+                )->mustRun();
             } elseif ($pgsql) {
                 $restore->exec($content);
             } else {
@@ -326,6 +318,7 @@ class LiveExporterIntegration extends TestCase
                     }
                 }
             }
+
             self::assertSame(1, (int) $restore->query('SELECT count(*) FROM a_child')->fetchColumn());
             self::assertSame("quote'and text", $restore->query('SELECT note FROM a_child')->fetchColumn());
             self::assertSame(2, (int) $restore->query('SELECT computed FROM a_child')->fetchColumn());
@@ -357,10 +350,146 @@ class LiveExporterIntegration extends TestCase
                 }
                 $admin->exec('DROP DATABASE ' . $name);
             }
-            if ($artifact !== null && is_file($artifact)) {
-                unlink($artifact);
-            }
-            rmdir($dir);
+            self::removeDirectory($dir);
         }
+    }
+
+    #[Test]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function oracleLegacyNativeRestoresDisposableSchemas(bool $compress): void
+    {
+        $active = self::activeTarget();
+
+        if (($active['platform'] ?? null) !== 'oracle') {
+            self::markTestSkipped('Active WINDWALKER_TEST_DB_DSN is not Oracle.');
+        }
+
+        $exp = self::oracleTool('exp', 'ORACLE_EXP_BINARY');
+        $imp = self::oracleTool('imp', 'ORACLE_IMP_BINARY');
+        if (!$exp || !$imp) {
+            self::markTestSkipped('Legacy Oracle exp and imp must be available (ORACLE_EXP_BINARY/ORACLE_IMP_BINARY or PATH).');
+        }
+
+        $options = $active['options'];
+        $host = $options['host'] ?? '127.0.0.1';
+        $port = self::port('oracle', $options);
+        $service = $options['dbname'] ?? 'FREEPDB1';
+        $admin = self::connectAdmin('oracle', $options);
+        $prefix = 'WW_EXP_' . strtoupper(bin2hex(random_bytes(5)));
+        $source = $prefix . '_SRC';
+        $targetSchema = $prefix . '_DST';
+        $password = 'Ww' . bin2hex(random_bytes(12));
+        $dir = dirname(__DIR__, 4) . '/tmp/' . $prefix;
+        mkdir($dir, 0777, true);
+        $created = [];
+        $artifact = null;
+        $native = $dir . '/restore.dmp';
+
+        try {
+            foreach ([$source, $targetSchema] as $user) {
+                $admin->exec("CREATE USER {$user} IDENTIFIED BY {$password} "
+                    . 'DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS');
+                $created[] = $user;
+                $admin->exec("GRANT CREATE SESSION, CREATE TABLE TO {$user}");
+            }
+
+            $statements = [
+                "CREATE TABLE {$source}.parent (id NUMBER PRIMARY KEY, label VARCHAR2(200))",
+                "CREATE TABLE {$source}.child (id NUMBER PRIMARY KEY, parent_id NUMBER REFERENCES {$source}.parent(id), "
+                . 'payload RAW(20))',
+                "INSERT INTO {$source}.parent VALUES (1,'fixture')",
+                "INSERT INTO {$source}.child VALUES (2,1,HEXTORAW('0001FF'))",
+                'COMMIT',
+            ];
+
+            foreach ($statements as $sql) {
+                $admin->exec($sql);
+            }
+
+            self::assertSame(1, (int) $admin->query(
+                "SELECT COUNT(*) FROM {$source}.child WHERE RAWTOHEX(payload)='0001FF'"
+            )->fetchColumn());
+            // Legacy CONSISTENT snapshots can predate DDL within the same timestamp granule.
+            sleep(2);
+
+            $db = $this->createStub(DatabaseAdapter::class);
+            $db->method('getOptions')->willReturn(new DriverOptions(
+                host: $host,
+                port: $port,
+                dbname: $service,
+                user: $source,
+                password: $password
+            ));
+            $app = $this->stubApplication($dir);
+            /**
+             * Skips the PHP OCI export path so the legacy exp binary (ORACLE_EXP_BINARY) is used.
+             */
+            $exporter = new class ($db, $app) extends OracleExporter {
+                protected function exportPhp(\Psr\Http\Message\StreamInterface $stream): void
+                {
+                    throw new \RuntimeException('Oracle native export failed; PHP OCI export is not expected.');
+                }
+            };
+            $output = new BufferedOutput();
+            $file = new DatabaseExportService($this->stubExporterFactory($exporter), $app, $db)->exportTo(
+                $dir . '/backup.sql',
+                $output,
+                ['compress' => $compress]
+            );
+            $artifact = $file->getPathname();
+            self::assertStringEndsWith('.dmp' . ($compress ? '.gz' : ''), $artifact, $output->fetch());
+            $content = file_get_contents($artifact);
+            if ($compress) {
+                self::assertSame("\x1f\x8b", substr($content, 0, 2));
+                $content = gzdecode($content);
+            }
+            self::assertNotEmpty($content);
+            file_put_contents($native, $content);
+
+            $import = new Process(
+                [
+                    $imp, ($options['user'] ?? '') . '@//' . $host . ':' . $port . '/' . $service,
+                    'FILE=' . $native, 'FROMUSER=' . $source, 'TOUSER=' . $targetSchema,
+                    'LOG=' . $dir . '/imp.log',
+                ],
+                input: ($options['password'] ?? '') . "\n",
+                timeout: 120,
+            );
+            $import->mustRun();
+
+            self::assertSame(1, (int) $admin->query(
+                "SELECT COUNT(*) FROM {$targetSchema}.child WHERE id=2 AND parent_id=1 AND RAWTOHEX(payload)='0001FF'"
+            )->fetchColumn(), $import->getOutput() . $import->getErrorOutput());
+            self::assertSame(1, (int) $admin->query(
+                "SELECT COUNT(*) FROM ALL_CONSTRAINTS WHERE OWNER='{$targetSchema}' AND TABLE_NAME='CHILD' "
+                . "AND CONSTRAINT_TYPE='R' AND R_OWNER='{$targetSchema}' AND STATUS='ENABLED'"
+            )->fetchColumn());
+            self::assertSame(filesize($artifact), $file->getSize());
+        } finally {
+            foreach (array_reverse($created) as $user) {
+                $admin->exec("DROP USER {$user} CASCADE");
+            }
+            self::removeDirectory($dir);
+        }
+    }
+
+    protected function stubApplication(string $dir): ApplicationInterface
+    {
+        $app = $this->createStub(ApplicationInterface::class);
+        $app->method('path')->willReturn($dir);
+        $app->method('createProcess')->willReturnCallback(
+            static fn(array $command): Process => new Process($command)
+        );
+
+        return $app;
+    }
+
+    protected function stubExporterFactory(object $exporter): ExporterFactory
+    {
+        $factory = $this->createStub(ExporterFactory::class);
+        $factory->method('createExporter')->willReturn($exporter);
+
+        return $factory;
     }
 }

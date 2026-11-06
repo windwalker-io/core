@@ -52,6 +52,10 @@ class MigrationSquashServiceRealDbTest extends TestCase
     #[Test]
     public function generateMigrationCodesReproducesRealTableAsSchemaCode(): void
     {
+        if (static::$db->getPlatform()->getName() !== 'MySQL') {
+            self::markTestSkipped('Expected code strings are MySQL-specific.');
+        }
+
         $migrationsDir = dirname(__DIR__, 3) . '/tests/resources/migrations';
 
         $app = new ApplicationTraitStub();

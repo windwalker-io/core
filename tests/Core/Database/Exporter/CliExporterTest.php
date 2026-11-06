@@ -22,14 +22,27 @@ use Windwalker\Database\Manager\SchemaManager;
 use Windwalker\Filesystem\Path;
 use Windwalker\Tests\Core\Database\Exporter\Stub\CliExporterHarness;
 
+/**
+ * Tests CLI export selection and fallback without any database server.
+ *
+ * What: for PostgreSQL, SQL Server, SQLite and Oracle, checks that the exporter chooses SQL output,
+ * then native output, then PHP output, and never mixes partial output from a failed tool into the result.
+ * Covers missing tools, empty output, start failures, gzip success and failure, PHP errors and Oracle warnings.
+ *
+ * How: CliExporterHarness replaces CLI discovery and the PHP exporter with fixtures. The application
+ * createProcess() returns fake commands whose output depends on the data-provider mode.
+ */
 class CliExporterTest extends TestCase
 {
     public static function exportModes(): iterable
     {
-        foreach (['pgsql', 'sqlserver', 'sqlite', 'oracle'] as $platform) {
-            foreach ([
-                'sql', 'native', 'php', 'missing', 'empty', 'start-failure', 'php-gzip', 'gzip-failure', 'php-error',
-            ] as $mode) {
+        $platforms = ['pgsql', 'sqlserver', 'sqlite', 'oracle'];
+        $modes = [
+            'sql', 'native', 'php', 'missing', 'empty', 'start-failure', 'php-gzip', 'gzip-failure', 'php-error',
+        ];
+
+        foreach ($platforms as $platform) {
+            foreach ($modes as $mode) {
                 foreach ([false, true] as $compress) {
                     yield "{$platform}-{$mode}-" . (int) $compress => [$platform, $mode, $compress];
                 }

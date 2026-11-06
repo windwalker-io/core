@@ -17,6 +17,16 @@ use Windwalker\Core\Database\Exporter\ExporterFactory;
 use Windwalker\Core\Database\Exporter\SQLiteExporter;
 use Windwalker\Database\DatabaseFactory;
 
+/**
+ * Tests SQLite file-database export and restore through the available CLI tools.
+ *
+ * What: exports a real SQLite file and restores it into a new file, with and without the native
+ * sqlite3 `.backup` path and with and without gzip compression.
+ *
+ * How: uses the installed sqlite3 binary when found. When it is missing, the mock expectations assert that
+ * no CLI process runs and the PHP exporter is used instead. The CLI and native branches are forced through
+ * an anonymous subclass.
+ */
 class SQLiteExporterTest extends TestCase
 {
     #[Test]
