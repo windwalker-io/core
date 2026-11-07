@@ -9,6 +9,7 @@ Load only what the task needs; do not read all of `docs/` up front.
 
 - [`../AGENTS.md`](../AGENTS.md): general contributor and agent rules
 - [`docs/index.md`](docs/index.md): documentation index, start here for any topic
+- https://windwalker.io/llms.txt: public Windwalker documentation index; fetch only the linked `.md` pages a task needs
 - [`docs/architecture.md`](docs/architecture.md): Core package layout, container layers, web/console lifecycle, packages (read before structural changes)
 - [`docs/schedule-worker.md`](docs/schedule-worker.md): resident CRON worker, CLI options and lifecycle
 - [`docs/task-run.md`](docs/task-run.md): serialized task command, subprocess runner and result protocol
