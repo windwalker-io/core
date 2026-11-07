@@ -37,6 +37,8 @@ class MigrationService implements EventAwareInterface
 
     public bool $ignoreErrors = false;
 
+    public static bool $running = false;
+
     /**
      * MigrationService constructor.
      *
@@ -169,6 +171,9 @@ class MigrationService implements EventAwareInterface
         $container->getAttributesResolver()->resolveObjectMembers($migration);
         $migration->addEventDealer($this);
 
+        $prevRunning = static::$running;
+        static::$running = true;
+
         try {
             $this->app->call($handler);
 
@@ -181,6 +186,8 @@ class MigrationService implements EventAwareInterface
             }
 
             $this->displayIgnoreErrorMessages($e, $migration);
+        } finally {
+            static::$running = $prevRunning;
         }
 
         // $this['log.' . $versionInfo['id']] = [

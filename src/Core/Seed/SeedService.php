@@ -34,6 +34,8 @@ class SeedService implements EventAwareInterface
      * @param  CodeGenerator         $codeGenerator
      * @param  DatabaseAdapter|null  $db
      */
+    public static bool $running = false;
+
     public function __construct(
         protected ApplicationInterface $app,
         #[Autowire]
@@ -186,7 +188,14 @@ class SeedService implements EventAwareInterface
             "Import seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
         );
 
-        $this->app->call($seeder->getImportHandler());
+        $prev = static::$running;
+        static::$running = true;
+
+        try {
+            $this->app->call($seeder->getImportHandler());
+        } finally {
+            static::$running = $prev;
+        }
 
         if ($seeder->count > 0) {
             $this->emitMessage('');
@@ -201,7 +210,14 @@ class SeedService implements EventAwareInterface
     {
         $seeder->addEventDealer($this);
 
-        $this->app->call($seeder->getClearHandler());
+        $prev = static::$running;
+        static::$running = true;
+
+        try {
+            $this->app->call($seeder->getClearHandler());
+        } finally {
+            static::$running = $prev;
+        }
 
         $this->emitMessage(
             "Clear seeder: <info>{$seeder->prettyName}</info> (<fg=gray>/{$seeder->file->getBasename()}</>)"
