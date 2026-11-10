@@ -16,7 +16,7 @@ use Windwalker\Filesystem\Path;
 #[CommandWrapper(
     description: 'Start a REPL console or exec code.',
 )]
-class ReplCommand implements CommandInterface
+class ReplExecCommand implements CommandInterface
 {
     protected IOInterface $io;
 

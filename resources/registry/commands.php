@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'exec' => \Windwalker\Core\Command\ReplCommand::class,
+    'exec' => \Windwalker\Core\Command\ReplExecCommand::class,
 
     'server:start' => \Windwalker\Core\CliServer\Command\ServerStartCommand::class,
     'server:stop' => \Windwalker\Core\CliServer\Command\ServerStopCommand::class,
