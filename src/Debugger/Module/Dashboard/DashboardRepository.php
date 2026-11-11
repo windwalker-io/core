@@ -37,6 +37,14 @@ class DashboardRepository
 
     public function getItem(string $id, string $section = 'basic'): Collection
     {
+        if (!preg_match('/^[\w.\-]+$/', $id) || str_contains($id, '..')) {
+            throw new RuntimeException('Invalid ID.');
+        }
+
+        if (!preg_match('/^\w+$/', $section)) {
+            throw new RuntimeException('Invalid section.');
+        }
+
         $dir = $this->getCacheFolder();
 
         $folder = $dir->appendPath('/' . $id);
