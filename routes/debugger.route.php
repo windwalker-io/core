@@ -18,6 +18,10 @@ use Windwalker\Debugger\Module\Index\IndexView;
 
 /** @var RouteCreator $router */
 
+if (env('APP_ENV') !== 'dev') {
+    return;
+}
+
 $router->group('debugger')
     ->prefix('/_debugger')
     ->namespace('debugger')
