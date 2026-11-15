@@ -158,6 +158,26 @@ class LoggerServiceTest extends TestCase
     }
 
     #[Test]
+    public function globalContextCanBeSetAddedAndReset(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame([], $service->getGlobalContext());
+
+        self::assertSame($service, $service->setGlobalContext(['a' => 1]));
+        self::assertSame(['a' => 1], $service->getGlobalContext());
+
+        $service->addGlobalContext(['a' => 2, 'b' => 3]);
+        self::assertSame(['a' => 2, 'b' => 3], $service->getGlobalContext());
+
+        $service->setGlobalContext(['c' => 4]);
+        self::assertSame(['c' => 4], $service->getGlobalContext());
+
+        self::assertSame($service, $service->resetGlobalContext());
+        self::assertSame([], $service->getGlobalContext());
+    }
+
+    #[Test]
     public function parseTraceReplacesRootPathWithPlaceholder(): void
     {
         $trace = WINDWALKER_ROOT . '/src/Foo.php:10';

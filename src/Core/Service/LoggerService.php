@@ -14,12 +14,17 @@ use Windwalker\Core\Manager\LoggerManager;
  *
  * @since  4.0
  */
-class LoggerService
+class LoggerService implements CoreLoggerInterface
 {
     /**
      * @var  LoggerManager
      */
     protected LoggerManager $manager;
+
+    /**
+     * Context merged into every log record.
+     */
+    protected array $globalContext = [];
 
     /**
      * LoggerService constructor.
@@ -213,6 +218,38 @@ class LoggerService
         }
 
         $this->getLogger($channel)->log($level, $message, $context);
+
+        return $this;
+    }
+
+    public function getGlobalContext(): array
+    {
+        return $this->globalContext;
+    }
+
+    /**
+     * Replace the global context.
+     */
+    public function setGlobalContext(array $context): static
+    {
+        $this->globalContext = $context;
+
+        return $this;
+    }
+
+    /**
+     * Merge data into the global context.
+     */
+    public function addGlobalContext(array $context): static
+    {
+        $this->globalContext = array_merge($this->globalContext, $context);
+
+        return $this;
+    }
+
+    public function resetGlobalContext(): static
+    {
+        $this->globalContext = [];
 
         return $this;
     }

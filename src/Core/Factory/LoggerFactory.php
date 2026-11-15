@@ -8,6 +8,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Windwalker\Core\DI\ServiceFactoryInterface;
 use Windwalker\Core\DI\ServiceFactoryTrait;
 use Windwalker\Core\Runtime\Runtime;
@@ -80,6 +81,18 @@ class LoggerFactory implements ServiceFactoryInterface
                     $handlers
                 ),
                 array_map(fn($processor) => $container->resolve($processor, ['_name' => $name]), $processors)
+            );
+
+            $logger->pushProcessor(
+                static function (LogRecord $record) use ($container) {
+                    $global = $container->get(LoggerService::class)->getGlobalContext();
+
+                    if ($global === []) {
+                        return $record;
+                    }
+
+                    return $record->with(context: array_merge($global, $record->context));
+                }
             );
 
             foreach ($container->getParam('logs.global_handlers') as $handler) {

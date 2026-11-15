@@ -31,7 +31,9 @@ class LoggerProvider implements ServiceProviderInterface, RequestBootableProvide
     {
         $container->prepareSharedObject(LoggerManager::class);
         $container->prepareSharedObject(LoggerFactory::class);
-        $container->prepareSharedObject(LoggerService::class);
+        $container->prepareSharedObject(LoggerService::class)
+            ->alias(LoggerInterface::class, LoggerService::class);
+
         $container->bindShared(
             LoggerInterface::class,
             fn(LoggerManager $factory, ?string $tag = null) => $factory->get($tag)
