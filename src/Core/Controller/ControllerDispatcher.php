@@ -138,7 +138,7 @@ class ControllerDispatcher
         }
 
         return function (AppContextInterface $app) use ($args, $handler) {
-            $this->container->call($handler, [...$app->getUrlVars(), ...$args]);
+            return $this->container->call($handler, [...$app->getUrlVars(), ...$args]);
         };
     }
 

@@ -292,11 +292,20 @@ class Navigator implements NavConstantInterface, EventAwareInterface
     {
         $root = $this->getSystemUri()->root;
 
-        if (str_starts_with((string) $uri, '/')) {
-            return true;
+        $uri = (string) $uri;
+
+        if (str_starts_with($uri, '/')) {
+            // "//host" and "/\host" are treated as external URLs by browsers
+            return !str_starts_with($uri, '//') && !str_starts_with($uri, '/\\');
         }
 
-        return stripos((string) $uri, $root) === 0;
+        if (stripos($uri, $root) !== 0) {
+            return false;
+        }
+
+        $next = $uri[strlen($root)] ?? '';
+
+        return $next === '' || str_ends_with($root, '/') || in_array($next, ['/', '?', '#'], true);
     }
 
     public function validateRedirectUrl(Stringable|string $uri): string

@@ -7,6 +7,7 @@ namespace Windwalker\Core\Router;
 use Windwalker\Utilities\Options\RecordOptionsTrait;
 
 use function Windwalker\get_object_dump_values;
+use function Windwalker\unwrap_enum;
 
 class NavOptions implements NavConstantInterface, \JsonSerializable
 {
@@ -123,7 +124,10 @@ class NavOptions implements NavConstantInterface, \JsonSerializable
      */
     public function jsonSerialize(): array
     {
-        return get_object_dump_values($this);
+        $values = get_object_dump_values($this);
+        $values['mode'] = unwrap_enum($values['mode'] ?? null);
+
+        return $values;
     }
 
     /**

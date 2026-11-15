@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Controller\ControllerDispatcher;
+use Windwalker\Core\Router\NavMode;
 use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
@@ -50,6 +51,49 @@ class NavigatorTest extends TestCase
 
         self::assertTrue($nav->isLocalUrl('http://example.com/base/foo'));
         self::assertFalse($nav->isLocalUrl('http://other.com/foo'));
+    }
+
+    #[Test]
+    #[DataProvider('externalUrlProvider')]
+    public function isLocalUrl_rejectsExternalLookingUrls(string $url): void
+    {
+        $app = $this->createAppStub(new SystemUri('http://example.com/base'));
+        $nav = $this->createNavigator(new Router(), $app);
+
+        self::assertFalse($nav->isLocalUrl($url));
+    }
+
+    public static function externalUrlProvider(): array
+    {
+        return [
+            'protocol relative' => ['//evil.com'],
+            'backslash' => ['/\\evil.com'],
+            'root prefix host' => ['http://example.com/base.evil.com/x'],
+        ];
+    }
+
+    #[Test]
+    public function to_cacheKeyDistinguishesNavModes(): void
+    {
+        $app = $this->createAppStub(new SystemUri('http://example.com/base'));
+        $nav = $this->createNavigator(new Router(['foo' => new Route('foo', '/foo')]), $app);
+
+        $raw = $nav->to('foo', options: new NavOptions(mode: NavMode::RAW));
+        $full = $nav->to('foo', options: new NavOptions(mode: NavMode::FULL));
+
+        self::assertNotSame($raw, $full);
+        self::assertSame(NavMode::RAW, $raw->getOptions()->mode);
+        self::assertSame(NavMode::FULL, $full->getOptions()->mode);
+    }
+
+    #[Test]
+    public function navOptions_jsonEncodeSupportsMode(): void
+    {
+        self::assertNotFalse(json_encode(new NavOptions(mode: NavMode::RAW)));
+        self::assertNotSame(
+            json_encode(new NavOptions(mode: NavMode::RAW)),
+            json_encode(new NavOptions(mode: NavMode::FULL))
+        );
     }
 
     #[Test]
