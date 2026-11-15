@@ -11,7 +11,6 @@ use Windwalker\Console\CommandInterface;
 use Windwalker\Console\CommandWrapper;
 use Windwalker\Console\IOInterface;
 use Windwalker\Core\Application\ApplicationInterface;
-use Windwalker\Filesystem\Path;
 
 #[CommandWrapper(
     description: 'Start a REPL console or exec code.',
@@ -19,8 +18,6 @@ use Windwalker\Filesystem\Path;
 class ReplExecCommand implements CommandInterface
 {
     protected IOInterface $io;
-
-    protected ?string $code = null;
 
     public function __construct(protected ApplicationInterface $app) {}
 
@@ -42,103 +39,121 @@ class ReplExecCommand implements CommandInterface
 
     public function execute(IOInterface $io): int
     {
+        $this->io = $io;
+
+        // Arbitrary code execution is only allowed on a local CLI in debug mode.
+        if (!$this->app->isCliRuntime() || !$this->app->isDebug()) {
+            throw new \RuntimeException(
+                'The repl command is only available in CLI runtime with debug mode enabled.'
+            );
+        }
+
         $code = $io->getOption('code');
         $file = $io->getArgument('file');
 
-        $this->io = $io;
+        if ($code !== null && $code !== '' && $file !== null && $file !== '') {
+            throw new \InvalidArgumentException('Cannot use --code and file argument at the same time.');
+        }
 
-        // todo: Reuse code for code mode and file mode
-
-        // If --file/-f provided, execute file non-interactively.
         if ($file !== null && $file !== '') {
-            $file = Path::realpath($file);
-
-            if (!is_file($file)) {
-                throw new \RuntimeException(sprintf('File "%s" not found.', $file));
-            }
-
-            try {
-                ob_start();
-
-                $vars = $this->getVars();
-                extract($vars);
-
-                // Use include so the file can return a value. It will run in this scope.
-                $result = include $real;
-
-                $stdout = ob_get_clean();
-
-                if ($stdout !== '') {
-                    $io->writeln($stdout);
-                }
-
-                if (isset($result) && $result !== null) {
-                    dump($result);
-                }
-
-                return Command::SUCCESS;
-            } catch (\Throwable $e) {
-                ob_get_clean();
-
-                throw $e;
-            }
+            return $this->runFile($io, $file);
         }
 
-        // If --code/-c option provided, execute the PHP code non-interactively.
         if ($code !== null && $code !== '') {
-            ob_start();
-
-            $this->code = $code;
-
-            $runner = function () {
-                $vars = $this->getVars();
-
-                extract($vars);
-
-                // Try evaluate as expression first, fallback to statement execution.
-                try {
-                    return eval('return ' . $this->getCode() . ';');
-                } catch (\Throwable $e) {
-                    ob_end_clean();
-                    ob_start();
-                    return eval($this->getCode() . ';');
-                }
-            };
-
-            try {
-                $result = $runner();
-            } catch (\Throwable $e) {
-                ob_end_clean();
-                throw $e;
-            }
-
-            $stdout = ob_get_clean();
-
-            if ($stdout !== '') {
-                $io->writeln($stdout);
-            }
-
-            if (isset($result) && $result !== null) {
-                if (function_exists('dump')) {
-                    dump($result);
-                } else {
-                    $io->writeln(var_export($result, true));
-                }
-            }
-
-            return Command::SUCCESS;
+            return $this->runCode($io, $code);
         }
 
-        // Fallback to interactive REPL using PsySH
-        // Instantiate PsySH shell and expose $io as a scope variable for convenience.
+        if (!$io->getInput()->isInteractive()) {
+            throw new \RuntimeException('Interactive REPL requires an interactive terminal.');
+        }
+
         $shell = new \Psy\Shell();
+        $shell->setScopeVariables($this->getVars());
+        $shell->run();
 
-        if (method_exists($shell, 'setScopeVariables')) {
-            // Modern PsySH supports setScopeVariables to inject variables into REPL scope.
-            $shell->setScopeVariables($this->getVars());
+        return Command::SUCCESS;
+    }
+
+    protected function runFile(IOInterface $io, string $file): int
+    {
+        $root = realpath($this->app->path('@root'));
+        $real = realpath($file);
+
+        if ($root === false || $real === false || !is_file($real)) {
+            throw new \RuntimeException(sprintf('File "%s" not found.', $file));
         }
 
-        $shell->run();
+        if (!str_starts_with($real, $root . DIRECTORY_SEPARATOR) || !str_ends_with($real, '.php')) {
+            throw new \RuntimeException('Only .php files inside the project root can be executed.');
+        }
+
+        return $this->executeIsolated(
+            static function (array $__vars, string $__file) {
+                extract($__vars, EXTR_SKIP);
+
+                return include $__file;
+            },
+            $io,
+            $real
+        );
+    }
+
+    protected function runCode(IOInterface $io, string $code): int
+    {
+        // Compile first so a syntax error never causes partial execution.
+        // Try as an expression, otherwise as statements; code is never run twice.
+        $code = rtrim(trim($code), ';');
+
+        try {
+            token_get_all('<?php return ' . $code . ';', TOKEN_PARSE);
+            $source = 'return ' . $code . ';';
+        } catch (\ParseError) {
+            $source = $code . ';';
+        }
+
+        return $this->executeIsolated(
+            static function (array $__vars, string $__source) {
+                extract($__vars, EXTR_SKIP);
+
+                return eval($__source);
+            },
+            $io,
+            $source
+        );
+    }
+
+    protected function executeIsolated(\Closure $runner, IOInterface $io, string $target): int
+    {
+        $level = ob_get_level();
+        ob_start();
+
+        try {
+            $result = $runner($this->getVars(), $target);
+        } catch (\Throwable $e) {
+            while (ob_get_level() > $level) {
+                ob_end_clean();
+            }
+
+            throw $e;
+        }
+
+        $stdout = '';
+
+        while (ob_get_level() > $level) {
+            $stdout = ob_get_clean() . $stdout;
+        }
+
+        if ($stdout !== '') {
+            $io->writeln($stdout);
+        }
+
+        if ($result !== null && $result !== 1) {
+            if (function_exists('dump')) {
+                dump($result);
+            } else {
+                $io->writeln(var_export($result, true));
+            }
+        }
 
         return Command::SUCCESS;
     }
@@ -149,10 +164,5 @@ class ReplExecCommand implements CommandInterface
             'io' => $this->io,
             'app' => $this->app,
         ];
-    }
-
-    public function getCode(): string
-    {
-        return $this->code;
     }
 }
