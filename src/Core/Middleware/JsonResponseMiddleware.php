@@ -58,6 +58,8 @@ class JsonResponseMiddleware implements AttributeMiddlewareInterface
         } catch (Throwable $e) {
             $this->logError($e);
 
+            $status = ErrorService::normalizeCode($e->getCode());
+
             return response()->json(
                 [
                     'error' => !$this->app->isDebug() ? $e->getMessage() : sprintf(
@@ -67,10 +69,10 @@ class JsonResponseMiddleware implements AttributeMiddlewareInterface
                         $e->getFile(),
                         $e->getLine()
                     ),
-                    'status' => ErrorService::normalizeCode($e->getCode()),
+                    'status' => $status,
                     'code' => $e->getCode(),
                 ]
-            );
+            )->withStatus($status);
         }
     }
 
