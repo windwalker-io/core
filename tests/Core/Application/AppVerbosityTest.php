@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use RuntimeException;
 use Windwalker\Core\Application\AppVerbosity;
+use Windwalker\Core\Form\Exception\ValidateFailException;
 use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 
 class AppVerbosityTest extends TestCase
@@ -53,6 +54,16 @@ class AppVerbosityTest extends TestCase
         self::assertSame('msg', AppVerbosity::NORMAL->displayMessage('msg'));
         self::assertSame('boom', AppVerbosity::NORMAL->displayMessage(new RuntimeException('boom')));
         self::assertSame('fb', AppVerbosity::HIDDEN->displayMessage(new RuntimeException('boom'), 'fb'));
+    }
+
+    #[Test]
+    public function displayMessageShowsSafeMessageWhenHidden(): void
+    {
+        $e = new ValidateFailException('invalid email')->setDebugMessage('field=email');
+
+        self::assertSame('invalid email', AppVerbosity::HIDDEN->displayMessage($e, 'fb'));
+        self::assertSame('invalid email', AppVerbosity::NORMAL->displayMessage($e));
+        self::assertSame('invalid email - field=email', AppVerbosity::VERBOSE->displayMessage($e));
     }
 
     #[Test]

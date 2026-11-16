@@ -212,7 +212,7 @@ class RoutingMiddleware implements MiddlewareInterface, EventAwareInterface
             $handler = $handlers['*'] ?? null;
         }
 
-        if (!$handler && $method === 'get') {
+        if (!$handler && in_array($method, ['get', 'query'], true)) {
             $handler = DefaultController::class;
         }
 

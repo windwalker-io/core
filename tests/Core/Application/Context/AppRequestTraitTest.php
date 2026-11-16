@@ -87,8 +87,39 @@ class AppRequestTraitTest extends TestCase
     {
         $req = $this->createRequest()->withMatchedRoute(new Route('r', '/foo')->vars(['id' => '5', 'a' => 'var']));
 
-        // Query values win over URL vars on key conflict (array_merge order).
-        self::assertSame(['id' => '5', 'a' => '1', 'b' => '2'], $req->getQueryValues());
+        // Non-empty URL vars win over query values on key conflict.
+        self::assertEquals(['a' => 'var', 'b' => '2', 'id' => '5'], $req->getQueryValues());
+    }
+
+    #[Test]
+    public function getQueryValuesLetsQueryFillNullAndEmptyUrlVars(): void
+    {
+        $req = $this->createRequest()->withMatchedRoute(
+            new Route('r', '/foo')->vars(['a' => null, 'b' => '', 'id' => '5'])
+        );
+
+        self::assertEquals(['a' => '1', 'b' => '2', 'id' => '5'], $req->getQueryValues());
+    }
+
+    #[Test]
+    public function getQueryValuesKeepsFalsyButNonEmptyUrlVars(): void
+    {
+        $req = $this->createRequest()->withMatchedRoute(
+            new Route('r', '/foo')->vars(['a' => '0', 'b' => 0])
+        );
+
+        self::assertEquals(['a' => '0', 'b' => 0], $req->getQueryValues());
+    }
+
+    #[Test]
+    public function inputPrefersUrlVarsOverQueryButBodyStillWins(): void
+    {
+        $req = $this->createRequest()->withMatchedRoute(
+            new Route('r', '/foo')->vars(['a' => 'var', 'b' => 'var'])
+        );
+
+        self::assertSame('var', $req->input('a'));
+        self::assertSame('body', $req->input('b'));
     }
 
     #[Test]

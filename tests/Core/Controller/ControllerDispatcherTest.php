@@ -88,6 +88,10 @@ class ControllerDispatcherTest extends TestCase
         PlainTaskControllerStub::$lastCalled = null;
         $this->createContext(method: 'POST')->dispatchController(PlainTaskControllerStub::class);
         self::assertSame('save-called', PlainTaskControllerStub::$lastCalled);
+
+        PlainTaskControllerStub::$lastCalled = null;
+        $this->createContext(method: 'QUERY')->dispatchController(PlainTaskControllerStub::class);
+        self::assertSame('index-called', PlainTaskControllerStub::$lastCalled);
     }
 
     #[Test]

@@ -93,6 +93,7 @@ class ControllerDispatcher
 
         $map = [
             'get' => 'index',
+            'query' => 'index',
             'post' => 'save',
             'put' => 'save',
             'patch' => 'save',

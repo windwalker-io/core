@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\Application;
 
 use Psr\Log\LogLevel;
+use Windwalker\Utilities\Exception\SafeMessageExceptionInterface;
 use Windwalker\Utilities\Exception\VerbosityExceptionInterface;
 
 enum AppVerbosity: int
@@ -64,6 +65,10 @@ enum AppVerbosity: int
     public function displayMessage(\Throwable|string $e, string $fallback = 'Something went wrong'): string
     {
         if ($e instanceof \Throwable) {
+            if ($this->isHidden() && $e instanceof SafeMessageExceptionInterface) {
+                return $e->getSafeMessage();
+            }
+
             if ($this->isVerbose() && $e instanceof VerbosityExceptionInterface) {
                 $e = $e->getMessageByVerbosity($this->value);
             } else {

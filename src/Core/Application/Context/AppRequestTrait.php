@@ -89,10 +89,13 @@ trait AppRequestTrait
 
     public function getQueryValues(): array
     {
-        return array_merge(
+        // Route vars take priority over URL query, unless they are null or empty string.
+        $vars = array_filter(
             $this->getUrlVars(),
-            $this->getUriQueryValues()
+            static fn(mixed $v) => $v !== null && $v !== ''
         );
+
+        return array_merge($this->getUriQueryValues(), $vars);
     }
 
     /**
