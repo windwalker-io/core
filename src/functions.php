@@ -71,6 +71,8 @@ namespace Windwalker {
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
     use Windwalker\Core\View\CollapseWrapper;
+    use Windwalker\Filter\FilterInterface;
+    use Windwalker\Filter\ValidatorInterface;
 
     if (!function_exists('Windwalker\ds')) {
         /**
@@ -303,6 +305,8 @@ namespace Windwalker {
          * @return  Chronos
          *
          * @throws  Exception
+         *
+         * @deprecated  Use chronos('now', $tz)->format($format) instead.
          */
         function now(string $format, string|DateTimeZone|null $tz = null): string
         {
@@ -319,6 +323,8 @@ namespace Windwalker {
          * @param  mixed|T  $value
          *
          * @return  mixed|T
+         *
+         * @deprecated  No longer needed.
          */
         function with(mixed $value): mixed
         {
@@ -334,6 +340,8 @@ namespace Windwalker {
          * @param  string|array  $command
          *
          * @return  mixed
+         *
+         * @deprecated  Use filterWith() primarily.
          */
         function filter(mixed $value, string|array $command): mixed
         {
@@ -349,6 +357,8 @@ namespace Windwalker {
          * @param  string|array  $command
          *
          * @return  bool
+         *
+         * @deprecated  Use validateWith() primarily.
          */
         function validate(mixed $value, string|array $command): bool
         {
@@ -360,12 +370,12 @@ namespace Windwalker {
         /**
          * Filter a value with callback rules. See FilterService::filterWith().
          *
-         * @param  mixed                                             $value
-         * @param  \Closure|\Windwalker\Filter\FilterInterface|array $rule
+         * @param  mixed                           $value
+         * @param  \Closure|FilterInterface|array  $rule
          *
          * @return  mixed
          */
-        function filterWith(mixed $value, \Closure|\Windwalker\Filter\FilterInterface|array $rule): mixed
+        function filterWith(mixed $value, \Closure|FilterInterface|array $rule): mixed
         {
             return Runtime::getContainer()->get(FilterService::class)->filterWith($value, $rule);
         }
@@ -375,12 +385,12 @@ namespace Windwalker {
         /**
          * Validate a value with callback rules. See FilterService::validateWith().
          *
-         * @param  mixed                                              $value
-         * @param  \Closure|\Windwalker\Filter\ValidatorInterface|array $rule
+         * @param  mixed                              $value
+         * @param  \Closure|ValidatorInterface|array  $rule
          *
          * @return  bool
          */
-        function validateWith(mixed $value, \Closure|\Windwalker\Filter\ValidatorInterface|array $rule): bool
+        function validateWith(mixed $value, \Closure|ValidatorInterface|array $rule): bool
         {
             return Runtime::getContainer()->get(FilterService::class)->validateWith($value, $rule);
         }
