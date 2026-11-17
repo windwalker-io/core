@@ -134,7 +134,7 @@ class CorsHandler
         $headers = array_map([HeaderHelper::class, 'normalizeHeaderName'], (array) $headers);
         $headers = implode(', ', $headers);
 
-        $this->response = $this->response->withHeader('Access-Control-Allow-Headers', $headers);
+        $this->response = $this->response->withHeader('Access-Control-Expose-Headers', $headers);
 
         return $this;
     }
