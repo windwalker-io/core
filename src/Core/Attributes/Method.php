@@ -35,7 +35,7 @@ class Method implements ContainerAttributeInterface
             $method = strtoupper($request->getMethod());
 
             if (!in_array($method, $this->methods, true)) {
-                throw new HttpRequestException('Method not allowed', 400);
+                throw new HttpRequestException('Method not allowed', 405);
             }
 
             return $handler(...$args);
