@@ -356,6 +356,36 @@ namespace Windwalker {
         }
     }
 
+    if (!function_exists('\Windwalker\filterWith')) {
+        /**
+         * Filter a value with callback rules. See FilterService::filterWith().
+         *
+         * @param  mixed           $value
+         * @param  \Closure|array  $rule
+         *
+         * @return  mixed
+         */
+        function filterWith(mixed $value, \Closure|array $rule): mixed
+        {
+            return Runtime::getContainer()->get(FilterService::class)->filterWith($value, $rule);
+        }
+    }
+
+    if (!function_exists('\Windwalker\validateWith')) {
+        /**
+         * Validate a value with callback rules. See FilterService::validateWith().
+         *
+         * @param  mixed           $value
+         * @param  \Closure|array  $rule
+         *
+         * @return  bool
+         */
+        function validateWith(mixed $value, \Closure|array $rule): bool
+        {
+            return Runtime::getContainer()->get(FilterService::class)->validateWith($value, $rule);
+        }
+    }
+
     if (!function_exists('\Windwalker\response')) {
         function response(mixed $data = '', int $status = 200, array $headers = []): CoreResponse
         {

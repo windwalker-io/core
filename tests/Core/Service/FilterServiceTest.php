@@ -157,4 +157,125 @@ class FilterServiceTest extends TestCase
         self::assertSame($service, $service->addFilterCallback('noop2', static fn($v) => $v));
         self::assertSame($service, $service->removeFilter('noop'));
     }
+
+    #[Test]
+    public function filterWithAppliesSingleClosureToScalarValue(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('1', $service->filterWith(' 1 ', static fn($v) => trim($v)));
+    }
+
+    #[Test]
+    public function filterWithAppliesClosureListInOrder(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('12', $service->filterWith(' 12 ', [strval(...), trim(...)]));
+    }
+
+    #[Test]
+    public function filterWithAppliesClosureToWholeArrayValue(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame(3, $service->filterWith([1, 2], [static fn(array $a) => array_sum($a)]));
+    }
+
+    #[Test]
+    public function filterWithAppliesNestedCallbackMapToArrayValue(): void
+    {
+        $service = $this->createService();
+
+        $result = $service->filterWith(
+            ['foo' => ' 12 ', 'tags' => ['a'], 'nested' => ['n' => '5'], 'extra' => 'keep'],
+            [
+                'foo' => [strval(...), trim(...)],
+                'tags' => static fn(array $t) => array_map(strtoupper(...), $t),
+                'nested' => ['n' => static fn($v) => (int) $v],
+            ]
+        );
+
+        self::assertSame(
+            ['foo' => '12', 'tags' => ['A'], 'nested' => ['n' => 5], 'extra' => 'keep'],
+            $result
+        );
+    }
+
+    #[Test]
+    public function filterWithSkipsRuleKeysMissingFromValue(): void
+    {
+        $service = $this->createService();
+
+        $result = $service->filterWith(['foo' => ' a '], ['foo' => trim(...), 'missing' => trim(...)]);
+
+        self::assertSame(['foo' => 'a'], $result);
+    }
+
+    #[Test]
+    public function filterWithReturnsScalarValueUnchangedForMapRule(): void
+    {
+        $service = $this->createService();
+
+        self::assertSame('abc', $service->filterWith('abc', ['foo' => trim(...)]));
+    }
+
+    #[Test]
+    public function validateWithReturnsTrueWhenSingleClosurePasses(): void
+    {
+        $service = $this->createService();
+
+        self::assertTrue($service->validateWith(5, static fn($v) => $v > 1));
+    }
+
+    #[Test]
+    public function validateWithReturnsTrueWhenAllChainedClosuresPass(): void
+    {
+        $service = $this->createService();
+
+        self::assertTrue(
+            $service->validateWith('abc', [static fn($v) => is_string($v), static fn($v) => strlen($v) === 3])
+        );
+    }
+
+    #[Test]
+    public function validateWithReturnsTrueWhenNestedMapPasses(): void
+    {
+        $service = $this->createService();
+
+        self::assertTrue($service->validateWith(['age' => 20], ['age' => static fn(int $a) => $a >= 18]));
+    }
+
+    #[Test]
+    public function validateWithThrowsWhenChainedClosureFails(): void
+    {
+        $service = $this->createService();
+
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessageIsOrContains('Value not match');
+
+        $service->validateWith('ab', [static fn($v) => is_string($v), static fn($v) => strlen($v) === 3]);
+    }
+
+    #[Test]
+    public function validateWithThrowsWithFieldMessageWhenMapFieldFails(): void
+    {
+        $service = $this->createService();
+
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessageIsOrContains('Field "age" not match');
+
+        $service->validateWith(['age' => 10], ['age' => static fn(int $a) => $a >= 18]);
+    }
+
+    #[Test]
+    public function validateWithUsesDotPathForNestedFailures(): void
+    {
+        $service = $this->createService();
+
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessageIsOrContains('Field "a.b" not match');
+
+        $service->validateWith(['a' => ['b' => 0]], ['a' => ['b' => static fn($v) => (bool) $v]]);
+    }
 }
