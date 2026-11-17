@@ -360,12 +360,12 @@ namespace Windwalker {
         /**
          * Filter a value with callback rules. See FilterService::filterWith().
          *
-         * @param  mixed           $value
-         * @param  \Closure|array  $rule
+         * @param  mixed                                             $value
+         * @param  \Closure|\Windwalker\Filter\FilterInterface|array $rule
          *
          * @return  mixed
          */
-        function filterWith(mixed $value, \Closure|array $rule): mixed
+        function filterWith(mixed $value, \Closure|\Windwalker\Filter\FilterInterface|array $rule): mixed
         {
             return Runtime::getContainer()->get(FilterService::class)->filterWith($value, $rule);
         }
@@ -375,12 +375,12 @@ namespace Windwalker {
         /**
          * Validate a value with callback rules. See FilterService::validateWith().
          *
-         * @param  mixed           $value
-         * @param  \Closure|array  $rule
+         * @param  mixed                                              $value
+         * @param  \Closure|\Windwalker\Filter\ValidatorInterface|array $rule
          *
          * @return  bool
          */
-        function validateWith(mixed $value, \Closure|array $rule): bool
+        function validateWith(mixed $value, \Closure|\Windwalker\Filter\ValidatorInterface|array $rule): bool
         {
             return Runtime::getContainer()->get(FilterService::class)->validateWith($value, $rule);
         }

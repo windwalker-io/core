@@ -82,20 +82,22 @@ class FilterService
      * Filter a value with callback rules.
      *
      * A rule is one of:
-     * - Closure: applied to the whole value.
-     * - Non-empty list of Closures: applied in order as one chain.
+     * - Closure or FilterInterface: applied to the whole value.
+     * - Non-empty list of Closures or FilterInterfaces: applied in order as one chain.
      * - Associative array: maps field keys to rules, applied recursively. Missing keys are skipped.
      *
-     * @param  mixed                $value
-     * @param  \Closure|array       $rule
+     * @param  mixed                                  $value
+     * @param  \Closure|FilterInterface|array         $rule
      *
      * @return  mixed
+     *
+     * @throws  \InvalidArgumentException  If a chain item is not a Closure or FilterInterface.
      */
-    public function filterWith(mixed $value, \Closure|array $rule): mixed
+    public function filterWith(mixed $value, \Closure|FilterInterface|array $rule): mixed
     {
         if ($this->isCallbackRule($rule)) {
             foreach ($this->toCallbacks($rule) as $callback) {
-                $value = $callback($value);
+                $value = $this->applyFilter($callback, $value);
             }
 
             return $value;
@@ -115,17 +117,18 @@ class FilterService
     }
 
     /**
-     * Validate a value with callback rules. Every Closure in a chain receives the same value;
-     * a Closure returning a falsy value fails the validation.
+     * Validate a value with callback rules. Every Closure or ValidatorInterface in a chain receives the same value;
+     * a Closure returning a falsy value, or a validator whose test() returns false, fails the validation.
      *
-     * @param  mixed           $value
-     * @param  \Closure|array  $rule
+     * @param  mixed                                   $value
+     * @param  \Closure|ValidatorInterface|array       $rule
      *
      * @return  bool
      *
      * @throws  ValidateException
+     * @throws  \InvalidArgumentException  If a chain item is not a Closure or ValidatorInterface.
      */
-    public function validateWith(mixed $value, \Closure|array $rule): bool
+    public function validateWith(mixed $value, \Closure|ValidatorInterface|array $rule): bool
     {
         $this->validateRule($value, $rule, '');
 
@@ -135,11 +138,11 @@ class FilterService
     /**
      * @throws  ValidateException
      */
-    private function validateRule(mixed $value, \Closure|array $rule, string $path): void
+    private function validateRule(mixed $value, \Closure|ValidatorInterface|array $rule, string $path): void
     {
         if ($this->isCallbackRule($rule)) {
             foreach ($this->toCallbacks($rule) as $callback) {
-                $validator = $this->createCallbackValidator($callback);
+                $validator = $this->toValidator($callback);
 
                 if (!$validator->test($value)) {
                     throw ValidateException::create(
@@ -171,6 +174,36 @@ class FilterService
         }
     }
 
+    private function applyFilter(mixed $callback, mixed $value): mixed
+    {
+        if ($callback instanceof \Closure) {
+            return $callback($value);
+        }
+
+        if ($callback instanceof FilterInterface) {
+            return $callback->filter($value);
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Filter rule must be a Closure or FilterInterface, %s given.', get_debug_type($callback))
+        );
+    }
+
+    private function toValidator(mixed $callback): ValidatorInterface
+    {
+        if ($callback instanceof ValidatorInterface) {
+            return $callback;
+        }
+
+        if ($callback instanceof \Closure) {
+            return $this->createCallbackValidator($callback);
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Validate rule must be a Closure or ValidatorInterface, %s given.', get_debug_type($callback))
+        );
+    }
+
     private function createCallbackValidator(\Closure $callback): ValidatorInterface
     {
         return new readonly class ($callback) implements ValidatorInterface {
@@ -183,9 +216,16 @@ class FilterService
         };
     }
 
+    private function isCallbackItem(mixed $item): bool
+    {
+        return $item instanceof \Closure
+            || $item instanceof FilterInterface
+            || $item instanceof ValidatorInterface;
+    }
+
     private function isCallbackRule(mixed $rule): bool
     {
-        if ($rule instanceof \Closure) {
+        if ($this->isCallbackItem($rule)) {
             return true;
         }
 
@@ -194,7 +234,7 @@ class FilterService
         }
 
         foreach ($rule as $item) {
-            if (!$item instanceof \Closure) {
+            if (!$this->isCallbackItem($item)) {
                 return false;
             }
         }
@@ -203,11 +243,11 @@ class FilterService
     }
 
     /**
-     * @return  \Closure[]
+     * @return  array<\Closure|FilterInterface|ValidatorInterface>
      */
-    private function toCallbacks(\Closure|array $rule): array
+    private function toCallbacks(mixed $rule): array
     {
-        return $rule instanceof \Closure ? [$rule] : $rule;
+        return is_array($rule) ? $rule : [$rule];
     }
 
     public function createNested(array $fields): NestedFilter

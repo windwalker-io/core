@@ -11,7 +11,9 @@ use PHPUnit\Framework\TestCase;
 use Windwalker\Filter\CallbackFilter;
 use Windwalker\Filter\Exception\ValidateException;
 use Windwalker\Filter\FilterFactory;
+use Windwalker\Filter\FilterInterface;
 use Windwalker\Filter\NestedFilter;
+use Windwalker\Filter\ValidatorInterface;
 use Windwalker\Core\Service\FilterService;
 
 #[CoversClass(FilterService::class)]
@@ -277,5 +279,119 @@ class FilterServiceTest extends TestCase
         $this->expectExceptionMessageIsOrContains('Field "a.b" not match');
 
         $service->validateWith(['a' => ['b' => 0]], ['a' => ['b' => static fn($v) => (bool) $v]]);
+    }
+
+    #[Test]
+    public function filterWithAcceptsFilterInterfaceInstance(): void
+    {
+        $service = $this->createService();
+
+        $upper = new class implements FilterInterface {
+            public function filter(mixed $value): mixed
+            {
+                return strtoupper($value);
+            }
+        };
+
+        self::assertSame('ABC', $service->filterWith('abc', $upper));
+    }
+
+    #[Test]
+    public function filterWithChainsFilterInterfaceAndClosure(): void
+    {
+        $service = $this->createService();
+
+        $trim = new class implements FilterInterface {
+            public function filter(mixed $value): mixed
+            {
+                return trim($value);
+            }
+        };
+
+        self::assertSame('ABC', $service->filterWith('  abc ', [$trim, strtoupper(...)]));
+    }
+
+    #[Test]
+    public function filterWithThrowsWhenItemIsValidatorInterface(): void
+    {
+        $service = $this->createService();
+
+        $validator = new class implements ValidatorInterface {
+            public function test(mixed $value, bool $strict = false): bool
+            {
+                return true;
+            }
+        };
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('Filter rule must be a Closure or FilterInterface');
+
+        $service->filterWith('abc', [$validator]);
+    }
+
+    #[Test]
+    public function validateWithAcceptsValidatorInterfaceInstance(): void
+    {
+        $service = $this->createService();
+
+        $string = new class implements ValidatorInterface {
+            public function test(mixed $value, bool $strict = false): bool
+            {
+                return is_string($value);
+            }
+        };
+
+        self::assertTrue($service->validateWith('abc', $string));
+    }
+
+    #[Test]
+    public function validateWithThrowsWhenValidatorInterfaceFails(): void
+    {
+        $service = $this->createService();
+
+        $string = new class implements ValidatorInterface {
+            public function test(mixed $value, bool $strict = false): bool
+            {
+                return is_string($value);
+            }
+        };
+
+        $this->expectException(ValidateException::class);
+        $this->expectExceptionMessageIsOrContains('Value not match');
+
+        $service->validateWith(123, $string);
+    }
+
+    #[Test]
+    public function validateWithChainsValidatorInterfaceAndClosure(): void
+    {
+        $service = $this->createService();
+
+        $string = new class implements ValidatorInterface {
+            public function test(mixed $value, bool $strict = false): bool
+            {
+                return is_string($value);
+            }
+        };
+
+        self::assertTrue($service->validateWith('abc', [$string, static fn($v) => strlen($v) === 3]));
+    }
+
+    #[Test]
+    public function validateWithThrowsWhenItemIsFilterInterface(): void
+    {
+        $service = $this->createService();
+
+        $upper = new class implements FilterInterface {
+            public function filter(mixed $value): mixed
+            {
+                return strtoupper($value);
+            }
+        };
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageIsOrContains('Validate rule must be a Closure or ValidatorInterface');
+
+        $service->validateWith('abc', [$upper]);
     }
 }

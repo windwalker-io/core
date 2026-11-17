@@ -50,11 +50,27 @@ validateWith($age, static fn (mixed $v): bool => is_int($v));
 
 ### Rule Types
 
-- **Closure**: applied to the whole value.
-- **List of closures** (non-empty, all items are `Closure`): applied in order, with each result passed to the next
-  closure.
-- **Associative array**: maps field keys to sub-rules. Each sub-rule can be any of these three forms, and nesting is
+- **Closure**: applied to the whole value. `filterWith()` also accepts a `FilterInterface` instance; `validateWith()`
+  also accepts a `ValidatorInterface` instance. Each calls its `filter()` or `test()` method.
+- **List of closures or interface instances** (non-empty): applied in order, with each result passed to the next
+  item.
+- **Associative array**: maps field keys to sub-rules. Each sub-rule can be any of these forms, and nesting is
   allowed.
+
+```php
+use Windwalker\Filter\FilterInterface;
+use Windwalker\Filter\Rule\Regex;
+
+$trim = new class implements FilterInterface {
+    public function filter(mixed $value): mixed
+    {
+        return trim($value);
+    }
+};
+
+$name = $filter->filterWith($input, [$trim, strtoupper(...), new Regex('/.../')]);
+```
+
 
 ### Behaviors
 
@@ -67,6 +83,8 @@ validateWith($age, static fn (mixed $v): bool => is_int($v));
   `Field "path"` for a nested field. The path uses dots, for example `Field "a.b" not match`.
 - **Closures are detected by type, not by callability.** A string such as `'trim'` is not treated as a closure rule.
   Pass `trim(...)` or a closure instead.
+- **Wrong interface type throws `InvalidArgumentException`.** A `ValidatorInterface` in `filterWith()` or a
+  `FilterInterface` in `validateWith()` is rejected.
 
 ### Limitations
 
