@@ -59,6 +59,9 @@ namespace Windwalker {
     use Windwalker\Core\Service\FilterService;
     use Windwalker\Core\Utilities\Dumper;
     use Windwalker\Core\View\CollapseWrapper;
+    use Brick\Math\BigDecimal;
+    use Brick\Math\BigInteger;
+    use Brick\Math\RoundingMode;
     use Windwalker\Filter\FilterInterface;
     use Windwalker\Filter\ValidatorInterface;
 
@@ -244,6 +247,61 @@ namespace Windwalker {
         function log_notice(string|array $channel, mixed $message, array $context = []): void
         {
             Logger::log($channel, LogLevel::NOTICE, $message, $context);
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_big_decimal')) {
+        /**
+         * NOTE: This function convert float to string first to avoid float precision issue.
+         * If you want ot keep the IEE 754 float precision, please use `BigDecimal::fromFloatShortest($float)` directly.
+         *
+         * @param  mixed  $value
+         * @param  int    $scale
+         *
+         * @return  BigDecimal|null
+         */
+        function try_big_decimal(
+            mixed $value,
+            int $scale = 4,
+            RoundingMode $roundingMode = RoundingMode::HalfUp
+        ): ?BigDecimal {
+            if (!class_exists(BigDecimal::class)) {
+                throw new \DomainException('Please install `brick/math` first.');
+            }
+
+            if ($value === null) {
+                return null;
+            }
+
+            if ($value instanceof BigDecimal) {
+                return $value->toScale($scale, $roundingMode);
+            }
+
+            return BigDecimal::of((string) $value)->toScale($scale, $roundingMode);
+        }
+    }
+
+    if (!function_exists('\Windwalker\try_big_integer')) {
+        /**
+         * @param  mixed  $value
+         *
+         * @return  BigInteger|null
+         */
+        function try_big_integer(mixed $value): ?BigInteger
+        {
+            if (!class_exists(BigInteger::class)) {
+                throw new \DomainException('Please install `brick/math` first.');
+            }
+
+            if ($value === null) {
+                return null;
+            }
+
+            if ($value instanceof BigInteger) {
+                return $value;
+            }
+
+            return BigInteger::of((string) $value);
         }
     }
 }

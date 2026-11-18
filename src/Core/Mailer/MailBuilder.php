@@ -6,6 +6,7 @@ namespace Windwalker\Core\Mailer;
 
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 use League\CommonMark\Util\HtmlFilter;
+use Windwalker\DOM\HTML5Factory;
 use Windwalker\DOM\HTMLElement;
 use Windwalker\Html\Grid\Grid;
 use Windwalker\Utilities\Classes\ChainingTrait;
@@ -61,11 +62,14 @@ class MailBuilder implements \Stringable
             throw new \LogicException('You cannot add more line in a line.');
         }
 
+        $fromSub = false;
+
         if ($elements instanceof \Closure) {
             $sub = new static($this->markdown, true);
             $sub = $elements($sub) ?? $sub;
 
             $elements = $sub->blocks;
+            $fromSub = true;
         }
 
         if (is_string($elements)) {
@@ -76,7 +80,10 @@ class MailBuilder implements \Stringable
 
         foreach (array_values($elements) as $i => $element) {
             if (is_string($element)) {
-                $element = $this->tryRenderMarkdown($element);
+                // Sub-builder blocks are already rendered HTML or escaped text, insert them as raw HTML.
+                $element = $fromSub
+                    ? HTML5Factory::parseAsFragment($element)
+                    : $this->tryRenderMarkdown($element);
             }
 
             if ($i > 0) {
@@ -215,7 +222,7 @@ class MailBuilder implements \Stringable
 
         $text = (string) $text;
         $this->blocks[] = $this->markdown
-            ? $this->tryRenderMarkdown($text)
+            ? $this->renderMarkdownHtml($text)
             : htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return $this;
@@ -245,7 +252,13 @@ class MailBuilder implements \Stringable
             return $text;
         }
 
-        $html = (string) $this->getMarkdownRenderer()->convert((string) $text);
+        // Return DOM nodes so rendered Markdown HTML is not escaped again when inserted into elements.
+        return HTML5Factory::parseAsFragment($this->renderMarkdownHtml((string) $text));
+    }
+
+    protected function renderMarkdownHtml(string $text): string
+    {
+        $html = (string) $this->getMarkdownRenderer()->convert($text);
 
         if (preg_match('/^<p>(.*)<\/p>\n?$/sD', $html, $matches)) {
             return $matches[1];

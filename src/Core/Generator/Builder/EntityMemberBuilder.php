@@ -570,7 +570,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
             $this->addUse(CastNullable::class);
             $this->addUse(ServerTimeCast::class);
             $prop->setAttribute('fullType', Chronos::class);
-            $prop->setAttribute('fullType', ServerTimeCast::class);
             $prop->attrGroups[] = $this->attributeGroup(
                 $this->attribute(
                     'CastNullable',
@@ -599,27 +598,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 $this->attribute(
                     'CastNullable',
                     new Node\Expr\ClassConstFetch(new Node\Name('PlainDateCast'), 'class')
-                ),
-            );
-        }
-
-        if (preg_match('/^\\??(BigInteger|BigNumber|BigDecimal)$/', $type, $matches)) {
-            if ($dbColumn->getIsNullable()) {
-                $cast = 'CastNullable';
-                $this->addUse(CastNullable::class);
-            } else {
-                $cast = 'Cast';
-                $this->addUse(Cast::class);
-            }
-
-            $className = $matches[1];
-
-            $this->addUse('Brick\\Math\\' . $className);
-            $prop->setAttribute('fullType', 'Brick\\Math\\' . $className);
-            $prop->attrGroups[] = $this->attributeGroup(
-                $this->attribute(
-                    $cast,
-                    new Node\Expr\ClassConstFetch(new Node\Name($className), 'class')
                 ),
             );
         }
