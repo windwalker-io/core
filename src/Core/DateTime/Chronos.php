@@ -145,8 +145,11 @@ class Chronos extends DateTimeImmutable implements
 
         $tz = static::wrapTimezoneObject($tz);
 
-        // If the date is numeric assume a unix timestamp and convert it.
-        $date = is_numeric($date) ? date('c', (int) $date) : $date;
+        // If the date is numeric assume a unix timestamp, render it in the target zone (default zone if none).
+        if (is_numeric($date)) {
+            $tz ??= new DateTimeZone(date_default_timezone_get());
+            $date = (new DateTimeImmutable('@' . (int) $date))->setTimezone($tz);
+        }
 
         if ($date instanceof DateTimeInterface) {
             $tz ??= $date->getTimezone();
@@ -249,15 +252,7 @@ class Chronos extends DateTimeImmutable implements
             return false;
         }
 
-        $chronos = new static($datetime->getTimestamp(), $datetime->getTimezone());
-        $chronos = $chronos->setTime(
-            (int) $datetime->format('H'),
-            (int) $datetime->format('i'),
-            (int) $datetime->format('s'),
-            (int) $datetime->format('u')
-        );
-
-        return $chronos;
+        return new static($datetime->format('Y-m-d H:i:s.u'), $datetime->getTimezone());
     }
 
     /**

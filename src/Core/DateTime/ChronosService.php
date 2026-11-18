@@ -170,10 +170,6 @@ class ChronosService
         $from = Chronos::wrapTimezoneObject($from);
         $to = Chronos::wrapTimezoneObject($to);
 
-        if ($from->getName() === $to->getName()) {
-            return Chronos::wrap($date);
-        }
-
         if (is_string($date) && preg_match(self::OFFSET_PATTERN, $date)) {
             $date = Chronos::wrap($date);
         } else {

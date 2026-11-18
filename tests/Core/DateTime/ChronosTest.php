@@ -218,6 +218,15 @@ class ChronosTest extends TestCase
     }
 
     #[Test]
+    public function createFromFormatHonorsTimezoneArgument(): void
+    {
+        $chronos = Chronos::createFromFormat('Y-m-d H:i:s', '2020-02-03 04:05:06', 'Asia/Tokyo');
+
+        self::assertSame('Asia/Tokyo', $chronos->getTimezone()->getName());
+        self::assertSame('2020-02-03 04:05:06', $chronos->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
     public function createFromFormatReturnsFalseOnInvalidInput(): void
     {
         $result = Chronos::createFromFormat('Y-m-d', 'not-a-date');

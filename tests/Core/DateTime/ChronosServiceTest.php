@@ -263,6 +263,15 @@ class ChronosServiceTest extends TestCase
     }
 
     #[Test]
+    public function createLocalHonorsExplicitTargetTimezone(): void
+    {
+        $result = $this->instance->createLocal('2026-01-02 03:04:05', null, 'UTC');
+
+        self::assertSame('UTC', $result->getTimezone()->getName());
+        self::assertSame('2026-01-01 19:04:05', $result->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
     public function createAsLocalConvertsFromGivenTimezoneToLocal(): void
     {
         $result = $this->instance->createAsLocal('2020-01-01 10:00:00', 'UTC');
