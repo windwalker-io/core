@@ -12,6 +12,7 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Clock\ClockInterface;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
+use Windwalker\Core\DateTime\Contract\HasInstantInterface;
 use Windwalker\Core\Language\TranslatorTrait;
 use Windwalker\Core\Runtime\Config;
 use Windwalker\Database\DatabaseAdapter;
@@ -30,6 +31,12 @@ class ChronosService
     public const string UNIT_DAY = 'day';
 
     public const string UNIT_WEEK = 'week';
+
+    /**
+     * Matches a time followed by an explicit UTC offset (e.g. "10:00:00+08:00", "10:00Z").
+     * Date-only strings like "2020-01-01" do not match.
+     */
+    private const string OFFSET_PATTERN = '/\d{1,2}:\d{2}(?::\d{2}(?:\.\d+)?)?\s*(?:Z|[+-]\d{2}(?::?\d{2})?)$/i';
 
     /**
      * ChronosService constructor.
@@ -167,7 +174,7 @@ class ChronosService
             return Chronos::wrap($date);
         }
 
-        if (is_string($date) && str_contains($date, '+')) {
+        if (is_string($date) && preg_match(self::OFFSET_PATTERN, $date)) {
             $date = Chronos::wrap($date);
         } else {
             $date = Chronos::wrap($date, $from);
@@ -254,6 +261,13 @@ class ChronosService
         DateTimeInterface|ChronosInterface $a,
         DateTimeInterface|ChronosInterface $b
     ): int {
+        // Plain* types (no instant) can only be compared with other ChronosInterface values.
+        foreach ([[$a, $b], [$b, $a]] as [$x, $y]) {
+            if ($x instanceof ChronosInterface && !$x instanceof HasInstantInterface && !$y instanceof ChronosInterface) {
+                throw new \TypeError(sprintf('Cannot compare %s with %s.', get_debug_type($x), get_debug_type($y)));
+            }
+        }
+
         // Chronos is both, plain DateTime is only a DateTimeInterface.
         if ($a instanceof ChronosInterface) {
             return $a->compareTo($b);
@@ -439,7 +453,7 @@ class ChronosService
         // Weeks
         $diff = round($diff / 7);
 
-        if ($diff <= 4 || $unit === static::UNIT_DAY) {
+        if ($diff <= 4 || $unit === static::UNIT_WEEK) {
             return $this->choice('windwalker.datetime.relative.week', $diff, d: $diff);
         }
 
