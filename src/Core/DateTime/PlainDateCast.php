@@ -30,7 +30,7 @@ class PlainDateCast implements CastInterface
 
         // Some drivers return a full datetime for DATE columns (e.g. Oracle).
         if (!preg_match('/^(\d{4}-\d{2}-\d{2})(?:[ T].*)?$/', $value, $matches)) {
-            throw new \InvalidArgumentException(sprintf('Invalid date "%s", expect Y-m-d.', $value));
+            throw new \DateMalformedStringException(sprintf('Invalid date "%s", expect Y-m-d.', $value));
         }
 
         // MySQL zero date is not a real date.

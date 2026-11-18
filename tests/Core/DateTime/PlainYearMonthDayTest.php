@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\DateTime;
 
+use DateMalformedStringException;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -51,7 +52,7 @@ class PlainYearMonthDayTest extends TestCase
             try {
                 PlainYearMonth::parse($bad);
                 self::fail($bad);
-            } catch (InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 self::assertTrue(true);
             }
         }
@@ -152,7 +153,7 @@ class PlainYearMonthDayTest extends TestCase
             try {
                 PlainMonthDay::parse($bad);
                 self::fail($bad);
-            } catch (InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 self::assertTrue(true);
             }
         }
@@ -182,7 +183,7 @@ class PlainYearMonthDayTest extends TestCase
             try {
                 $class::parse($value);
                 self::fail($class . ' ' . json_encode($value));
-            } catch (InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 self::assertTrue(true);
             }
         }

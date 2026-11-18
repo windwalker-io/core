@@ -8,7 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\DateTime\Contract\DifferenceInterface;
@@ -94,7 +94,7 @@ final class PlainDateTime implements ChronosInterface, DifferenceInterface, Roun
         $p = ChronosMath::parseIso($dateTime);
 
         if ($p === null) {
-            throw new InvalidArgumentException(
+            throw new DateMalformedStringException(
                 sprintf('Invalid date time "%s", expect Y-m-d\TH:i[:s[.f]].', $dateTime)
             );
         }

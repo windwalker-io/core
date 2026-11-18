@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\DateTime;
 
 use DateInterval;
+use DateMalformedIntervalStringException;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
@@ -270,7 +271,7 @@ class Chronos extends DateTimeImmutable implements
      *
      * @return  DateInterval
      *
-     * @throws  Exception
+     * @throws  DateMalformedIntervalStringException
      */
     public static function createInterval(\DateInterval|string|int $duration): DateInterval
     {

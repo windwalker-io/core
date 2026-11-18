@@ -8,7 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\DateTime\Contract\DifferenceInterface;
@@ -89,6 +89,10 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
      */
     public static function parse(string $instant): self
     {
+        if (str_contains($instant, "\0")) {
+            throw new DateMalformedStringException(sprintf('Invalid instant "%s", expect ISO 8601 with time zone.', $instant));
+        }
+
         $normalized = preg_replace_callback(
             '/[.,](\d+)(?=[zZ+-])/',
             static fn(array $m) => '.' . substr(str_pad($m[1], 6, '0'), 0, 6),
@@ -103,7 +107,7 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid instant "%s", expect ISO 8601 with time zone.', $instant));
+        throw new DateMalformedStringException(sprintf('Invalid instant "%s", expect ISO 8601 with time zone.', $instant));
     }
 
     public function toInstant(): self

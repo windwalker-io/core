@@ -8,7 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\DateTime\Contract\DifferenceInterface;
@@ -86,7 +86,7 @@ final class PlainYearMonth implements ChronosInterface, DifferenceInterface
             return self::of($parsed['year'], $parsed['month']);
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid year month "%s", expect Y-m.', $value));
+        throw new DateMalformedStringException(sprintf('Invalid year month "%s", expect Y-m.', $value));
     }
 
     public static function today(DateTimeZone|string|null $tz = null): self

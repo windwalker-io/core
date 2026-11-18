@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Windwalker\Tests\Core\DateTime;
 
-use InvalidArgumentException;
+use DateMalformedStringException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use TypeError;
@@ -16,9 +16,12 @@ use Windwalker\Core\DateTime\PlainTime;
 use function Windwalker\must_plain_date;
 use function Windwalker\must_plain_datetime;
 use function Windwalker\must_plain_time;
+use function Windwalker\to_instant;
 use function Windwalker\to_plain_date;
 use function Windwalker\to_plain_datetime;
 use function Windwalker\to_plain_time;
+use function Windwalker\try_chronos;
+use function Windwalker\try_instant;
 use function Windwalker\try_plain_date;
 use function Windwalker\try_plain_datetime;
 use function Windwalker\try_plain_time;
@@ -42,7 +45,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function mustPlainDateRejectsInvalidValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         must_plain_date('2026/03/05');
     }
@@ -50,7 +53,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function mustPlainDateRejectsOutOfRangeDate(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         must_plain_date('2026-02-30');
     }
@@ -66,7 +69,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function mustPlainDateRejectsEmptyString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         must_plain_date('');
     }
@@ -87,7 +90,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function toPlainDateThrowsForInvalidValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         to_plain_date('not-a-date');
     }
@@ -129,7 +132,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function mustPlainTimeRejectsInvalidAndOutOfRangeValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         must_plain_time('25:00:00');
     }
@@ -153,7 +156,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function toPlainTimeThrowsForInvalidValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         to_plain_time('25:00:00');
     }
@@ -181,7 +184,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function mustPlainDateTimeRejectsInvalidValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         must_plain_datetime('2026-03-05 25:00:00');
     }
@@ -200,7 +203,7 @@ class DatetimeFunctionsTest extends TestCase
     #[Test]
     public function toPlainDateTimeThrowsForInvalidValues(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedStringException::class);
 
         to_plain_datetime('2026-03-05 25:00:00');
     }
@@ -226,5 +229,39 @@ class DatetimeFunctionsTest extends TestCase
             '2026-03-05T03:00:00',
             try_plain_datetime(Chronos::create('2026-03-05 03:00', 'Asia/Taipei'))?->toIso()
         );
+    }
+
+    #[Test]
+    public function toInstantReturnsNullForNullAndEmpty(): void
+    {
+        self::assertNull(to_instant(null));
+        self::assertNull(to_instant(''));
+    }
+
+    #[Test]
+    public function toInstantThrowsOnInvalidString(): void
+    {
+        $this->expectException(DateMalformedStringException::class);
+
+        to_instant('not-a-date');
+    }
+
+    #[Test]
+    public function tryInstantReturnsNullForInvalidString(): void
+    {
+        self::assertNull(try_instant('not-a-date'));
+        self::assertNull(try_instant(''));
+        self::assertNull(try_instant(null));
+        self::assertNull(try_instant("2026-03-05T02:00:00Z\0"));
+        self::assertSame('2026-03-05T02:00:00Z', try_instant('2026-03-05T02:00:00Z')?->toIso());
+    }
+
+    #[Test]
+    public function tryChronosReturnsNullForInvalidString(): void
+    {
+        self::assertNull(try_chronos('not-a-date'));
+        self::assertNull(try_chronos(''));
+        self::assertNull(try_chronos(null));
+        self::assertSame('2026-03-05', try_chronos('2026-03-05')?->format('Y-m-d'));
     }
 }

@@ -41,7 +41,7 @@ class PlainTimeCastTest extends TestCase
     #[Test]
     public function hydrateRejectsOutOfRange(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\DateMalformedStringException::class);
 
         new PlainTimeCast()->hydrate('838:59:59');
     }

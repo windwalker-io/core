@@ -40,7 +40,7 @@ class PlainDateCastTest extends TestCase
     #[Test]
     public function hydrateRejectsInvalid(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\DateMalformedStringException::class);
 
         new PlainDateCast()->hydrate('tomorrow');
     }

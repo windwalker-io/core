@@ -6,7 +6,7 @@ namespace Windwalker\Core\DateTime;
 
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use JsonSerializable;
 use Stringable;
 
@@ -62,7 +62,7 @@ final class PlainMonthDay implements Stringable, JsonSerializable
             return self::of($parsed['month'], $parsed['day']);
         }
 
-        throw new InvalidArgumentException(sprintf('Invalid month day "%s", expect m-d.', $value));
+        throw new DateMalformedStringException(sprintf('Invalid month day "%s", expect m-d.', $value));
     }
 
     public static function today(DateTimeZone|string|null $tz = null): self

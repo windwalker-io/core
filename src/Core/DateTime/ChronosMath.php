@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Core\DateTime;
 
 use DateInterval;
+use DateMalformedIntervalStringException;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -615,17 +616,21 @@ final class ChronosMath
             try {
                 return new DateInterval($value);
             } catch (\Exception $e) {
-                throw new InvalidArgumentException(sprintf('Invalid ISO 8601 duration "%s".', $value), 0, $e);
+                throw new DateMalformedIntervalStringException(
+                    sprintf('Invalid ISO 8601 duration "%s".', $value),
+                    0,
+                    $e
+                );
             }
         }
 
         if (!preg_match(self::RELATIVE_PATTERN, $value)) {
-            throw new InvalidArgumentException(
+            throw new DateMalformedIntervalStringException(
                 sprintf('"%s" is not an additive interval, only "N unit" terms are supported.', $value)
             );
         }
 
         return DateInterval::createFromDateString($value)
-            ?: throw new InvalidArgumentException(sprintf('Invalid interval string "%s".', $value));
+            ?: throw new DateMalformedIntervalStringException(sprintf('Invalid interval string "%s".', $value));
     }
 }

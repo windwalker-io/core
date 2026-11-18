@@ -8,7 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\DateTime\Contract\DifferenceInterface;
@@ -58,7 +58,7 @@ final class PlainDate implements ChronosInterface, DifferenceInterface, HasDateI
         $parsed = ChronosMath::parseIso($date);
 
         if ($parsed === null) {
-            throw new InvalidArgumentException(sprintf('Invalid date "%s", expect Y-m-d.', $date));
+            throw new DateMalformedStringException(sprintf('Invalid date "%s", expect Y-m-d.', $date));
         }
 
         return self::of($parsed['year'], $parsed['month'], $parsed['day']);

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Windwalker {
 
+    use DateMalformedStringException;
     use DateTimeInterface;
     use DateTimeZone;
     use Exception;
     use Windwalker\Core\DateTime\Chronos;
     use Windwalker\Core\DateTime\ChronosService;
+    use Windwalker\Core\DateTime\Contract\HasChronosInterface;
     use Windwalker\Core\DateTime\Contract\HasDateInterface;
     use Windwalker\Core\DateTime\Contract\HasInstantInterface;
     use Windwalker\Core\DateTime\Contract\HasTimeInterface;
@@ -92,22 +94,42 @@ namespace Windwalker {
          */
         function try_chronos(mixed $date = 'now', string|DateTimeZone|null $tz = null): ?Chronos
         {
-            return Chronos::tryWrap($date, $tz);
+            if ($date === null || $date === '') {
+                return null;
+            }
+
+            if ($date instanceof DateTimeInterface || $date instanceof HasChronosInterface) {
+                return Chronos::wrap($date, $tz);
+            }
+
+            if (!is_string($date)) {
+                return null;
+            }
+
+            try {
+                return Chronos::wrap($date, $tz);
+            } catch (DateMalformedStringException) {
+                return null;
+            }
         }
     }
 
     if (!function_exists('\Windwalker\to_instant')) {
         /**
-         * Strictly convert a value to Instant.
+         * Strictly convert a value to Instant. Null and empty string return NULL.
          *
          * Accepts: Instant (returned as is), any HasInstantInterface (Chronos), \DateTimeInterface,
          * and strict ISO 8601 string with time zone. PlainDate/PlainTime/PlainDateTime are rejected
          * because they have no time zone.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
-        function to_instant(mixed $value): Instant
+        function to_instant(mixed $value): ?Instant
         {
+            if ($value === null || $value === '') {
+                return null;
+            }
+
             return match (true) {
                 $value instanceof Instant => $value,
                 $value instanceof HasInstantInterface => $value->toInstant(),
@@ -120,11 +142,32 @@ namespace Windwalker {
 
     if (!function_exists('\Windwalker\try_instant')) {
         /**
-         * Same as to_instant() but returns NULL for null or empty string.
+         * Same as to_instant() but returns NULL for invalid string formats instead of throwing.
+         * Unsupported types (e.g. PlainDate) also return NULL.
          */
         function try_instant(mixed $value): ?Instant
         {
-            return $value === null || $value === '' ? null : to_instant($value);
+            if ($value instanceof Instant) {
+                return $value;
+            }
+
+            if ($value instanceof HasInstantInterface) {
+                return $value->toInstant();
+            }
+
+            if ($value instanceof DateTimeInterface) {
+                return Instant::from($value);
+            }
+
+            if (!is_string($value) || $value === '') {
+                return null;
+            }
+
+            try {
+                return Instant::parse($value);
+            } catch (DateMalformedStringException) {
+                return null;
+            }
         }
     }
 
@@ -135,7 +178,7 @@ namespace Windwalker {
          * Accepts: PlainDate (returned as is), any HasDateInterface (PlainDateTime, Chronos),
          * \DateTimeInterface, and strict `Y-m-d` string. Instant is rejected. Null and empty string are rejected.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function must_plain_date(mixed $value): PlainDate
         {
@@ -153,7 +196,7 @@ namespace Windwalker {
         /**
          * Same as must_plain_date() but returns NULL for null or empty string.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function to_plain_date(mixed $value): ?PlainDate
         {
@@ -185,7 +228,7 @@ namespace Windwalker {
 
             try {
                 return PlainDate::parse($value);
-            } catch (\InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 return null;
             }
         }
@@ -198,7 +241,7 @@ namespace Windwalker {
          * Accepts: PlainTime (returned as is), any HasTimeInterface (PlainDateTime, Chronos),
          * \DateTimeInterface, and strict time string. Instant is rejected. Null and empty string are rejected.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function must_plain_time(mixed $value): PlainTime
         {
@@ -216,7 +259,7 @@ namespace Windwalker {
         /**
          * Same as must_plain_time() but returns NULL for null or empty string.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function to_plain_time(mixed $value): ?PlainTime
         {
@@ -248,7 +291,7 @@ namespace Windwalker {
 
             try {
                 return PlainTime::parse($value);
-            } catch (\InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 return null;
             }
         }
@@ -262,7 +305,7 @@ namespace Windwalker {
          * without time zone. PlainDate/PlainTime/Instant are rejected, combine or convert explicitly.
          * Null and empty string are rejected.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function must_plain_datetime(mixed $value): PlainDateTime
         {
@@ -282,7 +325,7 @@ namespace Windwalker {
         /**
          * Same as must_plain_datetime() but returns NULL for null or empty string.
          *
-         * @throws  \TypeError|\InvalidArgumentException
+         * @throws  \TypeError|DateMalformedStringException
          */
         function to_plain_datetime(mixed $value): ?PlainDateTime
         {
@@ -314,7 +357,7 @@ namespace Windwalker {
 
             try {
                 return PlainDateTime::parse($value);
-            } catch (\InvalidArgumentException) {
+            } catch (DateMalformedStringException) {
                 return null;
             }
         }

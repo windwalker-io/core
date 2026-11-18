@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Windwalker\Tests\Core\DateTime;
 
 use DateInterval;
+use DateMalformedIntervalStringException;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
@@ -60,7 +61,7 @@ class ChronoValueObjectsTest extends TestCase
     #[Test]
     public function plainDateRejectsInvalid(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\DateMalformedStringException::class);
 
         PlainDate::parse('2026-02-31');
     }
@@ -108,9 +109,17 @@ class ChronoValueObjectsTest extends TestCase
     #[Test]
     public function plusRejectsNonAdditiveString(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DateMalformedIntervalStringException::class);
 
         PlainDate::of(2026, 1, 1)->plus('next monday');
+    }
+
+    #[Test]
+    public function plusRejectsMalformedIsoDuration(): void
+    {
+        $this->expectException(DateMalformedIntervalStringException::class);
+
+        PlainDate::of(2026, 1, 1)->plus('PXYZ');
     }
 
     #[Test]
@@ -221,7 +230,7 @@ class ChronoValueObjectsTest extends TestCase
     #[Test]
     public function instantParseRequiresTimeZone(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\DateMalformedStringException::class);
 
         Instant::parse('2026-01-01T00:00:00');
     }
@@ -346,7 +355,7 @@ class ChronoValueObjectsTest extends TestCase
             try {
                 PlainDateTime::parse($bad);
                 self::fail($bad);
-            } catch (\InvalidArgumentException) {
+            } catch (\DateMalformedStringException) {
                 self::assertTrue(true);
             }
         }

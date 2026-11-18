@@ -8,7 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
+use DateMalformedStringException;
 use RoundingMode;
 use Windwalker\Core\DateTime\Contract\ChronosInterface;
 use Windwalker\Core\DateTime\Contract\DifferenceInterface;
@@ -71,7 +71,7 @@ final class PlainTime implements ChronosInterface, DifferenceInterface, Roundabl
         $parts = ChronosMath::parseIsoTime($time);
 
         if ($parts === null) {
-            throw new InvalidArgumentException(sprintf('Invalid time "%s", expect H:i[:s[.f]].', $time));
+            throw new DateMalformedStringException(sprintf('Invalid time "%s", expect H:i[:s[.f]].', $time));
         }
 
         return self::of(...$parts);
