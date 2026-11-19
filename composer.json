@@ -52,7 +52,8 @@
         "dragonmantank/cron-expression": "^3.6",
         "tijsverkoyen/css-to-inline-styles": "^2.4",
         "mikey179/vfsstream": "^1.6",
-        "league/commonmark": "^2.10"
+        "league/commonmark": "^2.10",
+        "brick/math": "^1.0"
     },
     "scripts": {
         "test": "phpunit",
