@@ -29,6 +29,7 @@ class OffsetClock implements ChronosClockInterface
         return $this;
     }
 
+    #[\NoDiscard]
     public function withAddedSeconds(int $seconds): static
     {
         $clone = clone $this;

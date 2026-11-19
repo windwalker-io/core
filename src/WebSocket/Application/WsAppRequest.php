@@ -72,6 +72,7 @@ class WsAppRequest implements AppRequestInterface, \JsonSerializable, WebSocketF
      *
      * @return  static  Return self to support chaining.
      */
+    #[\NoDiscard]
     public function withServerRequest(WebSocketRequestInterface $request): static
     {
         $new = clone $this;

@@ -19,7 +19,7 @@ use Windwalker\Reactor\Swoole\Event\WorkerStartEvent;
 #[EventSubscriber]
 class SwooleProcessSubscriber
 {
-    public function __construct(protected Container $container) {}
+    public function __construct(protected Container $container, protected ?int $garbageMax = null) {}
 
     #[ListenTo(ManagerStartEvent::class)]
     public function managerStart(ManagerStartEvent $event): void
@@ -64,7 +64,8 @@ class SwooleProcessSubscriber
     public function response(): void
     {
         // Todo: Move this to config
-        $garbageMax = 50;
+        $garbageMax = $this->garbageMax ?? 50;
+
         if ((memory_get_usage() / 1024 / 1024) > $garbageMax) {
             gc_collect_cycles();
         }

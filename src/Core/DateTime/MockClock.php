@@ -21,6 +21,7 @@ class MockClock implements ChronosClockInterface
         return $this->now;
     }
 
+    #[\NoDiscard]
     public function with(string|int|float|\DateTimeInterface $date): static
     {
         $clone = clone $this;

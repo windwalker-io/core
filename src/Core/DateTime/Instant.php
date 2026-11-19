@@ -175,6 +175,7 @@ final class Instant implements ChronosInterface, DifferenceInterface, RoundableI
         );
     }
 
+    #[\NoDiscard]
     public function round(
         DateTimeUnit|string $smallestUnit,
         int $roundingIncrement = 1,

@@ -133,6 +133,7 @@ final class PlainTime implements ChronosInterface, DifferenceInterface, Roundabl
         );
     }
 
+    #[\NoDiscard]
     public function round(
         DateTimeUnit|string $smallestUnit,
         int $roundingIncrement = 1,

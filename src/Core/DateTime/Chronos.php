@@ -596,6 +596,7 @@ class Chronos extends DateTimeImmutable implements
      * Same wall-clock fields, placed in another time zone. The instant changes.
      * A wall-clock time that does not exist in the target zone (DST gap) is shifted forward by PHP.
      */
+    #[\NoDiscard]
     public function withTimezoneKeepingLocal(DateTimeZone|string $timezone): static
     {
         return new static($this->format('Y-m-d H:i:s.u'), static::wrapTimezoneObject($timezone));

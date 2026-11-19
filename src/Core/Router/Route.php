@@ -229,6 +229,7 @@ class Route implements JsonSerializable
      *
      * @since  3.5
      */
+    #[\NoDiscard]
     public function compile(): Route
     {
         $new = clone $this;
