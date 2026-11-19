@@ -109,7 +109,7 @@ class PseudoCrypt
             $int = bcdiv($int, '62');
         }
 
-        return strrev($key);
+        return $key === '' ? '0' : strrev($key);
     }
 
     public function hash(int|string $num, int $len = 5): string

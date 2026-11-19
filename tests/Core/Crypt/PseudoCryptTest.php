@@ -11,9 +11,9 @@ use Windwalker\Core\Crypt\PseudoCrypt;
 class PseudoCryptTest extends TestCase
 {
     #[Test]
-    public function base62EncodesZeroAsEmptyString(): void
+    public function base62EncodesZeroAsZero(): void
     {
-        self::assertSame('', PseudoCrypt::base62(0));
+        self::assertSame('0', PseudoCrypt::base62(0));
     }
 
     #[Test]
