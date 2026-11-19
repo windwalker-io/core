@@ -36,6 +36,18 @@ $parser->format(engine: SocketIoParser::ENGINE_PONG);              // 3
 - 其他封包：`requestTarget` = `socket.io:<type>` 或 `engine.io:<type>`，`parsedData` 為完整封包。
 - 完整封包永遠放在 request attribute `socketio`（含 ack id、namespace）。
 
+### 在 handler 取得參數
+
+EVENT 的 `parsedData` 是從 0 開始的參數 list，可用 `input()` 依索引取值（`ChainingArgumentsParer` 的 `["event", a, b]` 也相同）：
+
+```php
+$app->input(0);     // 第一個參數 a
+$app->input(0, 1);  // Collection [a, b]
+$app->input();      // 全部參數
+```
+
+`input()` 只忽略 `null` 與空字串欄位，索引 `0` 是有效欄位。索引不存在時回傳 `null`。
+
 ## 限制（未實作）
 
 Parser 只做無狀態的資料結構轉換，以下需另行實作：

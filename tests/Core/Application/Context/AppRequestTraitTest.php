@@ -256,4 +256,14 @@ class AppRequestTraitTest extends TestCase
 
         self::assertSame('raw-scalar-payload', $request->input('foo', 'bar'));
     }
+
+    #[Test]
+    public function inputWithZeroIndexReturnsFirstItemOfListInput(): void
+    {
+        $request = new AppRequestTraitStub(['first', 'second']);
+
+        self::assertSame('first', $request->input(0));
+        self::assertSame('second', $request->input(1));
+        self::assertSame(['first', 'second'], $request->input(0, 1)->dump());
+    }
 }

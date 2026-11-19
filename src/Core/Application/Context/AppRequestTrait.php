@@ -172,7 +172,7 @@ trait AppRequestTrait
     {
         $input = $this->compileInput();
 
-        $fields = array_filter($fields);
+        $fields = array_filter($fields, static fn($field) => $field !== null && $field !== '');
 
         if ($fields === []) {
             if (is_array($input) || is_object($input)) {

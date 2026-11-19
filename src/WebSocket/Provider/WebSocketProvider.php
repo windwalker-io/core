@@ -86,7 +86,9 @@ class WebSocketProvider implements ServiceProviderInterface, BootableProviderInt
             fn(Container $container) => $container->get(WebSocketServerInterface::class)->getMessageEmitter()
         );
 
-        $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
+        if (!$container->has(WebSocketParserInterface::class)) {
+            $container->bindShared(WebSocketParserInterface::class, SimpleMessageParser::class);
+        }
 
         $this->registerRequestObject($container);
 
