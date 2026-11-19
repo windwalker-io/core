@@ -65,14 +65,14 @@ class CliExporterTest extends TestCase
     /**
      * Commands received by createProcess() (including gzip), used to verify the tools and arguments invoked.
      *
-     * @var list<list<string>>
+     * @var  list<list<string>>
      */
     private array $commands = [];
 
     /**
      * Fake processes run as export tools (excluding gzip and start-failure), used to verify env vars and stdin.
      *
-     * @var list<Process>
+     * @var  list<Process>
      */
     private array $processes = [];
 
@@ -188,7 +188,7 @@ class CliExporterTest extends TestCase
         $app = $this->createStub(ApplicationInterface::class);
         $app->method('path')->willReturn($dir);
         $app->method('createProcess')->willReturnCallback(
-            fn (array $command): Process => $this->fakeProcess($command, $mode)
+            fn(array $command): Process => $this->fakeProcess($command, $mode)
         );
 
         return $app;

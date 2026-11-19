@@ -286,7 +286,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $upper = new class implements FilterInterface {
+        $upper = new class () implements FilterInterface {
             public function filter(mixed $value): mixed
             {
                 return strtoupper($value);
@@ -301,7 +301,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $trim = new class implements FilterInterface {
+        $trim = new class () implements FilterInterface {
             public function filter(mixed $value): mixed
             {
                 return trim($value);
@@ -316,7 +316,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $validator = new class implements ValidatorInterface {
+        $validator = new class () implements ValidatorInterface {
             public function test(mixed $value, bool $strict = false): bool
             {
                 return true;
@@ -334,7 +334,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $string = new class implements ValidatorInterface {
+        $string = new class () implements ValidatorInterface {
             public function test(mixed $value, bool $strict = false): bool
             {
                 return is_string($value);
@@ -349,7 +349,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $string = new class implements ValidatorInterface {
+        $string = new class () implements ValidatorInterface {
             public function test(mixed $value, bool $strict = false): bool
             {
                 return is_string($value);
@@ -367,7 +367,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $string = new class implements ValidatorInterface {
+        $string = new class () implements ValidatorInterface {
             public function test(mixed $value, bool $strict = false): bool
             {
                 return is_string($value);
@@ -382,7 +382,7 @@ class FilterServiceTest extends TestCase
     {
         $service = $this->createService();
 
-        $upper = new class implements FilterInterface {
+        $upper = new class () implements FilterInterface {
             public function filter(mixed $value): mixed
             {
                 return strtoupper($value);

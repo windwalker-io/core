@@ -86,8 +86,8 @@ class FilterService
      * - Non-empty list of Closures or FilterInterfaces: applied in order as one chain.
      * - Associative array: maps field keys to rules, applied recursively. Missing keys are skipped.
      *
-     * @param  mixed                                  $value
-     * @param  \Closure|FilterInterface|array         $rule
+     * @param  mixed                           $value
+     * @param  \Closure|FilterInterface|array  $rule
      *
      * @return  mixed
      *
@@ -120,8 +120,8 @@ class FilterService
      * Validate a value with callback rules. Every Closure or ValidatorInterface in a chain receives the same value;
      * a Closure returning a falsy value, or a validator whose test() returns false, fails the validation.
      *
-     * @param  mixed                                   $value
-     * @param  \Closure|ValidatorInterface|array       $rule
+     * @param  mixed                              $value
+     * @param  \Closure|ValidatorInterface|array  $rule
      *
      * @return  bool
      *

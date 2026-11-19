@@ -22,14 +22,13 @@ use Windwalker\ORM\Attributes\CastNullable;
 class BigDecimalEntityMemberSubscriber
 {
     /**
-     * @param  int  $defaultScale  Scale used when the DB column does not report one.
+     * @param  int           $defaultScale         Scale used when the DB column does not report one.
      * @param  RoundingMode  $defaultRoundingMode  Rounding mode passed to \Windwalker\try_big_decimal().
      */
     public function __construct(
         private int $defaultScale = 4,
         private RoundingMode $defaultRoundingMode = RoundingMode::HalfUp,
-    ) {
-    }
+    ) {}
 
     #[ListenTo(BuildEntityPropertyEvent::class)]
     public function buildProperty(BuildEntityPropertyEvent $event): void

@@ -131,7 +131,7 @@ class BigDecimalEntityMemberSubscriberTest extends TestCase
     {
         $event = $this->makeSetHookEvent(new DbColumn('amount', 'decimal', false, null, ['numeric_scale' => 6]));
 
-        (new BigDecimalEntityMemberSubscriber())->buildSetHook($event);
+        new BigDecimalEntityMemberSubscriber()->buildSetHook($event);
 
         self::assertSame(6, $this->hookCall($event)->args[1]->value->value);
     }
@@ -141,7 +141,7 @@ class BigDecimalEntityMemberSubscriberTest extends TestCase
     {
         $event = $this->makeSetHookEvent(new DbColumn('amount', 'decimal', false));
 
-        (new BigDecimalEntityMemberSubscriber(defaultScale: 2))->buildSetHook($event);
+        new BigDecimalEntityMemberSubscriber(defaultScale: 2)->buildSetHook($event);
 
         self::assertSame(2, $this->hookCall($event)->args[1]->value->value);
     }
@@ -151,7 +151,7 @@ class BigDecimalEntityMemberSubscriberTest extends TestCase
     {
         $event = $this->makeSetHookEvent(new DbColumn('amount', 'decimal', false, null, ['numeric_scale' => 3]));
 
-        (new BigDecimalEntityMemberSubscriber(defaultScale: 2))->buildSetHook($event);
+        new BigDecimalEntityMemberSubscriber(defaultScale: 2)->buildSetHook($event);
 
         self::assertSame(3, $this->hookCall($event)->args[1]->value->value);
     }
@@ -161,7 +161,7 @@ class BigDecimalEntityMemberSubscriberTest extends TestCase
     {
         $event = $this->makeSetHookEvent(new DbColumn('amount', 'decimal', false));
 
-        (new BigDecimalEntityMemberSubscriber(defaultRoundingMode: RoundingMode::Down))->buildSetHook($event);
+        new BigDecimalEntityMemberSubscriber(defaultRoundingMode: RoundingMode::Down)->buildSetHook($event);
 
         self::assertSame('Down', $this->hookCall($event)->args[2]->value->name->toString());
     }

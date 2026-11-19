@@ -148,7 +148,7 @@ class Chronos extends DateTimeImmutable implements
         // If the date is numeric assume a unix timestamp, render it in the target zone (default zone if none).
         if (is_numeric($date)) {
             $tz ??= new DateTimeZone(date_default_timezone_get());
-            $date = (new DateTimeImmutable('@' . (int) $date))->setTimezone($tz);
+            $date = new DateTimeImmutable('@' . (int) $date)->setTimezone($tz);
         }
 
         if ($date instanceof DateTimeInterface) {
