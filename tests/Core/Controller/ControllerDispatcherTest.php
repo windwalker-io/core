@@ -69,12 +69,9 @@ class ControllerDispatcherTest extends TestCase
         $ctx = $this->createContext();
         PlainTaskControllerStub::$lastCalled = null;
 
-        // Resolves to the array-callable branch internally, which (see
-        // dispatchWithPlainCallableArrayInvokesMethodButReturnsNull()) does
-        // not propagate the method's return value.
         $result = $ctx->dispatchController(PlainTaskControllerStub::class . '::save');
 
-        self::assertNull($result);
+        self::assertSame('save-called', $result);
         self::assertSame('save-called', PlainTaskControllerStub::$lastCalled);
     }
 
@@ -124,17 +121,13 @@ class ControllerDispatcherTest extends TestCase
     }
 
     #[Test]
-    public function dispatchWithPlainCallableArrayInvokesMethodButReturnsNull(): void
+    public function dispatchWithPlainCallableArrayInvokesMethodAndReturnsResult(): void
     {
         $ctx = $this->createContext();
 
-        // The plain-callable branch of prepareArrayCallable() does not
-        // propagate the method's return value (see
-        // ControllerDispatcher::prepareArrayCallable()), so dispatch()
-        // resolves to null even though 'save' is actually invoked.
         $result = $ctx->dispatchController([PlainTaskControllerStub::class, 'save']);
 
-        self::assertNull($result);
+        self::assertSame('save-called', $result);
     }
 
     #[Test]

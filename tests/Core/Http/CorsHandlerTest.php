@@ -127,13 +127,11 @@ class CorsHandlerTest extends TestCase
     #[Test]
     public function exposeHeadersNormalizesAndJoinsHeaderNames(): void
     {
-        // Note: exposeHeaders() writes to the "Access-Control-Allow-Headers" header,
-        // matching current source behavior (see CorsHandler::exposeHeaders()).
         $handler = new CorsHandler()->exposeHeaders(['x-foo', 'x-bar']);
 
         self::assertSame(
             'X-Foo, X-Bar',
-            $handler->getResponse()->getHeaderLine('Access-Control-Allow-Headers')
+            $handler->getResponse()->getHeaderLine('Access-Control-Expose-Headers')
         );
     }
 

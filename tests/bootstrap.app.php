@@ -18,6 +18,13 @@ use Composer\Autoload\ClassLoader;
 use Windwalker\DI\Container;
 use Windwalker\Tests\TestApp;
 
+// Default to the package root so tests can rely on this variable being set.
+if (!(getenv('WINDWALKER_TEST_APP_ROOT') ?: ($_ENV['WINDWALKER_TEST_APP_ROOT'] ?? ''))) {
+    $defaultRoot = dirname(__DIR__);
+    putenv('WINDWALKER_TEST_APP_ROOT=' . $defaultRoot);
+    $_ENV['WINDWALKER_TEST_APP_ROOT'] = $_SERVER['WINDWALKER_TEST_APP_ROOT'] = $defaultRoot;
+}
+
 $init = include __DIR__ . '/../src/Core/Testing/test.init.php';
 
 /** @var Container $container */
