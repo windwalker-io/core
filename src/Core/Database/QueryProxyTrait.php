@@ -227,11 +227,20 @@ trait QueryProxyTrait
     /**
      * @param  array|QueryCallback  $wheres
      */
-    public function andWhere(array|Closure $wheres): static
+    public function andWhereGroup(array|Closure $wheres): static
     {
-        $this->getInnerQuery()->andWhere($wheres);
+        $this->getInnerQuery()->andWhereGroup($wheres);
 
         return $this;
+    }
+
+    /**
+     * @param  array|QueryCallback  $wheres
+     * @deprecated  Use andWhereGroup() instead.
+     */
+    public function andWhere(array|Closure $wheres): static
+    {
+        return $this->andWhereGroup($wheres);
     }
 
     /**
@@ -328,11 +337,20 @@ trait QueryProxyTrait
     /**
      * @param  array|QueryCallback  $wheres
      */
-    public function orWhere(array|Closure $wheres): static
+    public function orWhereGroup(array|Closure $wheres): static
     {
-        $this->getInnerQuery()->orWhere($wheres);
+        $this->getInnerQuery()->orWhereGroup($wheres);
 
         return $this;
+    }
+
+    /**
+     * @param  array|QueryCallback  $wheres
+     * @deprecated  Use orWhereGroup() instead.
+     */
+    public function orWhere(array|Closure $wheres): static
+    {
+        return $this->orWhereGroup($wheres);
     }
 
     /**
@@ -358,11 +376,20 @@ trait QueryProxyTrait
     /**
      * @param  array|QueryCallback  $wheres
      */
-    public function orHaving(array|Closure $wheres): static
+    public function orHavingGroup(array|Closure $wheres): static
     {
-        $this->getInnerQuery()->orHaving($wheres);
+        $this->getInnerQuery()->orHavingGroup($wheres);
 
         return $this;
+    }
+
+    /**
+     * @param  array|QueryCallback  $wheres
+     * @deprecated  Use orHavingGroup() instead.
+     */
+    public function orHaving(array|Closure $wheres): static
+    {
+        return $this->orHavingGroup($wheres);
     }
 
     public function __call(string $name, array $args = []): mixed
