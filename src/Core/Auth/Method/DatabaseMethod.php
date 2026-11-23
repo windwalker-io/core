@@ -77,7 +77,7 @@ class DatabaseMethod implements MethodInterface
 
         $user = $this->db->select('*')
             ->from($table)
-            ->orWhere(
+            ->orWhereGroup(
                 function (Query $query) use ($usernames) {
                     foreach ($usernames as $field => $username) {
                         $query->where($field, $username);
