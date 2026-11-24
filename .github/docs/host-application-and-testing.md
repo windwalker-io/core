@@ -54,7 +54,12 @@ report the missing app-specific setup when the test requires it.
 `phpunit.app.dist.xml` uses [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php),
 which loads the host autoloader (root from `WINDWALKER_TEST_APP_ROOT`, default
 `dirname(__DIR__, 4)`), boots the runtime, and sets
-`Windwalker\Tests\TestApp::$instance` (an `AbstractTestApp` subclass).
+`Windwalker\Tests\TestApp::$instance` (an `AbstractTestApp` subclass), then
+registers it with `TestAppRegistry::use()`. `TestDatabaseFixtures` and
+`ServiceAwareTestTrait` resolve the app through `TestAppRegistry::instance()`, so
+any package's own TestApp (Unicorn, Luna, a host's) works the same way: its
+bootstrap must call `TestAppRegistry::use(TestApp::$instance)` after
+`createInstance()`.
 `AbstractTestApp::resetDatabase()` DROPS the configured database, so point
 `DATABASE_NAME` (via an `APP_ENV` `.env.*` file) at a disposable database
 before running DB tests.
