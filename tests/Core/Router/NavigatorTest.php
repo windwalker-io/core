@@ -166,7 +166,7 @@ class NavigatorTest extends TestCase
     }
 
     #[Test]
-    public function toMailLink_withAppUrlUsesItAsBaseAndReturnsRouteUri(): void
+    public function toNotifyLink_withAppUrlUsesItAsBaseAndReturnsRouteUri(): void
     {
         $_ENV['APP_URL'] = 'https://app.example.com/';
         $app = $this->createAppStub(new SystemUri('http://evil.test/base'));
@@ -175,14 +175,14 @@ class NavigatorTest extends TestCase
             $app
         );
 
-        $link = $nav->toMailLink('forget_confirm', ['token' => 'abc']);
+        $link = $nav->toNotifyLink('forget_confirm', ['token' => 'abc']);
 
         self::assertInstanceOf(RouteUri::class, $link);
         self::assertSame('https://app.example.com/forget/confirm?token=abc', (string) $link);
     }
 
     #[Test]
-    public function toMailLink_withoutAppUrlFallsBackToRequestHost(): void
+    public function toNotifyLink_withoutAppUrlFallsBackToRequestHost(): void
     {
         unset($_ENV['APP_URL'], $_SERVER['APP_URL']);
         $app = $this->createAppStub(new SystemUri('http://example.com/base'));
@@ -191,7 +191,7 @@ class NavigatorTest extends TestCase
             $app
         );
 
-        $link = $nav->toMailLink('forget_confirm', ['token' => 'abc']);
+        $link = $nav->toNotifyLink('forget_confirm', ['token' => 'abc']);
 
         self::assertInstanceOf(RouteUri::class, $link);
         self::assertStringStartsWith('http://example.com/base/forget/confirm', (string) $link);

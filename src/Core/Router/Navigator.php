@@ -131,7 +131,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
      * fixed base so a forged Host header can not redirect mail links to another domain.
      * When unset, the request host is used and a warning is logged.
      */
-    public function toMailLink(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
+    public function toNotifyLink(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
     {
         $options = clone NavOptions::wrapWith($options);
         $options->mode = NavMode::FULL;
