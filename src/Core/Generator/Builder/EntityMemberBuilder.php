@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Windwalker\Core\Generator\Builder;
 
 use MyCLabs\Enum\Enum;
-use PhpParser\Comment;
 use PhpParser\Node;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionProperty;
@@ -179,7 +178,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                 }
 
                 // Loop all properties to create hooks
-                $hasHooks = false;
                 foreach ($node->stmts as $i => $stmt) {
                     if ($stmt instanceof Node\Stmt\Property) {
                         if ($options['hooks'] ?? true) {
@@ -190,16 +188,9 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
                                 $added
                             );
                         }
-
-                        if ($stmt->hooks !== []) {
-                            $hasHooks = true;
-                        }
                     }
                 }
 
-                if ($hasHooks) {
-                    $this->ignoreSniffer($node);
-                }
                 // End class node
             }
 
@@ -243,22 +234,6 @@ class EntityMemberBuilder extends AbstractAstBuilder implements EventAwareInterf
         $addedMembers['enums'] = $this->newEnums;
 
         return $code;
-    }
-
-    protected function ignoreSniffer(Node\Stmt\Class_ $node): void
-    {
-        $comments = $node->getComments();
-
-        if (
-            !array_any(
-                $comments,
-                static fn(Comment $comment) => str_contains($comment->getText(), 'phpcs:disable')
-            )
-        ) {
-            $comments[] = new Comment('// phpcs:disable');
-            $comments[] = new Comment('// todo: remove this when phpcs supports 8.4');
-            $node->setAttribute('comments', $comments);
-        }
     }
 
     /**

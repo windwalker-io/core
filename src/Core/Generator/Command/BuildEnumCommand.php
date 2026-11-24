@@ -54,7 +54,6 @@ class BuildEnumCommand implements CommandInterface
             'Do not save class.'
         );
 
-        // phpcs:disable
         $command->setHelp(
             <<<HELP
             $ <info>php windwalker build:enum Foo</info> => Use short name, will auto build App\\Enum\\Foo class
@@ -63,7 +62,6 @@ class BuildEnumCommand implements CommandInterface
             $ <info>php windwalker build:enum "App\\Enum\\*"</info> => Use wildcards, will build all App\\Enum\\* classes
             HELP
         );
-        // phpcs:enable
     }
 
     /**

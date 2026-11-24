@@ -18,7 +18,6 @@ use Windwalker\Utilities\Str;
 
 class CanonicalizeMiddleware implements MiddlewareInterface
 {
-    // phpcs:disable
     protected \Closure|WwwRedirect $wwwRedirect {
         set(\Closure|WwwRedirect|int|string $value) {
             if ($value instanceof \Closure || $value instanceof WwwRedirect) {
@@ -28,7 +27,6 @@ class CanonicalizeMiddleware implements MiddlewareInterface
             }
         }
     }
-    // phpcs:enable
 
     public function __construct(
         protected AppContext $app,

@@ -106,7 +106,6 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
 
         $this->configureDatabaseOptions($command);
 
-        // phpcs:disable
         $command->setHelp(
             <<<HELP
             $ <info>php windwalker build:entity Foo</info> => Use short name, will auto build App\\Entity\\Foo class
@@ -115,7 +114,6 @@ class BuildEntityCommand implements CommandInterface, CompletionHandlerInterface
             $ <info>php windwalker build:entity "App\\Entity\\*"</info> => Use wildcards, will build all App\\Entity\\* classes
             HELP
         );
-        // phpcs:enable
     }
 
     /**

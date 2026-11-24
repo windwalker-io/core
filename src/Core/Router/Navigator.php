@@ -147,7 +147,7 @@ class Navigator implements NavConstantInterface, EventAwareInterface
             $options->base = $appUrl;
         }
 
-        return $this->to($route, $query, $options)->var('locale', null);
+        return $this->to($route, $query, $options);
     }
 
     public function to(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
