@@ -9,12 +9,12 @@ use ReflectionException;
 use UnitEnum;
 use Windwalker\Core\Application\AppContext;
 use Windwalker\Core\Testing\AbstractTestApp;
+use Windwalker\Core\Testing\TestAppRegistry;
 use Windwalker\DI\Container;
 use Windwalker\DI\DIOptions;
 use Windwalker\DI\Exception\DefinitionNotFoundException;
 use Windwalker\DI\Exception\DefinitionResolveException;
 use Windwalker\DI\Exception\DependencyResolutionException;
-use Windwalker\Tests\TestApp;
 
 /**
  * Creates a per-test-class child container from the shared app-backed test
@@ -41,7 +41,7 @@ trait ServiceAwareTestTrait
     #[BeforeClass(priority: 100)]
     public static function prepareAppContext(): void
     {
-        $ctx = TestApp::prepareTestContext();
+        $ctx = TestAppRegistry::instance()::prepareTestContext();
 
         static::$container = $ctx->container;
         static::$appContext = $ctx;

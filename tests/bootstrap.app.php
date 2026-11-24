@@ -15,6 +15,7 @@
 declare(strict_types=1);
 
 use Composer\Autoload\ClassLoader;
+use Windwalker\Core\Testing\TestAppRegistry;
 use Windwalker\DI\Container;
 use Windwalker\Tests\TestApp;
 
@@ -50,3 +51,5 @@ TestApp::createInstance(
         '@seeders' => $root . '/tests/resources/seeders',
     ]
 );
+
+TestAppRegistry::use(TestApp::$instance);

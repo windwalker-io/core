@@ -8,10 +8,10 @@ use Windwalker\Core\Application\PathResolver;
 use Windwalker\Core\Factory\DatabaseServiceFactory;
 use Windwalker\Core\Migration\MigrationService;
 use Windwalker\Core\Seed\SeedService;
+use Windwalker\Core\Testing\TestAppRegistry;
 use Windwalker\Database\DatabaseAdapter;
 use Windwalker\Database\Platform\AbstractPlatform;
 use Windwalker\DI\Attributes\Service;
-use Windwalker\Tests\TestApp;
 
 #[Service]
 class TestDatabaseFixtures
@@ -31,7 +31,7 @@ class TestDatabaseFixtures
 
     public static function reset(?string $connection = null): void
     {
-        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+        $db = TestAppRegistry::instance()::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
 
         $dbname = $db->driver->options->dbname;
 
@@ -55,9 +55,9 @@ class TestDatabaseFixtures
 
     public static function createMigrationRunner(?string $connection = null): MigrationService
     {
-        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+        $db = TestAppRegistry::instance()::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
 
-        return TestApp::$ctx->make(
+        return TestAppRegistry::instance()::$ctx->make(
             MigrationService::class,
             [
                 'db' => $db,
@@ -67,8 +67,8 @@ class TestDatabaseFixtures
 
     public static function migrate(?string $connection = null, string|bool $log = false): int
     {
-        $factory = TestApp::$ctx->retrieve(DatabaseServiceFactory::class);
-        $pathResolver = TestApp::$ctx->retrieve(PathResolver::class);
+        $factory = TestAppRegistry::instance()::$ctx->retrieve(DatabaseServiceFactory::class);
+        $pathResolver = TestAppRegistry::instance()::$ctx->retrieve(PathResolver::class);
 
         // Logging
         $logName = $connection ?? $factory->getDefaultName();
@@ -94,9 +94,9 @@ class TestDatabaseFixtures
 
     public static function createSeedRunner(?string $connection = null): SeedService
     {
-        $db = TestApp::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
+        $db = TestAppRegistry::instance()::$ctx->retrieve(DatabaseAdapter::class, tag: $connection);
 
-        return TestApp::$ctx->make(
+        return TestAppRegistry::instance()::$ctx->make(
             SeedService::class,
             [
                 'db' => $db,
@@ -108,7 +108,7 @@ class TestDatabaseFixtures
     {
         return static::createSeedRunner($connection)
             ->import(
-                TestApp::$ctx->retrieve(PathResolver::class)->resolve('@seeders'),
+                TestAppRegistry::instance()::$ctx->retrieve(PathResolver::class)->resolve('@seeders'),
             );
     }
 
