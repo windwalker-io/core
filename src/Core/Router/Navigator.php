@@ -124,6 +124,32 @@ class Navigator implements NavConstantInterface, EventAwareInterface
         return $this->self($options);
     }
 
+    /**
+     * Build an absolute link for emails.
+     *
+     * When APP_URL (origin only, e.g. https://example.com) is set, it is used as the
+     * fixed base so a forged Host header can not redirect mail links to another domain.
+     * When unset, the request host is used and a warning is logged.
+     */
+    public function toMailLink(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
+    {
+        $options = clone NavOptions::wrapWith($options);
+        $options->mode = NavMode::FULL;
+
+        $appUrl = rtrim((string) env('APP_URL'), '/');
+
+        if ($appUrl === '') {
+            $this->app?->log(
+                'APP_URL is not set; mail links are built from the request Host header.',
+                level: 'warning'
+            );
+        } else {
+            $options->base = $appUrl;
+        }
+
+        return $this->to($route, $query, $options)->var('locale', null);
+    }
+
     public function to(string $route, array $query = [], NavOptions|int $options = new NavOptions()): RouteUri
     {
         $options = $this->mergeDefaultOptions($options);

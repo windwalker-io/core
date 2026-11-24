@@ -13,6 +13,7 @@ use Windwalker\Core\Router\NavMode;
 use Windwalker\Core\Router\NavOptions;
 use Windwalker\Core\Router\Navigator;
 use Windwalker\Core\Router\Route;
+use Windwalker\Core\Router\RouteUri;
 use Windwalker\Core\Router\Router;
 use Windwalker\Core\Router\SystemUri;
 use Windwalker\DI\Container;
@@ -162,6 +163,45 @@ class NavigatorTest extends TestCase
         $nav = $this->createNavigator(new Router(), $app);
 
         self::assertSame('/foo', $nav->absolute('/foo'));
+    }
+
+    #[Test]
+    public function toMailLink_withAppUrlUsesItAsBaseAndReturnsRouteUri(): void
+    {
+        $_ENV['APP_URL'] = 'https://app.example.com/';
+        $app = $this->createAppStub(new SystemUri('http://evil.test/base'));
+        $nav = $this->createNavigator(
+            new Router(['forget_confirm' => new Route('forget_confirm', '/forget/confirm')]),
+            $app
+        );
+
+        $link = $nav->toMailLink('forget_confirm', ['token' => 'abc']);
+
+        self::assertInstanceOf(RouteUri::class, $link);
+        self::assertSame('https://app.example.com/forget/confirm?token=abc', (string) $link);
+    }
+
+    #[Test]
+    public function toMailLink_withoutAppUrlFallsBackToRequestHost(): void
+    {
+        unset($_ENV['APP_URL'], $_SERVER['APP_URL']);
+        $app = $this->createAppStub(new SystemUri('http://example.com/base'));
+        $nav = $this->createNavigator(
+            new Router(['forget_confirm' => new Route('forget_confirm', '/forget/confirm')]),
+            $app
+        );
+
+        $link = $nav->toMailLink('forget_confirm', ['token' => 'abc']);
+
+        self::assertInstanceOf(RouteUri::class, $link);
+        self::assertStringStartsWith('http://example.com/base/forget/confirm', (string) $link);
+    }
+
+    protected function tearDown(): void
+    {
+        unset($_ENV['APP_URL'], $_SERVER['APP_URL']);
+
+        parent::tearDown();
     }
 
     #[Test]

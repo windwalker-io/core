@@ -79,17 +79,22 @@ class SefMiddleware implements MiddlewareInterface
     {
         $uri = $this->app->getSystemUri();
 
-        // Replace src links.
-        $baseHref = $this->baseHref
-            ?? rtrim($uri->path . $uri->script, '/') . '/';
+        // Values are used as preg_replace replacement strings, so escape "\" and "$" to keep them literal.
+        $escapeReplacement = static fn(string $value): string => str_replace(['\\', '$'], ['\\\\', '\\$'], $value);
 
-        $baseSrc = $this->baseSrc ?? $uri->path;
+        // Replace src links.
+        $baseHref = $escapeReplacement(
+            $this->baseHref
+            ?? rtrim($uri->path . $uri->script, '/') . '/',
+        );
+
+        $baseSrc = $escapeReplacement($this->baseSrc ?? $uri->path);
 
         // For feeds we need to search for the URL with domain.
 
         // Search Hash anchor
         if (($this->flags & static::REPLACE_LINK_HASH) && str_contains($buffer, '#')) {
-            $fullPath = new Uri($uri->full())->toString(Uri::PATH | Uri::QUERY);
+            $fullPath = $escapeReplacement(new Uri($uri->full())->toString(Uri::PATH | Uri::QUERY));
 
             $regex = '#\shref="\#(?!/|\')([^"]*)"#m';
             $buffer = preg_replace($regex, ' href="' . $fullPath . '#$1"', $buffer);
