@@ -9,6 +9,7 @@ use Windwalker\Query\Clause\Clause;
 use Windwalker\Query\Clause\ClausePosition;
 use Windwalker\Query\Data\CursorPaginate;
 use Windwalker\Query\Query;
+use Windwalker\Utilities\Symbol\Undefined;
 use Windwalker\Utilities\Wrapper\RawWrapper;
 
 /**
@@ -34,16 +35,12 @@ use Windwalker\Utilities\Wrapper\RawWrapper;
  * @method  $this          resetBounded()
  * @method  $this          unbind(mixed $keys)
  * @method  array          getAllTables()
- * @method  $this          whereIn($column, array $values)
- * @method  $this          whereNotIn($column, array $values)
  * @method  $this          whereBetween($column, $start, $end)
  * @method  $this          whereNotBetween($column, $start, $end)
  * @method  $this          whereLike($column, string $search)
  * @method  $this          whereNotLike($column, string $search)
  * @method  $this          whereJsonContains(string $column, mixed $json, string $path = '$')
  * @method  $this          whereJsonNotContains(string $column, mixed $json, string $path = '$')
- * @method  $this          havingIn($column, array $values)
- * @method  $this          havingNotIn($column, array $values)
  * @method  $this          havingBetween($column, $start, $end)
  * @method  $this          havingNotBetween($column, $start, $end)
  * @method  $this          havingLike($column, string $search)
@@ -220,6 +217,34 @@ trait QueryProxyTrait
     public function having(mixed $column, mixed ...$args): static
     {
         $this->getInnerQuery()->having($column, ...$args);
+
+        return $this;
+    }
+
+    public function whereIn(mixed $column, iterable $values, mixed $default = new Undefined()): static
+    {
+        $this->getInnerQuery()->whereIn($column, $values, $default);
+
+        return $this;
+    }
+
+    public function havingIn(mixed $column, iterable $values, mixed $default = new Undefined()): static
+    {
+        $this->getInnerQuery()->havingIn($column, $values, $default);
+
+        return $this;
+    }
+
+    public function whereNotIn(mixed $column, iterable $values, mixed $default = new Undefined()): static
+    {
+        $this->getInnerQuery()->whereNotIn($column, $values, $default);
+
+        return $this;
+    }
+
+    public function havingNotIn(mixed $column, iterable $values, mixed $default = new Undefined()): static
+    {
+        $this->getInnerQuery()->havingNotIn($column, $values, $default);
 
         return $this;
     }
