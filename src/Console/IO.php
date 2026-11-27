@@ -13,10 +13,10 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Windwalker\Console\Prompt\SelectPrompt;
 
 /**
  * The IO class.
@@ -145,54 +145,81 @@ class IO implements IOInterface
     }
 
     /**
-     * Ask a single choice with an arrow-key (↑/↓) navigable menu, similar to laravel/prompts `select()`.
+     * Ask a single choice with an arrow-key (↑/↓) navigable menu, powered by laravel/prompts `select()`.
      *
-     * Keys: ↑/↓ or k/j to move, Enter to confirm, Ctrl+C to abort.
-     * Falls back to a numbered/typed choice when the input is not an interactive terminal.
+     * Windows falls back to a ChoiceQuestion, because laravel/prompts does not support Windows.
      *
      * @param  string        $question  The question text.
-     * @param  array<mixed>  $options   Map of value => label, or a list of labels (value = index).
+     * @param  array<mixed>  $options   Map of value => label.
      * @param  mixed         $default   Default value (must be a key of $options).
      *
      * @return  mixed  The selected value (array key).
      */
     public function askSelect(string $question, array $options, mixed $default = null): mixed
     {
-        $values = array_keys($options);
-        $labels = array_values($options);
-
-        if ($labels === []) {
+        if ($options === []) {
             throw new InvalidArgumentException('askSelect() requires at least one option.');
         }
 
-        $index = array_search($default, $values, true);
-        $index = $index === false ? 0 : $index;
+        if (PHP_OS_FAMILY === 'Windows') {
+            $keys = array_keys($options);
+            $labels = array_values($options);
+            $defaultLabel = array_key_exists($default, $options) ? $options[$default] : null;
 
-        if (!$this->isTerminalInteractive()) {
-            // Keep the original keys so users can type the key (e.g. 1, 2) directly.
-            $answer = $this->askChoice($question, $options, $values[$index]);
+            $answer = $this->ask(new ChoiceQuestion($question, $labels, $defaultLabel));
 
-            if (array_key_exists($answer, $options)) {
-                return $answer;
-            }
-
-            $found = array_search($answer, $labels, true);
-
-            return $values[$found === false ? $index : $found];
+            return $keys[array_search($answer, $labels, true)];
         }
 
-        $selected = new SelectPrompt($this->output)->run($question, $labels, $index);
-
-        return $values[$selected];
+        return \Laravel\Prompts\select(
+            label: $question,
+            options: $options,
+            default: $default,
+        );
     }
 
-    protected function isTerminalInteractive(): bool
+    /**
+     * Ask multiple choices with a navigable checkbox menu, powered by laravel/prompts `multiselect()`.
+     *
+     * Windows falls back to a multiselect ChoiceQuestion, because laravel/prompts does not support Windows.
+     *
+     * @param  string        $question  The question text.
+     * @param  array<mixed>  $options   Map of value => label.
+     * @param  array<mixed>  $default   Default values (keys of $options).
+     *
+     * @return  array  The selected values (array keys).
+     */
+    public function multiSelect(string $question, array $options, array $default = []): array
     {
-        // Arrow-key menu needs POSIX raw mode (stty); fall back to askChoice on Windows.
-        return PHP_OS_FAMILY !== 'Windows'
-            && $this->input->isInteractive()
-            && defined('STDIN')
-            && stream_isatty(STDIN);
+        if ($options === []) {
+            throw new InvalidArgumentException('multiSelect() requires at least one option.');
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $keys = array_keys($options);
+            $labels = array_values($options);
+            $defaultLabels = array_values(array_intersect_key($options, array_flip($default)));
+
+            $qn = new ChoiceQuestion(
+                $question,
+                $labels,
+                $defaultLabels === [] ? null : implode(',', $defaultLabels)
+            );
+            $qn->setMultiselect(true);
+
+            $answers = (array) $this->ask($qn);
+
+            return array_map(
+                static fn($answer) => $keys[array_search($answer, $labels, true)],
+                $answers
+            );
+        }
+
+        return \Laravel\Prompts\multiselect(
+            label: $question,
+            options: $options,
+            default: $default,
+        );
     }
 
     protected function getQuestionHelper(): QuestionHelper

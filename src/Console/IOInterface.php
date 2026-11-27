@@ -129,4 +129,15 @@ interface IOInterface extends InputInterface, OutputInterface
      * @return  mixed  The selected value (key of $options).
      */
     public function askSelect(string $question, array $options, mixed $default = null): mixed;
+
+    /**
+     * Multiple choice checkbox menu.
+     *
+     * @param  string        $question
+     * @param  array<mixed>  $options   Map of value => label.
+     * @param  array<mixed>  $default   Default values (keys of $options).
+     *
+     * @return  array  The selected values (keys of $options).
+     */
+    public function multiSelect(string $question, array $options, array $default = []): array;
 }

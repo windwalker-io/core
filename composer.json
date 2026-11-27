@@ -8,6 +8,7 @@
         "php": ">=8.4.6",
         "ext-json": "*",
         "laravel/serializable-closure": "^2.0",
+        "laravel/prompts": "^0.3.28",
         "psr/clock": "^1.0",
         "fakerphp/faker": "^1.0",
         "fig/link-util": "^1.2",
@@ -53,8 +54,7 @@
         "tijsverkoyen/css-to-inline-styles": "^2.4",
         "mikey179/vfsstream": "^1.6",
         "league/commonmark": "^2.10",
-        "brick/math": "^1.0",
-        "laravel/prompts": "^0.3.28"
+        "brick/math": "^1.0"
     },
     "scripts": {
         "test": "phpunit",
