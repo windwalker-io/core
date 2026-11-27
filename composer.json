@@ -53,7 +53,8 @@
         "tijsverkoyen/css-to-inline-styles": "^2.4",
         "mikey179/vfsstream": "^1.6",
         "league/commonmark": "^2.10",
-        "brick/math": "^1.0"
+        "brick/math": "^1.0",
+        "laravel/prompts": "^0.3.28"
     },
     "scripts": {
         "test": "phpunit",

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Windwalker\Console\Prompt\SelectPrompt;
 
 /**
  * The IO class.
@@ -141,6 +142,57 @@ class IO implements IOInterface
     public function askChoice(string|Question $question, array $options, mixed $default = null): mixed
     {
         return $this->style()->choice($question, $options, $default);
+    }
+
+    /**
+     * Ask a single choice with an arrow-key (↑/↓) navigable menu, similar to laravel/prompts `select()`.
+     *
+     * Keys: ↑/↓ or k/j to move, Enter to confirm, Ctrl+C to abort.
+     * Falls back to a numbered/typed choice when the input is not an interactive terminal.
+     *
+     * @param  string        $question  The question text.
+     * @param  array<mixed>  $options   Map of value => label, or a list of labels (value = index).
+     * @param  mixed         $default   Default value (must be a key of $options).
+     *
+     * @return  mixed  The selected value (array key).
+     */
+    public function askSelect(string $question, array $options, mixed $default = null): mixed
+    {
+        $values = array_keys($options);
+        $labels = array_values($options);
+
+        if ($labels === []) {
+            throw new InvalidArgumentException('askSelect() requires at least one option.');
+        }
+
+        $index = array_search($default, $values, true);
+        $index = $index === false ? 0 : $index;
+
+        if (!$this->isTerminalInteractive()) {
+            // Keep the original keys so users can type the key (e.g. 1, 2) directly.
+            $answer = $this->askChoice($question, $options, $values[$index]);
+
+            if (array_key_exists($answer, $options)) {
+                return $answer;
+            }
+
+            $found = array_search($answer, $labels, true);
+
+            return $values[$found === false ? $index : $found];
+        }
+
+        $selected = new SelectPrompt($this->output)->run($question, $labels, $index);
+
+        return $values[$selected];
+    }
+
+    protected function isTerminalInteractive(): bool
+    {
+        // Arrow-key menu needs POSIX raw mode (stty); fall back to askChoice on Windows.
+        return PHP_OS_FAMILY !== 'Windows'
+            && $this->input->isInteractive()
+            && defined('STDIN')
+            && stream_isatty(STDIN);
     }
 
     protected function getQuestionHelper(): QuestionHelper

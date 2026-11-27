@@ -118,4 +118,15 @@ interface IOInterface extends InputInterface, OutputInterface
     public function askAndHideAnswer(string|Question $question): mixed;
 
     public function askChoice(string|Question $question, array $options, mixed $default = null): mixed;
+
+    /**
+     * Arrow-key (↑/↓) single select menu.
+     *
+     * @param  string        $question
+     * @param  array<mixed>  $options   Map of value => label, or list of labels.
+     * @param  mixed         $default   Default value (key of $options).
+     *
+     * @return  mixed  The selected value (key of $options).
+     */
+    public function askSelect(string $question, array $options, mixed $default = null): mixed;
 }
