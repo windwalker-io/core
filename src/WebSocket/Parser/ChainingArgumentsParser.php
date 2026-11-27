@@ -7,9 +7,9 @@ namespace Windwalker\WebSocket\Parser;
 use Windwalker\Reactor\WebSocket\WebSocketRequestInterface;
 
 /**
- * The ChainingArgumentsParer class.
+ * The ChainingArgumentsParser class.
  */
-class ChainingArgumentsParer implements WebSocketParserInterface
+class ChainingArgumentsParser implements WebSocketParserInterface
 {
     public function parse(string $data): array
     {
