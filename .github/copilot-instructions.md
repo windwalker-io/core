@@ -61,9 +61,8 @@ environment-specific configuration.
 - `composer test`: PHPUnit suite (database/service tests need local DSN/config).
 - `composer cs-check`: PHP-CS-Fixer check.
 - `composer cs-fix`: modifies files; use only when formatting changes are intended.
-- Style commands run from Core's root via `bin/php-cs-fixer`, which prefers
-  Core's `vendor/bin/php-cs-fixer`, then a parent host app's fixer, and fails
-  with an install message if none exists.
+- Composer style commands run from Core's root via `bin/cs-fixer.php`, which
+  loads PHP-CS-Fixer through Core's or the parent host app's Composer autoload.
 - Markdown-only changes: confirm the content is Markdown and fits the file's
   role; PHP checks are not needed.
 
