@@ -126,16 +126,24 @@ class StarterInstaller
                 'pdo_sqlite',
             ];
 
-            $io->write('Please select database drivers: ');
+            if (PHP_OS_FAMILY === 'Windows') {
+                $io->write('Please select database drivers: ');
 
-            foreach ($supportedDrivers as $i => $driver) {
-                $j = $i + 1;
-                $io->write("  [$j] $driver");
+                foreach ($supportedDrivers as $i => $driver) {
+                    $j = $i + 1;
+                    $io->write("  [$j] $driver");
+                }
+
+                $k = $io->ask('> ');
+
+                $driver = $supportedDrivers[$k - 1] ?? 'pdo_mysql';
+            } else {
+                $driver = \Laravel\Prompts\select(
+                    label: 'Please select database driver:',
+                    options: array_combine($supportedDrivers, $supportedDrivers),
+                    default: 'pdo_mysql',
+                );
             }
-
-            $k = $io->ask('> ');
-
-            $driver = $supportedDrivers[$k - 1] ?? 'pdo_mysql';
 
             $io->write('Selected driver: ' . $driver);
 
