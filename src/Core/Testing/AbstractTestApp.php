@@ -54,8 +54,12 @@ abstract class AbstractTestApp extends WebApplication
      */
     public static AppContext $sharedCtx;
 
-    public static function createInstance(Container $container, array $config = []): static
-    {
+    public static function createInstance(
+        Container $container,
+        array $config = [],
+        array $providers = [],
+        array $bindings = [],
+    ): static {
         static::$instance = new static($container);
 
         if ($config) {
@@ -65,6 +69,13 @@ abstract class AbstractTestApp extends WebApplication
         // Register TestAppProvider
 
         static::$instance->prepareSharedContext();
+
+        static::$instance->getContainer()->registerByConfig(
+            [
+                'providers' => $providers,
+                'bindings' => $bindings,
+            ]
+        );
 
         return static::$instance;
     }

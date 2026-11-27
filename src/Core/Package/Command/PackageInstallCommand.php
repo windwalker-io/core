@@ -268,14 +268,27 @@ class PackageInstallCommand implements CommandInterface, CompletionAwareInterfac
             throw new UnexpectedValueException('No packages found.');
         }
 
-        $qn = new ChoiceQuestion(
-            '<question>Please select package or tags, use "," to select multiple options:</question>',
-            $options
-        );
-        $qn->setMultiselect(true);
-
         $this->io->newLine();
-        $selected = $this->io->ask($qn);
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $qn = new ChoiceQuestion(
+                '<question>Please select package or tags, use "," to select multiple options:</question>',
+                $options
+            );
+            $qn->setMultiselect(true);
+
+            $selected = $this->io->ask($qn);
+        } else {
+            $labels = array_combine($options, $options);
+            $selected = \Laravel\Prompts\multisearch(
+                label: 'Please select package or tags:',
+                options: static fn(string $search): array => array_filter(
+                    $labels,
+                    static fn(string $label): bool => $search === '' || stripos($label, $search) !== false,
+                ),
+                scroll: 12
+            );
+        }
 
         $items = array_values(array_intersect_key($items, array_flip($selected)));
 
