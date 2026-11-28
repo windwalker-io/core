@@ -65,9 +65,11 @@ are CLI wiring, not package behavior. Do not write unit tests for them, and do n
 methods either — simply leave them out of a package's test and coverage scope by default. Test them only when the
 requested change specifically requires validating their behavior (for example, a regression tied to that command).
 
-Tests touching a real database: see [Database Testing](../docs/database-testing.md) (never run DB suites in parallel).
+Tests touching a real database: see [Database Testing](../skills/test/references/database-testing.md)
+(never run DB suites in parallel).
 
-See [Testing and Coverage](../docs/testing.md) for test selectors, driver setup, report commands, and scope caveats.
+See [Testing and Coverage](../skills/test/references/windwalker-testing.md)
+for test selectors, driver setup, report commands, and scope caveats.
 
 ## Reading or setting ENV values in tests
 
@@ -75,14 +77,14 @@ Use `Windwalker\Utilities\Env::get()` instead of reading `$_SERVER`/`$_ENV` dire
 already checks `$_SERVER` then `$_ENV`, matching what the framework's own `env()` helper reads. If the installed
 `windwalker/utilities` version also provides `Env::set()`, prefer it for writes too, since it keeps `$_SERVER`,
 `$_ENV`, and `putenv()` in sync in one call; otherwise set `$_SERVER` (and `$_ENV` if relevant) manually. This
-matters because a host app's local `.env` may set a variable (for example `MAIL_ENABLED=1`) that leaks into
+matters because the local `.env` may set a variable (for example `MAIL_ENABLED=1`) that leaks into
 `$_SERVER`/`$_ENV` during bootstrap and pollutes tests expecting a different default. When a test depends on an env
 value, read and save the original value with `Env::get()` in a `#[Before]` hook before overwriting it, then restore
 that saved value in `#[After]`.
 
-## Prefer the project's own `tmp/` directory for temporary files
+## Prefer the project's own `tmp` directory for temporary files
 
-When a test needs a scratch file or directory, prefer the project's own `tmp/` directory (`WINDWALKER_TEMP`, which
+When a test needs a scratch file or directory, prefer the project's own `tmp` directory (`WINDWALKER_TEMP`, which
 resolves to `WINDWALKER_ROOT . '/tmp'` by default, gitignored except for `.gitkeep`) over `sys_get_temp_dir()` /
 `tempnam()` on the OS temp dir, and never create loose scratch files directly under the project root. Build the path
 with something like `WINDWALKER_TEMP . '/ww-test-' . uniqid()`, create it in a `#[Before]`/setup step, and always
@@ -91,14 +93,15 @@ remove it in `#[After]` (or register a shutdown function) so leftover test artif
 ## Filesystem tests: cross-platform paths and virtual storage
 
 - When testing the real filesystem, use
-  [`FilesystemTestTrait`](../../packages/filesystem/test/FilesystemTestTrait.php)
+  `FilesystemTestTrait`
   (`Windwalker\Filesystem\Test\FilesystemTestTrait`) for path comparisons across Windows and Unix-like systems.
   Use `assertPathEquals()` (`Path::clean()`) or `assertRealpathEquals()` (`Path::normalize()`) as appropriate;
   do not compare raw path strings when separator differences are irrelevant to the behavior under test.
   Despite its name, `assertRealpathEquals()` normalizes paths; it does not resolve them with PHP's `realpath()`.
 - For file storage/read/write tests that do not require real filesystem or OS-specific behavior, VFS
   (`org\bovigo\vfs\vfsStream`, `vfs://` paths) can provide isolated virtual fixtures instead of writing to disk.
-  Reuse [`AbstractVfsTestCase`](../../packages/filesystem/test/AbstractVfsTestCase.php) when its fixture setup fits.
+  Reuse `AbstractVfsTestCase`
+  when its fixture setup fits.
   Use real temporary files when the API does not support stream wrappers or the test requires native filesystem
   semantics, and clean them up after the test.
 

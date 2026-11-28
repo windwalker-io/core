@@ -6,9 +6,9 @@ coverage ignore annotations. Also mark temporary integration/coverage-only test 
 later.
 
 1. Identify the target scope from the user's request, selected files, or tagged scope. Keep changes within this
-   checkout; source and tests normally live under `src/` and `tests/`.
+   checkout; source and tests normally live under `../../../../../src` and `tests/`.
 2. Read `.github/instructions/test.instructions.md`, `.github/instructions/test-common.instructions.md`, and
-   `.github/docs/testing-architecture.md` first, and follow their rules. Use `.php-cs-fixer.dist.php` for style.
+   `.github/docs/testing-architecture.md` first, and follow their rules. Use `../../../../../.php-cs-fixer.dist.php` for style.
 3. Find source code that has no need for tests and add `@codeCoverageIgnore` in its docblock:
    - Logic-free getters/setters (only return/assign a property, optionally `return $this`) without meaningful coverage
      from other behavior tests.
@@ -29,7 +29,7 @@ later.
 
 Large-scope handling:
 
-- If the scope is large (many files or subdirectories across `src/` and `tests/`), do not process it all in one pass.
+- If the scope is large (many files or subdirectories across `../../../../../src` and `tests/`), do not process it all in one pass.
   Split it into multiple iterations, one subdirectory (or small batch of files) per iteration, and
   finish each one (inspect, change, verify) before starting the next.
 - Keep a short checklist of the subdirectories/files and mark each as done, so most files are genuinely inspected

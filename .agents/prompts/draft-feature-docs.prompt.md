@@ -13,7 +13,7 @@ can later move into the official documentation.
 3. Write the draft from the end user's point of view:
    - **Introduction**: what the feature is, what problem it solves, and when to use it.
    - **Usage**: how to use or operate it, with minimal, runnable PHP examples that follow the repository code style
-     (`.php-cs-fixer.dist.php`) and prefer current APIs (e.g. `***Options` classes over legacy flags).
+     (`../../../../../.php-cs-fixer.dist.php`) and prefer current APIs (e.g. `***Options` classes over legacy flags).
    - **Options / behaviors**: notable parameters, defaults, edge cases, and limitations that users need to know.
    - Mention deprecated or replaced APIs only when users need to migrate.
 4. Write as if the content is one section of a long document. Assume surrounding sections already explain

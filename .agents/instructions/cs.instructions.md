@@ -6,9 +6,9 @@ applyTo: "**/*.php"
 
 This project follows the [PER-3.1](https://www.php-fig.org/per/coding-style/) PHP coding standard.
 
-These rules are enforced by `.php-cs-fixer.dist.php` (`@PER-CS` ruleset plus project overrides). Run
+These rules are enforced by [`../../.php-cs-fixer.dist.php`](../../.php-cs-fixer.dist.php) (`@PER-CS` ruleset plus project overrides). Run
 `composer cs-check` to verify and `composer cs-fix` to auto-fix. For the full rule set and rationale, see
-`/.github/docs/code-style.md`.
+the project PHP-CS-Fixer configuration.
 
 ## Running PHP-CS-Fixer
 
@@ -21,8 +21,8 @@ composer cs-fix -- --path-mode=intersection packages/cache/src/CachePool.php
 
 Pass multiple file paths when needed. `--path-mode=intersection` preserves the configured Finder exclusions.
 Run the check again after fixing and review the diff. Bare `composer cs-check` / `composer cs-fix` scan the whole
-configured tree; use them only when that scope is intended. See the [fixer guide](../docs/code-style.md#running-the-fixer)
-for prerequisites and direct CLI equivalents.
+configured tree; use them only when that scope is intended. See the
+[PHP-CS-Fixer configuration](../../.php-cs-fixer.dist.php) for the configured rules and exclusions.
 
 ## Clean up phpdoc
 

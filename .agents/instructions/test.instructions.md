@@ -11,20 +11,20 @@ integration with `TestWebAppFactory`, app-backed, database), see
 
 ## Test placement
 
-- Mirror the object's path under `src/` in `tests/`, and name its test class
+- Mirror the object's path under `../../../../../src` in `tests/`, and name its test class
   and file `<ClassName>Test`.
   For example, `src/Core/Router/Navigator.php` belongs with
   `tests/Core/Router/NavigatorTest.php`.
 - Use the `Windwalker\Tests\` namespace followed by the mirrored directory
-  path, consistent with the development autoload mapping in `composer.json`.
+  path, consistent with the development autoload mapping in `../../../../../composer.json`.
 
 ## Stubs and mocks
 
 - Before writing a new Stub or Mock class, check
-  [`src/Core/Testing/Stub/`](../../src/Core/Testing/Stub/) for an existing
+  [`src/Core/Testing/Stub/`](../../src/Core/Testing/Stub) for an existing
   double that already does the job. Do not duplicate one that already
   exists there. This directory ships under Core's production autoload
-  (`Windwalker\` → `src/`), so any host app consuming `windwalker/core` can
+  (`Windwalker\` → `../../../../../src`), so any host app consuming `windwalker/core` can
   reuse these doubles from its own tests without a dev-only dependency on
   Core's `tests/` folder.
 - If the double you are about to write has no dependency on the specific
@@ -54,10 +54,10 @@ integration with `TestWebAppFactory`, app-backed, database), see
 ## Test helpers
 
 Core's app-backed test traits live in
-[`src/Core/Testing/Traits/`](../../src/Core/Testing/Traits/) and the
+[`src/Core/Testing/Traits/`](../../src/Core/Testing/Traits) and the
 `AbstractTestApp` they rely on lives in
 [`src/Core/Testing/AbstractTestApp.php`](../../src/Core/Testing/AbstractTestApp.php).
-Shipping these under `src/` (rather than `tests/`) means any host app can
+Shipping these under `../../../../../src` (rather than `tests/`) means any host app can
 reuse them from its own test suite. [`tests/TestApp.php`](../../tests/TestApp.php)
 is Core's own reference example of extending `AbstractTestApp`; copy its
 pattern (and `tests/bootstrap.app.php`'s wiring) in a consuming app.

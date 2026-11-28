@@ -7,7 +7,7 @@ changing applications, providers, routing, controllers, views, or packages.
 ## Placement
 
 - Put code in the `src/Core/<Capability>/` directory that owns the concern;
-  console primitives in `src/Console/`, WebSocket in `src/WebSocket/`, debugger
+  console primitives in `../../../../../src/Console`, WebSocket in `src/WebSocket/`, debugger
   in `src/Debugger/`. Do not add a top-level area without a clear reason.
 - Core provides contracts and wiring. Concrete modules, routes, config values,
   migrations, and assets belong to the host app, not Core.
@@ -32,12 +32,12 @@ changing applications, providers, routing, controllers, views, or packages.
   `WINDWALKER_TEMP`, `WINDWALKER_RESOURCES`, `WINDWALKER_DEBUG`, ...) are
   defined by and scoped to the host app's bootstrap; they are not part of
   Core's internal API.
-- Inside `src/`, resolve filesystem paths through `PathResolver`
+- Inside `../../../../../src`, resolve filesystem paths through `PathResolver`
   (`$app->path('@root/...')` or inject `PathResolver`) instead of referencing
   `WINDWALKER_*` path constants directly.
-- Inside `src/`, read debug mode via `ApplicationInterface::isDebug()`
+- Inside `../../../../../src`, read debug mode via `ApplicationInterface::isDebug()`
   (`$app->isDebug()`) instead of reading `WINDWALKER_DEBUG` directly.
-- Existing `WINDWALKER_*` usages in `src/` predate this rule; do not copy them
+- Existing `WINDWALKER_*` usages in `../../../../../src` predate this rule; do not copy them
   as a pattern for new code, and prefer `PathResolver`/`isDebug()` when
   touching that code.
 - When fixing an existing `WINDWALKER_*` usage: if `PathResolver` /

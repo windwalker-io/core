@@ -8,7 +8,7 @@ cover the gaps.
    changes within this checkout unless a directly related shared test helper must be used.
 2. Read the source and neighboring tests, `.github/instructions/test.instructions.md`,
    `.github/instructions/test-common.instructions.md`, and `.github/docs/testing-architecture.md`. Follow the local
-   PHPUnit conventions, use the existing test traits and fixtures, and use `.php-cs-fixer.dist.php` for style.
+   PHPUnit conventions, use the existing test traits and fixtures, and use `../../../../../.php-cs-fixer.dist.php` for style.
 3. Run the current test suite and capture a source-scoped coverage baseline using an available coverage driver.
    Inspect uncovered source lines and branches, then prioritize meaningful behaviors, edge cases, and error paths. Do
    not add tests solely for logic-free getters/setters or chase coverage percentages with assertion-free tests.
@@ -22,7 +22,7 @@ cover the gaps.
 
 Large-scope handling:
 
-- If the scope is large (many files or subdirectories across `src/` and `tests/`), do not process it all in one pass.
+- If the scope is large (many files or subdirectories across `../../../../../src` and `tests/`), do not process it all in one pass.
   Split it into multiple iterations, one subdirectory (or small batch of files) per iteration, and
   finish each one (inspect, change, verify) before starting the next.
 - Keep a short checklist of the subdirectories/files and mark each as done, so most files are genuinely inspected

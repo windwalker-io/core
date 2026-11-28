@@ -12,7 +12,7 @@ testing requirements, and Markdown templates.
 
 ## Organization
 
-- [`templates/`](templates/): Markdown document templates
+- [`templates`](templates): Markdown document templates
 - [`architecture.md`](architecture.md): package layout, container layers,
   application and request/console lifecycle, modules, packages
 - [`testing-architecture.md`](testing-architecture.md): test tiers per architecture layer and the light-integration recipe

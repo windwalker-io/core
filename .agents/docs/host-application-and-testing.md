@@ -7,7 +7,7 @@ A consuming app may use any name and may live outside this repository; it
 installs Core and supplies application-specific bootstrap, configuration,
 routes, resources, and environment. The app's Composer autoloading maps its own
 namespace (for example, `App\`) to its source directory, while Core maps
-`Windwalker\` to Core's [`src/`](../../src/). Each package loads its own
+`Windwalker\` to Core's [`../../../../../src`](../../src). Each package loads its own
 bootstrap file.
 
 Core code should use framework contracts and package APIs; app-specific
@@ -25,8 +25,8 @@ use that app as the integration context. Do not assume the app is named Earth
 or is always located at a fixed relative path.
 
 If no host app can be identified, treat Core as an independently checked-out
-and independently tested package. Use Core's own [`composer.json`](../../composer.json),
-[`phpunit.dist.xml`](../../phpunit.dist.xml), source, and test support; do not
+and independently tested package. Use Core's own [`../../../../../composer.json`](../../composer.json),
+[`../../../../../phpunit.dist.xml`](../../phpunit.dist.xml), source, and test support; do not
 search for or invent an application bootstrap, app config, routes, or
 migrations. Run isolated Core tests directly. Add only a minimal test bootstrap
 or fixture required by the specific behavior under test. If the behavior
@@ -48,7 +48,7 @@ If the host app has no `phpunit.app.xml`, use the package's
 [`phpunit.app.dist.xml`](../../phpunit.app.dist.xml) as the host-app test
 configuration when its bootstrap path and test setup fit the workspace. If
 neither app-aware configuration is available or suitable, use Core's
-[`phpunit.dist.xml`](../../phpunit.dist.xml) for standalone package tests, or
+[`../../../../../phpunit.dist.xml`](../../phpunit.dist.xml) for standalone package tests, or
 report the missing app-specific setup when the test requires it.
 
 `phpunit.app.dist.xml` uses [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php),
@@ -97,7 +97,7 @@ isolated container can cover the behavior.
 
 Core's test support includes
 [`src/Core/Testing/AbstractTestApp.php`](../../src/Core/Testing/AbstractTestApp.php).
-Shipped under Core's production autoload (`Windwalker\` → `src/`), it is
+Shipped under Core's production autoload (`Windwalker\` → `../../../../../src`), it is
 reusable by any host app, not just Core's own test suite. It extends
 `WebApplication` and creates request contexts; database-backed test support
 uses
@@ -114,7 +114,7 @@ autoloading alone does not provide this application state.
 For database integration tests:
 
 - Configure a dedicated disposable test database using the DSN constants
-  documented in [`phpunit.dist.xml`](../../phpunit.dist.xml)
+  documented in [`../../../../../phpunit.dist.xml`](../../phpunit.dist.xml)
   (`WINDWALKER_TEST_DB_DSN_*`) and provide matching database configuration in
   the test app or standalone test fixture.
 - Provide `WINDWALKER_MIGRATIONS` and `WINDWALKER_TEMP` when using
@@ -139,6 +139,6 @@ For database integration tests:
 
 Tests for optional external services should be opt-in and require their
 service-specific configuration, as indicated by the commented flags in
-[`phpunit.dist.xml`](../../phpunit.dist.xml). Prefer isolated unit or component
+[`../../../../../phpunit.dist.xml`](../../phpunit.dist.xml). Prefer isolated unit or component
 tests unless app boot, routes, database migrations, or real external services
 are part of the behavior under test.

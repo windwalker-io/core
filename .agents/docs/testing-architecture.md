@@ -1,7 +1,7 @@
 # Testing Core by architecture layer
 
 Use this document to decide how to test a change, based on the layer it
-touches. The existing tests under [`tests/`](../../tests/) are the reference
+touches. The existing tests under [`../../../../../tests`](../../tests) are the reference
 implementations; read the nearest one before writing a new test. Architecture
 background is in [`architecture.md`](architecture.md); app/DB prerequisites are
 in [`host-application-and-testing.md`](host-application-and-testing.md); style
@@ -16,7 +16,7 @@ Pick the lowest tier that covers the behavior.
 | Tier | Needs | Use for | Reference |
 |------|-------|---------|-----------|
 | 1. Unit with doubles | nothing | one class with mocked collaborators (factories, services, form, managers) | [`tests/Core/Form/FormFactoryTest.php`](../../tests/Core/Form/FormFactoryTest.php) |
-| 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application/) with [`TestWebAppFactory`](../../tests/Core/Application/Stub/TestWebAppFactory.php) |
+| 2. Light integration | no DB, no host app | a real `WebApplication` / `MicroApplication` booting, request context, middleware, routing, controller dispatch | [`tests/Core/Application/`](../../tests/Core/Application) with [`TestWebAppFactory`](../../tests/Core/Application/Stub/TestWebAppFactory.php) |
 | 3. App-backed | host app, `phpunit.app.dist.xml` | behavior that needs the host's providers, config, routes, or ORM | [`src/Core/Testing/AbstractTestApp.php`](../../src/Core/Testing/AbstractTestApp.php), [`tests/TestApp.php`](../../tests/TestApp.php) (reference example), [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php), `ServiceAwareTestTrait`, `ControllerTestTrait` |
 | 4. Database | disposable DB, DSN or host DB config | ORM, migrations, seeders, query behavior | `DatabaseTestTrait` (see [`../instructions/test.instructions.md`](../instructions/test.instructions.md)) |
 
@@ -27,7 +27,7 @@ Tiers 3 and 4 depend on a host app; never make tier 1 or 2 tests depend on one.
 `TestWebAppFactory::create()` builds an isolated app with its own
 `Container` and `Config` (name, debug, secret only), so the whole pipeline
 from [`architecture.md`](architecture.md#web-request-lifecycle) can be run
-without `Runtime`, `www/`, or environment files:
+without `Runtime`, `../../../../../www`, or environment files:
 
 ```php
 $app = TestWebAppFactory::create();
@@ -213,7 +213,7 @@ wiring error from scratch.
 - **A minimal `ServerInterface` stub only needs 4 no-op methods**
   (`listen()`, `stop()`, and the inherited `EventListenableInterface`
   methods `subscribe()`/`on()`) to test `bootForServer()`.
-- **On Windows, run `php-cs-fixer` through PHP directly, not the `bin/`
+- **On Windows, run `php-cs-fixer` through PHP directly, not the `../../../../../bin`
   bash wrapper.** `bash bin/php-cs-fixer ...` (and thus `composer cs-check`)
   can fail with `$'\r': command not found` when the repo's line endings are
   CRLF (`core.autocrlf=true`); use

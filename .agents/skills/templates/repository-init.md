@@ -9,7 +9,7 @@ Create a lightweight, project-appropriate guide for a new or existing repository
 Use this skill when a repository needs:
 
 - a clear project overview
-- a minimal `AGENTS.md` or guidance file
+- a minimal `../../../../../../AGENTS.md` or guidance file
 - repository conventions for future contributors
 - a simple, maintainable documentation baseline
 
@@ -17,7 +17,7 @@ Use this skill when a repository needs:
 
 1. Inspect the repository structure and determine its real purpose.
 2. Identify the main folders, templates, and documentation files.
-3. Create or update `AGENTS.md` and relevant guidance files only when they add clear value.
+3. Create or update `../../../../../../AGENTS.md` and relevant guidance files only when they add clear value.
 4. Keep the guidance concise, generic, and grounded in the actual repository.
 5. Avoid forcing a rigid folder structure or unrelated conventions.
 

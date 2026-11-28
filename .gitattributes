@@ -1,9 +1,17 @@
+# Folders
+/.agents export-ignore
+/.githooks export-ignore
+/.github export-ignore
 /assets export-ignore
 /tests export-ignore
+
+# Files
 /.gitattributes export-ignore
 /.gitignore export-ignore
-/.travis.yml export-ignore
-/.github export-ignore
-/package.json export-ignore
-/phpunit.travis.xml export-ignore
-/phpunit.xml.dist export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/AGENTS.md export-ignore
+/docker-compose.dist.yml export-ignore
+/phpunit.app.dist.xml export-ignore
+/phpunit.app.xml export-ignore
+/phpunit.ci.xml export-ignore
+/phpunit.dist.xml export-ignore

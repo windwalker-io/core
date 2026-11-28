@@ -5,7 +5,7 @@ recommendation.
 
 ## Requirements
 
-1. **Analyze the existing architecture first.** Read the relevant code under `src/`, neighboring tests under `tests/`,
+1. **Analyze the existing architecture first.** Read the relevant code under `../../../../../src`, neighboring tests under `tests/`,
    and applicable documentation under `docs/`. Follow this checkout's `AGENTS.md`, `.github/copilot-instructions.md`,
    and `.php-cs-fixer.dist.php`; identify how the change fits this package and which APIs, tests, and docs it touches.
 2. **Research how other frameworks and systems solve the same problem.** Cover a diverse set of references:

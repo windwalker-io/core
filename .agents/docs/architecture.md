@@ -9,26 +9,26 @@ mandatory rules derived from this architecture are in
 
 ## Package layout
 
-Namespace `Windwalker\` maps to [`src/`](../../src/); tests use
-`Windwalker\Tests\` from [`tests/`](../../tests/).
+Namespace `Windwalker\` maps to [`../../../../../src`](../../src); tests use
+`Windwalker\Tests\` from [`../../../../../tests`](../../tests).
 
-- [`src/Core/`](../../src/Core/): the framework implementation. One directory per
+- [`src/Core/`](../../src/Core): the framework implementation. One directory per
   capability, see [Capability areas](#capability-areas).
-- [`src/Console/`](../../src/Console/): console IO and command primitives
+- [`../../../../../src/Console`](../../src/Console): console IO and command primitives
   (`CommandWrapper`, `IO`, completion, questions) built on Symfony Console.
-- [`src/WebSocket/`](../../src/WebSocket/): WebSocket application, router,
+- [`src/WebSocket/`](../../src/WebSocket): WebSocket application, router,
   parser, and Swoole support.
-- [`src/Debugger/`](../../src/Debugger/): the debugger package (itself an
+- [`src/Debugger/`](../../src/Debugger): the debugger package (itself an
   `AbstractPackage`), with its own module, services, and subscribers.
-- [`src/bootstrap.php`](../../src/bootstrap.php) and
-  [`src/functions.php`](../../src/functions.php): autoloaded global helpers.
-- [`etc/`](../../etc/): Core's own config fragments (`attributes.php` registers
+- [`../../../../../src/bootstrap.php`](../../src/bootstrap.php) and
+  [`../../../../../src/functions.php`](../../src/functions.php): autoloaded global helpers.
+- [`../../../../../etc`](../../etc): Core's own config fragments (`attributes.php` registers
   the attribute handlers; `debugger.config.php` is the debugger config).
-- [`routes/`](../../routes/), [`views/`](../../views/),
-  [`resources/`](../../resources/), [`assets/`](../../assets/): resources shipped
+- [`../../../../../routes`](../../routes), [`../../../../../views`](../../views),
+  [`../../../../../resources`](../../resources), [`assets/`](../../assets): resources shipped
   with Core (debugger routes/views, language files, code templates, shell
   completion, registries).
-- [`bin/`](../../bin/): CLI entry (`windwalker.php`), release and style tooling.
+- [`../../../../../bin`](../../bin): CLI entry (`windwalker.php`), release and style tooling.
 
 Core is built on the other `windwalker/*` packages (`di`, `event`, `http`,
 `attributes`, `data`, `cache`, `crypt`, `filesystem`, `filter`, ...). Core
@@ -58,7 +58,7 @@ Providers declare where they apply with `providedIn()` / `canProvide()`
 state never leaks between requests in long-running servers (Swoole, CLI
 server). Providers can implement `RequestBootableProviderInterface` /
 `RequestReleasableProviderInterface` (see
-[`src/Core/DI/`](../../src/Core/DI/)) to hook request start and cleanup.
+[`src/Core/DI/`](../../src/Core/DI)) to hook request start and cleanup.
 
 ### Request-scoped service isolation
 
@@ -91,16 +91,16 @@ the application.
 
 ## Applications
 
-Applications live in [`src/Core/Application/`](../../src/Core/Application/).
+Applications live in [`src/Core/Application/`](../../src/Core/Application).
 
 - `WebApplication`: HTTP application. `boot()` registers `AppProvider`, then
   every config section through `registerAllConfigs()`, then the middleware
   list, then `WebProvider`.
-- `ConsoleApplication` ([`src/Core/Console/`](../../src/Core/Console/)):
+- `ConsoleApplication` ([`src/Core/Console/`](../../src/Core/Console)):
   Symfony-based CLI. Registers `AppProvider` and `ConsoleProvider`, loads
   `commands` from config via a container command loader.
 - `MicroApplication`: minimal routed app without the full config pipeline.
-- `WsRootApplication` ([`src/WebSocket/`](../../src/WebSocket/)): WebSocket
+- `WsRootApplication` ([`src/WebSocket/`](../../src/WebSocket)): WebSocket
   application.
 - `AppType` (`WEB`, `CLI_WEB`, `CONSOLE`) and `AppClient` describe the
   runtime; `AppVerbosity` controls debug output.
@@ -125,13 +125,13 @@ host decides file layout. Core's contract:
 - Top-level `middlewares`, `listeners`, and `commands` are read by the
   applications. `factories.*` and `@alias` keys in the runtime config tell the
   entry points how to build the apps and where paths point.
-- Core's providers are in [`src/Core/Provider/`](../../src/Core/Provider/)
+- Core's providers are in [`src/Core/Provider/`](../../src/Core/Provider)
   (App, Web, Request, Router, Session, Security, Logger/Monolog, Mailer, Edge,
   Event, ErrorHandling, Whoops, DateTime, Auth, Console, Runtime).
 
 ## Web request lifecycle
 
-1. The host's `www/index.php` boots `Runtime`, resolves the HTTP server and
+1. The host's `../../../../../www/index.php` boots `Runtime`, resolves the HTTP server and
    `WebApplication`, calls `bootForServer()`, then
    `executeServerEvent()` per request.
 2. `createContext()` creates the level 3 child container, shares the PSR
@@ -146,7 +146,7 @@ host decides file layout. Core's contract:
    Routing events: `BeforeRoutingEvent`, `AfterRoutingEvent`,
    `RoutingNotMatchedEvent`. Route-level middleware
    (`Route::middleware()`) and attribute middleware
-   ([`src/Core/Middleware/`](../../src/Core/Middleware/)) wrap the handler.
+   ([`src/Core/Middleware/`](../../src/Core/Middleware)) wrap the handler.
 5. `ControllerDispatcher::dispatch()` resolves the handler: a callable, a
    `Class::method` string, or a class whose default task is derived from the
    HTTP method (`get` → `index`, `post`/`put`/`patch` → `save`, `delete` →
@@ -169,7 +169,7 @@ host decides file layout. Core's contract:
 Uncaught exceptions are handled in `WebApplication::dispatch()`: validation
 and CSRF failures and non-GET errors redirect back with a flash message
 unless the call is API/JSON or debug mode is on; otherwise they propagate to
-the error handlers in [`src/Core/Error/`](../../src/Core/Error/) (Whoops in
+the error handlers in [`src/Core/Error/`](../../src/Core/Error) (Whoops in
 debug).
 
 ## Console lifecycle
@@ -177,9 +177,9 @@ debug).
 `bin/windwalker.php` boots `Runtime`, resolves `factories.console`, and runs
 it. `ConsoleApplication::boot()` registers providers and commands from the
 `commands` config. Commands are `CommandInterface` classes (Core's own are in
-`src/Core/*/Command/` and [`src/Core/Command/`](../../src/Core/Command/)) and
+`src/Core/*/Command/` and [`src/Core/Command/`](../../src/Core/Command)) and
 are lazily built by the container. Console events are in
-[`src/Core/Events/Console/`](../../src/Core/Events/Console/).
+[`src/Core/Events/Console/`](../../src/Core/Events/Console).
 
 `db:export --compress` and compressed migration backups share
 `DatabaseExportService`. Successful `mysqldump` exports use the system
@@ -260,9 +260,9 @@ Core supplies the contracts; the host supplies the concrete modules.
 
 - Route → handler (controller class, method, or callable) and optional view
   (view model class). Route building is in
-  [`src/Core/Router/`](../../src/Core/Router/) (`RouteCreator`,
+  [`src/Core/Router/`](../../src/Core/Router) (`RouteCreator`,
   `RouteBuilder`, `Route`, `Navigator` for URL generation).
-- Controllers: [`src/Core/Controller/`](../../src/Core/Controller/).
+- Controllers: [`src/Core/Controller/`](../../src/Core/Controller).
   `#[Controller]` and request attributes (`#[Input]`, `#[QueryParam]`,
   `#[BodyValue]`, `#[RouteParam]`, `#[UrlVar]`, `#[Header]`, `#[File]`) and
   `#[Method]`, `#[Json]`, `#[JsonApi]`, `#[Csrf]`, `#[Transaction]`,
@@ -270,7 +270,7 @@ Core supplies the contracts; the host supplies the concrete modules.
   [`etc/attributes.php`](../../etc/attributes.php).
 - View models: `#[ViewModel(layout:, css:, js:, modules:)]` on the class,
   `#[ViewPrepare]` on the prepare method, `#[ViewMetadata]` on metadata
-  methods. See [`src/Core/View/`](../../src/Core/View/).
+  methods. See [`src/Core/View/`](../../src/Core/View).
 - Modules: `#[Module]` + `AbstractModule` group a feature's controller,
   views and config; `ConfigModule` provides module-scoped config.
 - Attribute handlers implement `ContainerAttributeInterface` (see
@@ -293,7 +293,7 @@ Core supplies the contracts; the host supplies the concrete modules.
 
 The `generate` console command (`GenerateCommand` and `SubCommand/*`: view,
 route, controller, model, entity, middleware, ...) scaffolds these classes, and
-its templates live in [`resources/templates/`](../../resources/templates/).
+its templates live in [`resources/templates/`](../../resources/templates).
 
 ### Debug mode and profiler
 
@@ -307,7 +307,7 @@ turn the profiler off (`disableDebugProfiler()`).
 ## Packages (extensions)
 
 An extension implements `AbstractPackage` (`install()`, optional
-`migrate()`), and declares itself in its `composer.json` under
+`migrate()`), and declares itself in its `../../../../../composer.json` under
 `extra.windwalker.packages`. `PackageRegistry::discover()` scans the host's
 `composer.json` and `vendor/composer/installed.json` for those declarations
 and instantiates the packages. `PackageInstaller` / `PackageMigrator` and the
@@ -317,7 +317,7 @@ contract.
 
 ## Capability areas
 
-Directories in [`src/Core/`](../../src/Core/), grouped by concern:
+Directories in [`src/Core/`](../../src/Core), grouped by concern:
 
 - Application & runtime: `Application`, `Runtime`, `Provider`, `DI`,
   `Package`, `Module`, `State`, `Manager`, `Factory`, `Service`
@@ -343,16 +343,16 @@ Events are typed objects dispatched through `CoreEventEmitter` /
 `CoreEventAwareTrait`. The application and `AppContext` both dispatch; listeners
 come from config `listeners` (global and per section) and attributes
 (`EventSubscriber`). When adding a lifecycle hook, add a typed event under
-[`src/Core/Events/`](../../src/Core/Events/) rather than a callback option.
+[`src/Core/Events/`](../../src/Core/Events) rather than a callback option.
 
 ## Tests layout
 
-[`tests/Core/`](../../tests/Core/) mirrors `src/Core/`. Reusable test support
+[`tests/Core/`](../../tests/Core) mirrors `src/Core/`. Reusable test support
 (stubs, traits, the app-backed `AbstractTestApp`) ships under
-[`src/Core/Testing/`](../../src/Core/Testing/) — Core's production autoload —
-so any host app can reuse it from its own tests; `tests/` only keeps
+[`src/Core/Testing/`](../../src/Core/Testing) — Core's production autoload —
+so any host app can reuse it from its own tests; `../../../../../tests` only keeps
 `tests/TestApp.php` as the reference example extending `AbstractTestApp`, and
 the app-aware bootstrap in [`tests/bootstrap.app.php`](../../tests/bootstrap.app.php).
 See [`testing-architecture.md`](testing-architecture.md) for per-layer test
 strategy and
-[`../instructions/test.instructions.md`](../instructions/test.instructions.md).
+[`../instructions`](../instructions/test.instructions.md).
