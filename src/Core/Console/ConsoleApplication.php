@@ -12,8 +12,11 @@ use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Component\Console\Application as SymfonyApp;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
@@ -152,6 +155,11 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
                 // Handle class command
                 if (class_exists($command)) {
                     $container->bind($command, create($command, name: $name));
+
+                    if ($this->addLazyCommand($name, $command, $container)) {
+                        continue;
+                    }
+
                     $commandsMap[$name] = $command;
                     continue;
                 }
@@ -191,6 +199,46 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
                 $commandsMap
             )
         );
+    }
+
+    /**
+     * Register class command as a LazyCommand, so handler won't be created until command is really used.
+     */
+    protected function addLazyCommand(string $name, string $class, Container $container): bool
+    {
+        $attrs = new ReflectionClass($class)->getAttributes(CommandWrapper::class, ReflectionAttribute::IS_INSTANCEOF);
+
+        if ($attrs === []) {
+            return false;
+        }
+
+        /** @var CommandWrapper $meta */
+        $meta = $attrs[0]->newInstance();
+
+        $this->addCommand(
+            new LazyCommand(
+                $name,
+                $meta->getAliases(),
+                $meta->getDescription(),
+                $meta->isHidden(),
+                fn() => $container->get($class),
+                true
+            )
+        );
+
+        return true;
+    }
+
+    /**
+     * Unwrap LazyCommand so only the requested command is created,
+     * and completion / signal / CommandWrapper checks work on the real command.
+     */
+    #[\Override]
+    public function find(string $name): Command
+    {
+        $command = parent::find($name);
+
+        return $command instanceof LazyCommand ? $command->getCommand() : $command;
     }
 
     /**
@@ -334,7 +382,7 @@ class ConsoleApplication extends SymfonyApp implements RootApplicationInterface
         }
 
         /** @var CommandWrapper $runCommandWrapper */
-        $runCommandWrapper = $this->get('run');
+        $runCommandWrapper = $this->find('run');
         /** @var RunCommand $runCommand */
         $runCommand = $runCommandWrapper->getHandler();
         $scripts = array_keys($runCommand->getAvailableScripts());
